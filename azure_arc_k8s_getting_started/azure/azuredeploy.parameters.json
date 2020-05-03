@@ -7,6 +7,9 @@
         },
         "adminPasswordOrKey": {
             "value": "arcdemo123!!"
+        },
+        "dnsLabelPrefix": {
+            "value": "arck3sdemo"
         }
     }
 }
