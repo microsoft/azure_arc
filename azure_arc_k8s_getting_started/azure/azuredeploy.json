@@ -11,6 +11,7 @@
         },
         "adminUsername": {
             "type": "string",
+            "defaultValue": "arcdemo",
             "metadata": {
                 "description": "Username for the Virtual Machine."
             }
