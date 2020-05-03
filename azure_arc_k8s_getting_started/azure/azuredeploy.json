@@ -158,7 +158,7 @@
                         }
                     },
                     {
-                        "name": "Cluster API",
+                        "name": "Cluster-API",
                         "properties": {
                             "priority": 1001,
                             "protocol": "TCP",
