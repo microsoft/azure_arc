@@ -53,7 +53,6 @@
       },
       "adminPasswordOrKey": {
         "type": "securestring",
-        "defaultValue": "arcdemo123!!",
         "metadata": {
           "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
         }
@@ -169,10 +168,10 @@
                   {
                     "name": "Arc-K3s-Demo",
                     "properties": {
-                      "description": "Allow Arc-K3s-Demo Web Access",
+                      "description": "Allow Cluster API",
                       "protocol": "Tcp",
                       "sourcePortRange": "*",
-                      "destinationPortRange": "7396",
+                      "destinationPortRange": "6443",
                       "sourceAddressPrefix": "Internet",
                       "destinationAddressPrefix": "*",
                       "access": "Allow",
