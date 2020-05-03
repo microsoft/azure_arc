@@ -29,6 +29,7 @@
         },
         "adminPasswordOrKey": {
             "type": "securestring",
+            "defaultValue": "arcdemo123!!",
             "metadata": {
                 "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
             }
@@ -59,7 +60,7 @@
         },
         "VmSize": {
             "type": "string",
-            "defaultValue": "Standard_D4_v3",
+            "defaultValue": "Standard_B2s",
             "metadata": {
                 "description": "The size of the VM"
             }
@@ -94,7 +95,7 @@
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
         "linuxConfiguration": {
-            "disablePasswordAuthentication": true,
+            "disablePasswordAuthentication": false,
             "ssh": {
                 "publicKeys": [
                     {
