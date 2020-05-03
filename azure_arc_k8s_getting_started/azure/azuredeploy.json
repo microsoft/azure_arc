@@ -259,7 +259,7 @@
         },
         {
           "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(parameters('vmName'),'/installscript')]",
+          "name": "[concat(parameters('vmName'),'/installscript_k3s')]",
           "apiVersion": "2019-07-01",
           "location": "[parameters('location')]",
           "dependsOn": [
@@ -278,7 +278,7 @@
         },
         {
           "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(parameters('vmName'),'/installscript')]",
+          "name": "[concat(parameters('vmName'),'/installscript_vars')]",
           "apiVersion": "2019-07-01",
           "location": "[parameters('location')]",
           "dependsOn": [
@@ -294,7 +294,7 @@
               "commandToExecute": "sh set_env_vars.sh"
             }
           }
-        }                 
+        }                       
     ],
     "outputs": {
         "adminUsername": {
