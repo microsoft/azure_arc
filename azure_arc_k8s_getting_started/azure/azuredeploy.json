@@ -271,8 +271,8 @@
             "typeHandlerVersion": "2.1",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "fileUris": ["https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_getting_started/azure/wrapper.sh"],  
-              "commandToExecute": "sh wrapper.sh"
+              "fileUris": ["https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_getting_started/azure/install_k3s.sh"],  
+              "commandToExecute": "sh install_k3s.sh"
             }
           }
         }                      
