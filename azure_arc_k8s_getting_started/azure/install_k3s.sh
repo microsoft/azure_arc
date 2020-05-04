@@ -1,4 +1,5 @@
 #!/bin/bash
+exec &> >(tee -a kubeadm_run.log)
 
 sudo apt-get update
 
