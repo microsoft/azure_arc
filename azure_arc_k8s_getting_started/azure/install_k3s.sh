@@ -1,5 +1,4 @@
-#!/bin/sh
-exec &> >(tee -a /tmp/install_k3s.log)
+#!/bin/bash
 
 sudo apt-get update
 
@@ -7,7 +6,8 @@ sudo apt-get update
 curl -sLS https://get.k3sup.dev | sh
 sudo cp k3sup /usr/local/bin/k3sup
 
-k3sup install --local --context arck3sdemo
+mkdir ~/.kube
+sudo k3sup install --local --context arck3sdemo --local-path ~/.kube/config
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 kubectl get nodes
 # mv kubeconfig ~/.kube/config
