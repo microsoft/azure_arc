@@ -12,7 +12,8 @@ sudo cp k3sup /usr/local/bin/k3sup
 
 k3sup install --local --user $USER --context arck3sdemo
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-mkdir ~/.kube
+kubectl get nodes
+# mkdir ~/.kube
 cp kubeconfig ~/.kube/config
 
 # Install Helm 3
