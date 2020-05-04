@@ -2,17 +2,16 @@
 
 sudo apt-get update
 
-sudo mkdir $HOME/.kube
-sudo chown -R $USER $HOME/.kube
+sudo mkdir ~/.kube
+sudo chown -R $USER ~/.kube
 
 # Install Rancer K3s single master cluster 
 curl -sLS https://get.k3sup.dev | sh
 sudo install k3sup /usr/local/bin/
 
-k3sup install --local --user $USER --context arck3sdemo --local-path ~/.kube/config
+k3sup install --local --user $USER --context arck3sdemo
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-# export KUBECONFIG=/home/$USER/.kube/config
-# cp /home/$USER/kubeconfig ~/.kube/config
+cp /home/$USER/kubeconfig ~/.kube/config
 
 # Install Helm 3
 sudo snap install helm --classic
