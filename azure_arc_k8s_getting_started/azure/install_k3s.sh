@@ -1,6 +1,5 @@
 #!/bin/bash
-sudo exec &> >(tee -a /tmp/install_k3s1.log)
-exec &> >(tee -a /tmp/install_k3s2.log)
+exec &> >(tee -a /tmp/install_k3s.log)
 
 sudo apt-get update
 
