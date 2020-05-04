@@ -1,5 +1,5 @@
 #!/bin/bash
-exec &> >(tee -a kubeadm_run.log)
+exec &> >(tee -a install_k3s.log)
 
 sudo apt-get update
 
