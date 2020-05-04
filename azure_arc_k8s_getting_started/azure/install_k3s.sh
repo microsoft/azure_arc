@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 sudo apt-get update
 
@@ -21,9 +21,9 @@ sudo snap install helm --classic
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# Install Azure CLI Arc Extensions
-sudo -u $USER mkdir az_extensions
-curl https://arcgettingstarted.blob.core.windows.net/az-extentions/connectedk8s-0.1.3-py2.py3-none-any.whl --output az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl
-curl https://arcgettingstarted.blob.core.windows.net/az-extentions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --output az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl
-az extension add --source ./az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl --yes
-az extension add --source ./az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
+# # Install Azure CLI Arc Extensions
+# sudo -u $USER mkdir az_extensions
+# curl https://arcgettingstarted.blob.core.windows.net/az-extentions/connectedk8s-0.1.3-py2.py3-none-any.whl --output az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl
+# curl https://arcgettingstarted.blob.core.windows.net/az-extentions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --output az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl
+# az extension add --source ./az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl --yes
+# az extension add --source ./az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
