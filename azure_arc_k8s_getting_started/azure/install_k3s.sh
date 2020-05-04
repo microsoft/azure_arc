@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 exec &> >(tee -a /tmp/install_k3s.log)
 
 sudo apt-get update
