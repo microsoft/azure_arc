@@ -41,6 +41,24 @@
                 "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
             }
         },
+        "appId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN app ID"
+            }
+        },
+        "password": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN password"
+            }
+        },
+        "tenantId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN tenant ID"
+            }
+        },                         
         "ubuntuOSVersion": {
             "type": "string",
             "defaultValue": "18.04-LTS",
@@ -274,7 +292,7 @@
               "timestamp": 987654321
             },
             "protectedSettings": {
-            "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'))]",
+            "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'))]",
             "fileUris": ["https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_getting_started/azure/install_k3s.sh"
             ]  
             }            
