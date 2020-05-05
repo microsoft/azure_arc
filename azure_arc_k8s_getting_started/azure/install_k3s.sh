@@ -1,15 +1,6 @@
 #!/bin/bash
 
-sudo cat <<EOT >> install.sh
-#!/bin/bash
-mkdir lior
 mkdir ~/.kube
-EOT
-
-sudo chmod +x install.sh
-
-./install.sh
-
 
 # sudo apt-get update
 
@@ -17,7 +8,7 @@ sudo chmod +x install.sh
 # curl -sLS https://get.k3sup.dev | sh
 # sudo cp k3sup /usr/local/bin/k3sup
 
-# sudo mkdir ~/.kube
+
 
 # sudo k3sup install --local --context arck3sdemo
 # sudo chmod 644 /etc/rancher/k3s/k3s.yaml
