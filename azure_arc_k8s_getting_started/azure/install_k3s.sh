@@ -10,7 +10,7 @@ sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 ADMINUSER=`awk -F: 'END { print $1}' /etc/passwd`
 sudo -u "$ADMINUSER" mkdir /home/"$ADMINUSER"/.kube
 
-sudo mv /var/lib/waagent/custom-script/download/0/kubeconfig ~/.kube/config ## Need to see if can be changed to just kubeconfig
+sudo cp /var/lib/waagent/custom-script/download/0/kubeconfig ~/.kube/config ## Need to see if can be changed to just kubeconfig
 
 
 # # Install Helm 3
