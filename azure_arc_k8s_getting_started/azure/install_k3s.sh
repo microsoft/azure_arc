@@ -1,18 +1,17 @@
 #!/bin/bash
 
-# sudo mkdir ~/.kube
+sudo apt-get update
 
-# sudo apt-get update
-
-# Install Rancer K3s single master cluster using k3sup
-# curl -sLS https://get.k3sup.dev | sh
-# sudo cp k3sup /usr/local/bin/k3sup
-# sudo k3sup install --local --context arck3sdemo
-# sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-# sudo -u arcdemo mkdir /home/arcdemo/.kube 
-# sudo mv /var/lib/waagent/custom-script/download/0/kubeconfig ~/.kube/config
+Install Rancer K3s single master cluster using k3sup
+curl -sLS https://get.k3sup.dev | sh
+sudo cp k3sup /usr/local/bin/k3sup
+sudo k3sup install --local --context arck3sdemo
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 ADMINUSER=`awk -F: 'END { print $1}' /etc/passwd`
-sudo -u "$ADMINUSER" mkdir /home/"$ADMINUSER"/testing
+sudo -u "$ADMINUSER" mkdir /home/"$ADMINUSER"/.kube
+
+sudo mv /var/lib/waagent/custom-script/download/0/kubeconfig ~/.kube/config ## Need to see if can be changed to just kubeconfig
+
 
 # # Install Helm 3
 # sudo snap install helm --classic
