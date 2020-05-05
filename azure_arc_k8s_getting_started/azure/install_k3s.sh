@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "Something" >> something.txt
 # sudo mkdir ~/.kube
 
 # sudo apt-get update
