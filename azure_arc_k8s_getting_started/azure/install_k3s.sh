@@ -44,4 +44,4 @@ sudo cp k8sconfiguration-0.1.6-py2.py3-none-any.whl /home/${adminUsername}/az_ex
 sudo -u $adminUsername az extension add --source /home/arcdemo/az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl --yes
 sudo -u $adminUsername az extension add --source /home/arcdemo/az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
 
-az login --service-principal --username ${appId} --password ${password} --tenant ${tenantId}
+sudo -u $adminUsername az login --service-principal --username ${appId} --password ${password} --tenant ${tenantId}
