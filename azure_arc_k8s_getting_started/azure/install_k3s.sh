@@ -12,7 +12,7 @@
 # sudo -u arcdemo mkdir /home/arcdemo/.kube 
 # sudo mv /var/lib/waagent/custom-script/download/0/kubeconfig ~/.kube/config
 ADMINUSER=`awk -F: 'END { print $1}' /etc/passwd`
-sudo -u "$ADMINUSER" mkdir /home/"$ADMINUSER"/lior
+sudo -u "$ADMINUSER" mkdir /home/"$ADMINUSER"/testing
 
 # # Install Helm 3
 # sudo snap install helm --classic
