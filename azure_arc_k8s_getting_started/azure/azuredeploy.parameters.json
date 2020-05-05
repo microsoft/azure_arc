@@ -8,9 +8,6 @@
         "adminPasswordOrKey": {
             "value": "arcdemo123!!"
         },
-        "dnsLabelPrefix": {
-            "value": "arck3sdemo"
-        },
         "appId": {
             "value": "40bc3876-dfe9-46fa-8210-7ecf757e127f"
         },
