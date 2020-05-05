@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkdir ~/.kube
+mkdir $HOME/$USER/.kube
 
 # sudo apt-get update
 
