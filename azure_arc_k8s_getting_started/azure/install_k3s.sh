@@ -3,8 +3,8 @@
 sudo apt-get update
 
 # Install Rancer K3s single master cluster using k3sup
-# ADMINUSER=`awk -F: 'END { print $1}' /etc/passwd`
-# sudo -u "$ADMINUSER" mkdir /home/"$ADMINUSER"/.kube
+ADMINUSER=`awk -F: 'END { print $1}' /etc/passwd`
+sudo -u "$ADMINUSER" mkdir /home/"$ADMINUSER"/.kube
 curl -sLS https://get.k3sup.dev | sh
 sudo cp k3sup /usr/local/bin/k3sup
 sudo k3sup install --local --context arck3sdemo
