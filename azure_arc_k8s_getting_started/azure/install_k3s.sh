@@ -1,5 +1,16 @@
 #!/bin/bash
-mkdir "lior"
+
+sudo cat <<EOT >> install.sh
+#!/bin/bash
+mkdir lior
+mkdir ~/.kube
+EOT
+
+sudo chmod +x install.sh
+
+./install.sh
+
+
 # sudo apt-get update
 
 # # Install Rancer K3s single master cluster using k3sup
