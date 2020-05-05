@@ -271,7 +271,7 @@
             "typeHandlerVersion": "2.1",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "timestamp": 1234567811
+              "timestamp": 1234567812
             },
             "protectedSettings": {
             "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'))]",
