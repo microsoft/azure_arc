@@ -19,11 +19,11 @@ sed -i '6s/^/export tenantId=/' vars.sh
 chmod +x vars.sh 
 . ./vars.sh
 
-echo $adminUsername >> test1
-echo $adminPasswordOrKey >> test2
-echo $appId >> test3
-echo $password >> test4
-echo $tenantId >> test5
+# echo $adminUsername >> test1
+# echo $adminPasswordOrKey >> test2
+# echo $appId >> test3
+# echo $password >> test4
+# echo $tenantId >> test5
 
 # sudo -u $SPN_USER mkdir /home/${SPN_USER}/lior
 
@@ -44,14 +44,19 @@ sudo snap install helm --classic
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# curl https://arcgettingstarted.blob.core.windows.net/az-extentions/connectedk8s-0.1.3-py2.py3-none-any.whl --output connectedk8s-0.1.3-py2.py3-none-any.whl
-# curl https://arcgettingstarted.blob.core.windows.net/az-extentions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --output k8sconfiguration-0.1.6-py2.py3-none-any.whl
+curl https://arcgettingstarted.blob.core.windows.net/az-extentions/connectedk8s-0.1.3-py2.py3-none-any.whl --output connectedk8s-0.1.3-py2.py3-none-any.whl
+curl https://arcgettingstarted.blob.core.windows.net/az-extentions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --output k8sconfiguration-0.1.6-py2.py3-none-any.whl
 
-# sudo cat <<EOT >> az_extension.sh
-# #!/bin/bash
-# az extension add --source connectedk8s-0.1.3-py2.py3-none-any.whl --yes
-# az extension add --source k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
-# EOT
+sudo cat <<EOT >> az_extensions.sh
+#!/bin/bash
+az extension add --source ./connectedk8s-0.1.3-py2.py3-none-any.whl --yes
+az extension add --source ./k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
+EOT
 
-# chmod +x az_extension.sh
-# . ./az_extension.sh
+chmod +x az_extensions.sh
+
+. ./az_extensions.sh
+
+sudo cp connectedk8s-0.1.3-py2.py3-none-any.whl /home/${adminUsername}/az_extensions
+sudo cp k8sconfiguration-0.1.6-py2.py3-none-any.whl /home/${adminUsername}/az_extensions
+sudo cp az_extensions.sh /home/${adminUsername}/az_extensions
