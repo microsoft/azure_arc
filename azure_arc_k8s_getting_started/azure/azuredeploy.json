@@ -304,7 +304,7 @@
           "apiVersion": "2019-07-01",
           "location": "[parameters('location')]",
           "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'),'/extensions/installscript_k3s')]" 
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'),'/extensions/installscript_k3s')]" 
           ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
