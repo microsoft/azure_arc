@@ -106,6 +106,7 @@
         }
     },
     "variables": {
+        "vmName": "[concat(parameters('vmName'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
@@ -235,7 +236,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
-            "name": "[parameters('vmName')]",
+            "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
@@ -246,7 +247,7 @@
                 },
                 "storageProfile": {
                     "osDisk": {
-                        "name": "[concat(parameters('vmName'),'-OSDisk')]",
+                        "name": "[concat(variables('vmName'),'-OSDisk')]",
                         "caching": "ReadWrite",
                         "createOption": "fromImage",
                         "managedDisk": {
@@ -268,7 +269,7 @@
                     ]
                 },
                 "osProfile": {
-                    "computerName": "[parameters('vmName')]",
+                    "computerName": "[variables('vmName')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPasswordOrKey')]",
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
@@ -277,11 +278,11 @@
         },
         {
           "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(parameters('vmName'),'/installscript_k3s')]",
+          "name": "[concat(variables('vmName'),'/installscript_k3s')]",
           "apiVersion": "2019-07-01",
           "location": "[parameters('location')]",
           "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
           ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
@@ -300,11 +301,11 @@
         },
         {
           "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(parameters('vmName'),'/installscript_az')]",
+          "name": "[concat(variables('vmName'),'/installscript_az')]",
           "apiVersion": "2019-07-01",
           "location": "[parameters('location')]",
           "dependsOn": [
-            "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'), '/extensions/installscript_k3s')]"
+            "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'), '/extensions/installscript_k3s')]"
           ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
