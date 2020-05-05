@@ -1,16 +1,16 @@
 #!/bin/bash
+mkdir "lior"
+# sudo apt-get update
 
-sudo apt-get update
+# # Install Rancer K3s single master cluster using k3sup
+# curl -sLS https://get.k3sup.dev | sh
+# sudo cp k3sup /usr/local/bin/k3sup
 
-# Install Rancer K3s single master cluster using k3sup
-curl -sLS https://get.k3sup.dev | sh
-sudo cp k3sup /usr/local/bin/k3sup
+# sudo mkdir ~/.kube
 
-sudo mkdir ~/.kube
-mkdir lior
-sudo k3sup install --local --context arck3sdemo --local-path ~/.kube/config
-sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-kubectl get nodes
+# sudo k3sup install --local --context arck3sdemo
+# sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+# kubectl get nodes
 # mv kubeconfig ~/.kube/config
 
 # # Install Helm 3
