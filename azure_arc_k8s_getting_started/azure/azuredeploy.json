@@ -297,7 +297,30 @@
             ]  
             }            
           }
-        }                             
+        },
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(parameters('vmName'),'/installscript_az')]",
+          "apiVersion": "2019-07-01",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'),'/extensions/installscript_k3s')]" 
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.1",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "timestamp": 987654321
+            },
+            "protectedSettings": {
+            "commandToExecute": "[concat('bash install_az_extensions.sh')]",
+            "fileUris": ["https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_getting_started/azure/install_az_extensions.sh"
+            ]  
+            }            
+          }
+        }                                     
     ],
     "outputs": {
         "adminUsername": {
