@@ -1,8 +1,7 @@
 #!/bin/bash
 
-mkdir .kube
-mkdir lior
-
+mkdir ~/.kube
+mkdir ~/test
 # sudo apt-get update
 
 # # Install Rancer K3s single master cluster using k3sup
