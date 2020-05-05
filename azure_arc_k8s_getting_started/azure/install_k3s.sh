@@ -2,6 +2,11 @@
 
 sudo apt-get update
 
+# Testing vars
+
+echo $adminUsername >> vars1.txt
+echo $adminUsername:$1 >> vars2.txt
+
 # Install Rancer K3s single master cluster using k3sup
 ADMINUSER=`awk -F: 'END { print $1}' /etc/passwd`
 sudo -u $ADMINUSER mkdir /home/${ADMINUSER}/.kube
