@@ -1,6 +1,7 @@
 #!/bin/bash
 
 mkdir ~/.kube
+mkdir lior
 
 # sudo apt-get update
 
