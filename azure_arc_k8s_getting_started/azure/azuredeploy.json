@@ -268,9 +268,10 @@
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
             "type": "CustomScript",
-            "typeHandlerVersion": "2.2",
+            "typeHandlerVersion": "2.1",
             "autoUpgradeMinorVersion": true,
             "settings": {
+              "skipDos2Unix":false,
               "fileUris": ["https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_getting_started/azure/install_k3s.sh"],  
               "commandToExecute": "bash install_k3s.sh"
             }
