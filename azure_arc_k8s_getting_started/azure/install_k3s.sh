@@ -9,7 +9,7 @@ curl -sLS https://get.k3sup.dev | sh
 sudo cp k3sup /usr/local/bin/k3sup
 sudo k3sup install --local --context arck3sdemo
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo cp kubeconfig ~/.kube/config
+sudo cp kubeconfig /home/\$ADMINUSER/.kube/config
 
 # # Install Helm 3
 # sudo snap install helm --classic
