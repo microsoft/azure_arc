@@ -9,9 +9,9 @@
 # sudo cp k3sup /usr/local/bin/k3sup
 # sudo k3sup install --local --context arck3sdemo
 # sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo -u arcdemo mkdir /home/arcdemo/.kube
+# sudo -u arcdemo mkdir /home/arcdemo/.kube 
 # sudo mv /var/lib/waagent/custom-script/download/0/kubeconfig ~/.kube/config
-
+sudo -u $adminUsername mkdir /home/$adminUsername/lior
 
 # # Install Helm 3
 # sudo snap install helm --classic
