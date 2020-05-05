@@ -4,9 +4,19 @@ sudo apt-get update
 
 # Testing vars
 
-echo $adminUsername:$1 >> vars1.txt
-echo $adminPasswordOrKey:$2 >> vars2.txt
-sudo -u $adminUsername:$1 mkdir /home/${adminPasswordOrKey:$2}/lior
+echo '#!/bin/bash' >> vars.sh
+echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
+echo $adminPasswordOrKey:$1 | awk '{print substr($1,2); }' >> vars.sh
+sed -i '2s/^/export SPN_USER=/' vars.sh
+sed -i '3s/^/export SPN_PASSWORD=/' vars.sh
+
+chmod +x vars.sh 
+. ./vars.sh
+
+echo $SPN_USER >> test1
+echo $SPN_PASSWORD >> test2
+
+sudo -u $SPN_USER mkdir /home/${SPN_USER}/lior
 
 # Install Rancer K3s single master cluster using k3sup
 ADMINUSER=`awk -F: 'END { print $1}' /etc/passwd`
@@ -34,4 +44,4 @@ az extension add --source k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
 EOT
 
 sudo chmod +x az_extension.sh
-./az_extension.sh
+. ./az_extension.sh
