@@ -47,16 +47,18 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 curl https://arcgettingstarted.blob.core.windows.net/az-extentions/connectedk8s-0.1.3-py2.py3-none-any.whl --output connectedk8s-0.1.3-py2.py3-none-any.whl
 curl https://arcgettingstarted.blob.core.windows.net/az-extentions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --output k8sconfiguration-0.1.6-py2.py3-none-any.whl
 
-sudo cat <<EOT >> az_extensions.sh
-#!/bin/bash
-az extension add --source ./connectedk8s-0.1.3-py2.py3-none-any.whl --yes
-az extension add --source ./k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
-EOT
+# sudo cat <<EOT >> az_extensions.sh
+# #!/bin/bash
+# az extension add --source ./connectedk8s-0.1.3-py2.py3-none-any.whl --yes
+# az extension add --source ./k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
+# EOT
 
-chmod +x az_extensions.sh
+# chmod +x az_extensions.sh
 
-. ./az_extensions.sh
-
+# . ./az_extensions.sh
+sudo -u $adminUsername mkdir /home/${adminUsername}/az_extensions
 sudo cp connectedk8s-0.1.3-py2.py3-none-any.whl /home/${adminUsername}/az_extensions
 sudo cp k8sconfiguration-0.1.6-py2.py3-none-any.whl /home/${adminUsername}/az_extensions
-sudo cp az_extensions.sh /home/${adminUsername}/az_extensions
+
+sudo -u $adminUsername az extension add --source /home/arcdemo/az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl --yes
+sudo -u $adminUsername az extension add --source /home/arcdemo/az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
