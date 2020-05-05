@@ -272,11 +272,10 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "skipDos2Unix":false,
-              "timestamp":768
+              "timestamp":769
             },
             "protectedSettings": {
-                "commandToExecute": "[concat('curl -s \"https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_getting_started/azure/install_k3s.sh\" -o',' ', '/home/',parameters('adminUsername'),'/...')]"
-                
+                "commandToExecute": "[concat('curl -k https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_getting_started/azure/install_k3s.sh\" -o install_k3s.sh',' ', '/home/',parameters('adminUsername'),'/...')]"                
             }                       
           }
         }                      
