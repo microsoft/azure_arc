@@ -1,0 +1,4 @@
+.DS_Store
+.vscode
+azure_arc_k8s_getting_started/backup
+azure_arc_k8s_getting_started/terraform/secrets.tf
