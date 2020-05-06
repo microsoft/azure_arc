@@ -297,7 +297,7 @@
         },
         "sshCommand": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))).IpAddress]" 
+            "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(variables('publicIPAddressName')).IpAddress)]"
         }
     }
 }
