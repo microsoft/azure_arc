@@ -297,7 +297,7 @@
         },
         "sshCommand": {
             "type": "string",
-            "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(variables('publicIPAddressName')))]"
+            "value": "[concat('ssh ', parameters('adminUsername'), '@', variables('publicIPAddressName'))]"
         }
     }
 }
