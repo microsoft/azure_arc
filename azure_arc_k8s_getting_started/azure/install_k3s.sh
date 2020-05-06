@@ -26,7 +26,7 @@ sudo cp k3sup /usr/local/bin/k3sup
 sudo k3sup install --local --context arck3sdemo
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo cp kubeconfig /home/${adminUsername}/.kube/config
-chown -R arcdemo /home/arcdemo/.kube/
+chown -R $adminUsername /home/${adminUsername}/.kube/
 
 # Install Helm 3
 sudo snap install helm --classic
