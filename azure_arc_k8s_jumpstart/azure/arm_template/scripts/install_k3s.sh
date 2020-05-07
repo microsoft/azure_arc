@@ -79,3 +79,5 @@ spec:
         ports:
         - containerPort: 8080
 EOT
+
+sudo cp hello-kubernetes.yaml /home/${adminUsername}/
