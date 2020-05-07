@@ -47,13 +47,13 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
 
-![](../img/azure_terraform/01.png)
+    ![](../img/azure_terraform/01.png)
 
 * Run the ```terraform apply --auto-approve``` command and wait for the plan to finish.
 
-![](../img/azure_terraform/02.png)   
+    ![](../img/azure_terraform/02.png)   
 
-![](../img/azure_terraform/03.png)
+    ![](../img/azure_terraform/03.png)
 
 # Connecting to Azure Arc
 
@@ -61,11 +61,11 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * SSH to the VM using the created Azure Public IP and your username/password.
 
-![](../img/azure_terraform/04.png)
+    ![](../img/azure_terraform/04.png)
 
 * Check the cluster is up and running using the ```kubectl get nodes -o wide```
 
-![](../img/azure_terraform/05.png)
+    ![](../img/azure_terraform/05.png)
 
 * Using the Azure Service Principle you've created, run the below command to connect the cluster to Azure Arc.
 
@@ -75,11 +75,11 @@ The only thing you need to do before executing the Terraform plan is to export t
 
     ```az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo --onboarding-spn-id 40bc3876-dfe9-46fa-8210-7ecf757e127f --onboarding-spn-secret e15fa6e6-f453-42e9-b024-746f1379ce59```
 
-![](../img/azure_terraform/06.png)   
+    ![](../img/azure_terraform/06.png)   
 
-![](../img/azure_terraform/07.png)
+    ![](../img/azure_terraform/07.png)
 
-![](../img/azure_terraform/08.png)
+    ![](../img/azure_terraform/08.png)
 
 # K3s External Access
 
@@ -109,11 +109,8 @@ The most straightforward to delete the cluster is via the Azure Portal, just sel
 
 ![](../img/azure_terraform/15.png)
 
-
-If you want to nuke the entire environment, just delete the Azure Resource Group. 
+If you want to nuke the entire environment, just delete the Azure Resource Group or alternatively, you can use the ```terraform destroy --auto-approve``` command.
 
 ![](../img/azure_terraform/16.png)
-
-Alternatively, you can use the ```terraform destroy --auto-approve``` command.
 
 ![](../img/azure_terraform/17.png)
