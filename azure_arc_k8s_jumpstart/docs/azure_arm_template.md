@@ -81,11 +81,11 @@ For example:
 
 * SSH to the VM using the created Azure Public IP and your username/password.
 
-![](../img/azure_arm_template/02.png)
+  ![](../img/azure_arm_template/02.png)
 
 * Check the cluster is up and running using the ```kubectl get nodes -o wide```
 
-![](../img/azure_arm_template/03.png)
+  ![](../img/azure_arm_template/03.png)
 
 * Using the Azure Service Principle you've created, run the below command to connect the cluster to Azure Arc.
 
@@ -95,18 +95,40 @@ For example:
 
     ```az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo --onboarding-spn-id 40bc3876-dfe9-46fa-8210-7ecf757e127f --onboarding-spn-secret e15fa6e6-f453-42e9-b024-746f1379ce59```
 
-![](../img/azure_arm_template/04.png)
+  ![](../img/azure_arm_template/04.png)
 
-![](../img/azure_arm_template/05.png)
+  ![](../img/azure_arm_template/05.png)
 
-![](../img/azure_arm_template/06.png)
+  ![](../img/azure_arm_template/06.png)
+
+# K3s External Access
+
+Traefik is the (default) ingress controller for k3s and uses port 80. To test external access to k3s cluster, an "*hello-world*" deployment was for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes). 
+
+* Since port 80 is taken by Traefik [(read more about here)](https://github.com/rancher/k3s/issues/436), the deployment LoadBalancer was changed to use port 32323 along side with the matching Azure Network Security Group (NSG). 
+
+  ![](../img/azure_arm_template/07.png)
+
+  ![](../img/azure_arm_template/08.png)
+
+  To deploy it, use the ```kubectl apply -f hello-kubernetes.yaml``` command. Run ```kubectl get pods``` and ```kubectl get svc``` to check that the pods and the service has been created. 
+
+  ![](../img/azure_arm_template/09.png)
+
+  ![](../img/azure_arm_template/10.png)
+
+  ![](../img/azure_arm_template/11.png)
+
+* In your browser, enter the *cluster_public_ip:3232* which will bring up the *hello-world* application.
+
+  ![](../img/azure_arm_template/12.png)
 
 # Delete the deployment
 
 The most straightforward to delete the cluster is via the Azure Portal, just select cluster and delete it. 
 
-![](../img/azure_arm_template/03.png)
+![](../img/azure_arm_template/13.png)
 
 If you want to nuke the entire environment, just delete the Azure Resource Group. 
 
-![](../img/azure_arm_template/04.png)
+![](../img/azure_arm_template/14.png)
