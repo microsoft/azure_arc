@@ -44,3 +44,38 @@ sudo -u $adminUsername az extension add --source /home/arcdemo/az_extensions/con
 sudo -u $adminUsername az extension add --source /home/arcdemo/az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
 
 sudo -u $adminUsername az login --service-principal --username ${appId} --password ${password} --tenant ${tenantId}
+
+sudo cat <<EOT >> hello-kubernetes.yaml
+# hello-kubernetes.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-kubernetes
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 32323
+    targetPort: 8080
+  selector:
+    app: hello-kubernetes
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-kubernetes
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hello-kubernetes
+  template:
+    metadata:
+      labels:
+        app: hello-kubernetes
+    spec:
+      containers:
+      - name: hello-kubernetes
+        image: paulbouwer/hello-kubernetes:1.8
+        ports:
+        - containerPort: 8080
+EOT

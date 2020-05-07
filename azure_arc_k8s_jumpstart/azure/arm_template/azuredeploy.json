@@ -157,9 +157,9 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "SSH",
+                        "name": "allow_SSH",
                         "properties": {
-                            "priority": 1000,
+                            "priority": 1001,
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
@@ -170,9 +170,9 @@
                         }
                     },
                     {
-                        "name": "Cluster-API",
+                        "name": "allow_k8s_6443",
                         "properties": {
-                            "priority": 1001,
+                            "priority": 1002,
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
@@ -181,7 +181,72 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "6443"
                         }
-                    }                    
+                    },
+                    {
+                        "name": "allow_k8s_80",
+                        "properties": {
+                            "priority": 1003,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_8080",
+                        "properties": {
+                            "priority": 1004,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "8080"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_443",
+                        "properties": {
+                            "priority": 1005,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "443"
+                        }
+                    }, 
+                    {
+                        "name": "allow_k8s_kubelet",
+                        "properties": {
+                            "priority": 1006,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "10250"
+                        }
+                    },
+                    {
+                        "name": "allow_traefik_lb_external",
+                        "properties": {
+                            "priority": 1007,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "32323"
+                        }
+                    }                                                                                                                       
                 ]
             }
         },
@@ -284,7 +349,7 @@
             },
             "protectedSettings": {
             "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'))]",
-            "fileUris": ["https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_getting_started/azure/install_k3s.sh"
+            "fileUris": ["https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_jumpstart/azure/arm_template/scripts/install_k3s.sh" 
             ]  
             }            
           }
