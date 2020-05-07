@@ -17,15 +17,15 @@ To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Princ
 
 Output should look like this:
 
-```
-{
-  "appId": "aedfb806-53fc-4dff-8d7c-67f4526ac661",
-  "displayName": "AzureArcK8s",
-  "name": "http://AzureArcK8s",
-  "password": "b5453b1a-d066-4fba-90dd-ebd89ab2338e",
-  "tenant": "72f988bf-86f1-41af-91ab-2d7cd011db47"
-}
-```
+    ```
+    {
+    "appId": "aedXXXXXXXXXXXXXXXXXXac661",
+    "displayName": "AzureArcK8s",
+    "name": "http://AzureArcK8s",
+    "password": "b54XXXXXXXXXXXXXXXXXb2338e",
+    "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
+    }
+    ```
 
 **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
@@ -81,7 +81,11 @@ For example:
 
 * SSH to the VM using the created Azure Public IP and your username/password.
 
-![]()
+![](../img/azure_arm_template/02.png)
+
+* Check the cluster is up and running using the ```kubectl get nodes -o wide```
+
+![](../img/azure_arm_template/03.png)
 
 * Using the Azure Service Principle you've created, run the below command to connect the cluster to Azure Arc.
 
@@ -91,9 +95,11 @@ For example:
 
     ```az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo --onboarding-spn-id 40bc3876-dfe9-46fa-8210-7ecf757e127f --onboarding-spn-secret e15fa6e6-f453-42e9-b024-746f1379ce59```
 
-<Command output PIC>
+![](../img/azure_arm_template/04.png)
 
-<Arc in Azure PIC>
+![](../img/azure_arm_template/05.png)
+
+![](../img/azure_arm_template/06.png)
 
 # Delete the deployment
 
