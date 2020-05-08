@@ -12,7 +12,7 @@ The following README will guide you on how to use the provided Terraform plan to
 
 * To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
-    ```az login``
+    ```az login```
 
     ```az ad sp create-for-rbac -n "http://AzureArc" --role contributor```
 
