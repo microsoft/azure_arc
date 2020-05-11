@@ -18,6 +18,13 @@ The following guides will walk you how to demo and started with Azure Arc. They 
 
 ## Azure Arc for Servers
 
+
+### In planning:
+
+* Deploy a single GCP VM and connect it to Azure Arc using Terraform
+
+* Deploy a single AWS EC2 instance and connect it to Azure Arc using Terraform
+
 ## Azure Arc for Kubernetes
 
 The below deployment options are focusing on Azure Arc for Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with it. 
