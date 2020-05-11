@@ -15,9 +15,9 @@ sed -i '4s/^/export appId=/' vars.sh
 sed -i '5s/^/export password=/' vars.sh
 sed -i '6s/^/export tenantId=/' vars.sh
 
-publicIp=$(curl icanhazip.com)
-echo $publicIp:$6 | awk '{print substr($1,2); }' >> vars.sh
-sed -i '7s/^/export publicIp=/' vars.sh
+# publicIp=$(curl icanhazip.com)
+# # echo $publicIp:$6 | awk '{print substr($1,2); }' >> vars.sh
+# # sed -i '7s/^/export publicIp=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
