@@ -89,11 +89,11 @@ For example:
 
 * Using the Azure Service Principle you've created, run the below command to connect the cluster to Azure Arc.
 
-    ```az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure Resource Group Name> --onboarding-spn-id 40bc3876-dfe9-46fa-8210-7ecf757e127f --onboarding-spn-secret e15fa6e6-f453-42e9-b024-746f1379ce59```
+    ```az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure Resource Group Name>```
 
     For example:
 
-    ```az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo --onboarding-spn-id 40bc3876-dfe9-46fa-8210-7ecf757e127f --onboarding-spn-secret e15fa6e6-f453-42e9-b024-746f1379ce59```
+    ```az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo```
 
   ![](../img/azure_arm_template/04.png)
 

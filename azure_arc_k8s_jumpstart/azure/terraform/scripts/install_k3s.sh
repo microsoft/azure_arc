@@ -19,13 +19,10 @@ sudo snap install helm --classic
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-sudo mkdir az_extensions
-sudo curl https://arcgettingstarted.blob.core.windows.net/az-extentions/connectedk8s-0.1.3-py2.py3-none-any.whl --output az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl
-sudo curl https://arcgettingstarted.blob.core.windows.net/az-extentions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --output az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl
-sudo az extension add --source ./az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl --yes
-sudo az extension add --source ./az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
+sudo -u $adminUsername az extension add --name connectedk8s
+sudo -u $adminUsername az extension add --name k8sconfiguration
 
-sudo az login --service-principal --username $appId --password $password --tenant $tenantId
+sudo -u $adminUsername az login --service-principal --username ${appId} --password ${password} --tenant ${tenantId}
 
 sudo cat <<EOT >> az.sh
 #!/bin/sh

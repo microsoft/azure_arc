@@ -15,15 +15,6 @@ sed -i '4s/^/export appId=/' vars.sh
 sed -i '5s/^/export password=/' vars.sh
 sed -i '6s/^/export tenantId=/' vars.sh
 
-# echo '#!/bin/bash' >> test_vars.sh
-# echo $adminUsername:$1 | awk '{print substr($1,2); }' >> test_vars.sh
-# echo $adminPasswordOrKey:$2 | awk '{print substr($1,2); }' >> test_vars.sh
-# sed -i '2s/^/export adminUsername=/' test_vars.sh
-# sed -i '3s/^/export adminPasswordOrKey=/' test_vars.sh
-
-# echo $publicIp:$3 | awk '{print substr($1,2); }' >> test_vars.sh
-# sed -i '4s/^/export publicIp=/' test_vars.sh
-
 chmod +x vars.sh 
 . ./vars.sh
 
@@ -45,20 +36,12 @@ sudo snap install helm --classic
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# curl https://arcgettingstarted.blob.core.windows.net/az-extentions/connectedk8s-0.1.3-py2.py3-none-any.whl --output connectedk8s-0.1.3-py2.py3-none-any.whl
-# curl https://arcgettingstarted.blob.core.windows.net/az-extentions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --output k8sconfiguration-0.1.6-py2.py3-none-any.whl
-
-# sudo -u $adminUsername mkdir /home/${adminUsername}/az_extensions
-# # sudo cp connectedk8s-0.1.3-py2.py3-none-any.whl /home/${adminUsername}/az_extensions
-# sudo cp k8sconfiguration-0.1.6-py2.py3-none-any.whl /home/${adminUsername}/az_extensions
-# sudo -u $adminUsername az extension add --source /home/arcdemo/az_extensions/connectedk8s-0.1.3-py2.py3-none-any.whl --yes
-# sudo -u $adminUsername az extension add --source /home/arcdemo/az_extensions/k8sconfiguration-0.1.6-py2.py3-none-any.whl --yes
-
 sudo -u $adminUsername az extension add --name connectedk8s
 sudo -u $adminUsername az extension add --name k8sconfiguration
 
 sudo -u $adminUsername az login --service-principal --username ${appId} --password ${password} --tenant ${tenantId}
 
+# Creating "hello-world" Kubernetes yaml
 sudo cat <<EOT >> hello-kubernetes.yaml
 # hello-kubernetes.yaml
 apiVersion: v1

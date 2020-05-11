@@ -216,7 +216,6 @@ resource "azurerm_linux_virtual_machine" "arck3sdemo" {
     user = var.admin_username
     password = var.admin_password
     timeout = "2m"
-    
     }
   }  
 }
