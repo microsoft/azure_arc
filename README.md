@@ -2,7 +2,9 @@
 
 For customers who want to simplify complex and distributed environments across on-premises, edge and multicloud, Azure Arc enables deployment of Azure services anywhere and extends Azure management to any infrastructure.
 
-![](azure_arc_k8s_jumpstart/img/Azure_Arc.png)
+<p align="center"> 
+<img src="azure_arc_k8s_jumpstart/img/Azure_Arc.png?style=centerme">
+</p>
 
 * **Organize and govern across environments** - Get databases, Kubernetes clusters, and servers sprawling across on-premises, edge and multicloud environments under control by centrally organizing and governing from a single place.
 
