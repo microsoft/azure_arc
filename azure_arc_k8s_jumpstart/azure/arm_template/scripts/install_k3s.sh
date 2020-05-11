@@ -15,14 +15,14 @@ sed -i '4s/^/export appId=/' vars.sh
 sed -i '5s/^/export password=/' vars.sh
 sed -i '6s/^/export tenantId=/' vars.sh
 
-echo '#!/bin/bash' >> test_vars.sh
-echo $adminUsername:$1 | awk '{print substr($1,2); }' >> test_vars.sh
-echo $adminPasswordOrKey:$2 | awk '{print substr($1,2); }' >> test_vars.sh
-sed -i '2s/^/export adminUsername=/' test_vars.sh
-sed -i '3s/^/export adminPasswordOrKey=/' test_vars.sh
+# echo '#!/bin/bash' >> test_vars.sh
+# echo $adminUsername:$1 | awk '{print substr($1,2); }' >> test_vars.sh
+# echo $adminPasswordOrKey:$2 | awk '{print substr($1,2); }' >> test_vars.sh
+# sed -i '2s/^/export adminUsername=/' test_vars.sh
+# sed -i '3s/^/export adminPasswordOrKey=/' test_vars.sh
 publicIp=$(curl icanhazip.com)
-echo $publicIp:$3 | awk '{print substr($1,2); }' >> test_vars.sh
-sed -i '4s/^/export publicIp=/' test_vars.sh
+# echo $publicIp:$3 | awk '{print substr($1,2); }' >> test_vars.sh
+# sed -i '4s/^/export publicIp=/' test_vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
