@@ -24,8 +24,8 @@ The goal is for you to have a working Azure Arc demo environment spined-up in no
 
 The below deployment options are focusing on Azure Arc for Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with it. 
 
-* [Deploy Rancher k3s using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
+* [Deploy Rancher k3s on an Azure VM using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
 
-* [Deploy Rancher k3s using Terraform](azure_arc_k8s_jumpstart/docs/azure_terraform.md)
+* [Deploy Rancher k3s on an Azure VM using Terraform](azure_arc_k8s_jumpstart/docs/azure_terraform.md)
 
 ## Azure Arc for Data Services
