@@ -7,7 +7,7 @@ echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
 echo $adminPasswordOrKey:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $appId:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $password:$4 | awk '{print substr($1,2); }'| awk '{print substr($1,2); }'
+echo $password:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $tenantId:$5 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export adminPasswordOrKey=/' vars.sh
@@ -20,12 +20,14 @@ sed -i '6s/^/export tenantId=/' vars.sh
 # echo $adminPasswordOrKey:$2 | awk '{print substr($1,2); }' >> test_vars.sh
 # sed -i '2s/^/export adminUsername=/' test_vars.sh
 # sed -i '3s/^/export adminPasswordOrKey=/' test_vars.sh
-publicIp=$(curl icanhazip.com)
+
 # echo $publicIp:$3 | awk '{print substr($1,2); }' >> test_vars.sh
 # sed -i '4s/^/export publicIp=/' test_vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
+
+publicIp=$(curl icanhazip.com)
 
 # Installing Rancer K3s single master cluster using k3sup
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
