@@ -18,15 +18,15 @@ The following README will guide you on how to use the provided [Terraform](https
 
 Output should look like this:
 
-    {
-    "appId": "aedXXXXXXXXXXXXXXXXXXac661",
-    "displayName": "AzureArcK8s",
-    "name": "http://AzureArcK8s",
-    "password": "b54XXXXXXXXXXXXXXXXXb2338e",
-    "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
-    }
+        {
+        "appId": "aedXXXXXXXXXXXXXXXXXXac661",
+        "displayName": "AzureArcK8s",
+        "name": "http://AzureArcK8s",
+        "password": "b54XXXXXXXXXXXXXXXXXb2338e",
+        "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
+        }
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+**Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 * The Terraform plan execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the ***scripts/vars.sh*** to match the Azure Service Principle you've just created. 
 
