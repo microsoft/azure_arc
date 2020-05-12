@@ -1,5 +1,6 @@
 #!/bin/bash
 
+do-release-upgrade
 apt-get update
 
 # Injecting environment variables
@@ -17,7 +18,7 @@ az group create --location $location --name $resourceGroup --subscription $subsc
 
 cat <<EOT >> delete_rg.sh
 #!/bin/sh
-az group delete --name $resourceGroup --yes
+az group delete --name $resourceGroup --subscription $subscriptionId --yes
 EOT
 chmod +x delete_rg.sh
 
