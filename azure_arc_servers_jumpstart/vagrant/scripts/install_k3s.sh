@@ -3,7 +3,7 @@
 apt-get update
 
 # Injecting environment variables
-curl https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_servers_jumpstart/vagrant/scripts/vars.sh -o /tmp/vars.sh
+curl https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_servers_jumpstart/vagrant/scripts/vars.sh --output /tmp/vars.sh
 # source /tmp/vars.sh
 # publicIp=$(curl icanhazip.com)
 
