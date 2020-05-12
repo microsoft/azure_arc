@@ -16,9 +16,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ```az ad sp create-for-rbac -n "http://AzureArc" --role contributor```
 
-    Output should look like this:
+Output should look like this:
 
-        {
+    {
     "appId": "aedXXXXXXXXXXXXXXXXXXac661",
     "displayName": "AzureArcK8s",
     "name": "http://AzureArcK8s",
