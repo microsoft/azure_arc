@@ -13,16 +13,16 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
-sudo cat <<EOT >> az.sh
-#!/bin/sh
-sudo chown -R $USER /home/${USER}/.azure/config
-sudo chown -R $USER /home/${USER}/.azure
-sudo chmod -R 777 /home/${USER}/.azure/config
-sudo chmod -R 777 /home/${USER}/.azure
-EOT
-sudo chmod +x az.sh
-. ./az.sh
-sudo rm az.sh
+# sudo cat <<EOT >> az.sh
+# #!/bin/sh
+# sudo chown -R $USER /home/${USER}/.azure/config
+# sudo chown -R $USER /home/${USER}/.azure
+# sudo chmod -R 777 /home/${USER}/.azure/config
+# sudo chmod -R 777 /home/${USER}/.azure
+# EOT
+# sudo chmod +x az.sh
+# . ./az.sh
+# sudo rm az.sh
 
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
