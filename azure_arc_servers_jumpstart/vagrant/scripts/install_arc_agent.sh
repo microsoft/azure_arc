@@ -17,4 +17,15 @@ az login --service-principal --username $appId --password $password --tenant $te
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
 # Download the installation package
-sudo wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
+
+sudo cat <<EOT >> arc.sh
+#!/bin/sh
+# Download the installation package
+wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
+# Install the hybrid agent
+bash ~/install_linux_azcmagent.sh
+EOT
+
+sudo chmod +x arc.sh
+. ./arc.sh
+sudo rm arc.sh
