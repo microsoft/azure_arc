@@ -41,9 +41,9 @@ chmod +x arc.sh
 
 # Run connect command
 azcmagent connect \
-  --service-principal-id "{appId}" \
-  --service-principal-secret "{password}" \
-  --resource-group "{resourceGroup}" \
-  --tenant-id "{tenantId}" \
-  --location "{location}" \
-  --subscription-id "{subscriptionId}"
+  --service-principal-id "${appId}" \
+  --service-principal-secret "${password}" \
+  --resource-group "${resourceGroup}" \
+  --tenant-id "${tenantId}" \
+  --location "${location}" \
+  --subscription-id "${subscriptionId}"
