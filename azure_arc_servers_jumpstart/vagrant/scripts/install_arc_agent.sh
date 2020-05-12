@@ -17,8 +17,8 @@ az group create --location $location --name $resourceGroup --subscription $subsc
 # Download the installation package
 curl https://aka.ms/azcmagent --output /tmp/install_linux_azcmagent.sh
 
-# # Install the hybrid agent
-# . ./tmp/install_linux_azcmagent.sh
+# Install the hybrid agent
+. ./tmp/install_linux_azcmagent.sh
 
 # Run connect command
 # azcmagent connect --resource-group "Arc-Dev" --tenant-id "72f988bf-86f1-41af-91ab-2d7cd011db47" --location "eastus" --subscription-id "e73c1dbe-2574-4f38-9e8f-c813757b1786"
