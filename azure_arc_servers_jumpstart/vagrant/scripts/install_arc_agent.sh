@@ -9,7 +9,7 @@ apt-get update
 source /tmp/vars.sh
 
 
-# Installing Azure CLI & Azure Arc Extensions
+# Installing Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 az login --service-principal --username $appId --password $password --tenant $tenantId
@@ -22,10 +22,13 @@ sudo cat <<EOT >> arc.sh
 #!/bin/sh
 # Download the installation package
 wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
+
 # Install the hybrid agent
 bash ~/install_linux_azcmagent.sh
 EOT
 
 sudo chmod +x arc.sh
 . ./arc.sh
-sudo rm arc.sh
+
+# Run connect command
+azcmagent connect --resource-group $resourceGroup --tenant-id $tenantId --location $location --subscription-id $subscriptionId
