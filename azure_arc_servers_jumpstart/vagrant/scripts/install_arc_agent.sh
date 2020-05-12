@@ -13,7 +13,7 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
 # Download the installation package
-wget https://aka.ms/azcmagent -O /tmp/install_linux_azcmagent.sh
+curl https://aka.ms/azcmagent --output /tmp/install_linux_azcmagent.sh
 
 # Install the hybrid agent
 . ./tmp/install_linux_azcmagent.sh
