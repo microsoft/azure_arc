@@ -1,7 +1,7 @@
 #!/bin/bash
 
 apt-get update
-
+apt-get upgrde -y
 
 # Injecting environment variables
 # curl https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_servers_jumpstart/vagrant/scripts/vars.sh --output /tmp/vars.sh
@@ -33,11 +33,11 @@ chmod +x arc.sh
 # Run connect command
 # azcmagent connect --resource-group $resourceGroup --tenant-id $tenantId --location $location --subscription-id $subscriptionId
 
-# Run connect command
-azcmagent connect \
-  --service-principal-id "{appId}" \
-  --service-principal-secret "{password}" \
-  --resource-group "{resourceGroup}" \
-  --tenant-id "{tenantId}" \
-  --location "{location}" \
-  --subscription-id "{subscriptionId}"
+# # Run connect command
+# azcmagent connect \
+#   --service-principal-id "{appId}" \
+#   --service-principal-secret "{password}" \
+#   --resource-group "{resourceGroup}" \
+#   --tenant-id "{tenantId}" \
+#   --location "{location}" \
+#   --subscription-id "{subscriptionId}"
