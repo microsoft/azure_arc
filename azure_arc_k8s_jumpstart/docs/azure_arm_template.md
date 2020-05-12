@@ -17,15 +17,13 @@ To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Princ
 
 Output should look like this:
 
-```
-    {
-    "appId": "aedXXXXXXXXXXXXXXXXXXac661",
-    "displayName": "AzureArcK8s",
-    "name": "http://AzureArcK8s",
-    "password": "b54XXXXXXXXXXXXXXXXXb2338e",
-    "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
-    }
-```
+      {
+      "appId": "aedXXXXXXXXXXXXXXXXXXac661",
+      "displayName": "AzureArcK8s",
+      "name": "http://AzureArcK8s",
+      "password": "b54XXXXXXXXXXXXXXXXXb2338e",
+      "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
+      }
 
 **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
