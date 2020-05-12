@@ -18,7 +18,7 @@ az group create --location $location --name $resourceGroup --subscription $subsc
 
 # Download the installation package
 
-sudo cat <<EOT >> arc.sh
+cat <<EOT >> arc.sh
 #!/bin/sh
 # Download the installation package
 wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
@@ -27,7 +27,7 @@ wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
 bash ~/install_linux_azcmagent.sh
 EOT
 
-sudo chmod +x arc.sh
+chmod +x arc.sh
 . ./arc.sh
 
 # Run connect command
