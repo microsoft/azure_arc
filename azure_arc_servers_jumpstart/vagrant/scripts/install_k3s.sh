@@ -4,15 +4,15 @@ apt-get update
 
 # Injecting environment variables
 curl https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_servers_jumpstart/vagrant/scripts/vars.sh --output /tmp/vars.sh
-# source /tmp/vars.sh
-# publicIp=$(curl icanhazip.com)
+source /tmp/vars.sh
+publicIp=$(curl icanhazip.com)
 
-# # Installing Rancer K3s single master cluster using k3sup
-# mkdir ~/.kube
-# curl -sLS https://get.k3sup.dev | sh
-# cp k3sup /usr/local/bin/k3sup
-# k3sup install --local --context arck3sdemo --ip $publicIp --local-path ~/.kube/config
-# chmod 644 /etc/rancher/k3s/k3s.yaml
+# Installing Rancer K3s single master cluster using k3sup
+mkdir ~/.kube
+curl -sLS https://get.k3sup.dev | sh
+cp k3sup /usr/local/bin/k3sup
+k3sup install --local --context arck3sdemo --ip $publicIp --local-path ~/.kube/config
+chmod 644 /etc/rancher/k3s/k3s.yaml
 
 # # Installing Helm 3
 # sudo snap install helm --classic
