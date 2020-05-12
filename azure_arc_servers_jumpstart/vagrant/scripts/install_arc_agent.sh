@@ -16,6 +16,12 @@ az login --service-principal --username $appId --password $password --tenant $te
 
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
+cat <<EOT >> delete_rg.sh
+#!/bin/sh
+az group delete --name $resourceGroup --yes
+EOT
+chmod +x delete_rg.sh
+
 # Download the installation package
 
 cat <<EOT >> arc.sh
@@ -33,11 +39,11 @@ chmod +x arc.sh
 # Run connect command
 # azcmagent connect --resource-group $resourceGroup --tenant-id $tenantId --location $location --subscription-id $subscriptionId
 
-# # Run connect command
-# azcmagent connect \
-#   --service-principal-id "{appId}" \
-#   --service-principal-secret "{password}" \
-#   --resource-group "{resourceGroup}" \
-#   --tenant-id "{tenantId}" \
-#   --location "{location}" \
-#   --subscription-id "{subscriptionId}"
+# Run connect command
+azcmagent connect \
+  --service-principal-id "{appId}" \
+  --service-principal-secret "{password}" \
+  --resource-group "{resourceGroup}" \
+  --tenant-id "{tenantId}" \
+  --location "{location}" \
+  --subscription-id "{subscriptionId}"
