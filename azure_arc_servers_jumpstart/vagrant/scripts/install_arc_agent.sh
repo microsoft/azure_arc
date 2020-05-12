@@ -23,20 +23,23 @@ chmod +x delete_rg.sh
 
 # Download the installation package
 
-cat <<EOT >> arc.sh
-#!/bin/sh
+# cat <<EOT >> arc.sh
+# #!/bin/sh
+# # Download the installation package
+# wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
+
+# # Install the hybrid agent
+# bash ~/install_linux_azcmagent.sh
+# EOT
+
+# chmod +x arc.sh
+# . ./arc.sh
+
 # Download the installation package
 wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
 
 # Install the hybrid agent
 bash ~/install_linux_azcmagent.sh
-EOT
-
-chmod +x arc.sh
-. ./arc.sh
-
-# Run connect command
-# azcmagent connect --resource-group $resourceGroup --tenant-id $tenantId --location $location --subscription-id $subscriptionId
 
 # Run connect command
 azcmagent connect \
