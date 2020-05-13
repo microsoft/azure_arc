@@ -1,5 +1,4 @@
 
-Set-ExecutionPolicy Unrestricted -Force
 
 # Injecting environment variables
 Invoke-Expression "C:\runtime\vars.ps1"

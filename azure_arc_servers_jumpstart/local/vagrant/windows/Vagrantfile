@@ -12,6 +12,8 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
+  vm.synced_folder ".", "/vagrant", disabled: true  
+  
   config.vm.define "windows" do |windows|
     config.vm.box = "gusztavvargadr/windows-server"
     config.vm.hostname = "Arc-Win10-Demo"
