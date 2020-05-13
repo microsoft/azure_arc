@@ -17,17 +17,21 @@ For customers who want to simplify complex and distributed environments across o
 The following guides will walk you how to demo and started with Azure Arc. They are designed in "short & sweet" fashion with as much automation in mind. The goal is for you to have a working Azure Arc demo environment spined-up in no time so you can focus on showing the core values of the platform. 
 
 ## Azure Arc for Servers
+The below deployment options are focusing on Azure Arc for Servers. It is designed to quickly spin up a server that is ready to be projected in Azure Arc and for you to start playing with it. 
 
+* [Deploy a local Ubuntu VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_ubuntu.md)
 
 ### In planning:
 
-* Deploy a single GCP VM and connect it to Azure Arc using Terraform
+* Deploy a local Windows VM and connect it to Azure Arc using Vagrant
 
-* Deploy a single AWS EC2 instance and connect it to Azure Arc using Terraform
+* Deploy a GCP VM and connect it to Azure Arc using Terraform
+
+* Deploy an AWS EC2 instance and connect it to Azure Arc using Terraform
 
 ## Azure Arc for Kubernetes
 
-The below deployment options are focusing on Azure Arc for Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with it. 
+The below deployment options are focusing on Azure Arc for Kubernetes. It is designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with it. 
 
 * [Deploy Rancher k3s on an Azure VM using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
 

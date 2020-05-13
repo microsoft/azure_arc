@@ -11,13 +11,13 @@ The following README will guide you on how to deploy a local "Ready to Go" Ubunt
     * Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads). 
     
         - If you are an OSX user, simply run ```brew cask install virtualbox```
-        - If you are a Windows user, you can use a the [Chocolatey package](https://chocolatey.org/packages/virtualbox)
+        - If you are a Windows user, you can use the [Chocolatey package](https://chocolatey.org/packages/virtualbox)
         - If you are a Linux user, all package installation methods can be found [here](https://www.virtualbox.org/wiki/Linux_Downloads)
 
     * Install [Vagrant](https://www.vagrantup.com/docs/installation/)
 
         - If you are an OSX user, simply run ```brew cask install vagrant``` 
-        - If you are a Windows user, you can use a the [Chocolatey package](https://chocolatey.org/packages/vagrant)
+        - If you are a Windows user, you can use the [Chocolatey package](https://chocolatey.org/packages/vagrant)
         - If you are a Linux user, look [here](https://www.vagrantup.com/downloads.html)
 
 * Create Azure Service Principal (SP)   
@@ -40,7 +40,7 @@ The following README will guide you on how to deploy a local "Ready to Go" Ubunt
     ```
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-* The Vagrantfile execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the ***scripts/vars.sh*** to match the Azure Service Principle you've just created. 
+* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the ***scripts/vars.sh*** to match the Azure Service Principle you've just created. 
 
     * subscriptionId=Your Azure Subscription ID
     * appId=Your Azure Service Principle name
@@ -56,11 +56,11 @@ Like any Vagrant deployment, a *Vagrantfile* and a [Vagrant Box](https://www.vag
 1. Download the Ubuntu 16.04 [Vagrant Box](https://app.vagrantup.com/ubuntu/boxes/xenial64)
 2. Execute the Arc installation script
 
-After editing the ***scripts/vars.sh*** to match your environment, from the *Vagrantfile* folder, run ```vagrant up```. As this is the first time you are creating the VM, the first run will be slower then the ones to follow. This is because the deployment is downloading the Ubuntu box for the first time.
+After editing the ***scripts/vars.sh*** to match your environment, from the *Vagrantfile* folder, run ```vagrant up```. As this is the first time you are creating the VM, the first run will be slower than the ones to follow. This is because the deployment is downloading the Ubuntu box for the first time.
 
 ![](../img/local_vagrant_ubuntu/01.png)
 
-Once the download is complete, the actual provisioning will start. As you can see in the screenshot below, the process takes no longer then 3min!
+Once the download is complete, the actual provisioning will start. As you can see in the screenshot below, the process takes no longer than 3min!
 
 ![](../img/local_vagrant_ubuntu/02.png)
 
@@ -69,3 +69,31 @@ Upon completion, you will have a local Ubuntu VM deployed, connected as a new Az
 ![](../img/local_vagrant_ubuntu/03.png)
 
 ![](../img/local_vagrant_ubuntu/04.png)
+
+# Semi-Automated Deployment (Optional)
+
+As you noticed, the last step of the run is to register the VM as a new Arc server resource. 
+
+![](../img/local_vagrant_ubuntu/05.png)
+
+In a case you want demo/control the actual registration process, to the following: 
+
+1. In the [*install_arc_agent*](../local/vagrant/ubuntu/scripts/install_arc_agent.sh) shell script, comment out the "Run connect command" section and save the file. You can also comment out or change the creation of the Resource Group. 
+
+![](../img/local_vagrant_ubuntu/06.png)
+
+![](../img/local_vagrant_ubuntu/07.png)
+
+2. SSH the VM using the ```vagrant ssh``` command.
+
+![](../img/local_vagrant_ubuntu/08.png)
+
+3. Run the same *azcmagent connect* command you've just commented out using your environment variables. 
+
+![](../img/local_vagrant_ubuntu/09.png)
+
+# Delete the deployment
+
+To delete the entire deployment, run the ```vagrant destroy -f``` command. The Vagrantfile includes a *before: destroy* Vagrant trigger which will run a script to delete the Azure Resource Group before destroying the actual VM. That way, you will be starting fresh next time. 
+
+![](../img/local_vagrant_ubuntu/10.png)
