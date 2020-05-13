@@ -26,7 +26,7 @@ The following README will guide you on how to deploy a local "Ready to Go" Ubunt
 
     ```az login```
 
-    ```az ad sp create-for-rbac -n "http://AzureArc" --role contributor```
+    ```az ad sp create-for-rbac -n "http://AzureArcServer" --role contributor```
 
     Output should look like this:
     ```
