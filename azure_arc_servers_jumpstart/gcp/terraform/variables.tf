@@ -2,6 +2,9 @@
 variable "gcp_project_name" {
 }
 
+variable "gcp_credentials_filename" {
+}
+
 variable "gcp_region" {
     default = "us-west1"
 }

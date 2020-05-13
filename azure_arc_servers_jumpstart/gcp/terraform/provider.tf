@@ -1,7 +1,7 @@
 // Configure the Google Cloud provider
 provider "google" {
  version = "3.21"
- credentials = file(CREDENTIALS_FILE.json)
+ credentials = file(var.gcp_credentials_filename)
  project     = var.gcp_project_name
  region      = var.gcp_region
 }
