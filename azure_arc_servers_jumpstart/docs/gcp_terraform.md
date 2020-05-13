@@ -16,19 +16,19 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Browse to https://console.developers.google.com and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
-    ![](../img/gcp/04.png)
+    <!-- ![](../img/gcp/04.png) -->
 
 * Once the new project is created and selected in the dropdown at the top of the page, you must enable Compute Engine API access for the project. Click on "+Enable APIs and Services" and search for "Compute Engine". 
 
-    ![](../img/gcp/05.png)
+    <!-- ![](../img/gcp/05.png) -->
 
 * Then click Enable to enable API access.
 
-    ![](../img/gcp/01.png)
+    <!-- ![](../img/gcp/01.png) -->
 
 * Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select the default service account or create a new one, select JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the ```gcp/terraform``` directory.
 
-* Open ```providers.tf``` and change the CREDENTIALS_FILE.json value to the name of the json file you just created.
+* Finally, make sure your SSH keys are available in ```~/.ssh``` and named id_rsa.pub and id_rsa. If not, you may need to modify ```main.tf``` to use a key with a different name or path.
 
 ### Create Azure Service Principal (SP)   
 
