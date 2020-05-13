@@ -28,7 +28,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select the default service account or create a new one, select JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the ```gcp/terraform``` directory.
 
-* Finally, make sure your SSH keys are available in ```~/.ssh``` and named id_rsa.pub and id_rsa. If not, you may need to modify ```main.tf``` to use a key with a different name or path.
+* Finally, make sure your SSH keys are available in ```~/.ssh``` and named id_rsa.pub and id_rsa. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify ```main.tf``` to use a key with a different path.
 
 ### Create Azure Service Principal (SP)   
 
