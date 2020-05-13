@@ -14,7 +14,7 @@ For customers who want to simplify complex and distributed environments across o
 
 # Azure Arc "Jumpstart"
 
-The following guides will walk you how to demo and started with Azure Arc. They are designed in "short & sweet" fashion with as much automation in mind. The goal is for you to have a working Azure Arc demo environment spined-up in no time so you can focus on showing the core values of the platform. 
+The following guides will walk you how to demo and get started with Azure Arc. They are designed in "short & sweet" fashion with as much automation in mind. The goal is for you to have a working Azure Arc demo environment spined-up in no time so you can focus on showing the core values of the platform. 
 
 ## Azure Arc for Servers
 The below deployment options are focusing on Azure Arc for Servers. It is designed to quickly spin up a server that is ready to be projected in Azure Arc and for you to start playing with it. 
