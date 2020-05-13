@@ -3,3 +3,4 @@
 backup/
 *tfstate*
 .terraform
+azure_arc_servers_jumpstart/vagrant/ubuntu/scripts/vars.sh
