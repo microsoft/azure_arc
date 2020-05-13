@@ -23,12 +23,11 @@ wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
 # Install the hybrid agent
 bash ~/install_linux_azcmagent.sh
 
-# # Run connect command
-# azcmagent connect \
-#   --service-principal-id "${appId}" \
-#   --service-principal-secret "${password}" \
-#   --resource-group "${resourceGroup}" \
-#   --tenant-id "${tenantId}" \
-#   --location "${location}" \
-#   --subscription-id "${subscriptionId}"
-  
+# Run connect command
+azcmagent connect \
+  --service-principal-id "${appId}" \
+  --service-principal-secret "${password}" \
+  --resource-group "${resourceGroup}" \
+  --tenant-id "${tenantId}" \
+  --location "${location}" \
+  --subscription-id "${subscriptionId}"
