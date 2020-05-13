@@ -1,6 +1,6 @@
 
 # Injecting environment variables
-Invoke-Expression "C:\vagrant\vars.ps1"
+Invoke-Expression "C:\runtime\vars.ps1"
 
 # Installing Azure CLI
 Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
