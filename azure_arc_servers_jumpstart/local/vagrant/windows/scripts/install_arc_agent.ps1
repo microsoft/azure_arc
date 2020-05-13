@@ -9,8 +9,8 @@ az login --service-principal --username $appId --password $password --tenant $te
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
 # Creating cleanup script for 'vagrant destory'
-New-Item C:\vagrant\delete_rg.ps1
-Set-Content C:\vagrant\delete_rg.ps1 'az group delete --name $resourceGroup --subscription $subscriptionId --yes'
+New-Item C:\runtime\delete_rg.ps1
+Set-Content C:\runtim\delete_rg.ps1 'az group delete --name $resourceGroup --subscription $subscriptionId --yes'
 
 # Download the package
 function download() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi}
