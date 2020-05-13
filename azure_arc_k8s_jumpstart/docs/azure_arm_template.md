@@ -8,24 +8,25 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 * To deploy the ARM template, Azure CLI is required. To install it, follow the official Azure [document](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 
-### Create Azure Service Principal (SP)   
-To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+* Create Azure Service Principal (SP)   
 
-```az login```
+    To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
-```az ad sp create-for-rbac -n "http://AzureArc" --role contributor```
+    ```az login```
 
-Output should look like this:
+    ```az ad sp create-for-rbac -n "http://AzureArc" --role contributor```
 
-      {
-      "appId": "aedXXXXXXXXXXXXXXXXXXac661",
-      "displayName": "AzureArcK8s",
-      "name": "http://AzureArcK8s",
-      "password": "b54XXXXXXXXXXXXXXXXXb2338e",
-      "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
-      }
-
-**Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    Output should look like this:
+    ```
+    {
+    "appId": "aedXXXXXXXXXXXXXXXXXXac661",
+    "displayName": "AzureArcK8s",
+    "name": "http://AzureArcK8s",
+    "password": "b54XXXXXXXXXXXXXXXXXb2338e",
+    "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
+    }
+    ```
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
 # Deployment 
 
