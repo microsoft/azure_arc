@@ -3,17 +3,14 @@
 apt-get update
 
 # Injecting environment variables
-# curl https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_servers_jumpstart/vagrant/scripts/vars.sh --output /tmp/vars.sh
-
 source /tmp/vars.sh
 
 # Installing Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
 az login --service-principal --username $appId --password $password --tenant $tenantId
-
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
+# Creating cleanup script for 'vagrant destory'
 cat <<EOT >> delete_rg.sh
 #!/bin/bash
 az group delete --name $resourceGroup --subscription $subscriptionId --yes
@@ -34,3 +31,4 @@ azcmagent connect \
   --tenant-id "${tenantId}" \
   --location "${location}" \
   --subscription-id "${subscriptionId}"
+  
