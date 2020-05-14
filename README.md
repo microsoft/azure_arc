@@ -25,8 +25,6 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 ### In planning:
 
-* Deploy a local Windows VM and connect it to Azure Arc using Vagrant
-
 * Deploy a GCP VM and connect it to Azure Arc using Terraform
 
 * Deploy an AWS EC2 instance and connect it to Azure Arc using Terraform
