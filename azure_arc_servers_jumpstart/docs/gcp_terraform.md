@@ -26,7 +26,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     <!-- ![](../img/gcp/01.png) -->
 
-* Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select the default service account or create a new one, give it a name, select Project->Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the ```gcp/terraform``` directory.
+* Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select the default service account or create a new one, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the ```azure_arc_servers_jumpstart/gcp/terraform``` directory.
 
 * Finally, make sure your SSH keys are available in ```~/.ssh``` and named id_rsa.pub and id_rsa. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify ```main.tf``` to use a key with a different path.
 
@@ -80,6 +80,37 @@ Before executing the Terraform plan, you must export the environment variables w
     ![](../img/gcp/09.png)
 
 * stuff about managing resource
+
+# Semi-Automated Deployment (Optional)
+
+As you may noticed, the last step of the run is to register the VM as a new Arc server resource. 
+
+    ![](../img/gcp/10.png)
+
+If you want to demo/control the actual registration process, do the following: 
+
+1. In the [*deploy_arcagent.sh.tmpl*](../gcp/terraform/scripts/deploy_arcagent.sh.tmpl) script template, comment out the "Run connect command" section and save the file.
+
+    ![](../img/gcp/11.png)
+
+2. Get the public IP of the GCP VM by running ```terraform output```
+
+    ![](../img/gcp/12.png)
+
+3. SSH the VM using the ```ssh arcadmin@x.x.x.x``` where x.x.x.x is the host ip. 
+
+    ![](../img/gcp/13.png)
+
+4. Export all the environment variables in [*vars.sh*](../gcp/terraform/scripts/vars.sh)
+
+    ![](../img/gcp/14.png)
+
+5. Run the following command
+    ```azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-Servers-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id```
+
+    ![](../img/gcp/15.png)
+
+6. When complete, your vm will be registered with Azure Arc and visible in the resource group inside Azure Portal.
 
 # Delete the deployment
 
