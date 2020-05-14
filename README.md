@@ -45,14 +45,16 @@ TBD
 
 ### Azure Arc for Servers
 
-- [ ] Support for GCP instance deployment using Terraform
-- [ ] Support for AWS EC2 instance deployment using Terraform
+- [ ] Support for an Ubuntu Server GCP instance deployment using Terraform
+- [ ] Support for a Windows Server GCP instance deployment using Terraform
+- [ ] Support for an Ubuntu Server AWS EC2 instance deployment using Terraform
+- [ ] Support for a Windows Server AWS EC2 instance deployment using Terraform
 
 ### Azure Arc for Kubernetes
 
-- [ ] Support for Azure OpenShift deployment using ARM template
-- [ ] Support for Azure OpenShift deployment using Terraform
-- [ ] Support for GKE k8s deployment using Terraform
-- [ ] Support for EKS k8s deployment using Terraform
+- [ ] Support for an Azure OpenShift deployment using ARM template
+- [ ] Support for an Azure OpenShift deployment using Terraform
+- [ ] Support for a GKE k8s deployment using Terraform
+- [ ] Support for an EKS k8s deployment using Terraform
 
 ### Azure Arc for Data Services
