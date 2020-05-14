@@ -38,3 +38,21 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 * [Deploy Rancher k3s on an Azure VM using Terraform](azure_arc_k8s_jumpstart/docs/azure_terraform.md)
 
 ## Azure Arc for Data Services
+
+TBD
+
+## Support for future deployment scenarios
+
+### Azure Arc for Servers
+
+- [ ] Support for GCP instance deployment using Terraform
+- [ ] Support for AWS EC2 instance deployment using Terraform
+
+### Azure Arc for Kubernetes
+
+- [ ] Support for Azure OpenShift deployment using ARM template
+- [ ] Support for Azure OpenShift deployment using Terraform
+- [ ] Support for GKE k8s deployment using Terraform
+- [ ] Support for EKS k8s deployment using Terraform
+
+### Azure Arc for Data Services
