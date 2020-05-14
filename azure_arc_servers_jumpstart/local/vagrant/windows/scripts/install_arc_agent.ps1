@@ -1,10 +1,11 @@
-
-
 # Injecting environment variables
 Invoke-Expression "C:\runtime\vars.ps1"
 
+iwr -useb https://chocolatey.org/install.ps1 | iex
+
 # Installing Azure CLI
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+# Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+choco install -y azure-cli
 az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 az group create --location $env:location --name $env:resourceGroup --subscription $env:subscriptionId 
 
