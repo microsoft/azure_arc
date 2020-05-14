@@ -61,7 +61,7 @@ Before executing the Terraform plan, you must export the environment variables w
 * The Terraform plan creates resources in both Microsoft Azure and Google Cloud. It then executes a script on a Google Cloud virtual machine to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your Google Cloud and Azure environments. Edit ***scripts/vars.sh*** and update each of the variables with the appropriate values.
     ![](../img/gcp/06.png)
 
-* Open Az CLI and navigate to the azure_arc_servers_jumpstart/gcp/terraform directory of the cloned repo.
+* Open Az CLI and navigate to the ```azure_arc_servers_jumpstart/gcp/terraform``` directory of the cloned repo.
 
 * Export the environment variables you edited by running the vars.sh script with the source command as shown below.
 

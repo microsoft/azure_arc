@@ -1,5 +1,5 @@
 # Declare TF variables
-variable "gcp_project_name" {
+variable "gcp_project_id" {
 }
 
 variable "gcp_credentials_filename" {
