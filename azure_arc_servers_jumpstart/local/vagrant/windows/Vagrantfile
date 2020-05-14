@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
     config.vm.box = "gusztavvargadr/windows-server"
     config.vm.hostname = "Arc-Win10-Demo"
     config.vm.provision "file", source: "scripts/vars.ps1", destination: "C:/runtime/vars.ps1"
-    config.vm.provision "shell", path: "https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/install_arc_agent.ps1" 
+    config.vm.provision "shell", privileged: true, path: "https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/install_arc_agent.ps1" 
     # windows.trigger.before :destroy do |trigger|
     #   trigger.warn = "Deleting Azure Resource Group"
     #   trigger.run_remote = {inline: "bash delete_rg.sh"}
