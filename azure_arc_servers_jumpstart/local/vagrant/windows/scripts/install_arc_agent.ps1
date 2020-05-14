@@ -21,9 +21,9 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
 
  # Run connect command
  & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
- --service-principal-id "{$env:appId}" `
- --service-principal-secret "{$env:password}" `
- --resource-group "{$env:resourceGroup}" `
- --tenant-id "{$env:tenantId}" `
- --location "{$env:location}" `
- --subscription-id "{$env:subscriptionId}" 
+ --service-principal-id $env:appId `
+ --service-principal-secret $env:password `
+ --resource-group $env:resourceGroup `
+ --tenant-id $env:tenantId `
+ --location $env:location `
+ --subscription-id $env:subscriptionId
