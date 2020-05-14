@@ -41,7 +41,7 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 TBD
 
-## Support for future deployment scenarios
+# Support for future deployment scenarios
 
 ### Azure Arc for Servers
 
