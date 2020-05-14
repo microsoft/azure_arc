@@ -45,6 +45,8 @@ TBD
 
 ### Azure Arc for Servers
 
+Below are an additional deployment scenarios the team is currently working on.
+
 - [ ] Support for an Ubuntu Server GCP instance deployment using Terraform
 - [ ] Support for a Windows Server GCP instance deployment using Terraform
 - [ ] Support for an Ubuntu Server AWS EC2 instance deployment using Terraform
