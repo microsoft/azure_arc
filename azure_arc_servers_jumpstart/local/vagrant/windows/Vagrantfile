@@ -28,14 +28,14 @@ Vagrant.configure("2") do |config|
     config.winrm.password = "vagrant"
     config.vm.guest = :windows 
     config.vm.hostname = "Arc-Win10-Demo"
-    config.vm.provision "file", source: "scripts/vars.ps1", destination: "C:/runtime/vars.ps1"
+    config.vm.provision "file", source: "vars.ps1", destination: "C:/runtime/vars.ps1"
     config.vm.provision "shell", inline: $script, privileged: true, powershell_elevated_interactive: true
     config.vm.provision "shell", privileged: true, path: "https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/install_arc_agent.ps1"
 
-    # windows.trigger.before :destroy do |trigger|
-    #   trigger.warn = "Deleting Azure Resource Group"
-    #   trigger.run_remote = {inline: "bash delete_rg.sh"}
-    # end
+    windows.trigger.before :destroy do |trigger|
+      trigger.warn = "Deleting Azure Resource Group"
+      trigger.run_remote = {inline: "C:/runtime/delete_rg.ps1"}
+    end
   end
 
   # Provider-specific configuration so you can fine-tune various
@@ -44,7 +44,7 @@ Vagrant.configure("2") do |config|
   #
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
-    vb.gui = true 
+    vb.gui = false 
   
     # Customize the amount of memory on the VM:
     vb.memory = "2048"   

@@ -21,6 +21,8 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 * [Deploy a local Ubuntu VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_ubuntu.md)
 
+* [Deploy a local Windows 10 VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_windows.md)
+
 ### In planning:
 
 * Deploy a local Windows VM and connect it to Azure Arc using Vagrant

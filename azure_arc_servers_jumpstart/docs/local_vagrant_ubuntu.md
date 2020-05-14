@@ -1,6 +1,6 @@
 # Overview
 
-The following README will guide you on how to deploy a local "Ready to Go" Ubuntu virtual machine using [Vagrant](https://www.vagrantup.com/) and connect it as an Azure Arc server resource.
+The following README will guide you on how to deploy a local "Ready to Go" **Ubuntu** virtual machine using [Vagrant](https://www.vagrantup.com/) and connect it as an Azure Arc server resource.
 
 # Prerequisites
 
@@ -31,16 +31,16 @@ The following README will guide you on how to deploy a local "Ready to Go" Ubunt
     Output should look like this:
     ```
     {
-    "appId": "aedXXXXXXXXXXXXXXXXXXac661",
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServer",
     "name": "http://AzureArcServer",
-    "password": "b54XXXXXXXXXXXXXXXXXb2338e",
-    "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](../local/vagrant/ubuntu/scripts/vars.sh) to match the Azure Service Principle you've just created. 
+* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](../local/vagrant/ubuntu/scripts/vars.sh) shell script to match the Azure Service Principle you've just created. 
 
     * subscriptionId=Your Azure Subscription ID
     * appId=Your Azure Service Principle name
@@ -51,12 +51,12 @@ The following README will guide you on how to deploy a local "Ready to Go" Ubunt
 
 # Deployment
 
-Like any Vagrant deployment, a *Vagrantfile* and a [Vagrant Box](https://www.vagrantup.com/docs/boxes.html) is needed. At a high-level, the deployment will:
+Like any Vagrant deployment, a [*Vagrantfile*](../local/vagrant/ubuntu/Vagrantfile) and a [Vagrant Box](https://www.vagrantup.com/docs/boxes.html) is needed. At a high-level, the deployment will:
 
-1. Download the Ubuntu 16.04 [Vagrant Box](https://app.vagrantup.com/ubuntu/boxes/xenial64)
+1. Download the Ubuntu 16.04 image file [Vagrant Box](https://app.vagrantup.com/ubuntu/boxes/xenial64)
 2. Execute the Arc installation script
 
-After editing the ***scripts/vars.sh*** to match your environment, from the *Vagrantfile* folder, run ```vagrant up```. As this is the first time you are creating the VM, the first run will be slower than the ones to follow. This is because the deployment is downloading the Ubuntu box for the first time.
+After editing the ***scripts/vars.sh*** script to match your environment, from the *Vagrantfile* folder, run ```vagrant up```. As this is the first time you are creating the VM, the first run will be **much slower** than the ones to follow. This is because the deployment is downloading the Ubuntu box for the first time.
 
 ![](../img/local_vagrant_ubuntu/01.png)
 
@@ -72,11 +72,11 @@ Upon completion, you will have a local Ubuntu VM deployed, connected as a new Az
 
 # Semi-Automated Deployment (Optional)
 
-As you noticed, the last step of the run is to register the VM as a new Arc server resource. 
+As you may noticed, the last step of the run is to register the VM as a new Arc server resource. 
 
 ![](../img/local_vagrant_ubuntu/05.png)
 
-In a case you want demo/control the actual registration process, to the following: 
+In a case you want to demo/control the actual registration process, to the following: 
 
 1. In the [*install_arc_agent*](../local/vagrant/ubuntu/scripts/install_arc_agent.sh) shell script, comment out the "Run connect command" section and save the file. You can also comment out or change the creation of the Resource Group. 
 
