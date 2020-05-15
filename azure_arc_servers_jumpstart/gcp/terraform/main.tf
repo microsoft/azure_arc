@@ -19,7 +19,6 @@ resource "google_compute_instance" "default" {
    initialize_params {
      image = "ubuntu-os-cloud/ubuntu-1604-lts"
    }
-   
  }
  
  network_interface {
@@ -56,7 +55,6 @@ resource "google_compute_instance" "default" {
     timeout = "2m"
     }
   }
-  
   provisioner "remote-exec" {
     inline = [     
            "sudo chmod +x /tmp/install_arc_agent.sh",
