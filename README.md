@@ -51,7 +51,7 @@ Below are an additional deployment scenarios the team is currently working on.
 
 ### Azure Arc for Kubernetes
 
-- Support for an Azure OpenShift deployment using ARM template
+- Support for an Azure Red Hat OpenShift deployment using ARM template
 - Support for a GKE deployment using Terraform
 - Support for an EKS deployment using Terraform
 
