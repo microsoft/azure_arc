@@ -11,7 +11,7 @@ resource "azurerm_resource_group" "azure_rg" {
 
 // A single Google Cloud Engine instance
 resource "google_compute_instance" "default" {
- name         = "Arc-GCP-demo-${random_id.instance_id.hex}"
+ name         = "azure-arc-gcp-demo-${random_id.instance_id.hex}"
  machine_type = "f1-micro"
  zone         = var.gcp_zone
 
