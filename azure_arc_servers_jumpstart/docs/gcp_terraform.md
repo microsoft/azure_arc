@@ -79,8 +79,6 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have a GCP Ubuntu VM deployed and connected as a new Azure Arc server inside a new Resource Group.
 
-# View the GCP VM from Azure Portal
-
 * Open the Azure portal and navigate to the resource group "Arc-Servers-Demo". The virtual machine created in GCP will be visible as a resource.
 
     ![](../img/gcp/09.png)
