@@ -23,15 +23,11 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 * [Deploy a local Windows 10 VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_windows.md)
 
-### In planning:
-
-* Deploy a GCP VM and connect it to Azure Arc using Terraform
-
-* Deploy an AWS EC2 instance and connect it to Azure Arc using Terraform
-
 ## Azure Arc for Kubernetes
 
 The below deployment options are focusing on Azure Arc for Kubernetes. It is designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with it. 
+
+* [Connect an existing Kubernetes cluster to Azure Arc](azure_arc_k8s_jumpstart/docs/onboard_k8s.md)
 
 * [Deploy Rancher k3s on an Azure VM using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
 
