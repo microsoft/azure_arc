@@ -103,7 +103,7 @@ Traefik is the (default) ingress controller for k3s and uses port 80. To test ex
 
 # Delete the deployment
 
-The most straightforward to delete the cluster is via the Azure Portal, just select cluster and delete it. 
+The most straightforward way is to delete the cluster is via the Azure Portal, just select cluster and delete it. 
 
 ![](../img/azure_terraform/15.png)
 
