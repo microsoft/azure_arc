@@ -1,4 +1,3 @@
-
 // Terraform plugin for creating random ids
 resource "random_id" "instance_id" {
  byte_length = 8
@@ -12,7 +11,7 @@ resource "azurerm_resource_group" "azure_rg" {
 
 // A single Google Cloud Engine instance
 resource "google_compute_instance" "default" {
- name         = "gcp-vm-${random_id.instance_id.hex}"
+ name         = "Arc-GCP-demo-${random_id.instance_id.hex}"
  machine_type = "f1-micro"
  zone         = var.gcp_zone
 
@@ -46,8 +45,8 @@ resource "google_compute_instance" "default" {
     }
  }
  provisioner "file" {
-    source      = "scripts/deploy_arcagent.sh"
-    destination = "/tmp/deploy_arcagent.sh"
+    source      = "scripts/install_arc_agent.sh"
+    destination = "/tmp/install_arc_agent.sh"
 
     connection {
     type = "ssh"
@@ -60,8 +59,8 @@ resource "google_compute_instance" "default" {
   
   provisioner "remote-exec" {
     inline = [     
-           "sudo chmod +x /tmp/deploy_arcagent.sh",
-           "/tmp/deploy_arcagent.sh",
+           "sudo chmod +x /tmp/install_arc_agent.sh",
+           "/tmp/install_arc_agent.sh",
           ]
 
     connection {
@@ -74,13 +73,13 @@ resource "google_compute_instance" "default" {
   }
 }
 
-resource "local_file" "deploy_arcagent_sh" {
-  content = templatefile("scripts/deploy_arcagent.sh.tmpl", {
-    resourceGroup                  = var.azure_resource_group
-    location                       = var.azure_location
+resource "local_file" "install_arc_agent_sh" {
+  content = templatefile("scripts/install_arc_agent.sh.tmpl", {
+    resourceGroup = var.azure_resource_group
+    location = var.azure_location
     }
   )
-  filename = "scripts/deploy_arcagent.sh"
+  filename = "scripts/install_arc_agent.sh"
 }
 
 // A variable for extracting the external ip of the instance
