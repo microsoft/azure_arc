@@ -3,7 +3,7 @@
 For customers who want to simplify complex and distributed environments across on-premises, edge and multicloud, Azure Arc enables deployment of Azure services anywhere and extends Azure management to any infrastructure.
 
 <p align="center"> 
-<img src="azure_arc_k8s_jumpstart/img/Azure_Arc.png?style=centerme">
+<img src="img/Azure_Arc.png?style=centerme">
 </p>
 
 * **Organize and govern across environments** - Get databases, Kubernetes clusters, and servers sprawling across on-premises, edge and multicloud environments under control by centrally organizing and governing from a single place.
@@ -28,13 +28,38 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 * Deploy a local Windows VM and connect it to Azure Arc using Vagrant
 
 * Deploy an AWS EC2 instance and connect it to Azure Arc using Terraform
+=======
+* [Deploy a local Windows 10 VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_windows.md)
 
 ## Azure Arc for Kubernetes
 
 The below deployment options are focusing on Azure Arc for Kubernetes. It is designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with it. 
+
+* [Connect an existing Kubernetes cluster to Azure Arc](azure_arc_k8s_jumpstart/docs/onboard_k8s.md)
 
 * [Deploy Rancher k3s on an Azure VM using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
 
 * [Deploy Rancher k3s on an Azure VM using Terraform](azure_arc_k8s_jumpstart/docs/azure_terraform.md)
 
 ## Azure Arc for Data Services
+
+TBD
+
+# Support for future deployment scenarios
+
+Below are an additional deployment scenarios the team is currently working on.
+
+### Azure Arc for Servers
+
+- Support for an Ubuntu Server GCP instance deployment using Terraform
+- Support for a Windows Server GCP instance deployment using Terraform
+- Support for an Ubuntu Server AWS EC2 instance deployment using Terraform
+- Support for a Windows Server AWS EC2 instance deployment using Terraform
+
+### Azure Arc for Kubernetes
+
+- Support for an Azure OpenShift deployment using ARM template
+- Support for a GKE deployment using Terraform
+- Support for an EKS deployment using Terraform
+
+### Azure Arc for Data Services

@@ -14,16 +14,16 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ```az login```
 
-    ```az ad sp create-for-rbac -n "http://AzureArc" --role contributor```
+    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
 
     Output should look like this:
     ```
     {
-    "appId": "aedXXXXXXXXXXXXXXXXXXac661",
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcK8s",
     "name": "http://AzureArcK8s",
-    "password": "b54XXXXXXXXXXXXXXXXXb2338e",
-    "tenant": "72f98XXXXXXXXXXXXXXXXX11db47"
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
