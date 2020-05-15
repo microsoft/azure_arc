@@ -67,7 +67,7 @@ Before executing the Terraform plan, you must export the environment variables w
     * TF_VAR_gcp_project_id=GCP project id
     * TF_VAR_gcp_credentials_filename=GCP credentials json filename
 
-* Open Az CLI and navigate to the [*azure_arc_servers_jumpstart/gcp/terraform*](../gcp/terraform) directory of the cloned repo.
+* From CLI, navigate to the [*azure_arc_servers_jumpstart/gcp/terraform*](../gcp/terraform) directory of the cloned repo.
 
 * Export the environment variables you edited by running [*scripts/vars.sh*](../gcp/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly. Note that this script will also be automatically executed remotely on the GCP virtual machine as part of the Terraform deployment. 
 
@@ -117,4 +117,7 @@ If you want to demo/control the actual registration process, do the following:
 
 # Delete the deployment
 
-To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
+To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command.
+
+Alternatively, you can delete the GCP VM directly from [GCP Console](https://console.cloud.google.com/compute/instances). 
+    ![](../img/gcp/16.png)
