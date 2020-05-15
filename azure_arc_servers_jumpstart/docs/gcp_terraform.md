@@ -12,7 +12,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-### Create a new GCP Project
+# Create a new GCP Project
 
 * Browse to https://console.developers.google.com and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
@@ -30,7 +30,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Finally, make sure your SSH keys are available in *~/.ssh* and named *id_rsa.pub* and *id_rsa*. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify [*main.tf*](../gcp/terraform/main.tf) to use a key with a different path.
 
-### Create Azure Service Principal (SP)   
+# Create Azure Service Principal (SP)   
 
 * To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
@@ -115,7 +115,8 @@ If you want to demo/control the actual registration process, do the following:
 
 # Delete the deployment
 
-To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command.
+To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
+    ![](../img/gcp/17.png)
 
 Alternatively, you can delete the GCP VM directly from [GCP Console](https://console.cloud.google.com/compute/instances). 
     ![](../img/gcp/16.png)
