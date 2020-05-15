@@ -5,15 +5,15 @@ resource "random_id" "instance_id" {
 
 // An Azure Resource Group
 resource "azurerm_resource_group" "azure_rg" {
-  name     = var.azure_resource_group
+  name = var.azure_resource_group
   location = var.azure_location
 }
 
 // A single Google Cloud Engine instance
 resource "google_compute_instance" "default" {
- name         = "azure-arc-gcp-demo-${random_id.instance_id.hex}"
+ name = "azure-arc-gcp-demo-${random_id.instance_id.hex}"
  machine_type = "f1-micro"
- zone         = var.gcp_zone
+ zone = var.gcp_zone
 
  boot_disk {
    initialize_params {
@@ -33,7 +33,7 @@ resource "google_compute_instance" "default" {
    ssh-keys = "${var.admin_username}:${file("~/.ssh/id_rsa.pub")}"
  }
  provisioner "file" {
-    source      = "scripts/vars.sh"
+    source = "scripts/vars.sh"
     destination = "/tmp/vars.sh"
 
     connection {
@@ -45,7 +45,7 @@ resource "google_compute_instance" "default" {
     }
  }
  provisioner "file" {
-    source      = "scripts/install_arc_agent.sh"
+    source = "scripts/install_arc_agent.sh"
     destination = "/tmp/install_arc_agent.sh"
 
     connection {
