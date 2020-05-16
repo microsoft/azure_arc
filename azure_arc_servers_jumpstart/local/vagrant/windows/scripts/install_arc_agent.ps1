@@ -1,8 +1,7 @@
 # Injecting environment variables
 Invoke-Expression "C:\runtime\vars.ps1"
 
-# Installing Azure CLI
-# Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+# Creating new Azure Arc Resource Group
 az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 az group create --location $env:location --name $env:resourceGroup --subscription $env:subscriptionId 
 
