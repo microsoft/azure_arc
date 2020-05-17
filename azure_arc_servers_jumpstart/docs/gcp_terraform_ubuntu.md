@@ -26,7 +26,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ![](../img/gcp_ubuntu/04.png)
 
-* Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select the default service account or create a new one, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the [*azure_arc_servers_jumpstart/gcp/ubuntu/terraform*](../gcp/ubuntu/terraform/) directory.
+* Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select "New Service Account" from the dropdown, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the [*azure_arc_servers_jumpstart/gcp/ubuntu/terraform*](../gcp/ubuntu/terraform/) directory.
 
     ![](../img/gcp_ubuntu/05.png)
 
