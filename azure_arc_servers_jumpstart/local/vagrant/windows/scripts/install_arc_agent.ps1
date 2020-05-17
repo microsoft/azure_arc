@@ -17,7 +17,7 @@ download
 # Install the package
 msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-String
 
- # Run connect command
+# Run connect command
  & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
  --service-principal-id $env:appId `
  --service-principal-secret $env:password `
