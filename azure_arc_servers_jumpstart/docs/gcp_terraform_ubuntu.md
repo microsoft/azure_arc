@@ -8,11 +8,11 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key) 
 
-* Google Cloud account - [create a free trial account](https://cloud.google.com/free)
+* [Create free Google Cloud account]((https://cloud.google.com/free))
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-# Create a new GCP Project
+## Create a new GCP Project
 
 * Browse to https://console.developers.google.com and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
@@ -32,7 +32,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Finally, make sure your SSH keys are available in *~/.ssh* and named *id_rsa.pub* and *id_rsa*. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify [*main.tf*](../gcp/ubuntu/terraform/main.tf) to use a key with a different path.
 
-# Create Azure Service Principal (SP)   
+## Create Azure Service Principal (SP)   
 
 * To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 

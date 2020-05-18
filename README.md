@@ -14,7 +14,7 @@ For customers who want to simplify complex and distributed environments across o
 
 # Azure Arc "Jumpstart"
 
-The following guides will walk you how to demo and get started with Azure Arc. They are designed in "short & sweet" fashion with as much automation in mind. The goal is for you to have a working Azure Arc demo environment spined-up in no time so you can focus on showing the core values of the platform. 
+The following guides will walk you how to demo and get started with Azure Arc. They are designed with a "zero to hero" approach in mind and with much automation as possible. The goal is for you to have a working Azure Arc demo environment spined-up in no time so you can focus on showing the core values of the solution.
 
 ## Azure Arc for Servers
 The below deployment options are focusing on Azure Arc for Servers. It is designed to quickly spin up a server that is ready to be projected in Azure Arc and for you to start playing with it. 
@@ -37,6 +37,8 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 * [Connect an existing Kubernetes cluster to Azure Arc](azure_arc_k8s_jumpstart/docs/onboard_k8s.md)
 
+* [Deploy Google Kubernetes Engine (GKE) cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/gke_terraform.md)
+
 * [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
 
 * [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/azure_terraform.md)
@@ -58,7 +60,6 @@ Below are an additional deployment scenarios the team is currently working on.
 ### Azure Arc for Kubernetes
 
 - Support for an Azure Red Hat OpenShift deployment using ARM template
-- Support for a GKE deployment using Terraform
 - Support for an EKS deployment using Terraform
 
 ### Azure Arc for Data Services
