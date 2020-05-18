@@ -37,9 +37,9 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 * [Connect an existing Kubernetes cluster to Azure Arc](azure_arc_k8s_jumpstart/docs/onboard_k8s.md)
 
-* [Deploy Rancher k3s on an Azure VM using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
+* [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
 
-* [Deploy Rancher k3s on an Azure VM using Terraform](azure_arc_k8s_jumpstart/docs/azure_terraform.md)
+* [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/azure_terraform.md)
 
 ## Azure Arc for Data Services
 
