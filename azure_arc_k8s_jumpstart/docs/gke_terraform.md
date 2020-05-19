@@ -84,9 +84,9 @@ The only thing you need to do before executing the Terraform plan is to export t
 
     For example:
 
-    ```export TF_VAR_gcp_project_id=azure-arc-demo-277620```
-    ```export TF_VAR_gcp_credentials_filename=account.json```
-    ```export TF_VAR_gcp_region=us-west1```
+    ```export TF_VAR_gcp_project_id=azure-arc-demo-277620```   
+    ```export TF_VAR_gcp_credentials_filename=account.json```   
+    ```export TF_VAR_gcp_region=us-west1```   
 
 * Run the ```terraform init``` command which will download the Terraform Google provider.
 
