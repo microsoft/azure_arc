@@ -36,7 +36,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Retrieve your Azure Subscription ID using the ```az account list``` command.
 
-* Export the environment variables
+* Export the environment variables needed for the Terraform plan.
 
     ```export TF_VAR_subscription_id=<Your Azure Subscription ID>```   
     ```export TF_VAR_client_id=<Your Azure Service Principal App ID>```   
