@@ -27,8 +27,7 @@ resource "google_compute_instance" "default" {
    }
  }
  metadata = {
-   // windows-startup-script-ps1 = file("./scripts/install_arc_agent.ps1")
-   windows-startup-script-ps1 = local_file.install_arc_agent_ps1.content
+   // windows-startup-script-ps1 = local_file.install_arc_agent_ps1.content
  }
 }
 
