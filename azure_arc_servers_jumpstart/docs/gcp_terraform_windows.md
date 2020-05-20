@@ -18,25 +18,6 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
-# Create a new GCP Project
-
-* Browse to https://console.cloud.google.com and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
-
-    ![](../img/gcp_windows/01.png)
-
-    ![](../img/gcp_windows/02.png)
-
-* Once the new project is created and selected in the dropdown at the top of the page, you must enable Compute Engine API access for the project. Click on "+Enable APIs and Services" and search for "Compute Engine". Then click Enable to enable API access.
-
-    ![](../img/gcp_windows/03.png)
-
-    ![](../img/gcp_windows/04.png)
-
-* Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select "New Service Account" from the dropdown, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the [*azure_arc_servers_jumpstart/gcp/windows/terraform*](../gcp/windows/terraform/) directory.
-
-    ![](../img/gcp_windows/05.png)
-
-
 # Create Azure Service Principal (SP)   
 
 * To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
@@ -58,6 +39,24 @@ The following README will guide you on how to use the provided [Terraform](https
     ```
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+
+# Create a new GCP Project
+
+* Browse to https://console.cloud.google.com and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
+
+    ![](../img/gcp_windows/01.png)
+
+    ![](../img/gcp_windows/02.png)
+
+* Once the new project is created and selected in the dropdown at the top of the page, you must enable Compute Engine API access for the project. Click on "+Enable APIs and Services" and search for "Compute Engine". Then click Enable to enable API access.
+
+    ![](../img/gcp_windows/03.png)
+
+    ![](../img/gcp_windows/04.png)
+
+* Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select "New Service Account" from the dropdown, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the [*azure_arc_servers_jumpstart/gcp/windows/terraform*](../gcp/windows/terraform/) directory.
+
+    ![](../img/gcp_windows/05.png)
 
 # Deployment
 
