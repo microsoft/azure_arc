@@ -6,7 +6,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone this repo
 
-* [Create free Google Cloud account](https://cloud.google.com/free)
+* [Create a free Google Cloud account](https://cloud.google.com/free)
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
