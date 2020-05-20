@@ -31,6 +31,8 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 * [Deploy a GCP Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_ubuntu.md)
 
+* [Deploy a GCP Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_windows.md)
+
 ## Azure Arc for Kubernetes
 
 The below deployment options are focusing on Azure Arc for Kubernetes. It is designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with it. 
