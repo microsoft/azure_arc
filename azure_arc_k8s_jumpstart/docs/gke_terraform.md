@@ -6,13 +6,13 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone this repo
 
-* [Create free Google Cloud account]((https://cloud.google.com/free))
+* [Create free Google Cloud account]
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 * Create Azure Service Principal (SP)   
 
-    To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+    To connect the GKE cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
     ```az login```
 
