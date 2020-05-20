@@ -97,38 +97,39 @@ Before executing the Terraform plan, you must set and then export the environmen
 
 # Semi-Automated Deployment (Optional)
 
-As you may have noticed, the last step of the run is to register the VM as a new Arc server resource.
-    ![](../img/gcp_ubuntu/10.png)
+The Terraform plan automatically installs the Azure Arc agent and connects the VM to Azure as a managed resource by executing a Powershell script when the VM is first booted.
+    ![](../img/gcp_windows/12.png)
 
 If you want to demo/control the actual registration process, do the following: 
 
-1. In the [*install_arc_agent.sh.tmpl*](../gcp/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file.
+1. Before running the ```terraform apply``` command, open [*main.tf*](../gcp/windows/terraform/main.tf) and comment out the ```windows-startup-script-ps1 = local_file.install_arc_agent_ps1.content``` line and save the file.
 
-    ![](../img/gcp_ubuntu/11.png)
+    ![](../img/gcp_windows/13.png)
 
-2. Get the public IP of the GCP VM by running ```terraform output```
+2. Run ```terraform apply --auto-approve``` as instructed above.
 
-    ![](../img/gcp_ubuntu/12.png)
+3. Open the Google Cloud console and navigate to the [Compute Instance page](https://console.cloud.google.com/compute/instances), then click on the VM that was created. 
 
-3. SSH the VM using the ```ssh arcadmin@x.x.x.x``` where x.x.x.x is the host ip. 
+    ![](../img/gcp_windows/14.png)
 
-    ![](../img/gcp_ubuntu/13.png)
+    ![](../img/gcp_windows/15.png)
 
-4. Export all the environment variables in [*vars.sh*](../gcp/terraform/scripts/vars.sh)
+4. Create a user and password for the VM by clicking "Set Password" and specifying a username.
 
-    ![](../img/gcp_ubuntu/14.png)
+    ![](../img/gcp_windows/17.png)
 
-5. Run the following command
-    ```azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-Servers-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id```
+5. RDP into the VM by clicking the RDP button from the VM page in Google Cloud console, and login with the username and password you just created.
 
-    ![](../img/gcp_ubuntu/15.png)
+    ![](../img/gcp_windows/18.png)
 
-6. When complete, your VM will be registered with Azure Arc and visible in the resource group inside Azure Portal.
+6. Once logged in, open Powershell ISE **as Administrator**. Make sure you are running the x64 version of Powershell ISE and not x86. Once open, select File->New to create an empty .ps1 file. Then paste in the entire contents of [./scripts/install_arc_agent.ps1](./scripts/install_arc_agent.ps1). Click the play button to execute the script. When complete, you should see the output showing successful onboarding of the machine.
+
+    ![](../img/gcp_windows/19.png)
 
 # Delete the deployment
 
 To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
-    ![](../img/gcp_ubuntu/17.png)
+    ![](../img/gcp_windows/11.png)
 
 Alternatively, you can delete the GCP VM directly from [GCP Console](https://console.cloud.google.com/compute/instances). 
-    ![](../img/gcp_ubuntu/16.png)
+    ![](../img/gcp_windows/16.png)
