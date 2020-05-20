@@ -18,7 +18,7 @@ variable "admin_username" {
 }
 
 variable "admin_password" {
-    default = "arcpass123!!"
+    default = "arcdemo123!!"
 }
 
 variable "key_name" {
