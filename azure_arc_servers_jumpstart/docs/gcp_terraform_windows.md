@@ -6,8 +6,6 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone this repo
 
-* [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key)
-
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 * Google Cloud account with billing enabled - [Create a free trial account](https://cloud.google.com/free). To create Windows Server virtual machines, you must upgraded your account to enable billing. Click Billing from the menu and then select Upgrade in the lower right.
@@ -18,7 +16,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ![](../img/gcp_windows/32.png)
 
-    ***Disclaimer*** - **Be sure to completely delete any resources created as part of the tutorial in order to prevent unexpected charges. The tutorial provides instructions on how to delete everything but double check so you don't get charged inadvertently.**
+    ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
 # Create a new GCP Project
 
@@ -34,11 +32,10 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ![](../img/gcp_windows/04.png)
 
-* Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select "New Service Account" from the dropdown, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the [*azure_arc_servers_jumpstart/gcp/ubuntu/terraform*](../gcp/ubuntu/terraform/) directory.
+* Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select "New Service Account" from the dropdown, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the [*azure_arc_servers_jumpstart/gcp/windows/terraform*](../gcp/windows/terraform/) directory.
 
     ![](../img/gcp_windows/05.png)
 
-* Finally, make sure your SSH keys are available in *~/.ssh* and named *id_rsa.pub* and *id_rsa*. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify [*main.tf*](../gcp/ubuntu/terraform/main.tf) to use a key with a different path.
 
 # Create Azure Service Principal (SP)   
 
@@ -79,7 +76,7 @@ Before executing the Terraform plan, you must set and then export the environmen
 
 * From CLI, navigate to the [*azure_arc_servers_jumpstart/gcp/windows/terraform*](../gcp/windows/terraform) directory of the cloned repo.
 
-* Export the environment variables you edited by running [*scripts/vars.sh*](../gcp/ubuntu/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly.
+* Export the environment variables you edited by running [*scripts/vars.sh*](../gcp/windows/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly.
 
     ```source ./scripts/vars.sh```
 
