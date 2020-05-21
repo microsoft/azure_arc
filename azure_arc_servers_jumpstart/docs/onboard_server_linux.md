@@ -4,6 +4,8 @@ The following README will guide you on how to connect an Linux server to Azure A
 
 # Prerequisites
 
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
+
 * Create Azure Service Principal (SP)   
 
     To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:

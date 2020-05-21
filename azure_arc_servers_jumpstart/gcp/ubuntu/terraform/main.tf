@@ -1,8 +1,3 @@
-// Terraform plugin for creating random ids
-resource "random_id" "instance_id" {
- byte_length = 8
-}
-
 // An Azure Resource Group
 resource "azurerm_resource_group" "azure_rg" {
   name = var.azure_resource_group
@@ -11,7 +6,7 @@ resource "azurerm_resource_group" "azure_rg" {
 
 // A single Google Cloud Engine instance
 resource "google_compute_instance" "default" {
- name = "arc-gcp-demo${random_id.instance_id.hex}"
+ name = "arc-gcp-demo"
  machine_type = "f1-micro"
  zone = var.gcp_zone
 
