@@ -47,7 +47,7 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 ## Azure Arc for Data Services
 
-TBD
+Coming soon!
 
 # Support for future deployment scenarios
 
@@ -68,4 +68,7 @@ Below are an additional deployment scenarios the team is currently working on.
 
 ### Azure Arc for Data Services
 
-TBD
+- Support SQL Managed Instance (MI) in Azure Kubernetes Service (AKS) deployment using ARM template
+- Support SQL Managed Instance (MI) in Azure Kubernetes Service (AKS) deployment using Terraform
+- Support PostgreSQL Hyperscale in Azure Kubernetes Service (AKS) deployment using ARM template
+- Support PostgreSQL Hyperscale in Azure Kubernetes Service (AKS) deployment using Terraform
