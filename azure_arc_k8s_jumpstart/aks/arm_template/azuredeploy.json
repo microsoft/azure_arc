@@ -87,14 +87,7 @@
             "metadata": {
                 "description": "The type of operating system."
             }
-        },
-        "kubernetesVersion": {
-            "defaultValue": "1.17.3",
-            "type": "string",
-            "metadata": {
-                "description": "The version of Kubernetes."
-            }
-        }                
+        }              
     },
     "resources": [
         {
