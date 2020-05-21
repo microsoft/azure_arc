@@ -6,7 +6,9 @@ The following README will guide you on how to deploy a local "Ready to Go" **Win
 
 * Clone this repo
 
-* Vagrant relies on an underline hypervisor. For the purpose of this guide, we will be using "Oracle VM VirtualBox".
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
+
+* Vagrant relies on an underlying hypervisor. For the purpose of this guide, we will be using "Oracle VM VirtualBox".
 
     * Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads). 
     
