@@ -6,7 +6,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 * Clone this repo
 
-* To deploy the ARM template, Azure CLI is required. To install it, follow the official Azure [document](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
 
 * [Generate SSH Key](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
 
