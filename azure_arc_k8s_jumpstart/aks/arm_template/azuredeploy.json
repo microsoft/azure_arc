@@ -71,6 +71,13 @@
             },
             "type": "securestring"
         },
+        "enableRBAC": {
+            "defaultValue": true,
+            "type": "bool",
+            "metadata": {
+                "description": "boolean flag to turn on and off of RBAC"
+            }
+        },        
         "osType": {
             "type": "string",
             "defaultValue": "Linux",
@@ -80,7 +87,14 @@
             "metadata": {
                 "description": "The type of operating system."
             }
-        }        
+        }
+        "kubernetesVersion": {
+            "defaultValue": "1.17.3",
+            "type": "string",
+            "metadata": {
+                "description": "The version of Kubernetes."
+            }
+        }                
     },
     "resources": [
         {
