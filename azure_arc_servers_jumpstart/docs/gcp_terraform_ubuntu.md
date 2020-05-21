@@ -6,6 +6,8 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone this repo
 
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
+
 * [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key) 
 
 * [Create free Google Cloud account]((https://cloud.google.com/free))
@@ -92,7 +94,7 @@ As you may have noticed, the last step of the run is to register the VM as a new
 
 If you want to demo/control the actual registration process, do the following: 
 
-1. In the [*install_arc_agent.sh.tmpl*](../gcp/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file.
+1. In the [*install_arc_agent.sh.tmpl*](../gcp/ubuntu/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file.
 
     ![](../img/gcp_ubuntu/11.png)
 
@@ -104,7 +106,7 @@ If you want to demo/control the actual registration process, do the following:
 
     ![](../img/gcp_ubuntu/13.png)
 
-4. Export all the environment variables in [*vars.sh*](../gcp/terraform/scripts/vars.sh)
+4. Export all the environment variables in [*vars.sh*](../gcp/ubuntu/terraform/scripts/vars.sh)
 
     ![](../img/gcp_ubuntu/14.png)
 
