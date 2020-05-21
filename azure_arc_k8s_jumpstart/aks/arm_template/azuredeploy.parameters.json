@@ -1,0 +1,24 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clusterName": {
+            "value": "<AKS cluster name>"
+        },
+        "dnsPrefix": {
+            "value": "<AKS unique DNS prefix>"
+        },        
+         "linuxAdminUsername": {
+            "value": "<OS Username>"
+        },
+        "sshRSAPublicKey": {
+            "value": "<Your ssh public key>"
+        },
+        "servicePrincipalClientId": {
+            "value": "<Your Azure Service Principle name>"
+        },
+        "servicePrincipalClientSecret": {
+            "value": "<Your Azure Service Principle password>"
+        }
+    }
+}
