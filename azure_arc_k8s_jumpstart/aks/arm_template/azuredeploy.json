@@ -103,6 +103,8 @@
             "location": "[parameters('location')]",
             "name": "[parameters('clusterName')]",
             "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "enableRBAC": "[parameters('enableRBAC')]",                
                 "dnsPrefix": "[parameters('dnsPrefix')]",
                 "agentPoolProfiles": [
                     {
