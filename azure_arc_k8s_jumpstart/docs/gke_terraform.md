@@ -100,7 +100,9 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 ![](../img/gke_terraform/21.png)
 
-* Now that you have a running GKE cluster, retrieve your Azure Subscription ID using the ```az account list``` command and edit the environment variables section in the included *az_connect_gke* shell script.
+# Connecting to Azure Arc
+
+* Now that you have a running GKE cluster, retrieve your Azure Subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_gke](../gke/terraform/scripts/az_connect_gke.sh) shell script.
 
 ![](../img/gke_terraform/22.png)
 

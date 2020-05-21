@@ -10,7 +10,7 @@ export resourceGroup=<Azure Resource Group Name>
 export arcClusterName=<The name of your k8s cluster as it will be shown in Azure Arc>
 
 # Getting AKS credentials
-echo "Log in with Service Principle & Getting AKS credentials"
+echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 
