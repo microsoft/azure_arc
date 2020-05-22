@@ -1,3 +1,4 @@
+# Configure the Google Provider
 provider "google" {
  version = "3.21"
  credentials = file(var.gcp_credentials_filename)
