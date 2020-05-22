@@ -36,7 +36,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Export the environment variables needed for the Terraform plan.
 
-    ```export TF_VAR_client_id=<Your Azure Service Principal App ID>```
+    ```export TF_VAR_client_id=<Your Azure Service Principal App ID>```   
     ```export TF_VAR_client_secret=<Your Azure Service Principal App Password>```
 
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
