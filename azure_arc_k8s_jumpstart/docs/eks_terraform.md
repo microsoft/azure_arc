@@ -101,40 +101,53 @@ cd azure_arc_k8s_jumpstart/eks/terraform
 Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:
 ![](../img/eks_terraform/image6.png)
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. 
+### Deploy EKS  
+Run the ```terraform apply --auto-approve``` command.
+Wait for the plan to finish:
+![](../img/eks_terraform/image7.png)
 
+### Setting Up kubectl
+You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
+```bash
+mkdir ~/.kube/
+terraform output kubeconfig>~/.kube/config
+```
+Check to see if cluster is discoverable by ```kubectl``` by running:
+```bash
+$ kubectl version
+Client Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:16:51Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
+Server Version: version.Info{Major:"1", Minor:"16+", GitVersion:"v1.16.8-eks-e16311", GitCommit:"e163110a04dcb2f39c3325af96d019b4925419eb", GitTreeState:"clean", BuildDate:"2020-03-27T22:37:12Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
+```
 
-Once done, you will have a ready GKE cluster under the *Kubernetes Engine* page in your GCP console.
+### Configure EKS Nodes to comminicate to EKS Control place
+Now let’s add the ConfigMap to the cluster from Terraform as well. The ConfigMap is a Kubernetes configuration, in this case for granting access to our EKS cluster. This ConfigMap allows our ec2 instances in the cluster to communicate with the EKS master, as well as allowing our user account access to run commands against the cluster. You’ll run the Terraform output command to a file, and the kubectl apply command to apply that file:
+```bash
+$ terraform output config_map_aws_auth > configmap.yml
+$ kubectl apply -f configmap.yml
+```
+![](../img/eks_terraform/image8.png)
 
-![](../img/gke_terraform/19.png)
+Once this is complete, you should see your nodes from your autoscaling group either starting to join or joined to the cluster. Once the second column reads Ready the node can have deployments pushed to it. Again, your output may vary here:
+```bash
+$ kubectl get nodes -o wide
+```
+![](../img/eks_terraform/image9.png)
 
-![](../img/gke_terraform/20.png)
+### Finished Deploying EKS
+Once done, you will have a ready EKS cluster under the ***Elastic Kubernetes Service*** section in your AWS console.
 
-![](../img/gke_terraform/21.png)
+![](../img/eks_terraform/image11.png)
+![](../img/eks_terraform/image10.png)
 
 # Connecting to Azure Arc
 
-* Now that you have a running GKE cluster, retrieve your Azure Subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_gke](../gke/terraform/scripts/az_connect_gke.sh) shell script.
+Now that you have a running EKS cluster, retrieve your Azure Subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_eks](../eks/terraform/scripts/az_connect_eks.sh) shell script.
 
-![](../img/gke_terraform/22.png)
+![](../img/eks_terraform/image12.png)
 
-* Open a new Cloud Shell session which will pre-authenticated against your GKE cluster. 
-
-![](../img/gke_terraform/23.png)
-
-![](../img/gke_terraform/24.png)
-
-![](../img/gke_terraform/25.png)
-
-* Upload the *az_connect_gke* shell script and run it using the ```. ./az_connect_gke.sh``` command. 
+Next run the edited [az_connect_eks](../eks/terraform/scripts/az_connect_eks.sh) file by ```. ./az_connect_gke.sh``` command. 
 
 **Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
-
-![](../img/gke_terraform/26.png)
-
-![](../img/gke_terraform/27.png)
-
-![](../img/gke_terraform/28.png)
 
 * Upon completion, you will have your GKE cluster connect as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
 
