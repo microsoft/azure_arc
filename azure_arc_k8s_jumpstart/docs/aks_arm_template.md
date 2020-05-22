@@ -78,7 +78,7 @@ For example:
 ```--template-uri https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_jumpstart/aks/arm_template/azuredeploy.json \```   
 ```--parameters azuredeploy.parameters.json```
 
-Once the ARM template deployment is finished, a new AKS cluster in a new Azure Resource Group is created. 
+Once the ARM template deployment is completed, a new AKS cluster in a new Azure Resource Group is created. 
 
 ![](../img/aks_arm_template/02.png)
 

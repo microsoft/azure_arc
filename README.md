@@ -43,6 +43,8 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 * [Deploy Azure Kubernetes Service (AKS) cluster and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/aks_arm_template.md)
 
+* [Deploy Azure Kubernetes Service (AKS) cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/aks_terraform.md)
+
 * [Deploy Google Kubernetes Engine (GKE) cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/gke_terraform.md)
 
 * [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/azure_arm_template.md)
@@ -65,7 +67,6 @@ Below are an additional deployment scenarios the team is currently working on.
 
 ### Azure Arc for Kubernetes
 
-- Support for an Azure Kubernetes Service (AKS) deployment using Terraform
 - Support for an Azure Red Hat OpenShift deployment using ARM template
 - Support for an EKS deployment using Terraform
 
