@@ -10,7 +10,7 @@ export password=<Your Azure Service Principle password>
 export tenantId=<Your Azure tenant ID>
 export resourceGroup=<Azure Resource Group Name>
 export location=<Azure Region>
-export arcClusterName=<Azure Arc GKE Cluster Name>
+export arcClusterName=<Azure Arc EKS Cluster Name>
 
 # Installing Helm 3
 echo "Installing Helm 3"
