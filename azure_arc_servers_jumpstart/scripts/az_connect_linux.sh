@@ -5,12 +5,12 @@ sudo apt-get update
 # <--- Change the following environment variables according to your Azure Service Principle name --->
 
 echo "Exporting environment variables"
-export subscriptionId=<Your Azure Subscription ID>
-export appId=<Your Azure Service Principle name>
-export password=<Your Azure Service Principle password>
-export tenantId=<Your Azure tenant ID>
-export resourceGroup=<Azure Resource Group Name>
-export location=<Azure Region>
+export subscriptionId='<Your Azure Subscription ID>'
+export appId='<Your Azure Service Principle name>'
+export password='<Your Azure Service Principle password>'
+export tenantId='<Your Azure tenant ID>'
+export resourceGroup='<Azure Resource Group Name>'
+export location='<Azure Region>'
 
 # Installing Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
