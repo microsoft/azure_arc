@@ -64,11 +64,13 @@ Below are an additional deployment scenarios the team is currently working on.
 - Support for an AWS Linux 2 instance deployment using Terraform
 - Support for an Ubuntu Server AWS EC2 instance deployment using Terraform
 - Support for a Windows Server AWS EC2 instance deployment using Terraform
+- Support for an Ubuntu Server VMware vSphere VM deployment using Terraform
 
 ### Azure Arc for Kubernetes
 
 - Support for an Azure Red Hat OpenShift deployment using ARM template
 - Support for an EKS deployment using Terraform
+- Support for Rancher K3s single-host cluster in VMware vSphere VM deployment using Terraform
 
 ### Azure Arc for Data Services
 
