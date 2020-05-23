@@ -30,7 +30,7 @@ The following README will guide you on how to use the provided [Terraform](https
     ```
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
-* The Terraform plan execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](../azure/terraform/scripts/vars.sh) to match the Azure Service Principle you've just created. 
+* The Terraform plan execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](../rancher_k3s/terraform/scripts/vars.sh) to match the Azure Service Principle you've just created. 
 
 # Deployment
 
@@ -47,13 +47,13 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
 
-    ![](../img/azure_terraform/01.png)
+    ![](../img/rancher_k3s_terraform/01.png)
 
 * Run the ```terraform apply --auto-approve``` command and wait for the plan to finish.
 
-    ![](../img/azure_terraform/02.png)   
+    ![](../img/rancher_k3s_terraform/02.png)   
 
-    ![](../img/azure_terraform/03.png)
+    ![](../img/rancher_k3s_terraform/03.png)
 
 # Connecting to Azure Arc
 
@@ -61,11 +61,11 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * SSH to the VM using the created Azure Public IP and your username/password.
 
-    ![](../img/azure_terraform/04.png)
+    ![](../img/rancher_k3s_terraform/04.png)
 
 * Check the cluster is up and running using the ```kubectl get nodes -o wide```
 
-    ![](../img/azure_terraform/05.png)
+    ![](../img/rancher_k3s_terraform/05.png)
 
 * Using the Azure Service Principle you've created, run the below command to connect the cluster to Azure Arc.
 
@@ -75,42 +75,42 @@ The only thing you need to do before executing the Terraform plan is to export t
 
     ```az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo```
 
-    ![](../img/azure_terraform/06.png)   
+    ![](../img/rancher_k3s_terraform/06.png)   
 
-    ![](../img/azure_terraform/07.png)
+    ![](../img/rancher_k3s_terraform/07.png)
 
-    ![](../img/azure_terraform/08.png)
+    ![](../img/rancher_k3s_terraform/08.png)
 
 # K3s External Access
 
-Traefik is the (default) ingress controller for k3s and uses port 80. To test external access to k3s cluster, an "*hello-world*" deployment was [made available](../azure/terraform/deployment/hello-kubernetes.yaml) for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes). 
+Traefik is the (default) ingress controller for k3s and uses port 80. To test external access to k3s cluster, an "*hello-world*" deployment was [made available](../rancher_k3s/terraform/deployment/hello-kubernetes.yaml) for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes). 
 
 * Since port 80 is taken by Traefik [(read more about here)](https://github.com/rancher/k3s/issues/436), the deployment LoadBalancer was changed to use port 32323 along side with the matching Azure Network Security Group (NSG).
 
-    ![](../img/azure_terraform/09.png)
+    ![](../img/rancher_k3s_terraform/09.png)
 
-    ![](../img/azure_terraform/10.png)
+    ![](../img/rancher_k3s_terraform/10.png)
 
     To deploy it, use the ```kubectl apply -f hello-kubernetes.yaml``` command. Run ```kubectl get pods``` and ```kubectl get svc``` to check that the pods and the service has been created. 
 
-    ![](../img/azure_terraform/11.png)
+    ![](../img/rancher_k3s_terraform/11.png)
 
-    ![](../img/azure_terraform/12.png)
+    ![](../img/rancher_k3s_terraform/12.png)
 
-    ![](../img/azure_terraform/13.png)
+    ![](../img/rancher_k3s_terraform/13.png)
 
 * In your browser, enter the *cluster_public_ip:3232* which will bring up the *hello-world* application.
 
-    ![](../img/azure_terraform/14.png)
+    ![](../img/rancher_k3s_terraform/14.png)
 
 # Delete the deployment
 
 The most straightforward way is to delete the cluster is via the Azure Portal, just select cluster and delete it. 
 
-![](../img/azure_terraform/15.png)
+![](../img/rancher_k3s_terraform/15.png)
 
 If you want to nuke the entire environment, just delete the Azure Resource Group or alternatively, you can use the ```terraform destroy --auto-approve``` command.
 
-![](../img/azure_terraform/16.png)
+![](../img/rancher_k3s_terraform/16.png)
 
-![](../img/azure_terraform/17.png)
+![](../img/rancher_k3s_terraform/17.png)
