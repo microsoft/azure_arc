@@ -90,7 +90,7 @@ Once the ARM template deployment is completed, a new AKS cluster in a new Azure 
 
 ![](../img/aks_arm_template/04.png)
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. 
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. Make sure Cloud Shell is configured to use Bash.
 
 ![](../img/aks_arm_template/05.png)
 
