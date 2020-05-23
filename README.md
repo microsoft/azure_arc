@@ -65,6 +65,7 @@ Below are an additional deployment scenarios the team is currently working on.
 - Support for an Ubuntu Server AWS EC2 instance deployment using Terraform
 - Support for a Windows Server AWS EC2 instance deployment using Terraform
 - Support for an Ubuntu Server VMware vSphere VM deployment using Terraform
+- Support for an Windows Server VMware vSphere VM deployment using Terraform
 
 ### Azure Arc for Kubernetes
 
