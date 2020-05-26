@@ -14,7 +14,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ## Create Azure Service Principal (SP)   
 
-* To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+* To connect the VMware vSphere virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
     ```az login```
 
