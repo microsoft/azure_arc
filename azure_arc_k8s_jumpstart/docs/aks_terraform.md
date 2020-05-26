@@ -85,7 +85,7 @@ The most straightforward way is to delete the Azure Arc cluster resource via the
 
 ![](../img/aks_terraform/13.png)
 
-If you want to nuke the entire environment, delete both the AKS and the AKS resources Resource Groups .
+If you want to nuke the entire environment, delete both the AKS and the AKS resources Resource Groups or run the ```terraform destroy -auto-approve``` command.
 
 ![](../img/aks_terraform/14.png)
 

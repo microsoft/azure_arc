@@ -37,7 +37,7 @@ resource "google_compute_instance" "default" {
     private_key = file("~/.ssh/id_rsa")
     timeout = "2m"
     }
- }
+  }
  provisioner "file" {
     source = "scripts/install_arc_agent.sh"
     destination = "/tmp/install_arc_agent.sh"
@@ -50,7 +50,7 @@ resource "google_compute_instance" "default" {
     timeout = "2m"
     }
   }
-  provisioner "remote-exec" {
+ provisioner "remote-exec" {
     inline = [     
            "sudo chmod +x /tmp/install_arc_agent.sh",
            "/tmp/install_arc_agent.sh",

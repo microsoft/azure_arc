@@ -1,6 +1,6 @@
 # Overview
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a GCP virtual machine and connect it as an Azure Arc server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Ubuntu Server GCP virtual machine and connect it as an Azure Arc server resource.
 
 # Prerequisites
 
@@ -110,7 +110,8 @@ If you want to demo/control the actual registration process, do the following:
 
     ![](../img/gcp_ubuntu/14.png)
 
-5. Run the following command
+5. Run the following command:
+
     ```azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-Servers-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id```
 
     ![](../img/gcp_ubuntu/15.png)
@@ -120,7 +121,9 @@ If you want to demo/control the actual registration process, do the following:
 # Delete the deployment
 
 To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
-    ![](../img/gcp_ubuntu/17.png)
 
-Alternatively, you can delete the GCP VM directly from [GCP Console](https://console.cloud.google.com/compute/instances). 
-    ![](../img/gcp_ubuntu/16.png)
+![](../img/gcp_ubuntu/17.png)
+
+Alternatively, you can delete the GCP VM directly from [GCP Console](https://console.cloud.google.com/compute/instances).
+
+![](../img/gcp_ubuntu/16.png)
