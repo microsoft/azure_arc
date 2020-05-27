@@ -72,7 +72,10 @@ resource "aws_instance" "default" {
   key_name                    = aws_key_pair.keypair.id
   vpc_security_group_ids      = [aws_security_group.ingress-all.id]
   subnet_id                   = aws_subnet.subnet1.id
-
+  tags = {
+    Name = "Azure-arc-demo"
+  }
+  
   connection {
     user        = "ec2-user"
     private_key = file("~/.ssh/id_rsa")
