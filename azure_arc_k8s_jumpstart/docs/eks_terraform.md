@@ -99,8 +99,8 @@ The following README will guide you on how to use the provided [Terraform](https
   ```
 
 * **Initialize Terraform**
-  <br>  Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:
-  <img src="../img/eks_terraform/image6.png" width="80%">
+  <br>  Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:<br>
+  <img src="../img/eks_terraform/image6.png" width="60%">
 
 * **Deploy EKS**<br>
   Run the ```terraform apply --auto-approve``` command.
