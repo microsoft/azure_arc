@@ -4,65 +4,82 @@ The following README will guide you on how to use the provided [Terraform](https
 
 # Prerequisites
 
-### Install AWS CLI
-  * **[MAC]** Use the package manager ```homebrew``` to install the AWS CLI.
+* Clone the repo
   ```bash
-  $ brew install awscli
-  ```
-  * **[PC]** Use the package manager ```Chocolatey``` to install the AWS CLI.
-  ```powershell
-  $ choco install awscli
-  ```
+  git clone https://github.com/likamrat/azure_arc
+  ``` 
 
-### Install **wget** package (required for the eks module)
-  * **[MAC]** Use the package manager ```homebrew``` to install the AWS CLI.
-  ```bash
-  $ brew install wget
-  ```
-  * **[PC]** Use the package manager ```Chocolatey``` to install the AWS CLI.
-  ```powershell
-  $ choco install wget
-  ```
+* [Install](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) and [Configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration) AWS CLI
 
-### Install AWS IAM Authenticator
-  * **[MAC]** Use the package manager ```homebrew``` to install the AWS CLI.
-  ```bash
-  $ brew install aws-iam-authenticator
-  ```
-  * **[PC]** Use the package manager ```Chocolatey``` to install the AWS CLI.
-  ```powershell
-  $ choco install aws-iam-authenticator
-  ```
+* Install **wget** package (required for the eks module)
+  * [Windows](https://builtvisible.com/download-your-website-with-wget/)
+  * [Mac](https://www.cyberciti.biz/faq/howto-install-wget-om-mac-os-x-mountain-lion-mavericks-snow-leopard/)
+  * [Linux](https://www.tecmint.com/install-wget-in-linux/)
 
-### [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). 
-* Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
-### [Create a free Amazon Web Service's account](https://aws.amazon.com/free/)
+* [Install AWS IAM Authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
 
-### [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). 
+    * Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
+* [Create a free Amazon Web Service's account](https://aws.amazon.com/free/)
 
-### Create Azure Service Principal (SP)   
+* [Install Helm 3](https://helm.sh/docs/intro/install/)
 
-    To connect the EKS cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-    ```az login```
+* Create Azure Service Principal (SP) 
 
-    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
+    To connect the EKS cluster to Azure Arc, Azure Service Principal is required and can be created by:
+
+
+    ```
+    az login
+
+    az ad sp create-for-RBAC --skip-assignment --name "https://azure-arc-for-k8s-onboarding"
+    ``` 
 
     Output should look like this:
     ```
     {
-    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcK8s",
-    "name": "http://AzureArcK8s",
-    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        "appId": "22cc2695-54b9-49c1-9a73-2269592103d8",
+        "displayName": "azure-arc-for-k8s-onboarding",
+        "name": "https://azure-arc-for-k8s-onboarding",
+        "password": "09d3a928-b223-4dfe-80e8-fed13baa3b3d",
+        "tenant": "72f988bf-86f1-41af-91ab-2d7cd011db47"
     }
     ```
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+    Next assign permissions to the ***Service Principal*** created:
+    ```bash
+    az role assignment create \
+    --role 34e09817-6cbe-4d01-b1a2-e0eac5743d41 \      # this is the id for the built-in role
+    --assignee 22cc2695-54b9-49c1-9a73-2269592103d8 \  # use the appId from the new SP
+    --scope /subscriptions/<<SUBSCRIPTION_ID>>         # apply the appropriate scope
+    ```
+* Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
+  Registration is an asynchronous process, and registration may take approximately 10 minutes.
+  ```bash
+  az provider register --namespace Microsoft.Kubernetes
+  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.Kubernetes'
 
-### Create AWS User IAM Key
+  az provider register --namespace Microsoft.KubernetesConfiguration
+  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.KubernetesConfiguration'
+  ```
+  You can monitor the registration process with the following commands:
+  ```bash
+  az provider show -n Microsoft.Kubernetes -o table
+  ```
+  ```bash
+  az provider show -n Microsoft.KubernetesConfiguration -o table
+  ```
 
-An access key grants programmatic access to your resources. To create an AWS Access Key for a user:
+* Install the ***connectedk8s*** and ***k8sconfiguration*** extension, which helps you connect Kubernetes clusters to Azure:
+  ```bash
+  az extension add --name connectedk8s
+  az extension add --name k8sconfiguration
+  ```
+
+* Create AWS User IAM Key
+
+  An access key grants programmatic access to your resources. To create an AWS Access Key for a user:
   1. Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home). 
     ![](../img/eks_terraform/image0.png)
   2. Select the **Users** from the side menue. 
@@ -76,97 +93,95 @@ An access key grants programmatic access to your resources. To create an AWS Acc
   6. In the popup window it will show you the ***Access key ID*** and ***Secret access key***. Save both of these values to configure **AWS CLI** later
   ![](../img/eks_terraform/image5.png)
 
-### Configure AWS CLI using ***Access Key***
-To configure **AWS CLI** run ```aws configure``` and when prompted, enter your ***AWS Access Key ID***, ***Secret Access Key***, ***region*** and output format (type ***json***).
-```bash
-$ aws configure
-AWS Access Key ID [None]: YOUR_AWS_ACCESS_KEY_ID
-AWS Secret Access Key [None]: YOUR_AWS_SECRET_ACCESS_KEY
-Default region name [None]: YOUR_AWS_REGION
-Default output format [None]: json
-```
-
 # Deployment
+* Navigate to the folder that has **EKS** terraform binaries.
+  ```bash
+  cd azure_arc_k8s_jumpstart/eks/terraform
+  ```
 
-### Clone the repo
-```bash
-git clone https://github.com/alihhussain/azure_arc
-``` 
-Navigate to the folder that has **EKS** terraform binaries.
-```bash
-cd azure_arc_k8s_jumpstart/eks/terraform
-```
-
-### Initialize Terraform
-Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:
+* **Initialize Terraform**
+  <br>  Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:
 ![](../img/eks_terraform/image6.png)
 
-### Deploy EKS  
+* **Deploy EKS**<br>
 Run the ```terraform apply --auto-approve``` command.
 Wait for the plan to finish:
 ![](../img/eks_terraform/image7.png)
 
-### Setting Up kubectl
-You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
-```bash
-mkdir ~/.kube/
-terraform output kubeconfig>~/.kube/config
-```
-Check to see if cluster is discoverable by ```kubectl``` by running:
-```bash
-$ kubectl version
-Client Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:16:51Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
-Server Version: version.Info{Major:"1", Minor:"16+", GitVersion:"v1.16.8-eks-e16311", GitCommit:"e163110a04dcb2f39c3325af96d019b4925419eb", GitTreeState:"clean", BuildDate:"2020-03-27T22:37:12Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
-```
+* **Setting Up kubectl**<br>
+You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. <br>Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
+  ```bash
+  mkdir ~/.kube/
+  terraform output kubeconfig>~/.kube/config
+  ```
+  Check to see if cluster is discoverable by ```kubectl``` by running:
+  ```bash
+  $ kubectl version
+  Client Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:16:51Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
+  Server Version: version.Info{Major:"1", Minor:"16+", GitVersion:"v1.16.8-eks-e16311", GitCommit:"e163110a04dcb2f39c3325af96d019b4925419eb", GitTreeState:"clean", BuildDate:"2020-03-27T22:37:12Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
+  ```
 
-### Configure EKS Nodes to comminicate to EKS Control place
+* **Configure EKS Nodes to comminicate to EKS Control place**<br>
 Now let’s add the ConfigMap to the cluster from Terraform as well. The ConfigMap is a Kubernetes configuration, in this case for granting access to our EKS cluster. This ConfigMap allows our ec2 instances in the cluster to communicate with the EKS master, as well as allowing our user account access to run commands against the cluster. You’ll run the Terraform output command to a file, and the kubectl apply command to apply that file:
-```bash
-$ terraform output config_map_aws_auth > configmap.yml
-$ kubectl apply -f configmap.yml
-```
-![](../img/eks_terraform/image8.png)
+  ```bash
+  terraform output config_map_aws_auth > configmap.yml
 
-Once this is complete, you should see your nodes from your autoscaling group either starting to join or joined to the cluster. Once the second column reads Ready the node can have deployments pushed to it. Again, your output may vary here:
-```bash
-$ kubectl get nodes -o wide
-```
-![](../img/eks_terraform/image9.png)
+  kubectl apply -f configmap.yml
+  ```
+  ![](../img/eks_terraform/image8.png)
 
-### Finished Deploying EKS
+  Once this is complete, you should see your nodes from your autoscaling group either starting to join or joined to the cluster. Once the second column reads Ready the node can have deployments pushed to it. Again, your output may vary here:
+  ```bash
+  kubectl get nodes -o wide
+  ```
+  ![](../img/eks_terraform/image9.png)
+
+* **Finished Deploying EKS**<br>
 Once done, you will have a ready EKS cluster under the ***Elastic Kubernetes Service*** section in your AWS console.
 
-![](../img/eks_terraform/image11.png)
-![](../img/eks_terraform/image10.png)
+  ![](../img/eks_terraform/image10.png)
+  ![](../img/eks_terraform/image11.png)
 
 # Connecting to Azure Arc
 
-Now that you have a running EKS cluster, retrieve your Azure Subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_eks](../eks/terraform/scripts/az_connect_eks.sh) shell script.
+Now that you have a running EKS cluster, lets connect the EKS cluster to Azure Arc by:<br>
+* login to Azure CLI
+  ```bash
+  az login
+  ```
 
-![](../img/eks_terraform/image12.png)
+ * Create a resoure group<br> 
+   ```bash
+   az group create --name arceksdemo -l EastUS -o table
+   ```
+* Change login to previously created [***Service Principal***](#prerequisites) <br>
+  ```bash
+  az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
+  ```
+  
+* Deploy Arc binaries using Azure CLI:
+  ```bash
+  az connectedk8s connect -n arceksdemo -g arceksdemo
+  ```
 
-Next run the edited [az_connect_eks](../eks/terraform/scripts/az_connect_eks.sh) file by ```. ./az_connect_gke.sh``` command. 
+* Upon completion, you will have your EKS cluster connect as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
 
-**Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
+  ![](../img/eks_terraform/image13.png)
 
-* Upon completion, you will have your GKE cluster connect as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
+  ![](../img/eks_terraform/image14.png)
 
-![](../img/gke_terraform/29.png)
-
-![](../img/gke_terraform/30.png)
-
-![](../img/gke_terraform/31.png)
+  ![](../img/eks_terraform/image15.png)
 
 # Delete the deployment
 
 In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal.
 
-![](../img/gke_terraform/32.png)
+![](../img/eks_terraform/image16.png)
 
-![](../img/gke_terraform/33.png)
+![](../img/eks_terraform/image17.png)
 
-On your GCP console, select the cluster and delete it or alternatively, you can use the ```terraform destroy --auto-approve``` command.
+On your AWS portal, select the cluster and delete it or alternatively, you can use the ```terraform destroy --auto-approve``` command.
 
-![](../img/gke_terraform/34.png)
+![](../img/eks_terraform/image18.png)
 
-![](../img/gke_terraform/35.png)
+![](../img/eks_terraform/image20.png)
