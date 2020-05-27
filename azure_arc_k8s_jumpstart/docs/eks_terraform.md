@@ -148,6 +148,7 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
    ```bash
    az group create --name arceksdemo -l EastUS -o table
    ```
+   **NOTE** Azure Arc enabled Kubernetes is currently supported in ***East US*** and ***West Europe***
 
   
 * Deploy Arc binaries using Azure CLI:
