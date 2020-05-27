@@ -94,7 +94,7 @@ resource "aws_instance" "default" {
   provisioner "remote-exec" {
     inline = [
       "sudo chmod +x /tmp/install_arc_agent.sh",
-      // "/tmp/install_arc_agent.sh",
+      "/tmp/install_arc_agent.sh",
     ]
   }
 }
