@@ -30,6 +30,22 @@ The following README will guide you on how to connect an existing Kubernetes clu
     ```
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
+* Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
+  Registration is an asynchronous process, and registration may take approximately 10 minutes.
+  ```bash
+  az provider register --namespace Microsoft.Kubernetes
+  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.Kubernetes'
+
+  az provider register --namespace Microsoft.KubernetesConfiguration
+  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.KubernetesConfiguration'
+  ```
+  You can monitor the registration process with the following commands:
+  ```bash
+  az provider show -n Microsoft.Kubernetes -o table
+ 
+  az provider show -n Microsoft.KubernetesConfiguration -o table
+  ```
+
 * Create a new Azure Resource Group where you want your cluster(s) to show up. 
 
 * Download the [az_connect_k8s](../scripts/az_connect_k8s.sh) shell script.
