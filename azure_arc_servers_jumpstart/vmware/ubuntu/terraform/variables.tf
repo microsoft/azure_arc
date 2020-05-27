@@ -3,7 +3,7 @@ variable "location" {
 }
 
 variable "resourceGroup" {
-    default = "Arc-Servers-Demo"
+  default = "Arc-Servers-Demo"
 }
 
 variable "subscription_id" {
@@ -49,8 +49,8 @@ variable "network_cards" {
 
 variable "ipv4_submask" {
   description = "ipv4 Subnet Mask"
-  type = list(string)
-  default = ["24"]
+  type        = list(string)
+  default     = ["24"]
 }
 
 variable "vsphere_folder" {
@@ -107,7 +107,7 @@ variable "vm_gateway" {
 }
 
 variable "vm_dns" {
-  type = list(string)
+  type    = list(string)
   default = null
 }
 
