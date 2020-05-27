@@ -34,26 +34,21 @@ The following README will guide you on how to use the provided [Terraform](https
     ```
     az login
 
-    az ad sp create-for-RBAC --skip-assignment --name "https://azure-arc-for-k8s-onboarding"
+    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ``` 
 
     Output should look like this:
     ```
     {
-        "appId": "22cc2695-54b9-49c1-9a73-2269592103d8",
-        "displayName": "azure-arc-for-k8s-onboarding",
-        "name": "https://azure-arc-for-k8s-onboarding",
-        "password": "09d3a928-b223-4dfe-80e8-fed13baa3b3d",
-        "tenant": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+       "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+       "displayName": "AzureArcK8s",
+       "name": "http://AzureArcK8s",
+       "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+       "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-    Next assign permissions to the ***Service Principal*** created:
-    ```bash
-    az role assignment create \
-    --role 34e09817-6cbe-4d01-b1a2-e0eac5743d41 \      # this is the id for the built-in role
-    --assignee 22cc2695-54b9-49c1-9a73-2269592103d8 \  # use the appId from the new SP
-    --scope /subscriptions/<<SUBSCRIPTION_ID>>         # apply the appropriate scope
-    ```
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+
 * Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
   Registration is an asynchronous process, and registration may take approximately 10 minutes.
   ```bash
@@ -144,19 +139,16 @@ Once done, you will have a ready EKS cluster under the ***Elastic Kubernetes Ser
 # Connecting to Azure Arc
 
 Now that you have a running EKS cluster, lets connect the EKS cluster to Azure Arc by:<br>
-* login to Azure CLI
-  ```bash
-  az login
-  ```
+  * Change login to previously created [***Service Principal***](#prerequisites) <br>
+    ```bash
+    az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
+    ```
 
  * Create a resoure group<br> 
    ```bash
    az group create --name arceksdemo -l EastUS -o table
    ```
-* Change login to previously created [***Service Principal***](#prerequisites) <br>
-  ```bash
-  az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
-  ```
+
   
 * Deploy Arc binaries using Azure CLI:
   ```bash
@@ -171,7 +163,11 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
 
 # Delete the deployment
 
-In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal.
+In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal or through the CLI.
+
+```bash
+az group delete --name arceksdemo
+```
 
 ![](../img/eks_terraform/image16.png)
 ![](../img/eks_terraform/image17.png)
