@@ -139,7 +139,7 @@ Once done, you will have a ready EKS cluster under the ***Elastic Kubernetes Ser
 # Connecting to Azure Arc
 
 Now that you have a running EKS cluster, lets connect the EKS cluster to Azure Arc by:<br>
-  * Change login to previously created [***Service Principal***](#prerequisites) <br>
+  * Login to previously created [***Service Principal***](#prerequisites) <br>
     ```bash
     az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
     ```
