@@ -100,12 +100,13 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * **Initialize Terraform**
   <br>  Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:
-![](../img/eks_terraform/image6.png)
+
+  <img src="../img/eks_terraform/image6.png" width="80%">
 
 * **Deploy EKS**<br>
 Run the ```terraform apply --auto-approve``` command.
 Wait for the plan to finish:
-![](../img/eks_terraform/image7.png)
+<img src="../img/eks_terraform/image7.png" width="80%">
 
 * **Setting Up kubectl**<br>
 You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. <br>Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
@@ -166,9 +167,7 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
 * Upon completion, you will have your EKS cluster connect as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
 
   ![](../img/eks_terraform/image13.png)
-
   ![](../img/eks_terraform/image14.png)
-
   ![](../img/eks_terraform/image15.png)
 
 # Delete the deployment
@@ -176,11 +175,9 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
 In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal.
 
 ![](../img/eks_terraform/image16.png)
-
 ![](../img/eks_terraform/image17.png)
 
 On your AWS portal, select the cluster and delete it or alternatively, you can use the ```terraform destroy --auto-approve``` command.
 
 ![](../img/eks_terraform/image18.png)
-
-![](../img/eks_terraform/image20.png)
+<img src="../img/eks_terraform/image20.png" width="60%">
