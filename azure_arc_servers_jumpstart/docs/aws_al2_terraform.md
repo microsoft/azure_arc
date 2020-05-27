@@ -89,7 +89,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * From CLI, navigate to the [*azure_arc_servers_jumpstart/aws/al2/terraform*](../aws/al2/terraform) directory of the cloned repo.
 
-* Export the environment variables you edited by running [*scripts/vars.sh*](../gcp/ubuntu/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly. Note that this script will also be automatically executed remotely on the GCP virtual machine as part of the Terraform deployment. 
+* Export the environment variables you edited by running [*scripts/vars.sh*](../gcp/ubuntu/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly. Note that this script will also be automatically executed remotely on the AWS virtual machine as part of the Terraform deployment. 
 
     ```source ./scripts/vars.sh```
 
@@ -97,11 +97,11 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
 
-    ![](../img/gcp_ubuntu/08.png)
+    ![](../img/aws_al2/09.png)
 
 # Deployment
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have a GCP Ubuntu VM deployed and connected as a new Azure Arc server inside a new Resource Group.
+* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have an AWS Amazon Linux 2 VM deployed and connected as a new Azure Arc server inside a new Resource Group.
 
 * Open the Azure portal and navigate to the resource group "Arc-Servers-Demo". The virtual machine created in GCP will be visible as a resource.
 
