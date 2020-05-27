@@ -20,4 +20,4 @@ az extension add --name connectedk8s
 az extension add --name k8sconfiguration
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup
+az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --location 'eastus'
