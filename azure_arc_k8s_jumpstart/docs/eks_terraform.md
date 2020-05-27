@@ -100,16 +100,15 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * **Initialize Terraform**
   <br>  Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:
-
   <img src="../img/eks_terraform/image6.png" width="80%">
 
 * **Deploy EKS**<br>
-Run the ```terraform apply --auto-approve``` command.
-Wait for the plan to finish:
-<img src="../img/eks_terraform/image7.png" width="80%">
+  Run the ```terraform apply --auto-approve``` command.
+  Wait for the plan to finish:
+  <img src="../img/eks_terraform/image7.png" width="80%">
 
 * **Setting Up kubectl**<br>
-You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. <br>Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
+  You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. <br>Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
   ```bash
   mkdir ~/.kube/
   terraform output kubeconfig>~/.kube/config
