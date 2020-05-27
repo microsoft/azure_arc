@@ -1,25 +1,25 @@
 # Declare TF variables
 variable "aws_region" {
-    default = "us-west-2"
+  default = "us-west-2"
 }
 variable "aws_availabilityzone" {
-    default = "us-west-2a"
+  default = "us-west-2a"
 }
 
 variable "admin_username" {
-    default = "arcadmin"
+  default = "arcadmin"
 }
 
 variable "admin_password" {
-    default = "arcdemo123!!"
+  default = "arcdemo123!!"
 }
 
 variable "azure_location" {
-    default = "westus2"
+  default = "westus2"
 }
 
 variable "azure_resource_group" {
-    default = "Arc-Servers-Demo"
+  default = "Arc-Servers-Demo"
 }
 
 variable "subscription_id" {
