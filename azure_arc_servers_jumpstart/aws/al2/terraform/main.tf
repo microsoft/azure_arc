@@ -73,9 +73,9 @@ resource "aws_instance" "default" {
   vpc_security_group_ids      = [aws_security_group.ingress-all.id]
   subnet_id                   = aws_subnet.subnet1.id
   tags = {
-    Name = "Azure-arc-demo"
+    Name = "arc-aws-demo"
   }
-  
+
   connection {
     user        = "ec2-user"
     private_key = file("~/.ssh/id_rsa")
@@ -94,7 +94,7 @@ resource "aws_instance" "default" {
   provisioner "remote-exec" {
     inline = [
       "sudo chmod +x /tmp/install_arc_agent.sh",
-      "/tmp/install_arc_agent.sh",
+      // "/tmp/install_arc_agent.sh",
     ]
   }
 }
