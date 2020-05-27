@@ -144,7 +144,7 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
     az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
     ```
 
- * Create a resoure group<br> 
+ * Create a resource group<br> 
    ```bash
    az group create --name arceksdemo -l EastUS -o table
    ```
