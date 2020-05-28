@@ -18,6 +18,10 @@ variable "azure_location" {
   default = "westus2"
 }
 
+variable "hostname" {
+  default = "azure-arc-demo"
+}
+
 variable "azure_resource_group" {
   default = "Arc-Servers-Demo"
 }
