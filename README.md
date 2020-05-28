@@ -69,9 +69,11 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 #### Rancher k3s
 
-* [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/rancher_k3s_arm_template.md)
+* [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/rancher_k3s_azure_arm_template.md)
 
-* [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/rancher_k3s_terraform.md)
+* [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/rancher_k3s_azure_terraform.md)
+
+* [Deploy Rancher k3s on a VMware vSphere VM and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/rancher_k3s_vmware_terraform.md)
 
 ## Azure Arc for Data Services
 
@@ -91,7 +93,6 @@ Below are an additional deployment scenarios the team is currently working on.
 ### Azure Arc for Kubernetes
 
 - Support for an Azure Red Hat OpenShift deployment using ARM template
-- Support for Rancher K3s single-host cluster in VMware vSphere VM deployment using Terraform
 
 ### Azure Arc for Data Services
 
