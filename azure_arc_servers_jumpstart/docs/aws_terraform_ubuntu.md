@@ -126,7 +126,7 @@ If you want to demo/control the actual registration process, do the following:
 
     ![](../img/aws_ubuntu/14.png)
 
-4. Export all the environment variables in [*vars.sh*](../aws/al2/terraform/scripts/vars.sh)
+4. Export all the environment variables in [*vars.sh*](../aws/ubuntu/terraform/scripts/vars.sh)
 
     ![](../img/aws_ubuntu/15.png)
 
