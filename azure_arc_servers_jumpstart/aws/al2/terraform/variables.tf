@@ -14,6 +14,10 @@ variable "admin_password" {
   default = "arcdemo123!!"
 }
 
+variable "hostname" {
+  default = "azure-arc-demo"
+}
+
 variable "azure_location" {
   default = "westus2"
 }

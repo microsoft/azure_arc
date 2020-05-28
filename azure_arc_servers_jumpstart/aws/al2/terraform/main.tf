@@ -72,8 +72,9 @@ resource "aws_instance" "default" {
   key_name                    = aws_key_pair.keypair.id
   vpc_security_group_ids      = [aws_security_group.ingress-all.id]
   subnet_id                   = aws_subnet.subnet1.id
+  user_data                   = data.template_file.user_data.rendered
   tags = {
-    Name = "arc-aws-demo"
+    Name = var.hostname
   }
 
   connection {
@@ -106,6 +107,13 @@ resource "local_file" "install_arc_agent_sh" {
     }
   )
   filename = "scripts/install_arc_agent.sh"
+}
+
+data "template_file" "user_data" {
+  template = templatefile("scripts/user_data.tmpl", {
+    hostname = var.hostname
+    }
+  )
 }
 
 // A variable for extracting the external ip of the instance
