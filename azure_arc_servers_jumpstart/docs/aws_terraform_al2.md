@@ -56,7 +56,7 @@ In order for Terraform to create resources in AWS, we will need to create a new 
 
     ![](../img/aws_al2/04.png)
 
-* On the next "Set Permissions" screen, select "Attach existing policies directly" and then check the box next to AdministratorAccess as seen in the screenshot then click "Next"
+* On the next "Set Permissions" screen, select "Attach existing policies directly" and then check the box next to AmazonEC2FullAccess as seen in the screenshot then click "Next"
 
     ![](../img/aws_al2/05.png)
 
