@@ -1,0 +1,34 @@
+#!/bin/bash
+
+sudo apt-get update
+
+# Injecting environment variables
+source /tmp/vars.sh
+# publicIp=$(curl icanhazip.com)
+
+# Installing Rancer K3s single master cluster using k3sup
+sudo mkdir ~/.kube
+sudo curl -sLS https://get.k3sup.dev | sh
+sudo cp k3sup /usr/local/bin/k3sup
+sudo k3sup install --local --context arck3sdemo --local-path ~/.kube/config
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+
+# Installing Helm 3
+sudo snap install helm --classic
+
+# Installing Azure CLI & Azure Arc Extensions
+sudo apt-get update
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+sudo az extension add --name connectedk8s
+sudo az extension add --name k8sconfiguration
+
+sudo chown -R $TF_VAR_admin_user /home/$TF_VAR_admin_user/.kube
+sudo chown -R $TF_VAR_admin_user /home/$TF_VAR_admin_user/.kube/config
+sudo chown -R $TF_VAR_admin_user /home/$TF_VAR_admin_user/.azure/config
+sudo chown -R $TF_VAR_admin_user /home/$TF_VAR_admin_user/.azure
+sudo chmod -R 777 /home/$TF_VAR_admin_user/.azure/config
+sudo chmod -R 777 /home/$TF_VAR_admin_user/.azure
+
+sudo az login --service-principal --username $TF_VAR_client_id --password $TF_VAR_client_secret --tenant $TF_VAR_tenant_id
+sudo az connectedk8s connect --name $TF_VAR_arcClusterName --resource-group $TF_VAR_resourceGroup --location 'eastus'

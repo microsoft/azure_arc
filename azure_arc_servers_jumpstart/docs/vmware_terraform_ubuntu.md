@@ -12,9 +12,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * A VMware vCenter Server user with [permissions to deploy](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.vm_admin.doc/GUID-8254CD05-CC06-491D-BA56-A773A32A8130.html) a Virtual Machine from a Template in the vSphere Web Client.
 
-## Create Azure Service Principal (SP)   
+* Create Azure Service Principal (SP)   
 
-* To connect the VMware vSphere virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+   To connect the VMware vSphere virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
     ```az login```
 
@@ -42,7 +42,7 @@ Before using the below guide to deploy an Ubuntu Server VM and connect it to Azu
 
 # Deployment
 
-Before executing the Terraform plan, you must * the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and your VMware vSphere credentials.
+Before executing the Terraform plan, you must set the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and your VMware vSphere credentials.
 
 * Retrieve your Azure Subscription ID and tenant ID using the ```az account list``` command.
 
