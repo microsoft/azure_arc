@@ -61,7 +61,7 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 #### Amazon Elastic Kubernetes Service (EKS)
 
-* [Deploy Amazon Elastic Kubernetes Service (Amazon EKS) cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/eks_terraform.md)
+* [Deploy Amazon Elastic Kubernetes Service (EKS) cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/eks_terraform.md)
 
 #### Google Kubernetes Engine (GKE)
 
