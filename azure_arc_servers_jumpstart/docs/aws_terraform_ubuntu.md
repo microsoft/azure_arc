@@ -89,7 +89,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * From CLI, navigate to the [*azure_arc_servers_jumpstart/aws/ubuntu/terraform*](../aws/ubuntu/terraform) directory of the cloned repo.
 
-* Export the environment variables you edited by running [*scripts/vars.sh*](../aws/al2/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly. Note that this script will also be automatically executed remotely on the AWS virtual machine as part of the Terraform deployment. 
+* Export the environment variables you edited by running [*scripts/vars.sh*](../aws/ubuntu/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly. Note that this script will also be automatically executed remotely on the AWS virtual machine as part of the Terraform deployment. 
 
     ```source ./scripts/vars.sh```
 
@@ -122,7 +122,7 @@ If you want to demo/control the actual registration process, do the following:
 
     ![](../img/aws_ubuntu/13.png)
 
-3. SSH the VM using the ```ssh ec2-user@x.x.x.x``` where x.x.x.x is the host ip. 
+3. SSH the VM using the ```ssh ubuntu@x.x.x.x``` where x.x.x.x is the host ip. 
 
     ![](../img/aws_ubuntu/14.png)
 
