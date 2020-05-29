@@ -35,6 +35,10 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 * [Deploy a local Windows 10 VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_windows.md)
 
+#### Amazon Web Services (AWS)
+
+* [Deploy an AWS EC2 Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/aws_terraform_ubuntu.md)
+
 #### Google Cloud Platform
 
 * [Deploy a Google Cloud Platform (GCP) Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_ubuntu.md)
@@ -86,7 +90,6 @@ Below are an additional deployment scenarios the team is currently working on.
 ### Azure Arc for Servers
 
 - Support for an AWS Linux 2 instance deployment using Terraform
-- Support for an Ubuntu Server AWS EC2 instance deployment using Terraform
 - Support for a Windows Server AWS EC2 instance deployment using Terraform
 - Support for a Windows Server VMware vSphere VM deployment using Terraform
 
