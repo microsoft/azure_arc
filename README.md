@@ -21,7 +21,7 @@ The following guides will walk you how to demo and get started with Azure Arc. T
 ## Azure Arc for Servers
 The below deployment options are focusing on Azure Arc for Servers. It is designed to quickly spin up a server that is ready to be projected in Azure Arc and for you to start playing with it. 
 
-**Note**: For a list of supported operating systems and Azure regions, please visit the official [Azure Arc docs](https://docs.microsoft.com/en-us/azure/azure-arc/servers/overview). 
+***Note: For a list of supported operating systems and Azure regions, please visit the official [Azure Arc docs](https://docs.microsoft.com/en-us/azure/azure-arc/servers/overview).*** 
 
 #### General
 
