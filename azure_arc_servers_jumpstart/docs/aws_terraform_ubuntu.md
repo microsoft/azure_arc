@@ -14,7 +14,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-# Create Azure Service Principal (SP)   
+## Create Azure Service Principal (SP)   
 
 * To connect the AWS virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
@@ -72,7 +72,7 @@ In order for Terraform to create resources in AWS, we will need to create a new 
 
     ![](../img/aws_ubuntu/08.png)
 
-# Configure Terraform
+## Configure Terraform
 
 Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on your Azure subscription and tenant, the Azure Service Principal, and the AWS IAM user and keys you just created.
 
@@ -106,6 +106,8 @@ Before executing the Terraform plan, you must export the environment variables w
 * Open the Azure portal and navigate to the resource group "Arc-Servers-Demo". The virtual machine created in AWS will be visible as a resource.
 
     ![](../img/aws_ubuntu/10.png)
+
+    ![](../img/aws_ubuntu/19.png)
 
 # Semi-Automated Deployment (Optional)
 
@@ -142,5 +144,7 @@ If you want to demo/control the actual registration process, do the following:
 To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
     ![](../img/aws_ubuntu/17.png)
 
-Alternatively, you can delete the AWS EC2 instance directly by terminating it from the [AWS Console](https://console.aws.amazon.com/ec2/v2/home).
+Alternatively, you can delete the AWS EC2 instance directly by terminating it from the [AWS Console](https://console.aws.amazon.com/ec2/v2/home). Note that it will take a few minutes for the instance to actually be removed.
     ![](../img/aws_ubuntu/18.png)
+
+If you delete the instance manually, then you should also delete [install_arc_agent.sh](../aws/ubuntu/terraform/scripts/install_arc_agent.sh) which is created by the Terraform plan.
