@@ -76,6 +76,9 @@ For example:
   --parameters azuredeploy.parameters.json
 ```
 
+Upon completion, you will have new VM installed as a single-host k3s cluster in a new Resource Group.
+
+
 ![](../img/rancher_k3s/azure/arm_template/01.png)
 
 # Connecting to Azure Arc

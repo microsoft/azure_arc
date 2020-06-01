@@ -79,7 +79,7 @@ az deployment group create \
 --parameter sazuredeploy.parameters.json
 ```
 
-Upon completion, you will have new VM installed as a single-host k3s cluster in a new Azure Resource Group.
+Once the ARM template deployment is completed, a new AKS cluster in a new Azure Resource Group is created. 
 
 ![](../img/aks_arm_template/02.png)
 
