@@ -52,25 +52,27 @@ The deployment is using the template parameters file. Before initiating the depl
 
 ![](../img/aks_arm_template/01.png)
 
-## If you cloned this repo
+To deploy the ARM template, navigate to the [deployment folder](../aks/arm_template) and run the below command:
 
-If you cloned this repository and made these changes locally, run the below command:
+```bash
+az group create --name <Name of the Azure Resource Group> --location <Azure Region> 
+az deployment group create \  
+--resource-group <Name of the Azure Resource Group> \ 
+--name <The name of this deployment> \   
+--template-file <The *azuredeploy.json* template file location> \   
+--parameters <The *azuredeploy.parameters.json* parameters file location>
+```
 
-```az group create --name <Name of the Azure Resource Group> --location <Azure Region>```   
-```az deployment group create \```   
-```--resource-group <Name of the Azure Resource Group> \```   
-```--name <The name of this deployment> \```   
-```--template-file <The *azuredeploy.json* template file location> \```   
-```--parameters <The *azuredeploy.parameters.json* parameters file location>```
+For example:
 
-For example and to make it easy for you, from the directory where the ARM template JSON files are, run the below command and wait for it to finish.. 
-
-```az group create --name Arc-AKS-Demo --location "East US"```   
-```az deployment group create \```   
-```--resource-group Arc-AKS-Demo \```   
-```--name arcaksdemo01 \```   
-```--template-file azuredeploy.json \```   
-```--parameters azuredeploy.parameters.json```
+```bash
+az group create --name Arc-AKS-Demo --location "East US" 
+az deployment group create \  
+--resource-group Arc-AKS-Demo \ 
+--name arcaksdemo01 \   
+--template-file azuredeploy.json \   
+--parameter sazuredeploy.parameters.json
+```
 
 ## If you forked this repo
 
