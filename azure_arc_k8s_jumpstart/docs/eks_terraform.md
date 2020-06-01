@@ -31,11 +31,14 @@ The following README will guide you on how to use the provided [Terraform](https
     To connect the EKS cluster to Azure Arc, Azure Service Principal is required and can be created by:
 
 
-    ```
+    ```bash
     az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    ```
 
-    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
-    ``` 
+    For example:
+
+    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
 
     Output should look like this:
     ```
