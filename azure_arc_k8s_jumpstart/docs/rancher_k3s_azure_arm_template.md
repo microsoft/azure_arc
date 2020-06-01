@@ -12,7 +12,12 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
     To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
-    ```az login```
+    ```bash
+    az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    ```
+
+    For example:
 
     ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
 
@@ -49,9 +54,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 The deployment is using the template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include the OS username and password as well as the appId, password and tenant generated from the service principal creation.  
 
-## If you cloned this repo
-
-If you cloned this repository and made these changes locally, run the below command:
+To deploy the ARM template, navigate to the [deployment folder](../rancher_k3s/azure/arm_template) and run the below command:
 
 ```bash
   az group create --name <Name of the Azure Resource Group> --location <Azure Region>
@@ -62,7 +65,7 @@ If you cloned this repository and made these changes locally, run the below comm
   --parameters <The *azuredeploy.parameters.json* parameters file location>
 ```
 
-For example and to make it easy for you, ```cd``` to the directory of the ARM template json files and run the command and wait for it to finish.. 
+For example:
 
 ```bash
   az group create --name Arc-K3s-Demo --location "East US"
@@ -71,30 +74,6 @@ For example and to make it easy for you, ```cd``` to the directory of the ARM te
   --name arck3sdemo01 \ 
   --template-file azuredeploy.json \ 
   --parameters azuredeploy.parameters.json
-```
-
-## If you forked this repo
-
-If you forked this repository and you are pushing the changes to the forked repo, run the below command and wait for it to finish.
-
-```bash
-  az group create --name Arc-K3s-Demo --location "East US"   
-  az deployment group create \
-  --resource-group Arc-K3s-Demo \
-  --name arck3sdemo01 \
-  --template-uri <The *azuredeploy.json* template file location in your GitHub repo> \
-  --parameters <The *azuredeploy.parameters.json* template file location in your GitHub repo>
-```
-
-For example:
-
-```bash
-  az group create --name Arc-K3s-Demo --location "East US"   
-  az deployment group create \
-  --resource-group Arc-K3s-Demo \
-  --name arck3sdemo01 \
-  --template-uri https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_jumpstart/rancher_k3s/arm_template/azuredeploy.json \
-  --parameters https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_jumpstart/rancher_k3s/arm_template/azuredeploy.parameters.json
 ```
 
 ![](../img/rancher_k3s/azure/arm_template/01.png)
