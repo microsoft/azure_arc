@@ -77,7 +77,7 @@ The only thing you need to do before executing the Terraform plan is to export t
     ![](../img/rancher_k3s/azure/terraform/02.png) 
 
     ![](../img/rancher_k3s/azure/terraform/03.png)
-
+  
 # Connecting to Azure Arc
 
 **Note:** The VM bootstrap includes the log in process to Azure as well deploying the needed Azure Arc CLI extensions - no action items on you there!
