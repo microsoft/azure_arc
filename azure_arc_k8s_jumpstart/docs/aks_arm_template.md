@@ -79,29 +79,7 @@ az deployment group create \
 --parameter sazuredeploy.parameters.json
 ```
 
-## If you forked this repo
-
-If you forked this repository and you are pushing the changes to the forked repo, run the below command and wait for it to finish.
-
-**Note: As a best practice, don't push (and keep it local) the edited *azuredeploy.parameters.json* file which contains sensitive data to your GitHub account.**
-
-```az group create --name Arc-AKS-Demo --location "East US"```   
-```az deployment group create \```   
-```--resource-group Arc-AKS-Demo \```   
-```--name arcaksdemo01 \```   
-```--template-uri <The *azuredeploy.json* template file location in your GitHub repo> \```   
-```--parameters <The *azuredeploy.parameters.json* template file location>```
-
-For example:
-
-```az group create --name Arc-AKS-Demo --location "East US"```   
-```az deployment group create \```   
-```--resource-group Arc-AKS-Demo \```   
-```--name arcaksdemo01 \```   
-```--template-uri https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_jumpstart/aks/arm_template/azuredeploy.json \```   
-```--parameters azuredeploy.parameters.json```
-
-Once the ARM template deployment is completed, a new AKS cluster in a new Azure Resource Group is created. 
+Upon completion, you will have new VM installed as a single-host k3s cluster in a new Azure Resource Group.
 
 ![](../img/aks_arm_template/02.png)
 
