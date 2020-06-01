@@ -26,7 +26,12 @@ The following README will guide you on how to deploy a local "Ready to Go" **Win
 
     To connect the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
-    ```az login```
+    ```bash
+    az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    ```
+
+    For example:
 
     ```az ad sp create-for-rbac -n "http://AzureArcServer" --role contributor```
 
