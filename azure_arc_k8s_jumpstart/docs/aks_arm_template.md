@@ -16,8 +16,12 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
+
+    For example:
+
+    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
 
     Output should look like this:
     ```
