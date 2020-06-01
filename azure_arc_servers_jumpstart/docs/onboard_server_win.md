@@ -10,7 +10,12 @@ The following README will guide you on how to connect an Windows machine to Azur
 
     To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
-    ```az login```
+    ```bash
+    az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    ```
+
+    For example:
 
     ```az ad sp create-for-rbac -n "http://AzureArcServer" --role contributor```
 

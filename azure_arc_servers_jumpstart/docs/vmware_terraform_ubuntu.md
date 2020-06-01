@@ -16,9 +16,14 @@ The following README will guide you on how to use the provided [Terraform](https
 
    To connect the VMware vSphere virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
-    ```az login```
+    ```bash
+    az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    ```
 
-    ```az ad sp create-for-rbac -n "http://AzureArcVMW" --role contributor```
+    For example:
+
+    ```az ad sp create-for-rbac -n "http://AzureArcVMW --role contributor```
 
     Output should look similar to this:
 
