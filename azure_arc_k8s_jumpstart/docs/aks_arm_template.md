@@ -76,7 +76,7 @@ az deployment group create \
 --resource-group Arc-AKS-Demo \ 
 --name arcaksdemo01 \   
 --template-file azuredeploy.json \   
---parameter sazuredeploy.parameters.json
+--parameters azuredeploy.parameters.json
 ```
 
 Once the ARM template deployment is completed, a new AKS cluster in a new Azure Resource Group is created. 
