@@ -37,17 +37,19 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 #### Amazon Web Services (AWS)
 
-* [Deploy an AWS EC2 Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/aws_terraform_ubuntu.md)
+* [Deploy an AWS EC2, Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/aws_terraform_ubuntu.md)
 
 #### Google Cloud Platform
 
-* [Deploy a Google Cloud Platform (GCP) Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_ubuntu.md)
+* [Deploy a Google Cloud Platform (GCP), Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_ubuntu.md)
 
-* [Deploy a Google Cloud Platform (GCP) Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_windows.md)
+* [Deploy a Google Cloud Platform (GCP), Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_windows.md)
 
 #### VMware
 
-* [Deploy a VMware vSphere Ubuntu Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_ubuntu.md)
+* [Deploy a VMware vSphere, Ubuntu Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_ubuntu.md)
+
+* [Deploy a VMware vSphere, Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_winsrv.md)
 
 ## Azure Arc for Kubernetes
 
@@ -91,7 +93,6 @@ Below are an additional deployment scenarios the team is currently working on.
 
 - Support for an AWS Linux 2 instance deployment using Terraform
 - Support for a Windows Server AWS EC2 instance deployment using Terraform
-- Support for a Windows Server VMware vSphere VM deployment using Terraform
 
 ### Azure Arc for Kubernetes
 

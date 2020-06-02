@@ -1,0 +1,25 @@
+# Injecting environment variables
+
+# Set Azure vars
+$env:subscription_id="${subscription_id}"
+$env:client_id="${client_id}"
+$env:client_secret="${client_secret}"
+$env:tenant_id="${tenant_id}"
+$env:resourceGroup="${resourceGroup}"
+$env:location="${location}"
+
+# Download the package
+function download() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi}
+download
+
+# Install the package
+msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-String
+
+# Run connect command
+ & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
+ --service-principal-id $env:client_id `
+ --service-principal-secret $env:client_secret `
+ --resource-group $env:resourceGroup `
+ --tenant-id $env:tenant_id `
+ --location $env:location `
+ --subscription-id $env:subscription_id
