@@ -86,7 +86,7 @@ Power-on the VM and start the Ubuntu installation. No specific instructions here
 
 ## Post-installation 
 
-Before converting the VM to a template, few actions needs to be taken.
+Before converting the VM to a template, few actions are needed.
 
 * It's better to have your OS packages up-to-date
 
