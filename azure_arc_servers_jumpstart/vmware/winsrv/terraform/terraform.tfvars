@@ -13,6 +13,6 @@ cpu_hot_remove_enabled              = true
 memory_hot_add_enabled              = true
 domain                              = "something.local"
 vm_gateway                          = "10.0.0.1" // Your gateway address
-vm_dns = [ // Your DNS server address
+vm_dns = [                                       // Your DNS server address
   "10.0.0.1",
 ]
