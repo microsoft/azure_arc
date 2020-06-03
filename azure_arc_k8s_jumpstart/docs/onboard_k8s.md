@@ -44,16 +44,21 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-* Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
-  Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription for two providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
   ```bash
   az provider register --namespace Microsoft.Kubernetes
-  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.Kubernetes'
-
-  az provider register --namespace Microsoft.KubernetesConfiguration
-  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.KubernetesConfiguration'
   ```
+  Registering is still on-going. You can monitor using ```az provider show -n Microsoft.Kubernetes```.
+
+  ```bash
+  az provider register --namespace Microsoft.KubernetesConfiguration
+  ```
+  Registering is still on-going. You can monitor using ```az provider show -n Microsoft.KubernetesConfiguration```.
+
+
   You can monitor the registration process with the following commands:
+  
   ```bash
   az provider show -n Microsoft.Kubernetes -o table
  
@@ -62,13 +67,13 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 * Create a new Azure Resource Group where you want your cluster(s) to show up. 
 
-```az group create -l <Azure Region> -n <Resource Group Name>```
+  ```az group create -l <Azure Region> -n <Resource Group Name>```
 
-For example:
+  For example:
 
-```az group create -l eastus -n Arc-k8s-Clusters```
+  ```az group create -l eastus -n Arc-k8s-Clusters```
 
-**Note: Currently, Connected Azure Arc cluster resource creation is supported only in the following locations: eastus, westeurope, eastus2euap. Use the --location (or -l) flag to specify one of these locations.**
+  **Note: Currently, Connected Azure Arc cluster resource creation is supported only in the following locations: eastus, westeurope, eastus2euap. Use the --location (or -l) flag to specify one of these locations.**
 
 ![](../img/onboard_k8s/01.png)
 
@@ -149,7 +154,6 @@ Upon completion, you will have your Kubernetes cluster, connected as a new Azure
 ![](../img/onboard_k8s/03.png)
 
 ![](../img/onboard_k8s/04.png)
-
 
 # Delete the deployment
 
