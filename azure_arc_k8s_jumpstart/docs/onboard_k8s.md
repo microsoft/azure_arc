@@ -16,12 +16,12 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>"
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
+    ```az ad sp create-for-rbac -n "http://AzureArcK8s"```
 
     Output should look like this:
     ```
@@ -33,6 +33,9 @@ The following README will guide you on how to connect an existing Kubernetes clu
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
+
+    Then, assign a "contributor" to the SP using the ```az role assignment create --assignee "<Unique SP Name>" --role contributor```.
+
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
