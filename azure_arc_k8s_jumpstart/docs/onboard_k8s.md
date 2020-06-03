@@ -21,7 +21,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcK8s"```
+    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --skip-assignment```
 
     Output should look like this:
     ```
