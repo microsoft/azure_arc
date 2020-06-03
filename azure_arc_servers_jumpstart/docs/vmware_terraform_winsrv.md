@@ -41,7 +41,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-## Preparing an Ubuntu Server VMware vSphere VM Template
+## Preparing a Window Server VMware vSphere VM Template
 
 Before using the below guide to deploy an Ubuntu Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](../docs/vmware_winsrv2k19_template.md) will instruct you how to easily create such a template using VMware vSphere 6.5 and above. 
 
