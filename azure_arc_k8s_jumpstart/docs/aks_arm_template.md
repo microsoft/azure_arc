@@ -57,9 +57,11 @@ The deployment is using the template parameters file. Before initiating the depl
 
 ![](../img/aks_arm_template/01.png)
 
-Before deploying the ARM template, validate that the AKS service is available in your region using the below Azure CLI command.
+Before deploying the ARM template, validate that the AKS Kubernetes version is available in your region using the below Azure CLI command.
 
 ```az aks get-versions -l "<Your Azure Region>"```
+
+In case the AKS service is not available in your region, you can change the AKS Kubernetes version in the [*azuredeploy.json*](../aks/arm_template/azuredeploy.json) file by searching for *kubernetesVersion*.
 
 To deploy the ARM template, navigate to the [deployment folder](../aks/arm_template) and run the below command:
 

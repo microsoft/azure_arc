@@ -55,9 +55,11 @@ The following README will guide you on how to use the provided [Terraform](https
 
 The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure Service Principle you've just created and your subscription.  
 
-In addition, validate that the AKS service is available in your region using the below Azure CLI command.
+In addition, validate that the AKS Kubernetes version is available in your region using the below Azure CLI command.
 
 ```az aks get-versions -l "<Your Azure Region>"```
+
+In case the AKS service is not available in your region, you can change the AKS Kubernetes version in the [*variables.tf*](../aks/terraform/variables.tf) file by searching for *kubernetes_version*.
 
 * Export the environment variables needed for the Terraform plan.
 
