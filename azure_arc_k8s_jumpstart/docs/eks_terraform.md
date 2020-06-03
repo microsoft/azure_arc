@@ -68,7 +68,8 @@ The following README will guide you on how to use the provided [Terraform](https
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
-* Install the ***connectedk8s*** and ***k8sconfiguration*** extension, which helps you connect Kubernetes clusters to Azure:
+* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
+
   ```bash
   az extension add --name connectedk8s
   az extension add --name k8sconfiguration
@@ -107,10 +108,12 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * **Setting Up kubectl**<br>
   You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. <br>Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
+
   ```bash
   mkdir ~/.kube/
   terraform output kubeconfig>~/.kube/config
   ```
+  
   Check to see if cluster is discoverable by ```kubectl``` by running:
   ```bash
   $ kubectl version
