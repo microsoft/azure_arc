@@ -16,7 +16,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --skip-assignment
     ```
 
     For example:
