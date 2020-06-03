@@ -12,7 +12,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 * Create Azure Service Principal (SP)   
 
-    To connect the K3s cluster installed on the VM to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
     ```bash
     az login
