@@ -160,7 +160,7 @@ The deployment of all resources is going to be performed on Azure Cloud Shell.
 
   * Finish Deploying ARO Cluster:<br>
 
-    <img src="../img/aro/image7.png" width="80%">
+    <img src="../img/aro/image7.png" width="100%">
 
     
 
@@ -220,7 +220,7 @@ Now that you have a running ```aro``` cluster, lets connect the ARO cluster to A
 
   * Upon completion, you will have your Arc Kubernetes Resource in the the same resource group. <br>
 
-    <img src="../img/aro/image8.png" width="80%">
+    <img src="../img/aro/image8.png" width="100%">
 
 # Delete the deployment
 
@@ -229,4 +229,4 @@ In Azure, the most straightforward way is to delete the cluster or the Resource 
 ```bash
 az group delete --name $RESOURCEGROUP
 ```
-  <img src="../img/aro/image9.png" width="90%">
+  <img src="../img/aro/image9.png" width="100%">
