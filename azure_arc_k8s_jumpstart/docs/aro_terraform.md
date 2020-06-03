@@ -61,7 +61,7 @@ The following README will guide you on how to use the Azure CLI to deploy an Azu
   ```
 
 # Deployment
-There are to sets of resources that will be deployed, first is the Azure RedHat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
+There are two sets of resources that will be deployed, first is the Azure RedHat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
 
 The deployment of all resources is going to be performed on Azure Cloud Shell.
 
@@ -166,7 +166,7 @@ The deployment of all resources is going to be performed on Azure Cloud Shell.
 
 # Connecting to Azure Arc
 
-Now that you have a running EKS cluster, lets connect the EKS cluster to Azure Arc by:<br>
+Now that you have a running ```aro``` cluster, lets connect the ARO cluster to Azure Arc by:<br>
 
   * Install ```oc``` command-line in Cloud Shell.
     ```bash
@@ -229,5 +229,4 @@ In Azure, the most straightforward way is to delete the cluster or the Resource 
 ```bash
 az group delete --name $RESOURCEGROUP
 ```
-<br>
-<img src="../img/aro/image9.png" width="90%">
+  <img src="../img/aro/image9.png" width="90%">
