@@ -97,6 +97,9 @@ Below are an additional deployment scenarios the team is currently working on.
 ### Azure Arc for Kubernetes
 
 - Support for an Azure Red Hat OpenShift deployment using ARM template
+- Support for kind Deployment guide with Arc connectivity
+- Support for Minikube Deployment guide with Arc connectivity
+- Support for MicroK8s Deployment guide with Arc connectivity
 
 ### Azure Arc for Data Services
 
