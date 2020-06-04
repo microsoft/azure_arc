@@ -40,24 +40,27 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --skip-assignment
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcGCP" --role contributor```
+    ```az ad sp create-for-rbac -n "http://AzureArcGCP" --skip-assignment```
 
-    Output should look similar to this:
-
+    Output should look like this:
     ```
     {
-    "appId": "XXXXXXXXXXXXXXXXXXXXXXXX",
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcGCP",
     "name": "http://AzureArcGCP",
-    "password": "XXXXXXXXXXXXXXXXXXXXXXXX",
-    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXX"
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
+
+    Then, assign a the "Contributor" role to the SP you've just created.
+
+    ```az role assignment create --assignee "<Unique SP Name>" --role contributor```
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
