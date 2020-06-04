@@ -18,24 +18,27 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --skip-assignment
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcVMW --role contributor```
+    ```az ad sp create-for-rbac -n "http://AzureArcVMW" --skip-assignment```
 
-    Output should look similar to this:
-
+    Output should look like this:
     ```
     {
-    "appId": "XXXXXXXXXXXXXXXXXXXXXXXX",
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcVMW",
     "name": "http://AzureArcVMW",
-    "password": "XXXXXXXXXXXXXXXXXXXXXXXX",
-    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXX"
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
+
+    Then, assign a the "Contributor" role to the SP you've just created.
+
+    ```az role assignment create --assignee "<Unique SP Name>" --role contributor```
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
@@ -102,4 +105,3 @@ If you delete the instance manually, then you should also delete [install_arc_ag
 If you want to nuke the entire environment use the ```terraform destroy --auto-approve``` command as shown below.
 
 ![](../img/vmware_terraform_ubuntu/08.png)
-
