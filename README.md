@@ -107,3 +107,9 @@ Below are an additional deployment scenarios the team is currently working on.
 - Support SQL Managed Instance (MI) in Azure Kubernetes Service (AKS) deployment using Terraform
 - Support PostgreSQL Hyperscale in Azure Kubernetes Service (AKS) deployment using ARM template
 - Support PostgreSQL Hyperscale in Azure Kubernetes Service (AKS) deployment using Terraform
+
+## Contributing
+
+Before contributing code, please see the [CONTRIBUTING](CONTRIBUTING.md) guide.
+
+Issues, PRs and Feature Request have their own templates. Please fill out the whole template.
