@@ -2,15 +2,25 @@
 
 For customers who want to simplify complex and distributed environments across on-premises, edge and multicloud, [Azure Arc](https://azure.microsoft.com/en-us/services/azure-arc/) enables deployment of Azure services anywhere and extends Azure management to any infrastructure.
 
-<p align="center"> 
-<img src="img/arc_logo.png?style=centerme" width="20%">
-</p>
-
 * **Organize and govern across environments** - Get databases, Kubernetes clusters, and servers sprawling across on-premises, edge and multicloud environments under control by centrally organizing and governing from a single place.
 
 * **Manage Kubernetes Apps at scale** - Deploy and manage Kubernetes applications across environments using DevOps techniques. Ensure that applications are deployed and configured from source control consistently.
 
 * **Run data services anywhere** - Get automated patching, upgrades, security and scale on-demand across on-premises, edge and multicloud environments for your data estate.
+
+# Story Time
+
+Fabrikam Global Manufacturing runs workloads on different hardware, across on-premises datacenters, multiple public clouds, with Microsoft Azure being the main one as well as IoT workloads deployed on the edge. Workloads include very diverse services and are based on either virtual machines, managed Platforms-as-a-Service (PaaS) services as well as container-based applications. 
+ 
+As mentioned, Fabrkam’s R&D teams are well-invested in containerized workloads for their modernized applications and as a result, they are using Kubernetes as their container orchestration platform, deployed both as a self-managed Kubernetes in their on-premises environments as well as a managed Kubernetes deployments in the cloud.
+
+As part of their cloud-native practices with Azure being it’s main hyper-scale cloud, Fabrkam’s  operations teams are standardized and taking advantage of Azure Resource Manager (ARM) capabilities such as (but not limited to) tagging, Azure Monitoring for VMs and containers, logging and telemetry, policy and government, Desired State Configuration (DSC), Update Management, Change Tracking, Inventory management,etc. 
+
+These practices and techniques are already well established for Azure-based workloads Fabrkam are using such as Azure VMs, Azure Kubernetes Service (AKS), Azure SQL, and many more. In order to take advantage of these well-established practices, Fabrkam are using Azure Arc to extend the ARM API’s to project and manage it’s workloads deployed outside of Azure. Once onboarded, Azure Arc projects resources as first-class citizens in Azure which can then take advantage of ARM capabilities mentioned above. In addition, they are able to guarantee Kubernetes deployments and app consistency through GitOps-based configuration for their Kubernetes clusters in Azure, other clouds and on-premises. 
+ 
+With Azure Arc, Fabrikam are able to project resources and register them into Azure Resource Manager independently of where they run, so they have a single control plane and extend those cloud-native operations and governance beyond Azure.
+
+![](img/architecture.png)
 
 # Azure Arc "Jumpstart"
 
