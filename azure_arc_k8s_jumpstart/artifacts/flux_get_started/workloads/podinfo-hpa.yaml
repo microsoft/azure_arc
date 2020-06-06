@@ -2,7 +2,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: podinfo
-  namespace: demo
+  namespace: hello-arc
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
