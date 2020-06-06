@@ -4,28 +4,36 @@ The following README will guide you on how to use the Azure CLI to deploy an Azu
 
 # Prerequisites
 
-* Create Azure Service Principal (SP) **(This can be done in Cloud Shell as well)**
+* Create Azure Service Principal (SP)   
 
-    To connect the EKS cluster to Azure Arc, Azure Service Principal is required and can be created by:
+    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
 
-
-    ```
+    ```bash
     az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --skip-assignment
+    ```
 
-    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
-    ``` 
+    For example:
+
+    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --skip-assignment```
 
     Output should look like this:
     ```
     {
-       "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-       "displayName": "AzureArcK8s",
-       "name": "http://AzureArcK8s",
-       "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-       "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+      "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "displayName": "AzureArcK8s",
+      "name": "http://AzureArcK8s",
+      "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
+
+    Then, assign a the "Contributor" role to the SP you've just created.
+
+    ```az role assignment create --assignee "<Unique SP Name>" --role contributor```
+    
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+
 
 * Enable subscription for the three providers: <br>
    * Two for Azure Arc enabled Kubernetes
@@ -63,19 +71,22 @@ The following README will guide you on how to use the Azure CLI to deploy an Azu
 # Deployment
 There are two sets of resources that will be deployed, first is the Azure RedHat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
 
-The deployment of all resources is going to be performed on Azure Cloud Shell.
+The deployment of all resources is going to be performed in Azure Cloud Shell.
 
   * Log into Azure Cloud Shell
   ![](../img/aro/image2.png)
 
 
 
-  * Set the following variables to help run the preceeding commands.
+  * Set the following variables to help run the preceeding commands. For example:
     ```bash
-    LOCATION=eastus                 # the location of your cluster
-    RESOURCEGROUP=arcarodemo        # the name of the resource group where you want to create your cluster
-    AROCLUSTER=arcarodemo           # the name of your Openshift Container cluster
-    ARC=arcarodemo                  # the name of the Arc Kubernetes resource
+    LOCATION=eastus                     # the location of your cluster
+    RESOURCEGROUP=arcarodemo            # the name of the resource group where you want to create your cluster
+    AROCLUSTER=arcarodemo               # the name of your Openshift Container cluster
+    ARC=arcarodemo                      # the name of the Arc Kubernetes resource
+    SPClientId="PutInYours"        # the Service Principal appId or client ID
+    SPClientSecret="PutInYours"    # the Service Principal client secret
+    TenantID="PutInYours"             # the tenant ID for the Service Prinipal previously created
     ```
   * Create a resource group
     ```bash
