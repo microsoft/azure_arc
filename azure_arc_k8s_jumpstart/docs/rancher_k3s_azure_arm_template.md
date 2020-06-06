@@ -64,8 +64,8 @@ To deploy the ARM template, navigate to the [deployment folder](../rancher_k3s/a
   az group create --name <Name of the Azure Resource Group> --location <Azure Region>
   az deployment group create \
   --resource-group <Name of the Azure Resource Group> \
-  --name <The name of this deployment> \ 
-  --template-file <The *azuredeploy.json* template file location> \ 
+  --name <The name of this deployment> \
+  --template-file <The *azuredeploy.json* template file location> \
   --parameters <The *azuredeploy.parameters.json* parameters file location>
 ```
 
@@ -75,8 +75,8 @@ For example:
   az group create --name Arc-K3s-Demo --location "East US"
   az deployment group create \
   --resource-group Arc-K3s-Demo \
-  --name arck3sdemo01 \ 
-  --template-file azuredeploy.json \ 
+  --name arck3sdemo01 \
+  --template-file azuredeploy.json \
   --parameters azuredeploy.parameters.json
 ```
 
