@@ -9,37 +9,12 @@
             },
             "defaultValue": "arcarodemo"
         },
-        "clusterName": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of the RedHat Openshift Container Cluster"
-            },
-            "defaultValue": "arcarodemo"
-        },
         "VNetAddressPrefix": {
             "type": "string",
             "metadata": {
                 "description": "The CIDR block for the VNET in which Openshift Cluster is going to be deployed into"
             },
             "defaultValue": "10.0.0.0/22"
-        },
-        "aadTenantId": {
-            "type": "string",
-            "metadata": {
-                "description": "The ID of an Azure Active Directory tenant"
-            }
-        },
-        "aadClientId": {
-            "type": "string",
-            "metadata": {
-                "description": "The ID of an Azure Active Directory client application"
-            }
-        },
-        "aadClientSecret": {
-            "type": "string",
-            "metadata": {
-                "description": "The secret of an Azure Active Directory client application"
-            }
         }
     },
     "resources": [
@@ -66,7 +41,12 @@
                     ],
                     "properties": {
                         "addressPrefix": "10.0.0.0/23",
-                        "privateLinkServiceNetworkPolicies": "Disabled"
+                        "privateLinkServiceNetworkPolicies": "Disabled",
+                        "serviceEndpoints": [
+                            {
+                                "service": "Microsoft.ContainerRegistry"
+                            }
+                        ]
                     }
                 },
                 {
@@ -88,65 +68,6 @@
                     }
                 }
             ]
-        },
-        {
-            "apiVersion": "2019-04-30",
-            "type": "Microsoft.ContainerService/openShiftManagedClusters",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('vnetName'), '-', 'vnet'))]"
-            ],
-            "name": "[parameters('clusterName')]",
-            "properties": {
-                "openShiftVersion": "v3.11",
-                "networkProfile": {
-                    "vnetCidr": "[parameters('VNetAddressPrefix')]",
-                    "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('vnetName'), '-', 'vnet'))]"
-                },
-                "authProfile": {
-                    "identityProviders": [
-                        {
-                            "name": "Azure AD",
-                            "provider": {
-                                "kind": "AADIdentityProvider",
-                                "tenantId": "[parameters('aadTenantId')]",
-                                "clientId": "[parameters('aadClientId')]",
-                                "secret": "[parameters('aadClientSecret')]"
-                            }
-                        }
-                    ]
-                },
-                "masterPoolProfile": {
-                    "name": "master",
-                    "count": 3,
-                    "subnetCidr": "10.0.0.0/23",
-                    "vmSize": "Standard_D4s_v3",
-                    "osType": "Linux"
-                },
-                "agentPoolProfiles": [
-                    {
-                        "role": "infra",
-                        "name": "infra",
-                        "count": 3,
-                        "subnetCidr": "10.0.0.0/23",
-                        "vmSize": "Standard_D4s_v3",
-                        "osType": "Linux"
-                    },
-                    {
-                        "role": "compute",
-                        "name": "compute",
-                        "count": 3,
-                        "subnetCidr": "10.0.0.0/23",
-                        "vmSize": "Standard_D4s_v3",
-                        "osType": "Linux"
-                    }
-                ],
-                "routerProfiles": [
-                    {
-                        "name": "default"
-                    }
-                ]
-            }
         }
     ]
 }
