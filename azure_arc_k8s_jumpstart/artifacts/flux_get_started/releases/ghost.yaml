@@ -1,0 +1,31 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: ghost
+  namespace: demo
+  annotations:
+    fluxcd.io/automated: "false"
+    fluxcd.io/tag.chart-image: glob:3.1.1-debian-9-*
+spec:
+  releaseName: ghost
+  chart:
+    git: ssh://git@github.com/fluxcd/flux-get-started
+    ref: master
+    path: charts/ghost
+  values:
+    image:
+      repository: bitnami/ghost
+      tag: 3.1.1-debian-9-r0
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        memory: 32Mi
+        cpu: 10m
+    service:
+      type: ClusterIP
+    mariadb:
+      master:
+        persistence:
+          enabled: false
