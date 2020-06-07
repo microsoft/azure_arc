@@ -168,11 +168,11 @@ adminUser=$($az aro list-credentials --name $AROCLUSTER --resource-group $RESOUR
 adminPassword=$($az aro list-credentials --name $AROCLUSTER --resource-group $RESOURCEGROUP --query kubeadminPassword -o tsv)
 apiServer=$(az aro show -g $RESOURCEGROUP -n $AROCLUSTER --query apiserverProfile.url -o tsv)
 echo "The credentials are:"
-echo "adminUser = $adminUser"
-echo "adminPassword = $adminPassword"
-echo "apiServer = $apiServer"
+echo "adminUser=$adminUser"
+echo "adminPassword=$adminPassword"
+echo "apiServer=$apiServer"
 echo "done"
-
+sleep 10s
 # Log into the OC command
 echo "==============================================================================================================================================================="
 oc login $apiServer -u $adminUser -p $adminPassword
@@ -201,7 +201,6 @@ echo "done"
 echo "==============================================================================================================================================================="
 echo "Clean up the resources with the following two commands"
 echo "************************************************************************************************************************"
-echo "*   az ad sp delete --id "$appId"  *"
-echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP  *"
+echo "*   az group delete --name $RESOURCEGROUP -y --no-wait *"
 echo "************************************************************************************************************************"
 echo "done"
