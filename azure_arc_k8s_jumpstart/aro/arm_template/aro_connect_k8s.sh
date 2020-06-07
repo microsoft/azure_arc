@@ -160,7 +160,8 @@ echo " "
 echo "Executing: "
 echo "az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table"
 echo " "
-time $az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table
+$az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table --no-wait
+$az aro wait -n "$AROCLUSTER" -g $RESOURCEGROUP --created
 
 # Setting up credentials
 echo "==============================================================================================================================================================="
