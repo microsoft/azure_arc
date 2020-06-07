@@ -194,7 +194,7 @@ echo "==========================================================================
 echo "The password is too complex so please perform the next two steps manually by running the following commands"
 echo "********************************************************************************************************************************************************"
 echo "*   az login --service-principal -u $appId -p '$password' --tenant $tenant        *"
-echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                             *"
+echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                                                      *"
 echo "********************************************************************************************************************************************************"
 echo "done"
 
