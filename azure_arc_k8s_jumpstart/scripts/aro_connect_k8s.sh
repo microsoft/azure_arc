@@ -16,20 +16,27 @@ while getopts "a:b:c:d:e:f:g:" opt; do
 done
 
 # Assume parameters if not given
-if [ -z "$LOCATION"]; then
+if [ -z "$LOCATION" ]; then
     LOCATION="eastus"
 fi
 
-if [ -z "$RESOURCEGROUP"]; then
+if [ -z "$RESOURCEGROUP" ]; then
     RESOURCEGROUP="arcarodemo-$RAND"
 fi
 
-if [ -z "$AROCLUSTER"]; then
+if [ -z "$AROCLUSTER" ]; then
     AROCLUSTER="arcarodemo-$RAND"
 fi
 
-if [ -z "$ARC"]; then
+if [ -z "$ARC" ]; then
     ARC="arcarodemo-$RAND"
+fi
+
+# Check if az is installed, if not exit the script out.
+var='az'
+if ! which $var &>/dev/null; then
+    echo "This script will not run until Azure CLI is installed and you have been are logged in."
+    exit 1
 fi
 
 az=$(which az)
@@ -52,7 +59,7 @@ subwCIDR="10.0.2.0/23"
 # Check if the ARO Provider Registration is required
 echo "==============================================================================================================================================================="
 echo "Checking to see if ARO Provider is registered."
-if [ ! -n "$($az provider show -n Microsoft.RedHatOpenShift --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')"]; then
+if [ ! -n "$($az provider show -n Microsoft.RedHatOpenShift --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')" ]; then
     echo "The ARO resource provider has not been registered for your subscription $SUBID."
     echo -n "I will attempt to register the ARO RP now (this may take a few minutes)..."
     $az provider register -n Microsoft.RedHatOpenShift --wait >/dev/null
@@ -69,7 +76,7 @@ fi
 
 echo "==============================================================================================================================================================="
 echo "Checking to see if ARC Kubernetes Provider is registered."
-if [ ! -n "$($az provider show -n Microsoft.Kubernetes --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')"]; then
+if [ ! -n "$($az provider show -n Microsoft.Kubernetes --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')" ]; then
     echo "The ARC Kubernetes resource provider has not been registered for your subscription $SUBID."
     echo -n "I will attempt to register the ARC Kubernetes RP now (this may take a few minutes)..."
     $az provider register -n Microsoft.Kubernetes --wait >/dev/null
@@ -119,12 +126,48 @@ else
 fi
 
 echo "==============================================================================================================================================================="
-echo "Installing oc command line"
-wget -q https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz -O ~/openshift-client-linux.tar.gz
-mkdir ~/openshift
-tar -zxvf ~/openshift-client-linux.tar.gz -C ~/openshift
-echo 'export PATH=$PATH:~/openshift' >>~/.bashrc && source ~/.bashrc
-echo "The OC command line tool is installed... Done."
+echo "Checking if the oc command line, kubectl and helm exists."
+# Check if command oc is already there if not install it
+command="oc"
+if ! which $command &>/dev/null; then
+    echo "==============================================================================================================================================================="
+    echo "Installing oc command line"
+    wget -q https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz -O ~/openshift-client-linux.tar.gz
+    mkdir ~/openshift
+    tar -zxvf ~/openshift-client-linux.tar.gz -C ~/openshift
+    echo 'export PATH=$PATH:~/openshift' >>~/.bashrc && source ~/.bashrc
+    echo "The OC command line tool is installed... Done."
+else
+    echo "$command command already exists"
+fi
+
+# Check if command Kubectl already there if not install it
+command="kubectl"
+if ! which $command &>/dev/null; then
+    echo "==============================================================================================================================================================="
+    echo "Installing kubectl command."
+    latest=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/$latest/bin/linux/amd64/kubectl
+    mkdir ~/kubectl
+    echo 'export PATH=$PATH:~/kubectl' >>~/.bashrc && source ~/.bashrc
+    echo "The kubectl command line tool is installed... Done."
+else
+    echo "$command command already exists"
+fi
+
+command="helm"
+if ! which $command &>/dev/null; then
+    echo "==============================================================================================================================================================="
+    echo "Installing helm command."
+    latest=$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+    wget -q https://get.helm.sh/helm-v3.2.2-linux-amd64.tar.gz -O ~/helm-v3.2.2-linux-amd64.tar.gz
+    mkdir ~/helm
+    tar -zxvf ~/helm-v3.2.2-linux-amd64.tar.gz -C ~/helm
+    echo 'export PATH=$PATH:~/helm' >>~/.bashrc && source ~/.bashrc
+    echo "The $command is installed... Done."
+else
+    echo "$command command already exists"
+fi
 
 # Resource Group Creation
 echo "==============================================================================================================================================================="
@@ -181,8 +224,8 @@ oc login $apiServer -u $adminUser -p $adminPassword
 # Create a Service Principal
 echo "==============================================================================================================================================================="
 password=$($az ad sp create-for-rbac -n "http://AzureArcK8sARO$RAND" --skip-assignment --query password -o tsv)
-echo "The password of the SP is: $password"
 echo "Service principal created:"
+echo "The password of the SP is: $password"
 sleep 10s
 appId=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appId -o tsv)
 $az role assignment create --assignee "$appId" --role contributor >/dev/null
@@ -193,15 +236,15 @@ echo "done"
 
 echo "==============================================================================================================================================================="
 echo "The password is too complex so please perform the next two steps manually by running the following commands"
-echo "********************************************************************************************************************************************************"
+echo "**********************************************************************************************************************************************************************************"
 echo "*   az login --service-principal -u $appId -p '$password' --tenant $tenant        *"
-echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                                                      *"
-echo "********************************************************************************************************************************************************"
+echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                                                                                    *"
+echo "**********************************************************************************************************************************************************************************"
 echo "done"
 
 echo "==============================================================================================================================================================="
 echo "Clean up the resources with the following two commands"
 echo "**********************************************************************"
-echo "*   az group delete --name $RESOURCEGROUP -y --no-wait *"
+echo "*   az group delete --name $RESOURCEGROUP -y --no-wait               *"
 echo "**********************************************************************"
 echo "done"
