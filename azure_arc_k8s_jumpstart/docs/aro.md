@@ -33,7 +33,7 @@ The deployment of all resources is going to be done via Azure CLI.
       *  Deploy Azure Red Hat OpenShift Cluster
       *  Create an Azure Service Principal
       *  Give two commands to finish the deployment of Azure ARC for Kubernetes
-      *  Give two commands to clean up deployed resources
+      *  One command to clean up deployed resources
   
   * Finish deployment by running the two suggested commands:
     ![](../img/aro/01.png)
