@@ -51,11 +51,11 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 * [Deploy an AWS EC2, Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/aws_terraform_ubuntu.md)
 
-#### Google Cloud Platform
+#### Google Cloud Platform (GCP)
 
-* [Deploy a Google Cloud Platform (GCP), Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_ubuntu.md)
+* [Deploy a GCP, Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_ubuntu.md)
 
-* [Deploy a Google Cloud Platform (GCP), Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_windows.md)
+* [Deploy a GCP, Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_windows.md)
 
 #### VMware
 
@@ -65,7 +65,7 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 ## Azure Arc for Kubernetes
 
-The below deployment options are focusing on Azure Arc for Kubernetes. It is designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with it. 
+The below deployment options are focusing on Azure Arc for Kubernetes. It is designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with. 
 
 #### General
 
@@ -73,17 +73,19 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 #### Azure Kubernetes Service (AKS)
 
-* [Deploy Azure Kubernetes Service (AKS) cluster and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/aks_arm_template.md)
+* [Deploy AKS cluster and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/aks_arm_template.md)
 
-* [Deploy Azure Kubernetes Service (AKS) cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/aks_terraform.md)
+* [Deploy AKS cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/aks_terraform.md)
+
+* [Deploy GiOps configurations and perform basic GiOps flow on AKS as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/aks_gitops.md)
 
 #### Amazon Elastic Kubernetes Service (EKS)
 
-* [Deploy Amazon Elastic Kubernetes Service (EKS) cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/eks_terraform.md)
+* [Deploy EKS cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/eks_terraform.md)
 
 #### Google Kubernetes Engine (GKE)
 
-* [Deploy Google Kubernetes Engine (GKE) cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/gke_terraform.md)
+* [Deploy GKE cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/gke_terraform.md)
 
 #### Rancher k3s
 
