@@ -5,21 +5,25 @@ The following README will guide you on how to use the Azure CLI to deploy an Azu
 # Deployment
 There are two sets of resources that will be deployed, first is the Azure RedHat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
 
-The deployment of all resources is going to be performed in Azure Cloud Shell.
+The deployment of all resources is going to be done via Azure CLI.
 
-  * Log into Azure Cloud Shell
+
+  * Log into Azure CLI.
+    ```bash
+    az login
+    ```
   ![](../img/aro/image2.png)
 
   * Run the following automation script:
     ```bash
-    wget -O - https://tinyurl.com/yanpftrv | bash
+    wget -O - https://tinyurl.com/y85vpku9 | bash
     ```
   
     This script will perform the following tasks:
       *  Set the approprite environment variables
       *  Ensure providers are registered
       *  Ensure ```az``` extensions are added
-      *  Install the ```oc``` command line
+      *  Install the ```oc``` command line, ```helm```, and ```kubectl```
       *  Deploy Azure Resource Group
       *  Deploy Azure VNet and appropriate Subnets
       *  Deploy Azure Red Hat OpenShift Cluster
@@ -33,7 +37,7 @@ The deployment of all resources is going to be performed in Azure Cloud Shell.
     **Note** The two commands to clean up the deployed resources as well:
     <img src="../img/aro/image12.png" width="60%"><br>
     These commands will be used to clean up resources at the end.
-  
+
   * Log in to Service prinipal from the suggested command earlier:
      <img src="../img/aro/image13.png" width="90%"><br>
   * Run the command to deploy the Azure ARC for Kubernetes resource
