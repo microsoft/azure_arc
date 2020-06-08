@@ -102,11 +102,11 @@ Once the ARM template deployment is completed, a new AKS cluster in a new Azure 
 
 ![](../img/aks_arm_template/04.png)
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. Make sure Cloud Shell is configured to use Bash.
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. **Make sure Cloud Shell is configured to use Bash.**
 
 ![](../img/aks_arm_template/05.png)
 
-* Upload the *az_connect_aks* shell script and run it using the ```. ./az_connect_aks``` command.
+* Edit the environment variables in the [*az_connect_aks*](../aks/arm_template/scripts/az_connect_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_connect_aks.sh``` command.
 
 **Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
 
