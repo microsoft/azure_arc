@@ -82,7 +82,7 @@ The script will:
 - Create the GitOps configurations and deploy the Flux operator and Memcached on the Azure Arc connected cluster
 - Deploy the ["Hello Arc"](https://github.com/likamrat/hello_arc) application along side an Ingress rule to make it available from outside the cluster. 
 
-**Note: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval faster upon changes but it is recommended to have longer interval in your production environment (default value is 5min)**
+**Disclaimer: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval faster upon changes but it is recommended to have longer interval in your production environment (default value is 5min)**
 
 * Once the script completed it's run, you will have the GitOps configuration created all the resources deployed in your Kubernetes cluster. Note that it takes few min for the configuration change it's Operator state status from "Pending" to Install. 
 
