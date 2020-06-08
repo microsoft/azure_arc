@@ -94,7 +94,7 @@ The script will:
 
 # The "Hello Arc" Application & Components
 
-* Before kicking the GiOps flow, let's verify and zoom-in to the Kubernetes resources deployed by running few *kubectl* commands.
+* Before kicking the GitOps flow, let's verify and zoom-in to the Kubernetes resources deployed by running few *kubectl* commands.
 
     * ```kubectl get pods -n cluster-config``` - Will show the Flux operator and the Memcached pods.
     * ```kubectl get pods -n hello-arc``` - Will show 3 replicas of the "Hello Arc" application and the NGINX controller.
