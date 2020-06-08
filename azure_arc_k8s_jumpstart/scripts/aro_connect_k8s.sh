@@ -224,27 +224,30 @@ oc login $apiServer -u $adminUser -p $adminPassword
 # Create a Service Principal
 echo "==============================================================================================================================================================="
 password=$($az ad sp create-for-rbac -n "http://AzureArcK8sARO$RAND" --skip-assignment --query password -o tsv)
-echo "Service principal created:"
-echo "The password of the SP is: $password"
-sleep 10s
+sleep 2s
 appId=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appId -o tsv)
-$az role assignment create --assignee "$appId" --role contributor >/dev/null
-echo "appID=$appId"
 tenant=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appOwnerTenantId -o tsv)
-echo "TenantID = $tenant"
+echo "Service principal created:"
+echo "The appID of the SP is: $appId"
+echo "The password of the SP is: $password"
+echo "The TenantID of the SP is: $tenant"
+sleep 10s
+$az role assignment create --assignee "$appId" --role contributor >/dev/null
 echo "done"
 
 echo "==============================================================================================================================================================="
 echo "The password is too complex so please perform the next two steps manually by running the following commands"
-echo "**********************************************************************************************************************************************************************************"
-echo "*   az login --service-principal -u $appId -p '$password' --tenant $tenant                     *"
-echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                                                                                                             *"
-echo "**********************************************************************************************************************************************************************************"
+echo "**************************************************************************************************************************************************************"
+echo "*   az login --service-principal -u $appId -p '$password' --tenant $tenant *"
+echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                                                                                            *"
+echo "**************************************************************************************************************************************************************"
 echo "done"
 
 echo "==============================================================================================================================================================="
 echo "Clean up the resources with the following two commands"
 echo "**********************************************************************"
-echo "*   az group delete --name $RESOURCEGROUP -y --no-wait             *"
+echo "*   az group delete --name $RESOURCEGROUP -y --no-wait              *"
 echo "**********************************************************************"
 echo "done"
+
+********************
