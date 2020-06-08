@@ -8,6 +8,7 @@ export password='<Your Azure Service Principle password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
+export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
 
 # Getting AKS credentials
 echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
@@ -31,6 +32,6 @@ az k8sconfiguration create \
 --name cluster-config \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name cluster-config --operator-namespace cluster-config \
---repository-url https://github.com/likamrat/hello_arc.git \
+--repository-url $appClonedRepo \
 --scope cluster --cluster-type connectedClusters \
 --operator-params="--git-poll-interval 3s --git-readonly"
