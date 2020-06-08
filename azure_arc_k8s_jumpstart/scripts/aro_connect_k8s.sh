@@ -205,7 +205,7 @@ echo "az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --ma
 echo " "
 $az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table --no-wait
 $az aro wait -n "$AROCLUSTER" -g $RESOURCEGROUP --created
-
+sleep 20s
 # Setting up credentials
 echo "==============================================================================================================================================================="
 adminUser=$($az aro list-credentials --name $AROCLUSTER --resource-group $RESOURCEGROUP --query kubeadminUsername -o tsv)
