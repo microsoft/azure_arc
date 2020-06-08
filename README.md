@@ -77,7 +77,7 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 * [Deploy AKS cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/aks_terraform.md)
 
-* [Deploy GiOps configurations and perform basic GiOps flow on AKS as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/aks_gitops.md)
+* [Deploy GitOps configurations and perform basic GitOps flow on AKS as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/aks_gitops.md)
 
 #### Amazon Elastic Kubernetes Service (EKS)
 
