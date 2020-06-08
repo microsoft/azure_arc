@@ -59,7 +59,7 @@ subwCIDR="10.0.2.0/23"
 # Check if the ARO Provider Registration is required
 echo "==============================================================================================================================================================="
 echo "Checking to see if ARO Provider is registered."
-if [ ! -n "$($az provider show -n Microsoft.RedHatOpenShift --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')" ]; then
+if [ -n "$($az provider show -n Microsoft.RedHatOpenShift --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')" ]; then
     echo "The ARO resource provider has not been registered for your subscription $SUBID."
     echo -n "I will attempt to register the ARO RP now (this may take a few minutes)..."
     $az provider register -n Microsoft.RedHatOpenShift --wait >/dev/null
@@ -76,7 +76,7 @@ fi
 
 echo "==============================================================================================================================================================="
 echo "Checking to see if ARC Kubernetes Provider is registered."
-if [ ! -n "$($az provider show -n Microsoft.Kubernetes --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')" ]; then
+if [ -n "$($az provider show -n Microsoft.Kubernetes --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')" ]; then
     echo "The ARC Kubernetes resource provider has not been registered for your subscription $SUBID."
     echo -n "I will attempt to register the ARC Kubernetes RP now (this may take a few minutes)..."
     $az provider register -n Microsoft.Kubernetes --wait >/dev/null
@@ -237,8 +237,8 @@ echo "done"
 echo "==============================================================================================================================================================="
 echo "The password is too complex so please perform the next two steps manually by running the following commands"
 echo "**********************************************************************************************************************************************************************************"
-echo "*   az login --service-principal -u $appId -p '$password' --tenant $tenant                *"
-echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                                                                                                    *"
+echo "*   az login --service-principal -u $appId -p '$password' --tenant $tenant                     *"
+echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                                                                                                             *"
 echo "**********************************************************************************************************************************************************************************"
 echo "done"
 
