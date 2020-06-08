@@ -36,17 +36,20 @@ The deployment of all resources is going to be done via Azure CLI.
       *  Give two commands to clean up deployed resources
   
   * Finish deployment by running the two suggested commands:
-    ![](../img/aro/image11.png)
+    ![](../img/aro/01.png)
 
-    **Note** The two commands to clean up the deployed resources as well:
-    <img src="../img/aro/image12.png" width="60%"><br>
-    These commands will be used to clean up resources at the end.
+    ![](../img/aro/02.png)
+
+
+    **Note** The command to clean up the deployed resources as well:
+    <img src="../img/aro/03.png" width="70%"><br>
+    This command will be used to clean up resources at the end.
 
   * Log in to Service prinipal from the suggested command earlier:
-     <img src="../img/aro/image13.png" width="90%"><br>
+     <img src="../img/aro/04.png" width="90%"><br>
   * Run the command to deploy the Azure ARC for Kubernetes resource
   
-     <img src="../img/aro/image14.png" width="90%"><br>
+     <img src="../img/aro/05.png" width="90%"><br>
 
 
 
@@ -54,13 +57,13 @@ The deployment of all resources is going to be done via Azure CLI.
     *  Azure Arc enabled Kubernetes
     *  OpenShift cluster<br><br>
 
-    <img src="../img/aro/image15.png" width="90%">
+    <img src="../img/aro/06.png" width="90%">
 
 # Delete the deployment
 
 In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal or through the CLI.
 
-```bash
-az group delete --name $RESOURCEGROUP
-```
-  <img src="../img/aro/image9.png" width="100%">
+Use the command provided earlier to delete the resource group.
+
+  <img src="../img/aro/08.png" width="100%"><br><br>
+  <img src="../img/aro/07.png" width="100%">
