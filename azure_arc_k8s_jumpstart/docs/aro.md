@@ -2,6 +2,11 @@
 
 The following README will guide you on how to use the Azure CLI to deploy an Azure Red Hat OpenShift 4 cluster connected it as an Azure Arc cluster resource.
 
+# Prerequisites
+
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
+
+
 # Deployment
 There are two sets of resources that will be deployed, first is the Azure RedHat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
 
@@ -12,7 +17,6 @@ The deployment of all resources is going to be done via Azure CLI.
     ```bash
     az login
     ```
-  ![](../img/aro/image2.png)
 
   * Run the following automation script:
     ```bash
