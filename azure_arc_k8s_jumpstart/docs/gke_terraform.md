@@ -106,15 +106,27 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Export the environment variables needed for the Terraform plan.
 
-    ```export TF_VAR_gcp_project_id=<Your GCP Project ID>```   
-    ```export TF_VAR_gcp_credentials_filename=<Location on the Keys JSON file>```   
-    ```export TF_VAR_gcp_region=<GCP Region to deploy resources>```   
+  ```bash
+    export TF_VAR_gcp_project_id=<Your GCP Project ID   
+    export TF_VAR_gcp_credentials_filename=<Location on the Keys JSON file   
+    export TF_VAR_gcp_region=<GCP Region to deploy resources   
+    export TF_VAR_gke_cluster_name=<GKE cluster name>
+    export TF_VAR_admin_username=<GKE cluster admin username>
+    export TF_VAR_admin_password=<GKE cluster admin password>
+    export TF_VAR_gke_cluster_node_count<GKE cluster node count>
+  ```  
 
     For example:
 
-    ```export TF_VAR_gcp_project_id=azure-arc-demo-277620```   
-    ```export TF_VAR_gcp_credentials_filename=account.json```   
-    ```export TF_VAR_gcp_region=us-west1```   
+  ```bash
+    export TF_VAR_gcp_project_id=azure-arc-demo-273150   
+    export TF_VAR_gcp_credentials_filename=account.json   
+    export TF_VAR_gcp_region=us-west1
+    export TF_VAR_gke_cluster_name=arc-gke-demo
+    export TF_VAR_admin_username=arcdemo
+    export TF_VAR_admin_password=arcdemo123!!
+    export TF_VAR_gke_cluster_node_count=1
+  ```    
 
 * Run the ```terraform init``` command which will download the Terraform Google provider.
 
