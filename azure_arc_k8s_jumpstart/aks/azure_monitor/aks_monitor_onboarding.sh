@@ -15,7 +15,7 @@ curl -LO https://raw.githubusercontent.com/microsoft/OMS-docker/ci_feature/docs/
 echo "Modify the onboarding script to allow for SPN login insted of device token"
 sed /use-device-code/s/^/#/ onboarding_azuremonitor_for_containers.sh > onboarding_azuremonitor_for_containers_modify.sh
 
-echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
+echo "Log in to Azure with Service Principle & Getting k8s credentials (kubeconfig)"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 export currentContext="$(kubectl config current-context)"
