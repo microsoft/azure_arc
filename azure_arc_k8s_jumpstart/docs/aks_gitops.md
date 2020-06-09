@@ -26,23 +26,24 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
     ![](../img/aks_gitops/02.png)
 
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * Create Azure Service Principal (SP)   
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --skip-assignment
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --skip-assignment```
+    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
 
     Output should look like this:
-    ```terminal
+
+    ```
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcK8s",
@@ -51,10 +52,6 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-
-    Then, assign a the "Contributor" role to the SP you've just created.
-
-    ```az role assignment create --assignee "<Unique SP Name>" --role contributor```
     
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
