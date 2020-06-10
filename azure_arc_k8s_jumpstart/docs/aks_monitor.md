@@ -39,7 +39,7 @@ In this guide, you will deploy hook the AKS cluster to Azure Monitor by deployin
     
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-# Azure Monitor for Containers & Azure Arc Kubernetes Integration
+# Azure Monitor for Containers Integration
 
 * In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *aks_monitor_onboarding* script against the AKS connected cluster. For your convenient, both shell and Powershell scripts are [provided](../aks/azure_monitor).
 
