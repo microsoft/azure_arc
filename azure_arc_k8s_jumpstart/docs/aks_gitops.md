@@ -1,6 +1,6 @@
 # Overview
 
-The following README will guide you on how to create GitOps configuration on an Azure Kubernetes Service (AKS) cluster which is projected an Azure Arc connected cluster resource.
+The following README will guide you on how to create GitOps configuration on an Azure Kubernetes Service (AKS) cluster which is projected as an Azure Arc connected cluster resource.
 
 In this guide, you will deploy & attach GitOps configuration to your cluster which will also include deploying an "Hello World" Azure Arc web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow effect it. 
 
@@ -57,7 +57,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 # Azure Arc Kubernetes GitOps Configuration 
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. **Make sure Cloud Shell is configured to use Bash.**
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
 
 * Edit the environment variables in the [*az_k8sconfig_aks*](../aks/gitops/az_k8sconfig_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_aks.sh``` command.
 
@@ -81,7 +81,7 @@ The script will:
 
 **Disclaimer: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval faster upon changes but it is recommended to have longer interval in your production environment (default value is 5min)**
 
-* Once the script completed it's run, you will have the GitOps configuration created all the resources deployed in your Kubernetes cluster. Note that it takes few min for the configuration change it's Operator state status from "Pending" to Install. 
+* Once the script will complete it's run, you will have the GitOps configuration created all the resources deployed in your Kubernetes cluster. Note that it takes few min for the configuration change it's Operator state status from "Pending" to Install. 
 
     ![](../img/aks_gitops/07.png)
 
