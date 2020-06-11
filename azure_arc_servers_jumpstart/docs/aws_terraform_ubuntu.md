@@ -108,7 +108,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have an AWS Amazon Linux 2 VM deployed and connected as a new Azure Arc server inside a new Resource Group.
 
-* Open the Azure portal and navigate to the resource group "Arc-Servers-Demo". The virtual machine created in AWS will be visible as a resource.
+* Open the Azure portal and navigate to the resource group "Arc-AWS-Demo". The virtual machine created in AWS will be visible as a resource.
 
     ![](../img/aws_ubuntu/10.png)
 
@@ -139,7 +139,7 @@ If you want to demo/control the actual registration process, do the following:
 
 5. Run the following command
     ```bash
-    azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-Servers-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id
+    azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-AWS-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id
     ```
     ![](../img/aws_ubuntu/16.png)
 
