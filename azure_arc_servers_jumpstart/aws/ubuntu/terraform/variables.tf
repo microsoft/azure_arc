@@ -19,7 +19,7 @@ variable "azure_location" {
 }
 
 variable "hostname" {
-  default = "azure-arc-demo"
+  default = "arc-aws-demo"
 }
 
 variable "azure_resource_group" {
