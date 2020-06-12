@@ -1,10 +1,10 @@
 # Overview
 
-The following README will guide you on how to create GitOps configuration on an Azure Kubernetes Service (AKS) cluster which is projected as an Azure Arc connected cluster resource.
+The following README will guide you on how to create GitOps configuration on a Google Kubernetes Engine (GKE) cluster which is projected as an Azure Arc connected cluster resource.
 
 In this guide, you will deploy & attach GitOps configuration to your cluster which will also include deploying an "Hello World" Azure Arc web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect. 
 
-**Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](aks_arm_template.md) or [Terraform](aks_terraform.md).**
+**Note: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](gke_terraform.md).**
 
 # Prerequisites
 
@@ -20,11 +20,11 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
     * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
 
-* As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
+* As mentioned, this guide starts at the point where you already have a connected GKE cluster to Azure Arc.
 
-    ![](../img/aks_gitops/01.png)
+    ![](../img/gke_gitops/01.png)
 
-    ![](../img/aks_gitops/02.png)
+    ![](../img/gke_gitops/02.png)
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
@@ -57,19 +57,21 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 # Azure Arc Kubernetes GitOps Configuration 
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
+* In order to keep your local environment clean and untouched, we will use [Google Cloud Shell](https://cloud.google.com/shell) to run the [*az_k8sconfig_gke*](../gke/gitops/az_k8sconfig_gke.sh) shell script against the GKE connected cluster.
 
-* Edit the environment variables in the [*az_k8sconfig_aks*](../aks/gitops/az_k8sconfig_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_aks.sh``` command.
+* Edit the environment variables in the [*az_k8sconfig_gke*](../gke/gitops/az_k8sconfig_gke.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_gke.sh``` command.
 
 **Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
 
-![](../img/aks_gitops/03.png)
+![](../img/gke_gitops/03.png)
 
-![](../img/aks_gitops/04.png)
+![](../img/gke_gitops/04.png)
 
-![](../img/aks_gitops/05.png)
+![](../img/gke_gitops/05.png)
 
-![](../img/aks_gitops/06.png)
+![](../img/gke_gitops/06.png)
+
+![](../img/gke_gitops/07.png)
 
 The script will:
 
@@ -83,11 +85,9 @@ The script will:
 
 * Once the script will complete it's run, you will have the GitOps configuration created all the resources deployed in your Kubernetes cluster. Note that it takes few min for the configuration change it's Operator state status from "Pending" to Install. 
 
-    ![](../img/aks_gitops/07.png)
+    ![](../img/gke_gitops/08.png)
 
-    ![](../img/aks_gitops/08.png)
-
-    ![](../img/aks_gitops/09.png)
+    ![](../img/gke_gitops/09.png)
 
 # The "Hello Arc" Application & Components
 
@@ -98,13 +98,13 @@ The script will:
     * ```kubectl get svc -n hello-arc``` - Will show NGINX controller Kubernetes Service (Type LoadBalancer).
     * ```kubectl get ing -n hello-arc``` - Will show NGINX rule which will route the traffic to the "Hello Arc" application from outside the cluster.
     
-    ![](../img/aks_gitops/10.png)
+    ![](../img/gke_gitops/10.png)
 
-    ![](../img/aks_gitops/11.png)
+    ![](../img/gke_gitops/11.png)
 
-    ![](../img/aks_gitops/12.png)
+    ![](../img/gke_gitops/12.png)
 
-    ![](../img/aks_gitops/13.png)
+    ![](../img/gke_gitops/13.png)
 
 * The GitOps flow works as follow:
 
@@ -116,30 +116,30 @@ The script will:
 
 * To show the above flow, open 2 (ideally 3) side-by-side browser windows:
 
-    - Azure Cloud Shell open running the ```kubectl get pods -n hello-arc -w```
+    - Google Cloud Shell open running the ```kubectl get pods -n hello-arc -w```
 
-    ![](../img/aks_gitops/14.png)
+    ![](../img/gke_gitops/14.png)
 
-    - Your clone of the "Hello Arc" application repository. Open the [*hello_arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/yaml/hello_arc.yaml) file. 
+    - Your clone of the "Hello Arc" application repository. Open the [*hello_arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/yaml/hello_arc.yaml) file.
 
     - The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n hello-arc``` command. 
 
-    ![](../img/aks_gitops/15.png)
-
+    ![](../img/gke_gitops/15.png)
+   
     End result should look something like that:
 
-    ![](../img/aks_gitops/16.png)    
+    ![](../img/gke_gitops/16.png)    
 
     As mentioned in the Prerequisites above, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.   
 
-    ![](../img/aks_gitops/17.png)
+    ![](../img/gke_gitops/17.png)
 
 * In the repository window showing the *hello_arc.yaml* file, change the text under "MESSAGE" section commit the change. Alternatively, you can open the clone repository in your IDE, make the change, commit and push it.      
 
-![](../img/aks_gitops/18.png)
+![](../img/gke_gitops/18.png)
 
-![](../img/aks_gitops/19.png)
+![](../img/gke_gitops/19.png)
 
 * Upon committing the changes, notice how the Kubernetes Pod rolling upgrade starts. Once the Pod is up & running, the new "Hello Arc" application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful. 
 
-![](../img/aks_gitops/20.png)
+![](../img/gke_gitops/20.png)
