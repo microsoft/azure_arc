@@ -1,6 +1,6 @@
 # Overview
 
-The following is a guide on how to use the Azure Cloud Shell to deploy an Azure Red Hat OpenShift 4 cluster connected and have it as a connected Azure Arc Kubernetes resource.
+The following is a guide on how to use the Azure Cloud Shell to deploy an Azure Red Hat OpenShift 4 cluster and have it as a connected Azure Arc Kubernetes resource.
 
 # Deployment
 There are two sets of resources that will be deployed, first is the Azure RedHat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
@@ -39,7 +39,7 @@ The deployment of all resources is going to be done via Azure Cloud Shell.
 
     <img src="../img/aro/image5.png" width="80%"><br>
 
-  *  To track progress navigate to the logs of the container by selecting **Containers** under **Settings** and then selecting **Logs**
+  *  To track progress navigate to the logs of the container by selecting **Containers** under **Settings** and then selecting **Logs**. This deployment can take upto ***50 mins***.
 
       <img src="../img/aro/image6.png" width="80%"><br>
 
