@@ -30,7 +30,7 @@ Expand-Archive C:\tmp\azuredatastudio_insider.zip -DestinationPath 'C:\Program F
 Invoke-Item 'C:\Program Files\Azure Data Studio - Insider\azuredatastudio-insiders.exe'
 
 $TargetFile   = "C:\Program Files\Azure Data Studio - Insider\azuredatastudio-insiders.exe"
-$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insider.lnk"
+$ShortcutFile = "C:\Users\$env:UserName\Desktop\Azure Data Studio - Insider.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut     = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
