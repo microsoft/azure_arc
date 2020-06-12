@@ -20,20 +20,21 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
-# Create Azure Service Principal (SP)   
+* Create Azure Service Principal (SP)   
 
-* To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+    To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --skip-assignment
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcGCP" --skip-assignment```
+    ```az ad sp create-for-rbac -n "http://AzureArcGCP" --role contributor```
 
     Output should look like this:
+
     ```
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -43,10 +44,6 @@ The following README will guide you on how to use the provided [Terraform](https
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-
-    Then, assign a the "Contributor" role to the SP you've just created.
-
-    ```az role assignment create --assignee "<Unique SP Name>" --role contributor```
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 

@@ -34,9 +34,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Finally, make sure your SSH keys are available in *~/.ssh* and named *id_rsa.pub* and *id_rsa*. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify [*main.tf*](../gcp/ubuntu/terraform/main.tf) to use a key with a different path.
 
-## Create Azure Service Principal (SP)   
+* Create Azure Service Principal (SP)   
 
-* To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```bash
     az login
