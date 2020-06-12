@@ -29,7 +29,7 @@ The deployment of all resources is going to be done via Azure Cloud Shell.
     
     <img src="../img/aro/image2.png" width="80%"><br>
   
-  * To kick off the script log into [Azure device login page](https://microsoft.com/devicelogin) and authenticate your credentials using that code.
+  * To start creating resources first log into [Azure device login page](https://microsoft.com/devicelogin) and authenticate your credentials and that code copied earlier.
   
     <img src="../img/aro/image3.png" width="80%"><br>
     
@@ -52,6 +52,6 @@ The deployment of all resources is going to be done via Azure Cloud Shell.
 
 # Delete the deployment
 
-The way to delete the all the resources deployed is by deleting the resource group. This will delete the managed resource group as well that was created for Azure Redhat OpenShift cluster.
+The way to delete all the resources deployed is by deleting the resource group. This will delete the managed resource group as well that was created for Azure Redhat OpenShift cluster.
 
 <img src="../img/aro/image8.png" width="90%">
