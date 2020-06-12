@@ -19,11 +19,11 @@ variable "azure_location" {
 }
 
 variable "hostname" {
-  default = "azure-arc-demo"
+  default = "arc-aws-demo"
 }
 
 variable "azure_resource_group" {
-  default = "Arc-Servers-Demo"
+  default = "Arc-AWS-Demo"
 }
 
 variable "subscription_id" {
