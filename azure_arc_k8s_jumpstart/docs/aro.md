@@ -14,7 +14,7 @@ The deployment of all resources is going to be done via Azure Cloud Shell.
 
   * Run the following script:
     ```bash
-    wget -O - https://raw.githubusercontent.com/alihhussain/AzureTemplates/master/arc/aro/run.sh | bash
+    wget -O - https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_k8s_jumpstart/aro/run.sh | bash
     ```
   
     This script will perform the following tasks:
