@@ -94,7 +94,7 @@ Before executing the Terraform plan, you must set and then export the environmen
 
     ![](../img/gcp_windows/09.png)
 
-* After a few minutes, you should be able to open the Azure portal and navigate to the resource group "Arc-Servers-Demo". The Windows Server virtual machine created in GCP will be visible as a resource.
+* After a few minutes, you should be able to open the Azure portal and navigate to the resource group "Arc-GCP-Demo". The Windows Server virtual machine created in GCP will be visible as a resource.
 
     ![](../img/gcp_windows/10.png)
 
