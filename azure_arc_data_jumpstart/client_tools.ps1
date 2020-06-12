@@ -22,20 +22,10 @@ if ([string]::IsNullOrWhiteSpace($env:chocolateyAppList) -eq $false){
     }
 }
 
-Enable-WSManCredSSP -Role Server -Force
-Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
-New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation -Name AllowFreshCredentialsWhenNTLMOnly -Force
-New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation\AllowFreshCredentialsWhenNTLMOnly -Name 1 -Value * -PropertyType String
-
-
-$securePassword = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
-$credential = New-Object System.Management.Automation.PSCredential $env:computername\$env:UserName, $securePassword
-Invoke-Command -Authentication CredSSP -ScriptBlock {
-    New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
-    Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
-    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insider.zip"
-    Expand-Archive C:\tmp\azuredatastudio_insider.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insider'
-} -ComputerName $env:computername -Credential $credential
+New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
+Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
+Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insider.zip"
+Expand-Archive C:\tmp\azuredatastudio_insider.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insider'
 
 Invoke-Item 'C:\Program Files\Azure Data Studio - Insider\azuredatastudio-insiders.exe' | Out-Null
 
