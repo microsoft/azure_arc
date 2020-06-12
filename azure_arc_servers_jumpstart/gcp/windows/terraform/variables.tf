@@ -30,7 +30,7 @@ variable "azure_location" {
 }
 
 variable "azure_resource_group" {
-  default = "Arc-Servers-Demo"
+  default = "Arc-GCP-Demo"
 }
 
 variable "subscription_id" {
