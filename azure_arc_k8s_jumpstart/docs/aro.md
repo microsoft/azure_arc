@@ -1,69 +1,57 @@
 # Overview
 
-The following README will guide you on how to use the Azure CLI to deploy an Azure Red Hat OpenShift 4 cluster connected it as an Azure Arc cluster resource.
-
-# Prerequisites
-
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
-
+The following is a guide on how to use the Azure Cloud Shell to deploy an Azure Red Hat OpenShift 4 cluster connected and have it as a connected Azure Arc Kubernetes resource.
 
 # Deployment
 There are two sets of resources that will be deployed, first is the Azure RedHat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
 
-The deployment of all resources is going to be done via Azure CLI.
+The deployment of all resources is going to be done via Azure Cloud Shell.
 
 
-  * Log into Azure CLI.
+  * Log into Azure Cloud Shell.
+
+    <img src="../img/aro/image1.png" width="80%"><br>
+
+  * Run the following script:
     ```bash
-    az login
-    ```
-
-  * Run the following automation script:
-    ```bash
-    wget -O - https://tinyurl.com/y85vpku9 | bash
+    wget -O - https://raw.githubusercontent.com/alihhussain/AzureTemplates/master/arc/aro/run.sh | bash
     ```
   
     This script will perform the following tasks:
-      *  Set the approprite environment variables
-      *  Ensure providers are registered
-      *  Ensure ```az``` extensions are added
-      *  Install the ```oc``` command line, ```helm```, and ```kubectl```
-      *  Deploy Azure Resource Group
-      *  Deploy Azure VNet and appropriate Subnets
-      *  Deploy Azure Red Hat OpenShift Cluster
-      *  Create an Azure Service Principal
-      *  Give two commands to finish the deployment of Azure ARC for Kubernetes
-      *  One command to clean up deployed resources
+      *  Deploy the following Resources:
+         *  Azure Container Instance
+         * Azure VNet
+         * Azure Redhat OpenShift (```aro```) cluster
+         * Azure Arc K8s connected resource
+      *  Ensure required providers are registered
+    
+    When the script is finished copy the **device login code**
+    
+    <img src="../img/aro/image2.png" width="80%"><br>
   
-  * Finish deployment by running the two suggested commands:
-    ![](../img/aro/01.png)
-
-    ![](../img/aro/02.png)
-
-
-    **Note** The command to clean up the deployed resources as well:
-    <img src="../img/aro/03.png" width="70%"><br>
-    This command will be used to clean up resources at the end.
-
-  * Log in to Service prinipal from the suggested command earlier:
-     <img src="../img/aro/04.png" width="90%"><br>
-  * Run the command to deploy the Azure ARC for Kubernetes resource
+  * To kick off the script log into [Azure device login page](https://microsoft.com/devicelogin) and authenticate your credentials using that code.
   
-     <img src="../img/aro/05.png" width="90%"><br>
+    <img src="../img/aro/image3.png" width="80%"><br>
+    
+  * Close the Cloud Shell and navigate to the Resource Group
 
+    <img src="../img/aro/image4.png" width="80%"><br>
 
+    <img src="../img/aro/image5.png" width="80%"><br>
 
-  * Upon completion, you will have the following resources deployed in the resource group:
+  *  To track progress navigate to the logs of the container by selecting **Containers** under **Settings** and then selecting **Logs**
+
+      <img src="../img/aro/image6.png" width="80%"><br>
+
+  * Upon completion, the following resources will be deployed in the resource group:
     *  Azure Arc enabled Kubernetes
-    *  OpenShift cluster<br><br>
+    *  OpenShift cluster
+    *  Azure VNet<br><br>
 
-    <img src="../img/aro/06.png" width="90%">
+    <img src="../img/aro/image7.png" width="90%">
 
 # Delete the deployment
 
-In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal or through the CLI.
+The way to delete the all the resources deployed is by deleting the resource group. This will delete the managed resource group as well that was created for Azure Redhat OpenShift cluster.
 
-Use the command provided earlier to delete the resource group.
-
-  <img src="../img/aro/08.png" width="100%"><br><br>
-  <img src="../img/aro/07.png" width="100%">
+<img src="../img/aro/image8.png" width="90%">
