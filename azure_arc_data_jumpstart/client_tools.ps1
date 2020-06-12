@@ -1,6 +1,6 @@
-$env:chocolateyAppList = "azure-cli, kubernetes-cli"
+$chocolateyAppList = "kubernetes-cli"
 
-if ([string]::IsNullOrWhiteSpace($env:chocolateyAppList) -eq $false)
+if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
     try{
         choco config get cacheLocation
@@ -10,10 +10,10 @@ if ([string]::IsNullOrWhiteSpace($env:chocolateyAppList) -eq $false)
     }
 }
 
-if ([string]::IsNullOrWhiteSpace($env:chocolateyAppList) -eq $false){   
+if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){   
     Write-Host "Chocolatey Apps Specified"  
     
-    $appsToInstall = $env:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+    $appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
 
     foreach ($app in $appsToInstall)
     {
