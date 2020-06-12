@@ -1,5 +1,27 @@
 $env:chocolateyAppList = "kubernetes-cli"
 
+if ([string]::IsNullOrWhiteSpace($env:chocolateyAppList) -eq $false)
+{
+    try{
+        choco config get cacheLocation
+    }catch{
+        Write-Output "Chocolatey not detected, trying to install now"
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($env:chocolateyAppList) -eq $false){   
+    Write-Host "Chocolatey Apps Specified"  
+    
+    $appsToInstall = $env:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+
+    foreach ($app in $appsToInstall)
+    {
+        Write-Host "Installing $app"
+        & choco install $app /y | Write-Output
+    }
+}
+
 Enable-WSManCredSSP -Role Server -Force
 Enable-WSManCredSSP -Role Client -DelegateComputer * -Force
 New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation -Name AllowFreshCredentialsWhenNTLMOnly -Force
@@ -24,27 +46,7 @@ $Shortcut     = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-if ([string]::IsNullOrWhiteSpace($env:chocolateyAppList) -eq $false)
-{
-    try{
-        choco config get cacheLocation
-    }catch{
-        Write-Output "Chocolatey not detected, trying to install now"
-        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    }
-}
 
-if ([string]::IsNullOrWhiteSpace($env:chocolateyAppList) -eq $false){   
-    Write-Host "Chocolatey Apps Specified"  
-    
-    $appsToInstall = $env:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
-
-    foreach ($app in $appsToInstall)
-    {
-        Write-Host "Installing $app"
-        & choco install $app /y | Write-Output
-    }
-}
 
 #Install-Package msi -provider PowerShellGet -Force
 #Install-MSIProduct C:\tmp\AZDataCLI.msi
