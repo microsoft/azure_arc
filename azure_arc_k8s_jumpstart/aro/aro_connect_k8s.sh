@@ -1,36 +1,22 @@
 #!/bin/bash
 
-# Random string generator - don't change this.
-RAND="$(echo $RANDOM | tr '[0-9]' '[a-z]')"
+# Check if the first parameter given is there or not
+if [ -z "$subId" ]; then
+    echo "Script cannot run if the subscription ID is not given"
+    exit 1
+fi
 
-while getopts "a:b:c:d:e:f:g:" opt; do
-    case "$opt" in
-    a) LOCATION="$OPTARG" ;;
-    b) RESOURCEGROUP="$OPTARG" ;;
-    c) AROCLUSTER="$OPTARG" ;;
-    d) ARC="$OPTARG" ;;
-    e) SPClientId="$OPTARG" ;;
-    f) SPClientSecret="$OPTARG" ;;
-    g) TenantID="$OPTARG" ;;
-    esac
-done
+# Check if the first parameter given is there or not
+if [ -z "$RAND" ]; then
+    echo "Script cannot run if the RAN character is not given"
+    exit 1
+fi
 
 # Assume parameters if not given
-if [ -z "$LOCATION" ]; then
-    LOCATION="eastus"
-fi
-
-if [ -z "$RESOURCEGROUP" ]; then
-    RESOURCEGROUP="arcarodemo-$RAND"
-fi
-
-if [ -z "$AROCLUSTER" ]; then
-    AROCLUSTER="arcarodemo-$RAND"
-fi
-
-if [ -z "$ARC" ]; then
-    ARC="arcarodemo-$RAND"
-fi
+LOCATION="eastus"
+RESOURCEGROUP="arcarodemo-$RAND"
+AROCLUSTER="arcarodemo-$RAND"
+ARC="arcarodemo-$RAND"
 
 # Check if az is installed, if not exit the script out.
 var='az'
@@ -41,6 +27,11 @@ fi
 
 az=$(which az)
 
+# Login using the device code method.
+$az login --output none
+sleep 5s
+$az account set --subscription $subId
+
 # Good to know information
 echo "The az full path is: $az"
 echo "Resource Group is: $RESOURCEGROUP"
@@ -49,18 +40,22 @@ echo "AROCLUSTER=$AROCLUSTER"
 echo "ARC=$ARC"
 
 # Set the correct variables
-subID="$($az account show --query id -o tsv)"
-tenandID="$($az account show --query homeTenantId -o tsv)"
 vnetName="$ARC-vnet"
 vnetCIDR="10.0.0.0/22"
 submCIDR="10.0.0.0/23"
 subwCIDR="10.0.2.0/23"
 
+# echo "Logging into Azure:"
+# sleep 30s
+# $az login --service-principal -u $appId -p $password --tenant $tenant
+# echo "done"
+# echo "==============================================================================================================================================================="
+
 # Check if the ARO Provider Registration is required
 echo "==============================================================================================================================================================="
 echo "Checking to see if ARO Provider is registered."
 if [ -n "$($az provider show -n Microsoft.RedHatOpenShift --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')" ]; then
-    echo "The ARO resource provider has not been registered for your subscription $SUBID."
+    echo "The ARO resource provider has not been registered for your subscription $subid."
     echo -n "I will attempt to register the ARO RP now (this may take a few minutes)..."
     $az provider register -n Microsoft.RedHatOpenShift --wait >/dev/null
     echo "done."
@@ -77,7 +72,7 @@ fi
 echo "==============================================================================================================================================================="
 echo "Checking to see if ARC Kubernetes Provider is registered."
 if [ -n "$($az provider show -n Microsoft.Kubernetes --query registrationState -o tsv | grep -E '(Unregistered|NotRegistered)')" ]; then
-    echo "The ARC Kubernetes resource provider has not been registered for your subscription $SUBID."
+    echo "The ARC Kubernetes resource provider has not been registered for your subscription $subid."
     echo -n "I will attempt to register the ARC Kubernetes RP now (this may take a few minutes)..."
     $az provider register -n Microsoft.Kubernetes --wait >/dev/null
     echo "done."
@@ -113,7 +108,7 @@ echo "Checking to see if connectedk8s AZ extension is installed."
 if [ -z "$($az extension list --query '[].path' -o tsv | grep connectedk8s)" ]; then
     echo "The Azure CLI extension for connectedk8s has not been installed."
     echo -n "I will attempt to register the extension now (this may take a few minutes)..."
-    az extension add --name connectedk8s >/dev/null
+    $az extension add --name connectedk8s >/dev/null
     echo "done."
     echo -n "Verifying the Azure CLI extension exists..."
     if [ -z "$($az extension list --query '[].path' -o tsv | grep connectedk8s)" ]; then
@@ -169,43 +164,58 @@ else
     echo "$command command already exists"
 fi
 
-# Resource Group Creation
-echo "==============================================================================================================================================================="
-echo -n "Creating Resource Group..."
-$az group create -g "$RESOURCEGROUP" -l "$LOCATION" -o table >>/dev/null
-echo "done"
-
 # VNet Creation
-echo "==============================================================================================================================================================="
-echo -n "Creating Virtual Network..."
-$az network vnet create -g "$RESOURCEGROUP" -n $vnetName --address-prefixes $vnetCIDR -o table >/dev/null
-echo "done"
+if [ ! "$($az network vnet show -g $RESOURCEGROUP -n $vnetName --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
+    echo "==============================================================================================================================================================="
+    echo -n "Creating Virtual Network..."
+    $az network vnet create -g "$RESOURCEGROUP" -n $vnetName --address-prefixes $vnetCIDR -o table >/dev/null
+    echo "done"
 
-# Subnet Creation
-echo "==============================================================================================================================================================="
-echo -n "Creating 'Master' Subnet..."
-$az network vnet subnet create -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --address-prefixes "$submCIDR" --service-endpoints Microsoft.ContainerRegistry -o table >/dev/null
-echo "done"
-echo -n "Creating 'Worker' Subnet..."
-$az network vnet subnet create -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-worker" --address-prefixes "$subwCIDR" --service-endpoints Microsoft.ContainerRegistry -o table >/dev/null
-echo "done"
+    # Subnet Creation
+    echo "==============================================================================================================================================================="
+    echo -n "Creating 'Master' Subnet..."
+    $az network vnet subnet create -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --address-prefixes "$submCIDR" --service-endpoints Microsoft.ContainerRegistry -o table >/dev/null
+    echo "done"
+    echo -n "Creating 'Worker' Subnet..."
+    $az network vnet subnet create -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-worker" --address-prefixes "$subwCIDR" --service-endpoints Microsoft.ContainerRegistry -o table >/dev/null
+    echo "done"
 
-# VNet & Subnet Configuration
-echo "==============================================================================================================================================================="
-echo -n "Disabling 'PrivateLinkServiceNetworkPolicies' in 'Master' Subnet..."
-$az network vnet subnet update -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --disable-private-link-service-network-policies true -o table >/dev/null
-echo "done"
+    # VNet & Subnet Configuration
+    echo "==============================================================================================================================================================="
+    echo -n "Disabling 'PrivateLinkServiceNetworkPolicies' in 'Master' Subnet..."
+    $az network vnet subnet update -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --disable-private-link-service-network-policies true -o table >/dev/null
+    echo "done"
 
-# Build ARO
-echo "==============================================================================================================================================================="
-echo "Building Azure Red Hat OpenShift - this takes roughly 30-40 minutes. The time is now: $(date)..."
-echo " "
-echo "Executing: "
-echo "az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table"
-echo " "
-$az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table --no-wait
-$az aro wait -n "$AROCLUSTER" -g $RESOURCEGROUP --created
-sleep 20s
+    # Subnet Creation
+    echo "==============================================================================================================================================================="
+    echo -n "Creating 'Master' Subnet..."
+    $az network vnet subnet create -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --address-prefixes "$submCIDR" --service-endpoints Microsoft.ContainerRegistry -o table >/dev/null
+    echo "done"
+    echo -n "Creating 'Worker' Subnet..."
+    $az network vnet subnet create -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-worker" --address-prefixes "$subwCIDR" --service-endpoints Microsoft.ContainerRegistry -o table >/dev/null
+    echo "done"
+
+    # VNet & Subnet Configuration
+    echo "==============================================================================================================================================================="
+    echo -n "Disabling 'PrivateLinkServiceNetworkPolicies' in 'Master' Subnet..."
+    $az network vnet subnet update -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --disable-private-link-service-network-policies true -o table >/dev/null
+    echo "done"
+
+fi
+
+if [ ! "$($az aro show -g "$RESOURCEGROUP" -n "$AROCLUSTER" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
+    # Build ARO
+    echo "==============================================================================================================================================================="
+    echo "Building Azure Red Hat OpenShift - this takes roughly 30-40 minutes. The time is now: $(date)..."
+    echo " "
+    echo "Executing: "
+    echo "az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table"
+    echo " "
+    $az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table --no-wait
+    $az aro wait -n "$AROCLUSTER" -g $RESOURCEGROUP --created
+    sleep 20s
+fi
+
 # Setting up credentials
 echo "==============================================================================================================================================================="
 adminUser=$($az aro list-credentials --name $AROCLUSTER --resource-group $RESOURCEGROUP --query kubeadminUsername -o tsv)
@@ -217,35 +227,45 @@ echo "adminPassword=$adminPassword"
 echo "apiServer=$apiServer"
 echo "done"
 sleep 10s
+
 # Log into the OC command
 echo "==============================================================================================================================================================="
 oc login $apiServer -u $adminUser -p $adminPassword
 
-# Create a Service Principal
-echo "==============================================================================================================================================================="
-password=$($az ad sp create-for-rbac -n "http://AzureArcK8sARO$RAND" --skip-assignment --query password -o tsv)
-sleep 2s
-appId=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appId -o tsv)
-tenant=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appOwnerTenantId -o tsv)
-echo "Service principal created:"
-echo "The appID of the SP is: $appId"
-echo "The password of the SP is: $password"
-echo "The TenantID of the SP is: $tenant"
-sleep 10s
-$az role assignment create --assignee "$appId" --role contributor >/dev/null
-echo "done"
+if [ ! "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
+    # Create a Service Principal
+    echo "==============================================================================================================================================================="
+    password=$($az ad sp create-for-rbac -n "http://AzureArcK8sARO$RAND" --role contributor --query password -o tsv)
+    appId=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appId -o tsv)
+    tenant=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appOwnerTenantId -o tsv)
+    echo "Service principal created:"
+    echo "appId=$appId"
+    echo "password=$password"
+    echo "tenant=$tenant"
+    echo "done..."
+
+    echo "==============================================================================================================================================================="
+    echo "Logging into the Azure CLI with SP created."
+    echo "az login --service-principal -u $appId -p $password --tenant $tenant"
+    sleep 60s
+    $az login --service-principal -u $appId -p $password --tenant $tenant
+    echo "done"
+    echo "==============================================================================================================================================================="
+
+    sleep 60s
+    # Connect ARO to Arc
+    echo "==============================================================================================================================================================="
+    echo "Lets connect the RedHat Openshift Cluster to Arc for Kubernetes"
+    $az connectedk8s connect -n $ARC -g $RESOURCEGROUP
+    echo "done"
+fi
 
 echo "==============================================================================================================================================================="
-echo "The password is too complex so please perform the next two steps manually by running the following commands"
-echo "**************************************************************************************************************************************************************"
-echo "*   az login --service-principal -u $appId -p '$password' --tenant $tenant *"
-echo "*   az connectedk8s connect -n $ARC -g $RESOURCEGROUP                                                                                            *"
-echo "**************************************************************************************************************************************************************"
-echo "done"
+echo "To delete the Service Principal execute the following command:"
+echo "az ad sp delete --id $appId"
 
+# Set the container to not keep restarting
 echo "==============================================================================================================================================================="
-echo "Clean up the resources with the following two commands"
-echo "**********************************************************************"
-echo "*   az group delete --name $RESOURCEGROUP -y --no-wait              *"
-echo "**********************************************************************"
-echo "done"
+echo "Stopping the container from restarting since all resources are deployed:"
+echo "done."
+$az container stop -g $RESOURCEGROUP -n arcarodemo

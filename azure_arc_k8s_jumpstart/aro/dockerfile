@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/azure-cli:latest
+LABEL Ali Hussain "alhussai@microsoft.com"
+
+ADD ./ /root/
+RUN az extension add -n aro --index https://az.aroapp.io/stable \
+    && az extension add --name connectedk8s
+RUN wget -q https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz -O openshift-client-linux.tar.gz \
+    && tar -zxvf openshift-client-linux.tar.gz -C /bin/
+RUN wget -q https://get.helm.sh/helm-v3.2.2-linux-amd64.tar.gz -O helm-v3.2.2-linux-amd64.tar.gz \
+    && tar -zxvf helm-v3.2.2-linux-amd64.tar.gz -C /bin/ \
+    && mv /bin/linux-amd64/helm /bin/
+
+CMD ["/bin/bash", "/root/containerRun.sh"]
