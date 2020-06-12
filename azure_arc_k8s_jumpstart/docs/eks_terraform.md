@@ -140,6 +140,7 @@ Now let’s add the ConfigMap to the cluster from Terraform as well. The ConfigM
 Once done, you will have a ready EKS cluster under the ***Elastic Kubernetes Service*** section in your AWS console.
 
   ![](../img/eks_terraform/image10.png)
+
   ![](../img/eks_terraform/image11.png)
 
 # Connecting to Azure Arc
@@ -165,7 +166,9 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
 * Upon completion, you will have your EKS cluster connect as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
 
   ![](../img/eks_terraform/image13.png)
+
   ![](../img/eks_terraform/image14.png)
+
   ![](../img/eks_terraform/image15.png)
 
 # Delete the deployment
@@ -177,9 +180,11 @@ az group delete --name arceksdemo
 ```
 
 ![](../img/eks_terraform/image16.png)
+
 ![](../img/eks_terraform/image17.png)
 
 On your AWS portal, select the cluster and delete it or alternatively, you can use the ```terraform destroy --auto-approve``` command.
 
 ![](../img/eks_terraform/image18.png)
+
 <img src="../img/eks_terraform/image20.png" width="60%">
