@@ -1,13 +1,6 @@
-# <--- Change the following environment variables according to your Azure Service Principle name --->
-
-$env:subscriptionId = 'e73c1dbe-2574-4f38-9e8f-c813757b1786'
-$env:appId = '051b9a58-4a83-48de-b610-0e7ae1bca3fb'
-$env:password = '53ed1458-a77d-4201-9c21-4fe24a0981fa'
-$env:tenantId = '72f988bf-86f1-41af-91ab-2d7cd011db47'
-$env:resourceGroup = 'Arc-Data-Demo'
-$env:location = 'eastus'
-$env:arcClusterName = 'Arc-AKS-Demo'
-$chocolateyAppList = "kubernetes-cli"
+$securePassword = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential $env:computername\$env:UserName, $securePassword
+Invoke-Command -Authentication CredSSP -ScriptBlock {
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
@@ -58,7 +51,7 @@ Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\a
 # Creating new Azure Arc Resource Group
 az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
-
+} -ComputerName $env:computername -Credential $credential
 
 
 
