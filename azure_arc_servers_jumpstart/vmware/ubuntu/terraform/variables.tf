@@ -3,7 +3,7 @@ variable "location" {
 }
 
 variable "resourceGroup" {
-  default = "Arc-Servers-Demo"
+  default = "Arc-VMware-Demo"
 }
 
 variable "subscription_id" {
