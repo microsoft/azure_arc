@@ -1,11 +1,10 @@
-param (
-    [string]$appId,
-    [string]$password,
-    [string]$tenantId,
-    [string]$arcClusterName,
-    [string]$resourceGroup,
-    [string]$chocoPackages
-)
+# param (
+#     [string]$appId,
+#     [string]$password,
+#     [string]$tenantId,
+#     [string]$arcClusterName,
+#     [string]$resourceGroup
+# )
 
 $chocolateyAppList = "kubernetes-cli"
 
@@ -33,7 +32,14 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 
 Write-Host "Packages from choco.org were installed"
 
+[System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('arcClusterName', $arcClusterName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
+
 Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+Start-Process -FilePath 'C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az'
 
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
