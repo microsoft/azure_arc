@@ -3,7 +3,8 @@ param (
     [string]$password,
     [string]$tenantId,
     [string]$arcClusterName,
-    [string]$resourceGroup
+    [string]$resourceGroup,
+    [string]$adminUsername
 )
 
 $chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli"
@@ -35,6 +36,7 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('arcClusterName', $arcClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
 
 # New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 # New-Item -Path "C:\Users\$env:adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
@@ -46,8 +48,12 @@ $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
 
-Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
+Import-AzAksCredential -ResourceGroupName $k8sResourceGroups -Name $k8sArcCluster -Force
 kubectl get nodes
+
+$CopyDestination = "C:\Users\$env:adminUsername"
+Copy-Item -Path "C:\Windows\System32\config\systemprofile\.kube" -Destination $CopyDestination -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\Windows\System32\config\systemprofile\.Azure" -Destination $CopyDestination -Recurse -Force -ErrorAction Continue
 
 # az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 # az aks get-credentials --name $env:arcClusterName --resource-group $env:resourceGroup --overwrite-existing
