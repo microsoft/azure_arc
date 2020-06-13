@@ -11,7 +11,12 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 choco install azure-cli -y 
 choco install kubernetes-cli -y 
 
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
+    Write-Warning -Message ('Az module not installed. Having both the AzureRM and ' +
+      'Az modules installed at the same time is not supported.')
+} else {
+    Install-Module -Name Az -AllowClobber -Scope AllUsers -Force
+}
 
 [System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
@@ -28,8 +33,9 @@ $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";"
 # Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 # $env:Path = [System.Environment]::ExpandEnvironmentVariables([System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User"))
 
+Connect-AzAccount
 
-az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
-az aks get-credentials --name $env:arcClusterName --resource-group $env:resourceGroup --overwrite-existing
+# az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
+# az aks get-credentials --name $env:arcClusterName --resource-group $env:resourceGroup --overwrite-existing
 
 # Invoke-Expression -Command .\lucky2.ps1
