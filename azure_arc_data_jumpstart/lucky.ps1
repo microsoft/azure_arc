@@ -51,11 +51,7 @@ Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal
 Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
 kubectl get nodes
 
-New-Item -Path "C:\Users\$adminUsername\" -Name ".kube" -ItemType "directory"
-Copy-Item -Path "C:\Windows\System32\config\systemprofile\.kube\*" -Destination "C:\Users\$adminUsername\.kube" -Recurse
+New-Item -Path $env:USERPROFILE -Name ".kube" -ItemType "directory"
+Copy-Item -Path "C:\Windows\System32\config\systemprofile\.kube\config" -Destination "$env:USERPROFILE\.kube" -Recurse
 
 
-# az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
-# az aks get-credentials --name $env:arcClusterName --resource-group $env:resourceGroup --overwrite-existing
-
-# Invoke-Expression -Command .\lucky2.ps1
