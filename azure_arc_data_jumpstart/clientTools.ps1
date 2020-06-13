@@ -20,9 +20,10 @@ Invoke-Command -ScriptBlock $sb
 $chocoPackages.Split(";") | ForEach {
     choco install $_ -y -force
 }
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 
 Write-Host "Packages from choco.org were installed"
+
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 
 # New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
