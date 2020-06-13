@@ -1,10 +1,10 @@
-# param (
-#     [string]$appId,
-#     [string]$password,
-#     [string]$tenantId,
-#     [string]$arcClusterName,
-#     [string]$resourceGroup
-# )
+param (
+    [string]$appId,
+    [string]$password,
+    [string]$tenantId,
+    [string]$arcClusterName,
+    [string]$resourceGroup
+)
 
 $chocolateyAppList = "kubernetes-cli"
 
