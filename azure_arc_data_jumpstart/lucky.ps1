@@ -6,20 +6,20 @@ param (
     [string]$resourceGroup
 )
 
-# Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-# choco install azure-cli -y 
+choco install azure-cli -y 
 # choco install kubernetes-cli -y 
 
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+# Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+Install-Module -Name Az -AllowClobber -Scope AllUsers -Force
 
-
-if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
-    Write-Warning -Message ('Az module not installed. Having both the AzureRM and ' +
-      'Az modules installed at the same time is not supported.')
-} else {
-    Install-Module -Name Az -AllowClobber -Scope AllUsers -Force
-}
+# if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
+#     Write-Warning -Message ('Az module not installed. Having both the AzureRM and ' +
+#       'Az modules installed at the same time is not supported.')
+# } else {
+#     Install-Module -Name Az -AllowClobber -Scope AllUsers -Force
+# }
 
 
 [System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
