@@ -1,6 +1,12 @@
 #Script based on https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/SetupChocolatey.ps1
 param([Parameter(Mandatory=$true)][string]$chocoPackages)
-param([Parameter(Mandatory=$true)][string]$adminUsername)
+# param([Parameter(Mandatory=$true)][string]$adminUsername)
+param([Parameter(Mandatory=$true)][string]$appId)
+param([Parameter(Mandatory=$true)][string]$password)
+param([Parameter(Mandatory=$true)][string]$tenantId)
+param([Parameter(Mandatory=$true)][string]$arcClusterName)
+param([Parameter(Mandatory=$true)][string]$resourceGroup)
+
 
 Write-Host "File packages URL: $linktopackages"
 
@@ -24,11 +30,11 @@ $chocoPackages.Split(";") | ForEach {
 
 # Write-Host "Packages from choco.org were installed"
 
-New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
-New-Item -Path "C:\Users\$adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
+# New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
+# New-Item -Path "C:\Users\$adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
-Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
-Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
+# Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
+# Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 
 
 # $ExtensionsDestination = "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions"
@@ -45,4 +51,6 @@ Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.z
 # Install-Package msi -provider PowerShellGet -Force
 # Install-MSIProduct C:\tmp\AZDataCLI.msi
 
-Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
+# Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
+az login --service-principal --username $appId --password $password --tenant $tenantId
+az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
