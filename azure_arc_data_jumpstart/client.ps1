@@ -10,10 +10,10 @@ param([Parameter(Mandatory=$true)][string]$resourceGroup)
 
 Write-Host "File packages URL: $linktopackages"
 
-#Changing ExecutionPolicy
+# Changing ExecutionPolicy
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
-#Change securoty protocol
+# Change security protocol
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
 
 # Install Choco
@@ -23,12 +23,12 @@ Invoke-Command -ScriptBlock $sb
 $sb = { Set-ItemProperty -path HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System -name EnableLua -value 0 }
 Invoke-Command -ScriptBlock $sb 
 
-#Install Chocolatey Packages
+# Install Chocolatey Packages
 $chocoPackages.Split(";") | ForEach {
     choco install $_ -y -force
 }
 
-# Write-Host "Packages from choco.org were installed"
+Write-Host "Packages from choco.org were installed"
 
 # New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 # New-Item -Path "C:\Users\$adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
