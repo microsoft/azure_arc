@@ -1,6 +1,5 @@
 #Script based on https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/SetupChocolatey.ps1
 param([Parameter(Mandatory=$true)][string]$chocoPackages)
-param([Parameter(Mandatory=$true)][string]$appId)
 
 Write-Host "File packages URL: $linktopackages"
 
@@ -46,7 +45,5 @@ Write-Host "Packages from choco.org were installed"
 # $ExtensionsDestination = "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions"
 # Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
-$appId | Out-File c:\debug.txt
-
-# az login --service-principal --username $env:appId --password $password --tenant $tenantId
-# az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
+az login --service-principal --username $env:appId --password $password --tenant $tenantId
+az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
