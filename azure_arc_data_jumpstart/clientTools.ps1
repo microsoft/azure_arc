@@ -1,5 +1,6 @@
 #Script based on https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/SetupChocolatey.ps1
 param([Parameter(Mandatory=$true)][string]$chocoPackages)
+param([Parameter(Mandatory=$true)][string]$appId)
 
 Write-Host "File packages URL: $linktopackages"
 
@@ -23,7 +24,7 @@ $chocoPackages.Split(";") | ForEach {
 
 Write-Host "Packages from choco.org were installed"
 
-Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+# Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 
 # New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
