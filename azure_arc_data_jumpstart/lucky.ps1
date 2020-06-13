@@ -6,30 +6,35 @@ param (
     [string]$resourceGroup
 )
 
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+$chocolateyAppList = "azure-cli,az.powershell"
 
-choco install azure-cli -y 
-choco install az.powershell -y
-# choco install kubernetes-cli -y 
+if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
+{
+    try{
+        choco config get cacheLocation
+    }catch{
+        Write-Output "Chocolatey not detected, trying to install now"
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    }
+}
 
-# Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
-# Install-Module -Name Az -AllowClobber -Scope AllUsers -Force
+if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){   
+    Write-Host "Chocolatey Apps Specified"  
+    
+    $appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
 
-# if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
-#     Write-Warning -Message ('Az module not installed. Having both the AzureRM and ' +
-#       'Az modules installed at the same time is not supported.')
-# } else {
-#     Install-Module -Name Az -AllowClobber -Scope AllUsers -Force
-# }
-
+    foreach ($app in $appsToInstall)
+    {
+        Write-Host "Installing $app"
+        & choco install $app /y | Write-Output
+    }
+}
 
 [System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('arcClusterName', $arcClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
-
-# Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 
 # New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 # New-Item -Path "C:\Users\$env:adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
@@ -40,7 +45,7 @@ choco install az.powershell -y
 
 $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId  -ServicePrincipal 
+Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
 
 # az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 # az aks get-credentials --name $env:arcClusterName --resource-group $env:resourceGroup --overwrite-existing
