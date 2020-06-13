@@ -24,13 +24,13 @@
 # Write-Host "Packages from choco.org were installed"
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
-New-Item -Path "C:\Users\$env:USERNAME\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
+New-Item -Path "C:\Users\$env:adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
 Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 
 
-$ExtensionsDestination = "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions"
+$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions"
 Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
 Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo'
 
