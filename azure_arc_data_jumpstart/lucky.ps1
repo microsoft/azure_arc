@@ -9,8 +9,4 @@ choco install azure-cli -y
 Write-Host "Installing Kubernetes CLI"
 choco install kubernetes-cli -y
 
-Invoke-Expression 'cmd /c start powershell -Command { az login --service-principal --username '$appId' --password '$password' --tenant '$tenantId'; az aks get-credentials --name '$arcClusterName' --resource-group '$resourceGroup' --overwrite-existing}'
-
-
-# az login --service-principal --username $appId --password $password --tenant $tenantId
-# az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
+.\lucky2.ps1
