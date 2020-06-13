@@ -42,11 +42,11 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 # Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
 # Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 
-$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
+$azurePassword = ConvertTo-SecureString $env:password -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:appId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal 
 
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName
+Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force
 kubectl get nodes
 
 # az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
