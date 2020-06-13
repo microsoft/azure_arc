@@ -6,33 +6,10 @@ param (
     [string]$resourceGroup
 )
 
-$chocolateyAppList = "azure-cli,kubernetes-cli"
-
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
-if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
-{
-    try{
-        choco config get cacheLocation
-    }catch{
-        Write-Output "Chocolatey not detected, trying to install now"
-        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    }
-}
-
-if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){   
-    Write-Host "Chocolatey Apps Specified"  
-    
-    $appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
-
-    foreach ($app in $appsToInstall)
-    {
-        Write-Host "Installing $app"
-        & choco install $app /y | Write-Output
-    }
-}
-
-Write-Host "Packages from choco.org were installed"
+choco install azure-cli -y 
+choco install kubernetes-cli -y 
 
 $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."   
 Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
