@@ -38,9 +38,9 @@ choco install az.powershell -y
 # Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 # $env:Path = [System.Environment]::ExpandEnvironmentVariables([System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User"))
 
-$azurePassword = ConvertTo-SecureString $env:password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:tenantId  -ServicePrincipal 
+$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $tenantId  -ServicePrincipal 
 
 # az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 # az aks get-credentials --name $env:arcClusterName --resource-group $env:resourceGroup --overwrite-existing
