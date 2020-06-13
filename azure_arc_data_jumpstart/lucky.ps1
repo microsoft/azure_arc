@@ -6,7 +6,7 @@ param (
     [string]$resourceGroup
 )
 
-$chocolateyAppList = "kubernetes-cli"
+$chocolateyAppList = "azure-cli,kubernetes-cli"
 
 Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
 
@@ -41,6 +41,7 @@ Write-Host "Packages from choco.org were installed"
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 
 # Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+refreshenv
 
 # New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 # New-Item -Path "C:\Users\$env:adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
