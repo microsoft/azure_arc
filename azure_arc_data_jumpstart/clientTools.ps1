@@ -45,5 +45,5 @@ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI
 # $ExtensionsDestination = "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions"
 # Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
-# az login --service-principal --username $appId --password $password --tenant $tenantId
-# az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
+az login --service-principal --username $appId --password $password --tenant $tenantId
+az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
