@@ -48,12 +48,10 @@ $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
 
-Start-Sleep -s 30 
-
-Import-AzAksCredential -ResourceGroupName $k8sResourceGroups -Name $k8sArcCluster -Force
+Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
 kubectl get nodes
 
-$CopyDestination = "C:\Users\$env:adminUsername"
+$CopyDestination = "C:\Users\$adminUsername"
 Copy-Item -Path "C:\Windows\System32\config\systemprofile\.kube" -Destination $CopyDestination -Recurse -Force -ErrorAction Continue
 Copy-Item -Path "C:\Windows\System32\config\systemprofile\.Azure" -Destination $CopyDestination -Recurse -Force -ErrorAction Continue
 
