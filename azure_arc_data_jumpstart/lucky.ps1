@@ -11,6 +11,8 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 choco install azure-cli -y 
 choco install kubernetes-cli -y 
 
+refreshenv
+
 if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
     Write-Warning -Message ('Az module not installed. Having both the AzureRM and ' +
       'Az modules installed at the same time is not supported.')
