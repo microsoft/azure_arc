@@ -8,6 +8,8 @@ param (
 
 $chocolateyAppList = "kubernetes-cli"
 
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
+
 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
     try{
@@ -47,4 +49,4 @@ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI
 # Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 
 
-invoke-expression -Command .\lucky2.ps1
+Invoke-Expression -Command .\lucky2.ps1
