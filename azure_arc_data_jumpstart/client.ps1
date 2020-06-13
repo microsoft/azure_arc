@@ -1,11 +1,11 @@
 #Script based on https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/visual-studio-dev-vm-chocolatey/scripts/SetupChocolatey.ps1
 param([Parameter(Mandatory=$true)][string]$chocoPackages)
 # param([Parameter(Mandatory=$true)][string]$adminUsername)
-# param([Parameter(Mandatory=$true)][string]$appId)
-# param([Parameter(Mandatory=$true)][string]$password)
-# param([Parameter(Mandatory=$true)][string]$tenantId)
-# param([Parameter(Mandatory=$true)][string]$arcClusterName)
-# param([Parameter(Mandatory=$true)][string]$resourceGroup)
+param([Parameter(Mandatory=$true)][string]$appId)
+param([Parameter(Mandatory=$true)][string]$password)
+param([Parameter(Mandatory=$true)][string]$tenantId)
+param([Parameter(Mandatory=$true)][string]$arcClusterName)
+param([Parameter(Mandatory=$true)][string]$resourceGroup)
 
 
 Write-Host "File packages URL: $linktopackages"
