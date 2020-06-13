@@ -51,7 +51,7 @@ Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal
 Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
 kubectl get nodes
 
-$CopyDestination = "C:\Users\%USERPROFILE%"
+$CopyDestination = "%USERPROFILE%"
 Copy-Item -Path "C:\Windows\System32\config\systemprofile\.kube" -Destination $CopyDestination -Recurse -Force -ErrorAction Continue
 Copy-Item -Path "C:\Windows\System32\config\systemprofile\.Azure" -Destination $CopyDestination -Recurse -Force -ErrorAction Continue
 
