@@ -34,6 +34,10 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 
 Write-Host "Packages from choco.org were installed"
 
+$env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."   
+Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+refreshenv
+
 [System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
@@ -50,7 +54,7 @@ Write-Host "Packages from choco.org were installed"
 # Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 # $env:Path = [System.Environment]::ExpandEnvironmentVariables([System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User"))
 
-refreshenv
+
 az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 az aks get-credentials --name $env:arcClusterName --resource-group $env:resourceGroup --overwrite-existing
 
