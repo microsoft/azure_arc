@@ -6,7 +6,7 @@ param (
     [string]$resourceGroup
 )
 
-$chocolateyAppList = "azure-cli,az.powershell"
+$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli"
 
 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
@@ -46,6 +46,8 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
+
+Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName
 
 # az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 # az aks get-credentials --name $env:arcClusterName --resource-group $env:resourceGroup --overwrite-existing
