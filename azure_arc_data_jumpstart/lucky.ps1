@@ -48,6 +48,8 @@ $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
 
+Start-Sleep -s 30 
+
 Import-AzAksCredential -ResourceGroupName $k8sResourceGroups -Name $k8sArcCluster -Force
 kubectl get nodes
 
