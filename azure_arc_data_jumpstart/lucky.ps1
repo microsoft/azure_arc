@@ -1,32 +1,12 @@
-$chocolateyAppList = "azure-cli,kubernetes-cli"
 
-Param(  
-    [string]$chocolateyAppList
-)
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
-{
-    try{
-        choco config get cacheLocation
-    }catch{
-        Write-Output "Chocolatey not detected, trying to install now"
-        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    }
-}
+Write-Host "Installing Azure CLI"
+choco install azure-cli -y
 
-if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){   
-    Write-Host "Chocolatey Apps Specified"  
-    
-    $appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+Write-Host "Installing Kubernetes CLI"
+choco install kubernetes-cli -y
 
-    foreach ($app in $appsToInstall)
-    {
-        Write-Host "Installing $app"
-        & choco install $app /y | Write-Output
-    }
-}
-
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
 
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
