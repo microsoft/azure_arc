@@ -46,17 +46,22 @@ Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal
 Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
 kubectl get nodes
 
-# New-Item -Path $env:USERPROFILE -Name ".kube" -ItemType "directory"
-# Copy-Item -Path "C:\Windows\System32\config\systemprofile\.kube\config" -Destination "$env:USERPROFILE\.kube\"
-
 $variableNameToAdd = "KUBECONFIG"
 $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
 [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
 [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User)
 
-# New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
-# New-Item -Path "C:\Users\$adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
+New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
+New-Item -Path "C:\Users\$adminUsername\" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
-# Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
-# Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
+Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
+Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
+
+#Install-Package msi -provider PowerShellGet -Force
+#Install-MSIProduct C:\tmp\AZDataCLI.msi
+
+Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo' | Out-Null
+$ExtensionsDestination = "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions"
+Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
