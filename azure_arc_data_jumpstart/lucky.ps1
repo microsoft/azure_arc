@@ -49,7 +49,7 @@ param (
 # $variableNameToAdd = "KUBECONFIG"
 # $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
 # [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process) ## Check if can be removed
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
 # [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
 
 # {Arc Data Controller HERE}
@@ -57,11 +57,11 @@ param (
 $variableNameToAdd = "TMP_PROFILE_PATH"
 $variableValueToAdd = "C:\Users\$adminUsername"
 [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process) ## Check if can be removed
+[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
 
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
-New-Item -Path "$env:TMP_PROFILE_PATH" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
+# New-Item -Path "$env:TMP_PROFILE_PATH" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
 # New-Item -Path "$env:TMP_PROFILE_PATH" -Name ".test\extensions" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
 # Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
