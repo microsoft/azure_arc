@@ -77,7 +77,7 @@ Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredat
 # Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue
 
 
-$action = New-ScheduledTaskAction -Execute 'Powershell.exe' `-Argument '-NoProfile -WindowStyle Hidden -command "& {Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue}"'
+$action = New-ScheduledTaskAction -Execute 'Powershell.exe' `-Argument '-NoProfile -WindowStyle Hidden -command "& {C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue}"'
 
 $trigger =  New-ScheduledTaskTrigger -AtLogOn
 
