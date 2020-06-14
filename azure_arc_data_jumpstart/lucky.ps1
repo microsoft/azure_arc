@@ -55,7 +55,7 @@ param (
 # {Arc Data Controller HERE}
 
 $variableNameToAdd = "TMP_PROFILE_PATH"
-$variableValueToAdd = "C:\Users\$env:USERNAME"
+$variableValueToAdd = "C:\Users\$adminUsername"
 [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process) ## Check if can be removed
 
