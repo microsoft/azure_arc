@@ -54,18 +54,16 @@ param (
 
 # {Arc Data Controller HERE}
 
-$variableNameToAdd = "TMP_PROFILE_PATH"
-$variableValueToAdd = "C:\Users\$adminUsername"
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
+# $variableNameToAdd = "TMP_PROFILE_PATH"
+# $variableValueToAdd = "C:\Users\$adminUsername"
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
 
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
-New-Item -Path "C:\Users\$env:UserName" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
-# New-Item -Path "$env:TMP_PROFILE_PATH" -Name ".test\extensions" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
 # Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
-# Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
+Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 
 #Install-Package msi -provider PowerShellGet -Force
 #Install-MSIProduct C:\tmp\AZDataCLI.msi
@@ -76,7 +74,7 @@ New-Item -Path "C:\Users\$env:UserName" -Name ".azuredatastudio-insiders\extensi
 # $ExtensionsDestination = "$TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions"
 # Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 # Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "$env:TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions" -Recurse -Force -ErrorAction Continue
-
+Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue
 
 
 
