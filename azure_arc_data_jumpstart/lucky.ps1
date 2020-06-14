@@ -64,17 +64,18 @@ New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 # New-Item -Path "$env:TMP_PROFILE_PATH" -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
 # New-Item -Path "$env:TMP_PROFILE_PATH" -Name ".test\extensions" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
-# Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
+Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
 Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 
 #Install-Package msi -provider PowerShellGet -Force
 #Install-MSIProduct C:\tmp\AZDataCLI.msi
 
-# Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
 Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo' | Out-Null
 # $ExtensionsDestination = "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions"
-$ExtensionsDestination = "$env:TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions"
+# $ExtensionsDestination = "$TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions"
 Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "$TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions" -Recurse -Force -ErrorAction Continue
 
 
 
