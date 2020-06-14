@@ -69,7 +69,7 @@ Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.z
 #Install-MSIProduct C:\tmp\AZDataCLI.msi
 
 # Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
-# Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo'
+Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo'
 # $ExtensionsDestination = "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions"
 # $ExtensionsDestination = "$TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions"
 # Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
@@ -77,6 +77,11 @@ Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.z
 Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue
 
 
+# $action = New-ScheduledTaskAction -Execute 'Powershell.exe' `-Argument '-NoProfile -WindowStyle Hidden -command "& {Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue}"'
+
+# $trigger =  New-ScheduledTaskTrigger -AtLogOn 
+
+# Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "Arc" -Description "Logon Script to copy Arc Extensions"
 
 # [Environment]::SetEnvironmentVariable("[appId]",$null,"Machine")
 # [Environment]::SetEnvironmentVariable("[password]",$null,"Machine")
