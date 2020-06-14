@@ -71,11 +71,11 @@ Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.z
 #Install-MSIProduct C:\tmp\AZDataCLI.msi
 
 Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
-Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo' | Out-Null
+Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo'
 # $ExtensionsDestination = "C:\Users\$env:USERNAME\.azuredatastudio-insiders\extensions"
 # $ExtensionsDestination = "$TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions"
-Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
-Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "$TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions" -Recurse -Force -ErrorAction Continue
+# Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "$env:TMP_PROFILE_PATH\.azuredatastudio-insiders\extensions" -Recurse -Force -ErrorAction Continue
 
 
 
