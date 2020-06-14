@@ -61,7 +61,7 @@ $variableValueToAdd = "C:\Users\$adminUsername"
 
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
-$Path = "$Home\"
+$Path = "$Home"
 New-Item -Path $Path -Name ".azuredatastudio-insiders\extensions" -ItemType "directory"
 # New-Item -Path "$env:TMP_PROFILE_PATH" -Name ".test\extensions" -ItemType "directory"
 # Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
