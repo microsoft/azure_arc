@@ -129,7 +129,7 @@ If you want to demo/control the actual registration process, do the following:
 
     ![](../img/gcp_windows/19.png)
 
-# Delete the deployment
+# Delete the deployment<a name="teardown"></a>
 
 To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
     ![](../img/gcp_windows/11.png)
