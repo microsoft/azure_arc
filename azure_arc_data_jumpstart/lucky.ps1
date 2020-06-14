@@ -77,11 +77,27 @@ Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredat
 # Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue
 
 
-$action = New-ScheduledTaskAction -Execute 'Powershell.exe' `-Argument '-NoProfile -WindowStyle Hidden -command "& {C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue}"'
+# $action = New-ScheduledTaskAction -Execute 'Powershell.exe' `-Argument '-NoProfile -WindowStyle Hidden -command "& {C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue}"'
+
+# $trigger =  New-ScheduledTaskTrigger -AtLogOn
+
+# Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "Arc" -Description "Logon Script to copy Arc Extensions"
+
+$actions = @()
+
+$actions += New-ScheduledTaskAction -Execute 'Powershell.exe' `-Argument '-NoProfile -WindowStyle Hidden -command "& {Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue}"'
+$actions += New-ScheduledTaskAction -Execute 'Powershell.exe' `-Argument '-NoProfile -WindowStyle Hidden -command "& {Unregister-ScheduledTask -TaskName "Arc" -Confirm:$false}"'
+
 
 $trigger =  New-ScheduledTaskTrigger -AtLogOn
 
-Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "Arc" -Description "Logon Script to copy Arc Extensions"
+$description = 'Logon Script to copy Arc Extension'
+
+$task = New-ScheduledTask -Action $actions -Trigger $trigger -Description $description
+
+Register-ScheduledTask Arc -InputObject $task
+
+
 
 # [Environment]::SetEnvironmentVariable("[appId]",$null,"Machine")
 # [Environment]::SetEnvironmentVariable("[password]",$null,"Machine")
