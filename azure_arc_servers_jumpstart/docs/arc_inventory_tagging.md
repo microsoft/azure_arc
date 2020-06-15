@@ -73,11 +73,11 @@ Now that we have created a basic taxonomy structure, we will apply tags to our A
 
     ![](../img/inventory/07.png)
 
-## Tag Arc-connected GCP server
+## Tag Arc-connected GCP Ubuntu server
 
 * In AZ CLI, run the following commands to apply the "Hosting Platform : GCP" tag to your Arc GCP servers. 
 
-    **Note: If you connected your GCP servers using a method other than the one described in [this tutorial](../docs/gcp_terraform_ubuntu.md), then you will need to adjust the values for `gcpResourceGroup` and `gcpMachineName` to match values specific to your environment.
+    *Note: If you connected your GCP servers using a method other than the one described in [this tutorial](../docs/gcp_terraform_ubuntu.md), then you will need to adjust the values for `gcpResourceGroup` and `gcpMachineName` to match values specific to your environment.*
 
     ```bash
     export gcpResourceGroup="arc-gcp-demo"
