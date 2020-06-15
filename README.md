@@ -63,6 +63,10 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 
 * [Deploy a VMware vSphere, Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_winsrv.md)
 
+#### Azure Arc for Servers - Day-2 Scenarios & Use-Cases
+
+* [Tagging and querying server inventory across multiple clouds using Resource Graph Explorer](azure_arc_servers_jumpstart/docs/arc_inventory_tagging.md)
+
 ## Azure Arc for Kubernetes
 
 The below deployment options are focusing on Azure Arc for Kubernetes. It is designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with. 
