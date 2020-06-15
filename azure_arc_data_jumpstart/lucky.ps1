@@ -63,4 +63,4 @@ Install-MSIProduct C:\tmp\AZDataCLI.msi
 
 Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
 
-Remove-Item –path "C:\tmp" -Recurse -Force
+# Remove-Item –path "C:\tmp" -Recurse -Force
