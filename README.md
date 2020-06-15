@@ -105,7 +105,7 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 * [Deploy Rancher k3s on a VMware vSphere VM and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/rancher_k3s_vmware_terraform.md)
 
-#### - Azure Red Hat OpenShift V4
+#### Azure Red Hat OpenShift V4
 * [Deploy Azure Redhat Openshift Cluster and connect it to Azure Arc using automation](azure_arc_k8s_jumpstart/docs/aro_script.md)
 
 
