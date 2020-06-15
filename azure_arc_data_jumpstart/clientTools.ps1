@@ -3,8 +3,7 @@ param (
     [string]$password,
     [string]$tenantId,
     [string]$arcClusterName,
-    [string]$resourceGroup,
-    [string]$adminUsername
+    [string]$resourceGroup
 )
 
 $chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli"
