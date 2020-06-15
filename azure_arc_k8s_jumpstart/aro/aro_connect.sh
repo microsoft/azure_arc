@@ -34,8 +34,8 @@ $az account set --subscription $subId
 
 # Good to know information
 echo "The az full path is: $az"
-echo "Resource Group is: $RESOURCEGROUP"
-echo "Location=$LOCATION"
+echo "RESOURCEGROUP=$RESOURCEGROUP"
+echo "LOCATION=$LOCATION"
 echo "AROCLUSTER=$AROCLUSTER"
 echo "ARC=$ARC"
 
@@ -186,21 +186,6 @@ if [ ! "$($az network vnet show -g $RESOURCEGROUP -n $vnetName --query provision
     $az network vnet subnet update -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --disable-private-link-service-network-policies true -o table >/dev/null
     echo "done"
 
-    # Subnet Creation
-    echo "==============================================================================================================================================================="
-    echo -n "Creating 'Master' Subnet..."
-    $az network vnet subnet create -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --address-prefixes "$submCIDR" --service-endpoints Microsoft.ContainerRegistry -o table >/dev/null
-    echo "done"
-    echo -n "Creating 'Worker' Subnet..."
-    $az network vnet subnet create -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-worker" --address-prefixes "$subwCIDR" --service-endpoints Microsoft.ContainerRegistry -o table >/dev/null
-    echo "done"
-
-    # VNet & Subnet Configuration
-    echo "==============================================================================================================================================================="
-    echo -n "Disabling 'PrivateLinkServiceNetworkPolicies' in 'Master' Subnet..."
-    $az network vnet subnet update -g "$RESOURCEGROUP" --vnet-name $vnetName -n "$vnetName-master" --disable-private-link-service-network-policies true -o table >/dev/null
-    echo "done"
-
 fi
 
 if [ ! "$($az aro show -g "$RESOURCEGROUP" -n "$AROCLUSTER" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
@@ -209,33 +194,43 @@ if [ ! "$($az aro show -g "$RESOURCEGROUP" -n "$AROCLUSTER" --query provisioning
     echo "Building Azure Red Hat OpenShift - this takes roughly 30-40 minutes. The time is now: $(date)..."
     echo " "
     echo "Executing: "
-    echo "az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table"
+    echo "az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" --worker-vm-size Standard_D4as_v4 --master-vm-size Standard_D8s_v3 -o table"
     echo " "
-    $az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" -o table --no-wait
+    $az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" --worker-vm-size "Standard_D4as_v4" --master-vm-size "Standard_D8s_v3" -o table --no-wait
     $az aro wait -n "$AROCLUSTER" -g $RESOURCEGROUP --created
     sleep 20s
 fi
 
 # Setting up credentials
 echo "==============================================================================================================================================================="
-adminUser=$($az aro list-credentials --name $AROCLUSTER --resource-group $RESOURCEGROUP --query kubeadminUsername -o tsv)
-adminPassword=$($az aro list-credentials --name $AROCLUSTER --resource-group $RESOURCEGROUP --query kubeadminPassword -o tsv)
-apiServer=$(az aro show -g $RESOURCEGROUP -n $AROCLUSTER --query apiserverProfile.url -o tsv)
+adminUser=$($az aro list-credentials --name $AROCLUSTER --resource-group $RESOURCEGROUP --query kubeadminUsername -o tsv 2>/dev/null)
+adminPassword=$($az aro list-credentials --name $AROCLUSTER --resource-group $RESOURCEGROUP --query kubeadminPassword -o tsv 2>/dev/null)
+apiServer=$($az aro show -g $RESOURCEGROUP -n $AROCLUSTER --query apiserverProfile.url -o tsv 2>/dev/null)
+apiURL=$($az aro show -g $RESOURCEGROUP -n $AROCLUSTER --query consoleProfile.url -o tsv 2>/dev/null)
 echo "The credentials are:"
 echo "adminUser=$adminUser"
 echo "adminPassword=$adminPassword"
 echo "apiServer=$apiServer"
 echo "done"
+
 sleep 10s
 
 # Log into the OC command
 echo "==============================================================================================================================================================="
 oc login $apiServer -u $adminUser -p $adminPassword
+echo "==============================================================================================================================================================="
 
 if [ ! "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
     # Create a Service Principal
+    sleep 30s
     echo "==============================================================================================================================================================="
     password=$($az ad sp create-for-rbac -n "http://AzureArcK8sARO$RAND" --role contributor --query password -o tsv)
+    $az group update -n $RESOURCEGROUP --tag currentStatus=spCreated fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
+    if [ -z "$password" ]; then
+        echo "Script cannot finish because service principal was not created."
+        $az group update -n $RESOURCEGROUP --tag currentStatus=spCreationFailed fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
+        exit 1
+    fi
     appId=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appId -o tsv)
     tenant=$($az ad sp show --id http://AzureArcK8sARO$RAND --query appOwnerTenantId -o tsv)
     echo "Service principal created:"
@@ -249,6 +244,8 @@ if [ ! "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioni
     echo "az login --service-principal -u $appId -p $password --tenant $tenant"
     sleep 60s
     $az login --service-principal -u $appId -p $password --tenant $tenant
+    $az group update -n $RESOURCEGROUP --tag currentStatus=spLoggedIn fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
+
     echo "done"
     echo "==============================================================================================================================================================="
 
@@ -257,15 +254,37 @@ if [ ! "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioni
     echo "==============================================================================================================================================================="
     echo "Lets connect the RedHat Openshift Cluster to Arc for Kubernetes"
     $az connectedk8s connect -n $ARC -g $RESOURCEGROUP
+    $az group update -n $RESOURCEGROUP --tag currentStatus=ArcConnected fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
+    sleep 60s
     echo "done"
 fi
+
+echo "Upload kubeconfig to blob."
+storageName="arcstoragearo$RAND$RAND"
+if [ "$($az storage account check-name --name $storageName --query nameAvailable -o tsv 2>/dev/null)" = "true" ]; then
+    $az storage account create --name $storageName --resource-group $RESOURCEGROUP --location $LOCATION --sku Standard_ZRS -o none 2>/dev/null
+    $az storage container create --account-name $storageName --name arccontainer --public-access blob -o none 2>/dev/null
+    $az storage blob upload --account-name $storageName --container-name arccontainer --name config --file /root/.kube/config -o table
+    $az group update -n $RESOURCEGROUP --tag currentStatus=kubectlUploaded fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
+    echo "File Uploaded."
+else
+    $az group update -n $RESOURCEGROUP --tag currentStatus=kubectlFailed 2>/dev/null
+    echo "File Upload Failed"
+fi
+echo "done."
+echo "==============================================================================================================================================================="
 
 echo "==============================================================================================================================================================="
 echo "To delete the Service Principal execute the following command:"
 echo "az ad sp delete --id $appId"
 
 # Set the container to not keep restarting
-echo "==============================================================================================================================================================="
-echo "Stopping the container from restarting since all resources are deployed:"
-echo "done."
-$az container stop -g $RESOURCEGROUP -n arcarodemo
+if [ "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
+    echo "==============================================================================================================================================================="
+    echo "Terminating the container since all resources are deployed:"
+    echo "done."
+    $az container delete -g $RESOURCEGROUP -n arcarodemo -y
+    $az group update -n $RESOURCEGROUP --tag currentStatus=Done fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
+fi
+
+$az group update -n $RESOURCEGROUP --tag currentStatus=Incomplete fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
