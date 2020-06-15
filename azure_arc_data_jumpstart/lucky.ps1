@@ -31,13 +31,13 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
     }
 }
 
+Write-Host "Chocolatey Apps Installed"
+
 [System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('arcClusterName', $arcClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine) ## Check if can be removed
-
 
 $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
@@ -54,32 +54,13 @@ $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
 
 # {Arc Data Controller HERE}
 
-# $variableNameToAdd = "TMP_PROFILE_PATH"
-# $variableValueToAdd = "C:\Users\$adminUsername"
-# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
-
-
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory"
 Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
-Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
 
 Install-Package msi -provider PowerShellGet -Force
 Install-MSIProduct C:\tmp\AZDataCLI.msi
 
 Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
-Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo'
-# Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination "C:\Users\$adminUsername\.azuredatastudio-insiders\extensions\arc" -Recurse -Force -ErrorAction Continue
 
-
-
-
-
-
-# [Environment]::SetEnvironmentVariable("[appId]",$null,"Machine")
-# [Environment]::SetEnvironmentVariable("[password]",$null,"Machine")
-# [Environment]::SetEnvironmentVariable("[tenantId]",$null,"Machine")
-# [Environment]::SetEnvironmentVariable("[arcClusterName]",$null,"Machine")
-# [Environment]::SetEnvironmentVariable("[resourceGroup]",$null,"Machine")
-# Remove-Item –path "C:\tmp" -Recurse
+Remove-Item –path "C:\tmp" -Recurse -Force
