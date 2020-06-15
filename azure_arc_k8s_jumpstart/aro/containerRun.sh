@@ -1,2 +1,2 @@
 #!/bin/bash
-curl https://raw.githubusercontent.com/alihhussain/AzureTemplates/master/arc/aro/aro_connect.sh | bash
+curl https://raw.githubusercontent.com/alihhussain/azure_arc/master/azure_arc_k8s_jumpstart/aro/containerRun.sh | bash
