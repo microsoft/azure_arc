@@ -26,22 +26,21 @@ workflow ClientTools_01
 
                 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"                
                 Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
-                Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
                 Install-Package msi -provider PowerShellGet -Force
             }
         }
 
 ClientTools_01 | ft 
 
-# workflow ClientTools_02
-#         {
-#             #Run commands in parallel.
-#             {
-#                 Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
-#             }
-#         }
+workflow ClientTools_02
+        {
+            #Run commands in parallel.
+            {
+                Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+            }
+        }
         
-# ClientTools_02 | ft 
+ClientTools_02 | ft 
 
 $variableNameToAdd = "KUBECONFIG"
 $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
