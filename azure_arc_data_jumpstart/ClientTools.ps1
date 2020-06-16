@@ -38,7 +38,7 @@ workflow ClientTools_01
             }
         }
 
-        ClientTools_01 | ft 
+ClientTools_01 | ft 
 
 # workflow ClientTools_02
 #         {
