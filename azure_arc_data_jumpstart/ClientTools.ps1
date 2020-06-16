@@ -18,8 +18,6 @@ workflow ClientTools_01
             #Run commands in parallel.
             Parallel 
             {
-                
-
                 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
                 {
                     try{
@@ -42,27 +40,30 @@ workflow ClientTools_01
 
         ClientTools_01 | ft 
 
-workflow ClientTools_02
-        {
-            #Run commands in parallel.
+# workflow ClientTools_02
+#         {
+#             #Run commands in parallel.
             
-            {
-                Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
-            }
-        }
+#             {
+#                 Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+#             }
+#         }
         
-ClientTools_02 | ft 
+# ClientTools_02 | ft 
 
-$variableNameToAdd = "KUBECONFIG"
-$variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
+# $variableNameToAdd = "KUBECONFIG"
+# $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
 
-$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
-Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
-kubectl get nodes
+# $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
+# Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
+# kubectl get nodes
 
-Install-MSIProduct C:\tmp\AZDataCLI.msi
+
+
+
+# Install-MSIProduct C:\tmp\AZDataCLI.msi
