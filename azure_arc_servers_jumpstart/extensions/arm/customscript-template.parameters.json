@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "<arc_vm_name>"
+        },
+        "location": {
+            "value": "<Location value>"
+        },
+        "fileUris": {
+            "value": [
+                "<public_URL_for_script>"
+            ]
+        },
+        "commandToExecute": {
+            "value": "<command_to_run_script>"
+        }
+    }
+}
