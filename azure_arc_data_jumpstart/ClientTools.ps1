@@ -53,26 +53,16 @@ workflow ClientTools_01
 
 ClientTools_01 | ft
 
-# workflow ClientTools_03
-#         {
-#             $variableNameToAdd = 'KUBECONFIG'
-#             $variableValueToAdd = 'C:\Windows\System32\config\systemprofile\.kube\config'
-#             # $variableValueToAdd = "C:\Users\Administrator\.kube\config"
-                                    
-#                 {
-#                     InlineScript {
-#                         param (
-#                             [string]$variableNameToAdd,
-#                             [string]$variableValueToAdd
-#                         )
-#                         [System.Environment]::SetEnvironmentVariable($using:variableNameToAdd, $using:variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-#                         [System.Environment]::SetEnvironmentVariable($using:variableNameToAdd, $using:variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
-#                         [System.Environment]::SetEnvironmentVariable($using:variableNameToAdd, $using:variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed                     
-#                     }              
-#                 }
-#         }
-
-# ClientTools_03 | ft
+workflow ClientTools_02
+        {
+            #Run commands in parallel.
+            
+            {
+                Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+            }
+        }
+        
+ClientTools_02 | ft 
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
