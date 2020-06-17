@@ -6,7 +6,7 @@ In this case we will assign a policy to audit if the Azure Arc connected machine
 
 You can use the Azure Portal, an ARM template, PowerShell script to assign policies to Azure Subscriptions or Resource Groups. In this guide, you will use an ARM template to assign built-in policies. 
 
-**Note: This guide assumes you already deployed VMs or servers that are running on-prem or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [GCP Ubuntu VM](gcp_terraform_ubuntu.md), [GCP Windows VM](gcp_terraform_windows.md), [AWS Ubuntu VM](aws_terraform_ubntu.md), [VMware Ubuntu VM](vmware_terraform_ubuntu.md), [VMware Windows Server VM](vmware_terraform_winsrv.md), [Local Ubuntu VM](local_vagrant_ubuntu.md) or [Local Windows VM](local_vagrant_windows.md)**
+**Note: This guide assumes you already deployed VMs or servers that are running on-prem or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [GCP Ubuntu VM](gcp_terraform_ubuntu.md), [GCP Windows VM](gcp_terraform_windows.md), [AWS Ubuntu VM](aws_terraform_ubuntu.md), [VMware Ubuntu VM](vmware_terraform_ubuntu.md), [VMware Windows Server VM](vmware_terraform_winsrv.md), [Local Ubuntu VM](local_vagrant_ubuntu.md) or [Local Windows VM](local_vagrant_windows.md)**
 
 # Prerequisites
 
