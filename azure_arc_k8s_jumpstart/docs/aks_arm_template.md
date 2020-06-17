@@ -55,15 +55,13 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 # Deployment 
 
-The deployment is using the template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../aks/arm_template/azuredeploy.parameters.json) file to match your environment. 
-
-![](../img/aks_arm_template/01.png)
-
-Before deploying the ARM template, validate that the AKS Kubernetes version is available in your region using the below Azure CLI command.
+Before deploying the ARM template, determine which AKS Kubernetes versions are available in your region using the below Azure CLI command.
 
 ```az aks get-versions -l "<Your Azure Region>"```
 
-In case the AKS service is not available in your region, you can change the AKS Kubernetes version in the [*azuredeploy.json*](../aks/arm_template/azuredeploy.json) file by searching for *kubernetesVersion*.
+The deployment is using the template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../aks/arm_template/azuredeploy.parameters.json) file to match your environment and using one of the available Kubernetes Versions from the previous step. 
+
+![](../img/aks_arm_template/01.png)
 
 To deploy the ARM template, navigate to the [deployment folder](../aks/arm_template) and run the below command:
 
@@ -103,9 +101,9 @@ Once the ARM template deployment is completed, a new AKS cluster in a new Azure 
 
 ![](../img/aks_arm_template/05.png)
 
-* Edit the environment variables in the [*az_connect_aks*](../aks/arm_template/scripts/az_connect_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_connect_aks.sh``` command.
+* After editing the environment variables in the [*az_connect_aks*](../aks/arm_template/scripts/az_connect_aks.sh) shell script to match your parameters, save the file and then upload it to the Cloud Shell environment and run it using the ```. ./az_connect_aks.sh``` command.
 
-**Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
+**Note**: The extra dot is due to the script having an *export* function and needs to have the vars exported in the same shell session as the other commands. 
 
 ![](../img/aks_arm_template/06.png)
 
