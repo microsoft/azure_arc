@@ -73,7 +73,11 @@ ClientTools_01 | ft
 #         }
 
 # ClientTools_03 | ft
+
+$env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."   
+Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 refreshenv
+
 $variableNameToAdd = "KUBECONFIG"
 $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
 [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
