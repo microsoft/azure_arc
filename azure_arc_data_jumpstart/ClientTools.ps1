@@ -56,7 +56,8 @@ ClientTools_01 | ft
 workflow ClientTools_03
         {
             $variableNameToAdd = "KUBECONFIG"
-            $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"            
+            $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
+            # $variableValueToAdd = "C:\Users\Administrator\.kube\config"                        
                 {
                     InlineScript {
                         param (
@@ -72,10 +73,10 @@ workflow ClientTools_03
 
 ClientTools_03 | ft
 
-# $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
-# $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
-# Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
-# Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
-
+$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
+Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
+kubectl get nodes
 
 # Install-MSIProduct C:\tmp\AZDataCLI.msi
