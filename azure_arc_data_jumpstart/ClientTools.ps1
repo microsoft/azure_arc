@@ -53,24 +53,10 @@ workflow ClientTools_01
 
 ClientTools_01 | ft
 
-# workflow ClientTools_02
-#         {
-#             #Run commands in parallel.
-#             {
-#                 Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
-#             }
-#         }
-        
-# ClientTools_02 | ft 
-
-
-
 workflow ClientTools_03
         {
             $variableNameToAdd = "KUBECONFIG"
-            $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
-            #Run commands in parallel.
-            Parallel 
+            $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"            
                 {
                     InlineScript {
                         param (
@@ -86,10 +72,10 @@ workflow ClientTools_03
 
 ClientTools_03 | ft
 
-$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
-Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
-kubectl get nodes
+# $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
+# Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
+
 
 # Install-MSIProduct C:\tmp\AZDataCLI.msi
