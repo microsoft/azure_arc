@@ -60,7 +60,7 @@ workflow ClientTools_02
             {
                 InlineScript {
                     Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
-                    Install-MSIProduct C:\tmp\AZDataCLI.msi
+                    # Install-MSIProduct C:\tmp\AZDataCLI.msi
                 }
             }
         }
