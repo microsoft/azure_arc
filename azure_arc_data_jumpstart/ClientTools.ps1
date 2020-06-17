@@ -53,15 +53,15 @@ workflow ClientTools_01
 
 ClientTools_01 | ft
 
-workflow ClientTools_02
-        {
-            #Run commands in parallel.
-            {
-                Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
-            }
-        }
+# workflow ClientTools_02
+#         {
+#             #Run commands in parallel.
+#             {
+#                 Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+#             }
+#         }
         
-ClientTools_02 | ft 
+# ClientTools_02 | ft 
 
 $variableNameToAdd = "KUBECONFIG"
 $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
