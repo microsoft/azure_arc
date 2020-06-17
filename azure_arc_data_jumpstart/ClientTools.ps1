@@ -56,17 +56,18 @@ ClientTools_01 | ft
 workflow ClientTools_02
         {
             #Run commands in parallel.
-            
+            Parallel
             {
-                Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+                InlineScript {
+                    Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+                    # Install-MSIProduct C:\tmp\AZDataCLI.msi
+                }
             }
         }
         
 ClientTools_02 | ft 
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
-
-
 $variableNameToAdd = "KUBECONFIG"
 $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
 [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
@@ -79,4 +80,3 @@ Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal
 Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
 kubectl get nodes
 
-# Install-MSIProduct C:\tmp\AZDataCLI.msi
