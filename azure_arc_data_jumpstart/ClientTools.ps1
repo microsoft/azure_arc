@@ -67,16 +67,16 @@ workflow ClientTools_02
         
 ClientTools_02 | ft 
 
-New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
-$variableNameToAdd = "KUBECONFIG"
-$variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
+# New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
+# $variableNameToAdd = "KUBECONFIG"
+# $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
 
-$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
-Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
-kubectl get nodes
+# $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
+# Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
+# kubectl get nodes
 
