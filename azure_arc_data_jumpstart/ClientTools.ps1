@@ -4,7 +4,9 @@ param (
     [string]$tenantId,
     [string]$arcClusterName,
     [string]$resourceGroup,
-    [string]$chocolateyAppList
+    [string]$chocolateyAppList,
+    [string]$variableNameToAdd,
+    [string]$variableValueToAdd
 )
 
 [System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
