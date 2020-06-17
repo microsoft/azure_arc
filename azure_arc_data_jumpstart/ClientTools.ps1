@@ -63,11 +63,28 @@ ClientTools_01 | ft
         
 # ClientTools_02 | ft 
 
-$variableNameToAdd = "KUBECONFIG"
-$variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
+
+
+workflow ClientTools_03
+        {
+            $variableNameToAdd = "KUBECONFIG"
+            $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
+            #Run commands in parallel.
+            Parallel 
+                {
+                    InlineScript {
+                        param (
+                            [string]$variableNameToAdd,
+                            [string]$variableValueToAdd
+                        )
+                        [System.Environment]::SetEnvironmentVariable($using:variableNameToAdd, $using:variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
+                        [System.Environment]::SetEnvironmentVariable($using:variableNameToAdd, $using:variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
+                        [System.Environment]::SetEnvironmentVariable($using:variableNameToAdd, $using:variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed                     
+                    }              
+                }
+        }
+
+ClientTools_03 | ft
 
 $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
