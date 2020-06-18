@@ -1,6 +1,6 @@
 # Overview
 
-The following README will guide you on how to use Arc for servers to assign Azure Policies to VMs outside of Azure, wether they are on-premise or other clouds. With this feature you can now use Azure Policies to audit settings in the operating system of an Azure Arc connected servers, if a setting is not compliant you can also trigger a remmediation task. 
+The following README will guide you on how to use Arc for servers to assign Azure Policies to VMs outside of Azure, wether they are on-premises or other clouds. With this feature you can now use Azure Policies to audit settings in the operating system of an Azure Arc connected servers, if a setting is not compliant you can also trigger a remediation task. 
 
 In this case we will assign a policy to audit if the Azure Arc connected machine has the MMA agent installed, if not, we will use the extensions feature to automatically deploy it to the VM, an enrollment experience that levels to Azure VMs. This approach can be used to make sure all your servers are onboarded to services such as: Azure Monitor, Azure Security Center or Azure Sentinel. 
 
@@ -70,4 +70,3 @@ You can use the Azure Portal, an ARM template, PowerShell script to assign polic
    ```bash
     az policy remediation create --name myRemediation --policy-assignment '/subscriptions/<subscriptionId>/providers/Microsoft.Authorization/policyAssignments/Enable Azure Monitor for VMs'
     ```
-
