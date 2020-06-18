@@ -30,7 +30,7 @@ If you haven't, this repository offers you a few ways of doing so in an automate
 
 * Create Azure Service Principal (SP)   
 
-    To connect a VM or Server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+    To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
