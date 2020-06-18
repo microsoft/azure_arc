@@ -3,14 +3,23 @@
     "contentVersion": "1.0.0.1",
     "parameters": {
         "workspaceName": {
-            "value": "<loganalytics_workspace_name>" //Name for the new Log Analytics Workspace
+            "value": "<loganalytics_workspace_name>",
+            "metadata": {
+                "description": "Name for the new Log Analytics Workspace"
+            }
         },
         "location": {
-            "value": "<Location value>" //Azure region to deploy the workspace
+            "value": "<Location value>",
+            "metadata": {
+                "description": "Azure region to deploy the workspace"
+            }
+             
         },
         "sku": {
-            "value": 
-                "pergb2018" //SKU for the Log Analytics Workspace
+            "value": "pergb2018",
+                "metadata": {
+                    "description": "SKU for the Log Analytics Workspace"
+                }
         }
     }
 }
