@@ -1,11 +1,6 @@
 {
-<<<<<<< HEAD
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.1",
-=======
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.1",
->>>>>>> 65144f8b1b8f7f09b8902683d88fff1cbaa11829
     "parameters": {
         "workspaceName": {
             "type": "String",
