@@ -26,7 +26,7 @@ If you haven't, this repository offers you a few ways of doing so in an automate
     ![](../img/vm_policies/02.png)
 
   
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * Create Azure Service Principal (SP)   
 
