@@ -55,7 +55,7 @@ If you haven't, this repository offers you a few ways of doing so in an automate
     
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
-* You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the [parameters file](../policies/arm/log_analytics-template.parameters.json) and providing a name and location for your workspace. Then start the deployment with the command: 
+* You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../policies/arm/log_analytics-template.parameters.json) and provide a name and location for your workspace. Then start the deployment with the command: 
 
     ```bash
     az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
