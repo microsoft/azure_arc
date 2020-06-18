@@ -62,15 +62,27 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
 * Now that we have all the requirements set. We can assign policies to our Arc connected machines using these commands. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace. Then start the deployment with the command: 
 
+    ![](../img/vm_policies/04.png)
+
     ```bash
     az policy assignment create --name 'Enable Azure Monitor for VMs' --scope '/subscriptions/<subscription_id>/resourceGroups/<resource_group>' --policy-set-definition '55f3eceb-5573-4f18-9695-226972c6d74a' -p "<path_to_json>" --assign-identity --location "<region>"
     ```
 
-* If you navigate to the Azure Arc connected machine in the portal and click on Policies we can verify if the VM is compliant with the policy just assigned. We can see it reports 'Not Compliant'
+* Once you have assigned the initiative, you will see that it will be evaluated (it may take 30 minutes to run the first scan) and show that the server on GCP is not compliant.
 
-  ![](../img/vm_policies/04.png)
+  ![](../img/vm_policies/05.png)
 
 * We can now add a remediation task by clicking on the Initiative 'Enable Azure Monitor' and selecting 'Create Remediation Task' 
 
-  ![](../img/vm_policies/05.png)
+  ![](../img/vm_policies/06.png)
+
+* Under 'Policy to remediate' choose '[Preview] Deploy Log Analytics Agent to Linux Azure Arc machines' and select 'Remediate' 
+
+  ![](../img/vm_policies/07.png)
+
+* Once you have assigned remediation task, the policy will be evaluated again and show that the server on GCP is compliant. And that the Microsoft Monitoring Agent extension is installed on the Azure Arc machine. 
+
+  ![](../img/vm_policies/08.png)
+
+  ![](../img/vm_policies/09.png)
 
