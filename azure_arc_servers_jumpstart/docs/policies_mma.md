@@ -34,27 +34,24 @@ If you haven't, this repository offers you a few ways of doing so in an automate
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --skip-assignment
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcservers" --skip-assignment```
+    ```az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor```
 
     Output should look like this:
-    ```terminal
+
+    ```
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcservers",
-    "name": "http://AzureArcservers",
+    "displayName": "AzureArcServers",
+    "name": "http://AzureArcServers",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-
-    Then, assign a the "Contributor" role to the SP you've just created.
-
-    ```az role assignment create --assignee "<Unique SP Name>" --role contributor```
     
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
