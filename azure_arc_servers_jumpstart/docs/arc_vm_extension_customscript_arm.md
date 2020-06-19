@@ -52,7 +52,7 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
 **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).   
 
 
-* You must have a script to run on the VM. In this case, you can use these scripts for [*Linux*](../scripts/custom_script_linux.sh) to modify the message of the day (MOTD) on the operating system or for [*Windows*](../scripts/custom_script_windows.ps1) to deploy additional software. 
+* You must have a script to run on the VM. In this case, you can use these scripts for [*Linux*](../scripts/custom_script_linux.sh) to modify the message of the day (MOTD) on the operating system or for [*Windows*](../scripts/custom_script_windows.ps1) to deploy additional software: Microsoft Edge,7zip and Visual Studio Code.
 
 # Azure Arc for Servers Custom Script Extension Deployment
 
@@ -71,8 +71,8 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
    ![](../img/vm_extension_customscript/05.png)
 
     - A public Uri for the script that you would like to run on the servers, in this case use the URL for the script in raw format.
-        - For Windows: [Public Uri](https://raw.githubusercontent.com/likamrat/jumpstart/custom/azure_arc_servers_jumpstart/scripts/custom_script_linux.sh) 
-        - For Linux: [Public Uri](https://raw.githubusercontent.com/likamrat/jumpstart/custom/azure_arc_servers_jumpstart/scripts/custom_script_windows.ps1)
+        - For Windows: [Public Uri](https://raw.githubusercontent.com/likamrat/azure_arc/custom/azure_arc_servers_jumpstart/scripts/custom_script_windows.ps1) 
+        - For Linux: [Public Uri](https://raw.githubusercontent.com/likamrat/azure_arc/custom/azure_arc_servers_jumpstart/scripts/custom_script_linux.sh)
 
     - The command that will triger the script: 
         - For Windows: 
@@ -94,15 +94,17 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
 
     ![](../img/vm_extension_customscript/06.png)
     
-Since on the scripts we deployed configured our operating systems we can verify the results. 
-
-* For Linux VMs login to your VM and checkout the message of the day, it was customized by the script so you should see a message like this: 
+* Since on the scripts we deployed configured our operating systems we can verify the results. Go to the Azure Arc connected VM in the Azure Portal and select Extensions, you should see the Custom Script extension installed: 
 
     ![](../img/vm_extension_customscript/07.png)
 
-* For the Windows VM we deployed some applications in this case: Microsoft Edge, 7zip and Visual Studio Code. RDP to your VM and make sure the applications are installed. 
+* For Linux VMs login to your VM and checkout the message of the day, it was customized by the script so you should see a message like this: 
 
     ![](../img/vm_extension_customscript/08.png)
+
+* For the Windows VM we deployed some applications in this case: Microsoft Edge, 7zip and Visual Studio Code. RDP to your VM and make sure the applications are installed. 
+
+    ![](../img/vm_extension_customscript/09.png)
 
 # Clean up environment
 
