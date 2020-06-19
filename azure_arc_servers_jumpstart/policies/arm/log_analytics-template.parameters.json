@@ -1,16 +1,15 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workspaceName": {
-            "value": "<loganalytics_workspace_name>"
+        "name": {
+            "value": "<workspace_name>" //Name for your log analytics workspace
         },
         "location": {
-            "value": "<Location value>"
+            "value": "<location>" //Azure Region to deploy the Log Analytics Workspace
         },
         "sku": {
-            "value": 
-                "pergb2018"
+            "value": "pergb2018" //SKU, leave default
         }
     }
 }
