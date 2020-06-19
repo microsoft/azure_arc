@@ -1,16 +1,24 @@
 # Overview
 
-The following README will guide you on how to use Arc for servers to deploy the Custom Script Extension. This feature provides Azure Arc connected servers an enrollment experience to other management services that levels to Azure VMs.
+The following README will guide you on how to manage extensions on Azure Arc connected machines. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
 
-You can use the Azure Portal, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template deploy the Custom Script Extension to your servers. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
+Azure Arc for servers,  enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
 
-**Note: This guide assumes you already deployed VMs or servers that are running on-prem or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [GCP Ubuntu VM](gcp_terraform_ubuntu.md), [GCP Windows VM](gcp_terraform_windows.md), [AWS Ubuntu VM](aws_terraform_ubuntu.md), [VMware Ubuntu VM](vmware_terraform_ubuntu.md), [VMware Windows Server VM](vmware_terraform_winsrv.md), [Local Ubuntu VM](local_vagrant_ubuntu.md) or [Local Windows VM](local_vagrant_windows.md)**
+You can use the Azure Portal, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template to deploy the Custom Script extension.This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
+
+**Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
+
+**If you haven't, this repository offers you a way to do so in an automated fashion:**
+- **[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)**
+- **[AWS Ubuntu VM](aws_terraform_ubuntu.md)**
+- **[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)**
+- **[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)**
 
 # Prerequisites
 
-* Clone this repo
+* Clone this repo.
 
-* Register your subscription to access preview extensions functionality
+* Register your subscription to access preview extensions functionality.
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc.
 
