@@ -1,32 +1,28 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
       "name": {
           "type": "string"
       },
       "location": {
-          "type": "string"
+        "type": "string"
       },
       "sku": {
-          "type": "string"
-      },
-      "tags": {
-          "type": "object"
-      }
+        "type": "string"
+    }
   },
   "resources": [
-      {
-          "apiVersion": "2017-03-15-preview",
-          "name": "[parameters('name')]",
-          "location": "[parameters('location')]",
-          "tags": "[parameters('tags')]",
-          "type": "Microsoft.OperationalInsights/workspaces",
-          "properties": {
-              "sku": {
-                  "name": "[parameters('sku')]"
-              }
-          }
-      }
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2020-03-01-preview",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+            "name": "[parameters('sku')]"
+        }
+    }
+    }
   ]
 }
