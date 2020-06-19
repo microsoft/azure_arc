@@ -97,3 +97,20 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
     ![](../img/vm_extension_mma/10.png)
 
     ![](../img/vm_extension_mma/11.png)
+
+# Clean up environment
+
+Complete the following steps to clean up your environment.
+
+* Remove the virtual machines from each environment by following the teardown instructions from each guide.
+
+    - *[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)*
+    - *[AWS Ubuntu VM](aws_terraform_ubuntu.md)*
+    - *[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)*
+    - *[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)*
+
+* Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
+
+    ```bash
+    az monitor log-analytics workspace delete --resource-group <resource-group> --workspace-name <workspace-name> --yes
+    ```
