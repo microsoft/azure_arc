@@ -16,7 +16,7 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
 # Prerequisites
 
-* Clone this repo
+* Clone this repo.
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc.
 
@@ -48,7 +48,7 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
     }
     ```
     
-**Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+**Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 * You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../policies/arm/log_analytics-template.parameters.json) and provide a name and location for your workspace. Then start the deployment with the command:
 
@@ -72,11 +72,11 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
   ![](../img/vm_policies/05.png)
 
-* We can now add a remediation task by clicking on the Initiative 'Enable Azure Monitor' and selecting 'Create Remediation Task' 
+* We can now add a remediation task by clicking on the Initiative 'Enable Azure Monitor' and selecting 'Create Remediation Task'.
 
   ![](../img/vm_policies/06.png)
 
-* Under 'Policy to remediate' choose '[Preview] Deploy Log Analytics Agent to Linux Azure Arc machines' and select 'Remediate' 
+* Under 'Policy to remediate' choose '[Preview] Deploy Log Analytics Agent to Linux Azure Arc machines' and select 'Remediate'.
 
   ![](../img/vm_policies/07.png)
 
@@ -86,3 +86,24 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
   ![](../img/vm_policies/09.png)
 
+# Clean up environment
+
+Complete the following steps to clean up your environment.
+
+* Remove the virtual machines from each environment by following the teardown instructions from each guide.
+
+    - *[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)*
+    - *[AWS Ubuntu VM](aws_terraform_ubuntu.md)*
+    - *[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)*
+    - *[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)*
+
+* Remove the Azure Policy assignment by executing the following script in AZ CLI.
+
+   ```bash
+    az policy assignment delete --name 'Enable Azure Monitor for VMs' --resource-group <resource_group>
+    ```
+* Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
+
+    ```bash
+    az monitor log-analytics workspace delete --resource-group <resource-group> --workspace-name <workspace-name> --yes
+    ```
