@@ -52,7 +52,7 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
 **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).   
 
 
-* You must have a script to run on the VM. In this case, you can use these scripts for [*Linux*](../scripts/custom_script_linux.sh) to modify the message of the day (MOTD) on the operating system or for [*Windows*](../scripts/custom_script_windows.ps1) to deploy additional software: Microsoft Edge,7zip and Visual Studio Code.
+* You must have a script to run on the VM. In this case, you can use these scripts for [*Linux*](../scripts/custom_script_linux.sh) to modify the message of the day (MOTD) on the operating system or for [*Windows*](../scripts/custom_script_windows.ps1) to deploy additional software, in this case: Microsoft Edge,7zip and Visual Studio Code.
 
 # Azure Arc for Servers Custom Script Extension Deployment
 
