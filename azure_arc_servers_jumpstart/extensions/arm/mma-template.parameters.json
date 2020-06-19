@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "value": "<VMName>" //name of your Azure Arc connected VM as shown in the portal 
+            "value": "<VMName>" 
         },
         "location": {
-            "value": "<Location value>" //Azure Region where the Azure Arc VM is registered 
+            "value": "<Location value>" 
         },
         "workspaceId": {
-            "value": "<workspaceID Value>" //ID of the workspace to configure the MMA agent 
+            "value": "<workspaceID Value>" 
         },
         "workspaceKey": {
-            "value": "<key value>" //Key of the workspace to configure the MMA agent 
+            "value": "<key value>" 
         }
     }
 }
