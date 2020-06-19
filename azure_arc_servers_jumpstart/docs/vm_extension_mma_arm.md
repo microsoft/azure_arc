@@ -1,6 +1,6 @@
 # Overview
 
-The following README will guide you on how manage extensions on Azure Arc connected machines. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or to run a custom script.
+The following README will guide you on how to manage extensions on Azure Arc connected machines. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
 
 Azure Arc for servers,  enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
 
@@ -27,53 +27,60 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
 
     ![](../img/vm_extension_mma/02.png)
 
-* You must have a Log Analytics Workspace created prior to making Extension Install request.
 
-    ![](../img/vm_extension_mma/03.png)
-
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * Create Azure Service Principal (SP)   
 
-    To connect a VM or Server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following command:
+    To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```bash
+  ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --skip-assignment
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
-
     For example:
-
-    ```az ad sp create-for-rbac -n "http://AzureArcservers" --skip-assignment```
-
+    ```az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor```
     Output should look like this:
-    ```terminal
+    ```
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcservers",
-    "name": "http://AzureArcservers",
+    "displayName": "AzureArcServers",
+    "name": "http://AzureArcServers",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
-
-    Then, assign a the "Contributor" role to the SP you've just created.
-
-    ```az role assignment create --assignee "<Unique SP Name>" --role contributor```
+    ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+**Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+
+* You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../extensions/arm/log_analytics-template.parameters.json) and provide a name and location for your workspace. Then start the deployment with the command:
+
+    ![](../img/vm_extension_mma/03.png)
+
+    ```bash
+    az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
+    ```
 
 # Azure Arc for Servers Microsoft Monitoring Agent Extension Deployment
 
-* Edit the [*parameters file*](../extensions/arm/mma-template.parameters.json) to match your environment configuration, you will need to provide: 
+* Edit the [*extensions parameters file*](../extensions/arm/mma-template.parameters.json) 
 
-- The VMname as it is registered in Azure Arc
-- The location of the resource group where you registered the Azure Arc connected VM  
-- Information of the Log Analytics Workspace you previously created: Workspace ID and key. These parameters will be used to configure the MMA agent. You can get this information by going to your Log Analytics Workspace and under "Settings" select "Agent Management"
+   ![](../img/vm_extension_mma/04.png)
 
+* To match your configuration you will need to provide: 
+    - The VMname as it is registered in Azure Arc
 
-    ![](../img/vm_extension_mma/04.png)
+       ![](../img/vm_extension_mma/05.png)
 
-    ![](../img/vm_extension_mma/05.png)
+    - The location of the resource group where you registered the Azure Arc connected VM  
+
+        ![](../img/vm_extension_mma/06.png)
+
+    - Information of the Log Analytics Workspace you previously created: Workspace ID and key. These parameters will be used to configure the MMA agent. You can get this information by going to your Log Analytics Workspace and under "Settings" select "Agent Management"
+
+    ![](../img/vm_extension_mma/07.png)
+
+    ![](../img/vm_extension_mma/08.png)
 
 * Choose the ARM template that matches your Operating System, for [*Windows*](../extensions/arm/mma-template-windows.json) and [*Linux*](../extensions/arm/mma-template-linux.json), deploy the template by running the following command: 
 
@@ -81,12 +88,12 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
     az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
     ```
    
-* * Once the template has completed it's run, you should see an output as follows: 
+* Once the template has completed it's run, you should see an output as follows: 
 
-    ![](../img/vm_extension_mma/08.png)
+    ![](../img/vm_extension_mma/09.png)
     
 * You will have the Microsoft Monitoring agent deployed on your Windows or Linux system and reporting to the Log Analytics Workspace that you have selected. You can verify by going back to the "Agents Management" section of your workspace and choosing either Windows or Linux, you should see now an additional connected VM. 
 
-    ![](../img/vm_extension_mma/06.png)
+    ![](../img/vm_extension_mma/10.png)
 
-    ![](../img/vm_extension_mma/07.png)
+    ![](../img/vm_extension_mma/11.png)
