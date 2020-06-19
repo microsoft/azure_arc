@@ -26,7 +26,7 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
 
     ![](../img/vm_extension_customscript/02.png)
 
-* You must have a script to run on the VM. In this case, you can use these scripts for [*Linux*](../scripts/custom_script_linux.sh) or [*Windows*](../scripts/custom_script_windows.sh)
+* You must have a script to run on the VM. In this case, you can use these scripts for [*Linux*](../scripts/custom_script_linux.sh) or [*Windows*](../scripts/custom_script_windows.ps1
 
     
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.6.0 or later. Use ```az --version``` to check your current installed version.
