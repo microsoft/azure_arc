@@ -66,7 +66,12 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 #### Azure Arc for Servers - Day-2 Scenarios & Use-Cases
 
 * [Tagging and querying server inventory across multiple clouds using Resource Graph Explorer](azure_arc_servers_jumpstart/docs/arc_inventory_tagging.md)
-* [Deploying Microsofr Monitoring Agent with Azure Policies](azure_arc_servers_jumpstart/docs/arc_policies_mma.md)
+
+* [Deploying the Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Extension Management](azure_arc_servers_jumpstart/docs/arc_vm_extension_mma_arm.md)
+
+* [Deploying the Custom Script Extension to Azure Arc Linux and Windows VMs using Extension Management](azure_arc_servers_jumpstart/docs/arc_vm_extension_customscript_arm.md)
+
+* [Deploying the Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Azure Policies](azure_arc_servers_jumpstart/docs/arc_policies_mma.md)
 
 ## Azure Arc for Kubernetes
 
