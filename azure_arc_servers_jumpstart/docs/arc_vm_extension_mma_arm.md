@@ -4,7 +4,7 @@ The following README will guide you on how to manage extensions on Azure Arc con
 
 Azure Arc for servers,  enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
 
-You can use the Azure Portal, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM totemplate deploy the Microsoft Monitoring Agent (MMA) to your servers so they are onboarded on Azure Services that leverage this service: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
+You can use the Azure Portal, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template deploy the Microsoft Monitoring Agent (MMA) to your servers so they are onboarded on Azure Services that leverage this service: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -17,9 +17,9 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
 
 # Prerequisites
 
-* Clone this repo.
+* Clone this repo
 
-* Register your subscription to access preview extensions functionality.
+* Register your subscription to access preview extensions functionality
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc.
 
