@@ -1,18 +1,18 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "value": "<VMName>"
+            "value": "<VMName>" //name of your Azure Arc connected VM as shown in the portal 
         },
         "location": {
-            "value": "<Location value>"
+            "value": "<Location value>" //Azure Region where the Azure Arc VM is registered 
         },
         "workspaceId": {
-            "value": "<workspaceID Value>"
+            "value": "<workspaceID Value>" //ID of the workspace to configure the MMA agent 
         },
         "workspaceKey": {
-            "value": "<key value>"
+            "value": "<key value>" //Key of the workspace to configure the MMA agent 
         }
     }
 }

@@ -1,0 +1,4 @@
+{ "logAnalytics_1": 
+    { "value": "/subscriptions/<subscription_id>/resourcegroups/<resource_group>/providers/microsoft.operationalinsights/workspaces/<log_analytics_workspace>"
+    }
+}
