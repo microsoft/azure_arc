@@ -1,78 +1,28 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "workspaceName": {
-            "type": "String",
-            "metadata": {
-              "description": "Specifies the name of the workspace."
-            }
-        },
-      "sku": {
-        "type": "string",
-        "allowedValues": [
-          "pergb2018",
-          "Free",
-          "Standalone",
-          "PerNode",
-          "Standard",
-          "Premium"
-          ],
-        "defaultValue": "pergb2018",
-        "metadata": {
-        "description": "Pricing tier: PerGB2018 or legacy tiers (Free, Standalone, PerNode, Standard or Premium) which are not available to all customers."
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "name": {
+          "type": "string"
       },
       "location": {
-        "type": "String",
-        "allowedValues": [
-        "australiacentral", 
-        "australiaeast", 
-        "australiasoutheast", 
-        "brazilsouth",
-        "canadacentral", 
-        "centralindia", 
-        "centralus", 
-        "eastasia", 
-        "eastus", 
-        "eastus2", 
-        "francecentral", 
-        "japaneast", 
-        "koreacentral", 
-        "northcentralus", 
-        "northeurope", 
-        "southafricanorth", 
-        "southcentralus", 
-        "southeastasia", 
-        "uksouth", 
-        "ukwest", 
-        "westcentralus", 
-        "westeurope", 
-        "westus", 
-        "westus2" 
-        ],
-      "metadata": {
-        "description": "Specifies the location in which to create the workspace."
-        }
-      }
-    },
-    "resources": [
-        {
-            "type": "Microsoft.OperationalInsights/workspaces",
-            "name": "[parameters('workspaceName')]",
-            "apiVersion": "2017-03-15-preview",
-            "location": "[parameters('location')]",
-            "properties": {
-                "sku": {
-                    "name": "[parameters('sku')]"
-                },
-                "retentionInDays": 120,
-                "features": {
-                    "searchVersion": 1,
-                    "legacy": 0,
-                    "enableLogAccessUsingOnlyResourcePermissions": true
-                }
-            }
-          }
-       ]
+        "type": "string"
+      },
+      "sku": {
+        "type": "string"
     }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2020-03-01-preview",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+            "name": "[parameters('sku')]"
+        }
+    }
+    }
+  ]
+}
