@@ -1,7 +1,6 @@
 $chocolateyAppList = "microsoft-edge,7zip,vscode"
-$dismAppList = "Microsoft-Windows-Subsystem-Linux"
 
-if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false -or [string]::IsNullOrWhiteSpace($dismAppList) -eq $false)
+if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false
 {
     try{
         choco config get cacheLocation
@@ -23,18 +22,4 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
     }
 }
 
-if ([string]::IsNullOrWhiteSpace($dismAppList) -eq $false){
-    Write-Host "DISM Features Specified"    
-
-    $appsToInstall = $dismAppList -split "," | foreach { "$($_.Trim())" }
-
-    foreach ($app in $appsToInstall)
-    {
-        Write-Host "Installing $app"
-        & choco install $app /y /source windowsfeatures | Write-Output
-    }
-}
-
-Invoke-Expression "InstallApps.ps1 ""$chocolateyAppList"" ""$dismAppList"""
-
-Restart-Computer
+Invoke-Expression "InstallApps.ps1 ""$chocolateyAppList""
