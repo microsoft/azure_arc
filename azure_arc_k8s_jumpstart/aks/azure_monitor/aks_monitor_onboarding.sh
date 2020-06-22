@@ -10,9 +10,8 @@ export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
-curl -LO https://raw.githubusercontent.com/microsoft/OMS-docker/ci_feature/docs/haiku/onboarding_azuremonitor_for_containers.sh
-
 echo "Modify the onboarding script to allow for SPN login insted of device token"
+curl -LO https://raw.githubusercontent.com/microsoft/OMS-docker/ci_feature/docs/haiku/onboarding_azuremonitor_for_containers.sh
 sed /use-device-code/s/^/#/ onboarding_azuremonitor_for_containers.sh > onboarding_azuremonitor_for_containers_modify.sh
 
 echo "Log in to Azure with Service Principle & Getting k8s credentials (kubeconfig)"

@@ -20,7 +20,7 @@ resource "google_container_cluster" "arcdemo" {
 
 resource "google_container_node_pool" "primary_preemptible_nodes" {
   name       = "arcdemo-node-pool"
-  location   = "us-west1"
+  location   = var.gcp_region
   cluster    = google_container_cluster.arcdemo.name
   node_count = var.gke_cluster_node_count
 
