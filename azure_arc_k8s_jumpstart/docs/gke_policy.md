@@ -173,7 +173,11 @@ Although you can [deploy GitOps configuration individually](gke_gitops.md) on ea
 
     You can see how the Flux GitOps operator, Memcached, the "Hello Arc" application and the ingress rule now deployed on the cluster as well the Service with an external IP. 
 
+    ![](../img/gke_policy/29.png)  
+
 * Copy the Service external IP and paste in your browser. 
+
+    ![](../img/gke_policy/30.png) 
 
 # Clean up environment
 
@@ -183,3 +187,6 @@ Complete the following steps to clean up your environment.
 
 * From the Policy page in the Azure portal, remove the "[Preview]: Deploy GitOps to Kubernetes cluster" policy assignment from the cluster.
 
+    ![](../img/gke_policy/31.png) 
+
+    ![](../img/gke_policy/32.png)     
