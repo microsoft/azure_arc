@@ -109,12 +109,12 @@ Complete the following steps to clean up your environment.
     - *[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)*
     - *[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)*
 
-* Remove the Azure Policy assignment by executing the following script in AZ CLI.
+* Remove the Azure Policy assignment by executing the following command in AZ CLI.
 
    ```bash
     az policy assignment delete --name 'Enable Azure Monitor for VMs' --resource-group <resource_group>
     ```
-* Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
+* Remove the Log Analytics workspace by executing the following command in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
     ```bash
     az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
