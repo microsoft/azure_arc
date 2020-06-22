@@ -189,4 +189,5 @@ Complete the following steps to clean up your environment.
 
     ![](../img/gke_policy/31.png) 
 
-    ![](../img/gke_policy/32.png)     
+    ![](../img/gke_policy/32.png)
+     
