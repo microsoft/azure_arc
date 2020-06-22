@@ -1,10 +1,10 @@
 # Overview
 
-The following README will guide you on how to use Arc for servers to assign Azure Policies to VMs outside of Azure, wether they are on-premise or other clouds. With this feature you can now use Azure Policies to audit settings in the operating system of an Azure Arc connected servers, if a setting is not compliant you can also trigger a remediation task. 
+The following README will guide you on how to use Arc for servers to assign Azure Policies to VMs outside of Azure, whether they are on-premises or other clouds. With this feature you can now use Azure Policies to audit settings in the operating system of an Azure Arc connected servers, if a setting is not compliant you can also trigger a remediation task. 
 
-In this case we will assign a policy to audit if the Azure Arc connected machine has the (Microsoft Monitoring Agent) MMA agent installed, if not, we will use the extensions feature to automatically deploy it to the VM, an enrollment experience that levels to Azure VMs. This approach can be used to make sure all your servers are onboarded to services such as: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
+In this case, we will assign a built-in policy to audit if an Azure Arc connected machine has the Microsoft Monitoring Agent (MMA) installed. If it does not, the policy will automatically deploy the agent to the VM.. This approach can be used to make sure all your servers are onboarded to services such as: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
 
-You can use the Azure Portal, an ARM template or PowerShell script to assign policies to Azure Subscriptions or Resource Groups. In this guide, you will use an ARM template to assign built-in policies. 
+You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to assign policies to Azure Subscriptions or Resource Groups. In this guide, you will use an ARM template to assign built-in policies. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -18,7 +18,7 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
 * Clone this repo.
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
     ![](../img/vm_policies/01.png)
 
@@ -50,9 +50,11 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
     
 **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
-* You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../policies/arm/log_analytics-template.parameters.json) and provide a name and location for your workspace. Then start the deployment with the command:
+* You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../policies/arm/log_analytics-template.parameters.json), provide a name and location for your workspace
 
     ![](../img/vm_policies/03.png)
+
+Then start the deployment with the command:
 
     ```bash
     az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
@@ -60,9 +62,11 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
 # Azure Policies on Azure Arc connected machines
 
-* Now that we have all the requirements set. We can assign policies to our Arc connected machines using these commands. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace. Then start the deployment with the command: 
+* Now that we have all the requirements set, we can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace. 
 
     ![](../img/vm_policies/04.png)
+
+Then start the deployment with the command:
 
     ```bash
     az policy assignment create --name 'Enable Azure Monitor for VMs' --scope '/subscriptions/<subscription_id>/resourceGroups/<resource_group>' --policy-set-definition '55f3eceb-5573-4f18-9695-226972c6d74a' -p "<path_to_json>" --assign-identity --location "<region>"
@@ -80,7 +84,7 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
   ![](../img/vm_policies/07.png)
 
-* Once you have assigned remediation task, the policy will be evaluated again and show that the server on GCP is compliant. And that the Microsoft Monitoring Agent extension is installed on the Azure Arc machine. 
+* Once you have assigned remediation task, the policy will be evaluated again and show that the server on GCP is compliant and that the Microsoft Monitoring Agent extension is installed on the Azure Arc machine.
 
   ![](../img/vm_policies/08.png)
 
