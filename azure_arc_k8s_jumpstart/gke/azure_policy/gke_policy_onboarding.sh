@@ -1,16 +1,13 @@
 #!/bin/sh
 
-sudo apt-get update
-
 # <--- Change the following environment variables according to your Azure Service Principle name --->
 
-export subscriptionId='<Your Azure Subscription ID>'
+echo "Exporting environment variables"
 export appId='<Your Azure Service Principle name>'
 export password='<Your Azure Service Principle password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure Resource Group Name>'
-export location='<Azure Region>'
-export arcClusterName='<Azure Arc GKE Cluster Name>'
+export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
 # Installing Helm 3
 echo "Installing Helm 3"
@@ -31,16 +28,25 @@ sudo tee /etc/apt/sources.list.d/azure-cli.list
 sudo apt-get update
 sudo apt-get install azure-cli
 
-echo "Modify the onboarding script to allow for SPN login insted of device token"
-curl -LO https://raw.githubusercontent.com/microsoft/OMS-docker/ci_feature/docs/haiku/onboarding_azuremonitor_for_containers.sh
-sed /use-device-code/s/^/#/ onboarding_azuremonitor_for_containers.sh > onboarding_azuremonitor_for_containers_modify.sh
+# Installing NGINX
+echo "Installing NGINX Ingress Controller"
+kubectl create namespace hello-arc
+helm install hello-arc stable/nginx-ingress \
+    --namespace hello-arc \
+    --set controller.replicaCount=2 \
+    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
+    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
 
-echo "Log in to Azure with Service Principle & Getting k8s credentials (kubeconfig)"
+# Installing Azure Policy add-on
+echo "Log in to Azure with Service Principle & Getting Connected Cluster Azure Resource ID"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 export clusterId="$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id)"
 export clusterId="$(echo "$clusterId" | sed -e 's/^"//' -e 's/"$//')" 
-export currentContext="$(kubectl config current-context)"
 
-bash onboarding_azuremonitor_for_containers_modify.sh $clusterId $currentContext
+helm repo add azure-policy https://raw.githubusercontent.com/Azure/azure-policy/master/extensions/policy-addon-kubernetes/helm-charts
 
-rm onboarding_azuremonitor_for_containers.sh onboarding_azuremonitor_for_containers_modify.sh
+helm install azure-policy-addon azure-policy/azure-policy-addon-arc-clusters \
+    --set azurepolicy.env.resourceid=$clusterId \
+    --set azurepolicy.env.clientid=$appId \
+    --set azurepolicy.env.clientsecret=$password \
+    --set azurepolicy.env.tenantid=$tenantId
