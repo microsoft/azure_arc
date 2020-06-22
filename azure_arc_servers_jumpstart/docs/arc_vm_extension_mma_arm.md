@@ -21,7 +21,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
 * Register your subscription to access preview extensions functionality.
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
     ![](../img/vm_extension_mma/01.png)
 
@@ -57,11 +57,13 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
     ![](../img/vm_extension_mma/03.png)
 
-Then start the deployment with the command:
+To deploy the ARM template, navigate to the [deployment folder](../extensions/arm) and run the below command:
 
- ```bash
-az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
-```
+  ```bash
+    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    --template-file <The *log_analytics-template.json* template file location> \
+    --parameters <The *log_analytics-template.parameters.json* template file location>
+  ```
 
 # Azure Arc for Servers Microsoft Monitoring Agent Extension Deployment
 
@@ -87,7 +89,9 @@ az deployment group create --resource-group <resource-group-name> --template-fil
 * Choose the ARM template that matches your Operating System, for [*Windows*](../extensions/arm/mma-template-windows.json) and [*Linux*](../extensions/arm/mma-template-linux.json), deploy the template by running the following command: 
 
     ```bash
-    az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
+    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    --template-file <The *mma-template.json* template file location> \
+    --parameters <The *mma-temaplte.parameters.json* template file location>
     ```
    
 * Once the template has completed it's run, you should see an output as follows: 
@@ -114,5 +118,5 @@ Complete the following steps to clean up your environment.
 * Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
     ```bash
-    az monitor log-analytics workspace delete --resource-group <resource-group> --workspace-name <workspace-name> --yes
+    az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
     ```
