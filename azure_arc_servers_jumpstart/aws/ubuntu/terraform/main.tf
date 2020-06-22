@@ -94,6 +94,7 @@ resource "aws_instance" "default" {
   }
   provisioner "remote-exec" {
     inline = [
+      "sudo apt-get install -y python-ctypes",
       "sudo chmod +x /tmp/install_arc_agent.sh",
       "/tmp/install_arc_agent.sh",
     ]
