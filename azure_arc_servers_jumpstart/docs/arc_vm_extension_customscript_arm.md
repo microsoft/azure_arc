@@ -4,7 +4,7 @@ The following README will guide you on how to manage extensions on Azure Arc con
 
 Azure Arc for servers,  enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
 
-You can use the Azure Portal, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template to deploy the Custom Script extension.This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
+You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template to deploy the Custom Script extension.This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -20,7 +20,7 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
 
 * Register your subscription to access preview extensions functionality.
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
     ![](../img/vm_extension_customscript/01.png)
 
