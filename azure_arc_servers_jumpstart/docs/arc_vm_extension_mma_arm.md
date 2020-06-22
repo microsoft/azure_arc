@@ -17,9 +17,9 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
 # Prerequisites
 
-* Clone this repo
+* Clone this repo.
 
-* Register your subscription to access preview extensions functionality
+* Register your subscription to access preview extensions functionality.
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
@@ -59,9 +59,9 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
 Then start the deployment with the command:
 
-    ```bash
-    az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
-    ```
+ ```bash
+az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
+```
 
 # Azure Arc for Servers Microsoft Monitoring Agent Extension Deployment
 
@@ -78,7 +78,7 @@ Then start the deployment with the command:
 
         ![](../img/vm_extension_mma/06.png)
 
-    - Information of the Log Analytics Workspace you previously created: Workspace ID and key. These parameters will be used to configure the MMA agent. You can get this information by going to your Log Analytics Workspace and under "Settings" select "Agent Management"
+    - Information of the Log Analytics Workspace you previously created: Workspace ID and key. These parameters will be used to configure the MMA agent. You can get this information by going to your Log Analytics Workspace and under "Settings" select "Agent management"
 
     ![](../img/vm_extension_mma/07.png)
 
@@ -94,7 +94,7 @@ Then start the deployment with the command:
 
     ![](../img/vm_extension_mma/09.png)
     
-* You will have the Microsoft Monitoring agent deployed on your Windows or Linux system and reporting to the Log Analytics Workspace that you have selected. You can verify by going back to the "Agents Management" section of your workspace and choosing either Windows or Linux, you should see now an additional connected VM. 
+* You will have the Microsoft Monitoring agent deployed on your Windows or Linux system and reporting to the Log Analytics Workspace that you have selected. You can verify by going back to the "Agents management" section of your workspace and choosing either Windows or Linux, you should see now an additional connected VM. 
 
     ![](../img/vm_extension_mma/10.png)
 
