@@ -4,7 +4,7 @@ The following README will guide you on how to manage extensions on Azure Arc con
 
 Azure Arc for servers,  enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
 
-You can use the Azure Portal, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template deploy the Microsoft Monitoring Agent (MMA) to your servers so they are onboarded on Azure Services that leverage this service: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
+You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template deploy the Microsoft Monitoring Agent (MMA) to your servers so they are onboarded on Azure Services that leverage this service: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -21,7 +21,7 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
 
 * Register your subscription to access preview extensions functionality
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
     ![](../img/vm_extension_mma/01.png)
 
@@ -53,9 +53,11 @@ You can use the Azure Portal, an ARM template, PowerShell script or Azure polici
     
 **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
-* You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../extensions/arm/log_analytics-template.parameters.json) and provide a name and location for your workspace. Then start the deployment with the command:
+* You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../extensions/arm/log_analytics-template.parameters.json) and provide a name and location for your workspace. 
 
     ![](../img/vm_extension_mma/03.png)
+
+Then start the deployment with the command:
 
     ```bash
     az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
