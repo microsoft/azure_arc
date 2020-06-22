@@ -56,11 +56,11 @@ You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to
 
 To deploy the ARM template, navigate to the [deployment folder](../policies/arm) and run the below command:
 
-```bash
-az deployment group create --resource-group <Name of the Azure Resource Group> \
---template-file <The *log_analytics-template.json* template file location> \
---parameters <The *log_analytics-template.parameters.json* template file location>
-```
+  ```bash
+    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    --template-file <The *log_analytics-template.json* template file location> \
+    --parameters <The *log_analytics-template.parameters.json* template file location>
+  ```
 
 # Azure Policies on Azure Arc connected machines
 
