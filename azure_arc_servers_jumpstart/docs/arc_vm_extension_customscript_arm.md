@@ -4,7 +4,7 @@ The following README will guide you on how to manage extensions on Azure Arc con
 
 Azure Arc for servers,  enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
 
-You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template to deploy the Custom Script extension.This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
+You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template to deploy the Custom Script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -20,7 +20,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
 * Register your subscription to access preview extensions functionality.
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
     ![](../img/vm_extension_customscript/01.png)
 
@@ -84,17 +84,19 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
          ./custom_script_linux.sh
          ```
 
-* After you have provided your parameters, deploy the template by running the following command: 
+* To deploy the ARM template, navigate to the [deployment folder](../extensions/arm) and run the below command:
 
     ```bash
-    az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
+    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    --template-file <The *customscript-template.json* template file location> \
+    --parameters <The *customscript-template.parameters.json* template file location>
     ```
    
 * Once the template has completed it's run, you should see an output as follows: 
 
     ![](../img/vm_extension_customscript/06.png)
     
-* Since on the scripts we deployed configured our operating systems we can verify the results. Go to the Azure Arc connected VM in the Azure Portal and select Extensions, you should see the Custom Script extension installed: 
+* Since on the script you deployed configured the operating system you can verify the results. Go to the Azure Arc connected VM in the Azure Portal and select Extensions, you should see the Custom Script extension installed: 
 
     ![](../img/vm_extension_customscript/07.png)
 
@@ -102,7 +104,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
     ![](../img/vm_extension_customscript/08.png)
 
-* For the Windows VM we deployed some applications in this case: Microsoft Edge, 7zip and Visual Studio Code. RDP to your VM and make sure the applications are installed. 
+* For the Windows VM you deployed some applications in this case: Microsoft Edge, 7zip and Visual Studio Code. RDP to your VM and make sure the applications are installed. 
 
     ![](../img/vm_extension_customscript/09.png)
 
