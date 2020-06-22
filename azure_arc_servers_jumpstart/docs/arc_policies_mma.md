@@ -2,7 +2,7 @@
 
 The following README will guide you on how to use Arc for servers to assign Azure Policies to VMs outside of Azure, whether they are on-premises or other clouds. With this feature you can now use Azure Policies to audit settings in the operating system of an Azure Arc connected servers, if a setting is not compliant you can also trigger a remediation task. 
 
-In this case, we will assign a built-in policy to audit if an Azure Arc connected machine has the Microsoft Monitoring Agent (MMA) installed. If it does not, the policy will automatically deploy the agent to the VM.. This approach can be used to make sure all your servers are onboarded to services such as: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
+In this case, you will assign a built-in policy to audit if an Azure Arc connected machine has the Microsoft Monitoring Agent (MMA) installed. If it does not, the policy will automatically deploy the agent to the VM.. This approach can be used to make sure all your servers are onboarded to services such as: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
 
 You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to assign policies to Azure Subscriptions or Resource Groups. In this guide, you will use an ARM template to assign built-in policies. 
 
@@ -18,7 +18,7 @@ You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to
 
 * Clone this repo.
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
     ![](../img/vm_policies/01.png)
 
@@ -64,7 +64,7 @@ To deploy the ARM template, navigate to the [deployment folder](../policies/arm)
 
 # Azure Policies on Azure Arc connected machines
 
-* Now that we have all the requirements set, we can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace. 
+* Now that you have all the requirements set, you can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace. 
 
     ![](../img/vm_policies/04.png)
 
@@ -84,7 +84,7 @@ The flag *policy-set-definition* points to the initiative "Enable Azure Monitor"
 
   ![](../img/vm_policies/05.png)
 
-* We can now add a remediation task by clicking on the Initiative 'Enable Azure Monitor' and selecting 'Create Remediation Task'.
+* You can now add a remediation task by clicking on the Initiative 'Enable Azure Monitor' and selecting 'Create Remediation Task'.
 
   ![](../img/vm_policies/06.png)
 
