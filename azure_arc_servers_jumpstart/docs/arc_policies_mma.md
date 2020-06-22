@@ -54,11 +54,13 @@ You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to
 
     ![](../img/vm_policies/03.png)
 
-Then start the deployment with the command:
+To deploy the ARM template, navigate to the [deployment folder](../policies/arm) and run the below command:
 
-    ```bash
-    az deployment group create --resource-group <resource-group-name> --template-file <path-to-template> --parameters <path-to-parametersfile>
-    ```
+```bash
+az deployment group create --resource-group <Name of the Azure Resource Group> \
+--template-file <The *log_analytics-template.json* template file location> \
+--parameters <The *log_analytics-template.parameters.json* template file location>
+```
 
 # Azure Policies on Azure Arc connected machines
 
@@ -66,11 +68,17 @@ Then start the deployment with the command:
 
     ![](../img/vm_policies/04.png)
 
-Then start the deployment with the command:
+To start the deployment, use the below command: 
 
-    ```bash
-    az policy assignment create --name 'Enable Azure Monitor for VMs' --scope '/subscriptions/<subscription_id>/resourceGroups/<resource_group>' --policy-set-definition '55f3eceb-5573-4f18-9695-226972c6d74a' -p "<path_to_json>" --assign-identity --location "<region>"
-    ```
+```bash
+az policy assignment create --name 'Enable Azure Monitor for VMs' \
+--scope '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure Resource Group>' \
+--policy-set-definition '55f3eceb-5573-4f18-9695-226972c6d74a' \
+-p <The *policy.json* template file location> \
+--assign-identity --location <Azure Region>
+```
+
+The flag *policy-set-definition* points to the initiative "Enable Azure Monitor" definition ID. 
 
 * Once you have assigned the initiative, you will see that it will be evaluated (it may take 30 minutes to run the first scan) and show that the server on GCP is not compliant.
 
@@ -109,5 +117,5 @@ Complete the following steps to clean up your environment.
 * Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
     ```bash
-    az monitor log-analytics workspace delete --resource-group <resource-group> --workspace-name <workspace-name> --yes
+    az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
     ```
