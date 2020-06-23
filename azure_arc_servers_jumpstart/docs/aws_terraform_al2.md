@@ -135,7 +135,9 @@ If you want to demo/control the actual registration process, do the following:
     ![](../img/aws_al2/15.png)
 
 5. Run the following command
-    ```azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-Servers-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id```
+    ```bash
+    azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-Servers-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id
+    ```
 
     ![](../img/aws_al2/16.png)
 
