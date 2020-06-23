@@ -6,7 +6,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone this repo
 
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7.0 or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7.0 or later**. Use ```az --version``` to check your current installed version.
 
 * [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key) 
 
