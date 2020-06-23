@@ -60,7 +60,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
    ![](../img/vm_extension_customscript/03.png)
 
-* To match your environment configuration, you will need to provide the following: 
+* To match your environment configuration, you will need to provide the following information: 
 
     - The VMname as it is registered in Azure Arc
 
@@ -96,15 +96,16 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
     ![](../img/vm_extension_customscript/06.png)
     
-* Since on the script you deployed configured the operating system you can verify the results. Go to the Azure Arc connected VM in the Azure Portal and select Extensions, you should see the Custom Script extension installed: 
+* You can also verify the deployment by going to the Azure Arc connected VM in the Azure Portal and select Extensions, you should see the Custom Script extension installed: 
 
     ![](../img/vm_extension_customscript/07.png)
 
-* For Linux VMs login to your VM and checkout the message of the day, it was customized by the script so you should see a message like this: 
+* You can also verify the custom script execution by connecting to the VMs and verifying that the operating system has been configured. 
+    - For linux VM, use SSH to connect to your VM and checkout the message of the day, it was customized by the script so you should see a message like this: 
 
     ![](../img/vm_extension_customscript/08.png)
 
-* For the Windows VM you deployed some applications in this case: Microsoft Edge, 7zip and Visual Studio Code. RDP to your VM and make sure the applications are installed. 
+    - For the Windows VM, use RDP to connect to your VM and verify that the applications have been installed in this case: Microsoft Edge, 7zip and Visual Studio Code. 
 
     ![](../img/vm_extension_customscript/09.png)
 
