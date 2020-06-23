@@ -15,7 +15,7 @@ variable "admin_password" {
 }
 
 variable "hostname" {
-  default = "azure-arc-demo"
+  default = "arc-aws-al2-demo"
 }
 
 variable "azure_location" {
@@ -23,7 +23,7 @@ variable "azure_location" {
 }
 
 variable "azure_resource_group" {
-  default = "Arc-Servers-Demo"
+  default = "Arc-AWS-Demo"
 }
 
 variable "subscription_id" {
