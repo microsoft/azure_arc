@@ -10,7 +10,7 @@
         },
         "fileUris": {
             "value": [
-                "<public_URL_for_script>" //public URL for your script, can be Github or an Azure Storage Account
+                "<public_URL_for_script>" //public URL for your script, can point to GitHub repository or an Azure Storage Account
             ]
         },
         "commandToExecute": {
