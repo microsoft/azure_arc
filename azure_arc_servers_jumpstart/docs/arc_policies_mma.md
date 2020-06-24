@@ -64,7 +64,7 @@ To deploy the ARM template, navigate to the [deployment folder](../policies/arm)
 
 # Azure Policies on Azure Arc connected machines
 
-* Now that we have all the requirements set, we can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace. 
+* Now that we have all the prerequisites set, we can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace. 
 
     ![](../img/vm_policies/04.png)
 
