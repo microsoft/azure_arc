@@ -2,7 +2,7 @@
 
 The following README will guide you on how to manage extensions on Azure Arc connected machines. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
 
-Azure Arc for servers,  enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
+Azure Arc for servers, enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
 
 You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template to deploy the Custom Script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
 
@@ -52,9 +52,9 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).   
 
 
-* You must have a script to run on the VM. In this case, you can use these scripts:
-    - [*Linux*](../scripts/custom_script_linux.sh): modifies the message of the day (MOTD) on the operating system. 
-    - [*Windows*](../scripts/custom_script_windows.ps1): installs Microsoft Edge,7zip and Visual Studio Code on the VM.
+* In order to demonstrate the Custom Script Extention, we will use the below Linux and Windows scripts.
+    - [*Linux*](../scripts/custom_script_linux.sh): The script will modifie the message of the day (MOTD) on the operating system. 
+    - [*Windows*](../scripts/custom_script_windows.ps1): The script will installs Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
 
 # Azure Arc for Servers Custom Script Extension Deployment
 
@@ -64,7 +64,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
 * To match your environment configuration, you will need to provide the following information: 
 
-    - The VMname as it is registered in Azure Arc
+    - The VM name as it is registered in Azure Arc
 
    ![](../img/vm_extension_customscript/04.png)
 
@@ -76,12 +76,13 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
         - For Windows: [Public Uri](https://raw.githubusercontent.com/likamrat/azure_arc/custom/azure_arc_servers_jumpstart/scripts/custom_script_windows.ps1) 
         - For Linux: [Public Uri](https://raw.githubusercontent.com/likamrat/azure_arc/custom/azure_arc_servers_jumpstart/scripts/custom_script_linux.sh)
 
-    - The command that will triger the script: 
-        - For Windows: 
-        ```bash
-        powershell -ExecutionPolicy Unrestricted -File custom_script_windows.ps1 
-        ```
-        - For Linux:
+    -  To run either script, use the below commands: 
+        
+     - Windows: 
+         ```powershell
+         powershell -ExecutionPolicy Unrestricted -File custom_script_windows.ps1 
+         ```
+     - Linux:
          ```bash
          ./custom_script_linux.sh
          ```
@@ -94,20 +95,21 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
     --parameters <The *customscript-template.parameters.json* template file location>
     ```
    
-* Once the template has completed it's run, you should see an output as follows: 
+* Once the template deployment has completed it's run, you should see an output as follows: 
 
     ![](../img/vm_extension_customscript/06.png)
     
-* You can also verify the deployment by going to the Azure Arc connected VM in the Azure Portal and select Extensions, you should see the Custom Script extension installed: 
+* To verify a successful deployment on the Azure Arc connected server, in the Azure Portal, by clicking on "Extensions" settings. You should see the Custom Script extension installed.
 
     ![](../img/vm_extension_customscript/07.png)
 
-* You can also verify the custom script execution by connecting to the VMs and verifying that the operating system has been configured. 
-    - For the Linux VM, use SSH to connect to your VM and checkout the message of the day, it was customized by the script so you should see a message like this: 
+* Another way to verify successful custom script execution is by connecting to the VMs and verifying that the operating system has been configured. 
+
+    - For the Linux VM, use SSH to connect the VM and check out the message of the day which was customized by the script: 
 
     ![](../img/vm_extension_customscript/08.png)
 
-    - For the Windows VM, use RDP to connect to your VM and verify that the additional software has been installed: Microsoft Edge, 7zip and Visual Studio Code. 
+    - For the Windows VM, use RDP to connect the VM and verify that the additional software has been installed: Microsoft Edge, 7zip and Visual Studio Code. 
 
     ![](../img/vm_extension_customscript/09.png)
 
