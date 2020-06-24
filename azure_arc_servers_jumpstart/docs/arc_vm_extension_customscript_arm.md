@@ -52,7 +52,9 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).   
 
 
-* You must have a script to run on the VM. In this case, you can use these scripts for [*Linux*](../scripts/custom_script_linux.sh) to modify the message of the day (MOTD) on the operating system or for [*Windows*](../scripts/custom_script_windows.ps1) to deploy additional software, in this case: Microsoft Edge,7zip and Visual Studio Code.
+* You must have a script to run on the VM. In this case, you can use these scripts:
+    - [*Linux*](../scripts/custom_script_linux.sh): modifies the message of the day (MOTD) on the operating system. 
+    - [*Windows*](../scripts/custom_script_windows.ps1): installs Microsoft Edge,7zip and Visual Studio Code on the VM.
 
 # Azure Arc for Servers Custom Script Extension Deployment
 
@@ -101,11 +103,11 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
     ![](../img/vm_extension_customscript/07.png)
 
 * You can also verify the custom script execution by connecting to the VMs and verifying that the operating system has been configured. 
-    - For linux VM, use SSH to connect to your VM and checkout the message of the day, it was customized by the script so you should see a message like this: 
+    - For the Linux VM, use SSH to connect to your VM and checkout the message of the day, it was customized by the script so you should see a message like this: 
 
     ![](../img/vm_extension_customscript/08.png)
 
-    - For the Windows VM, use RDP to connect to your VM and verify that the applications have been installed in this case: Microsoft Edge, 7zip and Visual Studio Code. 
+    - For the Windows VM, use RDP to connect to your VM and verify that the additional software has been installed: Microsoft Edge, 7zip and Visual Studio Code. 
 
     ![](../img/vm_extension_customscript/09.png)
 
