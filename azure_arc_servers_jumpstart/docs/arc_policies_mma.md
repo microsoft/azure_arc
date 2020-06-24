@@ -1,10 +1,10 @@
 # Overview
 
-The following README will guide you on how to use Arc for servers to assign Azure Policies to VMs outside of Azure, whether they are on-premises or other clouds. With this feature you can now use Azure Policies to audit settings in the operating system of an Azure Arc connected servers, if a setting is not compliant you can also trigger a remediation task. 
+The following README will guide you on how to use Azure Arc for servers to assign Azure Policies to VMs outside of Azure, whether they are on-premises or other clouds. With this feature you can now use Azure Policies to audit settings in the operating system of an Azure Arc connected servers, if a setting is not compliant you can also trigger a remediation task. 
 
-In this case, you will assign a built-in policy to audit if an Azure Arc connected machine has the Microsoft Monitoring Agent (MMA) installed. If it does not, the policy will automatically deploy the agent to the VM.. This approach can be used to make sure all your servers are onboarded to services such as: Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
+In this case, we will assign a policy to audit if the Azure Arc connected machine has the (Microsoft Monitoring Agent) MMA agent installed, if not, we will use the extensions feature to automatically deploy it to the VM, an enrollment experience that levels to Azure VMs. This approach can be used to make sure all your servers are onboarded to services such as Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
 
-You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to assign policies to Azure Subscriptions or Resource Groups. In this guide, you will use an ARM template to assign built-in policies. 
+You can use the Azure Portal, an ARM template or PowerShell script to assign policies to Azure Subscriptions or Resource Groups. In this guide, you will use an ARM template to assign built-in policies. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -18,7 +18,7 @@ You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to
 
 * Clone this repo.
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
     ![](../img/vm_policies/01.png)
 
@@ -64,7 +64,7 @@ To deploy the ARM template, navigate to the [deployment folder](../policies/arm)
 
 # Azure Policies on Azure Arc connected machines
 
-* Now that you have all the requirements set, you can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace. 
+* * Now that you have all the prerequisites set, you can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace.
 
     ![](../img/vm_policies/04.png)
 
@@ -80,11 +80,11 @@ az policy assignment create --name 'Enable Azure Monitor for VMs' \
 
 The flag *policy-set-definition* points to the initiative "Enable Azure Monitor" definition ID. 
 
-* Once you have assigned the initiative, you will see that it will be evaluated (it may take 30 minutes to run the first scan) and show that the server on GCP is not compliant.
+* Once the initiative is assigned, it takes around 30 minutes for the assignment to be applied to the defined scope. After those 30 minutes, Azure Policy will start the evaluation cycle against the Azure Arc connected machine and recognize it as "Non-compliant" (since it still does note have the Log Analytics Agent configuration deployed). To check this, go to the Azure Arc connected Machine under the Policies section. 
 
   ![](../img/vm_policies/05.png)
 
-* You can now add a remediation task by clicking on the Initiative 'Enable Azure Monitor' and selecting 'Create Remediation Task'.
+* Now, you will assign a remediation task to the non-compliant resource to put into a compliant state. This remediation task is accomplished by instructing Azure Policy to run the deployIfNotExists effect and using the Azure Arc extension management capabilities to deploy the Log Analytics agent. 
 
   ![](../img/vm_policies/06.png)
 
@@ -109,12 +109,12 @@ Complete the following steps to clean up your environment.
     - *[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)*
     - *[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)*
 
-* Remove the Azure Policy assignment by executing the following command in AZ CLI.
+* Remove the Azure Policy assignment by executing the following script in AZ CLI.
 
    ```bash
     az policy assignment delete --name 'Enable Azure Monitor for VMs' --resource-group <resource_group>
     ```
-* Remove the Log Analytics workspace by executing the following command in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
+* Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
     ```bash
     az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes

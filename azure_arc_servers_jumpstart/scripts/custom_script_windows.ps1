@@ -1,6 +1,6 @@
-$chocolateyAppList = "microsoft-edge,7zip,vscode"
+$chocolateyAppList = "microsoft-windows-terminal,microsoft-edge,7zip,vscode"
 
-if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false
+if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false -or [string]::IsNullOrWhiteSpace($dismAppList) -eq $false)
 {
     try{
         choco config get cacheLocation
@@ -21,5 +21,3 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
         & choco install $app /y | Write-Output
     }
 }
-
-Invoke-Expression "InstallApps.ps1 ""$chocolateyAppList""
