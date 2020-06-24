@@ -84,11 +84,11 @@ The flag *policy-set-definition* points to the initiative "Enable Azure Monitor"
 
   ![](../img/vm_policies/05.png)
 
-* Now, you will assign a remediation task to the non-compliant resource to put into a compliant state. This remediation task is accomplished by instructing Azure Policy to run the deployIfNotExists effect and using the Azure Arc extension management capabilities to deploy the Log Analytics agent. 
+* Now, you will assign a remediation task to the non-compliant resource to put into a compliant state. 
 
   ![](../img/vm_policies/06.png)
 
-* Under 'Policy to remediate' choose '[Preview] Deploy Log Analytics Agent to Linux Azure Arc machines' and select 'Remediate'.
+* Under 'Policy to remediate' choose '[Preview] Deploy Log Analytics Agent to Linux Azure Arc machines' and select 'Remediate'. This remediation task is instructing Azure Policy to run the deployIfNotExists effect and use the Azure Arc extension management capabilities to deploy the Log Analytics agent on the VM
 
   ![](../img/vm_policies/07.png)
 
