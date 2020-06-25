@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "type": "String"
+        },
+        "location": {
+            "type": "String",
+            "defaultValue": "[resourceGroup().location]"
+        },
+        "workspaceId": {
+            "type": "String"
+        },
+        "workspaceKey": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.HybridCompute/machines/extensions",
+            "apiVersion": "2019-08-02-preview",
+            "name": "[concat(parameters('vmName'),'/OMSAgentForLinux')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                "type": "OmsAgentForLinux",
+                "settings": {
+                    "workspaceId": "[parameters('workspaceId')]"
+                },
+                "protectedSettings": {
+                    "workspaceKey": "[parameters('workspaceKey')]"
+                }
+            }
+        }
+    ]
+}
