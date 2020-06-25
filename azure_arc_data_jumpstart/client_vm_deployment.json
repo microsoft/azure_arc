@@ -44,13 +44,13 @@
                 "description": "The size of the VM"
             }
         },
-        "appId": {
+        "servicePrincipalClientId": {
             "type": "string",
             "metadata": {
                 "description": "Unique SPN app ID"
             }
         },
-        "password": {
+        "servicePrincipalClientSecret": {
             "type": "string",
             "metadata": {
                 "description": "Unique SPN password"
@@ -272,7 +272,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_data_jumpstart/ClientTools.ps1"
               ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -arcClusterName ', parameters('arcClusterName'), ' -adminUsername ', parameters('adminUsername'))]" 
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -arcClusterName ', parameters('arcClusterName'), ' -adminUsername ', parameters('adminUsername'))]" 
             }            
           }
         }                        
