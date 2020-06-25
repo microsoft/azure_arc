@@ -1,6 +1,7 @@
 param (
     [string]$servicePrincipalClientId,
     [string]$servicePrincipalClientSecret,
+    [string]$adminUsername,
     [string]$tenantId,
     [string]$arcClusterName,
     [string]$resourceGroup,
@@ -9,6 +10,7 @@ param (
 
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientId', $servicePrincipalClientId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientSecret', $servicePrincipalClientSecret,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('arcClusterName', $arcClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
@@ -67,18 +69,30 @@ workflow ClientTools_02
 ClientTools_02 | ft 
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
-$variableNameToAdd = "KUBECONFIG"
-$variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
-[System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
+# $variableNameToAdd = "KUBECONFIG"
+# $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
+# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
 
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-$azurePassword = ConvertTo-SecureString $servicePrincipalClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
-Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
-kubectl get nodes
+# $azurePassword = ConvertTo-SecureString $servicePrincipalClientSecret -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalClientId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
+# Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
+# kubectl get nodes
 
-azdata --version
+# azdata --version
+
+echo '$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force' > C:\tmp\StartupScript.ps1
+echo '$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId" , $azurePassword)' >> C:\tmp\StartupScript.ps1
+echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal' >> C:\tmp\StartupScript.ps1
+echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force' >> C:\tmp\StartupScript.ps1
+echo 'kubectl get nodes' >> C:\tmp\StartupScript.ps1
+echo 'azdata --version' >> C:\tmp\StartupScript.ps1
+
+$Trigger= New-ScheduledTaskTrigger -AtLogOn # Specify the trigger settings
+$User= $env:adminUsername # Specify the account to run the script
+$Action= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\StartupScript.ps1" # Specify what program to run and with its parameters
+Register-ScheduledTask -TaskName "MonitorGroupMembership" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force # Specify the name of the task
