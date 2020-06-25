@@ -31,7 +31,7 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
     To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-  ```bash
+    ```bash
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
@@ -48,13 +48,13 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
     }
     ```
     
-**Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+  **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 * You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../policies/arm/log_analytics-template.parameters.json), provide a name and location for your workspace
 
     ![](../img/vm_policies/03.png)
 
-To deploy the ARM template, navigate to the [deployment folder](../policies/arm) and run the below command:
+  To deploy the ARM template, navigate to the [deployment folder](../policies/arm) and run the below command:
 
   ```bash
     az deployment group create --resource-group <Name of the Azure Resource Group> \
@@ -64,21 +64,21 @@ To deploy the ARM template, navigate to the [deployment folder](../policies/arm)
 
 # Azure Policies on Azure Arc connected machines
 
-* * Now that you have all the prerequisites set, you can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace.
+* Now that you have all the prerequisites set, you can assign policies to our Arc connected machines. Edit the [parameters file](../policies/arm/policy.json) to provide your subscription ID as well as the Log Analytics Workspace.
 
     ![](../img/vm_policies/04.png)
 
-To start the deployment, use the below command: 
+  To start the deployment, use the below command: 
 
-```bash
-az policy assignment create --name 'Enable Azure Monitor for VMs' \
---scope '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure Resource Group>' \
---policy-set-definition '55f3eceb-5573-4f18-9695-226972c6d74a' \
--p <The *policy.json* template file location> \
---assign-identity --location <Azure Region>
-```
+  ```bash
+  az policy assignment create --name 'Enable Azure Monitor for VMs' \
+  --scope '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure Resource Group>' \
+  --policy-set-definition '55f3eceb-5573-4f18-9695-226972c6d74a' \
+  -p <The *policy.json* template file location> \
+  --assign-identity --location <Azure Region>
+  ```
 
-The flag *policy-set-definition* points to the initiative "Enable Azure Monitor" definition ID. 
+  The flag *policy-set-definition* points to the initiative "Enable Azure Monitor" definition ID. 
 
 * Once the initiative is assigned, it takes around 30 minutes for the assignment to be applied to the defined scope. After those 30 minutes, Azure Policy will start the evaluation cycle against the Azure Arc connected machine and recognize it as "Non-compliant" (since it still does note have the Log Analytics Agent configuration deployed). To check this, go to the Azure Arc connected Machine under the Policies section. 
 

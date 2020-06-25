@@ -51,7 +51,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
     }
     ```
     
-**Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
 * You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](../extensions/arm/log_analytics-template.parameters.json) and provide a name and location for your workspace. 
 
@@ -69,16 +69,16 @@ To deploy the ARM template, navigate to the [deployment folder](../extensions/ar
 
 * Edit the [*extensions parameters file*](../extensions/arm/mma-template.parameters.json) 
 
-   ![](../img/vm_extension_mma/04.png)
+    ![](../img/vm_extension_mma/04.png)
 
 * To match your configuration you will need to provide: 
-    - The VMname as it is registered in Azure Arc
+    - The VM name as it is registered in Azure Arc
 
-       ![](../img/vm_extension_mma/05.png)
+    ![](../img/vm_extension_mma/05.png)
 
     - The location of the resource group where you registered the Azure Arc connected VM  
 
-        ![](../img/vm_extension_mma/06.png)
+    ![](../img/vm_extension_mma/06.png)
 
     - Information of the Log Analytics Workspace you previously created: Workspace ID and key. These parameters will be used to configure the MMA agent. You can get this information by going to your Log Analytics Workspace and under "Settings" select "Agent management"
 
@@ -120,3 +120,4 @@ Complete the following steps to clean up your environment.
     ```bash
     az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
     ```
+    
