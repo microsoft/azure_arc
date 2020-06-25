@@ -53,7 +53,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
 
 * In order to demonstrate the Custom Script Extention, we will use the below Linux and Windows scripts.
     - [*Linux*](../scripts/custom_script_linux.sh): The script will modifie the message of the day (MOTD) on the operating system. 
-    - [*Windows*](../scripts/custom_script_windows.ps1): The script will installs Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
+    - [*Windows*](../scripts/custom_script_windows.ps1): The script will installs Windows Terminal, Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
 
 # Azure Arc for Servers Custom Script Extension Deployment
 
