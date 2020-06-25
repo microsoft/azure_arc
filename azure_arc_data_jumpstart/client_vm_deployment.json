@@ -272,7 +272,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_data_jumpstart/ClientTools.ps1"
               ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -arcClusterName ', parameters('arcClusterName'), ' -adminUsername ', parameters('adminUsername'))]" 
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -arcClusterName ', parameters('arcClusterName'), ' -adminUsername ', parameters('adminUsername'))]" 
             }            
           }
         }                        
