@@ -1,10 +1,8 @@
 # Overview
 
-The following README will guide you on how to manage extensions on Azure Arc connected machines. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
+The following README will guide you on how to execute custom scripts on Azure Arc connected machines by using Virtual Machine extensions. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script
 
-Azure Arc for servers, enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multicloud management experience that levels to Azure VMs.
-
-You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Arc servers, both Linux and Windows. In this guide, you will use an ARM template to deploy the Custom Script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
+You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux shell script, or Azure policies to manage the extension deployment to Arc servers. In this guide, we will use an ARM template to deploy the Custom Script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -38,6 +36,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
     ```
     For example:
     ```az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor```
+    
     Output should look like this:
     ```
     {
@@ -58,7 +57,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
 
 # Azure Arc for Servers Custom Script Extension Deployment
 
-* Edit the [*extension parameters file*](../extensions/arm/customscript-template.parameters.json) 
+* Edit the extensions paramters file for [*Windows*](../extensions/arm/customscript-templatewindows.parameters.json) or for[*Linux*](../extensions/arm/customscript-templatewindows.parameters.json)
 
    ![](../img/vm_extension_customscript/03.png)
 
@@ -87,7 +86,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
          ./custom_script_linux.sh
          ```
 
-* To deploy the ARM template for Linux or Windows, navigate to the [deployment folder](../extensions/arm) and run the below command:
+* To deploy the ARM template for Linux or Windows, navigate to the [deployment folder](../extensions/arm) and run the below command with the templates that match your operating system:
 
     ```bash
     az deployment group create --resource-group <Name of the Azure Resource Group> \
