@@ -1,14 +1,14 @@
 param (
-    [string]$appId,
-    [string]$password,
+    [string]$servicePrincipalClientId,
+    [string]$servicePrincipalClientSecret,
     [string]$tenantId,
     [string]$arcClusterName,
     [string]$resourceGroup,
     [string]$chocolateyAppList
 )
 
-[System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('servicePrincipalClientId', $servicePrincipalClientId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('servicePrincipalClientSecret', $servicePrincipalClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('arcClusterName', $arcClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
@@ -75,8 +75,8 @@ $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
 
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
+$azurePassword = ConvertTo-SecureString $servicePrincipalClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
 Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
 kubectl get nodes
