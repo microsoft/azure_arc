@@ -87,11 +87,11 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell script or A
          ./custom_script_linux.sh
          ```
 
-* To deploy the ARM template, navigate to the [deployment folder](../extensions/arm) and run the below command:
+* To deploy the ARM template for Linux or Windows, navigate to the [deployment folder](../extensions/arm) and run the below command:
 
     ```bash
     az deployment group create --resource-group <Name of the Azure Resource Group> \
-    --template-file <The *customscript-template.json* template file location> \
+    --template-file <The *customscript-template.json* template file location for Linux or Windows> \
     --parameters <The *customscript-template.parameters.json* template file location>
     ```
    
