@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "<arc_vm_name>" //Arc VM name as it is registered in ARM
+        },
+        "location": {
+            "value": "<Location value>" //Azure Region where the Arc VM is registered
+        },
+        "fileUris": {
+            "value": [
+                "<public_URL_for_script>" //public URL for your script, can point to GitHub repository or an Azure Storage Account
+            ]
+        },
+        "commandToExecute": {
+            "value": "<command_to_run_script>" //command that will trigger the script
+        }
+    }
+}
