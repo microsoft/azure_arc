@@ -95,4 +95,4 @@ echo 'azdata --version' >> C:\tmp\StartupScript.ps1
 $Trigger= New-ScheduledTaskTrigger -AtLogOn # Specify the trigger settings
 $User= $env:adminUsername # Specify the account to run the script
 $Action= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\StartupScript.ps1" # Specify what program to run and with its parameters
-Register-ScheduledTask -TaskName "MonitorGroupMembership" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force # Specify the name of the task
+Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force # Specify the name of the task
