@@ -30,7 +30,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
 
     To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-  ```bash
+    ```bash
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
@@ -48,16 +48,15 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
     }
     ```
     
-**Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).   
-
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).   
 
 * In order to demonstrate the Custom Script Extention, we will use the below Linux and Windows scripts.
-    - [*Linux*](../scripts/custom_script_linux.sh): The script will modifie the message of the day (MOTD) on the operating system. 
+    - [*Linux*](../scripts/custom_script_linux.sh): The script will modify the message of the day (MOTD) on the operating system. 
     - [*Windows*](../scripts/custom_script_windows.ps1): The script will installs Windows Terminal, Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
 
 # Azure Arc for Servers Custom Script Extension Deployment
 
-* Edit the extensions paramters file for [*Windows*](../extensions/arm/customscript-templatewindows.parameters.json) or for[*Linux*](../extensions/arm/customscript-templatewindows.parameters.json)
+* Edit the extensions parameters file for [*Windows*](../extensions/arm/customscript-templatewindows.parameters.json) or for[*Linux*](../extensions/arm/customscript-templatewindows.parameters.json)
 
    ![](../img/vm_extension_customscript/03.png)
 
