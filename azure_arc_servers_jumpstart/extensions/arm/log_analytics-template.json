@@ -3,13 +3,22 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
       "name": {
-          "type": "string"
+          "type": "string",
+          "metadata": {
+              "description": "Name for your log analytics workspace"
+          }
       },
       "location": {
-        "type": "string"
+        "type": "string",
+        "metadata": {
+            "description": "Azure Region to deploy the Log Analytics Workspace"
+        }
       },
       "sku": {
-        "type": "string"
+        "type": "string",
+        "metadata": {
+            "description": "SKU, leave default pergb2018"
+        }
     }
   },
   "resources": [
