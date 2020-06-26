@@ -77,11 +77,11 @@ New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cl
 
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-$azurePassword = ConvertTo-SecureString $servicePrincipalClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
-Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
-kubectl get nodes
+# $azurePassword = ConvertTo-SecureString $servicePrincipalClientSecret -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalClientId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
+# Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
+# kubectl get nodes
 
 # azdata --version
 
