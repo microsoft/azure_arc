@@ -5,6 +5,14 @@ param (
     [string]$tenantId,
     [string]$arcClusterName,
     [string]$resourceGroup,
+    [string]$AZDATA_USERNAME,
+    [string]$AZDATA_PASSWORD,
+    [string]$ACCEPT_EULA,
+    [string]$DOCKER_USERNAME,
+    [string]$DOCKER_PASSWORD,
+    [string]$ARC_DC_NAME,
+    [string]$ARC_DC_SUBSCRIPTION,
+    [string]$ARC_DC_REGION,
     [string]$chocolateyAppList
 )
 
@@ -13,7 +21,14 @@ param (
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('arcClusterName', $arcClusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $AZDATA_USERNAME,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $AZDATA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $ACCEPT_EULA,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('DOCKER_USERNAME', $DOCKER_USERNAME,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('DOCKER_PASSWORD', $DOCKER_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('ARC_DC_NAME', $ARC_DC_NAME,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 workflow ClientTools_01
@@ -79,14 +94,25 @@ echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrin
 echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force' >> 'C:\tmp\StartupScript.ps1'
 echo 'kubectl get nodes' >> 'C:\tmp\StartupScript.ps1'
 echo 'azdata --version' >> 'C:\tmp\StartupScript.ps1'
+
 echo '$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"' >> 'C:\tmp\StartupScript.ps1'
 echo 'Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue' >> 'C:\tmp\StartupScript.ps1' 
+
 echo '$TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"' >> 'C:\tmp\StartupScript.ps1'
 echo '$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"' >> 'C:\tmp\StartupScript.ps1'
 echo '$WScriptShell = New-Object -ComObject WScript.Shell' >> 'C:\tmp\StartupScript.ps1'
 echo '$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)' >> 'C:\tmp\StartupScript.ps1'
 echo '$Shortcut.TargetPath = $TargetFile' >> 'C:\tmp\StartupScript.ps1'
 echo '$Shortcut.Save()' >> 'C:\tmp\StartupScript.ps1'
+
+echo 'azdata arc dc config init -s azure-arc-aks-private-preview -t azure-arc-custom --force' >> 'C:\tmp\StartupScript.ps1'
+echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.displayName=$env:ARC_DC_NAME"' >> 'C:\tmp\StartupScript.ps1'
+echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.subscription=$env:ARC_DC_SUBSCRIPTION"' >> 'C:\tmp\StartupScript.ps1'
+echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.resourceGroup=$env:resourceGroup"' >> 'C:\tmp\StartupScript.ps1'
+echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.location=$env:ARC_DC_REGION"' >> 'C:\tmp\StartupScript.ps1'
+
+# echo 'azdata arc dc create -n $env:ARC_DC_NAME -c azure-arc-custom --accept-eula $env:ACCEPT_EULA' >> 'C:\tmp\StartupScript.ps1'
+
 echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1'
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn

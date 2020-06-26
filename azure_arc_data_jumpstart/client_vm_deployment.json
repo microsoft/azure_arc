@@ -73,7 +73,56 @@
             "metadata": {
                 "description": "Target AKS cluster"
             }
-        },                       
+        },
+        "AZDATA_USERNAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Username"
+            }
+        },
+        "AZDATA_PASSWORD": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Password"
+            }
+        },
+        "ACCEPT_EULA": {
+            "type": "string",
+            "defaultValue":"yes",
+            "metadata": {
+                "description": "azdata CLI EULA"
+            }
+        },
+        "DOCKER_USERNAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Private Arc Data Docker Registry Username"
+            }
+        },
+        "DOCKER_PASSWORD": {
+            "type": "string",
+            "metadata": {
+                "description": "Private Arc Data Docker Registry Password"
+            }
+        },
+        "ARC_DC_NAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller name"
+            }
+        },
+        "ARC_DC_SUBSCRIPTION": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller subscription ID"
+            }
+        },
+        "ARC_DC_REGION": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Region"
+            }
+        },                              
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "Arc-Data-Client-VNET",
@@ -272,7 +321,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_data_jumpstart/ClientTools.ps1"
               ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -arcClusterName ', parameters('arcClusterName'))]" 
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -arcClusterName ', parameters('arcClusterName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -DOCKER_USERNAME ', parameters('DOCKER_USERNAME'), ' -DOCKER_PASSWORD ', parameters('DOCKER_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'))]" 
             }            
           }
         }                        
