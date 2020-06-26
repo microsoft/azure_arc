@@ -89,6 +89,17 @@ ClientTools_02 | ft
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
+# Creating Powershell StartupScript
+
+# $Logfile = "C:\StartupScript.log"
+
+# Function LogWrite
+# {
+#    Param ([string]$logstring)
+
+#    Add-content $Logfile -value $logstring
+# }
+
 echo '$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force' > 'C:\tmp\StartupScript.ps1'
 echo '$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)' >> 'C:\tmp\StartupScript.ps1'
 echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal' >> 'C:\tmp\StartupScript.ps1'
@@ -112,10 +123,11 @@ echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json -
 echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.resourceGroup=$env:resourceGroup"' >> 'C:\tmp\StartupScript.ps1'
 echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.location=$env:ARC_DC_REGION"' >> 'C:\tmp\StartupScript.ps1'
 
-# echo 'azdata arc dc create -n $env:ARC_DC_NAME -c azure-arc-custom --accept-eula $env:ACCEPT_EULA' >> 'C:\tmp\StartupScript.ps1'
+echo 'azdata arc dc create -n $env:ARC_DC_NAME -c azure-arc-custom --accept-eula $env:ACCEPT_EULA' >> 'C:\tmp\StartupScript.ps1'
 
 echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1'
 
+# Creating StartupScript Windows Scheduled Task
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartupScript.ps1'
 Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
