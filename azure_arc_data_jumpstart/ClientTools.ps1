@@ -91,15 +91,15 @@ echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrin
 echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force' >> 'C:\tmp\StartupScript.ps1'
 echo 'kubectl get nodes' >> 'C:\tmp\StartupScript.ps1'
 echo 'azdata --version' >> 'C:\tmp\StartupScript.ps1'
-echo '$TargetFile = "C:\Program Files\Azure Data Studio - Insider\azuredatastudio-insiders.exe"' >> 'C:\tmp\StartupScript.ps1'
-echo '$ShortcutFile = "C:\Users\$env:UserName\Desktop\Azure Data Studio - Insiders.lnk"' >> 'C:\tmp\StartupScript.ps1'
-echo '$WScriptShell = New-Object -ComObject WScript.Shell' >> 'C:\tmp\StartupScript.ps1'
-echo '$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)' >> 'C:\tmp\StartupScript.ps1'
-echo '$Shortcut.TargetPath = $TargetFile' >> 'C:\tmp\StartupScript.ps1'
-echo '$Shortcut.Save()' >> 'C:\tmp\StartupScript.ps1'
-# Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false
+# echo '$TargetFile = "C:\Program Files\Azure Data Studio - Insider\azuredatastudio-insiders.exe"' >> 'C:\tmp\StartupScript.ps1'
+# echo '$ShortcutFile = "C:\Users\$env:UserName\Desktop\Azure Data Studio - Insiders.lnk"' >> 'C:\tmp\StartupScript.ps1'
+# echo '$WScriptShell = New-Object -ComObject WScript.Shell' >> 'C:\tmp\StartupScript.ps1'
+# echo '$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)' >> 'C:\tmp\StartupScript.ps1'
+# echo '$Shortcut.TargetPath = $TargetFile' >> 'C:\tmp\StartupScript.ps1'
+# echo '$Shortcut.Save()' >> 'C:\tmp\StartupScript.ps1'
+# echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1' 
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 # $User= $adminUsername # Specify the account to run the script
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartupScript.ps1'
-Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel Highest –Force
+Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $env:adminUsername -Action $Action -RunLevel Highest –Force
