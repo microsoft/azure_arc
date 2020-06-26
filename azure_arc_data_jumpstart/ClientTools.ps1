@@ -89,45 +89,77 @@ ClientTools_02 | ft
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating Powershell StartupScript
+# Creating Powershell Logon Script
 
-# $Logfile = "C:\StartupScript.log"
+# echo '$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force' > 'C:\tmp\StartupScript.ps1'
+# echo '$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)' >> 'C:\tmp\StartupScript.ps1'
+# echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal' >> 'C:\tmp\StartupScript.ps1'
+# echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force' >> 'C:\tmp\StartupScript.ps1'
+# echo 'kubectl get nodes' >> 'C:\tmp\StartupScript.ps1'
+# echo 'azdata --version' >> 'C:\tmp\StartupScript.ps1'
 
-# Function LogWrite
-# {
-#    Param ([string]$logstring)
+# echo '$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"' >> 'C:\tmp\StartupScript.ps1'
+# echo 'Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue' >> 'C:\tmp\StartupScript.ps1' 
 
-#    Add-content $Logfile -value $logstring
-# }
+# echo '$TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"' >> 'C:\tmp\StartupScript.ps1'
+# echo '$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"' >> 'C:\tmp\StartupScript.ps1'
+# echo '$WScriptShell = New-Object -ComObject WScript.Shell' >> 'C:\tmp\StartupScript.ps1'
+# echo '$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)' >> 'C:\tmp\StartupScript.ps1'
+# echo '$Shortcut.TargetPath = $TargetFile' >> 'C:\tmp\StartupScript.ps1'
+# echo '$Shortcut.Save()' >> 'C:\tmp\StartupScript.ps1'
 
-echo '$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force' > 'C:\tmp\StartupScript.ps1'
-echo '$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)' >> 'C:\tmp\StartupScript.ps1'
-echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal' >> 'C:\tmp\StartupScript.ps1'
-echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force' >> 'C:\tmp\StartupScript.ps1'
-echo 'kubectl get nodes' >> 'C:\tmp\StartupScript.ps1'
-echo 'azdata --version' >> 'C:\tmp\StartupScript.ps1'
+# echo 'azdata arc dc config init -s azure-arc-aks-private-preview -t azure-arc-custom --force' >> 'C:\tmp\StartupScript.ps1'
+# echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.displayName=$env:ARC_DC_NAME"' >> 'C:\tmp\StartupScript.ps1'
+# echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.subscription=$env:ARC_DC_SUBSCRIPTION"' >> 'C:\tmp\StartupScript.ps1'
+# echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.resourceGroup=$env:resourceGroup"' >> 'C:\tmp\StartupScript.ps1'
+# echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.location=$env:ARC_DC_REGION"' >> 'C:\tmp\StartupScript.ps1'
 
-echo '$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"' >> 'C:\tmp\StartupScript.ps1'
-echo 'Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue' >> 'C:\tmp\StartupScript.ps1' 
+# echo 'azdata arc dc create -n $env:ARC_DC_NAME -c azure-arc-custom --accept-eula $env:ACCEPT_EULA' >> 'C:\tmp\StartupScript.ps1'
 
-echo '$TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"' >> 'C:\tmp\StartupScript.ps1'
-echo '$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"' >> 'C:\tmp\StartupScript.ps1'
-echo '$WScriptShell = New-Object -ComObject WScript.Shell' >> 'C:\tmp\StartupScript.ps1'
-echo '$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)' >> 'C:\tmp\StartupScript.ps1'
-echo '$Shortcut.TargetPath = $TargetFile' >> 'C:\tmp\StartupScript.ps1'
-echo '$Shortcut.Save()' >> 'C:\tmp\StartupScript.ps1'
+# echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1'
 
-echo 'azdata arc dc config init -s azure-arc-aks-private-preview -t azure-arc-custom --force' >> 'C:\tmp\StartupScript.ps1'
-echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.displayName=$env:ARC_DC_NAME"' >> 'C:\tmp\StartupScript.ps1'
-echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.subscription=$env:ARC_DC_SUBSCRIPTION"' >> 'C:\tmp\StartupScript.ps1'
-echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.resourceGroup=$env:resourceGroup"' >> 'C:\tmp\StartupScript.ps1'
-echo 'azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.location=$env:ARC_DC_REGION"' >> 'C:\tmp\StartupScript.ps1'
 
-echo 'azdata arc dc create -n $env:ARC_DC_NAME -c azure-arc-custom --accept-eula $env:ACCEPT_EULA' >> 'C:\tmp\StartupScript.ps1'
+$LogonScript = @'
 
-echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1'
+$Logfile = "C:\tmp\LogonScript.log"
 
-# Creating StartupScript Windows Scheduled Task
+Function LogWrite
+{
+   Param ([string]$logstring)
+
+   Add-content $Logfile -value $logstring
+}
+
+$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
+Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force
+
+kubectl get nodes
+azdata --version
+
+$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"
+Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue 
+
+$TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"
+$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+azdata arc dc config init -s azure-arc-aks-private-preview -t azure-arc-custom --force
+azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.displayName=$env:ARC_DC_NAME"
+azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.subscription=$env:ARC_DC_SUBSCRIPTION"
+azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.resourceGroup=$env:resourceGroup"
+azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.location=$env:ARC_DC_REGION"
+
+azdata arc dc create -n $env:ARC_DC_NAME -c azure-arc-custom --accept-eula $env:ACCEPT_EULA
+
+Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
+'@ > C:\tmp\LogonScript.ps1
+
+# Creating LogonScript Windows Scheduled Task
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartupScript.ps1'
-Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\LogonScript.ps1'
+Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
