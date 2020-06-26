@@ -62,6 +62,10 @@ workflow ClientTools_02
                 InlineScript {
                     Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
                     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
+                    $Trigger=New-ScheduledTaskTrigger -AtLogOn # Specify the trigger settings
+                    # $User= $adminUsername # Specify the account to run the script
+                    $Action=New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\StartupScript.ps1" # Specify what program to run and with its parameters
+                    Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel Highest –Force # Specify the name of the task
                 }
             }
         }
@@ -91,8 +95,3 @@ echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrin
 echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force' >> C:\tmp\StartupScript.ps1
 echo 'kubectl get nodes' >> C:\tmp\StartupScript.ps1
 echo 'azdata --version' >> C:\tmp\StartupScript.ps1
-
-$Trigger=New-ScheduledTaskTrigger -AtLogOn # Specify the trigger settings
-# $User= $adminUsername # Specify the account to run the script
-$Action=New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\StartupScript.ps1" # Specify what program to run and with its parameters
-Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel Highest –Force # Specify the name of the task
