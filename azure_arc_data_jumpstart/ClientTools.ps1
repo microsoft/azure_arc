@@ -92,7 +92,7 @@ echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:ar
 echo 'kubectl get nodes' >> C:\tmp\StartupScript.ps1
 echo 'azdata --version' >> C:\tmp\StartupScript.ps1
 
-# $Trigger=New-ScheduledTaskTrigger -AtLogOn # Specify the trigger settings
-# $User=$adminUsername # Specify the account to run the script
-# $Action=New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\StartupScript.ps1" # Specify what program to run and with its parameters
-# Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force # Specify the name of the task
+$Trigger= New-ScheduledTaskTrigger -AtLogOn # Specify the trigger settings
+# $User= $adminUsername # Specify the account to run the script
+$Action= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\tmp\StartupScript.ps1" # Specify what program to run and with its parameters
+Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel Highest –Force # Specify the name of the task
