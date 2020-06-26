@@ -79,7 +79,7 @@ echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrin
 echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force' >> 'C:\tmp\StartupScript.ps1'
 echo 'kubectl get nodes' >> 'C:\tmp\StartupScript.ps1'
 echo 'azdata --version' >> 'C:\tmp\StartupScript.ps1'
-echo '$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions"' >> 'C:\tmp\StartupScript.ps1'
+echo '$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"' >> 'C:\tmp\StartupScript.ps1'
 echo 'Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue' >> 'C:\tmp\StartupScript.ps1' 
 echo '$TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"' >> 'C:\tmp\StartupScript.ps1'
 echo '$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"' >> 'C:\tmp\StartupScript.ps1'
@@ -87,7 +87,7 @@ echo '$WScriptShell = New-Object -ComObject WScript.Shell' >> 'C:\tmp\StartupScr
 echo '$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)' >> 'C:\tmp\StartupScript.ps1'
 echo '$Shortcut.TargetPath = $TargetFile' >> 'C:\tmp\StartupScript.ps1'
 echo '$Shortcut.Save()' >> 'C:\tmp\StartupScript.ps1'
-# echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1' 
+echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1'
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartupScript.ps1'
