@@ -100,6 +100,6 @@ echo 'azdata --version' >> 'C:\tmp\StartupScript.ps1'
 # echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1' 
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-# $User= $adminUsername # Specify the account to run the script
+$User = '$adminUsername' # Specify the account to run the script
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartupScript.ps1'
-Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User "$adminUsername" -Action $Action -RunLevel Highest –Force
+Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force
