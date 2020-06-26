@@ -47,7 +47,8 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"                
+                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
+                    Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"                
                     Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-may-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"                  
                 }
         }
@@ -61,6 +62,7 @@ workflow ClientTools_02
             {
                 InlineScript {
                     Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
+                    Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo'
                     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
                 }
             }
@@ -69,21 +71,7 @@ workflow ClientTools_02
 ClientTools_02 | ft 
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
-# $variableNameToAdd = "KUBECONFIG"
-# $variableValueToAdd = "C:\Windows\System32\config\systemprofile\.kube\config"
-# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Machine)
-# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::Process)
-# [System.Environment]::SetEnvironmentVariable($variableNameToAdd, $variableValueToAdd, [System.EnvironmentVariableTarget]::User) ## Check if can be removed
-
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
-
-# $azurePassword = ConvertTo-SecureString $servicePrincipalClientSecret -AsPlainText -Force
-# $psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalClientId , $azurePassword)
-# Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal 
-# Import-AzAksCredential -ResourceGroupName $resourceGroup -Name $arcClusterName -Force
-# kubectl get nodes
-
-# azdata --version
 
 echo '$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force' > 'C:\tmp\StartupScript.ps1'
 echo '$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)' >> 'C:\tmp\StartupScript.ps1'
@@ -91,6 +79,8 @@ echo 'Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrin
 echo 'Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force' >> 'C:\tmp\StartupScript.ps1'
 echo 'kubectl get nodes' >> 'C:\tmp\StartupScript.ps1'
 echo 'azdata --version' >> 'C:\tmp\StartupScript.ps1'
+echo '$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions"' >> 'C:\tmp\StartupScript.ps1'
+echo 'Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue' >> 'C:\tmp\StartupScript.ps1' 
 echo '$TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"' >> 'C:\tmp\StartupScript.ps1'
 echo '$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"' >> 'C:\tmp\StartupScript.ps1'
 echo '$WScriptShell = New-Object -ComObject WScript.Shell' >> 'C:\tmp\StartupScript.ps1'
@@ -100,6 +90,5 @@ echo '$Shortcut.Save()' >> 'C:\tmp\StartupScript.ps1'
 # echo 'Unregister-ScheduledTask -TaskName "StartupScript" -Confirm:$false' >> 'C:\tmp\StartupScript.ps1' 
 
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-# $User = "$adminUsername" # Specify the account to run the script
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartupScript.ps1'
 Register-ScheduledTask -TaskName "StartupScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
