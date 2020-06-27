@@ -31,6 +31,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
 
+# Installing tools
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 workflow ClientTools_01
         {
