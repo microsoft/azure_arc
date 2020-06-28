@@ -112,15 +112,13 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-# azdata arc dc config init -s azure-arc-aks-private-preview -t azure-arc-custom --force
-# azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.displayName=$env:ARC_DC_NAME"
-# azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.subscription=$env:ARC_DC_SUBSCRIPTION"
-# azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.resourceGroup=$env:resourceGroup"
-# azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.location=$env:ARC_DC_REGION"
-
+azdata arc dc config init -s azure-arc-aks-private-preview -t azure-arc-custom --force
+azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.displayName=$env:ARC_DC_NAME"
+azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.subscription=$env:ARC_DC_SUBSCRIPTION"
+azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.resourceGroup=$env:resourceGroup"
+azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.location=$env:ARC_DC_REGION"
 
 start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
-azdata arc dc create -c azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect --accept-eula $env:ACCEPT_EULA
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
