@@ -1,0 +1,272 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {},
+    "parameters": {
+        "clusterName": {
+            "type": "string",
+            "defaultValue":"Arc-Data-Demo",
+            "metadata": {
+                "description": "The name of the Managed Cluster resource."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "The location of the Managed Cluster resource."
+            }
+        },
+        "dnsPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+            }
+        },
+        "osDiskSizeGB": {
+            "type": "int",
+            "defaultValue": 0,
+            "metadata": {
+                "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agent VM size."
+            },
+            "minValue": 0,
+            "maxValue": 1023
+        },
+        "agentCount": {
+            "type": "int",
+            "defaultValue": 3,
+            "metadata": {
+                "description": "The number of nodes for the cluster."
+            },
+            "minValue": 1,
+            "maxValue": 50
+        },
+        "agentVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_D8s_v3",
+            "metadata": {
+                "description": "The size of the Virtual Machine."
+            }
+        },
+        "nodeAdminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "User name for the Linux Virtual Machines."
+            }
+        },
+        "sshRSAPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+            }
+        },
+        "servicePrincipalClientId": {
+            "metadata": {
+                "description": "Client ID (used by cloudprovider)"
+            },
+            "type": "securestring"
+        },
+        "servicePrincipalClientSecret": {
+            "metadata": {
+                "description": "The Service Principal Client Secret."
+            },
+            "type": "securestring"
+        },
+        "enableRBAC": {
+            "defaultValue": true,
+            "type": "bool",
+            "metadata": {
+                "description": "boolean flag to turn on and off of RBAC"
+            }
+        },        
+        "osType": {
+            "type": "string",
+            "defaultValue": "Linux",
+            "allowedValues": [
+                "Linux"
+            ],
+            "metadata": {
+                "description": "The type of operating system."
+            }
+        },
+        "kubernetesVersion": {
+            "defaultValue": "1.17.4",
+            "type": "string",
+            "metadata": {
+                "description": "The version of Kubernetes."
+            }
+        },
+        "vmName": {
+            "type": "string",
+            "defaultValue": "Arc-Data-Client",
+            "metadata": {
+                "description": "The name of you Virtual Machine."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "arcdemo",
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": "ArcPassword123!!",
+            "metadata": {
+                "description": "Windows password for the Virtual Machine"
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D8s_v3",
+            "metadata": {
+                "description": "The size of the VM"
+            }
+        },
+        "tenantId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN tenant ID"
+            }
+        },
+        "resourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "Target AKS cluster Resource Group"
+            }
+        },
+        "arcClusterName": {
+            "type": "string",
+            "metadata": {
+                "description": "Target AKS cluster"
+            }
+        },
+        "AZDATA_USERNAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Username"
+            }
+        },
+        "AZDATA_PASSWORD": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Password"
+            }
+        },
+        "ACCEPT_EULA": {
+            "type": "string",
+            "defaultValue":"yes",
+            "metadata": {
+                "description": "azdata CLI EULA"
+            }
+        },
+        "DOCKER_USERNAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Private Arc Data Docker Registry Username"
+            }
+        },
+        "DOCKER_PASSWORD": {
+            "type": "string",
+            "metadata": {
+                "description": "Private Arc Data Docker Registry Password"
+            }
+        },
+        "ARC_DC_NAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller name"
+            }
+        },
+        "ARC_DC_SUBSCRIPTION": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller subscription ID"
+            }
+        },
+        "ARC_DC_REGION": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Region"
+            }
+        }                                                                                                                        
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-03-01",
+            "type": "Microsoft.ContainerService/managedClusters",
+            "location": "[parameters('location')]",
+            "name": "[parameters('clusterName')]",
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "enableRBAC": "[parameters('enableRBAC')]",                
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                        "count": "[parameters('agentCount')]",
+                        "vmSize": "[parameters('agentVMSize')]",
+                        "osType": "[parameters('osType')]",
+                        "storageProfile": "ManagedDisks"
+                    }
+                ],
+                "linuxProfile": {
+                    "adminUsername": "[parameters('nodeAdminUsername')]",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('sshRSAPublicKey')]"
+                            }
+                        ]
+                    }
+                },
+                "servicePrincipalProfile": {
+                    "clientId": "[parameters('servicePrincipalClientId')]",
+                    "Secret": "[parameters('servicePrincipalClientSecret')]"
+                }
+            }
+        },
+        {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2019-10-01",
+        "name": "linkedTemplate",
+        "dependsOn": [
+            "[concat(resourceId('Microsoft.ContainerService/managedClusters', parameters('clusterName')))]"
+        ], 
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+            "uri":"https://raw.githubusercontent.com/likamrat/azure_arc/master/azure_arc_data_jumpstart/aks/client_vm_deployment.json",
+            "contentVersion":"1.0.0.0"
+            },
+            "parameters": {
+            "vmName":{"value": "[parameters('vmName')]"},
+            "adminUsername":{"value": "[parameters('adminUsername')]"},
+            "adminPassword":{"value": "[parameters('adminPassword')]"},
+            "vmSize":{"value": "[parameters('vmSize')]"},
+            "servicePrincipalClientId":{"value": "[parameters('servicePrincipalClientId')]"},
+            "servicePrincipalClientSecret":{"value": "[parameters('servicePrincipalClientSecret')]"},
+            "tenantId":{"value": "[parameters('tenantId')]"},
+            "resourceGroup":{"value": "[parameters('resourceGroup')]"},
+            "arcClusterName":{"value": "[parameters('arcClusterName')]"},
+            "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
+            "AZDATA_PASSWORD":{"value": "[parameters('AZDATA_PASSWORD')]"},
+            "ACCEPT_EULA":{"value": "[parameters('ACCEPT_EULA')]"},
+            "DOCKER_USERNAME":{"value": "[parameters('DOCKER_USERNAME')]"},
+            "DOCKER_PASSWORD":{"value": "[parameters('DOCKER_PASSWORD')]"},
+            "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
+            "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
+            "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"}         
+            }            
+          }        
+        }           
+    ],
+    "outputs": {
+        "controlPlaneFQDN": {
+            "type": "string",
+            "value": "[reference(parameters('clusterName')).fqdn]"
+        }
+    }    
+}
