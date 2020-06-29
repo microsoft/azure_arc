@@ -122,33 +122,41 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 * [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes ](azure_arc_k8s_jumpstart/docs/gke_policy.md)
 
-## Azure Arc for Data Services
+# Roadmap
 
-Coming soon!
+Up-to-date roadmap for the Azure Arc scenarios to be covered can be found under [this repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
 
-# Support for future deployment scenarios
+# Contributing
 
-Below are an additional deployment scenarios the team is currently working on.
+This project welcomes contributions and suggestions.  Most contributions require you to agree to a
+Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
+the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
 
-### Azure Arc for Servers
+When you submit a pull request, a CLA bot will automatically determine whether you need to provide
+a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
+provided by the bot. You will only need to do this once across all repos using our CLA.
 
-- Support for a Windows Server AWS EC2 instance deployment using Terraform
-
-### Azure Arc for Kubernetes
-
-- Support for kind Deployment guide with Arc connectivity
-- Support for Minikube Deployment guide with Arc connectivity
-- Support for MicroK8s Deployment guide with Arc connectivity
-
-### Azure Arc for Data Services
-
-- Support SQL Managed Instance (MI) in Azure Kubernetes Service (AKS) deployment using ARM template
-- Support SQL Managed Instance (MI) in Azure Kubernetes Service (AKS) deployment using Terraform
-- Support PostgreSQL Hyperscale in Azure Kubernetes Service (AKS) deployment using ARM template
-- Support PostgreSQL Hyperscale in Azure Kubernetes Service (AKS) deployment using Terraform
-
-## Contributing
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
+contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 Before contributing code, please see the [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 Issues, PRs and Feature Request have their own templates. Please fill out the whole template.
+
+# Legal Notices
+
+Microsoft and any contributors grant you a license to the Microsoft documentation and other content
+in this repository under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/legalcode),
+see the [LICENSE](LICENSE) file, and grant you a license to any code in the repository under the [MIT License](https://opensource.org/licenses/MIT), see the
+[LICENSE-CODE](LICENSE-CODE) file.
+
+Microsoft, Windows, Microsoft Azure and/or other Microsoft products and services referenced in the documentation
+may be either trademarks or registered trademarks of Microsoft in the United States and/or other countries.
+The licenses for this project do not grant you rights to use any Microsoft names, logos, or trademarks.
+Microsoft's general trademark guidelines can be found at http://go.microsoft.com/fwlink/?LinkID=254653.
+
+Privacy information can be found at https://privacy.microsoft.com/en-us/
+
+Microsoft and any contributors reserve all other rights, whether under their respective copyrights, patents,
+or trademarks, whether by implication, estoppel or otherwise.
