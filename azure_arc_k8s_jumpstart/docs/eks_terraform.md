@@ -6,7 +6,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone the repo
   ```bash
-  git clone https://github.com/likamrat/azure_arc
+  git clone https://github.com/microsoft/azure_arc.git
   ``` 
 
 * [Install](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) and [Configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration) AWS CLI
