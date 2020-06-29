@@ -119,6 +119,7 @@ azdata arc dc config replace --config-file azure-arc-custom/control.json --json-
 azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.location=$env:ARC_DC_REGION"
 
 start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
+azdata arc dc create -n $env:ARC_DC_NAME -c azure-arc-custom --accept-eula $env:ACCEPT_EULA
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
