@@ -104,7 +104,7 @@ Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClust
 kubectl get nodes
 azdata --version
 
-Write-Host "Copying Data Studio Extentions"
+Write-Host "Copying Azure Data Studio Extentions"
 Write-Host "`n"
 
 $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"
@@ -113,7 +113,7 @@ Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\a
 $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\azuredatastudio-postgresql-0.2.6"
 Copy-Item -Path "C:\tmp\azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue 
 
-Write-Host "Creating desktop shortcuts"
+Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"
 $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"
@@ -121,7 +121,6 @@ $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
-
 
 start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
 azdata arc dc create -c azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
