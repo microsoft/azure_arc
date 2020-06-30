@@ -112,7 +112,7 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-echo "Creating custom Azure Arc Data Controller 'control.json' config file located in "C:\Windows\SysWOW64\azure-arc-custom"
+echo "Creating custom Azure Arc Data Controller 'control.json' config file located in C:\Windows\SysWOW64\azure-arc-custom"
 azdata arc dc config init -s azure-arc-aks-private-preview -t azure-arc-custom --force
 azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.displayName=$env:ARC_DC_NAME"
 azdata arc dc config replace --config-file azure-arc-custom/control.json --json-values "$.spec.dataController.subscription=$env:ARC_DC_SUBSCRIPTION"
