@@ -122,10 +122,9 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-azdata arc dc create -c azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
 start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
-azdata arc dc create -n $env:ARC_DC_NAME -c azure-arc-custom --accept-eula $env:ACCEPT_EULA
+azdata arc dc create -c azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
 Write-Host "Enabling SQL Server Ports"
 # Enabling SQL Server Ports
