@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clusterName": {
+            "value": "Arc-Data-AKS"
+        },
+        "dnsPrefix": {
+            "value": "arcdatademo"          
+        },        
+         "nodeAdminUsername": {
+            "value": "arcdemo"           
+        },
+        "sshRSAPublicKey": {
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCaVZ09FZlAKd0Ts7GFYZecWo8JtLT5wfmpEo+KHfHqK2A0Hqzi5rvndFQfc1RdQKGi4DWGsMMekRk5OSnSYvAXHt/WQElirXeFlcjVOgepB5+IVdgTMQvgPs/Pge3nLLsOtUvKBcVUpEw8djLJRDGrJX3wAtqf3yMt0geYkP+dMbPRuoxgSQHgXuqULPf5lFRgX4zYF+i+nEEs2uEgH9THuYcpVGTBY2EIS/ITqfdLA5PFsWJMHdR1j7ilB4ZHnu/aomMGrCWaDSI6a/KUeT8AzGViQY0UF9pcvE0WNkuC3ClpkoAIV+eP2B4RXNpVj4FUiK0W/SnPHRJ+tEbhbVqD lior@MacBook-Pro.localdomain"             
+        },
+        "servicePrincipalClientId": {
+            "value": "051b9a58-4a83-48de-b610-0e7ae1bca3fb"            
+        },
+        "servicePrincipalClientSecret": {
+            "value": "53ed1458-a77d-4201-9c21-4fe24a0981fa"            
+        },
+        "kubernetesVersion": {
+            "value": "1.18.1"            
+        },
+        "adminUsername": {
+            "value": "arcdemo"            
+        },
+        "adminPassword": {
+            "value": "ArcPassword123!!"           
+        },
+        "vmSize": {
+            "value": "Standard_D4s_v3"            
+        },
+        "tenantId": {
+            "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"         
+        },
+        "resourceGroup": {
+            "value": "Arc-Data-Demo"            
+        },
+        "arcClusterName": {
+            "value": "Arc-Data-AKS"           
+        },
+        "AZDATA_USERNAME": {
+            "value": "arcdemo"           
+        },
+        "AZDATA_PASSWORD": {
+            "value": "ArcPassword123!!"           
+        },
+        "ACCEPT_EULA": {
+            "value": "yes"           
+        },
+        "DOCKER_USERNAME": {
+            "value": "22cda7bb-2eb1-419e-a742-8710c313fe79"           
+        },
+        "DOCKER_PASSWORD": {
+            "value": "cb892016-5c33-4135-acbf-7b15bc8cb0f7"           
+        },
+        "ARC_DC_NAME": {
+            "value": "arcdatactrl"          
+        },
+        "ARC_DC_SUBSCRIPTION": {
+            "value": "e73c1dbe-2574-4f38-9e8f-c813757b1786"           
+        },
+        "ARC_DC_REGION": {
+            "value": "eastus"           
+        }        
+    }
+}
