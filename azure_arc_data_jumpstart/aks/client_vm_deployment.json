@@ -206,7 +206,7 @@
                         }
                     },
                     {
-                        "name": "allow_1443",
+                        "name": "allow_SQL_1433",
                         "properties": {
                             "priority": 1002,
                             "protocol": "TCP",
