@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "clusterName": {
-            "value": "Arc-Data-AKS"
+            "value": "Arc-Data-AKS-Test"
         },
         "dnsPrefix": {
             "value": "arcdatademo"          
@@ -36,10 +36,10 @@
             "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"         
         },
         "resourceGroup": {
-            "value": "Arc-Data-Demo"            
+            "value": "Arc-Data-Win10-Demo"            
         },
         "arcClusterName": {
-            "value": "Arc-Data-AKS"           
+            "value": "Arc-Data-AKS-Test"           
         },
         "AZDATA_USERNAME": {
             "value": "arcdemo"           
