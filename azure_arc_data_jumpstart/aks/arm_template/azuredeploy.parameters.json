@@ -24,13 +24,13 @@
             "value": "<Kubernetes Version, e.g. 1.17.4>"
         },
         "adminUsername": {
-            "value": "<Client VM Windows admin username>"
+            "value": "<Client Windows VM admin username>"
         },
         "adminPassword": {
-            "value": "<Client VM Windows admin password>"
+            "value": "<Client Windows VM admin password>"
         },
         "vmSize": {
-            "value": "<Client VM size>"
+            "value": "<Client Windows VM size>"
         },
         "tenantId": {
             "value": "<Azure tenant ID>"
