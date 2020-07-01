@@ -3,7 +3,7 @@ param (
     [string]$servicePrincipalClientSecret,
     [string]$adminUsername,
     [string]$tenantId,
-    [string]$arcClusterName,
+    [string]$clusterName,
     [string]$resourceGroup,
     [string]$AZDATA_USERNAME,
     [string]$AZDATA_PASSWORD,
@@ -20,7 +20,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientSecret', $servicePrincipalClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('arcClusterName', $arcClusterName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $AZDATA_USERNAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $AZDATA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
@@ -99,7 +99,7 @@ Start-Transcript -Path C:\tmp\LogonScript.log
 $azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:arcClusterName -Force
+Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
 
 kubectl get nodes
 azdata --version

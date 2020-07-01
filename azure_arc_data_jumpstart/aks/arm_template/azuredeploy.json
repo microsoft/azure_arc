@@ -136,12 +136,6 @@
                 "description": "Target AKS cluster Resource Group"
             }
         },
-        "arcClusterName": {
-            "type": "string",
-            "metadata": {
-                "description": "Target AKS cluster"
-            }
-        },
         "AZDATA_USERNAME": {
             "type": "string",
             "metadata": {
@@ -250,7 +244,7 @@
             "servicePrincipalClientSecret":{"value": "[parameters('servicePrincipalClientSecret')]"},
             "tenantId":{"value": "[parameters('tenantId')]"},
             "resourceGroup":{"value": "[parameters('resourceGroup')]"},
-            "arcClusterName":{"value": "[parameters('arcClusterName')]"},
+            "clusterName":{"value": "[parameters('clusterName')]"},
             "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
             "AZDATA_PASSWORD":{"value": "[parameters('AZDATA_PASSWORD')]"},
             "ACCEPT_EULA":{"value": "[parameters('ACCEPT_EULA')]"},
