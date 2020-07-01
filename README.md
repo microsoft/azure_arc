@@ -31,11 +31,14 @@ With Azure Arc, Fabrikam are able to project resources and register them into Az
 </p>
 
 ## Azure Arc for Servers
-The below deployment options are focused on Azure Arc for Servers. It is designed to quickly spin up a server that is ready to be projected in Azure Arc and for you to start playing with it. 
+
+The below deployment scenarios will guide you through onboarding various Windows and Linux server deployments to Azure with Azure Arc. 
 
 **Note: For a list of supported operating systems and Azure regions, please visit the official [Azure Arc docs](https://docs.microsoft.com/en-us/azure/azure-arc/servers/overview).**
 
 #### General
+
+The following examples can be used to connect existing Windows or Linux servers to Azure with Azure Arc. Use these if you already have existing servers that you want to project into Azure.
 
 * [Connect an existing Linux server to Azure Arc](azure_arc_servers_jumpstart/docs/onboard_server_linux.md)
 
@@ -43,11 +46,15 @@ The below deployment options are focused on Azure Arc for Servers. It is designe
 
 #### Vagrant
 
+If you don't have any existing servers available, you can use [Vagrant](https://www.vagrantup.com/) to host a new server locally and onboard it to Azure. This will allow you to simulate "on-premises" servers from your local machine. 
+
 * [Deploy a local Ubuntu VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_ubuntu.md)
 
 * [Deploy a local Windows 10 VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_windows.md)
 
 #### Amazon Web Services (AWS)
+
+Azure Arc can project servers into Azure from any public cloud. The following guides provide end-to-end deployment of new Linux servers in AWS EC2 and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
 * [Deploy an AWS EC2, Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/aws_terraform_ubuntu.md)
 
@@ -55,17 +62,23 @@ The below deployment options are focused on Azure Arc for Servers. It is designe
 
 #### Google Cloud Platform (GCP)
 
-* [Deploy a GCP, Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_ubuntu.md)
+The following guides provide end-to-end deployment of new Windows or Linux servers in Google Cloud and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
-* [Deploy a GCP, Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_windows.md)
+* [Deploy a GCP Ubuntu VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_ubuntu.md)
+
+* [Deploy a GCP Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/gcp_terraform_windows.md)
 
 #### VMware
 
-* [Deploy a VMware vSphere, Ubuntu Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_ubuntu.md)
+The following guides provide end-to-end deployment of new Windows or Linux servers in VMWare and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
-* [Deploy a VMware vSphere, Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_winsrv.md)
+* [Deploy a VMware vSphere Ubuntu Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_ubuntu.md)
+
+* [Deploy a VMware vSphere Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_winsrv.md)
 
 #### Azure Arc for Servers - Day-2 Scenarios & Use-Cases
+
+Once you have server resources projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the servers as native Azure resources. The following guides show examples of using Azure management tools such as resource tags, Azure Policy, Log Analytics, and more with Azure Arc servers.
 
 * [Tagging and querying server inventory across multiple clouds using Resource Graph Explorer](azure_arc_servers_jumpstart/docs/arc_inventory_tagging.md)
 
@@ -77,13 +90,17 @@ The below deployment options are focused on Azure Arc for Servers. It is designe
 
 ## Azure Arc for Kubernetes
 
-The below deployment options are focusing on Azure Arc for Kubernetes. It is designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and for you to start playing with. 
+The below deployment options are focused on Azure Arc for Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
 
 #### General
+
+This example demonstrates how to connect an existing Kubernetes cluster to Arc. It assumes you already have a cluster ready to work with.
 
 * [Connect an existing Kubernetes cluster to Azure Arc](azure_arc_k8s_jumpstart/docs/onboard_k8s.md)
 
 #### Azure Kubernetes Service (AKS)
+
+If you do not yet have a Kubernetes cluster, the following examples walk through creating an AKS cluster to simulate an "on-premises" cluster. Examples are provided for deploying with either Terraform or with an ARM template.
 
 * [Deploy AKS cluster and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/aks_arm_template.md)
 
@@ -91,13 +108,19 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 #### Amazon Elastic Kubernetes Service (EKS)
 
+This example uses Terraform to deploy an EKS cluster on AWS and connect it to Azure with Azure Arc.
+
 * [Deploy EKS cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/eks_terraform.md)
 
 #### Google Kubernetes Engine (GKE)
 
+This example uses Terraform to deploy a GKE cluster on Google Cloud and connect it to Azure with Azure Arc.
+
 * [Deploy GKE cluster and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/gke_terraform.md)
 
 #### Rancher k3s
+
+These examples deploy [Rancher k3s](https://github.com/rancher/k3s) on an Azure VM or VMWare and onboards the cluster with Azure Arc. 
 
 * [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/rancher_k3s_azure_arm_template.md)
 
@@ -105,10 +128,15 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 * [Deploy Rancher k3s on a VMware vSphere VM and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/rancher_k3s_vmware_terraform.md)
 
-#### Azure Red Hat OpenShift (ARO) V4
-* [Deploy ARO Cluster and connect it to Azure Arc using automation](azure_arc_k8s_jumpstart/docs/aro_script.md)
+#### Azure Red Hat OpenShift V4
+
+Azure Arc can also support Azure Red Hat OpenShift (ARO). This example uses Terraform to deploy a new ARO cluster and onboards it to Azure with Azure Arc.
+
+* [Deploy Azure Redhat Openshift Cluster and connect it to Azure Arc using automation](azure_arc_k8s_jumpstart/docs/aro_script.md)
 
 #### Azure Arc for Kubernetes - Day-2 Scenarios & Use-Cases
+
+Once you have Kubernetes clusters projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the clusters as native Azure resources. The following guides show examples of using Azure management tools such as Azure Monitor, GitOps configurations, and Azure Policy.
 
 * [Deploy GitOps configurations and perform basic GitOps flow on AKS as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/aks_gitops.md)
 
