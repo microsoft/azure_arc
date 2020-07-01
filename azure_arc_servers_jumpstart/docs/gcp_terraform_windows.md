@@ -1,4 +1,4 @@
-# Overview
+#  Onboard a GCP Windows server with Azure Arc
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server GCP virtual machine and connect it as an Azure Arc server resource.
 
