@@ -122,7 +122,7 @@ The below deployment options are focusing on Azure Arc for Kubernetes. It is des
 
 * [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes ](azure_arc_k8s_jumpstart/docs/gke_policy.md)
 
-# Roadmap
+# Repository Roadmap
 
 Up-to-date roadmap for the Azure Arc scenarios to be covered can be found under [this repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
 
