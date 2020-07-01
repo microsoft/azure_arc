@@ -38,9 +38,6 @@
         "resourceGroup": {
             "value": "<Azure Resource Group>"
         },
-        "arcClusterName": {
-            "value": "<Azure Arc k8s (AKS) cluster name>"
-        },
         "AZDATA_USERNAME": {
             "value": "<Azure Arc Data Controller admin username>"
         },

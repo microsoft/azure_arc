@@ -37,8 +37,8 @@ The following README will guide you on how to use the provided [Azure ARM Templa
     
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
-* Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
-  Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription for two providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
   ```bash
   az provider register --namespace Microsoft.Kubernetes
   Registering is still on-going. You can monitor using 'az provider show -n Microsoft.Kubernetes'
