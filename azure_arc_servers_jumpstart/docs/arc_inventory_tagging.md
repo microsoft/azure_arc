@@ -1,4 +1,4 @@
-# Overview
+# Arc Inventory Tagging
 
 The following README will guide you on how to use Azure Arc for servers to provide server inventory management capabilities across hybrid multi-cloud and on-premises environments.
 
