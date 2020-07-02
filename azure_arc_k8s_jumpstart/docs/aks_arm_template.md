@@ -53,7 +53,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
-# Deployment 
+# Deployment
 
 Before deploying the ARM template, determine which AKS Kubernetes versions are available in your region using the below Azure CLI command.
 

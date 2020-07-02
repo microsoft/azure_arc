@@ -36,7 +36,7 @@
             "value": "<Azure tenant ID>"
         },
         "resourceGroup": {
-            "value": "<Azure Resource Group>"
+            "value": "<Azure Resource Group where all resource to be deployed>"
         },
         "AZDATA_USERNAME": {
             "value": "<Azure Arc Data Controller admin username>"
