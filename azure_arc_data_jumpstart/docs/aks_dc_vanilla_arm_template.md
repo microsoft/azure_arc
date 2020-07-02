@@ -1,6 +1,6 @@
 # Azure Arc Data Controller Vanilla Deployment on AKS (ARM Template)
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy resource on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster, deployed with [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview). 
+The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview). 
 
 By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
@@ -51,32 +51,32 @@ For you to get familiar with the automation and deployment flow, below is an exp
  
 - User is editing the ARM template parameters file (1-time edit). These params values are being used throughout the deployment.
 
-- Main ARM template will deploy AKS 
+- Main ARM template will deploy AKS.
 
-- Once AKS deployment has finished, the main ARM template will call a secondary ARM template which is depended on a successful AKS deployment
+- Once AKS deployment has finished, the main ARM template will call a secondary ARM template which is depended on a successful AKS deployment.
 
-- Secondary ARM template will deploy a client Windows Server 2019 VM
+- Secondary ARM template will deploy a client Windows Server 2019 VM.
 
-- As part of the Windows Server 2019 VM deployment, there are 2 scripts executions; First script (ClientTools.ps1) at deployment runtime using the ARM *"CustomScriptExtention"* module and a second script (LogonScript.ps1) on user first logon to Windows
+- As part of the Windows Server 2019 VM deployment, there are 2 scripts executions; First script (ClientTools.ps1) at deployment runtime using the ARM *"CustomScriptExtention"* module and a second script (LogonScript.ps1) on user first logon to Windows.
 
     - Runtime script will:
         - Inject user params values (from bullet point #1) to be used in both runtime and logon script
-        - Install required tools – az cli, az cli Powershell module, kube-cli (Chocolaty packages)
-        - Download & install Azure Data Studio (Insiders) & azdata cli
-        - Download Azure Data Studio Arc & PostgreSQL extensions
+        - Install the required tools – az cli, az cli Powershell module, kube-cli (Chocolaty packages)
+        - Download & install the Azure Data Studio (Insiders) & azdata cli
+        - Download the Azure Data Studio Arc & PostgreSQL extensions
         - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
         - Create the logon script
-        - Create a Windows schedule task to run the logon script at first login
-        - Disable Windows Server run at login
+        - Create the Windows schedule task to run the logon script at first login
+        - Disable Windows Server Manager from running at login
 
     - Logon script will:
-        - Create *LogonScript.log* file
-        - Retrieve AKS credentials & create *kubeconfig* file in user Windows profile
-        - Create *azdata* config file in user Windows profile
-        - Install Azure Data Studio Arc & PostgreSQL extensions
-        - Create Azure Data Studio desktop shortcut
+        - Create the *LogonScript.log* file
+        - Retrieve the AKS credentials & create the *kubeconfig* file in user Windows profile
+        - Create the *azdata* config file in user Windows profile
+        - Install the Azure Data Studio Arc & PostgreSQL extensions
+        - Create the Azure Data Studio desktop shortcut
         - Open another Powershell session which will execute the *“kubectl get pods -n <Arc Data Controller namespace> -w”* command
-        - Deploy Arc Data Controller using the user params values
+        - Deploy the Arc Data Controller using the user params values
         - Unregister the logon script Windows schedule task so it will not run after first login
 
 # Deployment 
