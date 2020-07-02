@@ -83,7 +83,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible on deploying AKS. Once AKS deployment has finished, the template will then automatically execute another template which will deploy the Windows Server Azure VM followed by the Azure Arc Data Controller deployment on the AKS cluster. 
 
-* Before deploying the ARM template, login to Azure using AZ CLI with the ```az login`` command. To determine which AKS Kubernetes versions are available in your region use the below Azure CLI command.
+* Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command. To determine which AKS Kubernetes versions are available in your region use the below Azure CLI command.
 
     ```bash
     az aks get-versions -l "<Your Azure Region>"
