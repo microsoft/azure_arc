@@ -128,7 +128,7 @@ These examples deploy [Rancher k3s](https://github.com/rancher/k3s) on an Azure 
 
 * [Deploy Rancher k3s on a VMware vSphere VM and connect it to Azure Arc using Terraform](azure_arc_k8s_jumpstart/docs/rancher_k3s_vmware_terraform.md)
 
-#### Azure Red Hat OpenShift V4
+#### Azure Red Hat OpenShift (ARO) V4
 
 Azure Arc can also support Azure Red Hat OpenShift (ARO). This example uses Terraform to deploy a new ARO cluster and onboards it to Azure with Azure Arc.
 
@@ -149,6 +149,16 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 * [Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/gke_monitor.md)
 
 * [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes ](azure_arc_k8s_jumpstart/docs/gke_policy.md)
+
+## Azure Arc for Data Services
+
+The below deployment options are focused on Azure Arc for Data Services. They are designed to quickly spin up Azure data services in Kubernetes that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
+
+#### Data Services on Azure Kubernetes Service (AKS)
+
+If you do not yet have a Kubernetes cluster, the following examples walk through creating an AKS cluster to simulate an "on-premises" cluster and deploy Azure Arc Data Services on top of it.
+
+* [Azure Arc Data Controller Vanilla Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_dc_vanilla_arm_template.md)
 
 # Repository Roadmap
 
