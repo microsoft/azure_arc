@@ -89,7 +89,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az aks get-versions -l "<Your Azure Region>"
     ```
 
-* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../aks/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../aks/arm_template/azuredeploy.parameters.example.json).
+* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../aks/arm_template/dc_vanilla/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../aks/arm_template/dc_vanilla/azuredeploy.parameters.example.json).
 
     - *"clusterName"* - AKS cluster name
 
@@ -133,14 +133,14 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository]((https://github.com/microsoft/Azure-data-services-on-Azure-Arc))**
 
- * To deploy the ARM template, navigate to the local cloned [deployment folder](../aks/arm_template) and run the below command:
+ * To deploy the ARM template, navigate to the local cloned [deployment folder](../aks/arm_template/dc_vanilla) and run the below command:
 
     ```bash
     az group create --name <Name of the Azure Resource Group> --location <Azure Region>
     az deployment group create \
     --resource-group <Name of the Azure Resource Group> \
     --name <The name of this deployment> \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.json \
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
@@ -153,7 +153,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az deployment group create \
     --resource-group Arc-Data-Demo \
     --name arcdatademo \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.json \
     --parameters azuredeploy.parameters.json
     ```
 
