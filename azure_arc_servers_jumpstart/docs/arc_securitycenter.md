@@ -8,6 +8,10 @@ In this guide, you will enable Security Center on a subscription and implement t
 
 * Assign Security Center’s default security policies.
 
+* Review Azure Security Center's recommendations.
+
+* Apply recommended configurations on Azure Arc connected Machines using ***Quick Fix*** remmediations. 
+
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
 **If you haven't, this repository offers you a way to do so in an automated fashion:**
@@ -91,26 +95,26 @@ In this guide, you will enable Security Center on a subscription and implement t
 
 Now that you have successfully onboarded Azure Security Center, you will get recommendations to help you protect your  resources, including your Azure Arc connected Machines. Security Center will periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
 
-You will get a recommendation to install the log analytics agent on Azure Arc machines (Windows, Linux). 
+* You will get a recommendation to install the log analytics agent on Azure Arc machines (Windows, Linux). 
 
     ![](../img/securitycenter/04.png)
 
-For each recommendation you will get: 
-- A short description of what is being recommended.
-- A Secure Score impact, in this case is High.
-- The remediation steps to carry out in order to implement the recommendation. For specific recommendations, like this one, you get also a ***Quick Fix*** that enables you to quickly remediate a recommendation on multiple resources. 
+* For each recommendation you will get: 
+    - A short description of what is being recommended.
+    - A Secure Score impact, in this case is High.
+    - The remediation steps to carry out in order to implement the recommendation. For specific recommendations, like this one, you get also a ***Quick Fix*** that enables you to quickly remediate a recommendation on multiple resources. 
     
     ![](../img/securitycenter/05.png)
 
-This remediation ***Quick Fix*** is using an ARM template to deploy the Microsoft Monitoring Agent extension on the Azure Arc machine. 
+* This remediation ***Quick Fix*** is using an ARM template to deploy the Microsoft Monitoring Agent extension on the Azure Arc machine. 
 
     ![](../img/securitycenter/06.png)
 
-You can trigger the remediation with the ARM template from the Azure Security Center dashboard, by selecting the Log Analytics Workspace used for ASC.
+* You can trigger the remediation with the ARM template from the Azure Security Center dashboard, by selecting the Log Analytics Workspace used for ASC.
 
     ![](../img/securitycenter/07.png)
 
-After you apply the recommendation on the Azure Arc connected machine the resource will be now marked as healthy.
+* After you apply the recommendation on the Azure Arc connected machine the resource will be now marked as healthy.
 
     ![](../img/securitycenter/08.png)
 
