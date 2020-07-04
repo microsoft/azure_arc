@@ -1,3 +1,5 @@
+start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
+
 kubectl delete ns $env:ARC_DC_NAME
 
 kubectl delete crd databases.mssqlcontroller.k8s.io
