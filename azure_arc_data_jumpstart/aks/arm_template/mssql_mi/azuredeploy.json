@@ -274,7 +274,7 @@
             "MSSQL_MI_NAME":{"value": "[parameters('MSSQL_MI_NAME')]"},
             "MSSQL_SA_PASSWORD":{"value": "[parameters('MSSQL_SA_PASSWORD')]"},
             "MSSQL_MI_vCores":{"value": "[parameters('MSSQL_MI_vCores')]"}
-            }            
+            }
           }        
         }           
     ],

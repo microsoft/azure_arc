@@ -36,6 +36,8 @@ The below deployment scenarios will guide you through onboarding various Windows
 
 **Note: For a list of supported operating systems and Azure regions, please visit the official [Azure Arc docs](https://docs.microsoft.com/en-us/azure/azure-arc/servers/overview).**
 
+**Disclaimer: Azure Arc for Servers is currently in Public Preview.**
+
 #### General
 
 The following examples can be used to connect existing Windows or Linux servers to Azure with Azure Arc. Use these if you already have existing servers that you want to project into Azure.
@@ -91,6 +93,8 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 ## Azure Arc for Kubernetes
 
 The below deployment options are focused on Azure Arc for Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
+
+**Disclaimer: Azure Arc for Kubernetes is currently in Public Preview.**
 
 #### General
 
@@ -153,6 +157,8 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 ## Azure Arc for Data Services
 
 The below deployment options are focused on Azure Arc for Data Services. They are designed to quickly spin up Azure data services in Kubernetes that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
+
+**Disclaimer: Azure Arc for Data Services is currently in Private Preview.**
 
 #### Data Services on Azure Kubernetes Service (AKS)
 
