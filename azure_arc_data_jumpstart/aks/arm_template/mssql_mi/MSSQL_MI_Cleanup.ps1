@@ -11,11 +11,10 @@ kubectl delete clusterrolebinding operator-rolebinding
 kubectl delete clusterrole arcdatactrl:cr-mssql-metricsdc-reader
 
 # Restoring State
-Copy-Item -Path "C:\tmp\settings_backup.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 Copy-Item -Path "C:\tmp\hosts_backup" -Destination "C:\Windows\System32\drivers\etc\hosts" -Recurse -Force -ErrorAction Continue
 Copy-Item -Path "C:\tmp\settings_template_backup.json" -Destination "C:\tmp\settings_template.json" -Recurse -Force -ErrorAction Continue
 
-Remove-Item "C:\tmp\settings_backup.json" -Force
+Remove-Item "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Force
 Remove-Item "C:\tmp\hosts_backup" -Force
 Remove-Item "C:\tmp\settings_template_backup.json" -Force
 

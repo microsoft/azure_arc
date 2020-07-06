@@ -101,44 +101,10 @@ ClientTools_02 | ft
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating Powershell Logon Script
-$LogonScript = @'
-Start-Transcript -Path C:\tmp\LogonScript.log
+# Creating Powershell sql_client_temp Script
+$sql_client_temp = @'
 
-$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
-
-kubectl get nodes
-azdata --version
-
-Write-Host "Copying Azure Data Studio Extentions"
-Write-Host "`n"
-
-$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"
-Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
-
-$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\azuredatastudio-postgresql-0.2.6"
-Copy-Item -Path "C:\tmp\azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue 
-
-Write-Host "Creating Azure Data Studio Desktop shortcut"
-Write-Host "`n"
-$TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"
-$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-$Shortcut.TargetPath = $TargetFile
-$Shortcut.Save()
-
-# Deploying Azure Arc Data Controller
-start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
-azdata arc dc create -c azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
-
-# Deploying Azure Arc SQL Managed Instance
-azdata login -n $env:ARC_DC_NAME
-azdata sql instance create -n $env:MSSQL_MI_NAME -c $env:MSSQL_MI_vCores -s $env:ARC_DC_SUBSCRIPTION -r $env:resourceGroup
-azdata sql instance list
+Start-Transcript "C:\tmp\sql_client_temp.log"
 
 # Retreving SQL Managed Instance IP
 azdata sql instance list | Tee-Object "C:\tmp\sql_instance_list.txt"
@@ -183,7 +149,6 @@ $s = Get-Content "C:\tmp\sql_instance_settings.txt"
 $s.Substring(0, $s.IndexOf(' ')) | Out-File "C:\tmp\sql_instance_settings.txt"
 
 # Creating Azure Data Studio settings for SQL Managed Instance connection
-Copy-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Destination "C:\tmp\settings_backup.json" -Recurse -Force -ErrorAction Continue
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
 
 $s = Get-Content "C:\tmp\sql_instance_settings.txt"
@@ -192,15 +157,61 @@ $s = Get-Content "C:\tmp\sql_instance_settings.txt"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
+# Cleaning garbage
+Remove-Item "C:\tmp\sql_instance_settings.txt" -Force
+Remove-Item "C:\tmp\sql_instance_list.txt" -Force
+Remove-Item "C:\tmp\merge.txt" -Force
+
 # Downloading demo database
 $podname = "$env:MSSQL_MI_NAME" + "-0"
 kubectl exec $podname -n $env:ARC_DC_NAME -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
 kubectl exec $podname -n $env:ARC_DC_NAME -- /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $env:MSSQL_SA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
 
-# Cleaning garbage
-Remove-Item "C:\tmp\sql_instance_settings.txt" -Force
-Remove-Item "C:\tmp\sql_instance_list.txt" -Force
-Remove-Item "C:\tmp\merge.txt" -Force
+Stop-Transcript
+
+'@ > C:\tmp\sql_client_temp.ps1
+
+# Creating Powershell Logon Script
+$LogonScript = @'
+Start-Transcript -Path C:\tmp\LogonScript.log
+
+$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
+Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
+
+kubectl get nodes
+azdata --version
+
+Write-Host "Copying Azure Data Studio Extentions"
+Write-Host "`n"
+
+$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"
+Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
+
+$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\azuredatastudio-postgresql-0.2.6"
+Copy-Item -Path "C:\tmp\azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue 
+
+Write-Host "Creating Azure Data Studio Desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe"
+$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\Azure Data Studio - Insiders.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+# Deploying Azure Arc Data Controller
+start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
+azdata arc dc create -c azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
+
+# Deploying Azure Arc SQL Managed Instance
+azdata login -n $env:ARC_DC_NAME
+azdata sql instance create -n $env:MSSQL_MI_NAME -c $env:MSSQL_MI_vCores -s $env:ARC_DC_SUBSCRIPTION -r $env:resourceGroup
+azdata sql instance list
+
+# Sanitizing MSSQL Instance connectivity details
+Start-Process powershell -ArgumentList "C:\tmp\sql_client_temp.ps1" -WindowStyle Hidden -Wait
 
 # Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
