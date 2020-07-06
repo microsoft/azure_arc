@@ -130,6 +130,9 @@ azdata arc dc create -c azure-arc-aks-private-preview --namespace $env:ARC_DC_NA
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
 Stop-Transcript
+
+Stop-Process -Name kubectl -Force
+Stop-Process -name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
 # Creating LogonScript Windows Scheduled Task
