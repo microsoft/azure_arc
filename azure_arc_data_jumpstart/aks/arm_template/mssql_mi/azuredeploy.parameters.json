@@ -63,13 +63,13 @@
             "value": "eastus"
         },
         "MSSQL_MI_NAME": {
-            "value": "<MSSQL instance name to be deployed on the Kubernetes cluster>"
+            "value": "<SQL Managed Instance name to be deployed on the Kubernetes cluster>"
         },
         "MSSQL_SA_PASSWORD": {
-            "value": "<MSSQL SA password>"
+            "value": "<SQL Managed Instance SA password>"
         },
         "MSSQL_MI_vCores": {
-            "value": "<MSSQL instance number of virtual cores>"
+            "value": "<SQL Managed Instance number of virtual cores>"
         }
     }
 }

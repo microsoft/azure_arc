@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "clusterName": {
-            "value": "Arc-Data-AKS"
+            "value": "Arc-Data-SQLMI-AKS"
         },
         "dnsPrefix": {
-            "value": "arcdatademo"
+            "value": "arcdatasqlmidemo"
         },        
          "nodeAdminUsername": {
             "value": "arcdemo"
@@ -36,7 +36,7 @@
             "value": "33333333-XXXX-41af-1111-7777777777"
         },
         "resourceGroup": {
-            "value": "Arc-Data-Demo"
+            "value": "Arc-Data-SQLMI-Demo"
         },
         "AZDATA_USERNAME": {
             "value": "arcdemo"
