@@ -1,16 +1,16 @@
 # Overview
 
-The following README will guide you on how to onboard an Azure Arc Connected Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/). ASC, will collect security-related configurations and event logs to recommend actions for you to take in order to secure your resources.
+The following README will guide you on how to onboard an Azure Arc Connected Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), it will collect security-related configurations and event logs to recommend actions for you to take in order to secure your resources.
 
 In this guide, you will enable Security Center on a subscription and implement the Standard tier, which provides advanced threat protection and detection capabilities. To complete this process you will: 
 
-* Set the Log Analytics workspace to which the OMS agent will send the data. 
+* Set the Log Analytics workspace where logs and events will be aggregated for analysis. 
 
 * Assign Security Center’s default security policies.
 
 * Review Azure Security Center's recommendations.
 
-* Apply recommended configurations on Azure Arc connected Machines using ***Quick Fix*** remmediations. 
+* Apply recommended configurations on Azure Arc connected Machines using ***Quick Fix*** remediations. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -82,7 +82,7 @@ In this guide, you will enable Security Center on a subscription and implement t
     ```bash
     az security pricing create -n VirtualMachines --tier 'standard'
     ```
-* Now you need to assign the default Security Center policy initiative:
+* Now you need to assign the default Security Center policy initiative, ASC makes its security recommendations based on policies. There is an specific initiative that groups Security Center policies with the definition ID '1f3afdf9-d0c9-4c3d-847f-89da613e70a8'. 
 
     ```bash
     az policy assignment create --name 'ASC Default <Your subscription ID>' \
