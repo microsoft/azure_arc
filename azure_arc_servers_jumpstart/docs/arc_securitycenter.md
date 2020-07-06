@@ -1,6 +1,6 @@
 # Overview
 
-The following README will guide you on how to onboard an Azure Arc Connected Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/). You will onboard the Azure Arc machine to Azure Security Center by deploying the [OMS agent](https://docs.microsoft.com/en-us/azure/security-center/security-center-enable-data-collection) to start collecting security-related configurations and event logs. The data collected by the agent will be stored in a Log Analytics Workspace for analysis. 
+The following README will guide you on how to onboard an Azure Arc Connected Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/). ASC, will collect security-related configurations and event logs to recommend actions for you to take in order to secure your resources.
 
 In this guide, you will enable Security Center on a subscription and implement the Standard tier, which provides advanced threat protection and detection capabilities. To complete this process you will: 
 
