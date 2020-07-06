@@ -149,8 +149,9 @@ $s = Get-Content "C:\tmp\sql_instance_settings.txt"
 $s.Substring(0, $s.IndexOf(' ')) | Out-File "C:\tmp\sql_instance_settings.txt"
 
 # Creating Azure Data Studio settings for SQL Managed Instance connection
+Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Hidden
+Stop-Process -Name azuredatastudio-insiders
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
-
 $s = Get-Content "C:\tmp\sql_instance_settings.txt"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$s | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:MSSQL_SA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
