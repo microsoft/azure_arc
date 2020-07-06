@@ -101,10 +101,10 @@ ClientTools_02 | ft
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating Powershell sql_client_temp Script
-$sql_client_temp = @'
+# Creating Powershell sql_connectivity Script
+$sql_connectivity = @'
 
-Start-Transcript "C:\tmp\sql_client_temp.log"
+Start-Transcript "C:\tmp\sql_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving SQL Managed Instance IP
@@ -169,7 +169,7 @@ kubectl exec $podname -n $env:ARC_DC_NAME -- /opt/mssql-tools/bin/sqlcmd -S loca
 
 Stop-Transcript
 
-'@ > C:\tmp\sql_client_temp.ps1
+'@ > C:\tmp\sql_connectivity.ps1
 
 # Creating Powershell Logon Script
 $LogonScript = @'
@@ -211,18 +211,16 @@ azdata sql instance create -n $env:MSSQL_MI_NAME -c $env:MSSQL_MI_vCores -s $env
 azdata sql instance list
 
 # Sanitizing MSSQL Instance connectivity details
-Start-Process powershell -ArgumentList "C:\tmp\sql_client_temp.ps1" -WindowStyle Hidden -Wait
-
-# Starting Azure Data Studio
-Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
+Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
 Stop-Transcript
 
+# Starting Azure Data Studio
+Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
 Stop-Process -Name kubectl -Force
 Stop-Process -Name powershell -Force
-
 '@ > C:\tmp\LogonScript.ps1
 
 # Creating LogonScript Windows Scheduled Task
