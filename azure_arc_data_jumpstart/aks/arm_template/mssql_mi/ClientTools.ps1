@@ -105,6 +105,7 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 $sql_client_temp = @'
 
 Start-Transcript "C:\tmp\sql_client_temp.log"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving SQL Managed Instance IP
 azdata sql instance list | Tee-Object "C:\tmp\sql_instance_list.txt"
@@ -149,8 +150,6 @@ $s = Get-Content "C:\tmp\sql_instance_settings.txt"
 $s.Substring(0, $s.IndexOf(' ')) | Out-File "C:\tmp\sql_instance_settings.txt"
 
 # Creating Azure Data Studio settings for SQL Managed Instance connection
-Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Hidden
-Stop-Process -Name azuredatastudio-insiders
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
 $s = Get-Content "C:\tmp\sql_instance_settings.txt"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$s | Set-Content -Path "C:\tmp\settings_template.json"
