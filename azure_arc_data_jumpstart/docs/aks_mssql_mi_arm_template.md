@@ -138,7 +138,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     - *MSSQL_SA_PASSWORD* - SQL Managed Instance SA password
 
-    - *MSSQL_MI_vCores* - SQL Managed Instance number of virtual cores
+    - *MSSQL_MI_vCores* - SQL Managed Instance number of virtual cores. **Note:** When specifying memory allocation and vCore allocation use this formula to ensure your deployment is successful - for each 1 vCore you need at least 4GB of RAM of capacity available on the Kubernetes node where the SQL managed instance pod will run.
 
     **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository]((https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md))**
 
