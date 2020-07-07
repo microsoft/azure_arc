@@ -175,7 +175,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process. 
 
-    Let the script to work it's course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is approximately 10min**.  
+    Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is approximately 10min long**.  
 
     Once the script will finish it's run, the logon script Powershell session will be closed and the Azure Arc Data Controller will be deployed on the AKS cluster and be ready to use. 
 
@@ -185,9 +185,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
     ![](../img/aks_dc_vanilla_arm_template/07.png)   
 
-    At this point you can also safely close the other Powershell session which runs the ```kubectl get pods -n $env:ARC_DC_NAME -w``` command.
-
-* In Powershell, login to the Controller and check it's health using the below commands.
+* In Powershell, login to the Data Controller and check it's health using the below commands.
 
     ```powershell
     azdata login -n $env:ARC_DC_NAME
@@ -207,7 +205,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
 # Cleanup
 
-* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp*
+* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp*. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is approximately 10min long**.
 
     ![](../img/aks_dc_vanilla_arm_template/12.png)
 
@@ -217,7 +215,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
 # Re-Deploy Azure Arc Data Controller
 
-In case you deleted the Azure Arc Data Controller from the Kubernetes cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp*
+In case you deleted the Azure Arc Data Controller from the Kubernetes cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp*. **The Deploy script run time is approximately 10min long**
 
 ![](../img/aks_dc_vanilla_arm_template/14.png)
 

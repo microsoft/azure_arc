@@ -166,6 +166,8 @@ If you do not yet have a Kubernetes cluster, the following examples walk through
 
 * [Azure Arc Data Controller Vanilla Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_dc_vanilla_arm_template.md)
 
+* [Azure SQL Managed Instance Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_mssql_mi_arm_template.md)
+
 # Repository Roadmap
 
 Up-to-date roadmap for the Azure Arc scenarios to be covered can be found under [this repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
