@@ -74,6 +74,8 @@ The below deployment options are focusing on Azure Arc for Servers. It is design
 * [Deploying Custom Script Extension to Azure Arc Linux and Windows VMs using Extension Management](azure_arc_servers_jumpstart/docs/arc_vm_extension_customscript_arm.md)
 
 * [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Azure Policies](azure_arc_servers_jumpstart/docs/arc_policies_mma.md)
+ 
+* [Integrate Azure Security Center with Azure Arc Connected Machines](azure_arc_servers_jumpstart/docs/arc_securitycenter.md)
 
 ## Azure Arc for Kubernetes
 
