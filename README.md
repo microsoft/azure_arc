@@ -142,6 +142,8 @@ Azure Arc can also support Azure Red Hat OpenShift (ARO). This example uses Terr
 
 Once you have Kubernetes clusters projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the clusters as native Azure resources. The following guides show examples of using Azure management tools such as Azure Monitor, GitOps configurations, and Azure Policy.
 
+##### AKS
+
 * [Deploy GitOps configurations and perform basic GitOps flow on AKS as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/aks_gitops_basic.md)
 
 * [Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/aks_gitops_helm.md)
@@ -149,6 +151,8 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 * [Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/aks_monitor.md)
 
 * [Apply GitOps configurations on AKS as an Azure Arc Connected Cluster using Azure Policy for Kubernetes ](azure_arc_k8s_jumpstart/docs/aks_policy.md)
+
+##### GKE
 
 * [Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/gke_gitops_basic.md)
 
