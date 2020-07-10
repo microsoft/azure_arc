@@ -30,7 +30,7 @@ With Azure Arc, Fabrikam are able to project resources and register them into Az
   <img src="img/architecture_dark.png" width="80%"/>
 </p>
 
-## Azure Arc for Servers
+## Azure Arc enabled Servers
 
 The below deployment scenarios will guide you through onboarding various Windows and Linux server deployments to Azure with Azure Arc. 
 
@@ -90,7 +90,7 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 
 * [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Azure Policies](azure_arc_servers_jumpstart/docs/arc_policies_mma.md)
 
-## Azure Arc for Kubernetes
+## Azure Arc enabled Kubernetes
 
 The below deployment options are focused on Azure Arc for Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
 
@@ -162,7 +162,7 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 * [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes ](azure_arc_k8s_jumpstart/docs/gke_policy.md)
 
-## Azure Arc for Data Services
+## Azure Arc enabled Data Services
 
 The below deployment options are focused on Azure Arc for Data Services. They are designed to quickly spin up Azure data services in Kubernetes that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
 
