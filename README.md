@@ -27,7 +27,7 @@ These practices and techniques are already well established for Azure-based work
 With Azure Arc, Fabrikam are able to project resources and register them into Azure Resource Manager independently of where they run, so they have a single control plane and extend those cloud-native operations and governance beyond Azure.
 
 <p align="center">
-  <img src="img/architecture.png" width="90%"/>
+  <img src="img/architecture_white.png" width="90%"/>
 </p>
 
 ## Azure Arc enabled Servers
