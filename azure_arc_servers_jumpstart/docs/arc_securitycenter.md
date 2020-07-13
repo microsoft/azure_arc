@@ -1,6 +1,6 @@
 # Azure Arc Machines on Azure Security Center
 
-The following README will guide you on how to onboard an Azure Arc Connected Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), it will collect security-related configurations and event logs to recommend actions for you to take in order to secure your resources.
+The following README will guide you on how to onboard an Azure Arc Connected Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), it will collect security-related configurations and event logs to recommend actions to improve your security posture.
 
 In this guide, you will enable Security Center on a subscription and implement the Standard tier, which provides advanced threat protection and detection capabilities. To complete this process you will: 
 
@@ -62,7 +62,7 @@ In this guide, you will enable Security Center on a subscription and implement t
 
     ![](../img/securitycenter/03.png)
 
-  To deploy the ARM template, navigate to the [deployment folder](../securitycenter/arm) and run the below command:
+To deploy the ARM template, navigate to the [deployment folder](../securitycenter/arm) and run the below command:
 
   ```bash
     az deployment group create --resource-group <Name of the Azure Resource Group> \
@@ -82,7 +82,7 @@ In this guide, you will enable Security Center on a subscription and implement t
     ```bash
     az security pricing create -n VirtualMachines --tier 'standard'
     ```
-* Now you need to assign the default Security Center policy initiative, ASC makes its security recommendations based on policies. There is an specific initiative that groups Security Center policies with the definition ID '1f3afdf9-d0c9-4c3d-847f-89da613e70a8'. 
+* Now you need to assign the default Security Center policy initiative. ASC makes its security recommendations based on policies, there is an specific initiative that groups Security Center policies with the definition ID '1f3afdf9-d0c9-4c3d-847f-89da613e70a8'. The command below will assign the ASC initiative to your subscription:
 
     ```bash
     az policy assignment create --name 'ASC Default <Your subscription ID>' \
