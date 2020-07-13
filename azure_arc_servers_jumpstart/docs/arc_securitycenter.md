@@ -33,7 +33,7 @@ In this guide, you will enable Security Center on a subscription and implement t
   
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP)   
+* Create Azure Service Principal (SP).   
 
     To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
