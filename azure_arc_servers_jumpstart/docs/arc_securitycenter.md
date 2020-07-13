@@ -1,6 +1,6 @@
 # Azure Arc Machines on Azure Security Center
 
-The following README will guide you on how to onboard an Azure Arc Connected Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), it will collect security-related configurations and event logs to recommend actions to improve your security posture.
+The following README will guide you on how to onboard an Azure Arc enabled Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), it will collect security-related configurations and event logs to recommend actions to improve your security posture.
 
 In this guide, you will enable Security Center on a subscription and implement the Standard tier, which provides advanced threat protection and detection capabilities. To complete this process you will: 
 
@@ -10,7 +10,7 @@ In this guide, you will enable Security Center on a subscription and implement t
 
 * Review Azure Security Center's recommendations.
 
-* Apply recommended configurations on Azure Arc connected Machines using ***Quick Fix*** remediations. 
+* Apply recommended configurations on Azure Arc enabled Machines using ***Quick Fix*** remediations. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -93,7 +93,7 @@ To deploy the ARM template, navigate to the [deployment folder](../securitycente
 
 # Azure Security Center Integration
 
-Now that you have successfully onboarded Azure Security Center, you will get recommendations to help you protect your  resources, including your Azure Arc connected Machines. Security Center will periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
+Now that you have successfully onboarded Azure Security Center, you will get recommendations to help you protect your  resources, including your Azure Arc enabled Machines. Security Center will periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
 
 * On the "Compute & Apps" section under "VM and Servers", Security Center will give you an overview of all security recommendations for your VMs and computers, including Azure VMs, Azure Classic VMs, servers and Azure Arc Machines. 
 
@@ -118,7 +118,7 @@ Now that you have successfully onboarded Azure Security Center, you will get rec
 
     ![](../img/securitycenter/08.png)
 
-* After you apply the recommendation on the Azure Arc connected machine the resource will be now marked as healthy.
+* After you apply the recommendation on the Azure Arc enabled machine the resource will be now marked as healthy.
 
     ![](../img/securitycenter/09.png)
 
