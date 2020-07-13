@@ -1,4 +1,4 @@
-# Overview
+# Azure Arc Machines on Azure Security Center
 
 The following README will guide you on how to onboard an Azure Arc Connected Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), it will collect security-related configurations and event logs to recommend actions for you to take in order to secure your resources.
 
