@@ -1,14 +1,38 @@
 #!/bin/bash
 
-export K8sVMadminUsername=$K8sVMadminUsername
-export AZDATA_USERNAME=$AZDATA_USERNAME
-export AZDATA_PASSWORD=$AZDATA_PASSWORD
-export DOCKER_USERNAME=$DOCKER_PASSWORD
-export DOCKER_PASSWORD=$DOCKER_USERNAME
-export ARC_DC_NAME=$ARC_DC_NAME
-export ARC_DC_SUBSCRIPTION=$ARC_DC_SUBSCRIPTION
-export ARC_DC_RG=$ARC_DC_RG
-export ARC_DC_REGION=$ARC_DC_REGION
+# export K8sVMadminUsername=$K8sVMadminUsername
+# export AZDATA_USERNAME=$AZDATA_USERNAME
+# export AZDATA_PASSWORD=$AZDATA_PASSWORD
+# export DOCKER_USERNAME=$DOCKER_PASSWORD
+# export DOCKER_PASSWORD=$DOCKER_USERNAME
+# export ARC_DC_NAME=$ARC_DC_NAME
+# export ARC_DC_SUBSCRIPTION=$ARC_DC_SUBSCRIPTION
+# export ARC_DC_RG=$ARC_DC_RG
+# export ARC_DC_REGION=$ARC_DC_REGION
+
+# Injecting environment variables
+echo '#!/bin/bash' >> vars.sh
+echo $K8sVMadminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
+echo $AZDATA_USERNAME:$2 | awk '{print substr($1,2); }' >> vars.sh
+echo $AZDATA_PASSWORD:$3 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_PASSWORD:$4 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_USERNAME:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $ARC_DC_NAME:$2 | awk '{print substr($1,2); }' >> vars.sh
+echo $ARC_DC_SUBSCRIPTION:$3 | awk '{print substr($1,2); }' >> vars.sh
+echo $ARC_DC_RG:$4 | awk '{print substr($1,2); }' >> vars.sh
+echo $ARC_DC_REGION:$5 | awk '{print substr($1,2); }' >> vars.sh
+sed -i '2s/^/export K8sVMadminUsername=/' vars.sh
+sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
+sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
+sed -i '5s/^/export DOCKER_PASSWORD=/' vars.sh
+sed -i '6s/^/export DOCKER_USERNAME=/' vars.sh
+sed -i '7s/^/export ARC_DC_NAME=/' vars.sh
+sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars.sh
+sed -i '9s/^/export ARC_DC_RG=/' vars.sh
+sed -i '10s/^/export ARC_DC_REGION=/' vars.sh
+
+chmod +x vars.sh 
+. ./vars.sh
 
 # Get controller username and password as input. It is used as default for the controller.
 #
