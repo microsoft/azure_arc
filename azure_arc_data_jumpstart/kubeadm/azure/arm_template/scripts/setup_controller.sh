@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export K8sVMadminUsername=$K8sVMadminUsername
 export AZDATA_USERNAME=$AZDATA_USERNAME
 export AZDATA_PASSWORD=$AZDATA_PASSWORD
 export DOCKER_USERNAME=$DOCKER_PASSWORD
@@ -130,7 +131,7 @@ sudo apt update -q
 sudo apt-get install -q --yes docker-ce=18.06.2~ce~3-0~ubuntu --allow-downgrades
 sudo apt-mark hold docker-ce
 
-sudo usermod --append --groups docker $USER
+sudo usermod --append --groups docker $K8sVMadminUsername
 
 # Create working directory
 rm -f -r setupscript
@@ -244,7 +245,7 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown -R $USER /home/${USER}/.kube/
+sudo chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
 # Local storage provisioning.
 kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
