@@ -99,22 +99,20 @@ Now that you have successfully onboarded ASC, you will get recommendations to he
 
     ![](../img/securitycenter/04.png)
 
-* On the Azure Arc machines, you will get a recommendation to install the log analytics agent.
+* On the Azure Arc machines, ASC will provide a recommendation to install the Log Analytics agent. In addition, each recommendation will include:
+    - A short description of what is being recommended.
+    - A Secure Score impact, in this case, with a status of *High*.
+    - The remediation steps to carry out in order to implement the recommendation. For specific recommendations, like this one, you will also get a ***Quick Fix*** that enables you to quickly remediate a recommendation on multiple resources.
 
     ![](../img/securitycenter/05.png)
-
-* For each recommendation you will get: 
-    - A short description of what is being recommended.
-    - A Secure Score impact, in this case is High.
-    - The remediation steps to carry out in order to implement the recommendation. For specific recommendations, like this one, you get also a ***Quick Fix*** that enables you to quickly remediate a recommendation on multiple resources. 
-    
+   
     ![](../img/securitycenter/06.png)
 
 * This remediation ***Quick Fix*** is using an ARM template to deploy the Microsoft Monitoring Agent extension on the Azure Arc machine. 
 
     ![](../img/securitycenter/07.png)
 
-* You can trigger the remediation with the ARM template from the Azure Security Center dashboard, by selecting the Log Analytics Workspace used for ASC.
+* You can trigger the remediation with the ARM template from the Azure Security Center dashboard, by selecting the Log Analytics Workspace used for ASC and clicking on "Remediate 1 resource".
 
     ![](../img/securitycenter/08.png)
 
