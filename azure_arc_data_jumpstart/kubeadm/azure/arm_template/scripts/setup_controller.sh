@@ -256,7 +256,7 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 # sudo chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
 sudo -u $K8sVMadminUsername mkdir /home/${K8sVMadminUsername}/.kube
-sudo cp kubeconfig /home/${K8sVMadminUsername}/.kube/config
+sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
 chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
 # Local storage provisioning.
