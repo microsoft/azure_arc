@@ -1,13 +1,13 @@
 #!/bin/bash
 
-export AZDATA_USERNAME='arcdemo'
-export AZDATA_PASSWORD='arcdemo123!!'
-export DOCKER_USERNAME='22cda7bb-2eb1-419e-a742-8710c313fe79'
-export DOCKER_PASSWORD='cb892016-5c33-4135-acbf-7b15bc8cb0f7'
-export ARC_DC_NAME='arcdatactrl'
-export ARC_DC_SUBSCRIPTION='e73c1dbe-2574-4f38-9e8f-c813757b1786'
-export ARC_DC_RG='Arc-Kubeadm-Data-Demo'
-export ARC_DC_REGION='eastus'
+export AZDATA_USERNAME=$AZDATA_USERNAME
+export AZDATA_PASSWORD=$AZDATA_PASSWORD
+export DOCKER_USERNAME=$DOCKER_PASSWORD
+export DOCKER_PASSWORD=$DOCKER_USERNAME
+export ARC_DC_NAME=$ARC_DC_NAME
+export ARC_DC_SUBSCRIPTION=$ARC_DC_SUBSCRIPTION
+export ARC_DC_RG=$ARC_DC_RG
+export ARC_DC_REGION=$ARC_DC_REGION
 
 # Get controller username and password as input. It is used as default for the controller.
 #
