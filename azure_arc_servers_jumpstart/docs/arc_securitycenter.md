@@ -1,16 +1,16 @@
 # Azure Arc Machines on Azure Security Center
 
-The following README will guide you on how to onboard an Azure Arc enabled Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), it will collect security-related configurations and event logs to recommend actions to improve your security posture.
+The following README will guide you on how to onboard an Azure Arc enabled Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), so you can start collecting security-related configurations as well as event logs as a way to recommend actions and improve your overall Azure security posture.
 
-In this guide, you will enable Security Center on a subscription and implement the Standard tier, which provides advanced threat protection and detection capabilities. To complete this process you will: 
+In this guide, you will enable and configure Standard tier ASC on your Azure subscription, which will provide you with advanced threat protection (ATP) and detection capabilities. To complete this process you will: 
 
-* Set the Log Analytics workspace where logs and events will be aggregated for analysis. 
+* Setup the Log Analytics Workspace where logs and events will be aggregated for analysis. 
 
 * Assign Security Center’s default security policies.
 
 * Review Azure Security Center's recommendations.
 
-* Apply recommended configurations on Azure Arc enabled Machines using ***Quick Fix*** remediations. 
+* Apply recommended configurations on Azure Arc enabled Servers using the ***Quick Fix*** remediations. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -24,7 +24,7 @@ In this guide, you will enable Security Center on a subscription and implement t
 
 * Clone this repo.
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using a Google Cloud Platform (GCP) instance that has been already connected to Azure Arc and is visible as a resource in Azure.
 
     ![](../img/securitycenter/01.png)
 
@@ -56,13 +56,13 @@ In this guide, you will enable Security Center on a subscription and implement t
     
   **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
-# Onboarding Azure Arc Machines on Azure Security Center
+# Onboarding Azure Security Center
 
 * Data collected by Security Center is stored in a Log Analytics workspace, you can either use the default one created by ASC or a custom one created by you. If you want to create a dedicated workspace, you can automate the deployment by editing the ARM template [parameters file](../securitycenter/arm/log_analytics-template.parameters.json), provide a name and location for your workspace:
 
     ![](../img/securitycenter/03.png)
 
-To deploy the ARM template, navigate to the [deployment folder](../securitycenter/arm) and run the below command:
+* To deploy the ARM template, navigate to the [deployment folder](../securitycenter/arm) and run the below command:
 
   ```bash
     az deployment group create --resource-group <Name of the Azure Resource Group> \
@@ -91,11 +91,11 @@ To deploy the ARM template, navigate to the [deployment folder](../securitycente
     ```
 
 
-# Azure Security Center Integration
+# Azure Arc and Azure Security Center Integration
 
-Now that you have successfully onboarded Azure Security Center, you will get recommendations to help you protect your  resources, including your Azure Arc enabled Machines. Security Center will periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
+Now that you have successfully onboarded ASC, you will get recommendations to help you protect your resources, including your Azure Arc enabled Machines. ASC will then periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
 
-* On the "Compute & Apps" section under "VM and Servers", Security Center will give you an overview of all security recommendations for your VMs and computers, including Azure VMs, Azure Classic VMs, servers and Azure Arc Machines. 
+* In the "Compute & apps" section under "VM and Servers", ASC will provide you with an overview of all the discovered security recommendations for your VMs and computers, including Azure VMs, Azure Classic VMs, servers and **Azure Arc Machines**.
 
     ![](../img/securitycenter/04.png)
 
