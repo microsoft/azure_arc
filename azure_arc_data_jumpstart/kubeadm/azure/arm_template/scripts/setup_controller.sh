@@ -261,9 +261,9 @@ echo "Starting to setup Kubernetes master..."
 # Initialize a kubernetes cluster on the current node.
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
+mkdir -p /home/${SUDO_USER}/.kube
+sudo cp -i /etc/kubernetes/admin.conf /home/${SUDO_USER}/.kube/config
+sudo chown -R $SUDO_USER /home/${SUDO_USER}/.kube/
 
 # Local storage provisioning.
 kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
