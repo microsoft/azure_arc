@@ -35,7 +35,6 @@ chmod +x vars.sh
 . ./vars.sh
 
 # Get controller username and password as input. It is used as default for the controller.
-#
 if [ -z "$AZDATA_USERNAME" ]
 then
     read -p "Create Username for Azure Arc Data Controller: " username
@@ -56,7 +55,6 @@ then
 fi
 
 # Prompt for private preview repository username and password provided by Microsoft
-#
 if [ -z "$DOCKER_USERNAME" ]
 then
     read -p 'Enter Azure Arc Data Controller repo username provided by Microsoft:' AADC_USERNAME
@@ -72,7 +70,6 @@ fi
 
 
 # Propmpt for Arc Data Controller properties.
-#
 if [ -z "$ARC_DC_NAME" ]
 then
     read -p "Enter a name for the new Azure Arc Data Controller: " dc_name
@@ -105,11 +102,9 @@ fi
 set -Eeuo pipefail
 
 # This is a script to create single-node Kubernetes cluster and deploy Azure Arc Data Controller on it.
-#
 export AZUREARCDATACONTROLLER_DIR=aadatacontroller
 
 # Name of virtualenv variable used.
-#
 export LOG_FILE="aadatacontroller.log"
 export DEBIAN_FRONTEND=noninteractive
 
@@ -118,7 +113,6 @@ export OSCODENAME=$(lsb_release -cs)
 export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE="https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/ubuntu-"$OSCODENAME"/azdata-cli_20.0.0-1~"$OSCODENAME"_all.deb"
 
 # Wait for 5 minutes for the cluster to be ready.
-#
 TIMEOUT=600
 RETRY_INTERVAL=5
 
@@ -267,10 +261,9 @@ echo "Starting to setup Kubernetes master..."
 # Initialize a kubernetes cluster on the current node.
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 
-# mkdir -p $HOME/.kube
-sudo -u $K8sVMadminUsername mkdir /home/${K8sVMadminUsername}/.kube
-sudo cp -i /etc/kubernetes/admin.conf /home/.kube/config
-sudo chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
+sudo -u $K8sVMadminUsername mkdir /${HOME}/${K8sVMadminUsername}/.kube
+sudo cp -i /etc/kubernetes/admin.conf /${HOME}/.kube/config
+sudo chown -R $K8sVMadminUsername /${HOME}/${K8sVMadminUsername}/.kube/
 
 # Local storage provisioning.
 kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
