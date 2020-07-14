@@ -260,7 +260,7 @@ sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
 chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
 # Local storage provisioning.
-kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
+sudo kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
 
 # Set local-storage as the default storage class
 kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
@@ -296,29 +296,29 @@ while true ; do
     echo "Cluster not ready. Retrying..."
 done
 
-# Install the dashboard for Kubernetes.
-# Add kubernetes-dashboard repository
-sudo helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-# Deploy a Helm Release named "my-release" using the kubernetes-dashboard chart
-sudo helm install my-dashboard kubernetes-dashboard/kubernetes-dashboard
+# # Install the dashboard for Kubernetes.
+# # Add kubernetes-dashboard repository
+# sudo helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# # Deploy a Helm Release named "my-release" using the kubernetes-dashboard chart
+# sudo helm install my-dashboard kubernetes-dashboard/kubernetes-dashboard
 
-echo "Kubernetes master setup done."
+# echo "Kubernetes master setup done."
 
 # Deploy azdata Azure Arc Data Cotnroller create cluster.
-echo ""
-echo "############################################################################"
-echo "Starting to deploy azdata cluster..." 
+# echo ""
+# echo "############################################################################"
+# echo "Starting to deploy azdata cluster..." 
 
-# Command to create cluster for single node cluster.
-azdata arc dc config init -s azure-arc-kubeadm-private-preview -t azure-arc-custom --force
+# # Command to create cluster for single node cluster.
+# azdata arc dc config init -s azure-arc-kubeadm-private-preview -t azure-arc-custom --force
 
-azdata arc dc create -n $ARC_DC_NAME -c azure-arc-custom --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
-echo "Azure Arc Data Controller cluster created." 
+# azdata arc dc create -n $ARC_DC_NAME -c azure-arc-custom --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
+# echo "Azure Arc Data Controller cluster created." 
 
-# Setting context to cluster.
-kubectl config set-context --current --namespace $ARC_DC_NAME
+# # Setting context to cluster.
+# kubectl config set-context --current --namespace $ARC_DC_NAME
 
-# Login and get endpoint list for the cluster.
-azdata login -n $ARC_DC_NAME
+# # Login and get endpoint list for the cluster.
+# azdata login -n $ARC_DC_NAME
 
-echo "Cluster successfully setup. Run 'azdata --help' to see all available options."
+# echo "Cluster successfully setup. Run 'azdata --help' to see all available options."
