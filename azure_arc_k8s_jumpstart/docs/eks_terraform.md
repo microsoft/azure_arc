@@ -121,7 +121,7 @@ The following README will guide you on how to use the provided [Terraform](https
   Server Version: version.Info{Major:"1", Minor:"16+", GitVersion:"v1.16.8-eks-e16311", GitCommit:"e163110a04dcb2f39c3325af96d019b4925419eb", GitTreeState:"clean", BuildDate:"2020-03-27T22:37:12Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
   ```
 
-* **Configure EKS Nodes to communicate to EKS Control place**<br>
+* **Configure EKS Nodes to communicate to EKS Control Plane**<br>
 Now let’s add the ConfigMap to the cluster from Terraform as well. The ConfigMap is a Kubernetes configuration, in this case for granting access to our EKS cluster. This ConfigMap allows our ec2 instances in the cluster to communicate with the EKS master, as well as allowing our user account access to run commands against the cluster. You’ll run the Terraform output command to a file, and the kubectl apply command to apply that file:
   ```bash
   terraform output config_map_aws_auth > configmap.yml
