@@ -1,15 +1,5 @@
 #!/bin/bash
 
-# export K8sVMadminUsername=$K8sVMadminUsername
-# export AZDATA_USERNAME=$AZDATA_USERNAME
-# export AZDATA_PASSWORD=$AZDATA_PASSWORD
-# export DOCKER_USERNAME=$DOCKER_PASSWORD
-# export DOCKER_PASSWORD=$DOCKER_USERNAME
-# export ARC_DC_NAME=$ARC_DC_NAME
-# export ARC_DC_SUBSCRIPTION=$ARC_DC_SUBSCRIPTION
-# export ARC_DC_RG=$ARC_DC_RG
-# export ARC_DC_REGION=$ARC_DC_REGION
-
 # Injecting environment variables
 echo '#!/bin/bash' >> vars.sh
 echo $K8sVMadminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
@@ -99,7 +89,7 @@ then
 fi
 
 
-set -Eeuo pipefail
+# set -Eeuo pipefail
 
 # This is a script to create single-node Kubernetes cluster and deploy Azure Arc Data Controller on it.
 export AZUREARCDATACONTROLLER_DIR=aadatacontroller
@@ -261,9 +251,9 @@ echo "Starting to setup Kubernetes master..."
 # Initialize a kubernetes cluster on the current node.
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 
-mkdir -p /home/${SUDO_USER}/.kube
-sudo cp -i /etc/kubernetes/admin.conf /home/${SUDO_USER}/.kube/config
-sudo chown -R $SUDO_USER /home/${SUDO_USER}/.kube/
+mkdir -p /home/${K8sVMadminUsername}/.kube
+sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
+sudo chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
 # Local storage provisioning.
 kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
