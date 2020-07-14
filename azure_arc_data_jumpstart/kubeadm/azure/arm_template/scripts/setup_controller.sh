@@ -17,10 +17,10 @@ echo $AZDATA_USERNAME:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_PASSWORD:$3 | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_PASSWORD:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_USERNAME:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $ARC_DC_NAME:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $ARC_DC_SUBSCRIPTION:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $ARC_DC_RG:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $ARC_DC_REGION:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
+echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
+echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
+echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export K8sVMadminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
