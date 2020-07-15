@@ -25,7 +25,7 @@
         },
         "adminPassword": {
             "type": "securestring",
-            "defaultValue": "ArcPassword123!!",
+            "defaultValue": "ArcDemo123!!",
             "metadata": {
                 "description": "Windows password for the Virtual Machine"
             }
