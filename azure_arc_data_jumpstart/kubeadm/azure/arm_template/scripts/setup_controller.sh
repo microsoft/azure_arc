@@ -259,7 +259,8 @@ sudo -u $K8sVMadminUsername mkdir /home/${K8sVMadminUsername}/.kube
 sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
 chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
-kubectl get nodes
+# To enable a single node cluster remove the taint that limits the first node to master only service.
+sudo -u kubectl taint nodes --all node-role.kubernetes.io/master-
 
 # Local storage provisioning.
 sudo -u kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
@@ -272,9 +273,6 @@ sudo -u kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master
 
 # RBAC for SQL
 sudo -u kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
-
-# To enable a single node cluster remove the taint that limits the first node to master only service.
-sudo -u kubectl taint nodes --all node-role.kubernetes.io/master-
 
 sleep 30
 
