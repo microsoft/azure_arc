@@ -255,32 +255,32 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 # sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
 # sudo chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
-sudo -u $K8sVMadminUsername mkdir /home/${K8sVMadminUsername}/.kube
-sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
-chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
-
-kubectl get nodes
+export KUBECONFIG=/etc/kubernetes/admin.conf
 
 # To enable a single node cluster remove the taint that limits the first node to master only service.
 kubectl taint nodes --all node-role.kubernetes.io/master-
 
-sleep 30
+kubectl get nodes
+
+# Local storage provisioning.
+kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
+
+# Set local-storage as the default storage class
+kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+# Install the software defined network.
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# RBAC for SQL
+kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
+
+sleep 20
 
 kubectl get nodes
 
-# # Local storage provisioning.
-# sudo -u $K8sVMadminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
-
-# # Set local-storage as the default storage class
-# sudo -u $K8sVMadminUsername kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-
-# # Install the software defined network.
-# sudo -u $K8sVMadminUsername kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-
-# # RBAC for SQL
-# sudo -u $K8sVMadminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
-
-
+sudo -u $K8sVMadminUsername mkdir /home/${K8sVMadminUsername}/.kube
+sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
+chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
 # # Verify that the cluster is ready to be used.
 # echo "Verifying that the cluster is ready for use..."
