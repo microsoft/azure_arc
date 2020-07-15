@@ -3,7 +3,7 @@ param (
     [string]$servicePrincipalClientSecret,
     [string]$adminUsername,
     [string]$adminpassword,
-    [string]$env:K8svmName,
+    [string]$K8svmName,
     [string]$tenantId,
     [string]$ARC_DC_RG,
     [string]$AZDATA_USERNAME,
@@ -21,7 +21,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientSecret', $servicePrincipalClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminpassword', $adminpassword,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('K8svmName', $env:K8svmName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('K8svmName', $K8svmName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_RG', $ARC_DC_RG,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $AZDATA_USERNAME,[System.EnvironmentVariableTarget]::Machine)
