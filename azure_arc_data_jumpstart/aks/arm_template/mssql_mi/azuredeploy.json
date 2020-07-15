@@ -100,7 +100,7 @@
             "type": "string",
             "defaultValue": "Arc-Data-Client",
             "metadata": {
-                "description": "The name of you Virtual Machine."
+                "description": "The name of the Client Virtual Machine."
             }
         },
         "adminUsername": {
@@ -275,8 +275,8 @@
             "MSSQL_SA_PASSWORD":{"value": "[parameters('MSSQL_SA_PASSWORD')]"},
             "MSSQL_MI_vCores":{"value": "[parameters('MSSQL_MI_vCores')]"}
             }
-          }        
-        }           
+          }
+        }
     ],
     "outputs": {
         "controlPlaneFQDN": {
