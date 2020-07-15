@@ -147,7 +147,7 @@
         },        
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "Arc-Data-VNET",
+            "defaultValue": "Arc-Data-Demo-VNET",
             "metadata": {
                 "description": "Name of the VNET"
             }
