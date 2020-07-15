@@ -276,27 +276,31 @@ kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/
 # To enable a single node cluster remove the taint that limits the first node to master only service.
 kubectl taint nodes --all node-role.kubernetes.io/master-
 
-# Verify that the cluster is ready to be used.
-echo "Verifying that the cluster is ready for use..."
-while true ; do
+sleep 30
 
-    if [[ "$TIMEOUT" -le 0 ]]; then
-        echo "Cluster node failed to reach the 'Ready' state. Kubeadm setup failed."
-        exit 1
-    fi
+kubectl get nodes
 
-    status=`kubectl get nodes --no-headers=true | awk '{print $2}'`
+# # Verify that the cluster is ready to be used.
+# echo "Verifying that the cluster is ready for use..."
+# while true ; do
 
-    if [ "$status" == "Ready" ]; then
-        break
-    fi
+#     if [[ "$TIMEOUT" -le 0 ]]; then
+#         echo "Cluster node failed to reach the 'Ready' state. Kubeadm setup failed."
+#         exit 1
+#     fi
 
-    sleep "$RETRY_INTERVAL"
+#     status=`kubectl get nodes --no-headers=true | awk '{print $2}'`
 
-    TIMEOUT=$(($TIMEOUT-$RETRY_INTERVAL))
+#     if [ "$status" == "Ready" ]; then
+#         break
+#     fi
 
-    echo "Cluster not ready. Retrying..."
-done
+#     sleep "$RETRY_INTERVAL"
+
+#     TIMEOUT=$(($TIMEOUT-$RETRY_INTERVAL))
+
+#     echo "Cluster not ready. Retrying..."
+# done
 
 # # Install the dashboard for Kubernetes.
 # # Add kubernetes-dashboard repository
