@@ -257,9 +257,6 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
-# To enable a single node cluster remove the taint that limits the first node to master only service.
-kubectl taint nodes --all node-role.kubernetes.io/master-
-
 # Local storage provisioning.
 kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
 
@@ -271,6 +268,9 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documen
 
 # RBAC for SQL
 kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
+
+# To enable a single node cluster remove the taint that limits the first node to master only service.
+kubectl taint nodes --all node-role.kubernetes.io/master-
 
 # Verify that the cluster is ready to be used.
 echo "Verifying that the cluster is ready for use..."
