@@ -320,3 +320,6 @@ echo "Cluster successfully setup. Run 'azdata --help' to see all available optio
 sudo -u $K8sVMadminUsername mkdir /home/${K8sVMadminUsername}/.kube
 sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
 chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
+
+sed '1d' vars.sh > vars_new.sh
+cat vars_new.sh >> /etc/profile
