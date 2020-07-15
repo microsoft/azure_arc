@@ -260,23 +260,23 @@ sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
 chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
 # To enable a single node cluster remove the taint that limits the first node to master only service.
-sudo -u kubectl taint nodes --all node-role.kubernetes.io/master-
+kubectl taint nodes --all node-role.kubernetes.io/master-
 
-# Local storage provisioning.
-sudo -u kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
+# # Local storage provisioning.
+# sudo -u $K8sVMadminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
 
-# Set local-storage as the default storage class
-sudo -u kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+# # Set local-storage as the default storage class
+# sudo -u $K8sVMadminUsername kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
-# Install the software defined network.
-sudo -u kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+# # Install the software defined network.
+# sudo -u $K8sVMadminUsername kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
-# RBAC for SQL
-sudo -u kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
+# # RBAC for SQL
+# sudo -u $K8sVMadminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
 
-sleep 30
+# sleep 30
 
-kubectl get nodes
+# kubectl get nodes
 
 # # Verify that the cluster is ready to be used.
 # echo "Verifying that the cluster is ready for use..."
