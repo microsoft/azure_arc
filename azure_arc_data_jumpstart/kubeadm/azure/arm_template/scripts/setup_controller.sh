@@ -5,8 +5,8 @@ echo '#!/bin/bash' >> vars.sh
 echo $K8sVMadminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_USERNAME:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_PASSWORD:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_PASSWORD:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_USERNAME:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_USERNAME:$4 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_PASSWORD:$5 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
@@ -14,8 +14,8 @@ echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export K8sVMadminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
-sed -i '5s/^/export DOCKER_PASSWORD=/' vars.sh
-sed -i '6s/^/export DOCKER_USERNAME=/' vars.sh
+sed -i '5s/^/export DOCKER_USERNAME=/' vars.sh
+sed -i '6s/^/export DOCKER_PASSWORD=/' vars.sh
 sed -i '7s/^/export ARC_DC_NAME=/' vars.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars.sh
@@ -250,10 +250,6 @@ echo "Starting to setup Kubernetes master..."
 
 # Initialize a kubernetes cluster on the current node.
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
-
-# mkdir -p /home/${K8sVMadminUsername}/.kube
-# sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
-# sudo chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
 
 export KUBECONFIG=/etc/kubernetes/admin.conf
 
