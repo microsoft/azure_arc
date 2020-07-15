@@ -2,7 +2,7 @@
 
 # Injecting environment variables
 echo '#!/bin/bash' >> vars.sh
-echo $K8sVMadminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
+echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_USERNAME:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_PASSWORD:$3 | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_USERNAME:$4 | awk '{print substr($1,2); }' >> vars.sh
@@ -11,7 +11,7 @@ echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
-sed -i '2s/^/export K8sVMadminUsername=/' vars.sh
+sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
 sed -i '5s/^/export DOCKER_USERNAME=/' vars.sh
@@ -139,7 +139,7 @@ sudo apt update -q
 sudo apt-get install -q --yes docker-ce=18.06.2~ce~3-0~ubuntu --allow-downgrades
 sudo apt-mark hold docker-ce
 
-sudo usermod --append --groups docker $K8sVMadminUsername
+sudo usermod --append --groups docker $adminUsername
 
 # Create working directory
 rm -f -r setupscript
@@ -317,9 +317,9 @@ azdata login -n $ARC_DC_NAME
 
 echo "Cluster successfully setup. Run 'azdata --help' to see all available options."
 
-sudo -u $K8sVMadminUsername mkdir /home/${K8sVMadminUsername}/.kube
-sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
-chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
+sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
+sudo cp -i /etc/kubernetes/admin.conf /home/${adminUsername}/.kube/config
+chown -R $adminUsername /home/${adminUsername}/.kube/
 
-sed '1d' vars.sh > vars_new.sh
-cat vars_new.sh >> /etc/profile
+# sed '1d' vars.sh > vars_new.sh
+# cat vars_new.sh >> /etc/profile
