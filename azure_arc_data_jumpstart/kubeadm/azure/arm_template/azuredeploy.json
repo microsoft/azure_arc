@@ -1,0 +1,467 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "K8svmName": {
+            "type": "string",
+            "defaultValue": "Arc-Kubeadm-Data-Demo",
+            "metadata": {
+                "description": "The name of the Kubeadm Virtual Machine."
+            }
+        },
+        "vmName": {
+            "type": "string",
+            "defaultValue": "Arc-Data-Client",
+            "metadata": {
+                "description": "The name of the Client Virtual Machine."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "arcdemo",
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            }
+        },
+        "authenticationType": {
+            "type": "string",
+            "defaultValue": "password",
+            "allowedValues": [
+                "sshPublicKey",
+                "password"
+            ],
+            "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": "ArcDemo123!!",
+            "metadata": {
+                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+            }
+        },
+        "servicePrincipalClientId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN app ID"
+            }
+        },
+        "servicePrincipalClientSecret": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN password"
+            }
+        },
+        "tenantId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN tenant ID"
+            }
+        },        
+        "AZDATA_USERNAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Username"
+            }
+        },
+        "AZDATA_PASSWORD": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Password"
+            }
+        },
+        "ACCEPT_EULA": {
+            "type": "string",
+            "defaultValue":"yes",
+            "metadata": {
+                "description": "azdata CLI EULA"
+            }
+        },
+        "DOCKER_USERNAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Private Arc Data Docker Registry Username"
+            }
+        },
+        "DOCKER_PASSWORD": {
+            "type": "string",
+            "metadata": {
+                "description": "Private Arc Data Docker Registry Password"
+            }
+        },
+        "ARC_DC_NAME": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller name"
+            }
+        },
+        "ARC_DC_SUBSCRIPTION": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller subscription ID"
+            }
+        },
+        "ARC_DC_RG": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Resource Group"
+            }
+        },
+        "ARC_DC_REGION": {
+            "type": "string",
+            "metadata": {
+                "description": "Arc Data Controller Region"
+            }
+        },
+        "ubuntuOSVersion": {
+            "type": "string",
+            "defaultValue": "18.04-LTS",
+            "allowedValues": [
+                "18.04-LTS"
+            ],
+            "metadata": {
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "K8sVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_D8s_v3",
+            "metadata": {
+                "description": "The size of the Kubeadm VM"
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D4s_v3",
+            "metadata": {
+                "description": "The size of the Client VM"
+            }
+        },        
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "Arc-Data-VNET",
+            "metadata": {
+                "description": "Name of the VNET"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "Subnet",
+            "metadata": {
+                "description": "Name of the subnet in the virtual network"
+            }
+        },
+        "networkSecurityGroupName": {
+            "type": "string",
+            "defaultValue": "Arc-Kubeadm-Data-Demo-NSG",
+            "metadata": {
+                "description": "Name of the Network Security Group"
+            }
+        }
+    },
+    "variables": {
+        "K8svmName": "[concat(parameters('K8svmName'))]",
+        "publicIpAddressName": "[concat(parameters('K8svmName'), '-PIP' )]",
+        "networkInterfaceName": "[concat(parameters('K8svmName'),'-NIC')]",
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "osDiskType": "Premium_LRS",
+        "subnetAddressPrefix": "10.1.0.0/24",
+        "addressPrefix": "10.1.0.0/16",
+        "linuxConfiguration": {
+            "disablePasswordAuthentication": false,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                        "keyData": "[parameters('adminPassword')]"
+                    }
+                ]
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "name": "[variables('networkInterfaceName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "name": "[parameters('networkSecurityGroupName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow_SSH",
+                        "properties": {
+                            "priority": 1001,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_6443",
+                        "properties": {
+                            "priority": 1002,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "6443"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_80",
+                        "properties": {
+                            "priority": 1003,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_8080",
+                        "properties": {
+                            "priority": 1004,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "8080"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_443",
+                        "properties": {
+                            "priority": 1005,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "443"
+                        }
+                    }, 
+                    {
+                        "name": "allow_k8s_kubelet",
+                        "properties": {
+                            "priority": 1006,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "10250"
+                        }
+                    },
+                    {
+                        "name": "allow_traefik_lb_external",
+                        "properties": {
+                            "priority": 1007,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "32323"
+                        }
+                    }                                                                                                                       
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-04-01",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetAddressPrefix')]",
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "name": "[variables('publicIpAddressName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIpAllocationMethod": "Static",
+                "publicIPAddressVersion": "IPv4",
+                "idleTimeoutInMinutes": 4
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-03-01",
+            "name": "[variables('K8svmName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('K8sVMSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "name": "[concat(variables('K8svmName'),'-OSDisk')]",
+                        "caching": "ReadWrite",
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "[parameters('ubuntuOSVersion')]",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[variables('K8svmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+                }
+            }
+        },
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "[concat(variables('K8svmName'),'/setup_controller')]",
+          "apiVersion": "2019-07-01",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('K8svmName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.1",
+            "autoUpgradeMinorVersion": true,
+            "protectedSettings": {
+            "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'))]",
+            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh"]
+            }
+          }
+        },
+        {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2019-10-01",
+        "name": "linkedTemplate",
+        "dependsOn": [
+            "[concat(resourceId('Microsoft.Compute/virtualMachines', parameters('K8svmName')))]"
+        ], 
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+            "uri":"https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/client_vm_deployment.json",
+            "contentVersion":"1.0.0.0"
+            },
+            "parameters": {
+            "vmName":{"value": "[parameters('vmName')]"},
+            "K8svmName":{"value": "[parameters('K8svmName')]"},           
+            "adminUsername":{"value": "[parameters('adminUsername')]"},
+            "adminPassword":{"value": "[parameters('adminPassword')]"},
+            "vmSize":{"value": "[parameters('vmSize')]"},
+            "servicePrincipalClientId":{"value": "[parameters('servicePrincipalClientId')]"},
+            "servicePrincipalClientSecret":{"value": "[parameters('servicePrincipalClientSecret')]"},
+            "tenantId":{"value": "[parameters('tenantId')]"},
+            "ARC_DC_RG":{"value": "[parameters('ARC_DC_RG')]"},
+            "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
+            "AZDATA_PASSWORD":{"value": "[parameters('AZDATA_PASSWORD')]"},
+            "ACCEPT_EULA":{"value": "[parameters('ACCEPT_EULA')]"},
+            "DOCKER_USERNAME":{"value": "[parameters('DOCKER_USERNAME')]"},
+            "DOCKER_PASSWORD":{"value": "[parameters('DOCKER_PASSWORD')]"},
+            "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
+            "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
+            "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"}
+            }
+          }        
+        }        
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        },
+        "sshCommand": {
+            "type": "string",
+            "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(variables('publicIPAddressName')).IpAddress)]"
+        }
+    }
+}

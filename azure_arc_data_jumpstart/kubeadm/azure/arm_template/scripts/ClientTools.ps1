@@ -2,9 +2,10 @@ param (
     [string]$servicePrincipalClientId,
     [string]$servicePrincipalClientSecret,
     [string]$adminUsername,
+    [string]$adminpassword,
+    [string]$env:K8svmName,
     [string]$tenantId,
-    [string]$clusterName,
-    [string]$resourceGroup,
+    [string]$ARC_DC_RG,
     [string]$AZDATA_USERNAME,
     [string]$AZDATA_PASSWORD,
     [string]$ACCEPT_EULA,
@@ -19,9 +20,10 @@ param (
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientId', $servicePrincipalClientId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientSecret', $servicePrincipalClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminpassword', $adminpassword,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('K8svmName', $env:K8svmName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('ARC_DC_RG', $ARC_DC_RG,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $AZDATA_USERNAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $AZDATA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $ACCEPT_EULA,[System.EnvironmentVariableTarget]::Machine)
@@ -35,7 +37,7 @@ param (
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,putty'
             #Run commands in parallel.
             Parallel 
                 {
@@ -68,8 +70,8 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
                     Invoke-WebRequest "https://github.com/microsoft/azuredatastudio-postgresql/archive/v0.2.6.zip" -OutFile "C:\tmp\pgsqltoolsservice-win-x64.zip"
                     Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/DC_Cleanup.ps1" -OutFile "C:\tmp\DC_Cleanup.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/DC_Deploy.ps1" -OutFile "C:\tmp\DC_Deploy.ps1"
+                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/DC_Cleanup.ps1" -OutFile "C:\tmp\DC_Cleanup.ps1"
+                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/DC_Deploy.ps1" -OutFile "C:\tmp\DC_Deploy.ps1"
                 }
         }
 
@@ -98,10 +100,25 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
+Write-Host "Connecting to Azure account"
+Write-Host "`n"
 $azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
+
+Write-Host "Copying kubeconfig file from Kubernetes VM"
+Write-Host "`n"
+$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
+
+$VM=Get-AzVM -ResourceGroupName $env:ARC_DC_RG -Name $env:K8svmName
+$Profile=$VM.NetworkProfile.NetworkInterfaces.Id.Split("/") | Select -Last 1
+$IPConfig=Get-AzNetworkInterface -Name $Profile
+$env:IPAddress=$IPConfig.IpConfigurations.PrivateIpAddress
+
+New-Item -Path "C:\Users\$env:adminUsername" -Name ".kube" -ItemType "directory" -Force
+echo y | pscp -pw $env:adminPassword -P 22 $env:IPAddress':/home/'$env:adminUsername'/.kube/config' C:\Users\$env:adminUsername\.kube\config
 
 kubectl get nodes
 azdata --version
@@ -124,14 +141,10 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
-azdata arc dc create -c azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
-
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
 Stop-Transcript
 
-Stop-Process -Name kubectl -Force
 Stop-Process -name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
