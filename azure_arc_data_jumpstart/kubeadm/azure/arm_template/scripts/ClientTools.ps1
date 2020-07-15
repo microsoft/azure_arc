@@ -2,7 +2,7 @@ param (
     [string]$servicePrincipalClientId,
     [string]$servicePrincipalClientSecret,
     [string]$adminUsername,
-    [string]$adminpassword,
+    [string]$adminPassword,
     [string]$K8svmName,
     [string]$tenantId,
     [string]$ARC_DC_RG,
@@ -20,7 +20,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientId', $servicePrincipalClientId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientSecret', $servicePrincipalClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('adminpassword', $adminpassword,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('K8svmName', $K8svmName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_RG', $ARC_DC_RG,[System.EnvironmentVariableTarget]::Machine)
