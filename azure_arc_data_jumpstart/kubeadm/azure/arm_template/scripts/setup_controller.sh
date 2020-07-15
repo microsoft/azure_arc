@@ -260,8 +260,6 @@ export KUBECONFIG=/etc/kubernetes/admin.conf
 # To enable a single node cluster remove the taint that limits the first node to master only service.
 kubectl taint nodes --all node-role.kubernetes.io/master-
 
-kubectl get nodes
-
 # Local storage provisioning.
 kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/local-storage-provisioner.yaml
 
@@ -274,59 +272,55 @@ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documen
 # RBAC for SQL
 kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
 
-sleep 20
+# Verify that the cluster is ready to be used.
+echo "Verifying that the cluster is ready for use..."
+while true ; do
 
-kubectl get nodes
+    if [[ "$TIMEOUT" -le 0 ]]; then
+        echo "Cluster node failed to reach the 'Ready' state. Kubeadm setup failed."
+        exit 1
+    fi
+
+    status=`kubectl get nodes --no-headers=true | awk '{print $2}'`
+
+    if [ "$status" == "Ready" ]; then
+        break
+    fi
+
+    sleep "$RETRY_INTERVAL"
+
+    TIMEOUT=$(($TIMEOUT-$RETRY_INTERVAL))
+
+    echo "Cluster not ready. Retrying..."
+done
+
+# Install the dashboard for Kubernetes.
+# Add kubernetes-dashboard repository
+sudo helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+# Deploy a Helm Release named "my-release" using the kubernetes-dashboard chart
+sudo helm install my-dashboard kubernetes-dashboard/kubernetes-dashboard
+
+echo "Kubernetes master setup done."
+
+Deploy azdata Azure Arc Data Cotnroller create cluster.
+echo ""
+echo "############################################################################"
+echo "Starting to deploy azdata cluster..." 
+
+# Command to create cluster for single node cluster.
+azdata arc dc config init -s azure-arc-kubeadm-private-preview -t azure-arc-custom --force
+
+azdata arc dc create -n $ARC_DC_NAME -c azure-arc-custom --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
+echo "Azure Arc Data Controller cluster created." 
+
+# Setting context to cluster.
+kubectl config set-context --current --namespace $ARC_DC_NAME
+
+# Login and get endpoint list for the cluster.
+azdata login -n $ARC_DC_NAME
+
+echo "Cluster successfully setup. Run 'azdata --help' to see all available options."
 
 sudo -u $K8sVMadminUsername mkdir /home/${K8sVMadminUsername}/.kube
 sudo cp -i /etc/kubernetes/admin.conf /home/${K8sVMadminUsername}/.kube/config
 chown -R $K8sVMadminUsername /home/${K8sVMadminUsername}/.kube/
-
-# # Verify that the cluster is ready to be used.
-# echo "Verifying that the cluster is ready for use..."
-# while true ; do
-
-#     if [[ "$TIMEOUT" -le 0 ]]; then
-#         echo "Cluster node failed to reach the 'Ready' state. Kubeadm setup failed."
-#         exit 1
-#     fi
-
-#     status=`kubectl get nodes --no-headers=true | awk '{print $2}'`
-
-#     if [ "$status" == "Ready" ]; then
-#         break
-#     fi
-
-#     sleep "$RETRY_INTERVAL"
-
-#     TIMEOUT=$(($TIMEOUT-$RETRY_INTERVAL))
-
-#     echo "Cluster not ready. Retrying..."
-# done
-
-# # Install the dashboard for Kubernetes.
-# # Add kubernetes-dashboard repository
-# sudo helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-# # Deploy a Helm Release named "my-release" using the kubernetes-dashboard chart
-# sudo helm install my-dashboard kubernetes-dashboard/kubernetes-dashboard
-
-# echo "Kubernetes master setup done."
-
-# Deploy azdata Azure Arc Data Cotnroller create cluster.
-# echo ""
-# echo "############################################################################"
-# echo "Starting to deploy azdata cluster..." 
-
-# # Command to create cluster for single node cluster.
-# azdata arc dc config init -s azure-arc-kubeadm-private-preview -t azure-arc-custom --force
-
-# azdata arc dc create -n $ARC_DC_NAME -c azure-arc-custom --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
-# echo "Azure Arc Data Controller cluster created." 
-
-# # Setting context to cluster.
-# kubectl config set-context --current --namespace $ARC_DC_NAME
-
-# # Login and get endpoint list for the cluster.
-# azdata login -n $ARC_DC_NAME
-
-# echo "Cluster successfully setup. Run 'azdata --help' to see all available options."
