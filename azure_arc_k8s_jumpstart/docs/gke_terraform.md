@@ -121,7 +121,7 @@ The only thing you need to do before executing the Terraform plan is to export t
     export TF_VAR_gcp_region=us-west1
     export TF_VAR_gke_cluster_name=arc-gke-demo
     export TF_VAR_admin_username=arcdemo
-    export TF_VAR_admin_password=arcdemo123!!
+    export TF_VAR_admin_password='arcdemo1234567!!'
     export TF_VAR_gke_cluster_node_count=1
   ```    
 
