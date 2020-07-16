@@ -35,6 +35,7 @@ echo $ARC_DC_NAME >> vars_profile.sh
 echo $ARC_DC_SUBSCRIPTION >> vars_profile.sh
 echo $ARC_DC_RG >> vars_profile.sh
 echo $ARC_DC_REGION >> vars_profile.sh
+echo $ACCEPT_EULA >> vars_profile.sh
 sed -i '2s/^/export adminUsername=/' vars_profile.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars_profile.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars_profile.sh
@@ -44,6 +45,7 @@ sed -i '7s/^/export ARC_DC_NAME=/' vars_profile.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars_profile.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars_profile.sh
 sed -i '10s/^/export ARC_DC_REGION=/' vars_profile.sh
+sed -i '11s/^/export ACCEPT_EULA=/' vars_profile.sh
 
 cat vars_profile.sh >> /etc/profile
 
