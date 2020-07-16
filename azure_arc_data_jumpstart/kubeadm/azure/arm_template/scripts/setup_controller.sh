@@ -26,15 +26,15 @@ chmod +x vars.sh
 
 # Exporting environment variables for sudo user
 echo '##Azure Arc environment variables##' >> vars_profile.sh
-echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars_profile.sh
-echo $AZDATA_USERNAME:$2 | awk '{print substr($1,2); }' >> vars_profile.sh
-echo $AZDATA_PASSWORD:$3 | awk '{print substr($1,2); }' >> vars_profile.sh
-echo $DOCKER_USERNAME:$4 | awk '{print substr($1,2); }' >> vars_profile.sh
-echo $DOCKER_PASSWORD:$5 | awk '{print substr($1,2); }' >> vars_profile.sh
-echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars_profile.sh
-echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars_profile.sh
-echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars_profile.sh
-echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars_profile.sh
+echo $adminUsername >> vars_profile.sh
+echo $AZDATA_USERNAME >> vars_profile.sh
+echo $AZDATA_PASSWORD >> vars_profile.sh
+echo $DOCKER_USERNAME >> vars_profile.sh
+echo $DOCKER_PASSWORD >> vars_profile.sh
+echo $ARC_DC_NAME >> vars_profile.sh
+echo $ARC_DC_SUBSCRIPTION >> vars_profile.sh
+echo $ARC_DC_RG >> vars_profile.sh
+echo $ARC_DC_REGION >> vars_profile.sh
 sed -i '2s/^/export adminUsername=/' vars_profile.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars_profile.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars_profile.sh
