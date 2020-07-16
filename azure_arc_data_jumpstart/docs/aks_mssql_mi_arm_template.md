@@ -61,7 +61,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     - Runtime script will:
         - Inject user params values (from bullet point #1) to be used in both runtime and logon script
-        - Install the required tools – az cli, az cli Powershell module, kube-cli (Chocolaty packages)
+        - Install the required tools – az cli, az cli Powershell module, kubernetes-cli (Chocolaty packages)
         - Download & install the Azure Data Studio (Insiders) & azdata cli
         - Download the Azure Data Studio Arc & PostgreSQL extensions
         - Download the *MSSQL_MI_Cleanup* and *MSSQL_MI_Deploy* Powershell scripts
