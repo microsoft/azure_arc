@@ -106,10 +106,6 @@ Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
 
 Write-Host "Copying kubeconfig file from Kubernetes VM"
 Write-Host "`n"
-$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
-
 $VM=Get-AzVM -ResourceGroupName $env:ARC_DC_RG -Name $env:K8svmName
 $Profile=$VM.NetworkProfile.NetworkInterfaces.Id.Split("/") | Select -Last 1
 $IPConfig=Get-AzNetworkInterface -Name $Profile

@@ -317,9 +317,11 @@ azdata login -n $ARC_DC_NAME
 
 echo "Cluster successfully setup. Run 'azdata --help' to see all available options."
 
+# Copying kubeconfig to sudo user Home directory
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 sudo cp -i /etc/kubernetes/admin.conf /home/${adminUsername}/.kube/config
 chown -R $adminUsername /home/${adminUsername}/.kube/
 
-# sed '1d' vars.sh > vars_new.sh
-# cat vars_new.sh >> /etc/profile
+# Exporting environment variables for sudo user
+sed '1d' vars.sh > vars_new.sh
+cat vars_new.sh >> /etc/profile
