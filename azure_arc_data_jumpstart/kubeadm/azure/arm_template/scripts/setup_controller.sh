@@ -323,5 +323,7 @@ sudo cp -i /etc/kubernetes/admin.conf /home/${adminUsername}/.kube/config
 chown -R $adminUsername /home/${adminUsername}/.kube/
 
 # Exporting environment variables for sudo user
-sed '1d' vars.sh > vars_new.sh
-cat vars_new.sh >> /etc/profile
+sudo sed '1d' vars.sh > vars_new.sh
+sudo cat vars_new.sh >> /etc/profile
+
+sudo -u $adminUsername sed '1d' vars.sh > vars_test.sh
