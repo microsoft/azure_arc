@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "K8svmName": {
+            "value": "Arc-Data-Kubeadm-Demo"
+        },
+        "vmName": {
+            "value": "Arc-Data-Client"
+        },         
+        "adminUsername": {
+            "value": "arcdemo"
+        },
+        "adminPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "K8sVMSize": {
+            "value": "Standard_D8s_v3"
+        },
+        "vmSize": {
+            "value": "Standard_D4s_v3"
+        },
+        "servicePrincipalClientId": {
+            "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
+        },
+        "servicePrincipalClientSecret": {
+            "value": "33333333-XXXX-YTYT-9c21-7777777777"
+        },
+        "tenantId": {
+            "value": "33333333-XXXX-41af-1111-7777777777"
+        },
+        "AZDATA_USERNAME": {
+            "value": "arcdemo"
+        },
+        "AZDATA_PASSWORD": {
+            "value": "ArcPassword123!!"
+        },
+        "ACCEPT_EULA": {
+            "value": "yes"
+        },        
+        "DOCKER_USERNAME": {
+            "value": "Go-to-private-repo"
+        },
+        "DOCKER_PASSWORD": {
+            "value": "Go-to-private-repo"
+        },
+        "ARC_DC_NAME": {
+            "value": "arcdatactrl"
+        },
+        "ARC_DC_SUBSCRIPTION": {
+            "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
+        },
+        "ARC_DC_RG": {
+            "value": "Arc-Data-Demo"
+        },
+        "ARC_DC_REGION": {
+            "value": "eastus"
+        }               
+    }
+}
