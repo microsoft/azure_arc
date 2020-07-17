@@ -113,7 +113,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     - *"tenantId"* - Azure tenant ID
 
-    - *"resourceGroup"* - Azure Resource Group where all resource to be deployed
+    - *"resourceGroup"* - Azure Resource Group where all the resources get deploy
 
     - *"AZDATA_USERNAME"* - Azure Arc Data Controller admin username
 

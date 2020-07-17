@@ -10,7 +10,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
     **If you already registered to Private Preview, you can skip this prerequisite.**
 
-    ![](../img/aks_dc_vanilla_arm_template/01.png)
+    ![](../img/kubeadm_dc_vanilla_arm_template/01.png)
 
 * Clone this repo
 
@@ -20,7 +20,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
 * Create Azure Service Principal (SP)   
 
-    In order for you to deploy the AKS cluster using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    In order for you to deploy the Azure resources using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```bash
     az login
@@ -56,7 +56,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     - Deploy a single-node Kubernetes cluster using Kubeadm.
     - Deploy the Azure Arc Data Controller on that cluster.
 
-- Once Ubuntu VM deployment has finished, the main ARM template will call a secondary ARM template which is depended on a successful AKS deployment.
+- Once Ubuntu VM deployment has finished, the main ARM template will call a secondary ARM template which is depended on a successful Ubuntu VM deployment.
 
 - Secondary ARM template will deploy a client Windows Server 2019 VM.
 
@@ -79,3 +79,132 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Create the Azure Data Studio desktop shortcut
         - Unregister the logon script Windows schedule task so it will not run after first login
 
+# Deployment 
+
+As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible on deploying Ubuntu VM install with Kubernetes and the Data Controller. Once Ubuntu VM deployment has finished, the template will then automatically execute another template which will deploy the Windows Server Azure VM which will be automatically connected to the Kubernetes cluster.
+
+* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../kubeadm/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../kubeadm/azure/arm_template/azuredeploy.parameters.example.json).
+
+    - *"K8svmName"* - Kubeadm Ubuntu VM name
+
+    - *"vmName"* - Client Windows VM name
+
+    - *"adminUsername"* - Client Windows VM admin username
+
+    - *"adminPassword"* - Client Windows VM admin password
+
+    - *"K8sVMSize"* - Kubeadm Ubuntu VM size
+
+    - *"vmSize"* - Client Windows VM size
+
+    - *"servicePrincipalClientId"* - Your Azure Service Principle name
+
+    - *"servicePrincipalClientSecret"* - Your Azure Service Principle password
+
+    - *"tenantId"* - Azure tenant ID    
+
+    - *"AZDATA_USERNAME"* - Azure Arc Data Controller admin username
+
+    - *"AZDATA_PASSWORD"* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
+
+    - *"ACCEPT_EULA"* - "yes" **Do not change**
+
+    - *"DOCKER_USERNAME"* - Azure Arc Data - Private Preview Docker Registry username (See note below)
+
+    - *"DOCKER_PASSWORD"* - Azure Arc Data - Private Preview Docker Registry password (See note below)
+
+    - *"ARC_DC_NAME"* - Azure Arc Data Controller name (will be used for k8s namespace as well)
+
+    - *"ARC_DC_SUBSCRIPTION"* - Azure Arc Data Controller Azure subscription ID
+
+    - *"ARC_DC_RG"* - Azure Resource Group where all the resources get deploy
+
+    - *"ARC_DC_REGION"* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+
+    **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository]((https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md))**
+
+ * To deploy the ARM template, navigate to the local cloned [deployment folder](../kubeadm/azure/arm_template) and run the below command:
+
+    ```bash
+    az group create --name <Name of the Azure Resource Group> --location <Azure Region>
+    az deployment group create \
+    --resource-group <Name of the Azure Resource Group> \
+    --name <The name of this deployment> \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json \
+    --parameters <The *azuredeploy.parameters.json* parameters file location>
+    ```
+
+    **Note: Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file** 
+
+    For example:
+
+    ```bash
+    az group create --name Arc-Data-Kubeadm-Demo --location "East US"
+    az deployment group create \
+    --resource-group Arc-Data-Kubeadm-Demo \
+    --name arcdatakubeadmdemo \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json \
+    --parameters azuredeploy.parameters.json
+    ```
+
+    **Note: Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20min long**
+
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal. 
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/02.png)
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/03.png)
+
+# Windows Login & Post Deployment
+
+Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are created, it is time to login the client VM. 
+
+* Using it's public IP, RDP to the VM
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/04.png)
+
+* At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process. 
+
+    Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. **The logon script run time is approximately 30s long**.  
+
+    Once the script will finish it's run, the logon script Powershell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/05.png)
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/06.png)
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/07.png)
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/08.png)
+
+* To start interacting with the Azure Arc Data Controller, Open PowerShell and use the log in command bellow.
+
+```powershell
+azdata login -n $env:ARC_DC_NAME
+```
+
+![](../img/kubeadm_dc_vanilla_arm_template/09.png)
+
+# Using the Ubuntu Kubernetes VM
+
+Even though everything you need is installed in the Windows client VM, it is possible, if you prefer, to use *azdata* CLI from within the Ubuntu VM. 
+
+* SSH to the Ubuntu VM using it public IP.
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/10.png)
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/11.png)
+
+* To start interacting with the Azure Arc Data Controller, use the log in command bellow.
+
+```bash
+azdata login -n $ARC_DC_NAME
+```
+
+![](../img/kubeadm_dc_vanilla_arm_template/12.png)
+
+# Cleanup
+
+* To delete the entire environment, simply delete the deployment Resource Group from the Azure portal.
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/13.png)
