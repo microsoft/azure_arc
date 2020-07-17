@@ -180,9 +180,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 # Windows Login & Post Deployment
 
-Now that both the AKS cluster and the Windows Server client VM are created, it is time to login the client VM. 
+Now that both the AKS cluster and the Windows Server client VM are created, it is time to login the Client VM. 
 
-* Using it's public IP, RDP to the VM
+* Using it's public IP, RDP to the **Client VM**
 
     ![](../img/aks_mssql_mi_arm_template/04.png)
 
