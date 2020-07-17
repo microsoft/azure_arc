@@ -135,7 +135,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     - *"ARC_DC_REGION"* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
-    **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md)**
+    **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
 
  * To deploy the ARM template, navigate to the local cloned [deployment folder](../aks/arm_template/dc_vanilla) and run the below command:
 
