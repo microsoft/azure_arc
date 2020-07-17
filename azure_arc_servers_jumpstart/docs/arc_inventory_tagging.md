@@ -14,6 +14,10 @@ In this guide, we will use [Resource Graph Explorer](https://docs.microsoft.com/
 
 * Clone this repo
 
+    ```terminal
+    git clone https://github.com/microsoft/azure_arc.git
+    ```
+
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * Resources projected into Azure via Azure Arc from AWS and/or GCP.

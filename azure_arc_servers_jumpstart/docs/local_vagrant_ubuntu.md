@@ -6,6 +6,10 @@ The following README will guide you on how to deploy a local "Ready to Go" **Ubu
 
 * Clone this repo
 
+    ```terminal
+    git clone https://github.com/microsoft/azure_arc.git
+    ```
+    
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * Vagrant relies on an underlying hypervisor. For the purpose of this guide, we will be using "Oracle VM VirtualBox".

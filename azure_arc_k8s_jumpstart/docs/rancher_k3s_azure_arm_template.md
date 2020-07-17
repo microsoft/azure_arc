@@ -4,8 +4,12 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 # Prerequisites
 
-* Clone or fork this repo.
+* Clone this repo
 
+    ```terminal
+    git clone https://github.com/microsoft/azure_arc.git
+    ```
+    
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * Create Azure Service Principal (SP)   
