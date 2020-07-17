@@ -14,8 +14,12 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
 
 # Prerequisites
 
-* Clone this repo.
+* Clone this repo
 
+    ```terminal
+    git clone https://github.com/microsoft/azure_arc.git
+    ```
+    
 * Register your subscription to access preview extensions functionality.
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.

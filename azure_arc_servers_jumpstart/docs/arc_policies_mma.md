@@ -16,7 +16,11 @@ You can use the Azure Portal, an ARM template or PowerShell script to assign pol
 
 # Prerequisites
 
-* Clone this repo.
+* Clone this repo
+
+    ```terminal
+    git clone https://github.com/microsoft/azure_arc.git
+    ```
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
