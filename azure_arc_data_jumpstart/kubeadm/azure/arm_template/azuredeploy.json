@@ -414,7 +414,7 @@
             "typeHandlerVersion": "2.1",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-            "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('ACCEPT_EULA'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'))]",
+                        "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'))]",
             "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh"]
             }
           }
