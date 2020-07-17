@@ -115,7 +115,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     - *"DOCKER_PASSWORD"* - Azure Arc Data - Private Preview Docker Registry password (See note below)
 
-    - *"ARC_DC_NAME"* - Azure Arc Data Controller name (will be used for k8s namespace as well)
+    - *"ARC_DC_NAME"* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. (This name will be used for k8s namespace as well)
 
     - *"ARC_DC_SUBSCRIPTION"* - Azure Arc Data Controller Azure subscription ID
 
