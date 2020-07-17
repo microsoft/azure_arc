@@ -116,7 +116,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     - *"tenantId"* - Azure tenant ID
 
-    - *"resourceGroup"* - Azure Resource Group where all resource to be deployed
+    - *"resourceGroup"* - Azure Resource Group where all the resources get deploy
 
     - *"AZDATA_USERNAME"* - Azure Arc Data Controller admin username
 
@@ -176,7 +176,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 # Windows Login & Post Deployment
 
-Now that both the AKS cluster and the Windows Server VM are created, it is time to login the VM. 
+Now that both the AKS cluster and the Windows Server client VM are created, it is time to login the client VM. 
 
 * Using it's public IP, RDP to the VM
 
