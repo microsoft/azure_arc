@@ -2,7 +2,7 @@
 
 The following README will guide you on how to onboard an Azure Arc enabled Machine on to [Azure Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources. 
 
-In this guide, you will enable and configure Azure Sentinel on your Azure subscription.
+In this guide, you will enable and configure Azure Sentinel on your Azure subscription. To complete this process you will: 
 
 * Setup the Log Analytics Workspace where logs and events will be aggregated for analysis and correlation. 
 
@@ -77,10 +77,10 @@ Azure Sentinel uses the Log Analytics agent to collect Windows and Linux server'
 
 # Azure Arc enabled VMs onboarding on Azure Sentinel 
 
-Once you have deployed Azure Sentinel on your Log Analytics workspace, you need to start connecting data sources. There are connectors for Microsoft services, 3rd party solutions of the security ecosystem or you can also use Common Event Format (CEF), Syslog or REST-API to connect your data sources with Azure Sentinel. For servers and VMs, you can install the MMA or Sentinel agent that collects the logs and forwards them to Azure Sentinel. You can deploy the agent in multiple ways levaring Azure Arc: 
+Once you have deployed Azure Sentinel on your Log Analytics workspace, you need to start connecting data sources. There are connectors for Microsoft services, 3rd party solutions of the security ecosystem or you can also use Common Event Format (CEF), Syslog or REST-API to connect your data sources with Azure Sentinel. For servers and VMs, you can install the MMA or Sentinel agent that collects the logs and forwards them to Azure Sentinel. You can deploy the agent in multiple ways leveraging Azure Arc: 
 
-* [Azure Extension Management](arc_vm_extension_mma_arm.md): Azure Arc for servers, enables you to deploy the Microsoft Monitoring Agent VM extensions to non-Azure Windows and Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to manage the extension deployment to Arc servers, both Linux and Windows. 
-* [Azure Policies](arc_policies_mma.md): with this approach you will assign a policy to audit if the Azure Arc enabled machine has the (Microsoft Monitoring Agent) MMA agent installed, if not, you will use the extensions feature to automatically deploy it to the VM with a remediation task, an enrollment experience that levels to Azure VMs.
+* **Extension Management**: Azure Arc for servers, enables you to deploy the Microsoft Monitoring Agent VM extensions to non-Azure Windows and Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to manage the extension deployment to Arc servers, both Linux and Windows. A guide con how to set up this solution can be found on this repo [here](arc_vm_extension_mma_arm.md)
+* **Azure Policies**: with this approach you will assign a policy to audit if the Azure Arc enabled machine has the (Microsoft Monitoring Agent) MMA agent installed, if not, you will use the extensions feature to automatically deploy it to the VM with a remediation task, an enrollment experience that levels to Azure VMs. A guide con how to set up this solution can be found on this repo [here](arc_policies_mma.md)
 
 # Clean up environment
 
