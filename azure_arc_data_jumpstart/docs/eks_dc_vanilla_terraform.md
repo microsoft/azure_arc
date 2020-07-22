@@ -93,5 +93,41 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
   ![](../img/eks_dc_vanilla_terraform/12.png)
 
+  ![](../img/eks_dc_vanilla_terraform/13.png)  
+
 * Copy the downloaded *pem* file to where the terraform binaries are located (in your cloned repository directory).
 
+  ![](../img/eks_dc_vanilla_terraform/14.png)
+
+# Automation Flow
+
+For you to get familiar with the automation and deployment flow, below is an explanation.
+ 
+- User is editing and exporting Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables values are being used throughout the deployment.
+
+- User deploys the Terraform plan which will deploy the EKS cluster and the EC2 Windows Client instance. 
+
+- In addition, the plan will copy the EKS *kubeconfig* file as well as the *configmap.yml* file (which is responsible for having the EKS nodes communicate with the cluster control plane) on to the Windows instance.
+
+- As part of the Windows Server 2019 VM deployment, there are 3 scripts executions:
+
+  1. *azure_arc.ps1* script will be created automatically at the Terraform plan runtime and is responsible on injecting the *TF_VAR* variables values on to the Windows instance which will then be used in both the *ClientTools* and the *LogonScript* scripts.
+
+  2. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
+    - Create the *ClientTools.log* file  
+    - Install the required tools – az cli, az cli Powershell module, kubernetes-cli, aws-iam-authenticator (Chocolaty packages)
+    - Download & install the Azure Data Studio (Insiders) & azdata cli
+    - Download the Azure Data Studio Arc & PostgreSQL extensions
+    - Apply the *configmap.yml* file on the EKS cluster
+    - Create the *azdata* config file in user Windows profile
+    - Install the Azure Data Studio Arc & PostgreSQL extensions
+    - Create the Azure Data Studio desktop shortcut    
+    - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
+    - Create the logon script
+    - Create the Windows schedule task to run the logon script at first login
+
+  3. *LogonScript.ps1* script will run on user first logon to Windows and will:
+    - Create the *LogonScript.log* file
+    - Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
+    - Deploy the Arc Data Controller using the *TF_VAR* variables values
+    - Unregister the logon script Windows schedule task so it will not run after first login
