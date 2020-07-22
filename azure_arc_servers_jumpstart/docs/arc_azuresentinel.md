@@ -81,7 +81,7 @@ Once you have deployed Azure Sentinel on your Log Analytics workspace, you need 
 
 * Using the **[Extension Management](arc_vm_extension_mma_arm.md)** feature in Azure Arc for servers that enables you to deploy the Microsoft Monitoring Agent VM extensions to non-Azure Windows and Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to manage the extension deployment to Arc servers, both Linux and Windows. 
 
-* Setting up **[Azure Policies](arc_policies_mma.md)**, with this approach you will assign a policy to audit if the Azure Arc enabled machine has the (Microsoft Monitoring Agent) MMA agent installed, if not, you will use the extensions feature to automatically deploy it to the VM with a remediation task, an enrollment experience that levels to Azure VMs. 
+* Setting up **[Azure Policies](arc_policies_mma.md)**, with this approach you will assign a policy to audit if the Azure Arc enabled machine has the Microsoft Monitoring Agent (MMA) installed, if not, you will use the extensions feature to automatically deploy it to the VM with a remediation task, an enrollment experience that levels to Azure VMs. 
 
 # Clean up environment
 
