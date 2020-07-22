@@ -12,5 +12,4 @@ kubectl delete clusterrole arcdatactrl:cr-mssql-metricsdc-reader
 
 Stop-Transcript
 
-Stop-Process -Name kubectl -Force
 Stop-Process -Name powershell -Force
