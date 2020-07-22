@@ -7,5 +7,4 @@ azdata login -n $env:ARC_DC_NAME
 
 Stop-Transcript
 
-Stop-Process -Name kubectl -Force
 Stop-Process -name powershell -Force
