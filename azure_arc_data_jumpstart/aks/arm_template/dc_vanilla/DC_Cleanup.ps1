@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\tmp\mssql_cleanup.log
+Start-Transcript -Path C:\tmp\dc_cleanup.log
 
 # Deleting Azure Arc Data Controller namespace and it's resources
 start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
