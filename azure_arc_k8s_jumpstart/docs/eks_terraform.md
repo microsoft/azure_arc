@@ -81,7 +81,7 @@ The following README will guide you on how to use the provided [Terraform](https
   An access key grants programmatic access to your resources. To create an AWS Access Key for a user:
   1. Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home). 
     ![](../img/eks_terraform/image0.png)
-  2. Select the **Users** from the side menue. 
+  2. Select the **Users** from the side menu. 
     ![](../img/eks_terraform/image1.png)
   3. Select the **User** you want to create the access key for. 
    ![](../img/eks_terraform/image2.png)
