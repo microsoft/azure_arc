@@ -85,7 +85,7 @@ Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
 # Stopping log for LogonScript.ps1
 Stop-Transcript
-Stop-Process -Name kubectl -Force
+
 Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
