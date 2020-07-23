@@ -92,6 +92,8 @@ Once you have server resources projected into Azure with Azure Arc, you can star
  
 * [Integrate Azure Security Center with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_securitycenter.md)
 
+* [Integrate Azure Sentinel with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_azuresentinel.md)
+
 ## Azure Arc enabled Kubernetes
 
 The below deployment options are focused on Azure Arc for Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
