@@ -1,6 +1,6 @@
 # Azure Arc enabled Servers on Azure Sentinel
 
-The following README will guide you on how to onboard an Azure Arc enabled Machine on to [Azure Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources. 
+The following README will guide you on how to onboard an Azure Arc enabled Servers on to [Azure Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources. 
 
 In this guide, you will enable and configure Azure Sentinel on your Azure subscription. To complete this process you will: 
 
@@ -8,7 +8,7 @@ In this guide, you will enable and configure Azure Sentinel on your Azure subscr
 
 * Enable Azure Sentinel on the workspace. 
 
-* Onboard Azure Arc enabled Machines on Sentinel by using the extension management feature and Azure Policies. 
+* Onboard Azure Arc enabled Servers on Sentinel by using the extension management feature and Azure Policies. 
 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
@@ -75,13 +75,26 @@ Azure Sentinel uses the Log Analytics agent to collect Windows and Linux server'
     --parameters <The *sentinel-template.parameters.json* template file location>
   ```
 
+For example: 
+
+   ![](../img/azuresentinel/04.png)
+
+
 # Azure Arc enabled VMs onboarding on Azure Sentinel 
 
-Once you have deployed Azure Sentinel on your Log Analytics workspace, you need to start connecting data sources. There are connectors for Microsoft services, 3rd party solutions of the security ecosystem or you can also use Common Event Format (CEF), Syslog or REST-API to connect your data sources with Azure Sentinel. For servers and VMs, you can install the MMA or Sentinel agent that collects the logs and forwards them to Azure Sentinel. You can deploy the agent in multiple ways leveraging Azure Arc: 
+Once you have deployed Azure Sentinel on your Log Analytics workspace, you will need to connect data sources to it. 
 
-* Using the **[Extension Management](arc_vm_extension_mma_arm.md)** feature in Azure Arc for servers that enables you to deploy the Microsoft Monitoring Agent VM extensions to non-Azure Windows and Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template or PowerShell script to manage the extension deployment to Arc servers, both Linux and Windows. 
+There are connectors for Microsoft services, 3rd party solutions from the Security products ecosystem or, you can also use Common Event Format (CEF), Syslog as well as REST-API to connect your data sources with Azure Sentinel. 
 
-* Setting up **[Azure Policies](arc_policies_mma.md)**, with this approach you will assign a policy to audit if the Azure Arc enabled machine has the Microsoft Monitoring Agent (MMA) installed, if not, you will use the extensions feature to automatically deploy it to the VM with a remediation task, an enrollment experience that levels to Azure VMs. 
+For servers and VMs, you can install the Microsoft Monitoring Agent (MMA) agent or the Sentinel agent which collects the logs and forwards them to Azure Sentinel. You can deploy the agent in multiple ways by leveraging Azure Arc:
+
+* Using the **[Extension Management](arc_vm_extension_mma_arm.md)**
+
+    This feature in Azure Arc enabled Servers allows you to deploy the MMA agent VM extensions to a non-Azure Windows and/or Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template as well as PowerShell script to manage the extension deployment to Arc servers.
+
+* Setting up **[Azure Policies](arc_policies_mma.md)**
+
+    Using this approach, you will assign an Azure Policy to audit if the Azure Arc enabled Server has the MMA agent installed. If the agent is not installed, you will use the Extensions feature to automatically deploy it to the VM using a Remediation task, an enrollment experience that levels to Azure VMs. 
 
 # Clean up environment
 
@@ -99,3 +112,4 @@ Complete the following steps to clean up your environment.
     ```bash
     az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
     ```
+   ![](../img/azuresentinel/05.png)
