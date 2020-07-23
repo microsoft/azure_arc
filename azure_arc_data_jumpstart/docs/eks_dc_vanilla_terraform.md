@@ -122,7 +122,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - As part of the Windows Server 2019 VM deployment, there are 3 scripts executions:
 
-  1. *azure_arc.ps1* script will be created automatically at the Terraform plan runtime and is responsible on injecting the *TF_VAR* variables values on to the Windows instance which will then be used in both the *ClientTools* and the *LogonScript* scripts.
+  1. *azure_arc.ps1* script will be created automatically as part of the Terraform plan runtime and is responsible on injecting the *TF_VAR* variables values on to the Windows instance which will then be used in both the *ClientTools* and the *LogonScript* scripts.
 
   2. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
       - Create the *ClientTools.log* file  
