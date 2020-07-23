@@ -249,7 +249,7 @@ Now that both the EKS cluster and the Windows Server Client instance are created
 
     ```powershell
     azdata login -n $env:ARC_DC_NAME
-    ata arc dc status show
+    azdata arc dc status show
     ```
 
   ![](../img/eks_dc_vanilla_terraform/32.png)
