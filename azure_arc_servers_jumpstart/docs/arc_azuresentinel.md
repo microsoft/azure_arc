@@ -112,4 +112,4 @@ Complete the following steps to clean up your environment.
     ```bash
     az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
     ```
-   ![](../img/azuresentinel/05.png)
+
