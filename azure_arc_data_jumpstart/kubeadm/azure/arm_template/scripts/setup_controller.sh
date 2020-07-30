@@ -329,7 +329,6 @@ echo "##########################################################################
 echo "Starting to deploy azdata cluster..." 
 
 # Command to create cluster for single node cluster.
-# azdata arc dc config init -s azure-arc-kubeadm-private-preview -t azure-arc-custom --force
 azdata arc dc create -n $ARC_DC_NAME -p azure-arc-kubeadm-private-preview --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
 echo "Azure Arc Data Controller cluster created."
 
