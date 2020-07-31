@@ -186,6 +186,12 @@ If you do not yet have a Kubernetes cluster, the following examples walk through
 
 * [Azure Arc Data Controller Vanilla Deployment on EKS using Terraform](azure_arc_data_jumpstart/docs/eks_dc_vanilla_terraform.md)
 
+#### Data Services on GCP Google Kubernetes Engine (GKE)
+
+If you do not yet have a Kubernetes cluster, the following examples walk through creating a GKE cluster and deploy Azure Arc Data Services on top of it.
+
+* [Azure Arc Data Controller Vanilla Deployment on GKE using Terraform](azure_arc_data_jumpstart/docs/gke_dc_vanilla_terraform.md)
+
 #### Data Services on Upstream Kubernetes (Kubeadm)
 
 If you do not yet have a Kubernetes cluster, the following examples walk through creating an single-node Kubernetes cluster to simulate an "on-premises" cluster and deploy Azure Arc Data Services on top of it.
