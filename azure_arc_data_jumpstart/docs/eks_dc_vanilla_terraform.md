@@ -167,19 +167,19 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
 
   - export TF_VAR_AZDATA_USERNAME='Azure Arc Data Controller admin username'
 
-  - export TF_VAR_AZDATA_PASSWORD='Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)'
+  - export TF_VAR_AZDATA_PASSWORD='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
 
   - export TF_VAR_DOCKER_USERNAME='Azure Arc Data - Private Preview Docker Registry username' (See note below)
 
   - export TF_VAR_DOCKER_PASSWORD='Azure Arc Data - Private Preview Docker Registry password' (See note below)
 
-  - export TF_VAR_ARC_DC_NAME='Azure Arc Data Controller name (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for k8s namespace as well)'
+  - export TF_VAR_ARC_DC_NAME='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
 
   - export TF_VAR_ARC_DC_SUBSCRIPTION='Azure Arc Data Controller Azure subscription ID'
 
   - export TF_VAR_ARC_DC_RG='Azure Resource Group where all future Azure Arc resources will be deployed'
 
-  - export TF_VAR_ARC_DC_REGION='Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)'
+  - export TF_VAR_ARC_DC_REGION='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
   **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
 
