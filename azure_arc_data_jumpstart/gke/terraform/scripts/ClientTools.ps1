@@ -82,7 +82,7 @@ azdata arc dc config replace --config-file "C:\tmp\custom\control.json" --json-v
 azdata arc dc config replace --config-file "C:\tmp\custom\control.json" --json-values "$.spec.endpoints[*].serviceType=LoadBalancer"
 
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc dc create --path "C:\tmp\custom\control.json" --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:ARC_DC_RG --location $env:ARC_DC_REGION --connectivity-mode indirect
+azdata arc dc create --path "C:\tmp\custom" --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:ARC_DC_RG --location $env:ARC_DC_REGION --connectivity-mode indirect
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
