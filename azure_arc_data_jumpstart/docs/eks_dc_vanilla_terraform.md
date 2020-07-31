@@ -219,7 +219,7 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
 
 # Windows Login & Post Deployment
 
-Now that both the EKS cluster and the Windows Server Client instance are created, it is time to login to the Client VM.
+Now that we have both the EKS cluster and the Windows Server Client instance created, it is time to login to the Client VM.
 
 * Select the Windows instance, click *"Connect"* and download the Remote Desktop file.
 
@@ -235,7 +235,7 @@ Now that both the EKS cluster and the Windows Server Client instance are created
 
     Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the EKS cluster. **The logon script run time is approximately 10min long**.
 
-    Once the script will finish it's run, the logon script Powershell session will be closed and the Azure Arc Data Controller will be deployed on the EKS cluster and be ready to use.
+    Once the script will finish it's run, the logon script Powershell session will be close and the Azure Arc Data Controller will be deployed on the EKS cluster and be ready to use.
 
   ![](../img/eks_dc_vanilla_terraform/28.png)
 
@@ -282,7 +282,7 @@ To completely delete the environment, follow the below steps:
 
   1. on the Windows Client instance, run the *DC_Cleanup.ps1* Powershell script.
 
-  2. Run the ```terraform destroy --auto-approve``` which will delete the AWS resources as well the Azure Resource Group. **The *terraform destroy* run time is approximately ~8-9min long** 
+  2. Run the ```terraform destroy --auto-approve``` which will delete all of the AWS resources as well as the Azure Resource Group. **The *terraform destroy* run time is approximately ~8-9min long** 
 
   ![](../img/eks_dc_vanilla_terraform/39.png)
 

@@ -1,6 +1,7 @@
 resource "google_container_cluster" "arcdemo" {
   name     = var.gke_cluster_name
   location = var.gcp_region
+  # zone   = var.gcp_zone
 
   # We can't create a cluster with no node pool defined, but we want to only use
   # separately managed node pools. So we create the smallest possible default

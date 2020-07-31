@@ -23,7 +23,6 @@ resource "google_compute_network" "default" {
 resource "google_compute_instance" "default" {
   name         = "arc-gcp-demo"
   machine_type = "n1-standard-2"
-  zone         = var.gcp_zone
   tags         = ["arc"]
   boot_disk {
     initialize_params {

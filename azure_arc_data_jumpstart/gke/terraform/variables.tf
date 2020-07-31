@@ -1,42 +1,59 @@
 # Declare TF variables
 variable "gcp_project_id" {
+  description = "GCP Project ID"
+  type        = string
 }
 
 variable "gcp_credentials_filename" {
+  description = "GCP Credentials filename (JSON)"
+  type        = string
 }
 
 variable "gcp_region" {
-  default = "us-west1"
-}
-
-variable "gke_cluster_name" {
-  default = "arc-data-gke"
-}
-
-variable "admin_username" {
-  default = "arcadmin"
-}
-
-variable "admin_password" {
-  default = "arcdemo123!!"
-}
-
-variable "gke_cluster_node_count" {
+  description = "GCP region where resource will be created"
+  type        = string
+  default     = "us-west1"
 }
 
 variable "gcp_zone" {
-  default = "us-west1-a"
+  description = "GCP zone where resource will be created"
+  type        = string
+  default     = "us-west1-a"
 }
 
-# variable "key_name" {
-#   default = "rsakey1"
-# }
+variable "gke_cluster_name" {
+  description = "GKE cluster name"
+  type        = string
+  default     = "arc-data-gke"
+}
+
+variable "admin_username" {
+  description = "GKE cluster administrator username"
+  type        = string
+  default     = "arcadmin"
+}
+
+variable "admin_password" {
+  description = "GKE cluster administrator password"
+  type        = string
+  default     = "ArcDemo1234567!!"
+}
+
+variable "gke_cluster_node_count" {
+  description = "GKE cluster number of worker nodes"
+  type        = number
+}
 
 variable "windows_username" {
+  description = "Windows Server Client compute instance VM administrator username"
+  type        = string
+  default     = "arcdemo"
 }
 
-
 variable "windows_password" {
+  description = "Windows Server Client compute instance VM administrator password"
+  type        = string
+  default     = "Passw0rd123!!"
 }
 
 variable "AZDATA_USERNAME" {

@@ -6,13 +6,12 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 # Deployment TL;DR
 
-  - Create a Google Cloud Platform (GCP) project and IAM Role
-  - Create & download AWS Key Pair
+  - Create a Google Cloud Platform (GCP) project, IAM Role & Service Account
+  - Download credentials file
   - Clone this repository
   - Edit *TF_VAR* variables values
   - *terraform init*
   - *terraform apply*
-  - EKS cleanup
   - *terraform destroy*
 
 # Prerequisites
@@ -108,76 +107,70 @@ In order to deploy resources in GCP, we will create a new GCP Project as well as
 
       ![](../img/gke_dc_vanilla_terraform/19.png)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
  
 - User is editing and exporting Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables values are being used throughout the deployment.
 
-- User deploys the Terraform plan which will deploy the EKS cluster and the EC2 Windows Client instance as well as an Azure Resource Group. The Azure Resource Group is required to host the Azure Arc services you will be able to deploy such as Azure SQL Managed Instance and PostgresSQL Hyperscale. 
+- User deploys the Terraform plan which will deploy the GKE cluster and the GCP compute instance VM as well as an Azure Resource Group. The Azure Resource Group is required to host the Azure Arc services you will be able to deploy such as Azure SQL Managed Instance and PostgresSQL Hyperscale. 
 
-- In addition, the plan will copy the EKS *kubeconfig* file as well as the *configmap.yml* file (which is responsible for having the EKS nodes communicate with the cluster control plane) on to the Windows instance.
+- In addition, the plan will copy the *faster_sc.yaml* file which will be used to create a Kubernetes Storage Class that will get leveraged by Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
 
-- As part of the Windows Server 2019 VM deployment, there are 3 scripts executions:
+- As part of the Windows Server 2019 VM deployment, there are 4 scripts executions:
 
   1. *azure_arc.ps1* script will be created automatically as part of the Terraform plan runtime and is responsible on injecting the *TF_VAR* variables values on to the Windows instance which will then be used in both the *ClientTools* and the *LogonScript* scripts.
 
-  2. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
+  2. *password_reset.ps1* script will be created automatically as part of the Terraform plan runtime and is responsible on creating the Windows username & password.
+
+  3. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
       - Create the *ClientTools.log* file  
-      - Install the required tools – az cli, az cli Powershell module, kubernetes-cli, aws-iam-authenticator (Chocolaty packages)
+      - Install the required tools – az cli, az cli Powershell module, kubernetes-cli (Chocolaty packages)
       - Download & install the Azure Data Studio (Insiders) & azdata cli
       - Download the Azure Data Studio Arc & PostgreSQL extensions
-      - Apply the *configmap.yml* file on the EKS cluster
+      - Apply the *faster_sc.yaml* file on the GKE cluster
       - Create the *azdata* config file in user Windows profile
       - Install the Azure Data Studio Arc & PostgreSQL extensions
       - Create the Azure Data Studio desktop shortcut    
       - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
+      - Disable Windows Server Manager
       - Create the logon script
       - Create the Windows schedule task to run the logon script at first login
 
-  3. *LogonScript.ps1* script will run on user first logon to Windows and will:
+  4. *LogonScript.ps1* script will run on user first logon to Windows and will:
       - Create the *LogonScript.log* file
       - Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
+      - Create Arc Data Controller config file (*control.json*) to setup the use of the Storage Class and Kubernetes LoadBalancer service
       - Deploy the Arc Data Controller using the *TF_VAR* variables values
       - Unregister the logon script Windows schedule task so it will not run after first login
 
 # Deployment
 
-As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows Server 2019 Client instance.
+As mentioned, the Terraform plan will deploy a GKE cluster and a Windows Server 2019 Client GCP compute instance.
 
-* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](../eks/terraform/example/TF_VAR_example.sh)
+* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](../gke/terraform/example/TF_VAR_example.sh)
 
-  ![](../img/eks_dc_vanilla_terraform/15.png)
+  ![](../img/gke_dc_vanilla_terraform/20.png)
 
-  - export TF_VAR_AWS_ACCESS_KEY_ID='Your AWS Access Key ID (Created in the prerequisites section)'
+  - export TF_VAR_gcp_project_id='Your GCP Project ID (Created in the prerequisites section)'
 
-  - export TF_VAR_AWS_SECRET_ACCESS_KEY='Your AWS Secret Key (Created in the prerequisites section)'
+  - export TF_VAR_gcp_credentials_filename='Your GCP Credentials JSON filename (Created in the prerequisites section)'
 
-  - export TF_VAR_key_name='Your AWS Key Pair name (Created in the prerequisites section)'
+  - export TF_VAR_gcp_region='GCP region where resource will be created'
 
-  - export TF_VAR_key_pair_filename='Your AWS Key Pair *.pem filename (Created in the prerequisites section)'
+  - export TF_VAR_gcp_zone='GCP zone where resource will be created'
+
+  - export TF_VAR_gke_cluster_name='GKE cluster name'
+
+  - export TF_VAR_admin_username='GKE cluster administrator username'
+
+  - export TF_VAR_admin_password='GKE cluster administrator password'
+  
+  - export TF_VAR_gke_cluster_node_count='GKE cluster number of worker nodes'
+
+  - export TF_VAR_windows_username='Windows Server Client compute instance VM administrator username'
+
+  - export TF_VAR_windows_password='Windows Server Client compute instance VM administrator password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)'
 
   - export TF_VAR_client_id='Your Azure Service Principle name'
 
@@ -206,64 +199,58 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
 * Navigate to the folder that has Terraform binaries.
 
   ```bash
-  cd azure_arc_data_jumpstart/eks/terraform
+  cd azure_arc_data_jumpstart/gke/terraform
   ```
 
 * Run the ```terraform init``` command which is used to initialize a working directory containing Terraform configuration files and load the required Terraform providers.
 
-  ![](../img/eks_dc_vanilla_terraform/16.png)
+  ![](../img/gke_dc_vanilla_terraform/21.png)
 
 * (Optional but recommended) Run the ```terraform plan``` command to make sure everything is configured properly.
 
-  ![](../img/eks_dc_vanilla_terraform/17.png)
+  ![](../img/gke_dc_vanilla_terraform/22.png)
 
 * Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. **Runtime for deploying all the AWS resources for this plan is ~30min.**
 
-* Once completed, the plan will output a decrypted password for your Windows Client instance. Before connecting to the Client instance, you can review the EKS cluster and the EC2 instances created. Notice how 3 instances were created; 2 EKS nodes and the Client instance.
+* Once completed, you can review the GKE cluster and the worker nodes resources as well as the GCP compute instance VM created.
 
-  ![](../img/eks_dc_vanilla_terraform/18.png)
+  ![](../img/gke_dc_vanilla_terraform/23.png)
 
-  ![](../img/eks_dc_vanilla_terraform/19.png)
+  ![](../img/gke_dc_vanilla_terraform/24.png)  
 
-  ![](../img/eks_dc_vanilla_terraform/20.png)
+  ![](../img/gke_dc_vanilla_terraform/25.png)
 
-  ![](../img/eks_dc_vanilla_terraform/21.png)
+  ![](../img/gke_dc_vanilla_terraform/26.png)  
 
-  ![](../img/eks_dc_vanilla_terraform/22.png)
-
-  ![](../img/eks_dc_vanilla_terraform/23.png)
+  ![](../img/gke_dc_vanilla_terraform/27.png)
 
 * In the Azure Portal, a new empty Azure Resource Group was created. As mentioned, this Resource Group will be used for Azure Arc Data Service you will be deploying in the future.
 
-  ![](../img/eks_dc_vanilla_terraform/24.png)
+  ![](../img/gke_dc_vanilla_terraform/28.png)
 
 # Windows Login & Post Deployment
 
-Now that both the EKS cluster and the Windows Server Client instance are created, it is time to login to the Client VM.
+Now that we have both the GKE cluster and the Windows Server Client instance created, it is time to login to the Client VM.
 
-* Select the Windows instance, click *"Connect"* and download the Remote Desktop file.
+* Select the Windows instance, click on the RDP dropdown and download the RDP file. Using your *windows_username* and *windows_password* credentials, log in to the VM. 
 
-  ![](../img/eks_dc_vanilla_terraform/25.png)
+  ![](../img/gke_dc_vanilla_terraform/29.png)
 
-  ![](../img/eks_dc_vanilla_terraform/26.png)
-
-  ![](../img/eks_dc_vanilla_terraform/27.png)
-
-* Using the decrypted password, RDP the Windows instance. In case you need to get the password later, use the ```terraform output``` command to re-present the plan output. 
+  ![](../img/gke_dc_vanilla_terraform/30.png)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process. 
 
-    Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the EKS cluster. **The logon script run time is approximately 10min long**.
+    Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the GKE cluster. **The logon script run time is approximately 10min long**.
 
-    Once the script will finish it's run, the logon script Powershell session will be closed and the Azure Arc Data Controller will be deployed on the EKS cluster and be ready to use.
+    Once the script will finish it's run, the logon script Powershell session will be close and the Azure Arc Data Controller will be deployed on the GKE cluster and be ready to use.
 
-  ![](../img/eks_dc_vanilla_terraform/28.png)
+  ![](../img/gke_dc_vanilla_terraform/31.png)
 
-  ![](../img/eks_dc_vanilla_terraform/29.png)
+  ![](../img/gke_dc_vanilla_terraform/32.png)
 
-  ![](../img/eks_dc_vanilla_terraform/30.png)
+  ![](../img/gke_dc_vanilla_terraform/33.png)
 
-  ![](../img/eks_dc_vanilla_terraform/31.png)    
+  ![](../img/gke_dc_vanilla_terraform/34.png)    
 
 * Using Powershell, login to the Data Controller and check it's health using the below commands.
 
@@ -272,40 +259,32 @@ Now that both the EKS cluster and the Windows Server Client instance are created
     azdata arc dc status show
     ```
 
-  ![](../img/eks_dc_vanilla_terraform/32.png)
+  ![](../img/gke_dc_vanilla_terraform/35.png)
 
 * Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions. 
 
-  ![](../img/eks_dc_vanilla_terraform/33.png)
+  ![](../img/gke_dc_vanilla_terraform/36.png)
 
-  ![](../img/eks_dc_vanilla_terraform/34.png)
+  ![](../img/gke_dc_vanilla_terraform/37.png) 
 
 # Cleanup
 
 * To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client instance. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is ~2-3min long**.
 
-  ![](../img/eks_dc_vanilla_terraform/35.png)
+  ![](../img/gke_dc_vanilla_terraform/38.png)
 
-  ![](../img/eks_dc_vanilla_terraform/36.png)
+  ![](../img/gke_dc_vanilla_terraform/39.png) 
 
 # Re-Deploy Azure Arc Data Controller
 
-In case you deleted the Azure Arc Data Controller from the EKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long** 
+In case you deleted the Azure Arc Data Controller from the GKE cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long** 
 
-  ![](../img/eks_dc_vanilla_terraform/37.png)
+  ![](../img/gke_dc_vanilla_terraform/40.png)
 
-  ![](../img/eks_dc_vanilla_terraform/38.png) 
+  ![](../img/gke_dc_vanilla_terraform/41.png) 
 
 # Delete the deployment
 
-To completely delete the environment, follow the below steps:
+To completely delete the environment, follow the below steps run the ```terraform destroy --auto-approve``` command which will delete all of the GCP resources as well as the Azure Resource Group. **The *terraform destroy* run time is approximately ~5-6min long** 
 
-  1. on the Windows Client instance, run the *DC_Cleanup.ps1* Powershell script.
-
-  2. Run the ```terraform destroy --auto-approve``` which will delete the AWS resources as well the Azure Resource Group. **The *terraform destroy* run time is approximately ~8-9min long** 
-
-  ![](../img/eks_dc_vanilla_terraform/39.png)
-
-  ![](../img/eks_dc_vanilla_terraform/40.png)
-
-  ![](../img/eks_dc_vanilla_terraform/41.png)
+  ![](../img/gke_dc_vanilla_terraform/42.png)
