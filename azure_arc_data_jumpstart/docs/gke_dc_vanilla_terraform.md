@@ -1,12 +1,12 @@
-# Azure Arc Data Controller Vanilla Deployment on EKS (Terraform)
+# Azure Arc Data Controller Vanilla Deployment on GKE (Terraform)
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on [Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks/) cluster, using [Terraform](https://www.terraform.io/). 
+The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster, using [Terraform](https://www.terraform.io/). 
 
-By the end of this guide, you will have an EKS cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) AWS EC2 instance VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
 # Deployment TL;DR
 
-  - Create AWS IAM Role
+  - Create a Google Cloud Platform (GCP) project and IAM Role
   - Create & download AWS Key Pair
   - Clone this repository
   - Edit *TF_VAR* variables values
@@ -21,7 +21,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
     **If you already registered to Private Preview, you can skip this prerequisite.**
 
-    ![](../img/eks_dc_vanilla_terraform/01.png)
+    ![](../img/gke_dc_vanilla_terraform/01.png)
 
 * Clone this repo
 
@@ -29,11 +29,9 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install AWS IAM Authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
-
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* [Create a free Amazon Web Service's account](https://aws.amazon.com/free/)
+* [Create a free Google Cloud account](https://cloud.google.com/free)
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
@@ -64,51 +62,73 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
     
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-* Create AWS User IAM Key. An access key grants programmatic access to your resources which we will be using later on in this guide. 
+* Create a new GCP Project, IAM Role & Service Account
 
-  1. Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home).
+In order to deploy resources in GCP, we will create a new GCP Project as well as a service account to allow Terraform to authenticate against GCP APIs and run the plan to deploy resources.
 
-    ![](../img/eks_dc_vanilla_terraform/02.png)
+  * Browse to https://console.cloud.google.com/ and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
-  2. Select the **Users** from the side menu.
+      ![](../img/gke_dc_vanilla_terraform/02.png)
 
-    ![](../img/eks_dc_vanilla_terraform/03.png)
-    
-  3. Select the **User** you want to create the access key for. 
+      ![](../img/gke_dc_vanilla_terraform/03.png)
 
-   ![](../img/eks_dc_vanilla_terraform/04.png)
+      ![](../img/gke_dc_vanilla_terraform/04.png)
 
-  4. Select ***Security credentials** of the **User** selected. 
+  * Enable the Compute Engine API for the project, create a project Owner service account credentials and download the private key JSON file and copy the file to the directory where Terraform files are located. Change the JSON file name (for example *account.json*). The Terraform plan will be using the credentials stored in this file to authenticate against your GCP project.   
 
-   ![](../img/eks_dc_vanilla_terraform/05.png)
+      ![](../img/gke_dc_vanilla_terraform/05.png)
 
-  5. Under **Access Keys** select **Create Access Keys**, this will download the
+      ![](../img/gke_dc_vanilla_terraform/06.png)
 
-  ![](../img/eks_dc_vanilla_terraform/06.png)
+      ![](../img/gke_dc_vanilla_terraform/07.png)
 
-  6. In the popup window it will show you the ***Access key ID*** and ***Secret access key***. Save both of these values to configure the **Terraform plan** variables later.
+      ![](../img/gke_dc_vanilla_terraform/08.png)
 
-  ![](../img/eks_dc_vanilla_terraform/07.png)
+      ![](../img/gke_dc_vanilla_terraform/09.png)
 
-* In order to open a RDP session to the Windows Client EC2 instance, an EC2 Key Pair is required. From the *Services* menu, click on *"EC2"*, enter the *Key Pairs* settings from the left sidebar (under the *Network & Security* section) and click on *"Create key pair"* (top-right corner) to create a new key pair.
+      ![](../img/gke_dc_vanilla_terraform/10.png)
 
-  ![](../img/eks_dc_vanilla_terraform/08.png)
+      ![](../img/gke_dc_vanilla_terraform/11.png)
 
-  ![](../img/eks_dc_vanilla_terraform/09.png)
+      ![](../img/gke_dc_vanilla_terraform/12.png)
 
-  ![](../img/eks_dc_vanilla_terraform/10.png)
+      ![](../img/gke_dc_vanilla_terraform/13.png)
 
-* Provide a meaningful name, for example *terraform*, and click on *"Create key pair"* which will then automatically download the created *pem* file.
+      ![](../img/gke_dc_vanilla_terraform/14.png)
 
-  ![](../img/eks_dc_vanilla_terraform/11.png)
+      ![](../img/gke_dc_vanilla_terraform/15.png)
 
-  ![](../img/eks_dc_vanilla_terraform/12.png)
+      ![](../img/gke_dc_vanilla_terraform/16.png)
 
-  ![](../img/eks_dc_vanilla_terraform/13.png)  
+      ![](../img/gke_dc_vanilla_terraform/17.png)
 
-* Copy the downloaded *pem* file to where the terraform binaries are located (in your cloned repository directory).
+  * Enable the Compute Engine API for the project
 
-  ![](../img/eks_dc_vanilla_terraform/14.png)
+      ![](../img/gke_dc_vanilla_terraform/18.png)
+
+      ![](../img/gke_dc_vanilla_terraform/19.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Automation Flow
 
