@@ -210,7 +210,7 @@ As mentioned, the Terraform plan will deploy a GKE cluster and a Windows Server 
 
   ![](../img/gke_dc_vanilla_terraform/22.png)
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. **Runtime for deploying all the AWS resources for this plan is ~30min.**
+* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. **Runtime for deploying all the GCP resources for this plan is ~30min.**
 
 * Once completed, you can review the GKE cluster and the worker nodes resources as well as the GCP compute instance VM created.
 
