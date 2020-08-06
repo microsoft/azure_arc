@@ -90,7 +90,7 @@
       }
     },
     "kubernetesVersion": {
-      "defaultValue": "1.17.4",
+      "defaultValue": "1.18.2",
       "type": "string",
       "metadata": {
         "description": "The version of Kubernetes."
@@ -100,7 +100,7 @@
       "type": "string",
       "defaultValue": "Arc-Data-Client",
       "metadata": {
-        "description": "The name of you Virtual Machine."
+        "description": "TThe name of the Client Virtual Machine."
       }
     },
     "adminUsername": {
@@ -268,72 +268,28 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": {
-            "value": "[parameters('vmName')]"
-          },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "vmSize": {
-            "value": "[parameters('vmSize')]"
-          },
-          "servicePrincipalClientId": {
-            "value": "[parameters('servicePrincipalClientId')]"
-          },
-          "servicePrincipalClientSecret": {
-            "value": "[parameters('servicePrincipalClientSecret')]"
-          },
-          "tenantId": {
-            "value": "[parameters('tenantId')]"
-          },
-          "resourceGroup": {
-            "value": "[parameters('resourceGroup')]"
-          },
-          "clusterName": {
-            "value": "[parameters('clusterName')]"
-          },
-          "AZDATA_USERNAME": {
-            "value": "[parameters('AZDATA_USERNAME')]"
-          },
-          "AZDATA_PASSWORD": {
-            "value": "[parameters('AZDATA_PASSWORD')]"
-          },
-          "ACCEPT_EULA": {
-            "value": "[parameters('ACCEPT_EULA')]"
-          },
-          "DOCKER_USERNAME": {
-            "value": "[parameters('DOCKER_USERNAME')]"
-          },
-          "DOCKER_PASSWORD": {
-            "value": "[parameters('DOCKER_PASSWORD')]"
-          },
-          "ARC_DC_NAME": {
-            "value": "[parameters('ARC_DC_NAME')]"
-          },
-          "ARC_DC_SUBSCRIPTION": {
-            "value": "[parameters('ARC_DC_SUBSCRIPTION')]"
-          },
-          "ARC_DC_REGION": {
-            "value": "[parameters('ARC_DC_REGION')]"
-          },
-          "PSHS_NAME": {
-            "value": "[parameters('PSHS_NAME')]"
-          },
-          "PSHS_NAMESPACE": {
-            "value": "[parameters('PSHS_NAMESPACE')]"
-          },
-          "PSHS_WORKER_NODE_COUNT": {
-            "value": "[parameters('PSHS_WORKER_NODE_COUNT')]"
-          },
-          "PSHS_DATASIZE": {
-            "value": "[parameters('PSHS_DATASIZE')]"
-          },
-          "PSHS_SERVICE_TYPE": {
-            "value": "[parameters('PSHS_SERVICE_TYPE')]"
-          }
+        "vmName":{"value": "[parameters('vmName')]"},
+        "adminUsername":{"value": "[parameters('adminUsername')]"},
+        "adminPassword":{"value": "[parameters('adminPassword')]"},
+        "vmSize":{"value": "[parameters('vmSize')]"},
+        "servicePrincipalClientId":{"value": "[parameters('servicePrincipalClientId')]"},
+        "servicePrincipalClientSecret":{"value": "[parameters('servicePrincipalClientSecret')]"},
+        "tenantId":{"value": "[parameters('tenantId')]"},
+        "resourceGroup":{"value": "[parameters('resourceGroup')]"},
+        "clusterName":{"value": "[parameters('clusterName')]"},
+        "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
+        "AZDATA_PASSWORD":{"value": "[parameters('AZDATA_PASSWORD')]"},
+        "ACCEPT_EULA":{"value": "[parameters('ACCEPT_EULA')]"},
+        "DOCKER_USERNAME":{"value": "[parameters('DOCKER_USERNAME')]"},
+        "DOCKER_PASSWORD":{"value": "[parameters('DOCKER_PASSWORD')]"},
+        "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
+        "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
+        "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
+        "PSHS_NAME":{"value": "[parameters('PSHS_NAME')]"},
+        "PSHS_NAMESPACE":{"value": "[parameters('PSHS_NAMESPACE')]"},
+        "PSHS_WORKER_NODE_COUNT":{"value": "[parameters('PSHS_WORKER_NODE_COUNT')]"},
+        "PSHS_DATASIZE":{"value": "[parameters('PSHS_DATASIZE')]"},
+        "PSHS_SERVICE_TYPE":{"value": "[parameters('PSHS_SERVICE_TYPE')]"}
         }
       }
     }
