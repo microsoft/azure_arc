@@ -210,7 +210,7 @@ azdata login -n $env:ARC_DC_NAME
 azdata sql instance create -n $env:MSSQL_MI_NAME -c $env:MSSQL_MI_vCores -s $env:ARC_DC_SUBSCRIPTION -r $env:resourceGroup
 azdata sql instance list
 
-# Cleaning MSSQL Instance connectivity details
+# Creating MSSQL Instance connectivity details
 Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
