@@ -209,10 +209,10 @@ $Shortcut.Save()
 start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
 azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
-# Deploying Azure Arc SQL Managed Instance
+# Deploying Azure Arc PostgreSQL Hyperscale Instance
 azdata login -n $env:ARC_DC_NAME
-azdata sql instance create -n $env:MSSQL_MI_NAME -c $env:MSSQL_MI_vCores -s $env:ARC_DC_SUBSCRIPTION -r $env:resourceGroup
-azdata sql instance list
+azdata postgres server create -n $env:PSHS_NAME -ns  $env:PSHS_NAMESPACE -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
+azdata postgres server list -ns $env:PSHS_NAMESPACE
 
 # Cleaning PSHS Instance connectivity details
 Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
