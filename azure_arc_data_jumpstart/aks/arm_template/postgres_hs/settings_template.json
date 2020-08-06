@@ -1,0 +1,30 @@
+{
+    "workbench.enablePreviewFeatures": true,
+    "datasource.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "C777F06B-202E-4480-B475-FA416154D458"
+        }
+    ],
+    "datasource.connections": [
+        {
+            "options": {
+                "connectionName": "",
+                "server": "arc_sql_mi",
+                "database": "",
+                "authenticationType": "SqlLogin",
+                "user": "sa",
+                "password": "sa_password",
+                "applicationName": "azdata",
+                "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+                "databaseDisplayName": ""
+            },
+            "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+            "providerName": "MSSQL",
+            "savePassword": false,
+            "id": "ac333479-a04b-436b-88ab-3b314a201295"
+        }
+    ],
+    "window.zoomLevel": 2
+}
+
