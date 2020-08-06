@@ -25,7 +25,7 @@
     },
     "osDiskSizeGB": {
       "type": "int",
-      "defaultValue": 32,
+      "defaultValue": 0,
       "metadata": {
         "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agent VM size."
       },
