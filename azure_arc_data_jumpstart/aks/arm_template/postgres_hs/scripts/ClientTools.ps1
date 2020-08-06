@@ -206,16 +206,16 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Deploying Azure Arc Data Controller
-start Powershell {kubectl get pods -n $env:ARC_DC_NAME -w}
+start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
 azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
-# Deploying Azure Arc PostgreSQL Hyperscale Instance
-azdata login -n $env:ARC_DC_NAME
-azdata postgres server create -n $env:PSHS_NAME -ns  $env:PSHS_NAMESPACE -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
-azdata postgres server list -ns $env:PSHS_NAMESPACE
+# # Deploying Azure Arc PostgreSQL Hyperscale Instance
+# azdata login -n $env:ARC_DC_NAME
+# azdata postgres server create -n $env:PSHS_NAME -ns  $env:PSHS_NAMESPACE -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
+# azdata postgres server list -ns $env:PSHS_NAMESPACE
 
-# Cleaning PSHS Instance connectivity details
-Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
+# Creating PSHS Instance connectivity details
+# Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
@@ -223,14 +223,13 @@ Stop-Transcript
 
 # Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
-Stop-Process -Name kubectl -Force
 Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
 # Creating LogonScript Windows Scheduled Task
-# $Trigger = New-ScheduledTaskTrigger -AtLogOn
-# $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\LogonScript.ps1'
-# Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\LogonScript.ps1'
+Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
