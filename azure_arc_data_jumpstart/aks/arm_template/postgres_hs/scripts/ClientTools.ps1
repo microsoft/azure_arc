@@ -211,7 +211,7 @@ azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NA
 
 # # Deploying Azure Arc PostgreSQL Hyperscale Instance
 # azdata login -n $env:ARC_DC_NAME
-# azdata postgres server create -n $env:PSHS_NAME -ns  $env:PSHS_NAMESPACE -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
+# azdata postgres server create -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE -pw $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
 # azdata postgres server list -ns $env:PSHS_NAMESPACE
 
 # Creating PSHS Instance connectivity details
