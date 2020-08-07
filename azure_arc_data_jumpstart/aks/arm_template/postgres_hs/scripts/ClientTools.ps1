@@ -74,7 +74,7 @@ workflow ClientTools_01
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
                     Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
-                    Invoke-WebRequest "https://github.com/microsoft/azuredatastudio-postgresql/archive/v0.2.6.zip" -OutFile "C:\tmp\pgsqltoolsservice-win-x64.zip"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/microsoft.azuredatastudio-postgresql-0.2.6.zip" -OutFile "C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6.zip"
                     Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jul-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/PSHS_Cleanup.ps1" -OutFile "C:\tmp\PSHS_Cleanup.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/PSHS_Deploy.ps1" -OutFile "C:\tmp\PSHS_Deploy.ps1"
@@ -92,7 +92,7 @@ workflow ClientTools_02
                 InlineScript {
                     Expand-Archive C:\tmp\azuredatastudio_insiders.zip -DestinationPath 'C:\Program Files\Azure Data Studio - Insiders'
                     Expand-Archive C:\tmp\azuredatastudio_repo.zip -DestinationPath 'C:\tmp\azuredatastudio_repo'
-                    Expand-Archive C:\tmp\pgsqltoolsservice-win-x64.zip -DestinationPath 'C:\tmp\'
+                    Expand-Archive C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6.zip -DestinationPath 'C:\tmp\'
                     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
                 }
             }
@@ -126,17 +126,23 @@ $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
 # Creating Azure Data Studio settings for PostgresSQL connection
+azdata postgres server endpoint -n $env:PSHS_NAME -ns $env:ARC_DC_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
-$s = Get-Content "C:\tmp\sql_instance_settings.txt"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$s | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:MSSQL_SA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
+Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
+$s = Get-Content "C:\tmp\out.txt" 
+$s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
+$s = Get-Content "C:\tmp\out.txt"
+$s.Substring(0, $s.IndexOf(':')) | Out-File -FilePath "C:\tmp\merge.txt" -Encoding ascii -NoNewline
+$s = Get-Content "C:\tmp\merge.txt"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_pshs',$s | Set-Content -Path "C:\tmp\settings_template.json"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
 # Cleaning garbage
-Remove-Item "C:\tmp\sql_instance_settings.txt" -Force
-Remove-Item "C:\tmp\sql_instance_list.txt" -Force
+Remove-Item "C:\tmp\pshs_instance_endpoint.txt" -Force
 Remove-Item "C:\tmp\merge.txt" -Force
+Remove-Item "C:\tmp\out.txt" -Force
 
 # Downloading demo database
 $podname = "$env:MSSQL_MI_NAME" + "-0"
@@ -165,8 +171,8 @@ Write-Host "`n"
 $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\arc"
 Copy-Item -Path "C:\tmp\azuredatastudio_repo\azuredatastudio-master\extensions\arc" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
-$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\azuredatastudio-postgresql-0.2.6"
-Copy-Item -Path "C:\tmp\azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue 
+$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\"
+Copy-Item -Path "C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
