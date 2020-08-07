@@ -194,7 +194,7 @@ azdata postgres server create --name $env:PSHS_NAME --namespace $env:ARC_DC_NAME
 azdata postgres server list -ns $env:ARC_DC_NAME
 
 # Creating PSHS Instance connectivity details
-# Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
+Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
