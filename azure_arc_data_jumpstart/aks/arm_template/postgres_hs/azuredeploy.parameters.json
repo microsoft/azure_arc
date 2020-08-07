@@ -54,13 +54,28 @@
             "value": "<Azure Arc Data - Private Preview Docker Registry password>"
         },
         "ARC_DC_NAME": {
-            "value": "<Azure Arc Data Controller name (will be used for k8s namespace as well)>"
+            "value": "<Azure Arc Data Controller name (will be used for k8s Arc namespace as well)>"
         },
         "ARC_DC_SUBSCRIPTION": {
             "value": "<Azure Arc Data Controller Azure subscription ID>"
         },
         "ARC_DC_REGION": {
             "value": "eastus"
-        }        
+        },
+        "PSHS_NAME": {
+                "value": "<PostgresSQL Hyperscale server group name to be deployed on the Kubernetes cluster>"
+        },
+        "PSHS_NAMESPACE": {
+            "value": "<Kubernetes namespace of PostgreSQL server group>"
+        },        
+        "PSHS_WORKER_NODE_COUNT": {
+                "value": "<PostgresSQL Hyperscale server group number of workers>"
+        },
+        "PSHS_DATASIZE": {
+                "value": "<PostgresSQL Hyperscale size of data volumes in MB>"
+        },
+        "PSHS_SERVICE_TYPE": {
+                "value": "<Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort>"
+        }
     }
 }

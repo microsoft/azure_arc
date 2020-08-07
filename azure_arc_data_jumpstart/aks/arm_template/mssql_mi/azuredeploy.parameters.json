@@ -21,7 +21,7 @@
             "value": "<Your Azure Service Principle password>"
         },
         "kubernetesVersion": {
-            "value": "<Kubernetes Version, e.g. 1.18.2>"
+            "value": "<Kubernetes Version, e.g. 1.18.4>"
         },
         "adminUsername": {
             "value": "<Client Windows VM admin username>"
@@ -54,7 +54,7 @@
             "value": "<Azure Arc Data - Private Preview Docker Registry password>"
         },
         "ARC_DC_NAME": {
-            "value": "<Azure Arc Data Controller name (will be used for k8s namespace as well)>"
+            "value": "<Azure Arc Data Controller name (will be used for k8s Arc namespace as well)>"
         },
         "ARC_DC_SUBSCRIPTION": {
             "value": "<Azure Arc Data Controller Azure subscription ID>"
