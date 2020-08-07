@@ -191,12 +191,6 @@
         "description": "Name of PostgreSQL server group"
       }
     },
-    "PSHS_NAMESPACE": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of Kubernetes namespace. Will go with the default if unspecified"
-      }
-    },
     "PSHS_WORKER_NODE_COUNT": {
       "type": "int",
       "defaultValue": 3,
@@ -286,7 +280,6 @@
         "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
         "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
         "PSHS_NAME":{"value": "[parameters('PSHS_NAME')]"},
-        "PSHS_NAMESPACE":{"value": "[parameters('PSHS_NAMESPACE')]"},
         "PSHS_WORKER_NODE_COUNT":{"value": "[parameters('PSHS_WORKER_NODE_COUNT')]"},
         "PSHS_DATASIZE":{"value": "[parameters('PSHS_DATASIZE')]"},
         "PSHS_SERVICE_TYPE":{"value": "[parameters('PSHS_SERVICE_TYPE')]"}
