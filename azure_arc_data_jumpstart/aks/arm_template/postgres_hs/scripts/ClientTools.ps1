@@ -144,10 +144,11 @@ Remove-Item "C:\tmp\pshs_instance_endpoint.txt" -Force
 Remove-Item "C:\tmp\merge.txt" -Force
 Remove-Item "C:\tmp\out.txt" -Force
 
-# Downloading demo database
-$podname = "$env:MSSQL_MI_NAME" + "-0"
-kubectl exec $podname -n $env:ARC_DC_NAME -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
-kubectl exec $podname -n $env:ARC_DC_NAME -- /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $env:MSSQL_SA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
+# Restoring demo database
+$podname = "$env:PSHS_NAME" + "-r000"
+kubectl exec $podname -n $env:ARC_DC_NAME -c database -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
+kubectl exec $podname -n $env:ARC_DC_NAME -c database -- psql -c 'CREATE DATABASE "adventureworks";'
+kubectl exec $podname -n $env:ARC_DC_NAME -c database -- psql -d adventureworks -f /tmp/AdventureWorks.sql
 
 Stop-Transcript
 
