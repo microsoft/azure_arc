@@ -14,7 +14,6 @@ param (
     [string]$ARC_DC_SUBSCRIPTION,
     [string]$ARC_DC_REGION,
     [string]$PSHS_NAME,
-    [string]$PSHS_NAMESPACE,
     [string]$PSHS_WORKER_NODE_COUNT,
     [string]$PSHS_DATASIZE,
     [string]$PSHS_SERVICE_TYPE,
@@ -36,7 +35,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_NAME', $PSHS_NAME,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('PSHS_NAMESPACE', $PSHS_NAMESPACE,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_WORKER_NODE_COUNT', $PSHS_WORKER_NODE_COUNT,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_DATASIZE', $PSHS_DATASIZE,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_SERVICE_TYPE', $PSHS_SERVICE_TYPE,[System.EnvironmentVariableTarget]::Machine)
@@ -77,9 +75,7 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
                     Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
                     Invoke-WebRequest "https://github.com/microsoft/azuredatastudio-postgresql/archive/v0.2.6.zip" -OutFile "C:\tmp\pgsqltoolsservice-win-x64.zip"
-                    Invoke-WebRequest "https://github.com/microsoft/azuredatastudio-postgresql/releases/download/v0.2.6/azuredatastudio-postgresql-0.2.6-win-x64.vsix" -OutFile "C:\tmp\azuredatastudio-postgresql-0.2.6-win-x64.vsix"
                     Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jul-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/vsixinstaller.exe" -OutFile "C:\tmp\vsixinstaller.exe"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/PSHS_Cleanup.ps1" -OutFile "C:\tmp\PSHS_Cleanup.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/PSHS_Deploy.ps1" -OutFile "C:\tmp\PSHS_Deploy.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/settings_template.json" -OutFile "C:\tmp\settings_template.json"
@@ -187,8 +183,8 @@ azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NA
 
 # Deploying Azure Arc PostgreSQL Hyperscale Instance
 azdata login -n $env:ARC_DC_NAME
-azdata postgres server create -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE -pw $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
-azdata postgres server list -ns $env:PSHS_NAMESPACE
+azdata postgres server create --name $env:PSHS_NAME --namespace $env:ARC_DC_NAME --password $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
+azdata postgres server list -ns $env:ARC_DC_NAME
 
 # Creating PSHS Instance connectivity details
 # Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
