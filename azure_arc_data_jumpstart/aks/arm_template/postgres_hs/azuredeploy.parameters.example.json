@@ -3,11 +3,11 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "clusterName": {
-            "value": "Arc-Data-SQLMI-AKS"
+            "value": "Arc-Data-PSHS-AKS"
         },
-        "dnsPrefix": {
-            "value": "arcdatasqlmidemo"
-        },        
+          "dnsPrefix": {
+            "value": "arcdatapshsdemo"
+        },   
          "nodeAdminUsername": {
             "value": "arcdemo"
         },
@@ -62,14 +62,17 @@
         "ARC_DC_REGION": {
             "value": "eastus"
         },
-        "MSSQL_MI_NAME": {
-            "value": "arcsqlmidemo"
+        "PSHS_NAME": {
+            "value": "arcpshs"
         },
-        "MSSQL_SA_PASSWORD": {
-            "value": "ArcDemo123!!"
+        "PSHS_WORKER_NODE_COUNT": {
+            "value": 5
         },
-        "MSSQL_MI_vCores": {
-            "value": "2"
+        "PSHS_DATASIZE": {
+            "value": 1024
+        },
+        "PSHS_SERVICE_TYPE": {
+            "value": "LoadBalancer"
         }
     }
 }

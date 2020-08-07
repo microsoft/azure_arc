@@ -129,6 +129,12 @@
             "description": "Name of PostgreSQL server group"
             }
         },
+        "PSHS_NAMESPACE": {
+        "type": "string",
+        "metadata": {
+            "description": "Kubernetes namespace of PostgreSQL server group"
+            }
+        },
         "PSHS_WORKER_NODE_COUNT": {
         "type": "int",
         "defaultValue": 3,
@@ -347,7 +353,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/ClientTools.ps1"
               ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -clusterName ', parameters('clusterName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -DOCKER_USERNAME ', parameters('DOCKER_USERNAME'), ' -DOCKER_PASSWORD ', parameters('DOCKER_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -PSHS_NAME ', parameters('PSHS_NAME'), ' -PSHS_WORKER_NODE_COUNT ', parameters('PSHS_WORKER_NODE_COUNT'), ' -PSHS_DATASIZE ', parameters('PSHS_DATASIZE'), ' -PSHS_SERVICE_TYPE ', parameters('PSHS_SERVICE_TYPE'))]" 
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -clusterName ', parameters('clusterName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -DOCKER_USERNAME ', parameters('DOCKER_USERNAME'), ' -DOCKER_PASSWORD ', parameters('DOCKER_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -PSHS_NAME ', parameters('PSHS_NAME'), ' -PSHS_NAMESPACE ', parameters('PSHS_NAMESPACE'), ' -PSHS_WORKER_NODE_COUNT ', parameters('PSHS_WORKER_NODE_COUNT'), ' -PSHS_DATASIZE ', parameters('PSHS_DATASIZE'), ' -PSHS_SERVICE_TYPE ', parameters('PSHS_SERVICE_TYPE'))]" 
             }            
           }
         }                        

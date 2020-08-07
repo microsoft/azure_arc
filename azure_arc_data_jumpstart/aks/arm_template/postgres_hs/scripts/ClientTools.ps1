@@ -14,6 +14,7 @@ param (
     [string]$ARC_DC_SUBSCRIPTION,
     [string]$ARC_DC_REGION,
     [string]$PSHS_NAME,
+    [string]$PSHS_NAMESPACE,    
     [string]$PSHS_WORKER_NODE_COUNT,
     [string]$PSHS_DATASIZE,
     [string]$PSHS_SERVICE_TYPE,
@@ -35,6 +36,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_NAME', $PSHS_NAME,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('PSHS_NAMESPACE', $PSHS_NAMESPACE,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_WORKER_NODE_COUNT', $PSHS_WORKER_NODE_COUNT,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_DATASIZE', $PSHS_DATASIZE,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_SERVICE_TYPE', $PSHS_SERVICE_TYPE,[System.EnvironmentVariableTarget]::Machine)
@@ -190,7 +192,7 @@ azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NA
 
 # Deploying Azure Arc PostgreSQL Hyperscale Instance
 azdata login -n $env:ARC_DC_NAME
-azdata postgres server create --name $env:PSHS_NAME --namespace $env:ARC_DC_NAME --password $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
+azdata postgres server create --name $env:PSHS_NAME --namespace $env:PSHS_NAMESPACE --password $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
 azdata postgres server list -ns $env:ARC_DC_NAME
 
 # Creating PSHS Instance connectivity details
