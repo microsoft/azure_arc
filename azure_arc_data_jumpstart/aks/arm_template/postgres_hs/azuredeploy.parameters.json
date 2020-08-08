@@ -63,16 +63,16 @@
             "value": "eastus"
         },
         "PSHS_NAME": {
-                "value": "<PostgresSQL Hyperscale server group name to be deployed on the Kubernetes cluster>"
+                "value": "<PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster>"
         },
         "PSHS_NAMESPACE": {
             "value": "<Kubernetes namespace of PostgreSQL server group>"
         },        
         "PSHS_WORKER_NODE_COUNT": {
-                "value": "<PostgresSQL Hyperscale server group number of workers>"
+                "value": "<PostgreSQL Hyperscale server group number of workers>"
         },
         "PSHS_DATASIZE": {
-                "value": "<PostgresSQL Hyperscale size of data volumes in MB>"
+                "value": "<PostgreSQL Hyperscale size of data volumes in MB>"
         },
         "PSHS_SERVICE_TYPE": {
                 "value": "<Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort>"
