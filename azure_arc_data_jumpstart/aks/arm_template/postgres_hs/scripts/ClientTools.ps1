@@ -77,7 +77,7 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/insider" -OutFile "C:\tmp\azuredatastudio_insiders.zip"
                     Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/microsoft.azuredatastudio-postgresql-0.2.6.zip" -OutFile "C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6.zip"
-                    Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jul-2020/msi/Azure%20Data%20CLI.msi" -OutFile "C:\tmp\AZDataCLI.msi"
+                    Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jul-2020-new/msi/azdata-cli-20.1.0.msi" -OutFile "C:\tmp\AZDataCLI.msi"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/PSHS_Cleanup.ps1" -OutFile "C:\tmp\PSHS_Cleanup.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/PSHS_Deploy.ps1" -OutFile "C:\tmp\PSHS_Deploy.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/settings_template.json" -OutFile "C:\tmp\settings_template.json"
@@ -190,21 +190,20 @@ $Shortcut.Save()
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
 azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
-# Deploying Azure Arc PostgreSQL Hyperscale Server Group
-start Powershell {for (0 -lt 1) {kubectl get pod -n $env:PSHS_NAMESPACE; sleep 5; clear }}
-azdata login -n $env:ARC_DC_NAME
-azdata postgres server create -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE -pw $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
-azdata postgres server list -ns $env:PSHS_NAMESPACE
+# # Deploying Azure Arc PostgreSQL Hyperscale Server Group
+# azdata login -n $env:ARC_DC_NAME
+# azdata postgres server create -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE -pw $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
+# azdata postgres server list -ns $env:PSHS_NAMESPACE
 
-# Creating PSHS Instance connectivity details
-Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
+# # Creating PSHS Instance connectivity details
+# Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
 Stop-Transcript
 
 # Starting Azure Data Studio
-Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
+# Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
 Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
