@@ -112,7 +112,7 @@ Start-Transcript "C:\tmp\pshs_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving PostgresSQL Server IP
-azdata postgres server endpoint -n $env:PSHS_NAME -ns $env:ARC_DC_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
+azdata postgres server endpoint -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
 Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
@@ -128,7 +128,7 @@ $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
 # Creating Azure Data Studio settings for PostgresSQL connection
-azdata postgres server endpoint -n $env:PSHS_NAME -ns $env:ARC_DC_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
+azdata postgres server endpoint -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
 Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
@@ -148,9 +148,9 @@ Remove-Item "C:\tmp\out.txt" -Force
 
 # Restoring demo database
 $podname = "$env:PSHS_NAME" + "-r000"
-kubectl exec $podname -n $env:ARC_DC_NAME -c database -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
-kubectl exec $podname -n $env:ARC_DC_NAME -c database -- psql -c 'CREATE DATABASE "adventureworks";'
-kubectl exec $podname -n $env:ARC_DC_NAME -c database -- psql -d adventureworks -f /tmp/AdventureWorks.sql
+kubectl exec $podname -n $env:PSHS_NAMESPACE -c database -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
+kubectl exec $podname -n $env:PSHS_NAMESPACE -c database -- psql -c 'CREATE DATABASE "adventureworks";'
+kubectl exec $podname -n $env:PSHS_NAMESPACE -c database -- psql -d adventureworks -f /tmp/AdventureWorks.sql
 
 Stop-Transcript
 
@@ -191,9 +191,10 @@ start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; c
 azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
 # Deploying Azure Arc PostgreSQL Hyperscale Instance
+start Powershell {for (0 -lt 1) {kubectl get pod -n $env:PSHS_NAMESPACE; sleep 5; clear }}
 azdata login -n $env:ARC_DC_NAME
 azdata postgres server create --name $env:PSHS_NAME --namespace $env:PSHS_NAMESPACE --password $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
-azdata postgres server list -ns $env:ARC_DC_NAME
+azdata postgres server list -ns $env:PSHS_NAMESPACE
 
 # Creating PSHS Instance connectivity details
 Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
