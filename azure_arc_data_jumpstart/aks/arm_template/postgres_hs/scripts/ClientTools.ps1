@@ -145,10 +145,10 @@ Remove-Item "C:\tmp\merge.txt" -Force
 Remove-Item "C:\tmp\out.txt" -Force
 
 # Restoring demo database
-# $podname = "$env:PSHS_NAME" + "-0"
-# kubectl exec $podname -n $env:ARC_DC_NAME -c database -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
-# kubectl exec $podname -n $env:ARC_DC_NAME -c database -- psql -c 'CREATE DATABASE "adventureworks";'
-# kubectl exec $podname -n $env:ARC_DC_NAME -c database -- psql -d adventureworks -f /tmp/AdventureWorks.sql
+$podname = "$env:PSHS_NAME" + "-0"
+kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
+kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- psql --username postgres -c 'CREATE DATABASE "adventureworks";'
+kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- psql --username postgres -d adventureworks -f /tmp/AdventureWorks.sql
 
 Stop-Transcript
 
@@ -201,7 +201,7 @@ Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 Stop-Transcript
 
 # Starting Azure Data Studio
-# Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
+Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
 Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
