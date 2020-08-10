@@ -1,16 +1,15 @@
-Start-Transcript -Path C:\tmp\mssql_deploy.log
+Start-Transcript -Path C:\tmp\pshs_deploy.log
 
 # Deploying Azure Arc Data Controller
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
+azdata arc dc create --profile-name azure-arc-aks-premium-storage --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
 # Deploying Azure Arc PostgreSQL Hyperscale Instance
 azdata login -n $env:ARC_DC_NAME
-start Powershell {for (0 -lt 1) {kubectl get pod -n $env:PSHS_NAMESPACE; sleep 5; clear }}
-azdata postgres server create -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE -pw $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
-azdata postgres server list -ns $env:PSHS_NAMESPACE
+azdata arc postgres server create -n $env:PSHS_NAME --workers $env:PSHS_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
+azdata arc postgres server endpoint list --name $env:PSHS_NAME
 
-# Cleaning MSSQL Instance connectivity details
+# Creating PSHS Instance connectivity details
 Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Stop-Transcript
