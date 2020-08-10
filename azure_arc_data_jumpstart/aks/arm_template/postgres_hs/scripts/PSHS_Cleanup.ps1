@@ -1,14 +1,12 @@
-Start-Transcript -Path C:\tmp\mssql_cleanup.log
+Start-Transcript -Path C:\tmp\pshs_cleanup.log
 
 # Deleting Azure Arc Data Controller namespace and it's resources (PostgreSQL incl.)
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
+azdata login -n $env:ARC_DC_NAME
+azdata arc postgres server delete -n $env:PSHS_NAME
+kubectl delete clusterroles arcdatactrl:cr-arc-metricsdc-reader
+kubectl delete clusterrolebindings arcdatactrl:crb-arc-metricsdc-reader
 kubectl delete ns $env:ARC_DC_NAME
-kubectl delete crd databases.mssqlcontroller.k8s.io
-kubectl delete crd registrations.tina-instances.com
-kubectl delete clusterrolebinding arcdatactrl:crb-mssql-metricsdc-reader
-kubectl delete clusterrolebinding crb-arcdatactrl-controller
-kubectl delete clusterrolebinding operator-rolebinding
-kubectl delete clusterrole arcdatactrl:cr-mssql-metricsdc-reader
 
 # Restoring State
 Copy-Item -Path "C:\tmp\hosts_backup" -Destination "C:\Windows\System32\drivers\etc\hosts" -Recurse -Force -ErrorAction Continue

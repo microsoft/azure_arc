@@ -8,13 +8,12 @@ param (
     [string]$AZDATA_USERNAME,
     [string]$AZDATA_PASSWORD,
     [string]$ACCEPT_EULA,
-    [string]$DOCKER_USERNAME,
-    [string]$DOCKER_PASSWORD,
+    [string]$REGISTRY_USERNAME,
+    [string]$REGISTRY_PASSWORD,
     [string]$ARC_DC_NAME,
     [string]$ARC_DC_SUBSCRIPTION,
     [string]$ARC_DC_REGION,
-    [string]$PSHS_NAME,
-    [string]$PSHS_NAMESPACE,    
+    [string]$PSHS_NAME,   
     [string]$PSHS_WORKER_NODE_COUNT,
     [string]$PSHS_DATASIZE,
     [string]$PSHS_SERVICE_TYPE,
@@ -30,13 +29,12 @@ param (
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $AZDATA_USERNAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $AZDATA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $ACCEPT_EULA,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('DOCKER_USERNAME', $DOCKER_USERNAME,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('DOCKER_PASSWORD', $DOCKER_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('REGISTRY_USERNAME', $REGISTRY_USERNAME,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('REGISTRY_PASSWORD', $REGISTRY_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_NAME', $ARC_DC_NAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_NAME', $PSHS_NAME,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('PSHS_NAMESPACE', $PSHS_NAMESPACE,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_WORKER_NODE_COUNT', $PSHS_WORKER_NODE_COUNT,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_DATASIZE', $PSHS_DATASIZE,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PSHS_SERVICE_TYPE', $PSHS_SERVICE_TYPE,[System.EnvironmentVariableTarget]::Machine)
@@ -112,7 +110,7 @@ Start-Transcript "C:\tmp\pshs_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving PostgreSQL Server IP
-azdata postgres server endpoint -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
+azdata arc postgres server endpoint list --name $env:PSHS_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
 Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
@@ -128,7 +126,7 @@ $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
 # Creating Azure Data Studio settings for PostgreSQL connection
-azdata postgres server endpoint -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
+azdata arc postgres server endpoint list --name $env:PSHS_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
 Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
@@ -147,10 +145,10 @@ Remove-Item "C:\tmp\merge.txt" -Force
 Remove-Item "C:\tmp\out.txt" -Force
 
 # Restoring demo database
-$podname = "$env:PSHS_NAME" + "-r000"
-kubectl exec $podname -n $env:PSHS_NAMESPACE -c database -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
-kubectl exec $podname -n $env:PSHS_NAMESPACE -c database -- psql -c 'CREATE DATABASE "adventureworks";'
-kubectl exec $podname -n $env:PSHS_NAMESPACE -c database -- psql -d adventureworks -f /tmp/AdventureWorks.sql
+# $podname = "$env:PSHS_NAME" + "-0"
+# kubectl exec $podname -n $env:ARC_DC_NAME -c database -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
+# kubectl exec $podname -n $env:ARC_DC_NAME -c database -- psql -c 'CREATE DATABASE "adventureworks";'
+# kubectl exec $podname -n $env:ARC_DC_NAME -c database -- psql -d adventureworks -f /tmp/AdventureWorks.sql
 
 Stop-Transcript
 
@@ -188,15 +186,15 @@ $Shortcut.Save()
 
 # Deploying Azure Arc Data Controller
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc dc create -p azure-arc-aks-private-preview --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
+azdata arc dc create --profile-name azure-arc-aks-premium-storage --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
-# # Deploying Azure Arc PostgreSQL Hyperscale Server Group
-# azdata login -n $env:ARC_DC_NAME
-# azdata postgres server create -n $env:PSHS_NAME -ns $env:PSHS_NAMESPACE -pw $env:AZDATA_PASSWORD -w $env:PSHS_WORKER_NODE_COUNT --dataSizeMb $env:PSHS_DATASIZE --serviceType $env:PSHS_SERVICE_TYPE
-# azdata postgres server list -ns $env:PSHS_NAMESPACE
+# Deploying Azure Arc PostgreSQL Hyperscale Server Group
+azdata login -n $env:ARC_DC_NAME
+azdata arc postgres server create -n $env:PSHS_NAME --workers $env:PSHS_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
+azdata arc postgres server endpoint list --name $env:PSHS_NAME
 
-# # Creating PSHS Instance connectivity details
-# Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
+# Creating PSHS Instance connectivity details
+Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
