@@ -8,7 +8,7 @@ For customers who want to simplify complex and distributed environments across o
 
 * **Run data services anywhere** - Get automated patching, upgrades, security and scale on-demand across on-premises, edge and multi-cloud environments for your data estate.
 
-# Azure Arc "Jumpstart"
+# Azure Arc Jumpstart
 
 The following guides will walk you trough on how to demo and get started with Azure Arc. They are designed with a "zero to hero" approach in mind and with much automation as possible. The goal is for you to have a working Azure Arc demo environment spined-up in no time so you can focus on showing the core values of the solution.
 
