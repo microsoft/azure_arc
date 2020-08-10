@@ -6,7 +6,7 @@ azdata arc dc create --profile-name azure-arc-aks-premium-storage --namespace $e
 
 # Deploying Azure Arc PostgreSQL Hyperscale Instance
 azdata login -n $env:ARC_DC_NAME
-azdata arc postgres server create -n $env:PSHS_NAME --workers $env:PSHS_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
+azdata arc postgres server create --name $env:PSHS_NAME --workers $env:PSHS_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
 azdata arc postgres server endpoint list --name $env:PSHS_NAME
 
 # Creating PSHS Instance connectivity details
