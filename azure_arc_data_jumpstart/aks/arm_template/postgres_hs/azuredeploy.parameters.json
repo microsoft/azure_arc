@@ -47,10 +47,10 @@
         "ACCEPT_EULA": {
             "value": "yes"           
         },
-        "DOCKER_USERNAME": {
+        "REGISTRY_USERNAME": {
             "value": "<Azure Arc Data - Private Preview Docker Registry username>"
         },
-        "DOCKER_PASSWORD": {
+        "REGISTRY_PASSWORD": {
             "value": "<Azure Arc Data - Private Preview Docker Registry password>"
         },
         "ARC_DC_NAME": {

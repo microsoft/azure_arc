@@ -180,6 +180,8 @@ If you do not yet have a Kubernetes cluster, the following examples walk through
 
 * [Azure SQL Managed Instance Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_mssql_mi_arm_template.md)
 
+* [Azure PostgreSQL Hyperscale Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_postgresql_hyperscale_arm_template.md)
+
 #### Data Services on AWS Elastic Kubernetes Service (EKS)
 
 If you do not yet have a Kubernetes cluster, the following examples walk through creating an EKS cluster and deploy Azure Arc Data Services on top of it.
