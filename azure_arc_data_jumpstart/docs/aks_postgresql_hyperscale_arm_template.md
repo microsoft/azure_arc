@@ -167,7 +167,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az group create --name Arc-Data-PSHS-Demo --location "East US"
     az deployment group create \
     --resource-group Arc-Data-PSHS-Demo \
-    --name arcdatasqlmidemo \
+    --name arcdatapshsmidemo \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json \
     --parameters azuredeploy.parameters.json
     ```
