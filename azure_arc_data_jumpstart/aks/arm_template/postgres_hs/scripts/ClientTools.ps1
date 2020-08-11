@@ -187,9 +187,10 @@ $Shortcut.Save()
 # Deploying Azure Arc Data Controller
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
 azdata arc dc create --profile-name azure-arc-aks-premium-storage --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
+Start-Sleep -s 30
 
 # Deploying Azure Arc PostgreSQL Hyperscale Server Group
-azdata login -n $env:ARC_DC_NAME
+azdata login --namespace $env:ARC_DC_NAME
 azdata arc postgres server create --name $env:PSHS_NAME --workers $env:PSHS_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
 azdata arc postgres server endpoint list --name $env:PSHS_NAME
 
