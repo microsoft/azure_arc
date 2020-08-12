@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\tmp\pshs_cleanup.log
+Start-Transcript -Path C:\tmp\postgres_cleanup.log
 
 # Deleting Azure Arc Data Controller namespace and it's resources (PostgreSQL incl.)
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}

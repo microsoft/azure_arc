@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\tmp\pshs_deploy.log
+Start-Transcript -Path C:\tmp\postgres_deploy.log
 
 # Deploying Azure Arc Data Controller
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}

@@ -103,15 +103,15 @@ ClientTools_02 | ft
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating Powershell pshs_connectivity Script
-$pshs_connectivity = @'
+# Creating Powershell postgres_connectivity Script
+$postgres_connectivity = @'
 
-Start-Transcript "C:\tmp\pshs_connectivity.log"
+Start-Transcript "C:\tmp\postgres_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving PostgreSQL Server IP
-azdata arc postgres server endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
-Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
+azdata arc postgres server endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
+Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt"
@@ -126,21 +126,21 @@ $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
 # Creating Azure Data Studio settings for PostgreSQL connection
-azdata arc postgres server endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
+azdata arc postgres server endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
-Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
+Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt"
 $s.Substring(0, $s.IndexOf(':')) | Out-File -FilePath "C:\tmp\merge.txt" -Encoding ascii -NoNewline
 $s = Get-Content "C:\tmp\merge.txt"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_pshs',$s | Set-Content -Path "C:\tmp\settings_template.json"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_postgres',$s | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
 # Cleaning garbage
-Remove-Item "C:\tmp\pshs_instance_endpoint.txt" -Force
+Remove-Item "C:\tmp\postgres_instance_endpoint.txt" -Force
 Remove-Item "C:\tmp\merge.txt" -Force
 Remove-Item "C:\tmp\out.txt" -Force
 
@@ -152,7 +152,7 @@ kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- psql --username postgre
 
 Stop-Transcript
 
-'@ > C:\tmp\pshs_connectivity.ps1
+'@ > C:\tmp\postgres_connectivity.ps1
 
 # Creating Powershell Logon Script
 $LogonScript = @'
@@ -194,8 +194,8 @@ azdata login --namespace $env:ARC_DC_NAME
 azdata arc postgres server create --name $env:POSTGRES_NAME --workers $env:POSTGRES_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
 azdata arc postgres server endpoint list --name $env:POSTGRES_NAME
 
-# Creating PSHS Instance connectivity details
-Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
+# Creating Postgres Instance connectivity details
+Start-Process powershell -ArgumentList "C:\tmp\postgres_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
