@@ -90,7 +90,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.17.4",
+            "defaultValue": "1.18.2",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes."
@@ -143,14 +143,14 @@
             }
         },
         "AZDATA_PASSWORD": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Arc Data Controller Password"
             }
         },
         "ACCEPT_EULA": {
             "type": "string",
-            "defaultValue":"yes",
+            "defaultValue": "yes",
             "metadata": {
                 "description": "azdata CLI EULA"
             }
@@ -162,7 +162,7 @@
             }
         },
         "DOCKER_PASSWORD": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Private Arc Data Docker Registry Password"
             }

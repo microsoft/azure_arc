@@ -21,7 +21,7 @@
             "value": "33333333-XXXX-YTYT-9c21-7777777777"
         },
         "kubernetesVersion": {
-            "value": "1.18.1"
+            "value": "1.18.4"
         },
         "adminUsername": {
             "value": "arcdemo"

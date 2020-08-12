@@ -8,7 +8,7 @@ For customers who want to simplify complex and distributed environments across o
 
 * **Run data services anywhere** - Get automated patching, upgrades, security and scale on-demand across on-premises, edge and multi-cloud environments for your data estate.
 
-# Azure Arc "Jumpstart"
+# Azure Arc Jumpstart
 
 The following guides will walk you trough on how to demo and get started with Azure Arc. They are designed with a "zero to hero" approach in mind and with much automation as possible. The goal is for you to have a working Azure Arc demo environment spined-up in no time so you can focus on showing the core values of the solution.
 
@@ -36,7 +36,7 @@ The below deployment scenarios will guide you through onboarding various Windows
 
 **Note: For a list of supported operating systems and Azure regions, please visit the official [Azure Arc docs](https://docs.microsoft.com/en-us/azure/azure-arc/servers/overview).**
 
-**Disclaimer: Azure Arc for Servers is currently in Public Preview.**
+**Disclaimer: Azure Arc enabled Servers is currently in Public Preview.**
 
 #### General
 
@@ -78,7 +78,7 @@ The following guides provide end-to-end deployment of new Windows or Linux serve
 
 * [Deploy a VMware vSphere Windows Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_winsrv.md)
 
-#### Azure Arc for Servers - Day-2 Scenarios & Use-Cases
+#### Azure Arc enabled Servers - Day-2 Scenarios & Use-Cases
 
 Once you have server resources projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the servers as native Azure resources. The following guides show examples of using Azure management tools such as resource tags, Azure Policy, Log Analytics, and more with Azure Arc servers.
 
@@ -92,11 +92,13 @@ Once you have server resources projected into Azure with Azure Arc, you can star
  
 * [Integrate Azure Security Center with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_securitycenter.md)
 
+* [Integrate Azure Sentinel with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_azuresentinel.md)
+
 ## Azure Arc enabled Kubernetes
 
-The below deployment options are focused on Azure Arc for Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
+The below deployment options are focused on Azure Arc enabled Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
 
-**Disclaimer: Azure Arc for Kubernetes is currently in Public Preview.**
+**Disclaimer: Azure Arc enabled Kubernetes is currently in Public Preview.**
 
 #### General
 
@@ -140,7 +142,7 @@ Azure Arc can also support Azure Red Hat OpenShift (ARO). This example uses Terr
 
 * [Deploy Azure Redhat Openshift Cluster and connect it to Azure Arc using automation](azure_arc_k8s_jumpstart/docs/aro_script.md)
 
-#### Azure Arc for Kubernetes - Day-2 Scenarios & Use-Cases
+#### Azure Arc enabled Kubernetes - Day-2 Scenarios & Use-Cases
 
 Once you have Kubernetes clusters projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the clusters as native Azure resources. The following guides show examples of using Azure management tools such as Azure Monitor, GitOps configurations, and Azure Policy.
 
@@ -166,17 +168,31 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 ## Azure Arc enabled Data Services
 
-The below deployment options are focused on Azure Arc for Data Services. They are designed to quickly spin up Azure data services in Kubernetes that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
+The below deployment options are focused on Azure Arc enabled Data Services. They are designed to quickly spin up Azure data services in Kubernetes that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
 
-**Disclaimer: Azure Arc for Data Services is currently in Private Preview.**
+**Disclaimer: Azure Arc enabled Data Services is currently in Private Preview.**
 
 #### Data Services on Azure Kubernetes Service (AKS)
 
-If you do not yet have a Kubernetes cluster, the following examples walk through creating an AKS cluster to simulate an "on-premises" cluster and deploy Azure Arc Data Services on top of it.
+If you do not yet have a Kubernetes cluster, the following examples walk through creating an AKS cluster to simulate an "on-premises" or other cloud platform's Kubernetes cluster and deploy Azure Arc Data Services on top of it.
 
 * [Azure Arc Data Controller Vanilla Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_dc_vanilla_arm_template.md)
 
 * [Azure SQL Managed Instance Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_mssql_mi_arm_template.md)
+
+* [Azure PostgreSQL Hyperscale Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_postgresql_hyperscale_arm_template.md)
+
+#### Data Services on AWS Elastic Kubernetes Service (EKS)
+
+If you do not yet have a Kubernetes cluster, the following examples walk through creating an EKS cluster and deploy Azure Arc Data Services on top of it.
+
+* [Azure Arc Data Controller Vanilla Deployment on EKS using Terraform](azure_arc_data_jumpstart/docs/eks_dc_vanilla_terraform.md)
+
+#### Data Services on GCP Google Kubernetes Engine (GKE)
+
+If you do not yet have a Kubernetes cluster, the following examples walk through creating a GKE cluster and deploy Azure Arc Data Services on top of it.
+
+* [Azure Arc Data Controller Vanilla Deployment on GKE using Terraform](azure_arc_data_jumpstart/docs/gke_dc_vanilla_terraform.md)
 
 #### Data Services on Upstream Kubernetes (Kubeadm)
 
