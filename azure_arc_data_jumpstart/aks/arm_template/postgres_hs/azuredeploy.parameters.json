@@ -62,17 +62,17 @@
         "ARC_DC_REGION": {
             "value": "eastus"
         },
-        "PSHS_NAME": {
-                "value": "<PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster>"
+        "POSTGRES_NAME": {
+            "value": "arcpg"
         },       
-        "PSHS_WORKER_NODE_COUNT": {
-                "value": "<PostgreSQL Hyperscale server group number of workers>"
+        "POSTGRES_WORKER_NODE_COUNT": {
+            "value": "<PostgreSQL Hyperscale server group number of workers>"
         },
-        "PSHS_DATASIZE": {
-                "value": "<PostgreSQL Hyperscale size of data volumes in MB>"
+        "POSTGRES_DATASIZE": {
+            "value": "<PostgreSQL Hyperscale size of data volumes in MB>"
         },
-        "PSHS_SERVICE_TYPE": {
-                "value": "<Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort>"
+        "POSTGRES_SERVICE_TYPE": {
+            "value": "<Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort>"
         }
     }
 }

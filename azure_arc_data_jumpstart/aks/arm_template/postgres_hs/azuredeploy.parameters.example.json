@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "clusterName": {
-            "value": "Arc-Data-PSHS-AKS"
+            "value": "Arc-Data-Postgres-AKS"
         },
           "dnsPrefix": {
-            "value": "arcdatapshsdemo"
+            "value": "arcdatapostgresdemo"
         },   
          "nodeAdminUsername": {
             "value": "arcdemo"
@@ -62,16 +62,16 @@
         "ARC_DC_REGION": {
             "value": "eastus"
         },
-        "PSHS_NAME": {
-            "value": "arcpshs"
+        "POSTGRES_NAME": {
+            "value": "arcpg"
         },
-        "PSHS_WORKER_NODE_COUNT": {
+        "POSTGRES_WORKER_NODE_COUNT": {
             "value": 5
         },
-        "PSHS_DATASIZE": {
+        "POSTGRES_DATASIZE": {
             "value": 1024
         },
-        "PSHS_SERVICE_TYPE": {
+        "POSTGRES_SERVICE_TYPE": {
             "value": "LoadBalancer"
         }
     }
