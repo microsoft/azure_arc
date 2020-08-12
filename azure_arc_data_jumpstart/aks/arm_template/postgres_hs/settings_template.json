@@ -10,12 +10,12 @@
         {
             "options": {
                 "connectionName": "",
-                "host": "arc_pshs",
+                "host": "arc_postgres",
                 "authenticationType": "SqlLogin",
                 "dbname": "",
                 "user": "postgres",
                 "password": "ps_password",
-                "hostaddr": "arc_pshs",
+                "hostaddr": "arc_postgres",
                 "port": "5432",
                 "connectTimeout": "15",
                 "applicationName": "azdata",
