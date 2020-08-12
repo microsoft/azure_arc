@@ -1,0 +1,78 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "clusterName": {
+            "value": "<AKS cluster name>"
+        },
+        "dnsPrefix": {
+            "value": "<AKS unique DNS prefix>"
+        },        
+         "nodeAdminUsername": {
+            "value": "<AKS Node Username>"
+        },
+        "sshRSAPublicKey": {
+            "value": "<Your ssh public key>"
+        },
+        "servicePrincipalClientId": {
+            "value": "<Your Azure Service Principle name>"
+        },
+        "servicePrincipalClientSecret": {
+            "value": "<Your Azure Service Principle password>"
+        },
+        "kubernetesVersion": {
+            "value": "<Kubernetes Version, e.g. 1.18.4>"
+        },
+        "adminUsername": {
+            "value": "<Client Windows VM admin username>"
+        },
+        "adminPassword": {
+            "value": "<Client Windows VM admin password>"
+        },
+        "vmSize": {
+            "value": "<Client Windows VM size>"
+        },
+        "tenantId": {
+            "value": "<Azure tenant ID>"
+        },
+        "resourceGroup": {
+            "value": "<Azure Resource Group where all resource to be deployed>"
+        },
+        "AZDATA_USERNAME": {
+            "value": "<Azure Arc Data Controller admin username>"
+        },
+        "AZDATA_PASSWORD": {
+            "value": "<Azure Arc Data Controller admin password>"
+        },
+        "ACCEPT_EULA": {
+            "value": "yes"           
+        },
+        "REGISTRY_USERNAME": {
+            "value": "<Azure Arc Data - Private Preview Docker Registry username>"
+        },
+        "REGISTRY_PASSWORD": {
+            "value": "<Azure Arc Data - Private Preview Docker Registry password>"
+        },
+        "ARC_DC_NAME": {
+            "value": "<Azure Arc Data Controller name (will be used for k8s Arc namespace as well)>"
+        },
+        "ARC_DC_SUBSCRIPTION": {
+            "value": "<Azure Arc Data Controller Azure subscription ID>"
+        },
+        "ARC_DC_REGION": {
+            "value": "eastus"
+        },
+        "PSHS_NAME": {
+                "value": "<PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster>"
+        },       
+        "PSHS_WORKER_NODE_COUNT": {
+                "value": "<PostgreSQL Hyperscale server group number of workers>"
+        },
+        "PSHS_DATASIZE": {
+                "value": "<PostgreSQL Hyperscale size of data volumes in MB>"
+        },
+        "PSHS_SERVICE_TYPE": {
+                "value": "<Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort>"
+        }
+    }
+}

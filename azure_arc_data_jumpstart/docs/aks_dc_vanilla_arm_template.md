@@ -189,11 +189,10 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
     ![](../img/aks_dc_vanilla_arm_template/07.png)   
 
-* In Powershell, login to the Data Controller and check it's health using the below commands.
+* Using Powershell, login to the Data Controller and check it's health using the below commands.
 
     ```powershell
     azdata login -n $env:ARC_DC_NAME
-
     azdata arc dc status show
     ```
 
@@ -209,7 +208,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
 # Cleanup
 
-* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp*. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is approximately 10min long**.
+* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is approximately 10min long**.
 
     ![](../img/aks_dc_vanilla_arm_template/12.png)
 
@@ -219,7 +218,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
 # Re-Deploy Azure Arc Data Controller
 
-In case you deleted the Azure Arc Data Controller from the Kubernetes cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp*. **The Deploy script run time is approximately 10min long**
+In case you deleted the Azure Arc Data Controller from the AKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 10min long**
 
 ![](../img/aks_dc_vanilla_arm_template/14.png)
 

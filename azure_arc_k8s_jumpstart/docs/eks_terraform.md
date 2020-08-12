@@ -81,7 +81,7 @@ The following README will guide you on how to use the provided [Terraform](https
   An access key grants programmatic access to your resources. To create an AWS Access Key for a user:
   1. Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home). 
     ![](../img/eks_terraform/image0.png)
-  2. Select the **Users** from the side menue. 
+  2. Select the **Users** from the side menu. 
     ![](../img/eks_terraform/image1.png)
   3. Select the **User** you want to create the access key for. 
    ![](../img/eks_terraform/image2.png)
@@ -91,7 +91,12 @@ The following README will guide you on how to use the provided [Terraform](https
   ![](../img/eks_terraform/image4.png)
   6. In the popup window it will show you the ***Access key ID*** and ***Secret access key***. Save both of these values to configure **AWS CLI** later
   ![](../img/eks_terraform/image5.png)
-
+  7. Set your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key.
+      ```bash
+        $ export AWS_ACCESS_KEY_ID="anaccesskey"
+        $ export AWS_SECRET_ACCESS_KEY="asecretkey"
+        $ export AWS_DEFAULT_REGION="us-west-2"
+      ```
 # Deployment
 * Navigate to the folder that has **EKS** terraform binaries.
   ```bash

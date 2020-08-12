@@ -5,3 +5,4 @@ backup/
 .terraform
 *.log
 .vagrant
+*.pem

@@ -69,7 +69,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ![](../img/gke_terraform/03.png)
 
-* Enable the Compute Engine API for the project, create a project Owner service account credentials and download the private key JSON file.Save the file to the directory where Terraform files are located and change the JSON file name (for example *account.json*). The Terraform plan will be using the file to authenticate against your GCP project.   
+* Enable the Compute Engine API for the project, create a project Owner service account credentials and download the private key JSON file and copy the file to the directory where Terraform files are located. Change the JSON file name (for example *account.json*). The Terraform plan will be using the credentials stored in this file to authenticate against your GCP project.   
 
 ![](../img/gke_terraform/04.png)
 
