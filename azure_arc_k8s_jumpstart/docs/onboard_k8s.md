@@ -86,7 +86,7 @@ export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 ```
 
-If using shell:
+If using PowerShell:
 
 ```powershell
 $env:appId=<Your Azure Service Principle name>
@@ -135,7 +135,7 @@ $env:arcClusterName=<The name of your k8s cluster as it will be shown in Azure A
   If using shell:
 
   ```bash
-  az connectedk8s connect --name arcClusterName --resource-group $resourceGroup
+  az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup
   ```
 
   If using Powershell:
