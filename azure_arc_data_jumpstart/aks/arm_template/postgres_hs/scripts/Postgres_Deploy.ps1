@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\tmp\pshs_deploy.log
+Start-Transcript -Path C:\tmp\postgres_deploy.log
 
 # Deploying Azure Arc Data Controller
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
@@ -7,11 +7,11 @@ Start-Sleep -s 30
 
 # Deploying Azure Arc PostgreSQL Hyperscale Instance
 azdata login --namespace $env:ARC_DC_NAME
-azdata arc postgres server create --name $env:PSHS_NAME --workers $env:PSHS_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
-azdata arc postgres server endpoint list --name $env:PSHS_NAME
+azdata arc postgres server create --name $env:POSTGRES_NAME --workers $env:POSTGRES_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
+azdata arc postgres server endpoint list --name $env:POSTGRES_NAME
 
-# Creating PSHS Instance connectivity details
-Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
+# Creating POSTGRES Instance connectivity details
+Start-Process powershell -ArgumentList "C:\tmp\postgres_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Stop-Transcript
 

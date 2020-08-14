@@ -13,10 +13,10 @@ param (
     [string]$ARC_DC_NAME,
     [string]$ARC_DC_SUBSCRIPTION,
     [string]$ARC_DC_REGION,
-    [string]$PSHS_NAME,   
-    [string]$PSHS_WORKER_NODE_COUNT,
-    [string]$PSHS_DATASIZE,
-    [string]$PSHS_SERVICE_TYPE,
+    [string]$POSTGRES_NAME,   
+    [string]$POSTGRES_WORKER_NODE_COUNT,
+    [string]$POSTGRES_DATASIZE,
+    [string]$POSTGRES_SERVICE_TYPE,
     [string]$chocolateyAppList
 )
 
@@ -34,10 +34,10 @@ param (
 [System.Environment]::SetEnvironmentVariable('ARC_DC_NAME', $ARC_DC_NAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('PSHS_NAME', $PSHS_NAME,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('PSHS_WORKER_NODE_COUNT', $PSHS_WORKER_NODE_COUNT,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('PSHS_DATASIZE', $PSHS_DATASIZE,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('PSHS_SERVICE_TYPE', $PSHS_SERVICE_TYPE,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('POSTGRES_NAME', $POSTGRES_NAME,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('POSTGRES_WORKER_NODE_COUNT', $POSTGRES_WORKER_NODE_COUNT,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('POSTGRES_DATASIZE', $POSTGRES_DATASIZE,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('POSTGRES_SERVICE_TYPE', $POSTGRES_SERVICE_TYPE,[System.EnvironmentVariableTarget]::Machine)
 
 # Installing tools
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
@@ -76,8 +76,8 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://github.com/microsoft/azuredatastudio/archive/master.zip" -OutFile "C:\tmp\azuredatastudio_repo.zip"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/microsoft.azuredatastudio-postgresql-0.2.6.zip" -OutFile "C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6.zip"
                     Invoke-WebRequest "https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jul-2020-new/msi/azdata-cli-20.1.0.msi" -OutFile "C:\tmp\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/PSHS_Cleanup.ps1" -OutFile "C:\tmp\PSHS_Cleanup.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/PSHS_Deploy.ps1" -OutFile "C:\tmp\PSHS_Deploy.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/Postgres_Cleanup.ps1" -OutFile "C:\tmp\Postgres_Cleanup.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/Postgres_Deploy.ps1" -OutFile "C:\tmp\Postgres_Deploy.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/settings_template.json" -OutFile "C:\tmp\settings_template.json"
                 }
         }
@@ -103,15 +103,15 @@ ClientTools_02 | ft
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating Powershell pshs_connectivity Script
-$pshs_connectivity = @'
+# Creating Powershell postgres_connectivity Script
+$postgres_connectivity = @'
 
-Start-Transcript "C:\tmp\pshs_connectivity.log"
+Start-Transcript "C:\tmp\postgres_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving PostgreSQL Server IP
-azdata arc postgres server endpoint list --name $env:PSHS_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
-Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
+azdata arc postgres server endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
+Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt"
@@ -126,33 +126,33 @@ $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
 # Creating Azure Data Studio settings for PostgreSQL connection
-azdata arc postgres server endpoint list --name $env:PSHS_NAME | Tee-Object "C:\tmp\pshs_instance_endpoint.txt"
+azdata arc postgres server endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
-Get-Content "C:\tmp\pshs_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
+Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt"
 $s.Substring(0, $s.IndexOf(':')) | Out-File -FilePath "C:\tmp\merge.txt" -Encoding ascii -NoNewline
 $s = Get-Content "C:\tmp\merge.txt"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_pshs',$s | Set-Content -Path "C:\tmp\settings_template.json"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_postgres',$s | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
 # Cleaning garbage
-Remove-Item "C:\tmp\pshs_instance_endpoint.txt" -Force
+Remove-Item "C:\tmp\postgres_instance_endpoint.txt" -Force
 Remove-Item "C:\tmp\merge.txt" -Force
 Remove-Item "C:\tmp\out.txt" -Force
 
 # Restoring demo database
-$podname = "$env:PSHS_NAME" + "-0"
+$podname = "$env:POSTGRES_NAME" + "-0"
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- psql --username postgres -c 'CREATE DATABASE "adventureworks";'
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- psql --username postgres -d adventureworks -f /tmp/AdventureWorks.sql
 
 Stop-Transcript
 
-'@ > C:\tmp\pshs_connectivity.ps1
+'@ > C:\tmp\postgres_connectivity.ps1
 
 # Creating Powershell Logon Script
 $LogonScript = @'
@@ -191,11 +191,11 @@ Start-Sleep -s 30
 
 # Deploying Azure Arc PostgreSQL Hyperscale Server Group
 azdata login --namespace $env:ARC_DC_NAME
-azdata arc postgres server create --name $env:PSHS_NAME --workers $env:PSHS_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
-azdata arc postgres server endpoint list --name $env:PSHS_NAME
+azdata arc postgres server create --name $env:POSTGRES_NAME --workers $env:POSTGRES_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
+azdata arc postgres server endpoint list --name $env:POSTGRES_NAME
 
-# Creating PSHS Instance connectivity details
-Start-Process powershell -ArgumentList "C:\tmp\pshs_connectivity.ps1" -WindowStyle Hidden -Wait
+# Creating Postgres Instance connectivity details
+Start-Process powershell -ArgumentList "C:\tmp\postgres_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
