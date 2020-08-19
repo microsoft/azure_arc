@@ -45,7 +45,7 @@ sudo -u $adminUsername az login --service-principal --username ${appId} --passwo
 
 # Onboard the cluster to Azure Arc
 resourceGroup=$(az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
-sudo -u az connectedk8s connect --name $vmName --resource-group $resourceGroup --location 'eastus'
+sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location 'eastus'
 resourceId=$(az resource list --query "[?name=='$vmName']".[id] --resource-group $resourceGroup --resource-type "Microsoft.Kubernetes/connectedClusters" -o tsv)
 sudo -u $adminUsername az tag create --resource-id $resourceId --tags "Project=jumpstart_azure_arc_k8s"
 
