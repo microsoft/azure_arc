@@ -100,7 +100,7 @@
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_k8s"
             }
-        }                        
+        }
     },
     "resources": [
         {
