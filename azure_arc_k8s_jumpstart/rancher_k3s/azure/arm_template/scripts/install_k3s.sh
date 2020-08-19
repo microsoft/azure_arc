@@ -41,13 +41,11 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 sudo -u $adminUsername az extension add --name connectedk8s
 sudo -u $adminUsername az extension add --name k8sconfiguration
 
-sudo -u $adminUsername az login --service-principal --username $appId --password $password --tenant $tenantId
+az az login --service-principal --username $appId --password $password --tenant $tenantId
 
 # Onboard the cluster to Azure Arc
-resourceGroup=$(az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
-sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location 'eastus'
-resourceId=$(az resource list --query "[?name=='$vmName']".[id] --resource-group $resourceGroup --resource-type "Microsoft.Kubernetes/connectedClusters" -o tsv)
-sudo -u $adminUsername az tag create --resource-id $resourceId --tags "Project=jumpstart_azure_arc_k8s"
+resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
+sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location 'eastus' --tags "Project[=jumpstart_azure_arc_k8s]"
 
 # Creating "hello-world" Kubernetes yaml
 sudo cat <<EOT >> hello-kubernetes.yaml
