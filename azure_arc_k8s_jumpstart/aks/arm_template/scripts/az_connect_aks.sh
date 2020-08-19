@@ -21,3 +21,7 @@ az extension add --name k8sconfiguration
 
 echo "Connecting the cluster to Azure Arc"
 az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --location 'eastus'
+
+echo "Adding Jumpstart tags"
+resourceId=$(az resource list --query "[?name=='$arcClusterName']".[id] --resource-group $resourceGroup --resource-type "Microsoft.Kubernetes/connectedClusters" -o tsv)
+az tag create --resource-id $resourceId --tags "Project=jumpstart_azure_arc_k8s"

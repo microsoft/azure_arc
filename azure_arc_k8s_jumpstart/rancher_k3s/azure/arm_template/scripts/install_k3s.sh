@@ -41,7 +41,7 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 sudo -u $adminUsername az extension add --name connectedk8s
 sudo -u $adminUsername az extension add --name k8sconfiguration
 
-sudo -u $adminUsername az login --service-principal --username ${appId} --password ${password} --tenant ${tenantId}
+sudo -u $adminUsername az login --service-principal --username $appId --password $password --tenant $tenantId
 
 # Onboard the cluster to Azure Arc
 resourceGroup=$(az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
