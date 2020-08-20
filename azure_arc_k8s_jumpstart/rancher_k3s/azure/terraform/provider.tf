@@ -1,6 +1,16 @@
+#
+# Providers Configuration
+#
+
+terraform {
+  required_version = "~> 0.12"
+  required_providers {
+    azurerm = "~> 2.9.0"
+  }
+}
+
 # Configure the Microsoft Azure Resource Manager Provider
 provider "azurerm" {
-  version = "=2.0.0"
   features {}
   subscription_id = var.subscription_id
   client_id       = var.client_id
