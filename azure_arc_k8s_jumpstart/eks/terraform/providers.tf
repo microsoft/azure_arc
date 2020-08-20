@@ -3,10 +3,10 @@
 #
 
 provider "aws" {
-  region  = "us-west-2"
-  version = ">= 2.38.0"
+  region     = "us-west-2"
+  version    = "~> 2.38.0"
   access_key = var.AWS_ACCESS_KEY_ID
-  secret_key = var.AWS_SECRET_ACCESS_KEY  
+  secret_key = var.AWS_SECRET_ACCESS_KEY
 }
 
 # Using these data sources allows the configuration to be
