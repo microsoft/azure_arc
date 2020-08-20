@@ -1,7 +1,7 @@
 vsphere_datacenter                  = "My Datacenter"
 vsphere_datastore                   = "My Datastore"
 vsphere_resource_pool               = "My Cluster/"  // If no Resource Pool is present, use vSphere Cluster
-network_cards                       = ["VM Network"] // vSwith/DVS Port Group
+network_cards                       = ["VM Network"] // vSwitch/DVS Port Group
 vsphere_folder                      = "Arc Servers"  // Use the following format for nested folders: "Folder1/Folder2/Folder3"
 vsphere_vm_template_name            = "VM Templates/WINSRV2K19-TMP"
 vsphere_virtual_machine_name        = "Arc-Win-Demo"
