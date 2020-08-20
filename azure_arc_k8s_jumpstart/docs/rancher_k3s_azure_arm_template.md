@@ -81,35 +81,9 @@ For example:
   --parameters azuredeploy.parameters.json
 ```
 
-Upon completion, you will have new VM installed as a single-host k3s cluster in a new Resource Group.
+Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc enabled Kubernetes cluster in a new Resource Group.
 
 ![](../img/rancher_k3s/azure/arm_template/01.png)
-
-# Connecting to Azure Arc
-
-**Note:** The VM bootstrap includes the log in process to Azure as well deploying the needed Azure Arc CLI extensions - no action items on you there!
-
-* SSH to the VM using the created Azure Public IP and your username/password.
-
-  ![](../img/rancher_k3s/azure/arm_template/02.png)
-
-* Check the cluster is up and running using the ```kubectl get nodes -o wide```
-
-  ![](../img/rancher_k3s/azure/arm_template/03.png)
-
-* Using the Azure Service Principle you've created, run the below command to connect the cluster to Azure Arc.
-
-    ```az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure Resource Group Name>```
-
-    For example:
-
-    ```az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo```
-
-  ![](../img/rancher_k3s/azure/arm_template/04.png)
-
-  ![](../img/rancher_k3s/azure/arm_template/05.png)
-
-  ![](../img/rancher_k3s/azure/arm_template/06.png)
 
 # K3s External Access
 
