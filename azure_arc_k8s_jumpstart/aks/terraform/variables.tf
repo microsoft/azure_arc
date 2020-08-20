@@ -20,7 +20,7 @@ variable "location" {
 
 variable "kubernetes_version" {
   description = "Kubernetes version deployed"
-  default     = "1.17.3"
+  default     = "1.18.4"
 }
 
 variable "node_count" {
