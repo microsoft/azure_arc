@@ -91,28 +91,25 @@ Traefik is the (default) ingress controller for k3s and uses port 80. To test ex
 
 * Since port 80 is taken by Traefik [(read more about here)](https://github.com/rancher/k3s/issues/436), the deployment LoadBalancer was changed to use port 32323 along side with the matching Azure Network Security Group (NSG). 
 
-  ![](../img/rancher_k3s/azure/arm_template/07.png)
+  ![](../img/rancher_k3s/azure/arm_template/02.png)
 
-  ![](../img/rancher_k3s/azure/arm_template/08.png)
+  ![](../img/rancher_k3s/azure/arm_template/03.png)
 
   To deploy it, use the ```kubectl apply -f hello-kubernetes.yaml``` command. Run ```kubectl get pods``` and ```kubectl get svc``` to check that the pods and the service has been created. 
 
-  ![](../img/rancher_k3s/azure/arm_template/09.png)
+  ![](../img/rancher_k3s/azure/arm_template/04.png)
 
-  ![](../img/rancher_k3s/azure/arm_template/10.png)
+  ![](../img/rancher_k3s/azure/arm_template/05.png)
 
-  ![](../img/rancher_k3s/azure/arm_template/11.png)
+  ![](../img/rancher_k3s/azure/arm_template/06.png)
 
 * In your browser, enter the *cluster_public_ip:3232* which will bring up the *hello-world* application.
 
-  ![](../img/rancher_k3s/azure/arm_template/12.png)
+  ![](../img/rancher_k3s/azure/arm_template/07.png)
 
 # Delete the deployment
 
-The most straightforward way is to delete the cluster is via the Azure Portal, just select the cluster and delete it. 
+To delete environment, simply just delete the Azure Resource Group.
 
-![](../img/rancher_k3s/azure/arm_template/13.png)
+![](../img/rancher_k3s/azure/arm_template/08.png)
 
-If you want to nuke the entire environment, just delete the Azure Resource Group. 
-
-![](../img/rancher_k3s/azure/arm_template/14.png)
