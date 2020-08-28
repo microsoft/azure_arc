@@ -109,7 +109,7 @@ azdata --version
 Write-Host "Copying Azure Data Studio Extentions"
 Write-Host "`n"
 
-$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\"
+$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\microsoft.arc-0.2.0"
 Copy-Item -Path "C:\tmp\microsoft.arc-0.2.0\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
 $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\"
@@ -132,7 +132,6 @@ Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
 Stop-Transcript
 
-Stop-Process -Name kubectl -Force
 Stop-Process -name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
