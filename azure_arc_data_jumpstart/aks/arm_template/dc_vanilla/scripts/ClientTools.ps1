@@ -122,6 +122,8 @@ $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\
 Copy-Item -Path "C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
 $SettingsDestination = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User"
+Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Hidden
+Stop-Process -Name azuredatastudio-insiders -Force
 Copy-Item -Path "C:\tmp\settings.json" -Destination $SettingsDestination -Recurse -Force -ErrorAction Continue
 
 Write-Host "Creating Azure Data Studio Desktop shortcut"
