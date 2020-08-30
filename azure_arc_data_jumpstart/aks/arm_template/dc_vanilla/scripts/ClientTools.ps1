@@ -126,6 +126,7 @@ Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredata
 Start-Sleep -s 5
 Stop-Process -Name "azuredatastudio-insiders" -Force
 Copy-Item -Path "C:\tmp\settings.json" -Destination $SettingsDestination -Recurse -Force -ErrorAction Continue
+Start-Sleep -s 10
 Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Hidden
 Start-Sleep -s 5
 Stop-Process -Name "azuredatastudio-insiders" -Force
