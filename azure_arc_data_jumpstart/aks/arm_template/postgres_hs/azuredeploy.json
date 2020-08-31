@@ -185,27 +185,27 @@
         "description": "Arc Data Controller Region"
       }
     },
-    "PSHS_NAME": {
+    "POSTGRES_NAME": {
       "type": "string",
       "metadata": {
         "description": "Name of PostgreSQL server group"
       }
     },   
-    "PSHS_WORKER_NODE_COUNT": {
+    "POSTGRES_WORKER_NODE_COUNT": {
       "type": "int",
       "defaultValue": 3,
       "metadata": {
         "description": "Number of PostgreSQL Hyperscale worker nodes"
       }
     },
-    "PSHS_DATASIZE": {
+    "POSTGRES_DATASIZE": {
       "type": "int",        
       "defaultValue": 1024,
       "metadata": {
         "description": "Size of data volumes in MB"
       }
     },
-    "PSHS_SERVICE_TYPE": {
+    "POSTGRES_SERVICE_TYPE": {
       "type": "string",
       "metadata": {
         "description": "Choose how PostgreSQL service is accessed through Kubernetes networking interface"
@@ -279,10 +279,10 @@
         "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
         "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
         "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
-        "PSHS_NAME":{"value": "[parameters('PSHS_NAME')]"},       
-        "PSHS_WORKER_NODE_COUNT":{"value": "[parameters('PSHS_WORKER_NODE_COUNT')]"},
-        "PSHS_DATASIZE":{"value": "[parameters('PSHS_DATASIZE')]"},
-        "PSHS_SERVICE_TYPE":{"value": "[parameters('PSHS_SERVICE_TYPE')]"}
+        "POSTGRES_NAME":{"value": "[parameters('POSTGRES_NAME')]"},       
+        "POSTGRES_WORKER_NODE_COUNT":{"value": "[parameters('POSTGRES_WORKER_NODE_COUNT')]"},
+        "POSTGRES_DATASIZE":{"value": "[parameters('POSTGRES_DATASIZE')]"},
+        "POSTGRES_SERVICE_TYPE":{"value": "[parameters('POSTGRES_SERVICE_TYPE')]"}
         }
       }
     }

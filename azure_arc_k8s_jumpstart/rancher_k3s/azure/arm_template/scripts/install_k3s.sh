@@ -9,11 +9,13 @@ echo $adminPasswordOrKey:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $appId:$3 | awk '{print substr($1,2); }' >> vars.sh
 echo $password:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $tenantId:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $vmName:$6 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export adminPasswordOrKey=/' vars.sh
 sed -i '4s/^/export appId=/' vars.sh
 sed -i '5s/^/export password=/' vars.sh
 sed -i '6s/^/export tenantId=/' vars.sh
+sed -i '7s/^/export vmName=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -39,7 +41,11 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 sudo -u $adminUsername az extension add --name connectedk8s
 sudo -u $adminUsername az extension add --name k8sconfiguration
 
-sudo -u $adminUsername az login --service-principal --username ${appId} --password ${password} --tenant ${tenantId}
+sudo -u $adminUsername az login --service-principal --username $appId --password $password --tenant $tenantId
+
+# Onboard the cluster to Azure Arc
+resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
+sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
 
 # Creating "hello-world" Kubernetes yaml
 sudo cat <<EOT >> hello-kubernetes.yaml

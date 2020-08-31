@@ -94,7 +94,13 @@
             "metadata": {
                 "description": "The version of Kubernetes."
             }
-        }                
+        },
+        "resourceTags": {
+            "type": "object",
+            "defaultValue": {
+                "Project": "jumpstart_azure_arc_k8s"
+            }
+        }
     },
     "resources": [
         {
@@ -102,6 +108,7 @@
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[parameters('location')]",
             "name": "[parameters('clusterName')]",
+            "tags": "[parameters('resourceTags')]",
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "enableRBAC": "[parameters('enableRBAC')]",                
