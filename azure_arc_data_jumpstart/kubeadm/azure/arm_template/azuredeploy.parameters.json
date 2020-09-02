@@ -38,10 +38,10 @@
         "ACCEPT_EULA": {
             "value": "yes"
         },        
-        "REGISTRY_USERNAME": {
+        "DOCKER_USERNAME": {
             "value": "<Azure Arc Data - Private Preview Container Registry username>"
         },
-        "REGISTRY_PASSWORD": {
+        "DOCKER_PASSWORD": {
             "value": "<Azure Arc Data - Private Preview Container Registry password>"
         },
         "ARC_DC_NAME": {
