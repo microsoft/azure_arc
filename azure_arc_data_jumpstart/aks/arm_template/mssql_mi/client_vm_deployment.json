@@ -135,12 +135,6 @@
                 "description": "MSSQL SA password"
             }
         },
-        "MSSQL_MI_vCores": {
-            "type": "string",
-            "metadata": {
-                "description": "MSSQL instance number of virtual cores"
-            }
-        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "Arc-Data-Client-VNET",
@@ -346,7 +340,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/scripts/ClientTools.ps1"
               ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -clusterName ', parameters('clusterName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -REGISTRY_USERNAME ', parameters('REGISTRY_USERNAME'), ' -REGISTRY_PASSWORD ', parameters('REGISTRY_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -MSSQL_MI_NAME ', parameters('MSSQL_MI_NAME'), ' -MSSQL_SA_PASSWORD ', parameters('MSSQL_SA_PASSWORD'), ' -MSSQL_MI_vCores ', parameters('MSSQL_MI_vCores'))]" 
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -clusterName ', parameters('clusterName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -REGISTRY_USERNAME ', parameters('REGISTRY_USERNAME'), ' -REGISTRY_PASSWORD ', parameters('REGISTRY_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -MSSQL_MI_NAME ', parameters('MSSQL_MI_NAME'), ' -MSSQL_SA_PASSWORD ', parameters('MSSQL_SA_PASSWORD'))]" 
             }            
           }
         }                        
