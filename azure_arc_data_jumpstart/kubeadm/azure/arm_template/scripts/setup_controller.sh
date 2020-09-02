@@ -5,8 +5,8 @@ echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_USERNAME:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_PASSWORD:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $REGISTRY_USERNAME:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $REGISTRY_PASSWORD:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_USERNAME:$4 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_PASSWORD:$5 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
@@ -14,8 +14,8 @@ echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
-sed -i '5s/^/export REGISTRY_USERNAME=/' vars.sh
-sed -i '6s/^/export REGISTRY_PASSWORD=/' vars.sh
+sed -i '5s/^/export DOCKER_USERNAME=/' vars.sh
+sed -i '6s/^/export DOCKER_PASSWORD=/' vars.sh
 sed -i '7s/^/export ARC_DC_NAME=/' vars.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars.sh
@@ -29,8 +29,8 @@ echo '##Azure Arc environment variables##' >> vars_profile.sh
 echo $adminUsername >> vars_profile.sh
 echo $AZDATA_USERNAME >> vars_profile.sh
 echo $AZDATA_PASSWORD >> vars_profile.sh
-echo $REGISTRY_USERNAME >> vars_profile.sh
-echo $REGISTRY_PASSWORD >> vars_profile.sh
+echo $DOCKER_USERNAME >> vars_profile.sh
+echo $DOCKER_PASSWORD >> vars_profile.sh
 echo $ARC_DC_NAME >> vars_profile.sh
 echo $ARC_DC_SUBSCRIPTION >> vars_profile.sh
 echo $ARC_DC_RG >> vars_profile.sh
@@ -39,8 +39,8 @@ echo $ACCEPT_EULA >> vars_profile.sh
 sed -i '2s/^/export adminUsername=/' vars_profile.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars_profile.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars_profile.sh
-sed -i '5s/^/export REGISTRY_USERNAME=/' vars_profile.sh
-sed -i '6s/^/export REGISTRY_PASSWORD=/' vars_profile.sh
+sed -i '5s/^/export DOCKER_USERNAME=/' vars_profile.sh
+sed -i '6s/^/export DOCKER_PASSWORD=/' vars_profile.sh
 sed -i '7s/^/export ARC_DC_NAME=/' vars_profile.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars_profile.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars_profile.sh
@@ -70,17 +70,17 @@ then
 fi
 
 # Prompt for private preview repository username and password provided by Microsoft
-if [ -z "$REGISTRY_USERNAME" ]
+if [ -z "$DOCKER_USERNAME" ]
 then
     read -p 'Enter Azure Arc Data Controller repo username provided by Microsoft:' AADC_USERNAME
     echo
-    export REGISTRY_USERNAME=$AADC_USERNAME
+    export DOCKER_USERNAME=$AADC_USERNAME
 fi
-if [ -z "$REGISTRY_PASSWORD" ]
+if [ -z "$DOCKER_PASSWORD" ]
 then
     read -sp 'Enter Azure Arc Data Controller repo password provided by Microsoft:' AADC_PASSWORD
     echo
-    export REGISTRY_PASSWORD=$AADC_PASSWORD
+    export DOCKER_PASSWORD=$AADC_PASSWORD
 fi
 
 

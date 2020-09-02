@@ -78,13 +78,13 @@
                 "description": "azdata CLI EULA"
             }
         },
-        "REGISTRY_USERNAME": {
+        "DOCKER_USERNAME": {
             "type": "string",
             "metadata": {
                 "description": "Private Azure Arc Data Container Registry Username"
             }
         },
-        "REGISTRY_PASSWORD": {
+        "DOCKER_PASSWORD": {
             "type": "string",
             "metadata": {
                 "description": "Private Azure Arc Data Container Registry Password"
@@ -421,7 +421,7 @@
             "typeHandlerVersion": "2.1",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-                        "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('REGISTRY_USERNAME'), ' ', parameters('REGISTRY_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'))]",
+                        "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'))]",
             "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh"]
             }
           }
@@ -452,8 +452,8 @@
             "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
             "AZDATA_PASSWORD":{"value": "[parameters('AZDATA_PASSWORD')]"},
             "ACCEPT_EULA":{"value": "[parameters('ACCEPT_EULA')]"},
-            "REGISTRY_USERNAME":{"value": "[parameters('REGISTRY_USERNAME')]"},
-            "REGISTRY_PASSWORD":{"value": "[parameters('REGISTRY_PASSWORD')]"},
+            "DOCKER_USERNAME":{"value": "[parameters('DOCKER_USERNAME')]"},
+            "DOCKER_PASSWORD":{"value": "[parameters('DOCKER_PASSWORD')]"},
             "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
             "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
             "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"}

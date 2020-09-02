@@ -38,10 +38,10 @@
         "ACCEPT_EULA": {
             "value": "yes"
         },        
-        "REGISTRY_USERNAME": {
+        "DOCKER_USERNAME": {
             "value": "Go-to-private-repo"
         },
-        "REGISTRY_PASSWORD": {
+        "DOCKER_PASSWORD": {
             "value": "Go-to-private-repo"
         },
         "ARC_DC_NAME": {
