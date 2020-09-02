@@ -50,16 +50,16 @@ Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
 Write-Host "Copying Azure Data Studio Extentions"
 Write-Host "`n"
 
-$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\microsoft.arc-0.3.3"
+$ExtensionsDestination = "C:\Users\$env:windows_username\.azuredatastudio-insiders\extensions\microsoft.arc-0.3.3"
 Copy-Item -Path "C:\tmp\microsoft.arc-0.3.3\microsoft.arc-0.3.3\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
-$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\microsoft.azdata-0.1.2"
+$ExtensionsDestination = "C:\Users\$env:windows_username\.azuredatastudio-insiders\extensions\microsoft.azdata-0.1.2"
 Copy-Item -Path "C:\tmp\microsoft.azdata-0.1.2\microsoft.azdata-0.1.2" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
-$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\"
+$ExtensionsDestination = "C:\Users\$env:windows_username\.azuredatastudio-insiders\extensions\"
 Copy-Item -Path "C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
-$SettingsDestination = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User"
+$SettingsDestination = "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User"
 Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Hidden
 Start-Sleep -s 5
 Stop-Process -Name "azuredatastudio-insiders" -Force
@@ -91,12 +91,12 @@ $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
 azdata arc dc config init --source azure-arc-kubeadm -t "C:\tmp\custom"
-azdata arc dc config replace --config-file "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=faster"
-azdata arc dc config replace --config-file "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=faster"
-azdata arc dc config replace --config-file "C:\tmp\custom\control.json" --json-values "$.spec.endpoints[*].serviceType=LoadBalancer"
+azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=faster"
+azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=faster"
+azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "$.spec.services[*].serviceType=LoadBalancer"
 
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc dc create --path "C:\tmp\custom" --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:ARC_DC_RG --location $env:ARC_DC_REGION --connectivity-mode indirect
+azdata arc dc create --path "C:\tmp\custom\control.json" --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:ARC_DC_RG --location $env:ARC_DC_REGION --connectivity-mode indirect
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
