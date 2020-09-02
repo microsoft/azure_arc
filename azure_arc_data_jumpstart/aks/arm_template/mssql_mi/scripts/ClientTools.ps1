@@ -15,7 +15,6 @@ param (
     [string]$ARC_DC_REGION,
     [string]$MSSQL_SA_PASSWORD,
     [string]$MSSQL_MI_NAME,
-    [string]$MSSQL_MI_vCores,
     [string]$chocolateyAppList
 )
 
@@ -35,7 +34,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('MSSQL_SA_PASSWORD', $MSSQL_SA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('MSSQL_MI_NAME', $MSSQL_MI_NAME,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('MSSQL_MI_vCores', $MSSQL_MI_vCores,[System.EnvironmentVariableTarget]::Machine)
 
 # Installing tools
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
