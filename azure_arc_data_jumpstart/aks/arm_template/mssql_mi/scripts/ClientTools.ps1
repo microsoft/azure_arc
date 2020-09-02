@@ -192,8 +192,8 @@ Copy-Item -Path "C:\tmp\microsoft.arc-0.3.3\" -Destination $ExtensionsDestinatio
 $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\microsoft.azdata-0.1.2"
 Copy-Item -Path "C:\tmp\microsoft.azdata-0.1.2\microsoft.azdata-0.1.2" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
-$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\azuredatastudio-postgresql-0.2.6"
-Copy-Item -Path "C:\tmp\azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue 
+$ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\"
+Copy-Item -Path "C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
