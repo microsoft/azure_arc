@@ -21,7 +21,7 @@
             "value": "33333333-XXXX-YTYT-9c21-7777777777"
         },
         "kubernetesVersion": {
-            "value": "1.18.4"
+            "value": "1.18.6"
         },
         "adminUsername": {
             "value": "arcdemo"
@@ -64,9 +64,6 @@
         },
         "MSSQL_MI_NAME": {
             "value": "arcsqlmidemo"
-        },
-        "MSSQL_SA_PASSWORD": {
-            "value": "ArcDemo123!!"
         }
     }
 }

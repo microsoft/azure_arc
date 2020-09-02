@@ -191,12 +191,6 @@
                 "description": "MSSQL instance name to be deployed on the Kubernetes cluster"
             }
         },
-        "MSSQL_SA_PASSWORD": {
-            "type": "string",
-            "metadata": {
-                "description": "MSSQL SA password"
-            }
-        },
         "resourceTags": {
             "type": "object",
             "defaultValue": {
@@ -272,8 +266,7 @@
             "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
             "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
             "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
-            "MSSQL_MI_NAME":{"value": "[parameters('MSSQL_MI_NAME')]"},
-            "MSSQL_SA_PASSWORD":{"value": "[parameters('MSSQL_SA_PASSWORD')]"}
+            "MSSQL_MI_NAME":{"value": "[parameters('MSSQL_MI_NAME')]"}
             }
           }
         }
