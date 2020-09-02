@@ -21,7 +21,7 @@
             "value": "<Your Azure Service Principle password>"
         },
         "kubernetesVersion": {
-            "value": "<Kubernetes Version, e.g. 1.18.4>"
+            "value": "<Kubernetes Version, e.g. 1.18.6>"
         },
         "adminUsername": {
             "value": "<Client Windows VM admin username>"
