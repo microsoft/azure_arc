@@ -135,12 +135,6 @@
                 "description": "MSSQL SA password"
             }
         },
-        "MSSQL_MI_vCores": {
-            "type": "string",
-            "metadata": {
-                "description": "MSSQL instance number of virtual cores"
-            }
-        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "Arc-Data-Client-VNET",
