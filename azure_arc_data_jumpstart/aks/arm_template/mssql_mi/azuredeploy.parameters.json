@@ -64,9 +64,6 @@
         },
         "MSSQL_MI_NAME": {
             "value": "<SQL Managed Instance name to be deployed on the Kubernetes cluster>"
-        },
-        "MSSQL_SA_PASSWORD": {
-            "value": "<SQL Managed Instance SA password>"
         }
     }
 }
