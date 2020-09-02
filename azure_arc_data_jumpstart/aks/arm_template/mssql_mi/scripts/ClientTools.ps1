@@ -13,7 +13,6 @@ param (
     [string]$ARC_DC_NAME,
     [string]$ARC_DC_SUBSCRIPTION,
     [string]$ARC_DC_REGION,
-    [string]$MSSQL_SA_PASSWORD,
     [string]$MSSQL_MI_NAME,
     [string]$chocolateyAppList
 )
@@ -32,7 +31,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('ARC_DC_NAME', $ARC_DC_NAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('MSSQL_SA_PASSWORD', $MSSQL_SA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('MSSQL_MI_NAME', $MSSQL_MI_NAME,[System.EnvironmentVariableTarget]::Machine)
 
 # Installing tools
@@ -107,8 +105,12 @@ $sql_connectivity = @'
 Start-Transcript "C:\tmp\sql_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
+
+Start-Transcript "C:\tmp\sql_connectivity.log"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+
 # Retreving SQL Managed Instance IP
-azdata sql instance list | Tee-Object "C:\tmp\sql_instance_list.txt"
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $lines = Get-Content "C:\tmp\sql_instance_list.txt"
 $first = $lines[0]
 $lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
@@ -116,12 +118,12 @@ $lines = Get-Content "C:\tmp\sql_instance_list.txt"
 $first = $lines[0]
 $lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
 $s = Get-Content "C:\tmp\sql_instance_list.txt"
-$s.Substring(0, $s.LastIndexOf(',')) | Out-File "C:\tmp\sql_instance_list.txt"
+$s.Substring(0, $s.LastIndexOf(':')) | Out-File "C:\tmp\sql_instance_list.txt"
 $s = Get-Content "C:\tmp\sql_instance_list.txt"
 $s.Split(' ')[-1] | Out-File -FilePath "C:\tmp\merge.txt" -Encoding ascii -NoNewline
 
 # Retreving SQL Managed Instance FQDN
-azdata sql instance list | Tee-Object "C:\tmp\sql_instance_list.txt"
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $lines = Get-Content "C:\tmp\sql_instance_list.txt"
 $first = $lines[0]
 $lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
@@ -131,7 +133,7 @@ $lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
 $s = Get-Content "C:\tmp\sql_instance_list.txt"
 $s.Substring(0, $s.IndexOf(' ')) | Out-File "C:\tmp\sql_instance_list.txt"
 $s = Get-Content "C:\tmp\sql_instance_list.txt"
-Add-Content -Path "C:\tmp\merge.txt" -Value ("   ",$s.Substring(0, $s.LastIndexOf(','))) -Encoding ascii -NoNewline
+Add-Content -Path "C:\tmp\merge.txt" -Value ("   ",$s) -Encoding ascii -NoNewline
 
 # Adding SQL Instance FQDN & IP to Hosts file
 Copy-Item -Path "C:\Windows\System32\drivers\etc\hosts" -Destination "C:\tmp\hosts_backup" -Recurse -Force -ErrorAction Continue
@@ -139,21 +141,23 @@ $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
 # Retreving SQL Managed Instance FQDN & Port
-azdata sql instance list | Tee-Object "C:\tmp\sql_instance_settings.txt"
-$lines = Get-Content "C:\tmp\sql_instance_settings.txt"
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
+$lines = Get-Content "C:\tmp\sql_instance_list.txt"
 $first = $lines[0]
-$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_settings.txt"
-$lines = Get-Content "C:\tmp\sql_instance_settings.txt"
+$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
+$lines = Get-Content "C:\tmp\sql_instance_list.txt"
 $first = $lines[0]
-$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_settings.txt"
-$s = Get-Content "C:\tmp\sql_instance_settings.txt"
-$s.Substring(0, $s.IndexOf(' ')) | Out-File "C:\tmp\sql_instance_settings.txt"
+$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
+$s = Get-Content "C:\tmp\sql_instance_list.txt"
+$s.Substring(0, $s.LastIndexOf(':')) | Out-File "C:\tmp\sql_instance_list.txt"
+$s = Get-Content "C:\tmp\sql_instance_list.txt"
+$s.Split(' ')[-1] | Out-File -FilePath "C:\tmp\sql_instance_settings.txt" -Encoding ascii -NoNewline
 
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
 $s = Get-Content "C:\tmp\sql_instance_settings.txt"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$s | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:MSSQL_SA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
@@ -164,8 +168,8 @@ Remove-Item "C:\tmp\merge.txt" -Force
 
 # Downloading demo database
 $podname = "$env:MSSQL_MI_NAME" + "-0"
-kubectl exec $podname -n $env:ARC_DC_NAME -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
-kubectl exec $podname -n $env:ARC_DC_NAME -- /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $env:MSSQL_SA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
+kubectl exec $podname -n $env:ARC_DC_NAME -c mssql-miaa -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
+kubectl exec $podname -n $env:ARC_DC_NAME -c mssql-miaa -- /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
 
 Stop-Transcript
 
@@ -187,7 +191,7 @@ Write-Host "Copying Azure Data Studio Extentions"
 Write-Host "`n"
 
 $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\microsoft.arc-0.3.3"
-Copy-Item -Path "C:\tmp\microsoft.arc-0.3.3\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\tmp\microsoft.arc-0.3.3\microsoft.arc-0.3.3\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
 $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\microsoft.azdata-0.1.2"
 Copy-Item -Path "C:\tmp\microsoft.azdata-0.1.2\microsoft.azdata-0.1.2" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
@@ -206,11 +210,11 @@ $Shortcut.Save()
 
 # Deploying Azure Arc Data Controller
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc dc create --profile-name azure-arc-aks-default-storage --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
+azdata arc dc create --profile-name azure-arc-aks-premium-storage --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
 # Deploying Azure Arc SQL Managed Instance
 azdata login -n $env:ARC_DC_NAME
-azdata arc sql mi create -n $env:MSSQL_MI_NAME --storage-class-data managed-premium --storage-class-logs managed-premium
+azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-premium --storage-class-logs managed-premium
 
 azdata arc sql mi list
 
