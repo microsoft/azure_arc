@@ -5,8 +5,8 @@ echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_USERNAME:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $AZDATA_PASSWORD:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_USERNAME:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_PASSWORD:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $REGISTRY_USERNAME:$4 | awk '{print substr($1,2); }' >> vars.sh
+echo $REGISTRY_PASSWORD:$5 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
@@ -14,8 +14,8 @@ echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
-sed -i '5s/^/export DOCKER_USERNAME=/' vars.sh
-sed -i '6s/^/export DOCKER_PASSWORD=/' vars.sh
+sed -i '5s/^/export REGISTRY_USERNAME=/' vars.sh
+sed -i '6s/^/export REGISTRY_PASSWORD=/' vars.sh
 sed -i '7s/^/export ARC_DC_NAME=/' vars.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars.sh
@@ -29,8 +29,8 @@ echo '##Azure Arc environment variables##' >> vars_profile.sh
 echo $adminUsername >> vars_profile.sh
 echo $AZDATA_USERNAME >> vars_profile.sh
 echo $AZDATA_PASSWORD >> vars_profile.sh
-echo $DOCKER_USERNAME >> vars_profile.sh
-echo $DOCKER_PASSWORD >> vars_profile.sh
+echo $REGISTRY_USERNAME >> vars_profile.sh
+echo $REGISTRY_PASSWORD >> vars_profile.sh
 echo $ARC_DC_NAME >> vars_profile.sh
 echo $ARC_DC_SUBSCRIPTION >> vars_profile.sh
 echo $ARC_DC_RG >> vars_profile.sh
@@ -39,8 +39,8 @@ echo $ACCEPT_EULA >> vars_profile.sh
 sed -i '2s/^/export adminUsername=/' vars_profile.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars_profile.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars_profile.sh
-sed -i '5s/^/export DOCKER_USERNAME=/' vars_profile.sh
-sed -i '6s/^/export DOCKER_PASSWORD=/' vars_profile.sh
+sed -i '5s/^/export REGISTRY_USERNAME=/' vars_profile.sh
+sed -i '6s/^/export REGISTRY_PASSWORD=/' vars_profile.sh
 sed -i '7s/^/export ARC_DC_NAME=/' vars_profile.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars_profile.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars_profile.sh
@@ -70,17 +70,17 @@ then
 fi
 
 # Prompt for private preview repository username and password provided by Microsoft
-if [ -z "$DOCKER_USERNAME" ]
+if [ -z "$REGISTRY_USERNAME" ]
 then
     read -p 'Enter Azure Arc Data Controller repo username provided by Microsoft:' AADC_USERNAME
     echo
-    export DOCKER_USERNAME=$AADC_USERNAME
+    export REGISTRY_USERNAME=$AADC_USERNAME
 fi
-if [ -z "$DOCKER_PASSWORD" ]
+if [ -z "$REGISTRY_PASSWORD" ]
 then
     read -sp 'Enter Azure Arc Data Controller repo password provided by Microsoft:' AADC_PASSWORD
     echo
-    export DOCKER_PASSWORD=$AADC_PASSWORD
+    export REGISTRY_PASSWORD=$AADC_PASSWORD
 fi
 
 
@@ -184,17 +184,17 @@ cd -
 azdata --version
 echo "Azdata has been successfully installed."
 
-# Installing azdata extensions
-echo "Installing azdata extension for Arc data controller..."
-azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_dc-0.0.1-py2.py3-none-any.whl --yes
+# # Installing azdata extensions
+# echo "Installing azdata extension for Arc Data Controller..."
+# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_dc-0.0.1-py2.py3-none-any.whl --yes
 
-echo "Installing azdata extension for postgres..."
-azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_postgres-0.0.1-py2.py3-none-any.whl --yes
+# echo "Installing azdata extension for Postgres..."
+# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_postgres-0.0.1-py2.py3-none-any.whl --yes
 
-echo "Installing azdata extension for sql..."
-azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_sqlinstance-0.0.1-py2.py3-none-any.whl --yes
+# echo "Installing azdata extension for SQL..."
+# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-aug-2020-new/pypi-azdata-cli/azdata_cli_sqlmi-20.1.1-py2.py3-none-any.whl --yes
 
-echo "Azdata extensions installed successfully."
+# echo "Azdata extensions installed successfully."
 
 # Install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -329,7 +329,7 @@ echo "##########################################################################
 echo "Starting to deploy azdata cluster..." 
 
 # Command to create cluster for single node cluster.
-azdata arc dc create -n $ARC_DC_NAME -p azure-arc-kubeadm-private-preview --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
+azdata arc dc create --profile-name azure-arc-kubeadm-private-preview --namespace $ARC_DC_NAME --name $ARC_DC_NAME --subscription $ARC_DC_SUBSCRIPTION --resource-group $ARC_DC_RG --location $ARC_DC_REGION --connectivity-mode indirect
 echo "Azure Arc Data Controller cluster created."
 
 # Setting context to cluster.
