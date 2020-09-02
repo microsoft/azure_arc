@@ -329,9 +329,7 @@ echo "##########################################################################
 echo "Starting to deploy azdata cluster..." 
 
 # Command to create cluster for single node cluster.
-# azdata arc dc create --profile-name azure-arc-kubeadm-private-preview --namespace $ARC_DC_NAME --name $ARC_DC_NAME --subscription $ARC_DC_SUBSCRIPTION --resource-group $ARC_DC_RG --location $ARC_DC_REGION --connectivity-mode indirect
-# Command to create cluster for single node cluster.
-#
+
 azdata arc dc config init --source azure-arc-kubeadm --path azure-arc-custom --force
 
 if [[ -v DOCKER_REGISTRY ]]; then
@@ -346,7 +344,6 @@ if [[ -v DOCKER_IMAGE_TAG ]]; then
     azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.docker.imageTag=$DOCKER_IMAGE_TAG'
 fi
 
-# azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.docker.imagePullPolicy=IfNotPresent'
 azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.storage.data.className=local-storage'
 azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.storage.logs.className=local-storage'
 
