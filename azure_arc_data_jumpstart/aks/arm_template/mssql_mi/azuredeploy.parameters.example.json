@@ -47,10 +47,10 @@
         "ACCEPT_EULA": {
             "value": "yes"
         },
-        "DOCKER_USERNAME": {
+        "REGISTRY_USERNAME": {
             "value": "Go-to-private-repo"
         },
-        "DOCKER_PASSWORD": {
+        "REGISTRY_PASSWORD": {
             "value": "Go-to-private-repo"
         },
         "ARC_DC_NAME": {
@@ -67,9 +67,6 @@
         },
         "MSSQL_SA_PASSWORD": {
             "value": "ArcDemo123!!"
-        },
-        "MSSQL_MI_vCores": {
-            "value": "2"
         }
     }
 }
