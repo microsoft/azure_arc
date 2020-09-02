@@ -158,8 +158,8 @@ resource "local_file" "azure_arc" {
     AZDATA_USERNAME          = var.AZDATA_USERNAME
     AZDATA_PASSWORD          = var.AZDATA_PASSWORD
     ACCEPT_EULA              = var.ACCEPT_EULA
-    DOCKER_USERNAME          = var.DOCKER_USERNAME
-    DOCKER_PASSWORD          = var.DOCKER_PASSWORD
+    REGISTRY_USERNAME          = var.REGISTRY_USERNAME
+    REGISTRY_PASSWORD          = var.REGISTRY_PASSWORD
     ARC_DC_NAME              = var.ARC_DC_NAME
     ARC_DC_SUBSCRIPTION      = var.ARC_DC_SUBSCRIPTION
     ARC_DC_RG                = var.ARC_DC_RG
