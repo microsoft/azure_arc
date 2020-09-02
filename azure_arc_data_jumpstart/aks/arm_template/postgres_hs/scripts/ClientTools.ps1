@@ -198,7 +198,7 @@ Start-Sleep -s 30
 
 # Deploying Azure Arc PostgreSQL Hyperscale Server Group
 azdata login --namespace $env:ARC_DC_NAME
-azdata arc postgres server create --name $env:POSTGRES_NAME --workers $env:POSTGRES_WORKER_NODE_COUNT --external-endpoint --storage-class-data managed-premium --storage-class-logs managed-premium
+azdata arc postgres server create --name $env:POSTGRES_NAME --workers $env:POSTGRES_WORKER_NODE_COUNT --storage-class-data managed-premium --storage-class-logs managed-premium
 azdata arc postgres server endpoint list --name $env:POSTGRES_NAME
 
 # Creating Postgres Instance connectivity details
