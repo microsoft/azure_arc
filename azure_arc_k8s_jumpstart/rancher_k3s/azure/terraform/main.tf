@@ -164,6 +164,10 @@ resource "azurerm_linux_virtual_machine" "arck3sdemo" {
     disk_size_gb         = var.azure_vm_os_disk_size_gb
   }
 
+  tags = {
+    Project = "jumpstart_azure_arc_k8s"
+  }
+
   provisioner "file" {
     source      = "scripts/install_k3s.sh"
     destination = "/tmp/install_k3s.sh"
