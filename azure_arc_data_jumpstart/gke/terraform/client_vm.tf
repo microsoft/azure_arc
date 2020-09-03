@@ -88,8 +88,8 @@ resource "google_compute_instance" "default" {
   }
 
   provisioner "file" {
-    source      = "scripts/faster_sc.yaml"
-    destination = "C:/tmp/faster_sc.yaml"
+    source      = "scripts/local_ssd_sc.yaml"
+    destination = "C:/tmp/local_ssd_sc.yaml"
 
     connection {
       host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
