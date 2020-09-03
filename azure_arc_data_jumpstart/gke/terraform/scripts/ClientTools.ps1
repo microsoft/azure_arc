@@ -82,7 +82,7 @@ $env:gcp_credentials_file_path="C:\tmp\$env:gcp_credentials_filename"
 gcloud auth activate-service-account --key-file $env:gcp_credentials_file_path
 gcloud container clusters get-credentials $env:gke_cluster_name --region $env:gcp_region  
 kubectl version
-kubectl apply -f 'C:\tmp\faster_sc.yaml'
+# kubectl apply -f 'C:\tmp\faster_sc.yaml'
 
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 azdata --version
@@ -91,8 +91,8 @@ $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
 azdata arc dc config init --source azure-arc-kubeadm --path "C:\tmp\custom"
-azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=faster"
-azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=faster"
+# azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=faster"
+# azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=faster"
 azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "$.spec.services[*].serviceType=LoadBalancer"
 
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
