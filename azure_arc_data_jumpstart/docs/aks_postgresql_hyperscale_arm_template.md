@@ -67,7 +67,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Inject user params values (from bullet point #1) to be used in both runtime and logon script
         - Install the required tools – az cli, az cli Powershell module, kubernetes-cli (Chocolaty packages)
         - Download & install the Azure Data Studio (Insiders) & azdata cli
-        - Download the Azure Data Studio Arc & PostgreSQL extensions
+        - Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
         - Download the *Postgres_Cleanup* and *Postgres_Deploy* Powershell scripts
         - Create the Postgres Connectivity script
         - Create the logon script
@@ -78,7 +78,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Create the *LogonScript.log* file
         - Retrieve the AKS credentials & create the *kubeconfig* file in user Windows profile
         - Create the *azdata* config file in user Windows profile
-        - Install the Azure Data Studio Arc & PostgreSQL extensions
+        - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
         - Create the Azure Data Studio desktop shortcut
         - Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller and PostgreSQL Kubernetes pods
         - Deploy the Arc Data Controller using the user params values
@@ -98,45 +98,45 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../aks/arm_template/postgres_hs/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../aks/arm_template/postgres_hs/azuredeploy.parameters.example.json).
 
-    - *"clusterName"* - AKS cluster name
+    - *clusterName* - AKS cluster name
 
-    - *"dnsPrefix"* - AKS unique DNS prefix
+    - *dnsPrefix* - AKS unique DNS prefix
 
-    - *"nodeAdminUsername"* - AKS Node Username
+    - *nodeAdminUsername* - AKS Node Username
 
-    - *"sshRSAPublicKey"* - Your ssh public key
+    - *sshRSAPublicKey* - Your ssh public key
 
-    - *"servicePrincipalClientId"* - Your Azure Service Principle name
+    - *servicePrincipalClientId* - Your Azure Service Principle name
 
-    - *"servicePrincipalClientSecret"* - Your Azure Service Principle password
+    - *servicePrincipalClientSecret* - Your Azure Service Principle password
 
-    - *"kubernetesVersion"* - AKS Kubernetes Version (See previous prerequisite)
+    - *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
 
-    - *"adminUsername"* - Client Windows VM admin username
+    - *adminUsername* - Client Windows VM admin username
 
-    - *"adminPassword"* - Client Windows VM admin password
+    - *adminPassword* - Client Windows VM admin password
 
-    - *"vmSize"* - Client Windows VM size
+    - *vmSize* - Client Windows VM size
 
-    - *"tenantId"* - Azure tenant ID
+    - *tenantId* - Azure tenant ID
 
-    - *"resourceGroup"* - Azure Resource Group where all the resources get deploy
+    - *resourceGroup* - Azure Resource Group where all the resources get deploy
 
-    - *"AZDATA_USERNAME"* - Azure Arc Data Controller admin username
+    - *AZDATA_USERNAME* - Azure Arc Data Controller admin username
 
-    - *"AZDATA_PASSWORD"* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
+    - *AZDATA_PASSWORD* - Azure Arc Data Controller admin password and the PostgreSQL password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
 
-    - *"ACCEPT_EULA"* - "yes" **Do not change**
+    - *ACCEPT_EULA* - "yes" **Do not change**
 
-    - *"REGISTRY_USERNAME"* - Azure Arc Data - Private Preview Docker Registry username (See note below)
+    - *REGISTRY_USERNAME* - Azure Arc Data - Private Preview Container Registry username (See note below)
 
-    - *"REGISTRY_PASSWORD"* - Azure Arc Data - Private Preview Docker Registry password (See note below)
+    - *REGISTRY_PASSWORD* - Azure Arc Data - Private Preview Container Registry password (See note below)
 
-    - *"ARC_DC_NAME"* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for k8s namespace as well).
+    - *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for k8s namespace as well).
 
-    - *"ARC_DC_SUBSCRIPTION"* - Azure Arc Data Controller Azure subscription ID
+    - *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
 
-    - *"ARC_DC_REGION"* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+    - *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
     - *POSTGRES_NAME* - PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster. Names must be 10 characters or fewer in length and conform to DNS naming conventions.
 
@@ -204,7 +204,7 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
     ![](../img/aks_postgresql_hyperscale_arm_template/09.png)
 
-* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Arc* and the *PostgreSQL* extensions. At the end of the logon script run, Azure Data Studio will automatically be open and connected to the Azure Postgres Hyperscale server with the sample DB. 
+* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. At the end of the logon script run, Azure Data Studio will automatically be open and connected to the Azure Postgres Hyperscale server with the sample DB.
 
     ![](../img/aks_postgresql_hyperscale_arm_template/10.png)
 
@@ -220,11 +220,11 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
     ![](../img/aks_postgresql_hyperscale_arm_template/12.png)
 
-    ![](../img/aks_postgresql_hyperscale_arm_template/13.png)
-
 # Cleanup
 
 * To delete the Azure Arc Data Controller and all of it's Kubernetes resources as well as Postgres Hyperscale, run the *Postgres_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is 5-10min long**.
+
+    ![](../img/aks_postgresql_hyperscale_arm_template/13.png)
 
     ![](../img/aks_postgresql_hyperscale_arm_template/14.png)
 
@@ -241,3 +241,5 @@ In case you deleted the Azure Arc Data Controller and Postgres Hyperscale from t
 ![](../img/aks_postgresql_hyperscale_arm_template/17.png)
 
 ![](../img/aks_postgresql_hyperscale_arm_template/18.png)
+
+![](../img/aks_postgresql_hyperscale_arm_template/19.png)

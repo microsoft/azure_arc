@@ -68,7 +68,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Inject user params values (from bullet point #1) to be used in both runtime and logon script
         - Install the required tools – az cli, az cli Powershell module, kubernetes-cli and putty (Chocolaty packages)
         - Download & install the Azure Data Studio (Insiders) & azdata cli
-        - Download the Azure Data Studio Arc & PostgreSQL extensions
+        - Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
         - Create the logon script
         - Create the Windows schedule task to run the logon script at first login
         - Disable Windows Server Manager from running at login
@@ -77,7 +77,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Create the *LogonScript.log* file
         - Connect to Azure using SPN credentials (from bullet point #1)
         - Copy the kubeconfig file from the Ubuntu (Kubeadm) VM to the local Windows user profile
-        - Install the Azure Data Studio Arc & PostgreSQL extensions
+        - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
         - Create the Azure Data Studio desktop shortcut
         - Unregister the logon script Windows schedule task so it will not run after first login
 
@@ -87,41 +87,41 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../kubeadm/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../kubeadm/azure/arm_template/azuredeploy.parameters.example.json).
 
-    - *"K8svmName"* - Kubeadm Ubuntu VM name
+    - *K8svmName* - Kubeadm Ubuntu VM name
 
-    - *"vmName"* - Client Windows VM name
+    - *vmName* - Client Windows VM name
 
-    - *"adminUsername"* - Client Windows VM admin username
+    - *adminUsername* - Client Windows VM admin username
 
-    - *"adminPassword"* - Client Windows VM admin password
+    - *adminPassword* - Client Windows VM admin password
 
-    - *"K8sVMSize"* - Kubeadm Ubuntu VM size
+    - *K8sVMSize* - Kubeadm Ubuntu VM size
 
-    - *"vmSize"* - Client Windows VM size
+    - *vmSize* - Client Windows VM size
 
-    - *"servicePrincipalClientId"* - Your Azure Service Principle name
+    - *servicePrincipalClientId* - Your Azure Service Principle name
 
-    - *"servicePrincipalClientSecret"* - Your Azure Service Principle password
+    - *servicePrincipalClientSecret* - Your Azure Service Principle password
 
-    - *"tenantId"* - Azure tenant ID    
+    - *tenantId* - Azure tenant ID    
 
-    - *"AZDATA_USERNAME"* - Azure Arc Data Controller admin username
+    - *AZDATA_USERNAME* - Azure Arc Data Controller admin username
 
-    - *"AZDATA_PASSWORD"* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
+    - *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
 
-    - *"ACCEPT_EULA"* - "yes" **Do not change**
+    - *ACCEPT_EULA* - "yes" **Do not change**
 
-    - *"DOCKER_USERNAME"* - Azure Arc Data - Private Preview Docker Registry username (See note below)
+    - *DOCKER_USERNAME* - Azure Arc Data - Private Preview Container Registry username (See note below)
 
-    - *"DOCKER_PASSWORD"* - Azure Arc Data - Private Preview Docker Registry password (See note below)
+    - *DOCKER_PASSWORD* - Azure Arc Data - Private Preview Container Registry password (See note below)
 
-    - *"ARC_DC_NAME"* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for k8s namespace as well).
+    - *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for k8s namespace as well).
 
-    - *"ARC_DC_SUBSCRIPTION"* - Azure Arc Data Controller Azure subscription ID
+    - *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
 
-    - *"ARC_DC_RG"* - Azure Resource Group where all the resources get deploy
+    - *ARC_DC_RG* - Azure Resource Group where all the resources get deploy
 
-    - *"ARC_DC_REGION"* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+    - *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
     **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
 
@@ -175,38 +175,40 @@ Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are crea
 
     ![](../img/kubeadm_dc_vanilla_arm_template/06.png)
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/07.png)
-
-    ![](../img/kubeadm_dc_vanilla_arm_template/08.png)
+    ![](../img/kubeadm_dc_vanilla_arm_template/07.png)    
 
 * To start interacting with the Azure Arc Data Controller, Open PowerShell and use the log in command bellow.
 
-```powershell
-azdata login -n $env:ARC_DC_NAME
-```
+    ```powershell
+    azdata login --namespace $env:ARC_DC_NAME
 
-![](../img/kubeadm_dc_vanilla_arm_template/09.png)
+    azdata arc dc status show
+    ```
+
+* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
+
+    ![](../img/kubeadm_dc_vanilla_arm_template/08.png)
 
 # Using the Ubuntu Kubernetes VM
 
-Even though everything you need is installed in the Windows client VM, it is possible, if you prefer, to use *azdata* CLI from within the Ubuntu VM. 
+Even though everything you need is installed in the Windows client VM, it is possible, if you prefer, to use *azdata* CLI from within the Ubuntu VM.
 
 * SSH to the Ubuntu VM using it public IP.
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/10.png)
-
-    ![](../img/kubeadm_dc_vanilla_arm_template/11.png)
+    ![](../img/kubeadm_dc_vanilla_arm_template/09.png)
 
 * To start interacting with the Azure Arc Data Controller, use the log in command bellow.
 
-```bash
-azdata login -n $ARC_DC_NAME
-```
+    ```bash
+    azdata login --namespace $ARC_DC_NAME
 
-![](../img/kubeadm_dc_vanilla_arm_template/12.png)
+    azdata arc dc status show
+    ```
+
+![](../img/kubeadm_dc_vanilla_arm_template/10.png)
 
 # Cleanup
 
 * To delete the entire environment, simply delete the deployment Resource Group from the Azure portal.
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/13.png)
+    ![](../img/kubeadm_dc_vanilla_arm_template/11.png)
