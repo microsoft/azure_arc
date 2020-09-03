@@ -48,13 +48,13 @@ variable "ACCEPT_EULA" {
   default     = "yes"
 }
 
-variable "DOCKER_USERNAME" {
-  description = "Azure Arc Data - Private Preview Docker Registry username"
+variable "REGISTRY_USERNAME" {
+  description = "Azure Arc Data - Private Preview Container Registry username"
   type        = string
 }
 
-variable "DOCKER_PASSWORD" {
-  description = "Azure Arc Data - Private Preview Docker Registry password"
+variable "REGISTRY_PASSWORD" {
+  description = "Azure Arc Data - Private Preview Container Registry password"
   type        = string
 }
 
