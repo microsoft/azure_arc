@@ -9,7 +9,7 @@ sudo -S bash ~/install_linux_azcmagent.sh
 source /tmp/vars.sh
 
 # Run connect command
-azcmagent connect \
+sudo azcmagent connect \
   --service-principal-id $TF_VAR_client_id \
   --service-principal-secret $TF_VAR_client_secret \
   --tenant-id $TF_VAR_tenant_id \
