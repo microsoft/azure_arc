@@ -213,7 +213,7 @@ start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; c
 azdata arc dc create --profile-name azure-arc-aks-premium-storage --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect
 
 # Deploying Azure Arc SQL Managed Instance
-azdata login -n $env:ARC_DC_NAME
+azdata login --namespace $env:ARC_DC_NAME
 azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-premium --storage-class-logs managed-premium
 
 azdata arc sql mi list
