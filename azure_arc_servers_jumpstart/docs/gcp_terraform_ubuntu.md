@@ -94,7 +94,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Open the Azure portal and navigate to the resource group "Arc-GCP-Demo". The virtual machine created in GCP will be visible as a resource.
 
-    ![](../img/gcp_ubuntu/09.png)
+    ![](../img/gcp_ubuntu/18.png)
 
 # Semi-Automated Deployment (Optional)
 
