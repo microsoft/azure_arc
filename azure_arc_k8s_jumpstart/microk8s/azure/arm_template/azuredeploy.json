@@ -350,7 +350,7 @@
             },
             "protectedSettings": {
             "commandToExecute": "[concat('bash install_microk8s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'))]",
-            "fileUris": ["https://rifiel.blob.core.windows.net/public/install_microk8s.sh" 
+            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_k8s_jumpstart/microk8s/azure/arm_template/scripts/install_microk8s.sh" 
             ]  
             }            
           }

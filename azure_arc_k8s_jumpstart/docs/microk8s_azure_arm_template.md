@@ -133,34 +133,32 @@ For example:
 
   ![](../img/microk8s/azure/arm_template/06.png)
 
-# K3s External Access
+# Microk8s External Access
 
-Traefik is the (default) ingress controller for k3s and uses port 80. To test external access to k3s cluster, an "*hello-world*" deployment was for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes). 
+Microk8s supports Istio and others as ingress controllers, [which can be enabled](https://microk8s.io/docs/addons) with ```microk8s enable <addon>```. For this deployment, however, we'll be exposing a service with NodePort. 
 
-* Since port 80 is taken by Traefik [(read more about here)](https://github.com/rancher/k3s/issues/436), the deployment LoadBalancer was changed to use port 32323 along side with the matching Azure Network Security Group (NSG). 
+To test external access to k3s cluster, an "*hello-world*" deployment was for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes). 
 
-  ![](../img/rancher_k3s/azure/arm_template/07.png)
+* Since we're using a NodePort service, it will be exposed in the default allowed range of 30000-32767, which in our case we've set to 30557. A matching Azure Network Security Group (NSG) was also applied.
 
-  ![](../img/rancher_k3s/azure/arm_template/08.png)
+  ![](../img/microk8s/azure/arm_template/09.png)
 
-  To deploy it, use the ```kubectl apply -f hello-kubernetes.yaml``` command. Run ```kubectl get pods``` and ```kubectl get svc``` to check that the pods and the service has been created. 
+  ![](../img/microk8s/azure/arm_template/11.png)
 
-  ![](../img/rancher_k3s/azure/arm_template/09.png)
+  To deploy it, use the ```microk8s kubectl apply -f hello-kubernetes.yaml``` command. Run ```microk8s kubectl get pods``` and ```microk8s kubectl get svc``` to check that the pods and the service has been created. 
 
-  ![](../img/rancher_k3s/azure/arm_template/10.png)
+  ![](../img/microk8s/azure/arm_template/10.png)
 
-  ![](../img/rancher_k3s/azure/arm_template/11.png)
+* In your browser, enter the *cluster_public_ip:30557* which will bring up the *hello-world* application.
 
-* In your browser, enter the *cluster_public_ip:3232* which will bring up the *hello-world* application.
-
-  ![](../img/rancher_k3s/azure/arm_template/12.png)
+  ![](../img/microk8s/azure/arm_template/09.png)
 
 # Delete the deployment
 
 The most straightforward way is to delete the cluster is via the Azure Portal, just select the cluster and delete it. 
 
-![](../img/rancher_k3s/azure/arm_template/13.png)
+![](../img/microk8s/azure/arm_template/07.png)
 
 If you want to nuke the entire environment, just delete the Azure Resource Group. 
 
-![](../img/rancher_k3s/azure/arm_template/14.png)
+![](../img/microk8s/azure/arm_template/08.png)
