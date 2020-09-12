@@ -137,11 +137,11 @@ For example:
 
 Microk8s supports Istio and others as ingress controllers, [which can be enabled](https://microk8s.io/docs/addons) with ```microk8s enable <addon>```. For this deployment, however, we'll be exposing a service with NodePort. 
 
-To test external access to k3s cluster, an "*hello-world*" deployment was for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes). 
+To test external access Microk8s, an "*hello-world*" deployment was for you and it is included in the *home* directory [(credit)](https://github.com/paulbouwer/hello-kubernetes). 
 
 * Since we're using a NodePort service, it will be exposed in the default allowed range of 30000-32767, which in our case we've set to 30557. A matching Azure Network Security Group (NSG) was also applied.
 
-  ![](../img/microk8s/azure/arm_template/09.png)
+  ![](../img/microk8s/azure/arm_template/12.png)
 
   ![](../img/microk8s/azure/arm_template/11.png)
 
