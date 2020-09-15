@@ -85,7 +85,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
     chmod +x ./kind
     sudo mv ./kind /usr/local/bin/kind
     ```
-  * On Mac:
+  * On MacOS:
 
     ```bash
     brew install kind
@@ -94,7 +94,6 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
        ```powershell
        choco install kind
        ```
-
 
 * Navigate to the folder that has the kind cluster definition.
   ```bash
@@ -123,7 +122,7 @@ Now that you have a running kind cluster, lets connect the kind cluster to Azure
 
  * Create a resource group<br> 
    ```bash
-   az group create --name arckinddemo -l EastUS -o table
+   az group create --name Arc-kind-Demo -l EastUS -o table
    ```
    **Note: Azure Arc enabled Kubernetes is currently supported in *East US* and *West Europe***
 
@@ -146,15 +145,16 @@ Now that you have a running kind cluster, lets connect the kind cluster to Azure
 * In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal or through the CLI.
 
     ```bash
-    az group delete --name arckinddemo
+    az group delete --name Arc-kind-Demo
     ```
+
 * To delete the kind cluster locally, use the following command:
     ```bash
     kind delete cluster
     ```
+
   ![](../img/kind_connect/06.png)
 
   ![](../img/kind_connect/07.png)
-
 
   ![](../img/kind_connect/08.png)
