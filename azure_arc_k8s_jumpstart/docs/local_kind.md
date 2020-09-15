@@ -100,9 +100,9 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   cd azure_arc/azure_arc_k8s_jumpstart/kind
   ```
 
-* Create the kind cluster
+* Create the kind cluster. We are using a configuration file called `kind_cluster.yaml` to specify our cluster configuration. This will create a 3 node cluster, with 1 master node and 2 worker nodes.
     ```bash
-    kind create cluster --config kind_cluster.yaml
+    kind create cluster --config kind_cluster.yaml --name Arc-Cluster
     ```
     ![](../img/kind_connect/01.png)
 
@@ -125,20 +125,21 @@ Now that you have a running kind cluster, lets connect the kind cluster to Azure
    az group create --name Arc-kind-Demo -l EastUS -o table
    ```
    **Note: Azure Arc enabled Kubernetes is currently supported in *East US* and *West Europe***
+  ![](../img/kind_connect/03.png)
 
   
 * Deploy the Arc binaries using Azure CLI:
   ```bash
-  az connectedk8s connect -n arckinddemo -g arckinddemo
+  az connectedk8s connect -n Arc-kind-Demo -g Arc-kind-Demo --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
 * Upon completion, you will have your kind cluster connected as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
 
-  ![](../img/kind_connect/03.png)
-
   ![](../img/kind_connect/04.png)
 
   ![](../img/kind_connect/05.png)
+
+  ![](../img/kind_connect/06.png)
 
 # Delete the deployment
 
@@ -150,11 +151,11 @@ Now that you have a running kind cluster, lets connect the kind cluster to Azure
 
 * To delete the kind cluster locally, use the following command:
     ```bash
-    kind delete cluster
+    kind delete cluster --name arc-cluster
     ```
-
-  ![](../img/kind_connect/06.png)
 
   ![](../img/kind_connect/07.png)
 
   ![](../img/kind_connect/08.png)
+
+  ![](../img/kind_connect/09.png)
