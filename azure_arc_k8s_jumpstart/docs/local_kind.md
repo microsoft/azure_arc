@@ -101,8 +101,9 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   ```
 
 * Create the kind cluster. We are using a configuration file called `kind_cluster.yaml` to specify our cluster configuration. This will create a 3 node cluster, with 1 master node and 2 worker nodes.
-    ```bash
-    kind create cluster --config kind_cluster.yaml --name Arc-Cluster
+  By default, kind will store the kubeconfig file used to connect to your cluster in the ~/.kube directory. If you want to use a custom directory to store the kubeconfig file, use the `--kube-config` flag.
+
+    kind create cluster --config kind_cluster.yaml --name arc-cluster
     ```
     ![](../img/kind_connect/01.png)
 
@@ -114,8 +115,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 # Connecting to Azure Arc
 
-Now that you have a running kind cluster, lets connect the kind cluster to Azure Arc.
-  * Login to previously created [***Service Principal***](#prerequisites) <br>
+Now that you have a running kind cluster, lets connect the kind cluster to Azure Arc.f
     ```bash
     az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
     ```
