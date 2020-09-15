@@ -146,7 +146,7 @@ Azure Arc can also support Azure Red Hat OpenShift (ARO). This example uses Terr
 
 This example walks you through how to create a Kubernetes cluster on your local machine using [kind (kubernetes in docker)](https://kind.sigs.k8s.io/), and onboard it as an Azure Arc enabled Kubernetes cluster
 
-* [Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc](azure_arc_k8s_jumpstart/docs/kind_local.md)
+* [Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc](azure_arc_k8s_jumpstart/docs/local_kind.md)
 
 #### Azure Arc enabled Kubernetes - Day-2 Scenarios & Use-Cases
 
