@@ -101,7 +101,10 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   ```
 
 * Create the kind cluster. We are using a configuration file called `kind_cluster.yaml` to specify our cluster configuration. This will create a 3 node cluster, with 1 master node and 2 worker nodes.
-  By default, kind will store the kubeconfig file used to connect to your cluster in the ~/.kube directory. If you want to use a custom directory to store the kubeconfig file, use the `--kube-config` flag.
+  
+**Note**: By default, kind will store the kubeconfig file used to connect to your cluster in the ~/.kube directory. If you want to use a custom directory to store the kubeconfig file, use the `--kube-config` flag. 
+If you did chose a specific location for the cluster's *kubeconfig* file make sure you are exporting its location as an environment variable using the `export KUBECONFIG=kubeconfig location` or in Windows, add this location to your PATH. 
+    
 
     kind create cluster --config kind_cluster.yaml --name arc-cluster
     ```
