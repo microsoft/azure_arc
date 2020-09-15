@@ -18,7 +18,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Kind leverages Docker to run the Kubernetes nodes. You will need to install Docker locally:
   * If you are a Windows user, install [Docker Desktop](https://www.docker.com/products/docker-desktop). You can also use the [Chocolatey package](https://chocolatey.org/packages/docker-desktop) to automate the installation.
-  * If you are a Mac User, install [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/).
+  * If you are a MacOS User, install [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/).
   * If you are a Linux user, use your package manager to install the [Docker engine](https://docs.docker.com/engine/install/).
 
 * Install the [Go programming language](https://golang.org/dl/).
