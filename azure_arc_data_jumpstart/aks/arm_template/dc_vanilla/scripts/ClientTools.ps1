@@ -16,6 +16,10 @@ param (
     [string]$chocolateyAppList
 )
 
+$DOCKER_REGISTRY=hlsaris.azurecr.io
+$DOCKER_REPOSITORY=aris-arc-public-preview 
+$DOCKER_IMAGE_TAG="15.0.4043.10016_14"
+
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientId', $servicePrincipalClientId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('servicePrincipalClientSecret', $servicePrincipalClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -27,6 +31,9 @@ param (
 [System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $ACCEPT_EULA,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('REGISTRY_USERNAME', $REGISTRY_USERNAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('REGISTRY_PASSWORD', $REGISTRY_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('DOCKER_REGISTRY', $DOCKER_REGISTRY,[System.EnvironmentVariableTarget]::Machine) ### To be removed ###
+[System.Environment]::SetEnvironmentVariable('DOCKER_REPOSITORY', $DOCKER_REPOSITORY,[System.EnvironmentVariableTarget]::Machine) ### To be removed ###
+[System.Environment]::SetEnvironmentVariable('DOCKER_IMAGE_TAG', $DOCKER_IMAGE_TAG,[System.EnvironmentVariableTarget]::Machine) ### To be removed ###
 [System.Environment]::SetEnvironmentVariable('ARC_DC_NAME', $ARC_DC_NAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
@@ -121,7 +128,7 @@ $env:argument3="microsoft.azuredatastudio-postgresql"
 Stop-Process -Name "conhost" -Force
 
 
-
+################## To be removed ##################
 # $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\microsoft.arc-0.3.3"
 # Copy-Item -Path "C:\tmp\microsoft.arc-0.3.3\microsoft.arc-0.3.3\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
 
@@ -130,7 +137,7 @@ Stop-Process -Name "conhost" -Force
 
 # $ExtensionsDestination = "C:\Users\$env:adminUsername\.azuredatastudio-insiders\extensions\"
 # Copy-Item -Path "C:\tmp\microsoft.azuredatastudio-postgresql-0.2.6\" -Destination $ExtensionsDestination -Recurse -Force -ErrorAction Continue
-
+################## To be removed ##################
 
 
 $SettingsDestination = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User"
