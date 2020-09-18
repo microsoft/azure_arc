@@ -1,0 +1,49 @@
+apiVersion: arcdata.microsoft.com/v1alpha1
+kind: datacontroller
+metadata:
+  generation: 1
+  name: arc
+spec:
+  credentials:
+    controllerAdmin: controller-login-secret
+    #dockerRegistry: <optional image pull secret if you are pulling images from a private container registry that requires authentication>
+    serviceAccount: sa-mssql-controller
+  docker:
+    imagePullPolicy: Always
+    imageTag: public-preview-sep-2020
+    registry: mcr.microsoft.com
+    repository: arcdata
+  security:
+    allowDumps: true
+    allowNodeMetricsCollection: true
+    allowPodMetricsCollection: true
+    allowRunAsRoot: false
+  services:
+  - name: controller
+    port: 30080
+    serviceType: LoadBalancer
+  - name: serviceProxy
+    port: 30777
+    serviceType: LoadBalancer
+  settings:
+    ElasticSearch:
+      vm.max_map_count: "-1"
+    azure:
+      connectionMode: Indirect
+      location: eastus
+      resourceGroup: <your resource group>
+      subscription: <your subscription GUID>
+    controller:
+      displayName: arc
+      enableBilling: "True"
+      logs.rotation.days: "7"
+      logs.rotation.size: "5000"
+  storage:
+    data:
+      accessMode: ReadWriteOnce
+      className: default
+      size: 15Gi
+    logs:
+      accessMode: ReadWriteOnce
+      className: default
+      size: 10Gi
