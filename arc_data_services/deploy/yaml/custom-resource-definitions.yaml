@@ -1,0 +1,102 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: datacontrollers.arcdata.microsoft.com
+spec:
+  group: arcdata.microsoft.com
+  version: v1alpha1
+  subresources:
+    status: {}
+  names:
+    kind: datacontroller
+    plural: datacontrollers
+  additionalPrinterColumns:
+  - name: State
+    type: string
+    JSONPath: .status.state
+  scope: Namespaced
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: postgresql-11s.arcdata.microsoft.com
+spec:
+  group: arcdata.microsoft.com
+  version: v1alpha1
+  names:
+    kind: postgresql-11
+    plural: postgresql-11s
+    categories: ["postgresqls"]
+  subresources:
+    status: {}
+  additionalPrinterColumns:
+  - name: State
+    type: string
+    JSONPath: ".status.state"
+  - name: Ready-Pods
+    type: string
+    JSONPath: ".status.readyPods"
+  - name: External-Endpoint
+    type: string
+    JSONPath: ".status.externalEndpoint"
+  - name: Age
+    type: date
+    JSONPath: ".metadata.creationTimestamp"
+  scope: Namespaced
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: postgresql-12s.arcdata.microsoft.com
+spec:
+  group: arcdata.microsoft.com
+  version: v1alpha1
+  names:
+    kind: postgresql-12
+    plural: postgresql-12s
+    categories: ["postgresqls"]
+  subresources:
+    status: {}
+  additionalPrinterColumns:
+  - name: State
+    type: string
+    JSONPath: ".status.state"
+  - name: Ready-Pods
+    type: string
+    JSONPath: ".status.readyPods"
+  - name: External-Endpoint
+    type: string
+    JSONPath: ".status.externalEndpoint"
+  - name: Age
+    type: date
+    JSONPath: ".metadata.creationTimestamp"
+  scope: Namespaced
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: sqlmanagedinstances.sql.arcdata.microsoft.com
+spec:
+  group: sql.arcdata.microsoft.com
+  version: v1alpha1
+  names:
+    kind: sqlmanagedinstance
+    plural: sqlmanagedinstances
+    shortNames:
+    - sqlmi
+  subresources:
+    status: {}
+  additionalPrinterColumns:
+  - name: Status
+    type: string
+    JSONPath: ".status.state"
+  - name: Replicas
+    type: string
+    JSONPath: ".status.readyReplicas"
+  - name: External-Endpoint
+    type: string
+    JSONPath: ".status.externalEndpoint"
+  - name: Age
+    type: date
+    JSONPath: ".metadata.creationTimestamp"
+  scope: Namespaced
