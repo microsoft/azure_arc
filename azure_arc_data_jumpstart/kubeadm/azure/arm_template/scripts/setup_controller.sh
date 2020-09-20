@@ -11,6 +11,9 @@ echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_REGISTRY:$10 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_REPOSITORY:$11 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_TAG:$12 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
@@ -20,6 +23,9 @@ sed -i '7s/^/export ARC_DC_NAME=/' vars.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars.sh
 sed -i '10s/^/export ARC_DC_REGION=/' vars.sh
+sed -i '11s/^/export DOCKER_REGISTRY=/' vars.sh
+sed -i '12s/^/export DOCKER_REPOSITORY=/' vars.sh
+sed -i '13s/^/export DOCKER_TAG=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -36,6 +42,9 @@ echo $ARC_DC_SUBSCRIPTION >> vars_profile.sh
 echo $ARC_DC_RG >> vars_profile.sh
 echo $ARC_DC_REGION >> vars_profile.sh
 echo $ACCEPT_EULA >> vars_profile.sh
+echo $DOCKER_REGISTRY >> vars_profile.sh
+echo $DOCKER_REPOSITORY >> vars_profile.sh
+echo $DOCKER_TAG >> vars_profile.sh
 sed -i '2s/^/export adminUsername=/' vars_profile.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars_profile.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars_profile.sh
@@ -46,6 +55,9 @@ sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars_profile.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars_profile.sh
 sed -i '10s/^/export ARC_DC_REGION=/' vars_profile.sh
 sed -i '11s/^/export ACCEPT_EULA=yes/' vars_profile.sh
+sed -i '12s/^/export DOCKER_REGISTRY=/' vars_profile.sh
+sed -i '13s/^/export DOCKER_REPOSITORY=/' vars_profile.sh
+sed -i '14s/^/export DOCKER_TAG=/' vars_profile.sh
 
 cat vars_profile.sh >> /etc/profile
 
