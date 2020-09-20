@@ -185,6 +185,27 @@
                 "description": "Arc Data Controller Region"
             }
         },
+        "DOCKER_REGISTRY": {
+            "type": "string",
+            "defaultValue": "mcr.microsoft.com",
+            "metadata": {
+                "description": "Azure Arc Data Container Registry"
+            }
+        },
+        "DOCKER_REPOSITORY": {
+            "type": "string",
+            "defaultValue": "azurearc",
+            "metadata": {
+                "description": "Azure Arc Data Container Registry Repository"
+            }
+        },
+        "DOCKER_TAG": {
+            "type": "string",
+            "defaultValue": "latest",
+            "metadata": {
+                "description": "Azure Arc Data Container Tag"
+            }
+        },
         "resourceTags": {
             "type": "object",
             "defaultValue": {
@@ -239,7 +260,7 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-            "uri":"https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/client_vm_deployment.json",
+            "uri":"https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/client_vm_deployment.json",
             "contentVersion":"1.0.0.0"
             },
             "parameters": {
@@ -259,7 +280,10 @@
             "REGISTRY_PASSWORD":{"value": "[parameters('REGISTRY_PASSWORD')]"},
             "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
             "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
-            "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"}         
+            "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
+            "DOCKER_REGISTRY":{"value": "[parameters('DOCKER_REGISTRY')]"},
+            "DOCKER_REPOSITORY":{"value": "[parameters('DOCKER_REPOSITORY')]"},
+            "DOCKER_TAG":{"value": "[parameters('DOCKER_TAG')]"}
             }            
           }        
         }           
