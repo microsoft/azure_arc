@@ -152,7 +152,7 @@ if(($DOCKER_REPOSITORY -ne $NULL) -or ($DOCKER_REPOSITORY -ne ""))
 }
 if(($DOCKER_TAG -ne $NULL) -or ($DOCKER_TAG -ne ""))
 {
-    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.tag=$DOCKER_TAG"
+    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.imageTag=$DOCKER_TAG"
 }
 
 azdata arc dc create --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect --path ./custom
