@@ -142,15 +142,15 @@ $Shortcut.Save()
 # Deploying Azure Arc Data Controller
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
 azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
-if(($DOCKER_REGISTRY -ne $NULL) -or ($DOCKER_REGISTRY -ne "")
+if(($DOCKER_REGISTRY -ne $NULL) -or ($DOCKER_REGISTRY -ne ""))
 {
     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.resgistry=$DOCKER_REGISTRY"
 }
-if(($DOCKER_REPOSITORY -ne $NULL) -or ($DOCKER_REPOSITORY -ne "")
+if(($DOCKER_REPOSITORY -ne $NULL) -or ($DOCKER_REPOSITORY -ne ""))
 {
     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.repository=$DOCKER_REPOSITORY"
 }
-if(($DOCKER_TAG -ne $NULL) -or ($DOCKER_TAG -ne "")
+if(($DOCKER_TAG -ne $NULL) -or ($DOCKER_TAG -ne ""))
 {
     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.tag=$DOCKER_TAG"
 }
