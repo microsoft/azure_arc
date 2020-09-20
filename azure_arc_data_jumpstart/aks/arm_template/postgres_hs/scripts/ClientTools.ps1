@@ -199,7 +199,7 @@ start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; c
 azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
 if(($DOCKER_REGISTRY -ne $NULL) -or ($DOCKER_REGISTRY -ne ""))
 {
-    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.resgistry=$DOCKER_REGISTRY"
+    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.registry=$DOCKER_REGISTRY"
 }
 if(($DOCKER_REPOSITORY -ne $NULL) -or ($DOCKER_REPOSITORY -ne ""))
 {
