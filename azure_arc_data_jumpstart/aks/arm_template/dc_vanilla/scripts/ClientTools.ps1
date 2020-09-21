@@ -138,16 +138,6 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-Write-Host "Registry info params:"
-Write-Host $DOCKER_REGISTRY
-Write-Host $DOCKER_REPOSITORY
-Write-Host $DOCKER_TAG
-
-Write-Host "Registry info env vars:"
-Write-Host $env:DOCKER_REGISTRY
-Write-Host $env:DOCKER_REPOSITORY
-Write-Host $env:DOCKER_TAG
-
 # Deploying Azure Arc Data Controller
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
 azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
