@@ -121,7 +121,7 @@ az connectedk8s connect -n microk8s -g Arc-MicroK8s-Demo --kube-config %HOMEPATH
 
 Linux and MacOS:
 ```
-az connectedk8s connect -n microk8s -g Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s  --tags 'Project=jumpstart_azure_arc_k8s'
+az connectedk8s connect --name microk8s --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
 ```
 
 ![](../img/local_microk8s/az-connectedk8s-connect-output.png)
