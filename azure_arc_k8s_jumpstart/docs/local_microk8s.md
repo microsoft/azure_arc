@@ -79,8 +79,8 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
     Once installed, enable MicroK8s with:
 
     ```
-        microk8s status --wait-ready
-        microk8s enable dns
+    microk8s status --wait-ready
+    microk8s enable dns
     ```
 
   * Linux:
