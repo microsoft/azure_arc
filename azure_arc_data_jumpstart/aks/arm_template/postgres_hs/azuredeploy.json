@@ -185,6 +185,27 @@
         "description": "Arc Data Controller Region"
       }
     },
+    "DOCKER_REGISTRY": {
+          "type": "string",
+          "defaultValue": "mcr.microsoft.com",
+          "metadata": {
+              "description": "Azure Arc Data Container Registry"
+          }
+      },
+      "DOCKER_REPOSITORY": {
+          "type": "string",
+          "defaultValue": "azurearc",
+          "metadata": {
+              "description": "Azure Arc Data Container Registry Repository"
+          }
+      },
+      "DOCKER_TAG": {
+          "type": "string",
+          "defaultValue": "latest",
+          "metadata": {
+              "description": "Azure Arc Data Container Tag"
+          }
+      },
     "POSTGRES_NAME": {
       "type": "string",
       "metadata": {
