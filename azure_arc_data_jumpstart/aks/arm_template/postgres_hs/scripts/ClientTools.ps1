@@ -120,7 +120,7 @@ Start-Transcript "C:\tmp\postgres_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving PostgreSQL Server IP
-azdata arc postgres server endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
+azdata arc postgres endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
 Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
@@ -136,14 +136,14 @@ $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
 # Creating Azure Data Studio settings for PostgreSQL connection
-azdata arc postgres server endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
+azdata arc postgres endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
 Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt"
 $s.Substring(0, $s.IndexOf(':')) | Out-File -FilePath "C:\tmp\merge.txt" -Encoding ascii -NoNewline
-$s = Get-Content "C:\tmp\merge.txt"
+$s = (Get-Content "C:\tmp\merge.txt").Trim()
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_postgres',$s | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
@@ -219,7 +219,7 @@ Start-Sleep -s 30
 # Deploying Azure Arc PostgreSQL Hyperscale Server Group
 azdata login --namespace $env:ARC_DC_NAME
 azdata arc postgres server create --name $env:POSTGRES_NAME --workers $env:POSTGRES_WORKER_NODE_COUNT --storage-class-data managed-premium --storage-class-logs managed-premium
-azdata arc postgres server endpoint list --name $env:POSTGRES_NAME
+azdata arc postgres endpoint list --name $env:POSTGRES_NAME
 
 # Creating Postgres Instance connectivity details
 Start-Process powershell -ArgumentList "C:\tmp\postgres_connectivity.ps1" -WindowStyle Hidden -Wait
