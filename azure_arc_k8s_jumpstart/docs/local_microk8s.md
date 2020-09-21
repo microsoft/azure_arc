@@ -119,7 +119,7 @@ Windows:
 az connectedk8s connect -n microk8s -g Arc-MicroK8s-Demo --kube-config %HOMEPATH%\.kube\microk8s --kube-context microk8s  --tags 'Project=jumpstart_azure_arc_k8s'
 ```
 
-Linux and Mac:
+Linux and MacOS:
 ```
 az connectedk8s connect -n microk8s -g Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s  --tags 'Project=jumpstart_azure_arc_k8s'
 ```
