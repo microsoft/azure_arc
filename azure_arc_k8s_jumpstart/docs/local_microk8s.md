@@ -90,7 +90,7 @@ Windows:
 ```
 microk8s config view > %HOMEPATH%\.kube\microk8s
 ```
-Linux and Mac: 
+Linux and MacOS: 
 
 ```
 microk8s config view > ~/.kube/microk8s
