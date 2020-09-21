@@ -78,16 +78,17 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
     Once installed, enable MicroK8s with:
 
-    ```
+    ```terminal
     microk8s status --wait-ready
     microk8s enable dns
     ```
 
   * Linux:
-    ```
+    ```terminal
     sudo snap install microk8s --classic
     microk8s status --wait-ready
     microk8s enable dns
+    
     ```
   * MacOS:
     ```
@@ -115,7 +116,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
     cd azure_arc/azure_arc_k8s_jumpstart/microk8s
     ```
 
-* Export MicroK8s kubeconfig file path
+* Export MicroK8s cluster kubeconfig file path
 
   MicroK8s will not update your .kube/config file, and accessing the cluster is done using the microk8s cli, eg: `microk8s kubectl get nodes`. To be able to use this config with the Azure Arc CLI, we need to export it into a file.
 
