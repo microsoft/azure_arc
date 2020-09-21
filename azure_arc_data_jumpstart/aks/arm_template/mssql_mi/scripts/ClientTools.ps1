@@ -175,7 +175,7 @@ Remove-Item "C:\tmp\merge.txt" -Force
 # Downloading demo database
 $podname = "$env:MSSQL_MI_NAME" + "-0"
 kubectl exec $podname -n $env:ARC_DC_NAME -c mssql-miaa -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
-kubectl exec $podname -n $env:ARC_DC_NAME -c mssql-miaa -- /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
+kubectl exec $podname -n $env:ARC_DC_NAME -c mssql-miaa -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
 
 Stop-Transcript
 
