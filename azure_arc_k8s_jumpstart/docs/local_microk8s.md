@@ -100,7 +100,7 @@ microk8s config view > ~/.kube/microk8s
 
 * Authenticate Azure CLI
 
-We'll start by authenticating our CLI with Azure, **replacing the values below** with the output from the command we issued to create service principal earlier (`az ad sp create-for-rbac`).
+We'll start by authenticating our CLI with Azure, **replacing the values below** with the output from the command we issued to create service principal earlier (`az ad sp create-for-rbac`) in the prerequisite section of this guide.
 
 ```
 az login --service-principal -u appId -p password --tenant tenant
