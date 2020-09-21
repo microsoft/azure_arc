@@ -77,7 +77,7 @@ Windows:
   cd azure_arc\azure_arc_k8s_jumpstart\microk8s
   ```
 
-Linux and Mac:
+Linux and MacOS:
   ```bash
   cd azure_arc/azure_arc_k8s_jumpstart/microk8s
   ```
