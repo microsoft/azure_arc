@@ -68,68 +68,105 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
 # Deployment
 
-* Install MicroK8s following the [specific install guide](https://microk8s.io/) for your operating system.
+* Install MicroK8s following the [specific install guide](https://microk8s.io/) for your operating system. For convenience, we've added some commands below:
+
+  * Windows:
+  
+    Download the [MicroK8s installer for Windows](https://microk8s.io/docs/install-alternatives#heading--windows) and follow the instructions. 
+
+    ![](https://aws1.discourse-cdn.com/business6/uploads/kubernetes/original/2X/c/cc39a370d6a9f62bbcfa0b84ba8356da84a4c8c1.png)
+
+    Once installed, enable MicroK8s with:
+
+    ```
+        microk8s status --wait-ready
+        microk8s enable dns
+    ```
+
+  * Linux:
+    ```
+    sudo snap install microk8s --classic
+    microk8s status --wait-ready
+    microk8s enable dns
+    ```
+  * MacOS:
+    ```
+    brew install ubuntu/microk8s/microk8s
+    microk8s install
+    microk8s status --wait-ready
+    microk8s enable dns
+    ```
+
+    ![](https://assets.ubuntu.com/v1/670398bd-mac1.png)
+
+  * WSL2
+
+    [This blog post](https://ubuntu.com/blog/kubernetes-on-windows-with-microk8s-and-wsl-2) walks through an installation of MicroK8s in WSL 2.
 
 * Navigate to the folder that has the MicroK8s cluster definition.
 
-Windows:
-  ```terminal
-  cd azure_arc\azure_arc_k8s_jumpstart\microk8s
-  ```
+  Windows:
+    ```terminal
+    cd azure_arc\azure_arc_k8s_jumpstart\microk8s
+    ```
 
-Linux and MacOS:
-  ```bash
-  cd azure_arc/azure_arc_k8s_jumpstart/microk8s
-  ```
+  Linux and MacOS:
+    ```bash
+    cd azure_arc/azure_arc_k8s_jumpstart/microk8s
+    ```
 
 * Export MicroK8s kubeconfig file path
 
-MicroK8s will not update your .kube/config file, and accessing the cluster is done using the microk8s cli, eg: `microk8s kubectl get nodes`. To be able to use this config with the Azure Arc CLI, we need to export it into a file.
+  MicroK8s will not update your .kube/config file, and accessing the cluster is done using the microk8s cli, eg: `microk8s kubectl get nodes`. To be able to use this config with the Azure Arc CLI, we need to export it into a file.
 
-Windows: 
-```
-microk8s config view > %HOMEPATH%\.kube\microk8s
-```
-Linux and MacOS: 
+  Windows: 
+  ```
+  microk8s config view > %HOMEPATH%\.kube\microk8s
+  ```
+  Linux and MacOS: 
 
-```
-microk8s config view > ~/.kube/microk8s
-```
+  ```
+  microk8s config view > ~/.kube/microk8s
+  ```
 
 # Connect the cluster to Azure Arc
 
 * Authenticate Azure CLI
 
-We'll start by authenticating our CLI with Azure, **replacing the values below** with the output from the command we issued to create service principal earlier (`az ad sp create-for-rbac`) in the prerequisite section of this guide.
+  We'll start by authenticating our CLI with Azure, **replacing the values below** with the output from the command we issued to create service principal earlier (`az ad sp create-for-rbac`) in the prerequisite section of this guide.
 
-```
-az login --service-principal -u appId -p password --tenant tenant
-```
+  ```
+  az login --service-principal -u appId -p password --tenant tenant
+  ```
+
+  ![](../img/local_microk8s/01.png)
 
 * Create a Resource Group
 
-```
-az group create -n Arc-MicroK8s-Demo -l EastUS
-```
+  ```
+  az group create -n Arc-MicroK8s-Demo -l EastUS
+  ```
+
+  ![](../img/local_microk8s/02.png)
 
 * Connect the cluster to Azure Arc
 
-Windows:
-```
-az connectedk8s connect --name microk8s --resource-group Arc-MicroK8s-Demo --kube-config %HOMEPATH%\.kube\microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
+  Windows:
+  ```
+  az connectedk8s connect --name microk8s --resource-group Arc-MicroK8s-Demo --kube-config %HOMEPATH%\.kube\microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
+  ```
+  Linux and MacOS:
+  ```
+  az connectedk8s connect --name microk8s --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
+  ```
 
-Linux and MacOS:
-```
-az connectedk8s connect --name microk8s --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
-```
-
-![](../img/local_microk8s/az-connectedk8s-connect-output.png)
+  ![](../img/local_microk8s/03.png)
 
 * Upon completion, you will have your MicroK8s cluster connected as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
 
-  ![](../img/local_microk8s/portal.png)
+  ![](../img/local_microk8s/04.png)
 
-  ![](../img/local_microk8s/portal-arc-resource.png)
+  ![](../img/local_microk8s/05.png)
 
 
 # Delete the deployment
@@ -140,11 +177,40 @@ az connectedk8s connect --name microk8s --resource-group Arc-MicroK8s-Demo  --ku
     az group delete --name Arc-MicroK8s-Demo
     ```
 
-  ![](../img/local_microk8s/portal-delete-rg.png)
+  ![](../img/local_microk8s/06.png)
 
 * To stop the MicroK8s cluster locally, use the following command:
     ```bash
     microk8s stop
     ```
 
-* To fully uninstall MicroK8s, check the [official docs](https://microk8s.io/docs) for your operating system.
+* The uninstall process of MicroK8s depends on your operating system.
+
+  * Windows
+
+    Stop the MicroK8s VM in Multipass:
+    ```
+    multipass stop microk8s-vm
+    ```
+    Launch `Add or Remove Programs` and uninstall MicroK8s.
+
+    ![](../img/local_microk8s/07.png)
+
+    ```
+    multipass delete microk8s-vm
+    multipass purge
+    ```
+
+    If you want to completely uninstall Multipass, launch `Add or Remove Programs` and uninstall Multipass.
+
+    ![](../img/local_microk8s/08.png)
+
+  * Linux
+    ```
+    sudo snap remove microk8s
+    ```
+  
+  * MacOS
+    ```
+    brew uninstall ubuntu/microk8s/microk8s
+    ```
