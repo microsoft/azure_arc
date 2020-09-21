@@ -73,7 +73,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 * Navigate to the folder that has the MicroK8s cluster definition.
 
 Windows:
-  ```bash
+  ```terminal
   cd azure_arc\azure_arc_k8s_jumpstart\microk8s
   ```
 
