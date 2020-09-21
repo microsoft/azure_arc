@@ -114,6 +114,27 @@
                 "description": "Arc Data Controller Region"
             }
         },
+        "DOCKER_REGISTRY": {
+            "type": "string",
+            "defaultValue": "mcr.microsoft.com",
+            "metadata": {
+                "description": "Azure Arc Data Container Registry"
+            }
+        },
+        "DOCKER_REPOSITORY": {
+            "type": "string",
+            "defaultValue": "azurearc",
+            "metadata": {
+                "description": "Azure Arc Data Container Registry Repository"
+            }
+        },
+        "DOCKER_TAG": {
+            "type": "string",
+            "defaultValue": "latest",
+            "metadata": {
+                "description": "Azure Arc Data Container Tag"
+            }
+        },
         "ubuntuOSVersion": {
             "type": "string",
             "defaultValue": "18.04-LTS",
@@ -421,7 +442,7 @@
             "typeHandlerVersion": "2.1",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-                        "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'))]",
+                        "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'), ' ', parameters('DOCKER_REGISTRY'), ' ', parameters('DOCKER_REPOSITORY'), ' ', parameters('DOCKER_TAG'))]",
             "fileUris": ["https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh"]
             }
           }
@@ -456,7 +477,10 @@
             "DOCKER_PASSWORD":{"value": "[parameters('DOCKER_PASSWORD')]"},
             "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
             "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
-            "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"}
+            "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
+            "DOCKER_REGISTRY":{"value": "[parameters('DOCKER_REGISTRY')]"},
+            "DOCKER_REPOSITORY":{"value": "[parameters('DOCKER_REPOSITORY')]"},
+            "DOCKER_TAG":{"value": "[parameters('DOCKER_TAG')]"}
             }
           }        
         }        
