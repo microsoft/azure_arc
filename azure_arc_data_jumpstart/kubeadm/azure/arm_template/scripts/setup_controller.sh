@@ -139,7 +139,9 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Requirements file.
 export OSCODENAME=$(lsb_release -cs)
-export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE="https://aka.ms/aug-2020-arc-azdata-$OSCODENAME"
+#TODO: Update this to final URL
+#export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE="https://aka.ms/aug-2020-arc-azdata-$OSCODENAME"
+export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE = "https://twrightazdata.blob.core.windows.net/azdata/azdata-cli_20.2.0-1_bionic_all.deb"
 
 # Wait for 5 minutes for the cluster to be ready.
 TIMEOUT=600
@@ -190,6 +192,7 @@ sudo apt install -y libodbc1 odbcinst odbcinst1debian2 unixodbc apt-transport-ht
 
 # Download and install azdata package
 echo ""
+
 echo "Downloading azdata installer from" $AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE 
 curl --location $AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE --output azdata_setup.deb
 sudo dpkg -i azdata_setup.deb
@@ -324,11 +327,8 @@ sudo helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 sudo helm install my-dashboard kubernetes-dashboard/kubernetes-dashboard
 
 echo "Kubernetes master setup done."
-
-Deploy azdata Azure Arc Data Cotnroller create cluster.
-echo ""
 echo "############################################################################"
-echo "Starting to deploy azdata cluster..." 
+echo "Starting to deploy Azure Arc data controller ..." 
 
 # Command to create cluster for single node cluster.
 
