@@ -160,7 +160,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
   ```
   Linux and MacOS:
   ```
-  az connectedk8s connect --name microk8s --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
+  az connectedk8s connect --name Arc-MicroK8s-Demo --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
   ![](../img/local_microk8s/03.png)
