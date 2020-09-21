@@ -78,6 +78,24 @@ variable "ARC_DC_REGION" {
   type        = string
 }
 
+variable "DOCKER_REGISTRY" {
+  description = "Container registry to pull images from."
+  type        = string
+  default     = "mcr.microsoft.com"
+}
+
+variable "DOCKER_REPOSITORY" {
+  description = "Container image registry repository to pull images from."
+  type        = string
+  default     = "azurearc"
+}
+
+variable "DOCKER_TAG" {
+  description = "Image tag to pull."
+  type        = string
+  default     = "latest"
+}
+
 variable "client_id" {
   description = "Your Azure Service Principle name"
   type        = string

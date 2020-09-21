@@ -15,6 +15,9 @@ resource "local_file" "azure_arc" {
     ARC_DC_SUBSCRIPTION   = var.ARC_DC_SUBSCRIPTION
     ARC_DC_RG             = var.ARC_DC_RG
     ARC_DC_REGION         = var.ARC_DC_REGION
+    DOCKER_REGISTRY       = var.DOCKER_REGISTRY
+    DOCKER_REPOSITORY     = var.DOCKER_REPOSITORY
+    DOCKER_TAG            = var.DOCKER_TAG
     }
   )
   filename = "scripts/azure_arc.ps1"
