@@ -84,7 +84,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
     ```
 
   * Linux:
-    ```
+    ```terminal
     sudo snap install microk8s --classic
     microk8s status --wait-ready
     microk8s enable dns
