@@ -82,7 +82,7 @@ Linux and MacOS:
   cd azure_arc/azure_arc_k8s_jumpstart/microk8s
   ```
 
-* Export MicroK8s config 
+* Export MicroK8s kubeconfig file path
 
 MicroK8s will not update your .kube/config file, and accessing the cluster is done using the microk8s cli, eg: `microk8s kubectl get nodes`. To be able to use this config with the Azure Arc CLI, we need to export it into a file.
 
