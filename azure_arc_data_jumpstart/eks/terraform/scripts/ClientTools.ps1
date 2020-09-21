@@ -93,7 +93,21 @@ $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc dc create --profile-name azure-arc-eks --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:ARC_DC_RG --location $env:ARC_DC_REGION --storage-class gp2 --connectivity-mode indirect
+azdata arc dc config init --source azure-arc-eks --path ./custom
+if(($env:DOCKER_REGISTRY -ne $NULL) -or ($env:DOCKER_REGISTRY -ne ""))
+{
+    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.registry=$env:DOCKER_REGISTRY"
+}
+if(($env:DOCKER_REPOSITORY -ne $NULL) -or ($env:DOCKER_REPOSITORY -ne ""))
+{
+    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.repository=$env:DOCKER_REPOSITORY"
+}
+if(($env:DOCKER_TAG -ne $NULL) -or ($env:DOCKER_TAG -ne ""))
+{
+    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.imageTag=$env:DOCKER_TAG"
+}
+
+azdata arc dc create --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:resourceGroup --location $env:ARC_DC_REGION --connectivity-mode indirect --path ./custom
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
