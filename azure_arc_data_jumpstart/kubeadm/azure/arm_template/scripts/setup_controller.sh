@@ -11,9 +11,10 @@ echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_REGISTRY:$10 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_REPOSITORY:$11 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_TAG:$12 | awk '{print substr($1,2); }' >> vars.sh
+echo $ACCEPT_EULA:$10 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_REGISTRY:$11 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_REPOSITORY:$12 | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_TAG:$13 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
@@ -23,9 +24,10 @@ sed -i '7s/^/export ARC_DC_NAME=/' vars.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars.sh
 sed -i '10s/^/export ARC_DC_REGION=/' vars.sh
-sed -i '11s/^/export DOCKER_REGISTRY=/' vars.sh
-sed -i '12s/^/export DOCKER_REPOSITORY=/' vars.sh
-sed -i '13s/^/export DOCKER_TAG=/' vars.sh
+sed -i '11s/^/export ACCEPT_EULA=/' vars.sh
+sed -i '12s/^/export DOCKER_REGISTRY=/' vars.sh
+sed -i '13s/^/export DOCKER_REPOSITORY=/' vars.sh
+sed -i '14s/^/export DOCKER_TAG=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -195,18 +197,6 @@ cd -
 
 azdata --version
 echo "Azdata has been successfully installed."
-
-# # Installing azdata extensions
-# echo "Installing azdata extension for Arc Data Controller..."
-# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_dc-0.0.1-py2.py3-none-any.whl --yes
-
-# echo "Installing azdata extension for Postgres..."
-# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_postgres-0.0.1-py2.py3-none-any.whl --yes
-
-# echo "Installing azdata extension for SQL..."
-# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-aug-2020-new/pypi-azdata-cli/azdata_cli_sqlmi-20.1.1-py2.py3-none-any.whl --yes
-
-# echo "Azdata extensions installed successfully."
 
 # Install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
