@@ -116,8 +116,7 @@ az group create -n Arc-MicroK8s-Demo -l EastUS
 
 Windows:
 ```
-az connectedk8s connect -n microk8s -g Arc-MicroK8s-Demo --kube-config %HOMEPATH%\.kube\microk8s --kube-context microk8s  --tags 'Project=jumpstart_azure_arc_k8s'
-```
+az connectedk8s connect --name microk8s --resource-group Arc-MicroK8s-Demo --kube-config %HOMEPATH%\.kube\microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
 
 Linux and MacOS:
 ```
