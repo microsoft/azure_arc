@@ -29,7 +29,9 @@ git clone https://github.com/microsoft/azure_arc.git
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcData" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
+    ```
 
     Output should look like this:
 
@@ -79,7 +81,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Open another Powershell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
     * Deploy the Arc Data Controller using the user params values
     * Deploy Azure Postgres server group **(with 5 workers)** on the AKS cluster
-    * Creating Postgres connectivity details using the SQL Connectivity script
+    * Creating Postgres connectivity details using the Postgres Connectivity script
     * Unregister the logon script Windows schedule task so it will not run after first login
 
 ## Deployment
@@ -118,27 +120,27 @@ az aks get-versions -l "<Your Azure Region>"
 
  * To deploy the ARM template, navigate to the local cloned [deployment folder](../aks/arm_template/postgres_hs) and run the below command:
 
-```console
-az group create --name <Name of the Azure Resource Group> --location <Azure Region>
-az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
-```
+    ```console
+    az group create --name <Name of the Azure Resource Group> --location <Azure Region>
+    az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
+    ```
 
-> [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file.
+    > [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file.
 
-For example:
+    For example:
 
-```console
-az group create --name Arc-Data-Postgres-Demo --location "East US"
-az deployment group create --resource-group Arc-Data-Postgres-Demo --name arcdatapostgresdemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json --parameters azuredeploy.parameters.json
-```
+    ```console
+    az group create --name Arc-Data-Postgres-Demo --location "East US"
+    az deployment group create --resource-group Arc-Data-Postgres-Demo --name arcdatapostgresdemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json --parameters azuredeploy.parameters.json
+    ```
 
-> [!NOTE]Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30min long
+> [!NOTE] Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30min long
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
-    ![](../img/aks_postgresql_hyperscale_arm_template/02.png)
+    ![](../img/aks_postgresql_hyperscale_arm_template/01.png)
 
-    ![](../img/aks_postgresql_hyperscale_arm_template/03.png)
+    ![](../img/aks_postgresql_hyperscale_arm_template/02.png)
 
 # Windows Login & Post Deployment
 
@@ -146,13 +148,15 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
 * Using it's public IP, RDP to the **Client VM**
 
-    ![](../img/aks_postgresql_hyperscale_arm_template/04.png)
+    ![](../img/aks_postgresql_hyperscale_arm_template/03.png)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
     Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is 10-15min long**.  
 
     Once the script will finish it's run, the logon script Powershell session will be closed and the Azure Arc Data Controller and an Azure Postgres Hyperscale (and a sample DB) will be deployed on the AKS cluster and be ready to use. 
+
+    ![](../img/aks_postgresql_hyperscale_arm_template/04.png)
 
     ![](../img/aks_postgresql_hyperscale_arm_template/05.png)
 
@@ -162,9 +166,9 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
     ![](../img/aks_postgresql_hyperscale_arm_template/08.png)
 
-    ![](../img/aks_postgresql_hyperscale_arm_template/09.png)
-
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. At the end of the logon script run, Azure Data Studio will automatically be open and connected to the Azure Postgres Hyperscale server with the sample DB.
+
+    ![](../img/aks_postgresql_hyperscale_arm_template/09.png)
 
     ![](../img/aks_postgresql_hyperscale_arm_template/10.png)
 
@@ -174,7 +178,6 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
     ```powershell
     azdata login --namespace $env:ARC_DC_NAME
-
     azdata arc dc status show
     ```
 
