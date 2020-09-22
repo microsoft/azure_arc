@@ -37,12 +37,6 @@
         },
         "ACCEPT_EULA": {
             "value": "yes"
-        },        
-        "DOCKER_USERNAME": {
-            "value": "Go-to-private-repo"
-        },
-        "DOCKER_PASSWORD": {
-            "value": "Go-to-private-repo"
         },
         "ARC_DC_NAME": {
             "value": "arcdatactrl"
