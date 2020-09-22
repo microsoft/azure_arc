@@ -137,12 +137,6 @@ export AZUREARCDATACONTROLLER_DIR=aadatacontroller
 export LOG_FILE="aadatacontroller.log"
 export DEBIAN_FRONTEND=noninteractive
 
-# Requirements file.
-export OSCODENAME=$(lsb_release -cs)
-#TODO: Update this to final URL
-#export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE="https://aka.ms/aug-2020-arc-azdata-$OSCODENAME"
-export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE = "https://twrightazdata.blob.core.windows.net/azdata/azdata-cli_20.2.0-1_bionic_all.deb"
-
 # Wait for 5 minutes for the cluster to be ready.
 TIMEOUT=600
 RETRY_INTERVAL=5
@@ -190,16 +184,27 @@ cd setupscript/
 # Download and install azdata prerequisites
 sudo apt install -y libodbc1 odbcinst odbcinst1debian2 unixodbc apt-transport-https libkrb5-dev
 
-# Download and install azdata package
-echo ""
 
-echo "Downloading azdata installer from" $AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE 
-curl --location $AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE --output azdata_setup.deb
-sudo dpkg -i azdata_setup.deb
-cd -
+# Download and install azdata package
+echo "installing azdata"
+
+#Using packages.microsoft.com
+sudo apt-get update
+sudo apt-get install gnupg ca-certificates curl wget software-properties-common apt-transport-https lsb-release -y
+curl -sL https://packages.microsoft.com/keys/microsoft.asc |
+gpg --dearmor |
+sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
+sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/18.04/prod.list)"
+sudo apt-get update
+sudo apt-get install -y azdata-cli
+
+#using a specific URL. useful for pre-release testing
+#TODO: pass in URL via parameters
+#sudo curl --location <some location here> --output azdata.deb
+#sudo dpkg i azdata.deb
 
 azdata --version
-echo "Azdata has been successfully installed."
+echo "Azdata has been successfully installed if you see azdata version output above."
 
 # Install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
