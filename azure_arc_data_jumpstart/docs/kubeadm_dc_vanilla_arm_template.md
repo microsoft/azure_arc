@@ -1,5 +1,7 @@
 # Azure Arc Data Controller Vanilla Deployment on Kubeadm Azure VM (ARM Template)
 
+> [!NOTE] THIS EXAMPLE IS STILL BEING UPDATED FOR PUBLIC PREVIEW.  PLEASE COME BACK IN A DAY OR TWO WHEN IT IS READY.
+
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on single-node Kubernetes cluster deployed with [Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) in az Azure Ubuntu VM, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
 By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
