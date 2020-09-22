@@ -108,7 +108,6 @@ $sql_connectivity = @'
 Start-Transcript "C:\tmp\sql_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
-
 Start-Transcript "C:\tmp\sql_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
