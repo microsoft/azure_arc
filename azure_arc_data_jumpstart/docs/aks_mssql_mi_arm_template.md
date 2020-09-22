@@ -136,9 +136,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
-    ![](../img/aks_mssql_mi_arm_template/02.png)
+    ![](../img/aks_mssql_mi_arm_template/01.png)
 
-    ![](../img/aks_mssql_mi_arm_template/03.png)
+    ![](../img/aks_mssql_mi_arm_template/02.png)
 
 ## Windows Login & Post Deployment
 
@@ -146,13 +146,15 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
 * Using it's public IP, RDP to the **Client VM**
 
-    ![](../img/aks_mssql_mi_arm_template/04.png)
+    ![](../img/aks_mssql_mi_arm_template/03.png)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
     Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is approximately 15min long**.  
 
     Once the script will finish it's run, the logon script Powershell session will be closed and the Azure Arc Data Controller and an Azure SQL MI (and a sample DB) will be deployed on the AKS cluster and be ready to use.
+
+    ![](../img/aks_mssql_mi_arm_template/04.png)
 
     ![](../img/aks_mssql_mi_arm_template/05.png)
 
@@ -162,11 +164,11 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
     ![](../img/aks_mssql_mi_arm_template/08.png)
 
-    ![](../img/aks_mssql_mi_arm_template/09.png)
-
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. At the end of the logon script run, Azure Data Studio will automatically be open and connected to the Azure SQL MI with the sample DB.
 
-> [!NOTE]To connect to the SQL managed instance use the AZDATA_USERNAME and AZDATA_PASSWORD values specified in the azuredeploy.parameters.json file.  The "sa" login is disabled.
+> [!NOTE]To connect to the SQL managed instance use the AZDATA_USERNAME and AZDATA_PASSWORD values specified in the azuredeploy.parameters.json file. The "sa" login is disabled.
+
+![](../img/aks_mssql_mi_arm_template/09.png)
 
 ![](../img/aks_mssql_mi_arm_template/10.png)
 
@@ -176,7 +178,6 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
     ```powershell
     azdata login --name $env:ARC_DC_NAME
-
     azdata arc dc status show
     ```
 
