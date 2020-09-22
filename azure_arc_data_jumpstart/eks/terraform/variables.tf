@@ -87,7 +87,7 @@ variable "DOCKER_REGISTRY" {
 variable "DOCKER_REPOSITORY" {
   description = "Container image registry repository to pull images from."
   type        = string
-  default     = "azurearc"
+  default     = "arcdata"
 }
 
 variable "DOCKER_TAG" {

@@ -123,7 +123,7 @@
         },
         "DOCKER_REPOSITORY": {
             "type": "string",
-            "defaultValue": "azurearc",
+            "defaultValue": "arcdata",
             "metadata": {
                 "description": "Azure Arc Data Container Registry Repository"
             }
