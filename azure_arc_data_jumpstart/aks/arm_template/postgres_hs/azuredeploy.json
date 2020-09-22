@@ -157,14 +157,14 @@
     },
     "REGISTRY_USERNAME": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "not_specified",
       "metadata": {
         "description": "Private Arc Data Docker Registry Username"
       }
     },
     "REGISTRY_PASSWORD": {
       "type": "securestring",
-      "defaultValue": "",
+      "defaultValue": "not_specified",
       "metadata": {
         "description": "Private Arc Data Docker Registry Password"
       }
