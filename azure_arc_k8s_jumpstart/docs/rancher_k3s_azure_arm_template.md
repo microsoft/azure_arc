@@ -66,7 +66,7 @@ To deploy the ARM template, navigate to the [deployment folder](../rancher_k3s/a
   az deployment group create \
   --resource-group <Name of the Azure Resource Group> \
   --name <The name of this deployment> \
-  --template-uri https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
+  --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
   --parameters <The *azuredeploy.parameters.json* parameters file location>
 ```
 
@@ -77,7 +77,7 @@ For example:
   az deployment group create \
   --resource-group Arc-K3s-Demo \
   --name arck3sdemo01 \
-  --template-uri https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
+  --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
   --parameters azuredeploy.parameters.json
 ```
 

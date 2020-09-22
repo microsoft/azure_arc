@@ -97,7 +97,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ```console
 az group create --name <Name of the Azure Resource Group> --location <Azure Region>
-az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
+az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
 ```
 
 > [!NOTE]Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file**
@@ -105,7 +105,7 @@ az deployment group create --resource-group <Name of the Azure Resource Group> -
 
 ```console
 az group create --name Arc-Data-Kubeadm-Demo --location "East US"
-az deployment group create --resource-group Arc-Data-Kubeadm-Demo --name arcdatakubeadmdemo --template-uri https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters azuredeploy.parameters.json
+az deployment group create --resource-group Arc-Data-Kubeadm-Demo --name arcdatakubeadmdemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters azuredeploy.parameters.json
 ```
 
 > [!NOTE]Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20 minutes.

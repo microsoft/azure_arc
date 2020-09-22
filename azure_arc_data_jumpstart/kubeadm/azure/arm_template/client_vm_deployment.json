@@ -345,7 +345,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/ClientTools.ps1"
+                "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/ClientTools.ps1"
               ],
               "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -adminPassword ', parameters('adminPassword'), ' -tenantId ', parameters('tenantId'), ' -ARC_DC_RG ', parameters('ARC_DC_RG'), ' -K8svmName ', parameters('K8svmName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -DOCKER_USERNAME ', parameters('DOCKER_USERNAME'), ' -DOCKER_PASSWORD ', parameters('DOCKER_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -DOCKER_REGISTRY ', parameters('DOCKER_REGISTRY'), ' -DOCKER_REPOSITORY ', parameters('DOCKER_REPOSITORY'), ' -DOCKER_TAG ', parameters('DOCKER_TAG'))]" 
             }            
