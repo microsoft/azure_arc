@@ -29,7 +29,9 @@ git clone https://github.com/microsoft/azure_arc.git
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcData" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
+    ```
 
     Output should look like this:
 

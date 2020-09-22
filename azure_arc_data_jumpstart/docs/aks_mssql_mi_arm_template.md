@@ -29,7 +29,9 @@ git clone https://github.com/microsoft/azure_arc.git
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcData" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
+    ```
 
     Output should look like this:
 
@@ -121,14 +123,14 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-> [!NOTE]Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
+    > [!NOTE]Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
 
-For example:
+    For example:
 
-```console
-az group create --name Arc-Data-SQLMI-Demo --location "East US"
-az deployment group create --resource-group Arc-Data-SQLMI-Demo --name arcdatasqlmidemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters azuredeploy.parameters.json
-```
+    ```console
+    az group create --name Arc-Data-SQLMI-Demo --location "East US"
+    az deployment group create --resource-group Arc-Data-SQLMI-Demo --name arcdatasqlmidemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters azuredeploy.parameters.json
+    ```
 
 > [!NOTE]Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30 minutes.
 
@@ -166,9 +168,9 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
 > [!NOTE]To connect to the SQL managed instance use the AZDATA_USERNAME and AZDATA_PASSWORD values specified in the azuredeploy.parameters.json file.  The "sa" login is disabled.
 
-    ![](../img/aks_mssql_mi_arm_template/10.png)
+![](../img/aks_mssql_mi_arm_template/10.png)
 
-    ![](../img/aks_mssql_mi_arm_template/11.png)
+![](../img/aks_mssql_mi_arm_template/11.png)
 
 * (Optional) In Powershell, login to the Data Controller and check it's health using the below commands.
 
