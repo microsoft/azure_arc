@@ -8,8 +8,6 @@ $env:tenant_id="${tenant_id}"
 $env:AZDATA_USERNAME="${AZDATA_USERNAME}"
 $env:AZDATA_PASSWORD="${AZDATA_PASSWORD}"
 $env:ACCEPT_EULA="${ACCEPT_EULA}"
-$env:REGISTRY_USERNAME="${REGISTRY_USERNAME}"
-$env:REGISTRY_PASSWORD="${REGISTRY_PASSWORD}"
 $env:ARC_DC_NAME="${ARC_DC_NAME}"
 $env:ARC_DC_SUBSCRIPTION="${ARC_DC_SUBSCRIPTION}"
 $env:ARC_DC_RG="${ARC_DC_RG}"
@@ -27,8 +25,6 @@ $env:DOCKER_TAG="${DOCKER_TAG}"
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $env:AZDATA_USERNAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $env:AZDATA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $env:ACCEPT_EULA,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('REGISTRY_USERNAME', $env:REGISTRY_USERNAME,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('REGISTRY_PASSWORD', $env:REGISTRY_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_NAME', $env:ARC_DC_NAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $env:ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_RG', $env:ARC_DC_RG,[System.EnvironmentVariableTarget]::Machine)

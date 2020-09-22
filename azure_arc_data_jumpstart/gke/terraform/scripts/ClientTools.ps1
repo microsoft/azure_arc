@@ -40,10 +40,6 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/
 
 Expand-Archive C:\tmp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
 
-# Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.azdata'
-# Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.arc'
-# Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.azuredatastudio-postgresql'
-
 Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
 
 $SettingsDestination = "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User"
@@ -87,22 +83,22 @@ azdata --version
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
-azdata arc dc config init --source azure-arc-kubeadm --path "C:\tmp\custom"
+azdata arc dc config init --source azure-arc-kubeadm --path "C:\tmp\custom" --force
 azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=local-ssd"
 azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=local-ssd"
 azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "$.spec.services[*].serviceType=LoadBalancer"
 
 if(($env:DOCKER_REGISTRY -ne $NULL) -or ($env:DOCKER_REGISTRY -ne ""))
 {
-    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.registry=$env:DOCKER_REGISTRY"
+    azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.docker.registry=$env:DOCKER_REGISTRY"
 }
 if(($env:DOCKER_REPOSITORY -ne $NULL) -or ($env:DOCKER_REPOSITORY -ne ""))
 {
-    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.repository=$env:DOCKER_REPOSITORY"
+    azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.docker.repository=$env:DOCKER_REPOSITORY"
 }
 if(($env:DOCKER_TAG -ne $NULL) -or ($env:DOCKER_TAG -ne ""))
 {
-    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.imageTag=$env:DOCKER_TAG"
+    azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.docker.imageTag=$env:DOCKER_TAG"
 }
 
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
