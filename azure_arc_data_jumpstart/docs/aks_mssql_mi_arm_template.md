@@ -70,17 +70,17 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Create the Windows schedule task to run the logon script at first login
     * Disable Windows Server Manager from running at login
 
-    * Logon script will:
-      * Create the *LogonScript.log* file
-      * Retrieve the AKS credentials & create the *kubeconfig* file in user Windows profile
-      * Create the *azdata* config file in user Windows profile
-      * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      * Create the Azure Data Studio desktop shortcut
-      * Open another Powershell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
-      * Deploy the Arc Data Controller using the user params values
-      * Deploy Azure SQL Managed Instance on the AKS cluster
-      * Creating MSSQL Instance connectivity details using the SQL Connectivity script
-      * Unregister the logon script Windows schedule task so it will not run after first login
+  * Logon script will:
+    * Create the *LogonScript.log* file
+    * Retrieve the AKS credentials & create the *kubeconfig* file in user Windows profile
+    * Create the *azdata* config file in user Windows profile
+    * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
+    * Create the Azure Data Studio desktop shortcut
+    * Open another Powershell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
+    * Deploy the Arc Data Controller using the user params values
+    * Deploy Azure SQL Managed Instance on the AKS cluster
+    * Creating MSSQL Instance connectivity details using the SQL Connectivity script
+    * Unregister the logon script Windows schedule task so it will not run after first login
 
 ## Deployment
 
@@ -88,9 +88,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command. To determine which AKS Kubernetes versions are available in your region use the below Azure CLI command.
 
-```console
-az aks get-versions -l "<Your Azure Region>"
-```
+    ```console
+    az aks get-versions -l "<Your Azure Region>"
+    ```
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../aks/arm_template/dc_vanilla/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../aks/arm_template/dc_vanilla/azuredeploy.parameters.example.json).
 
@@ -125,10 +125,10 @@ az aks get-versions -l "<Your Azure Region>"
 
 For example:
 
-    ```console
-    az group create --name Arc-Data-SQLMI-Demo --location "East US"
-    az deployment group create --resource-group Arc-Data-SQLMI-Demo --name arcdatasqlmidemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters azuredeploy.parameters.json
-    ```
+```console
+az group create --name Arc-Data-SQLMI-Demo --location "East US"
+az deployment group create --resource-group Arc-Data-SQLMI-Demo --name arcdatasqlmidemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters azuredeploy.parameters.json
+```
 
 > [!NOTE]Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30 minutes.
 
