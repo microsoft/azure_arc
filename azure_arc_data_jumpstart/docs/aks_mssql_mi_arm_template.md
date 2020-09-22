@@ -123,7 +123,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > [!NOTE]Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
+    > [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
 
     For example:
 
@@ -132,7 +132,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az deployment group create --resource-group Arc-Data-SQLMI-Demo --name arcdatasqlmidemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters azuredeploy.parameters.json
     ```
 
-> [!NOTE]Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30 minutes.
+> [!NOTE] Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30 minutes.
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
@@ -166,7 +166,7 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. At the end of the logon script run, Azure Data Studio will automatically be open and connected to the Azure SQL MI with the sample DB.
 
-> [!NOTE]To connect to the SQL managed instance use the AZDATA_USERNAME and AZDATA_PASSWORD values specified in the azuredeploy.parameters.json file. The "sa" login is disabled.
+> [!NOTE] To connect to the SQL managed instance use the AZDATA_USERNAME and AZDATA_PASSWORD values specified in the azuredeploy.parameters.json file. The "sa" login is disabled.
 
 ![](../img/aks_mssql_mi_arm_template/09.png)
 
