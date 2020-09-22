@@ -150,7 +150,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   ![](../img/local_microk8s/02.png)
 
-  ![](../img/local_microk8s/10.png)
+  ![](../img/local_microk8s/09.png)
 
 * Connect the cluster to Azure Arc
 
