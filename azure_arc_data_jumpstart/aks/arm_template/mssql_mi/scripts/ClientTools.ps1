@@ -89,9 +89,6 @@ workflow ClientTools_02
             {
                 InlineScript {
                     Expand-Archive C:\tmp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    # Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.azdata'
-                    # Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.arc'
-                    # Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.azuredatastudio-postgresql'
                     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
                 }
             }
