@@ -15,6 +15,6 @@ Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyl
 Stop-Transcript
 
 # Starting Azure Data Studio
-Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
+Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
 
 Stop-Process -name powershell -Force

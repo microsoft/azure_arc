@@ -13,6 +13,10 @@ $env:ARC_DC_NAME="${ARC_DC_NAME}"
 $env:ARC_DC_SUBSCRIPTION="${ARC_DC_SUBSCRIPTION}"
 $env:ARC_DC_RG="${ARC_DC_RG}"
 $env:ARC_DC_REGION="${ARC_DC_REGION}"
+$env:DOCKER_REGISTRY="${DOCKER_REGISTRY}"
+$env:DOCKER_REPOSITORY="${DOCKER_REPOSITORY}"
+$env:DOCKER_TAG="${DOCKER_TAG}"
+
 
 [System.Environment]::SetEnvironmentVariable('AWS_ACCESS_KEY_ID', $env:AWS_ACCESS_KEY_ID,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AWS_SECRET_ACCESS_KEY', $env:AWS_SECRET_ACCESS_KEY,[System.EnvironmentVariableTarget]::Machine)
@@ -28,3 +32,6 @@ $env:ARC_DC_REGION="${ARC_DC_REGION}"
 [System.Environment]::SetEnvironmentVariable('ARC_DC_SUBSCRIPTION', $env:ARC_DC_SUBSCRIPTION,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_RG', $env:ARC_DC_RG,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_REGION', $env:ARC_DC_REGION,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('DOCKER_REGISTRY', $env:DOCKER_REGISTRY,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('DOCKER_REPOSITORY', $env:DOCKER_REPOSITORY,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('DOCKER_TAG', $env:DOCKER_TAG,[System.EnvironmentVariableTarget]::Machine)
