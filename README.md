@@ -148,6 +148,12 @@ This example walks you through how to create a Kubernetes cluster on your local 
 
 * [Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc](azure_arc_k8s_jumpstart/docs/local_kind.md)
 
+#### MicroK8s
+
+This example walks you through how to create a Kubernetes cluster on your local machine using [MicroK8s](https://microk8s.io/), and onboard it as an Azure Arc enabled Kubernetes cluster
+
+* [Deploy a local Kubernetes Cluster using MicroK8s and connect it to Azure Arc](azure_arc_k8s_jumpstart/docs/local_microk8s.md)
+
 #### Azure Arc enabled Kubernetes - Day-2 Scenarios & Use-Cases
 
 Once you have Kubernetes clusters projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the clusters as native Azure resources. The following guides show examples of using Azure management tools such as Azure Monitor, GitOps configurations, and Azure Policy.
