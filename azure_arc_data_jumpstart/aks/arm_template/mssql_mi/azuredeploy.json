@@ -155,16 +155,16 @@
                 "description": "azdata CLI EULA"
             }
         },
-        "DOCKER_USERNAME": {
+        "REGISTRY_USERNAME": {
             "type": "string",
             "metadata": {
-                "description": "Private Arc Data Docker Registry Username"
+                "description": "Private Azure Arc Data Container Registry Username"
             }
         },
-        "DOCKER_PASSWORD": {
+        "REGISTRY_PASSWORD": {
             "type": "securestring",
             "metadata": {
-                "description": "Private Arc Data Docker Registry Password"
+                "description": "Private Azure Arc Data Container Registry Password"
             }
         },
         "ARC_DC_NAME": {
@@ -191,18 +191,12 @@
                 "description": "MSSQL instance name to be deployed on the Kubernetes cluster"
             }
         },
-        "MSSQL_SA_PASSWORD": {
-            "type": "string",
-            "metadata": {
-                "description": "MSSQL SA password"
+        "resourceTags": {
+            "type": "object",
+            "defaultValue": {
+                "Project": "jumpstart_azure_arc_data"
             }
-        },
-        "MSSQL_MI_vCores": {
-            "type": "string",
-            "metadata": {
-                "description": "MSSQL instance number of virtual cores"
-            }
-        }
+        }         
     },
     "resources": [
         {
@@ -210,6 +204,7 @@
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[parameters('location')]",
             "name": "[parameters('clusterName')]",
+            "tags": "[parameters('resourceTags')]",
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
                 "enableRBAC": "[parameters('enableRBAC')]",                
@@ -266,14 +261,12 @@
             "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
             "AZDATA_PASSWORD":{"value": "[parameters('AZDATA_PASSWORD')]"},
             "ACCEPT_EULA":{"value": "[parameters('ACCEPT_EULA')]"},
-            "DOCKER_USERNAME":{"value": "[parameters('DOCKER_USERNAME')]"},
-            "DOCKER_PASSWORD":{"value": "[parameters('DOCKER_PASSWORD')]"},
+            "REGISTRY_USERNAME":{"value": "[parameters('REGISTRY_USERNAME')]"},
+            "REGISTRY_PASSWORD":{"value": "[parameters('REGISTRY_PASSWORD')]"},
             "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
             "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
             "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
-            "MSSQL_MI_NAME":{"value": "[parameters('MSSQL_MI_NAME')]"},
-            "MSSQL_SA_PASSWORD":{"value": "[parameters('MSSQL_SA_PASSWORD')]"},
-            "MSSQL_MI_vCores":{"value": "[parameters('MSSQL_MI_vCores')]"}
+            "MSSQL_MI_NAME":{"value": "[parameters('MSSQL_MI_NAME')]"}
             }
           }
         }

@@ -128,10 +128,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
       - Create the *ClientTools.log* file  
       - Install the required tools – az cli, az cli Powershell module, kubernetes-cli, aws-iam-authenticator (Chocolaty packages)
       - Download & install the Azure Data Studio (Insiders) & azdata cli
-      - Download the Azure Data Studio Arc & PostgreSQL extensions
+      - Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       - Apply the *configmap.yml* file on the EKS cluster
       - Create the *azdata* config file in user Windows profile
-      - Install the Azure Data Studio Arc & PostgreSQL extensions
+      - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       - Create the Azure Data Studio desktop shortcut    
       - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
       - Create the logon script
@@ -151,37 +151,37 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
 
   ![](../img/eks_dc_vanilla_terraform/15.png)
 
-  - export TF_VAR_AWS_ACCESS_KEY_ID='Your AWS Access Key ID (Created in the prerequisites section)'
+  - *export TF_VAR_AWS_ACCESS_KEY_ID*='Your AWS Access Key ID (Created in the prerequisites section)'
 
-  - export TF_VAR_AWS_SECRET_ACCESS_KEY='Your AWS Secret Key (Created in the prerequisites section)'
+  - *export TF_VAR_AWS_SECRET_ACCESS_KEY*='Your AWS Secret Key (Created in the prerequisites section)'
 
-  - export TF_VAR_key_name='Your AWS Key Pair name (Created in the prerequisites section)'
+  - *export TF_VAR_key_name*='Your AWS Key Pair name (Created in the prerequisites section)'
 
-  - export TF_VAR_key_pair_filename='Your AWS Key Pair *.pem filename (Created in the prerequisites section)'
+  - *export TF_VAR_key_pair_filename*='Your AWS Key Pair *.pem filename (Created in the prerequisites section)'
 
-  - export TF_VAR_client_id='Your Azure Service Principle name'
+  - *export TF_VAR_client_id*='Your Azure Service Principle name'
 
-  - export TF_VAR_client_secret='Your Azure Service Principle password'
+  - *export TF_VAR_client_secret*='Your Azure Service Principle password'
 
-  - export TF_VAR_tenant_id='Your Azure tenant ID'
+  - *export TF_VAR_tenant_id*='Your Azure tenant ID'
 
-  - export TF_VAR_AZDATA_USERNAME='Azure Arc Data Controller admin username'
+  - *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
 
-  - export TF_VAR_AZDATA_PASSWORD='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
+  - *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
 
-  - export TF_VAR_DOCKER_USERNAME='Azure Arc Data - Private Preview Docker Registry username' (See note below)
+  - *export TF_VAR_REGISTRY_USERNAME*='Azure Arc Data - Private Preview Container Registry username' (See note below)
 
-  - export TF_VAR_DOCKER_PASSWORD='Azure Arc Data - Private Preview Docker Registry password' (See note below)
+  - *export TF_VAR_REGISTRY_PASSWORD*='Azure Arc Data - Private Preview Container Registry password' (See note below)
 
-  - export TF_VAR_ARC_DC_NAME='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
+  - *export TF_VAR_ARC_DC_NAME*='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
 
-  - export TF_VAR_ARC_DC_SUBSCRIPTION='Azure Arc Data Controller Azure subscription ID'
+  - *export TF_VAR_ARC_DC_SUBSCRIPTION*='Azure Arc Data Controller Azure subscription ID'
 
-  - export TF_VAR_ARC_DC_RG='Azure Resource Group where all future Azure Arc resources will be deployed'
+  - *export TF_VAR_ARC_DC_RG*='Azure Resource Group where all future Azure Arc resources will be deployed'
 
-  - export TF_VAR_ARC_DC_REGION='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+  - *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
-  **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
+  **Note: Currently, the REGISTRY_USERNAME / REGISTRY_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
 
 * Navigate to the folder that has Terraform binaries.
 
@@ -242,39 +242,39 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
   ![](../img/eks_dc_vanilla_terraform/29.png)
 
   ![](../img/eks_dc_vanilla_terraform/30.png)
-
-  ![](../img/eks_dc_vanilla_terraform/31.png)    
+   
 
 * Using Powershell, login to the Data Controller and check it's health using the below commands.
 
     ```powershell
-    azdata login -n $env:ARC_DC_NAME
+    azdata login --namespace $env:ARC_DC_NAME
+
     azdata arc dc status show
     ```
 
+  ![](../img/eks_dc_vanilla_terraform/31.png)
+
+* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions. 
+
   ![](../img/eks_dc_vanilla_terraform/32.png)
 
-* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions. 
-
   ![](../img/eks_dc_vanilla_terraform/33.png)
-
-  ![](../img/eks_dc_vanilla_terraform/34.png)
 
 # Cleanup
 
 * To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client instance. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is ~2-3min long**.
 
-  ![](../img/eks_dc_vanilla_terraform/35.png)
+  ![](../img/eks_dc_vanilla_terraform/34.png)
 
-  ![](../img/eks_dc_vanilla_terraform/36.png)
+  ![](../img/eks_dc_vanilla_terraform/35.png)
 
 # Re-Deploy Azure Arc Data Controller
 
 In case you deleted the Azure Arc Data Controller from the EKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long** 
 
-  ![](../img/eks_dc_vanilla_terraform/37.png)
+  ![](../img/eks_dc_vanilla_terraform/36.png)
 
-  ![](../img/eks_dc_vanilla_terraform/38.png) 
+  ![](../img/eks_dc_vanilla_terraform/37.png) 
 
 # Delete the deployment
 
@@ -284,8 +284,8 @@ To completely delete the environment, follow the below steps:
 
   2. Run the ```terraform destroy --auto-approve``` which will delete all of the AWS resources as well as the Azure Resource Group. **The *terraform destroy* run time is approximately ~8-9min long** 
 
-  ![](../img/eks_dc_vanilla_terraform/39.png)
+    ![](../img/eks_dc_vanilla_terraform/38.png)
 
-  ![](../img/eks_dc_vanilla_terraform/40.png)
+    ![](../img/eks_dc_vanilla_terraform/39.png)
 
-  ![](../img/eks_dc_vanilla_terraform/41.png)
+    ![](../img/eks_dc_vanilla_terraform/40.png)
