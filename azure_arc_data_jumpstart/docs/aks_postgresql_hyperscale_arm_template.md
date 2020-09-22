@@ -64,22 +64,23 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Install the required tools – az cli, az cli Powershell module, kube-cli (Chocolaty packages)
     * Download & install the Azure Data Studio & azdata cli
     * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-    * Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
-    * Create the logon script
+    * Download the *Postgres_Cleanup* and *Postgres_Deploy* Powershell scripts
+    * Create the Postgres Connectivity script
+    * Create the logon script 
     * Create the Windows schedule task to run the logon script at first login
     * Disable Windows Server Manager from running at login
 
-    * Logon script will:
-      * Create the *LogonScript.log* file
-      * Retrieve the AKS credentials & create the *kubeconfig* file in user Windows profile
-      * Create the *azdata* config file in user Windows profile
-      * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      * Create the Azure Data Studio desktop shortcut
-      * Open another Powershell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
-      * Deploy the Arc Data Controller using the user params values
-      * Deploy Azure Postgres server group **(with 5 workers)** on the AKS cluster
-      * Creating Postgres connectivity details using the SQL Connectivity script
-      * Unregister the logon script Windows schedule task so it will not run after first login
+  * Logon script will:
+    * Create the *LogonScript.log* file
+    * Retrieve the AKS credentials & create the *kubeconfig* file in user Windows profile
+    * Create the *azdata* config file in user Windows profile
+    * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
+    * Create the Azure Data Studio desktop shortcut
+    * Open another Powershell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
+    * Deploy the Arc Data Controller using the user params values
+    * Deploy Azure Postgres server group **(with 5 workers)** on the AKS cluster
+    * Creating Postgres connectivity details using the SQL Connectivity script
+    * Unregister the logon script Windows schedule task so it will not run after first login
 
 ## Deployment
 

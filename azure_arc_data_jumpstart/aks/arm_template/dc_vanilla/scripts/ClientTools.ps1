@@ -87,9 +87,9 @@ workflow ClientTools_02
             {
                 InlineScript {
                     Expand-Archive C:\tmp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.azdata'
-                    Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.arc'
-                    Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.azuredatastudio-postgresql'
+                    # Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.azdata'
+                    # Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.arc'
+                    # Start-Process azuredatastudio -Wait -ArgumentList '--install-extension Microsoft.azuredatastudio-postgresql'
                     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
                 }
             }
@@ -119,8 +119,7 @@ $env:argument1="--install-extension"
 $env:argument2="Microsoft.arc"
 $env:argument3="microsoft.azuredatastudio-postgresql"
 
-#TODO: THIS IS A BUG
-# & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument2
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument3
 
 Write-Host "Copying Azure Data Studio Settings Config"
