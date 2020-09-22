@@ -1,5 +1,7 @@
 # Azure Arc Data Controller Vanilla Deployment on GKE (Terraform)
 
+> [!NOTE] THIS EXAMPLE IS STILL BEING UPDATED FOR PUBLIC PREVIEW.  PLEASE COME BACK IN A DAY OR TWO WHEN IT IS READY.
+
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster, using [Terraform](https://www.terraform.io/).
 
 By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
