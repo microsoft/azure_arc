@@ -157,14 +157,14 @@
         },
         "REGISTRY_USERNAME": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "not_specified",
             "metadata": {
                 "description": "Private Azure Arc Data Container Registry Username"
             }
         },
         "REGISTRY_PASSWORD": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "not_specified",
             "metadata": {
                 "description": "Private Azure Arc Data Container Registry Password"
             }

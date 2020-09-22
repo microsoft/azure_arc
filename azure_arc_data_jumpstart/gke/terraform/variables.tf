@@ -75,13 +75,13 @@ variable "ACCEPT_EULA" {
 variable "REGISTRY_USERNAME" {
   description = "Azure Arc Data - Private Preview Container Registry username"
   type        = string
-  default     = ""
+  default     = "not_specified"
 }
 
 variable "REGISTRY_PASSWORD" {
   description = "Azure Arc Data - Private Preview Container Registry password"
   type        = string
-  default     = ""
+  default     = "not_specified"
 }
 
 variable "ARC_DC_NAME" {
