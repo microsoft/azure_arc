@@ -118,7 +118,7 @@ az aks get-versions -l "<Your Azure Region>"
 
     ```console
     az group create --name <Name of the Azure Resource Group> --location <Azure Region>
-    az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
+    az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
 > [!NOTE]Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
@@ -127,7 +127,7 @@ For example:
 
     ```console
     az group create --name Arc-Data-SQLMI-Demo --location "East US"
-    az deployment group create --resource-group Arc-Data-SQLMI-Demo --name arcdatasqlmidemo --template-uri https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters azuredeploy.parameters.json
+    az deployment group create --resource-group Arc-Data-SQLMI-Demo --name arcdatasqlmidemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json --parameters azuredeploy.parameters.json
     ```
 
 > [!NOTE]Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30 minutes.

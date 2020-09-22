@@ -75,8 +75,8 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
    ![](../img/vm_extension_customscript/05.png)
 
     - A public Uri for the script that you would like to run on the servers, in this case use the URL for the script in raw format.
-        - For Windows: [Public Uri](https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_servers_jumpstart/scripts/custom_script_windows.ps1) 
-        - For Linux: [Public Uri](https://raw.githubusercontent.com/twright-msft/azure_arc/master/azure_arc_servers_jumpstart/scripts/custom_script_linux.sh)
+        - For Windows: [Public Uri](https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/scripts/custom_script_windows.ps1) 
+        - For Linux: [Public Uri](https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/scripts/custom_script_linux.sh)
 
     -  To run either script, use the below commands: 
         
