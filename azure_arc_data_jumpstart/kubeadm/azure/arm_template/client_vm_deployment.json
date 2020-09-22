@@ -91,13 +91,13 @@
         "DOCKER_USERNAME": {
             "type": "string",
             "metadata": {
-                "description": "Private Arc Data Docker Registry Username"
+                "description": "Private Azure Arc Data Container Registry Username"
             }
         },
         "DOCKER_PASSWORD": {
             "type": "string",
             "metadata": {
-                "description": "Private Arc Data Docker Registry Password"
+                "description": "Private Azure Arc Data Container Registry Password"
             }
         },
         "ARC_DC_NAME": {
@@ -143,6 +143,12 @@
             "defaultValue": "Arc-Data-Client-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
+            }
+        },
+        "resourceTags": {
+            "type": "object",
+            "defaultValue": {
+                "Project": "jumpstart_azure_arc_data"
             }
         }
     },
@@ -265,6 +271,7 @@
             "apiVersion": "2019-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
+            "tags": "[parameters('resourceTags')]",            
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],

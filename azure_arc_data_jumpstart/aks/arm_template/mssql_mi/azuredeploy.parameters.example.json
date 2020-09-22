@@ -21,7 +21,7 @@
             "value": "33333333-XXXX-YTYT-9c21-7777777777"
         },
         "kubernetesVersion": {
-            "value": "1.18.4"
+            "value": "1.18.6"
         },
         "adminUsername": {
             "value": "arcdemo"
@@ -47,10 +47,10 @@
         "ACCEPT_EULA": {
             "value": "yes"
         },
-        "DOCKER_USERNAME": {
+        "REGISTRY_USERNAME": {
             "value": "Go-to-private-repo"
         },
-        "DOCKER_PASSWORD": {
+        "REGISTRY_PASSWORD": {
             "value": "Go-to-private-repo"
         },
         "ARC_DC_NAME": {
@@ -64,12 +64,6 @@
         },
         "MSSQL_MI_NAME": {
             "value": "arcsqlmidemo"
-        },
-        "MSSQL_SA_PASSWORD": {
-            "value": "ArcDemo123!!"
-        },
-        "MSSQL_MI_vCores": {
-            "value": "2"
         }
     }
 }

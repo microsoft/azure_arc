@@ -125,7 +125,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Requirements file.
 export OSCODENAME=$(lsb_release -cs)
-export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE="https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/ubuntu-"$OSCODENAME"/azdata-cli_20.0.0-1~"$OSCODENAME"_all.deb"
+export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE="https://aka.ms/aug-2020-arc-azdata-$OSCODENAME"
 
 # Wait for 5 minutes for the cluster to be ready.
 TIMEOUT=600
@@ -184,17 +184,17 @@ cd -
 azdata --version
 echo "Azdata has been successfully installed."
 
-# Installing azdata extensions
-echo "Installing azdata extension for Arc data controller..."
-azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_dc-0.0.1-py2.py3-none-any.whl --yes
+# # Installing azdata extensions
+# echo "Installing azdata extension for Arc Data Controller..."
+# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_dc-0.0.1-py2.py3-none-any.whl --yes
 
-echo "Installing azdata extension for postgres..."
-azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_postgres-0.0.1-py2.py3-none-any.whl --yes
+# echo "Installing azdata extension for Postgres..."
+# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_postgres-0.0.1-py2.py3-none-any.whl --yes
 
-echo "Installing azdata extension for sql..."
-azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_sqlinstance-0.0.1-py2.py3-none-any.whl --yes
+# echo "Installing azdata extension for SQL..."
+# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-aug-2020-new/pypi-azdata-cli/azdata_cli_sqlmi-20.1.1-py2.py3-none-any.whl --yes
 
-echo "Azdata extensions installed successfully."
+# echo "Azdata extensions installed successfully."
 
 # Install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -329,14 +329,33 @@ echo "##########################################################################
 echo "Starting to deploy azdata cluster..." 
 
 # Command to create cluster for single node cluster.
-azdata arc dc create -n $ARC_DC_NAME -p azure-arc-kubeadm-private-preview --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
+
+azdata arc dc config init --source azure-arc-kubeadm --path azure-arc-custom --force
+
+if [[ -v DOCKER_REGISTRY ]]; then
+    azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.docker.registry=$DOCKER_REGISTRY'
+fi
+
+if [[ -v DOCKER_REPOSITORY ]]; then
+    azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.docker.repository=$DOCKER_REPOSITORY'
+fi
+
+if [[ -v DOCKER_IMAGE_TAG ]]; then
+    azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.docker.imageTag=$DOCKER_IMAGE_TAG'
+fi
+
+azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.storage.data.className=local-storage'
+azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.storage.logs.className=local-storage'
+
+azdata arc dc create --name $ARC_DC_NAME --path azure-arc-custom --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
+
 echo "Azure Arc Data Controller cluster created."
 
 # Setting context to cluster.
 kubectl config set-context --current --namespace $ARC_DC_NAME
 
 # Login and get endpoint list for the cluster.
-azdata login -n $ARC_DC_NAME
+azdata login --namespace $ARC_DC_NAME
 
 echo "Cluster successfully setup. Run 'azdata --help' to see all available options."
 

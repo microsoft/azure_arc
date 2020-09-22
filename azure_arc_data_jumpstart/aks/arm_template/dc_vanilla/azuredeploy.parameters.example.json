@@ -21,7 +21,7 @@
             "value": "33333333-XXXX-YTYT-9c21-7777777777"
         },
         "kubernetesVersion": {
-            "value": "1.18.4"
+            "value": "1.18.6"
         },
         "adminUsername": {
             "value": "arcdemo"
@@ -36,7 +36,7 @@
             "value": "33333333-XXXX-41af-1111-7777777777"
         },
         "resourceGroup": {
-            "value": "Arc-Data-Demo"
+            "value": "Arc-Data-Vanilla-Demo"
         },
         "AZDATA_USERNAME": {
             "value": "arcdemo"

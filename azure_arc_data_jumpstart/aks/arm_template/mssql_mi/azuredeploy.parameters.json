@@ -21,7 +21,7 @@
             "value": "<Your Azure Service Principle password>"
         },
         "kubernetesVersion": {
-            "value": "<Kubernetes Version, e.g. 1.18.4>"
+            "value": "<Kubernetes Version, e.g. 1.18.6>"
         },
         "adminUsername": {
             "value": "<Client Windows VM admin username>"
@@ -47,11 +47,11 @@
         "ACCEPT_EULA": {
             "value": "yes"           
         },
-        "DOCKER_USERNAME": {
-            "value": "<Azure Arc Data - Private Preview Docker Registry username>"
+        "REGISTRY_USERNAME": {
+            "value": "<Azure Arc Data - Private Preview Container Registry username>"
         },
-        "DOCKER_PASSWORD": {
-            "value": "<Azure Arc Data - Private Preview Docker Registry password>"
+        "REGISTRY_PASSWORD": {
+            "value": "<Azure Arc Data - Private Preview Container Registry password>"
         },
         "ARC_DC_NAME": {
             "value": "<Azure Arc Data Controller name (will be used for k8s Arc namespace as well)>"
@@ -64,12 +64,6 @@
         },
         "MSSQL_MI_NAME": {
             "value": "<SQL Managed Instance name to be deployed on the Kubernetes cluster>"
-        },
-        "MSSQL_SA_PASSWORD": {
-            "value": "<SQL Managed Instance SA password>"
-        },
-        "MSSQL_MI_vCores": {
-            "value": "<SQL Managed Instance number of virtual cores>"
         }
     }
 }

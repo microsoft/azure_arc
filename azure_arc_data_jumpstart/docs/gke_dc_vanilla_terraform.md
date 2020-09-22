@@ -127,10 +127,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
       - Create the *ClientTools.log* file  
       - Install the required tools – az cli, az cli Powershell module, kubernetes-cli (Chocolaty packages)
       - Download & install the Azure Data Studio (Insiders) & azdata cli
-      - Download the Azure Data Studio Arc & PostgreSQL extensions
+      - Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       - Apply the *faster_sc.yaml* file on the GKE cluster
       - Create the *azdata* config file in user Windows profile
-      - Install the Azure Data Studio Arc & PostgreSQL extensions
+      - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       - Create the Azure Data Studio desktop shortcut    
       - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
       - Disable Windows Server Manager
@@ -152,49 +152,49 @@ As mentioned, the Terraform plan will deploy a GKE cluster and a Windows Server 
 
   ![](../img/gke_dc_vanilla_terraform/20.png)
 
-  - export TF_VAR_gcp_project_id='Your GCP Project ID (Created in the prerequisites section)'
+  - *export TF_VAR_gcp_project_id*='Your GCP Project ID (Created in the prerequisites section)'
 
-  - export TF_VAR_gcp_credentials_filename='Your GCP Credentials JSON filename (Created in the prerequisites section)'
+  - *export TF_VAR_gcp_credentials_filename*='Your GCP Credentials JSON filename (Created in the prerequisites section)'
 
-  - export TF_VAR_gcp_region='GCP region where resource will be created'
+  - *export TF_VAR_gcp_region*='GCP region where resource will be created'
 
-  - export TF_VAR_gcp_zone='GCP zone where resource will be created'
+  - *export TF_VAR_gcp_zone*='GCP zone where resource will be created'
 
-  - export TF_VAR_gke_cluster_name='GKE cluster name'
+  - *export TF_VAR_gke_cluster_name*='GKE cluster name'
 
-  - export TF_VAR_admin_username='GKE cluster administrator username'
+  - *export TF_VAR_admin_username*='GKE cluster administrator username'
 
-  - export TF_VAR_admin_password='GKE cluster administrator password'
+  - *export TF_VAR_admin_password*='GKE cluster administrator password'
   
-  - export TF_VAR_gke_cluster_node_count='GKE cluster number of worker nodes'
+  - *export TF_VAR_gke_cluster_node_count*='GKE cluster number of worker nodes'
 
-  - export TF_VAR_windows_username='Windows Server Client compute instance VM administrator username'
+  - *export TF_VAR_windows_username*='Windows Server Client compute instance VM administrator username'
 
-  - export TF_VAR_windows_password='Windows Server Client compute instance VM administrator password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols as well as **not containing** the user's account name or parts of the user's full name that exceed two consecutive characters)
+  - *export TF_VAR_windows_password*='Windows Server Client compute instance VM administrator password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols as well as **not containing** the user's account name or parts of the user's full name that exceed two consecutive characters)
 
-  - export TF_VAR_client_id='Your Azure Service Principle name'
+  - *export TF_VAR_client_id*='Your Azure Service Principle name'
 
-  - export TF_VAR_client_secret='Your Azure Service Principle password'
+  - *export TF_VAR_client_secret*='Your Azure Service Principle password'
 
-  - export TF_VAR_tenant_id='Your Azure tenant ID'
+  - *export TF_VAR_tenant_id*='Your Azure tenant ID'
 
-  - export TF_VAR_AZDATA_USERNAME='Azure Arc Data Controller admin username'
+  - *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
 
-  - export TF_VAR_AZDATA_PASSWORD='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
+  - *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
 
-  - export TF_VAR_DOCKER_USERNAME='Azure Arc Data - Private Preview Docker Registry username' (See note below)
+  - *export TF_VAR_REGISTRY_USERNAME*='Azure Arc Data - Private Preview Container Registry username' (See note below)
 
-  - export TF_VAR_DOCKER_PASSWORD='Azure Arc Data - Private Preview Docker Registry password' (See note below)
+  - *export TF_VAR_REGISTRY_PASSWORD*='Azure Arc Data - Private Preview Container Registry password' (See note below)
 
-  - export TF_VAR_ARC_DC_NAME='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
+  - *export TF_VAR_ARC_DC_NAME*='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
 
-  - export TF_VAR_ARC_DC_SUBSCRIPTION='Azure Arc Data Controller Azure subscription ID'
+  - *export TF_VAR_ARC_DC_SUBSCRIPTION*='Azure Arc Data Controller Azure subscription ID'
 
-  - export TF_VAR_ARC_DC_RG='Azure Resource Group where all future Azure Arc resources will be deployed'
+  - *export TF_VAR_ARC_DC_RG*='Azure Resource Group where all future Azure Arc resources will be deployed'
 
-  - export TF_VAR_ARC_DC_REGION='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+  - *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
-  **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
+  **Note: Currently, the REGISTRY_USERNAME / REGISTRY_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
 
 * Navigate to the folder that has Terraform binaries.
 
@@ -210,7 +210,7 @@ As mentioned, the Terraform plan will deploy a GKE cluster and a Windows Server 
 
   ![](../img/gke_dc_vanilla_terraform/22.png)
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. **Runtime for deploying all the GCP resources for this plan is ~30min.**
+* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. **Runtime for deploying all the GCP resources for this plan is ~20-30min.**
 
 * Once completed, you can review the GKE cluster and the worker nodes resources as well as the GCP compute instance VM created.
 
@@ -255,13 +255,14 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 * Using Powershell, login to the Data Controller and check it's health using the below commands.
 
     ```powershell
-    azdata login -n $env:ARC_DC_NAME
+    azdata login --namespace $env:ARC_DC_NAME
+
     azdata arc dc status show
     ```
 
   ![](../img/gke_dc_vanilla_terraform/35.png)
 
-* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions. 
+* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions. 
 
   ![](../img/gke_dc_vanilla_terraform/36.png)
 
@@ -281,10 +282,8 @@ In case you deleted the Azure Arc Data Controller from the GKE cluster, you can 
 
   ![](../img/gke_dc_vanilla_terraform/40.png)
 
-  ![](../img/gke_dc_vanilla_terraform/41.png) 
-
 # Delete the deployment
 
 To completely delete the environment, follow the below steps run the ```terraform destroy --auto-approve``` command which will delete all of the GCP resources as well as the Azure Resource Group. **The *terraform destroy* run time is approximately ~5-6min long** 
 
-  ![](../img/gke_dc_vanilla_terraform/42.png)
+  ![](../img/gke_dc_vanilla_terraform/41.png)

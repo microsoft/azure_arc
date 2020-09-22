@@ -67,7 +67,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Inject user params values (from bullet point #1) to be used in both runtime and logon script
         - Install the required tools – az cli, az cli Powershell module, kube-cli (Chocolaty packages)
         - Download & install the Azure Data Studio (Insiders) & azdata cli
-        - Download the Azure Data Studio Arc & PostgreSQL extensions
+        - Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
         - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
         - Create the logon script
         - Create the Windows schedule task to run the logon script at first login
@@ -77,7 +77,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Create the *LogonScript.log* file
         - Retrieve the AKS credentials & create the *kubeconfig* file in user Windows profile
         - Create the *azdata* config file in user Windows profile
-        - Install the Azure Data Studio Arc & PostgreSQL extensions
+        - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
         - Create the Azure Data Studio desktop shortcut
         - Open another Powershell session which will execute the *“kubectl get pods -n <Arc Data Controller namespace> -w”* command
         - Deploy the Arc Data Controller using the user params values
@@ -95,47 +95,47 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../aks/arm_template/dc_vanilla/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../aks/arm_template/dc_vanilla/azuredeploy.parameters.example.json).
 
-    - *"clusterName"* - AKS cluster name
+    - *clusterName* - AKS cluster name
 
-    - *"dnsPrefix"* - AKS unique DNS prefix
+    - *dnsPrefix* - AKS unique DNS prefix
 
-    - *"nodeAdminUsername"* - AKS Node Username
+    - *nodeAdminUsername* - AKS Node Username
 
-    - *"sshRSAPublicKey"* - Your ssh public key
+    - *sshRSAPublicKey* - Your ssh public key
 
-    - *"servicePrincipalClientId"* - Your Azure Service Principle name
+    - *servicePrincipalClientId* - Your Azure Service Principle name
 
-    - *"servicePrincipalClientSecret"* - Your Azure Service Principle password
+    - *servicePrincipalClientSecret* - Your Azure Service Principle password
 
-    - *"kubernetesVersion"* - AKS Kubernetes Version (See previous prerequisite)
+    - *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
 
-    - *"adminUsername"* - Client Windows VM admin username
+    - *adminUsername* - Client Windows VM admin username
 
-    - *"adminPassword"* - Client Windows VM admin password
+    - *adminPassword* - Client Windows VM admin password
 
-    - *"vmSize"* - Client Windows VM size
+    - *vmSize* - Client Windows VM size
 
-    - *"tenantId"* - Azure tenant ID
+    - *tenantId* - Azure tenant ID
 
-    - *"resourceGroup"* - Azure Resource Group where all the resources get deploy
+    - *resourceGroup* - Azure Resource Group where all the resources get deploy
 
-    - *"AZDATA_USERNAME"* - Azure Arc Data Controller admin username
+    - *AZDATA_USERNAME* - Azure Arc Data Controller admin username
 
-    - *"AZDATA_PASSWORD"* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
+    - *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
 
-    - *"ACCEPT_EULA"* - "yes" **Do not change**
+    - *ACCEPT_EULA* - "yes" **Do not change**
 
-    - *"DOCKER_USERNAME"* - Azure Arc Data - Private Preview Docker Registry username (See note below)
+    - *REGISTRY_USERNAME* - Azure Arc Data - Private Preview Container Registry username (See note below)
 
-    - *"DOCKER_PASSWORD"* - Azure Arc Data - Private Preview Docker Registry password (See note below)
+    - *REGISTRY_PASSWORD* - Azure Arc Data - Private Preview Container Registry password (See note below)
 
-    - *"ARC_DC_NAME"* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for k8s namespace as well).
+    - *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for k8s namespace as well).
 
-    - *"ARC_DC_SUBSCRIPTION"* - Azure Arc Data Controller Azure subscription ID
+    - *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
 
-    - *"ARC_DC_REGION"* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+    - *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
-    **Note: Currently, the DOCKER_USERNAME / DOCKER_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
+    **Note: Currently, the REGISTRY_USERNAME / REGISTRY_PASSWORD values can only be found in the Azure Arc Data Services [Private Preview repository](https://github.com/microsoft/Azure-data-services-on-Azure-Arc/blob/master/scenarios/002-create-data-controller.md).**
 
  * To deploy the ARM template, navigate to the local cloned [deployment folder](../aks/arm_template/dc_vanilla) and run the below command:
 
@@ -153,9 +153,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```bash
-    az group create --name Arc-Data-Demo --location "East US"
+    az group create --name Arc-Data-Vanilla-Demo --location "East US"
     az deployment group create \
-    --resource-group Arc-Data-Demo \
+    --resource-group Arc-Data-Vanilla-Demo \
     --name arcdatademo \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.json \
     --parameters azuredeploy.parameters.json
@@ -192,25 +192,25 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 * Using Powershell, login to the Data Controller and check it's health using the below commands.
 
     ```powershell
-    azdata login -n $env:ARC_DC_NAME
+    azdata login --name $env:ARC_DC_NAME
     azdata arc dc status show
     ```
 
     ![](../img/aks_dc_vanilla_arm_template/08.png)
 
-    ![](../img/aks_dc_vanilla_arm_template/09.png)
+* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions. 
 
-* Another tool automatically deployed is Azure Data Studio (Insiders Build) along with the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions. 
+    ![](../img/aks_dc_vanilla_arm_template/09.png)
 
     ![](../img/aks_dc_vanilla_arm_template/10.png)
 
-    ![](../img/aks_dc_vanilla_arm_template/11.png)
-
 # Cleanup
 
-* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is approximately 10min long**.
+* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is approximately 5min long**.
 
-    ![](../img/aks_dc_vanilla_arm_template/12.png)
+    ![](../img/aks_dc_vanilla_arm_template/11.png)
+
+    ![](../img/aks_dc_vanilla_arm_template/12.png)    
 
 * If you want to delete the entire environment, simply delete the deployment Resource Group from the Azure portal.
 
@@ -218,7 +218,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
 # Re-Deploy Azure Arc Data Controller
 
-In case you deleted the Azure Arc Data Controller from the AKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 10min long**
+In case you deleted the Azure Arc Data Controller from the AKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 5-10min long**
 
 ![](../img/aks_dc_vanilla_arm_template/14.png)
 
