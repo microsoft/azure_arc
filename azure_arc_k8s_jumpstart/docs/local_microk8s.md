@@ -150,7 +150,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   ![](../img/local_microk8s/02.png)
 
-  ![](../img/local_microk8s/09.png)
+  ![](../img/local_microk8s/03.png)
 
 * Connect the cluster to Azure Arc
 
@@ -163,13 +163,13 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
   az connectedk8s connect --name Arc-MicroK8s-Demo --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
-  ![](../img/local_microk8s/03.png)
+  ![](../img/local_microk8s/04.png)
 
 * Upon completion, you will have your MicroK8s cluster connected as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
 
-  ![](../img/local_microk8s/04.png)
-
   ![](../img/local_microk8s/05.png)
+
+  ![](../img/local_microk8s/06.png)
 
 
 # Delete the deployment
@@ -180,7 +180,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
     az group delete --name Arc-MicroK8s-Demo
     ```
 
-  ![](../img/local_microk8s/06.png)
+  ![](../img/local_microk8s/07.png)
 
 * To stop the MicroK8s cluster locally, use the following command:
     ```bash
@@ -197,7 +197,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
     ```
     Launch `Add or Remove Programs` and uninstall MicroK8s.
 
-    ![](../img/local_microk8s/07.png)
+    ![](../img/local_microk8s/08.png)
 
     ```
     multipass delete microk8s-vm
@@ -206,7 +206,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
     If you want to completely uninstall Multipass, launch `Add or Remove Programs` and uninstall Multipass.
 
-    ![](../img/local_microk8s/08.png)
+    ![](../img/local_microk8s/09.png)
 
   * Linux
     ```
