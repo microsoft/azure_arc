@@ -1,0 +1,40 @@
+apiVersion: v1
+data:
+  password: <your base64 encoded password>
+kind: Secret
+metadata:
+  name: example-login-secret
+type: Opaque
+---
+apiVersion: arcdata.microsoft.com/v1alpha1
+kind: postgresql-12
+metadata:
+  generation: 1
+  name: example
+spec:
+  engine:
+    extensions:
+    - name: citus
+  scale:
+    shards: 3
+  scheduling:
+    default:
+      resources:
+        limits:
+          cpu: "4"
+          memory: 4Gi
+        requests:
+          cpu: "1"
+          memory: 2Gi
+  service:
+    type: LoadBalancer
+  storage:
+    backups:
+      className: default
+      size: 5Gi
+    data:
+      className: default
+      size: 5Gi
+    logs:
+      className: default
+      size: 1Gi
