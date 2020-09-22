@@ -189,13 +189,12 @@ sudo apt install -y libodbc1 odbcinst odbcinst1debian2 unixodbc apt-transport-ht
 echo "installing azdata"
 
 #Using packages.microsoft.com
-sudo apt-get update
 sudo apt-get install gnupg ca-certificates curl wget software-properties-common apt-transport-https lsb-release -y
 curl -sL https://packages.microsoft.com/keys/microsoft.asc |
 gpg --dearmor |
 sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
 sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/18.04/prod.list)"
-sudo apt-get update
+sudo apt-get update -q
 sudo apt-get install -y azdata-cli
 
 #using a specific URL. useful for pre-release testing
