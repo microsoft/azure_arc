@@ -48,16 +48,22 @@ variable "ACCEPT_EULA" {
   default     = "yes"
 }
 
-variable "REGISTRY_USERNAME" {
-  description = "Azure Arc Data - Private Preview Container Registry username"
+variable "DOCKER_REGISTRY" {
+  description = "Azure Arc Data Container Registry"
   type        = string
-  default     = "not_specified"
+  default     = "mcr.microsoft.com"
 }
 
-variable "REGISTRY_PASSWORD" {
-  description = "Azure Arc Data - Private Preview Container Registry password"
+variable "DOCKER_REPOSITORY" {
+  description = "Azure Arc Data Container Registry Repository"
   type        = string
-  default     = "not_specified"
+  default     = "arcdata"
+}
+
+variable "DOCKER_TAG" {
+  description = "Azure Arc Data Container Tag"
+  type        = string
+  default     = "latest"
 }
 
 variable "ARC_DC_NAME" {
@@ -78,24 +84,6 @@ variable "ARC_DC_RG" {
 variable "ARC_DC_REGION" {
   description = "Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)"
   type        = string
-}
-
-variable "DOCKER_REGISTRY" {
-  description = "Container registry to pull images from."
-  type        = string
-  default     = "mcr.microsoft.com"
-}
-
-variable "DOCKER_REPOSITORY" {
-  description = "Container image registry repository to pull images from."
-  type        = string
-  default     = "arcdata"
-}
-
-variable "DOCKER_TAG" {
-  description = "Image tag to pull."
-  type        = string
-  default     = "latest"
 }
 
 variable "client_id" {
