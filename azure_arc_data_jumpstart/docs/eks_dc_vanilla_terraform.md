@@ -213,12 +213,12 @@ Once the script will finish it's run, the logon script Powershell session will b
 
 - Using Powershell, login to the Data Controller and check it's health using the below commands.
 
-```console
-azdata login --namespace $env:ARC_DC_NAME
-azdata arc dc status show
-```
+  ```console
+  azdata login --namespace $env:ARC_DC_NAME
+  azdata arc dc status show
+  ```
 
-  ![](../img/eks_dc_vanilla_terraform/30.png)
+![](../img/eks_dc_vanilla_terraform/30.png)
 
 - Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 

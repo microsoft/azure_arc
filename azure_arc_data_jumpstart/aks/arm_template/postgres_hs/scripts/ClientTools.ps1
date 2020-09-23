@@ -168,7 +168,7 @@ Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterN
 kubectl get nodes
 azdata --version
 
-Write-Host "Installing Azure Data Studio Extentions"
+Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
 
 $env:argument1="--install-extension"

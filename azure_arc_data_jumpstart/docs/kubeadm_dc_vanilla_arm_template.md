@@ -54,7 +54,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 * Deploy the Azure Arc Data Controller on that cluster.
 * Once Ubuntu VM deployment has finished, the main ARM template will call a secondary ARM template which is depended on a successful Ubuntu VM deployment.
 * Secondary ARM template will deploy a client Windows Server 2019 VM.
-* As part of the Windows Server 2019 VM deployment, there are 2 scripts executions; First script (ClientTools.ps1) at deployment runtime using the ARM *"CustomScriptExtention"* module and a second script (LogonScript.ps1) on user first logon to Windows.
+* As part of the Windows Server 2019 VM deployment, there are 2 scripts executions; First script (ClientTools.ps1) at deployment runtime using the ARM *"CustomScriptExtension"* module and a second script (LogonScript.ps1) on user first logon to Windows.
 * Runtime script will:
   * Inject user params values (from bullet point #1) to be used in both runtime and logon script
   * Install the required tools – az cli, az cli Powershell module, kubernetes-cli and putty (Chocolaty packages)
