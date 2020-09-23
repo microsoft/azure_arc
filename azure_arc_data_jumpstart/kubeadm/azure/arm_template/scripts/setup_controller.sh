@@ -11,10 +11,10 @@ echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $ACCEPT_EULA:$10 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_REGISTRY:$11 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_REPOSITORY:$12 | awk '{print substr($1,2); }' >> vars.sh
-echo $DOCKER_TAG:$13 | awk '{print substr($1,2); }' >> vars.sh
+echo $ACCEPT_EULA:${10} | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_REGISTRY:${11} | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_REPOSITORY:${12} | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_TAG:${13} | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
