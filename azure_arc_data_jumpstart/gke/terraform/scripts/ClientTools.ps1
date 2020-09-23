@@ -48,7 +48,7 @@ Start-Sleep -s 5
 Stop-Process -Name "azuredatastudio" -Force
 Copy-Item -Path "C:\tmp\settings.json" -Destination $SettingsDestination -Recurse -Force -ErrorAction Continue
 
-Write-Host "Installing Azure Data Studio Extentions"
+Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
 
 $env:argument1="--install-extension"
