@@ -55,7 +55,7 @@ Output should look like this:
 }
 ```
 
-> [!NOTE]It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+> [!NOTE] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 - Create a new GCP Project, IAM Role & Service Account
 
