@@ -3,12 +3,12 @@
 # <--- Change the following environment variables according to your Azure Service Principle name --->
 
 echo "Exporting environment variables"
-export appId='558024d3-bcb9-4185-b2e2-87351d81710a'
-export password='J-d~g3n4kP5-gNNH-0M3F71jYHz7pqV7jC'
-export tenantId='72f988bf-86f1-41af-91ab-2d7cd011db47'
-export resourceGroup='nfkindarc'
-export arcClusterName='testauto4'
-export appClonedRepo='https://github.com/nillsf/hello_arc.git'
+export appId='<Your Azure Service Principle name>'
+export password='<Your Azure Service Principle password>'
+export tenantId='<Your Azure tenant ID>'
+export resourceGroup='<Azure Resource Group Name>'
+export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
+export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
 
 # Getting AKS credentials
 echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
