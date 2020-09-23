@@ -3,8 +3,8 @@
 # <--- Change the following environment variables according to your Azure Service Principle name --->
 
 echo "Exporting environment variables"
-export resourceGroup='Arc-kind-Demo'
-export arcClusterName='Arc-kind-Demo'
+export resourceGroup='<Your resource group name>'
+export arcClusterName='<Your Arc cluster name>'
 
 # Deleting GitOps Configurations from Azure Arc Kubernetes cluster
 echo "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
