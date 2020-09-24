@@ -72,7 +72,7 @@ The following guides provide end-to-end deployment of new Windows or Linux serve
 
 #### VMware
 
-The following guides provide end-to-end deployment of new Windows or Linux servers in VMWare and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
+The following guides provide end-to-end deployment of new Windows or Linux servers in VMware and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
 * [Deploy a VMware vSphere Ubuntu Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_ubuntu.md)
 
