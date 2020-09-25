@@ -51,7 +51,7 @@ On the designated machine, Open Powershell ISE **as Administrator** and run the 
 
 ![](../img/onboard_server_win/04.png)
 
-Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your Resource Group. 
+Upon completion, you will have your Windows server, connected as a new Azure Arc resource inside your Resource Group. 
 
 ![](../img/onboard_server_win/05.png)
 
