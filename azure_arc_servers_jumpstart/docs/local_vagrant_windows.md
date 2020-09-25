@@ -85,7 +85,7 @@ Upon completion, you will have a local Windows 10 VM deployed, connected as a ne
 
 # Semi-Automated Deployment (Optional)
 
-As you may noticed, the last step of the run is to register the VM as a new Arc enabled server resource. 
+As you may noticed, the last step of the run is to register the VM as a new Azure Arc enabled server resource. 
 
 ![](../img/local_vagrant_windows/05.png)
 
