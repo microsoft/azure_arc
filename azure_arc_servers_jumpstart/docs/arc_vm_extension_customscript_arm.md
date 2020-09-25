@@ -2,7 +2,7 @@
 
 The following README will guide you on how to execute custom scripts on Azure Arc connected machines by using Virtual Machine extensions. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script
 
-You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux shell script, or Azure policies to manage the extension deployment to Arc servers. In this guide, we will use an ARM template to deploy the Custom Script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
+You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux shell script, or Azure policies to manage the extension deployment to Arc enabled servers. In this guide, we will use an ARM template to deploy the Custom Script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 

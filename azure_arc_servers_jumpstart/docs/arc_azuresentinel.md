@@ -90,7 +90,7 @@ For servers and VMs, you can install the Microsoft Monitoring Agent (MMA) agent 
 
 * Using the **[Extension Management](arc_vm_extension_mma_arm.md)**
 
-    This feature in Azure Arc enabled Servers allows you to deploy the MMA agent VM extensions to a non-Azure Windows and/or Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template as well as PowerShell script to manage the extension deployment to Arc servers.
+    This feature in Azure Arc enabled Servers allows you to deploy the MMA agent VM extensions to a non-Azure Windows and/or Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template as well as PowerShell script to manage the extension deployment to Arc enabled serverss.
 
 * Setting up **[Azure Policies](arc_policies_mma.md)**
 
