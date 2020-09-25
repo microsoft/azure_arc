@@ -117,7 +117,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 # Semi-Automated Deployment (Optional)
 
-As you may have noticed, the last step of the run is to register the VM as a new Arc enabled server resource.
+As you may have noticed, the last step of the run is to register the VM as a new Azure Arc enabled server resource.
     ![](../img/aws_al2/11.png)
 
 If you want to demo/control the actual registration process, do the following: 
