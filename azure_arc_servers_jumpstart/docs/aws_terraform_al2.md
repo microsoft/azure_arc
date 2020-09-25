@@ -1,6 +1,6 @@
 # Onboard an AWS Amazon Linux 2 server with Azure Arc
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an AWS Amazon Linux 2 virtual machine and connect it as an Azure Arc server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an AWS Amazon Linux 2 virtual machine and connect it as an Azure Arc enabled server resource.
 
 # Prerequisites
 
@@ -109,7 +109,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 # Deployment
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have an AWS Amazon Linux 2 VM deployed and connected as a new Azure Arc server inside a new Resource Group.
+* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have an AWS Amazon Linux 2 VM deployed and connected as a new Azure Arc enabled server inside a new Resource Group.
 
 * Open the Azure portal and navigate to the resource group "Arc-Servers-Demo". The virtual machine created in AWS will be visible as a resource.
 
@@ -117,7 +117,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 # Semi-Automated Deployment (Optional)
 
-As you may have noticed, the last step of the run is to register the VM as a new Arc server resource.
+As you may have noticed, the last step of the run is to register the VM as a new Azure Arc enabled server resource.
     ![](../img/aws_al2/11.png)
 
 If you want to demo/control the actual registration process, do the following: 
