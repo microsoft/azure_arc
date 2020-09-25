@@ -36,8 +36,6 @@ The deployment scenarios below will guide you through onboarding various Windows
 
 **Note: For a list of supported operating systems and Azure regions, please visit the official [Azure Arc docs](https://docs.microsoft.com/azure/azure-arc/servers/overview).**
 
-**Disclaimer: Azure Arc enabled Servers is currently in Public Preview.**
-
 #### General
 
 The following examples can be used to connect existing Windows or Linux servers to Azure with Azure Arc. Use these if you already have existing servers that you want to project into Azure.
