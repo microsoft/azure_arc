@@ -12,10 +12,6 @@ export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure Resource Group Name>'
 export location='<Azure Region>'
 
-# Installing Azure CLI
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-az login --service-principal --username $appId --password $password --tenant $tenantId
-
 # Download the installation package
 wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
 
