@@ -56,7 +56,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
     - [*Linux*](../scripts/custom_script_linux.sh): The script will modify the message of the day (MOTD) on the operating system. 
     - [*Windows*](../scripts/custom_script_windows.ps1): The script will installs Windows Terminal, Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
 
-# Azure Arc for Servers Custom Script Extension Deployment
+# Azure Arc enabled Servers Custom Script Extension Deployment
 
 * Edit the extensions parameters file for [*Windows*](../extensions/arm/customscript-templatewindows.parameters.json) or for[*Linux*](../extensions/arm/customscript-templatewindows.parameters.json)
 
