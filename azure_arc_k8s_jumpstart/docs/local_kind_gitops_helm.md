@@ -113,30 +113,9 @@ For our scenario, we will deploy the "Hello Arc" application from the ["demo rep
 
 ## Deployment
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal or directly on https://shell.azure.com) to run the *az_k8sconfig_helm_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
-
-**Note**: Please note how we will be using the cloud shell to deploy an application to the local kind cluster. Cloud shell has no connectivity to the local Kubernetes cluster. The application will be deployed through the GitOps process, which will get its configuration through Arc.
-
-* If this is the first time interacting with Arc enabled Kubernetes through the cloud shell, install the az CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
-
-  ```bash
-  az extension add --name connectedk8s
-  az extension add --name k8sconfiguration
-  ```
-
-* Edit the environment variables in the [*az_k8sconfig_helm_aks*](../kind/gitops/helm/az_k8sconfig_helm_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_helm_aks``` command.
+* Edit the environment variables in the [*az_k8sconfig_helm_aks*](../kind/gitops/helm/az_k8sconfig_helm_aks.sh) shell script to match your parameters, and run it using the ```. ./az_k8sconfig_helm_aks``` command.
 
 **Note**: The extra dot is due to the script having an *export* function and that needs to have the vars exported in the same shell session as the rest of the commands. 
-
-![](../img/local_kind_gitops_helm/08.png)
-
-![](../img/local_kind_gitops_helm/09.png)
-
-![](../img/local_kind_gitops_helm/10.png)
-
-![](../img/local_kind_gitops_helm/11.png)
-
-
 
 The `az_k8sconfig_helm_aks` script will:
 
@@ -147,12 +126,12 @@ The `az_k8sconfig_helm_aks` script will:
 
 * Once the script will complete its run, you will have the GitOps configuration created and all the resources deployed in your local kind Kubernetes cluster. **Note:** it can take a few minutes for the configuration to change its Operator state status from "Pending" to "Installed".
 
-    ![](../img/local_kind_gitops_helm/12.png)
+    ![](../img/local_kind_gitops_helm/08.png)
 
-    ![](../img/local_kind_gitops_helm/13.png)
+    ![](../img/local_kind_gitops_helm/09.png)
 
 
-    * The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment. **note**: Since cloud shell isn't connected to your local cluster, you will have to run these command on your local terminal.
+    * The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
 
         ```bash
         kubectl get pods -n prod
@@ -160,7 +139,7 @@ The `az_k8sconfig_helm_aks` script will:
         kubectl get ing -n prod
         ```
 
-    ![](../img/local_kind_gitops_helm/14.png) 
+    ![](../img/local_kind_gitops_helm/10.png) 
 
 # Initiating "Hello Arc" Application GitOps
 
@@ -176,7 +155,7 @@ The `az_k8sconfig_helm_aks` script will:
 
     - Local shell running ```kubectl get pods -n prod -w```
 
-    ![](../img/local_kind_gitops_helm/15.png) 
+    ![](../img/local_kind_gitops_helm/11.png) 
 
     - In your own repository fork, open the "Hello Arc" [*hello-arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/releases/prod/hello-arc.yaml) Helm release file. 
 
@@ -184,23 +163,23 @@ The `az_k8sconfig_helm_aks` script will:
 
     End result should look something like this:
 
-    ![](../img/local_kind_gitops_helm/17.png)   
+    ![](../img/local_kind_gitops_helm/12.png)   
 
     As mentioned in the Prerequisites above, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.   
 
-    ![](../img/local_kind_gitops_helm/16.png)   
+    ![](../img/local_kind_gitops_helm/13.png)   
 
 * In the repository window showing the *hello-arc.yaml* file, change the number of *replicaCount* to 3 as well as the the message text and commit your changes. Alternatively, you can open the forked repository in your IDE, make the change, commit and push it.
 
-    ![](../img/local_kind_gitops_helm/18.png)
+    ![](../img/local_kind_gitops_helm/14.png)
 
 * Upon committing the changes, notice how the rolling upgrade starts. Once the Pods are up & running, the new "Hello Arc" application version window will show the new messages as well as the additional pods replicas, showing the rolling upgrade is completed and the GitOps flow is successful. 
 
-    ![](../img/local_kind_gitops_helm/19.png)
+    ![](../img/local_kind_gitops_helm/15.png)
 
-    ![](../img/local_kind_gitops_helm/20.png)
+    ![](../img/local_kind_gitops_helm/16.png)
 
-    ![](../img/local_kind_gitops_helm/21.png)
+    ![](../img/local_kind_gitops_helm/17.png)
 
 # Cleanup
 
@@ -209,7 +188,7 @@ To delete the GitOps configuration and it's respective Kubernetes resources, edi
 ```bash
 . ./az_k8sconfig_helm_cleanup.sh
 ```
-![](../img/local_kind_gitops_helm/22.png)
+![](../img/local_kind_gitops_helm/18.png)
 
 If you also wish to remove the local kind cluster and the Arc connected cluster from Azure, you can run the following commands:
 
