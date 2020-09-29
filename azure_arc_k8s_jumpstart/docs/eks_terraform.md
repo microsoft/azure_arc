@@ -76,6 +76,8 @@ The following README will guide you on how to use the provided [Terraform](https
   az extension add --name k8sconfiguration
   ```
 
+**Note: If you already used this guide before and/or have the extensions installed, use the ```az extension update --name connectedk8s``` and the ```az extension update --name k8sconfiguration``` commands.**
+
 * Create AWS User IAM Key
 
   An access key grants programmatic access to your resources. To create an AWS Access Key for a user:
