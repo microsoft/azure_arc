@@ -66,6 +66,8 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
   az extension add --name k8sconfiguration
   ```
 
+**Note: If you already used this guide before and/or have the extensions installed, use the ```az extension update --name connectedk8s``` and the ```az extension update --name k8sconfiguration``` commands.**
+
 # Deployment
 
 * Install MicroK8s following the [specific install guide](https://microk8s.io/) for your operating system. For convenience, we've added some commands below:

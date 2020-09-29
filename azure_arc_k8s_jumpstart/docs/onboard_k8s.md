@@ -105,6 +105,8 @@ $env:arcClusterName=<The name of your k8s cluster as it will be shown in Azure A
   az extension add --name k8sconfiguration
   ```
 
+**Note: If you already used this guide before and/or have the extensions installed, use the ```az extension update --name connectedk8s``` and the ```az extension update --name k8sconfiguration``` commands.**
+
 * Login to your Azure Subscription using the SP you created.  
 
   If using shell:
