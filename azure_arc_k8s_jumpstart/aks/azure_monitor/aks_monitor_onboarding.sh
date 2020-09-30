@@ -10,17 +10,15 @@ export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
-echo "Modify the onboarding script to allow for SPN login insted of device token"
-curl -LO https://raw.githubusercontent.com/microsoft/OMS-docker/ci_feature/docs/haiku/onboarding_azuremonitor_for_containers.sh
-sed /use-device-code/s/^/#/ onboarding_azuremonitor_for_containers.sh > onboarding_azuremonitor_for_containers_modify.sh
+echo "Download the Azure Monitor onboarding script"
+curl -o enable-monitoring.sh -L https://aka.ms/enable-monitoring-bash-script
 
-echo "Log in to Azure with Service Principle & Getting k8s credentials (kubeconfig)"
+echo "Onboard the Azure Arc enabled Kubernetes cluster to Azure Monitor for containers"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
-export clusterId="$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id)"
-export clusterId="$(echo "$clusterId" | sed -e 's/^"//' -e 's/"$//')" 
-export currentContext="$(kubectl config current-context)"
+export azureArcClusterResourceId=$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id -o tsv)
+export kubeContext="$(kubectl config current-context)"
+bash enable-monitoring.sh --resource-id $azureArcClusterResourceId --client-id $appId --client-secret $password --tenant-id $tenantId --kube-context $kubeContext
 
-bash onboarding_azuremonitor_for_containers_modify.sh $clusterId $currentContext
-
-rm onboarding_azuremonitor_for_containers.sh onboarding_azuremonitor_for_containers_modify.sh
+echo "Cleaning up"
+rm enable-monitoring.sh
