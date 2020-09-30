@@ -10,10 +10,10 @@ export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
-echo "Download the Azure Monitor onboarding script"
+echo "Downloading the Azure Monitor onboarding script"
 curl -o enable-monitoring.sh -L https://aka.ms/enable-monitoring-bash-script
 
-echo "Onboard the Azure Arc enabled Kubernetes cluster to Azure Monitor for containers"
+echo "Onboarding the Azure Arc enabled Kubernetes cluster to Azure Monitor for containers"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 export azureArcClusterResourceId=$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id -o tsv)
