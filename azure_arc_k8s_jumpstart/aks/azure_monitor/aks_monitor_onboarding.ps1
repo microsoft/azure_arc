@@ -1,12 +1,12 @@
 # <--- Change the following environment variables according to your Azure Service Principle name --->
 
 Write-Output "Exporting environment variables"
-$env:subscriptionId="subscriptionId"
-$env:appId="appId"
-$env:password="appPassword"
-$env:tenantId="tenantId"
-$env:resourceGroup="resourceGroup"
-$env:arcClusterName="arcClusterName"
+$env:subscriptionId="${subscriptionId}"
+$env:appId="${appId}"
+$env:password="${appPassword}"
+$env:tenantId="${tenantId}"
+$env:resourceGroup="${resourceGroup}"
+$env:arcClusterName="${arcClusterName}"
 
 Write-Output  "Downloading the Azure Monitor onboarding script"
 Invoke-WebRequest https://aka.ms/enable-monitoring-powershell-script -OutFile enable-monitoring.ps1
