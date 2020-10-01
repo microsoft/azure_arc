@@ -97,7 +97,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 In the process of creating Azure Arc enabled Kubernetes GitOps configuration, [Weaveworks Flux Kubernetes Operator](https://github.com/fluxcd/flux) is deployed on the cluster. 
 
-The Operator is aware to an "HelmRelease" Custom Resource Definition (CRD). This HelmRelease points to a git repo and can optionally contain specific values to input into the helm chart. Due to this configuration, a user can choose to leave the chart values intact or to have different values for different releases. 
+The Operator is aware to an "HelmRelease" Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart. Due to this configuration, a user can choose to leave the chart values intact or to have different values for different releases. 
 
 For example, an application (captured in an Helm chart) dev release can have no pod replication (single pod) while a production release, using the same chart can have 3 pod replicas. 
 
