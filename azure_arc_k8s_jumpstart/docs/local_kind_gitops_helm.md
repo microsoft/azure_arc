@@ -64,7 +64,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
 The demo application that will be deployed later in this guide relies on an ingress controller. For ingress controllers to work on kind, a specific configuration of the ingress needs to be deployed. For more information related to this, please refer to the [kind documentation](https://kind.sigs.k8s.io/docs/user/ingress/).
 
-## Deployment
+## NGINX Controller Deployment
 * Run the following command to install the nginx ingress controller on kind:
     ```bash
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
