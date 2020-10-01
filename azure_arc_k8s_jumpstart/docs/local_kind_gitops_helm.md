@@ -26,7 +26,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
     * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
 
-* As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
+* As mentioned, this guide starts at the point where you already have a connected kind cluster to Azure Arc.
 
     ![](../img/local_kind_gitops_helm/01.png)
 
@@ -105,7 +105,7 @@ In the next section will use the "Hello Arc" Helm chart to deploy a production r
 
 ## Deployment Flow
 
-For our scenario, we will deploy the "Hello Arc" application from the ["demo repository"](https://github.com/likamrat/hello_arc). Since kind requires a specific ingress configuration, we will not deploy the nginx from the demo application repository. We will deploy the "Hello Arc" application (a Namespace-level component) with 1 replica to the *prod* namespace.
+For our scenario, we will deploy the "Hello Arc" application from the ["demo repository"](https://github.com/likamrat/hello_arc) through GitOps. We will deploy the "Hello Arc" application (a Namespace-level component) with 1 replica to the *prod* namespace.
 
 ![](../img/local_kind_gitops_helm/06.png)
 
@@ -114,11 +114,11 @@ For our scenario, we will deploy the "Hello Arc" application from the ["demo rep
 
 ## Deployment
 
-* Edit the environment variables in the [*az_k8sconfig_helm_aks*](../kind/gitops/helm/az_k8sconfig_helm_aks.sh) shell script to match your parameters, and run it using the ```. ./az_k8sconfig_helm_aks``` command.
+* Edit the environment variables in the [*az_k8sconfig_helm*](../kind/gitops/helm/az_k8sconfig_helm.sh) shell script to match your parameters, and run it using the ```. ./az_k8sconfig_helm``` command.
 
 **Note**: The extra dot is due to the script having an *export* function and that needs to have the vars exported in the same shell session as the rest of the commands. 
 
-The `az_k8sconfig_helm_aks` script will:
+The `az_k8sconfig_helm` script will:
 
 - Login to your Azure subscription using the SPN credentials.
 - Create the GitOps configurations for the Azure Arc Connected Cluster. The configuration will be using the Helm chart located in the "Hello Arc" repository. This will create a namespace-level config to deploy the "Hello Arc" application Helm chart.
