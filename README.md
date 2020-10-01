@@ -96,7 +96,7 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 
 The following guides are designed to provide scaled onboarding experience to Azure Arc of virtual machines deployed in various platforms and existing environments.
 
- * [Scale Onboarding VMware Windows Server VMs to Azure Arc](azure_arc_servers_jumpstart/docs/vmware_scale_powercli_win.md)
+ * [Scaled Onboarding VMware Windows Server VMs to Azure Arc](azure_arc_servers_jumpstart/docs/vmware_scaled_powercli_win.md)
 
 ## Azure Arc enabled Kubernetes
 
