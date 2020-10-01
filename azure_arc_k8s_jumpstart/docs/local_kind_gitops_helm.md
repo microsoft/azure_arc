@@ -84,7 +84,8 @@ The demo application that will be deployed later in this guide relies on an ingr
 
 ## Cluster-level Config
 
-With Cluster-level GitOps config, the goal is to have "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Meshes, Security products, Monitoring solutions, etc. You will not be creating a cluster-level config in this guide. For an example of a cluster-level configuration please refer to the [helm based gitops on AKS scenario](aks_gitops_helm.md).
+With Cluster-level GitOps config, the goal is to have "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Meshes, Security products, Monitoring solutions, etc. 
+**Note: You will not be creating a cluster-level config in this guide. For an example of a cluster-level configuration please refer to either the [Helm-based GitOps on AKS scenario](aks_gitops_helm.md) or the [GKE one](gke_gitops_helm.md).**
 
 ## Namespace-level Config
 
