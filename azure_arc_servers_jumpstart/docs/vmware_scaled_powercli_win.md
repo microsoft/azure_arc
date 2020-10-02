@@ -73,7 +73,7 @@ Below you can find the automation flow for this scenario:
 
 3. The *install_arc_agent.ps1* PowerCLI script will run on the VM guest OS and will install the "Azure Arc Connected Machine Agent" in order to onboard the VM to Azure Arc
 
-# Post Deployment
+# Pre-Deployment
 
 The demonstrate the before & after for this scenario, the below screenshots shows a dedicated, empty Azure Resources Group, a vCenter VM folder with candidate VMs and the "Apps & features" view in Windows showing no agent is installed.
 
