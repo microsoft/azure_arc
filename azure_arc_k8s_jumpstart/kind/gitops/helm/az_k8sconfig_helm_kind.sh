@@ -10,7 +10,7 @@ export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
 
-# Getting AKS credentials
+# Logging in to Azure using service principal
 echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
