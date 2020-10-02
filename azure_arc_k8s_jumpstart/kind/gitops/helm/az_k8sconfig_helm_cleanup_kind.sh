@@ -5,6 +5,13 @@
 echo "Exporting environment variables"
 export resourceGroup='<Your resource group name>'
 export arcClusterName='<Your Arc cluster name>'
+export appId='<Your Azure Service Principle name>'
+export password='<Your Azure Service Principle password>'
+export tenantId='<Your Azure tenant ID>'
+
+# Logging in to Azure using service principal
+echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
+az login --service-principal --username $appId --password $password --tenant $tenantId
 
 # Deleting GitOps Configurations from Azure Arc Kubernetes cluster
 echo "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
