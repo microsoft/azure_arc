@@ -114,7 +114,7 @@ For our scenario, we will deploy the "Hello Arc" application from the ["demo rep
 
 ## Deployment
 
-* Edit the environment variables in the [*az_k8sconfig_helm*](../kind/gitops/helm/az_k8sconfig_helm.sh) shell script to match your parameters, and run it using the ```. ./az_k8sconfig_helm``` command.
+* Edit the environment variables in the [*az_k8sconfig_helm_kind*](../kind/gitops/helm/az_k8sconfig_helm_kind.sh) shell script to match your parameters, and run it using the ```. ./az_k8sconfig_helm``` command.
 
 **Note**: The extra dot is due to the script having an *export* function and that needs to have the vars exported in the same shell session as the rest of the commands. 
 
@@ -184,7 +184,7 @@ The `az_k8sconfig_helm` script will:
 
 # Cleanup
 
-To delete the GitOps configuration and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup.sh](../kind/gitops/helm/az_k8sconfig_helm_cleanup.sh) script. It is recommended to run this script locally, since it also removes elements from the local cluster.
+To delete the GitOps configuration and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup_kind](../kind/gitops/helm/az_k8sconfig_helm_cleanup_kind.sh) shell script. It is recommended to run this script locally, since it also removes elements from the local cluster.
 
 ```bash
 . ./az_k8sconfig_helm_cleanup.sh
