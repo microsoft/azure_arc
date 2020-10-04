@@ -71,7 +71,7 @@ In order for Ansible to dynamically generate a server inventory from AWS, we wil
 
     ![](../img/aws_ubuntu/04.png)
 
-* On the next "Set Permissions" screen, select "Attach existing policies directly" and then check the box next to AmazonEC2FullAccess as seen in the screenshot then click "Next"
+* On the next "Set Permissions" screen, select "Attach existing policies directly" and then check the box next to *AmazonEC2FullAccess* as seen in the screenshot then click "Next"
 
     ![](../img/aws_ubuntu/05.png)
 
