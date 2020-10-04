@@ -92,6 +92,14 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 
 * [Integrate Azure Sentinel with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_azuresentinel.md)
 
+#### Azure Arc enabled Servers - Scaled Deployment Scenarios
+
+The following guides are designed to provide scaled onboarding experience to Azure Arc of virtual machines deployed in various platforms and existing environments.
+
+ * [Scaled Onboarding VMware vSphere Windows Server VMs to Azure Arc](azure_arc_servers_jumpstart/docs/vmware_scaled_powercli_win.md)
+
+ * [Scaled Onboarding VMware vSphere Linux VMs to Azure Arc](azure_arc_servers_jumpstart/docs/vmware_scaled_powercli_linux.md)
+
 ## Azure Arc enabled Kubernetes
 
 The below deployment options are focused on Azure Arc enabled Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
@@ -175,6 +183,10 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 * [Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/gke_monitor.md)
 
 * [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](azure_arc_k8s_jumpstart/docs/gke_policy.md)
+
+#### kind
+
+* [Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/local_kind_gitops_helm.md)
 
 ## Azure Arc enabled Data Services
 
