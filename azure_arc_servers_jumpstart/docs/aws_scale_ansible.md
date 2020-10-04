@@ -172,7 +172,7 @@ To delete all the resources you created as part of this demo use the ```terrafor
 
 ## Review provided Ansible configuration and playbook
 
-Navigate to the [ansible_config](../aws/scale_deployment/ansible/terraform/ansible_config) directory and review the provided configuration. The provided configuration contains a basic `ansible.cfg` file. This file enables the [amazon.aws.aws_ec2](https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ec2_inventory.html) Ansible plugin which dynamically loads your server inventory by using an AWS IAM role. Ensure that the IAM role you are using has sufficient privileges to access the inventory you wish to onboard.
+Navigate to the [ansible_config](../aws/scale_deployment/ansible/terraform/ansible_config) directory and review the provided configuration. The provided configuration contains a basic *ansible.cfg* file. This file enables the [amazon.aws.aws_ec2](https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ec2_inventory.html) Ansible plugin which dynamically loads your server inventory by using an AWS IAM role. Ensure that the IAM role you are using has sufficient privileges to access the inventory you wish to onboard.
     ![](../img/aws_scale_ansible/08.png)
 
 The file [inventory_uswest2_aws_ec2.yml](../aws/scale_deployment/ansible/terraform/ansible_config/ansible_plugins/inventory_uswest2_aws_ec2.yml) configures the aws_ec2 plugin to pull inventory from uswest-2 region and group assets by applied tags. Adjust this file as needed to support onboarding your server inventory (e.g., change region, or change groups or filters).
