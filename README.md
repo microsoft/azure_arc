@@ -100,7 +100,7 @@ The following guides are designed to provide scaled onboarding experience to Azu
 
  * [Scaled Onboarding VMware vSphere Linux VMs to Azure Arc](azure_arc_servers_jumpstart/docs/vmware_scaled_powercli_linux.md)
 
- * [Scaled Onboarding AWS servers to Azure Arc using Ansible](azure_arc_servers_jumpstart/docs/aws_scale_ansible.md)
+ * [Scaled Onboarding AWS EC2 instances to Azure Arc using Ansible](azure_arc_servers_jumpstart/docs/aws_scale_ansible.md)
 
 ## Azure Arc enabled Kubernetes
 
