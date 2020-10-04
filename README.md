@@ -12,7 +12,7 @@ For customers who want to simplify complex and distributed environments across o
 
 The following guides will walk you through the process of setting up demos that show how to get started with Azure Arc. They are designed with a "zero to hero" approach in mind and with as much automation as possible. The goal is for you to have a working Azure Arc demo environment spun up in no time so you can focus on showing the core values of the solution.
 
-**Disclaimer: The intention for this repo is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases and ease of use. It does not focus on Azure best-practices or the other tech and OSS project being leveraged in the guides and code.**
+**Disclaimer: The intention for this repo is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
 
 # Azure Arc Story Time
 
@@ -35,8 +35,6 @@ With Azure Arc, Fabrikam is able to project resources and register them into Azu
 The deployment scenarios below will guide you through onboarding various Windows and Linux server deployments to Azure with Azure Arc. 
 
 **Note: For a list of supported operating systems and Azure regions, please visit the official [Azure Arc docs](https://docs.microsoft.com/azure/azure-arc/servers/overview).**
-
-**Disclaimer: Azure Arc enabled Servers is currently in Public Preview.**
 
 #### General
 
@@ -72,7 +70,7 @@ The following guides provide end-to-end deployment of new Windows or Linux serve
 
 #### VMware
 
-The following guides provide end-to-end deployment of new Windows or Linux servers in VMWare and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
+The following guides provide end-to-end deployment of new Windows or Linux servers in VMware and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
 * [Deploy a VMware vSphere Ubuntu Server VM and connect it to Azure Arc using Terraform](azure_arc_servers_jumpstart/docs/vmware_terraform_ubuntu.md)
 
@@ -80,7 +78,7 @@ The following guides provide end-to-end deployment of new Windows or Linux serve
 
 #### Azure Arc enabled Servers - Day-2 Scenarios & Use-Cases
 
-Once you have server resources projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the servers as native Azure resources. The following guides show examples of using Azure management tools such as resource tags, Azure Policy, Log Analytics, and more with Azure Arc servers.
+Once you have server resources projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the servers as native Azure resources. The following guides show examples of using Azure management tools such as resource tags, Azure Policy, Log Analytics, and more with Azure Arc enabled servers.
 
 * [Tagging and querying server inventory across multiple clouds using Resource Graph Explorer](azure_arc_servers_jumpstart/docs/arc_inventory_tagging.md)
 
@@ -93,6 +91,14 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 * [Integrate Azure Security Center with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_securitycenter.md)
 
 * [Integrate Azure Sentinel with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_azuresentinel.md)
+
+#### Azure Arc enabled Servers - Scaled Deployment Scenarios
+
+The following guides are designed to provide scaled onboarding experience to Azure Arc of virtual machines deployed in various platforms and existing environments.
+
+ * [Scaled Onboarding VMware vSphere Windows Server VMs to Azure Arc](azure_arc_servers_jumpstart/docs/vmware_scaled_powercli_win.md)
+
+ * [Scaled Onboarding VMware vSphere Linux VMs to Azure Arc](azure_arc_servers_jumpstart/docs/vmware_scaled_powercli_linux.md)
 
 ## Azure Arc enabled Kubernetes
 
@@ -148,6 +154,12 @@ This example walks you through how to create a Kubernetes cluster on your local 
 
 * [Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc](azure_arc_k8s_jumpstart/docs/local_kind.md)
 
+#### MicroK8s
+
+This example walks you through how to create a Kubernetes cluster on your local machine using [MicroK8s](https://microk8s.io/), and onboard it as an Azure Arc enabled Kubernetes cluster
+
+* [Deploy a local Kubernetes Cluster using MicroK8s and connect it to Azure Arc](azure_arc_k8s_jumpstart/docs/local_microk8s.md)
+
 #### Azure Arc enabled Kubernetes - Day-2 Scenarios & Use-Cases
 
 Once you have Kubernetes clusters projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the clusters as native Azure resources. The following guides show examples of using Azure management tools such as Azure Monitor, GitOps configurations, and Azure Policy.
@@ -171,6 +183,10 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 * [Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/gke_monitor.md)
 
 * [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](azure_arc_k8s_jumpstart/docs/gke_policy.md)
+
+#### kind
+
+* [Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/local_kind_gitops_helm.md)
 
 ## Azure Arc enabled Data Services
 

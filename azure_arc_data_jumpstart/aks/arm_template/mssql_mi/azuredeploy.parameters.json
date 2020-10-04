@@ -47,12 +47,6 @@
         "ACCEPT_EULA": {
             "value": "yes"           
         },
-        "REGISTRY_USERNAME": {
-            "value": "<Azure Arc Data - Private Preview Container Registry username>"
-        },
-        "REGISTRY_PASSWORD": {
-            "value": "<Azure Arc Data - Private Preview Container Registry password>"
-        },
         "ARC_DC_NAME": {
             "value": "<Azure Arc Data Controller name (will be used for k8s Arc namespace as well)>"
         },

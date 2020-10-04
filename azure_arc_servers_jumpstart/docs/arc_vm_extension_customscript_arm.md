@@ -2,7 +2,7 @@
 
 The following README will guide you on how to execute custom scripts on Azure Arc connected machines by using Virtual Machine extensions. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script
 
-You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux shell script, or Azure policies to manage the extension deployment to Arc servers. In this guide, we will use an ARM template to deploy the Custom Script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
+You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux shell script, or Azure policies to manage the extension deployment to Azure Arc enabled servers. In this guide, we will use an ARM template to deploy the Custom Script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -19,8 +19,6 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
     ```terminal
     git clone https://github.com/microsoft/azure_arc.git
     ```
-    
-* Register your subscription to access preview extensions functionality.
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
@@ -58,7 +56,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
     - [*Linux*](../scripts/custom_script_linux.sh): The script will modify the message of the day (MOTD) on the operating system. 
     - [*Windows*](../scripts/custom_script_windows.ps1): The script will installs Windows Terminal, Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
 
-# Azure Arc for Servers Custom Script Extension Deployment
+# Azure Arc enabled Servers Custom Script Extension Deployment
 
 * Edit the extensions parameters file for [*Windows*](../extensions/arm/customscript-templatewindows.parameters.json) or for[*Linux*](../extensions/arm/customscript-templatewindows.parameters.json)
 

@@ -73,7 +73,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   az extension add --name k8sconfiguration
   ```
 
-
+**Note: If you already used this guide before and/or have the extensions installed, use the ```az extension update --name connectedk8s``` and the ```az extension update --name k8sconfiguration``` commands.**
  
 # Deployment
 

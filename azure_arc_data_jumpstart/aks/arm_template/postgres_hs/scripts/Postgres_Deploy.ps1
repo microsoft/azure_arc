@@ -8,7 +8,7 @@ Start-Sleep -s 30
 # Deploying Azure Arc PostgreSQL Hyperscale Instance
 azdata login --namespace $env:ARC_DC_NAME
 azdata arc postgres server create --name $env:POSTGRES_NAME --workers $env:POSTGRES_WORKER_NODE_COUNT --storage-class-data managed-premium --storage-class-logs managed-premium
-azdata arc postgres server endpoint list --name $env:POSTGRES_NAME
+azdata arc postgres endpoint list --name $env:POSTGRES_NAME
 
 # Creating POSTGRES Instance connectivity details
 Start-Process powershell -ArgumentList "C:\tmp\postgres_connectivity.ps1" -WindowStyle Hidden -Wait
@@ -16,5 +16,5 @@ Start-Process powershell -ArgumentList "C:\tmp\postgres_connectivity.ps1" -Windo
 Stop-Transcript
 
 # Starting Azure Data Studio
-Start-Process -FilePath "C:\Program Files\Azure Data Studio - Insiders\azuredatastudio-insiders.exe" -WindowStyle Maximized
+Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
 Stop-Process -name powershell -Force
