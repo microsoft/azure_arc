@@ -95,7 +95,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Retrieve your Azure Subscription ID and tenant ID using the ```az account list``` command.
 
-* The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on an AWS EC2 virtual machine to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your AWS and Azure environments. Edit [*scripts/vars.sh*](../aws/scale_deployment/ansible/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
+* The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on an AWS EC2 virtual machine to install Ansible and all necessary artifacts. This Terraform plan requires certain information about your AWS and Azure environments which it access using environment variables. Edit [*scripts/vars.sh*](../aws/scale_deployment/ansible/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
     
     * TF_VAR_subscription_id=Your Azure Subscription ID
     * TF_VAR_client_id=Your Azure Service Principal app id
@@ -104,7 +104,7 @@ Before executing the Terraform plan, you must export the environment variables w
     * AWS_ACCESS_KEY_ID=AWS access key
     * AWS_SECRET_ACCESS_KEY=AWS secret key
 
-* From CLI, navigate to the [*azure_arc_servers_jumpstart/aws/scale_deployment/ansible/terraform*](../aws/scale_deployment/ansible/terraform) directory of the cloned repo.
+* From your shell, navigate to the [*azure_arc_servers_jumpstart/aws/scale_deployment/ansible/terraform*](../aws/scale_deployment/ansible/terraform) directory of the cloned repo.
 
 * Export the environment variables you edited by running [*scripts/vars.sh*](../aws/ubuntu/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly.
 
