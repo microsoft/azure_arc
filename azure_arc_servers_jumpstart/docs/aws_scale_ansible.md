@@ -89,7 +89,7 @@ In order for Ansible to dynamically generate a server inventory from AWS, we wil
 
 # <a name="option1"></a>Option 1- Creating a sample AWS server inventory and Ansible control server using Terraform and onboarding the servers to Azure Arc
 
-*Note: If you already have an existing AWS server inventory and Ansible server, skip below to [Option 2](#option2).*
+**Note: If you already have an existing AWS server inventory and Ansible server, skip below to [Option 2](#option2).**
 
 ## Configure Terraform
 
