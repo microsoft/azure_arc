@@ -1,4 +1,4 @@
-# Onboard AWS servers to Azure Arc at scale using Ansible
+# Scaled Onboarding AWS EC2 instances to Azure Arc using Ansible
 
 The following README will guide you on how to automatically onboard servers to Azure Arc by using [Ansible](https://www.ansible.com/). This guide assumes that you have a basic understanding of Ansible. A basic Ansible playbook and configuration is provided that uses the [amazon.aws.aws_ec2](https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ec2_inventory.html) plugin for dynamic loading of EC2 server inventory. 
 
