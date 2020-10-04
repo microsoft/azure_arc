@@ -173,14 +173,12 @@ The files in [group_vars](../aws/scale_deployment/ansible/terraform/ansible_conf
 
 When you have adjusted the provided config to support your environment, run the Ansible playbook by executing the following command, substituting your Azure service principal id and service principal secret.
 
-    ```
-    ansible-playbook arc_agent.yml -i ansible_plugins/inventory_uswest2_aws_ec2.yml --extra-vars '{"service_principal_id": "XXXXXXX-XXXXX-XXXXXXX", "service_principal_secret": "XXXXXXXXXXXXXXXXXXXXXXXX"}'
-    ```
-
-    If the playbook run is successful, you should see output similar to the below screenshot. 
-
+```console
+ansible-playbook arc_agent.yml -i ansible_plugins/inventory_uswest2_aws_ec2.yml --extra-vars '{"service_principal_id": "XXXXXXX-XXXXX-XXXXXXX", "service_principal_secret": "XXXXXXXXXXXXXXXXXXXXXXXX"}'
+```
+    
+If the playbook run is successful, you should see output similar to the below screenshot. 
     ![](../img/aws_scale_ansible/05.png)
 
-* Open Azure Portal and navigate to the Arc-Aws-Demo resource group. You should see the Azure Arc enabled servers listed.
-
+Open Azure Portal and navigate to the Arc-Aws-Demo resource group. You should see the Azure Arc enabled servers listed.
     ![](../img/aws_scale_ansible/06.png)
