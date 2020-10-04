@@ -35,7 +35,9 @@ This guide can be used even if you do not already have an existing Ansible test 
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcAWS" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcAWS" --role contributor
+    ```
 
     Output should look like this:
 
