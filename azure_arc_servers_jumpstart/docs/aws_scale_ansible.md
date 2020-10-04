@@ -41,7 +41,7 @@ This guide can be used even if you do not already have an existing Ansible test 
 
     Output should look like this:
 
-    ```
+    ```console
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcAWS",
