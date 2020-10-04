@@ -9,7 +9,7 @@ export appId='<Your Azure Service Principle name>'
 export password='<Your Azure Service Principle password>'
 export tenantId='<Your Azure tenant ID>'
 
-# Logging in to Azure using service principal
+# Login to Azure using the service principal name
 echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
