@@ -95,7 +95,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Retrieve your Azure Subscription ID and tenant ID using the ```az account list``` command.
 
-* The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on an AWS EC2 virtual machine to install Ansible and all necessary artifacts. This Terraform plan requires certain information about your AWS and Azure environments which it access using environment variables. Edit [*scripts/vars.sh*](../aws/scale_deployment/ansible/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
+* The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on an AWS EC2 virtual machine to install Ansible and all necessary artifacts. This Terraform plan requires certain information about your AWS and Azure environments which it accesses using environment variables. Edit [*scripts/vars.sh*](../aws/scale_deployment/ansible/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
     
     * TF_VAR_subscription_id=Your Azure Subscription ID
     * TF_VAR_client_id=Your Azure Service Principal app id
