@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principal and AWS access key details --->
+<--- Change the following environment variables according to your Azure Service Principal and AWS project details --->
 export TF_VAR_subscription_id={subscription id}
 export TF_VAR_client_id={client id}
 export TF_VAR_client_secret={client secret}
