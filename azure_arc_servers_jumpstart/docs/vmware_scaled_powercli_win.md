@@ -1,4 +1,4 @@
-# Scaled Onboarding VMware Windows Server VMs to Azure Arc
+# Scaled Onboarding VMware vSphere Windows Server VMs to Azure Arc
 
 The following README will guide you on how to use the provided [VMware PowerCLI](https://code.vmware.com/web/dp/tool/vmware-powercli/) script so you can perform an automated scaled deployment of the "Azure Arc Connected Machine Agent" in multiple VMware vSphere virtual machines and as a result, onboarding these VMs as an Azure Arc enabled Servers.
 
