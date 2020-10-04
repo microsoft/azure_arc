@@ -1,7 +1,5 @@
 #!/bin/sh
 
-sudo apt-get update
-
 # <--- Change the following environment variables according to your Azure Service Principle name --->
 
 export subscriptionId='<Your Azure Subscription ID>'
@@ -19,7 +17,7 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 
 # Installing Azure CLI & Azure Arc Extensions
-echo "Installing Azure CLI & Azure Arc Extensions"
+echo "Installing Azure CLI"
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl apt-transport-https lsb-release gnupg
 curl -sL https://packages.microsoft.com/keys/microsoft.asc |
@@ -28,19 +26,16 @@ sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
 AZ_REPO=$(lsb_release -cs)
 echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" |
 sudo tee /etc/apt/sources.list.d/azure-cli.list
-sudo apt-get update
 sudo apt-get install azure-cli
 
-echo "Modify the onboarding script to allow for SPN login insted of device token"
-curl -LO https://raw.githubusercontent.com/microsoft/OMS-docker/ci_feature/docs/haiku/onboarding_azuremonitor_for_containers.sh
-sed /use-device-code/s/^/#/ onboarding_azuremonitor_for_containers.sh > onboarding_azuremonitor_for_containers_modify.sh
+echo "Downloading the Azure Monitor onboarding script"
+curl -o enable-monitoring.sh -L https://aka.ms/enable-monitoring-bash-script
 
-echo "Log in to Azure with Service Principle & Getting k8s credentials (kubeconfig)"
+echo "Onboarding the Azure Arc enabled Kubernetes cluster to Azure Monitor for containers"
 az login --service-principal --username $appId --password $password --tenant $tenantId
-export clusterId="$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id)"
-export clusterId="$(echo "$clusterId" | sed -e 's/^"//' -e 's/"$//')" 
-export currentContext="$(kubectl config current-context)"
+export azureArcClusterResourceId=$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id -o tsv)
+export kubeContext="$(kubectl config current-context)"
+bash enable-monitoring.sh --resource-id $azureArcClusterResourceId --client-id $appId --client-secret $password --tenant-id $tenantId --kube-context $kubeContext
 
-bash onboarding_azuremonitor_for_containers_modify.sh $clusterId $currentContext
-
-rm onboarding_azuremonitor_for_containers.sh onboarding_azuremonitor_for_containers_modify.sh
+echo "Cleaning up"
+rm enable-monitoring.sh

@@ -70,10 +70,10 @@ In this guide, you will hook the AKS cluster to Azure Monitor by deploying the [
     The script will:
 
     - Login to your Azure subscription using the SPN credentials
-    - Download and modify the downloaded OMS script to be able login to Azure using your SPN credentials instead of your device token
+    - Download the OMS script
     - Retrieve the Azure Arc Connected Cluster Azure Resource ID as well as the cluster credentials (KUBECONFIG)
-    - Execute the modify script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
-    - Delete both the downloaded and the modify scripts
+    - Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
+    - Delete the downloaded script
 
 * Once the script will complete it's run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers. At the end of it's run, the script generates URL for you to click on. This URL will open a new browser tab leading to the Azure Monitor for Containers Insights page. 
 

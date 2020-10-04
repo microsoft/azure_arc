@@ -1,6 +1,6 @@
-# Onboard a VMWare Ubuntu server with Azure Arc
+# Onboard a VMware Ubuntu server with Azure Arc
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Ubuntu Server, VMware vSphere virtual machine and connect it as an Azure Arc server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Ubuntu Server, VMware vSphere virtual machine and connect it as an Azure Arc enabled server resource.
 
 # Prerequisites
 
@@ -85,7 +85,7 @@ Before executing the Terraform plan, you must set the environment variables whic
 
 * Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. 
 
-Once the Terraform deployment is completed, a new Ubuntu Server VM will be up & running and will be projected as an Azure Arc server resource in a newly created Azure Resource Group. 
+Once the Terraform deployment is completed, a new Ubuntu Server VM will be up & running and will be projected as an Azure Arc enabled server resource in a newly created Azure Resource Group. 
 
 ![](../img/vmware_terraform_ubuntu/03.png)
 

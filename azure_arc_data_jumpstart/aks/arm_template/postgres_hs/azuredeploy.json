@@ -157,12 +157,14 @@
     },
     "REGISTRY_USERNAME": {
       "type": "string",
+      "defaultValue": "not_specified",
       "metadata": {
         "description": "Private Arc Data Docker Registry Username"
       }
     },
     "REGISTRY_PASSWORD": {
       "type": "securestring",
+      "defaultValue": "not_specified",
       "metadata": {
         "description": "Private Arc Data Docker Registry Password"
       }
@@ -183,6 +185,27 @@
       "type": "string",
       "metadata": {
         "description": "Arc Data Controller Region"
+      }
+    },
+    "DOCKER_REGISTRY": {
+      "type": "string",
+      "defaultValue": "mcr.microsoft.com",
+      "metadata": {
+          "description": "Azure Arc Data Container Registry"
+      }
+    },
+    "DOCKER_REPOSITORY": {
+      "type": "string",
+      "defaultValue": "arcdata",
+      "metadata": {
+          "description": "Azure Arc Data Container Registry Repository"
+      }
+    },
+    "DOCKER_TAG": {
+      "type": "string",
+      "defaultValue": "latest",
+      "metadata": {
+          "description": "Azure Arc Data Container Tag"
       }
     },
     "POSTGRES_NAME": {
@@ -279,6 +302,9 @@
         "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
         "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
         "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
+        "DOCKER_REGISTRY":{"value": "[parameters('DOCKER_REGISTRY')]"},
+        "DOCKER_REPOSITORY":{"value": "[parameters('DOCKER_REPOSITORY')]"},
+        "DOCKER_TAG":{"value": "[parameters('DOCKER_TAG')]"},
         "POSTGRES_NAME":{"value": "[parameters('POSTGRES_NAME')]"},       
         "POSTGRES_WORKER_NODE_COUNT":{"value": "[parameters('POSTGRES_WORKER_NODE_COUNT')]"},
         "POSTGRES_DATASIZE":{"value": "[parameters('POSTGRES_DATASIZE')]"},

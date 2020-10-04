@@ -11,6 +11,10 @@ echo $ARC_DC_NAME:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_SUBSCRIPTION:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_RG:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $ARC_DC_REGION:$9 | awk '{print substr($1,2); }' >> vars.sh
+echo $ACCEPT_EULA:${10} | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_REGISTRY:${11} | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_REPOSITORY:${12} | awk '{print substr($1,2); }' >> vars.sh
+echo $DOCKER_TAG:${13} | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
@@ -20,6 +24,10 @@ sed -i '7s/^/export ARC_DC_NAME=/' vars.sh
 sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars.sh
 sed -i '10s/^/export ARC_DC_REGION=/' vars.sh
+sed -i '11s/^/export ACCEPT_EULA=/' vars.sh
+sed -i '12s/^/export DOCKER_REGISTRY=/' vars.sh
+sed -i '13s/^/export DOCKER_REPOSITORY=/' vars.sh
+sed -i '14s/^/export DOCKER_TAG=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -36,6 +44,9 @@ echo $ARC_DC_SUBSCRIPTION >> vars_profile.sh
 echo $ARC_DC_RG >> vars_profile.sh
 echo $ARC_DC_REGION >> vars_profile.sh
 echo $ACCEPT_EULA >> vars_profile.sh
+echo $DOCKER_REGISTRY >> vars_profile.sh
+echo $DOCKER_REPOSITORY >> vars_profile.sh
+echo $DOCKER_TAG >> vars_profile.sh
 sed -i '2s/^/export adminUsername=/' vars_profile.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars_profile.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars_profile.sh
@@ -46,6 +57,9 @@ sed -i '8s/^/export ARC_DC_SUBSCRIPTION=/' vars_profile.sh
 sed -i '9s/^/export ARC_DC_RG=/' vars_profile.sh
 sed -i '10s/^/export ARC_DC_REGION=/' vars_profile.sh
 sed -i '11s/^/export ACCEPT_EULA=yes/' vars_profile.sh
+sed -i '12s/^/export DOCKER_REGISTRY=/' vars_profile.sh
+sed -i '13s/^/export DOCKER_REPOSITORY=/' vars_profile.sh
+sed -i '14s/^/export DOCKER_TAG=/' vars_profile.sh
 
 cat vars_profile.sh >> /etc/profile
 
@@ -123,10 +137,6 @@ export AZUREARCDATACONTROLLER_DIR=aadatacontroller
 export LOG_FILE="aadatacontroller.log"
 export DEBIAN_FRONTEND=noninteractive
 
-# Requirements file.
-export OSCODENAME=$(lsb_release -cs)
-export AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE="https://aka.ms/aug-2020-arc-azdata-$OSCODENAME"
-
 # Wait for 5 minutes for the cluster to be ready.
 TIMEOUT=600
 RETRY_INTERVAL=5
@@ -174,27 +184,26 @@ cd setupscript/
 # Download and install azdata prerequisites
 sudo apt install -y libodbc1 odbcinst odbcinst1debian2 unixodbc apt-transport-https libkrb5-dev
 
+
 # Download and install azdata package
-echo ""
-echo "Downloading azdata installer from" $AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE 
-curl --location $AZDATA_PRIVATE_PREVIEW_DEB_PACKAGE --output azdata_setup.deb
-sudo dpkg -i azdata_setup.deb
-cd -
+echo "installing azdata"
+
+#Using packages.microsoft.com
+sudo apt-get install gnupg ca-certificates curl wget software-properties-common apt-transport-https lsb-release -y
+curl -sL https://packages.microsoft.com/keys/microsoft.asc |
+gpg --dearmor |
+sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
+sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/18.04/prod.list)"
+sudo apt-get update -q
+sudo apt-get install -y azdata-cli
+
+#using a specific URL. useful for pre-release testing
+#TODO: pass in URL via parameters
+#sudo curl --location <some location here> --output azdata.deb
+#sudo dpkg i azdata.deb
 
 azdata --version
-echo "Azdata has been successfully installed."
-
-# # Installing azdata extensions
-# echo "Installing azdata extension for Arc Data Controller..."
-# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_dc-0.0.1-py2.py3-none-any.whl --yes
-
-# echo "Installing azdata extension for Postgres..."
-# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-jun-2020/pypi-azdata-cli-extensions/azdata_cli_postgres-0.0.1-py2.py3-none-any.whl --yes
-
-# echo "Installing azdata extension for SQL..."
-# azdata extension add --source https://private-repo.microsoft.com/python/azure-arc-data/private-preview-aug-2020-new/pypi-azdata-cli/azdata_cli_sqlmi-20.1.1-py2.py3-none-any.whl --yes
-
-# echo "Azdata extensions installed successfully."
+echo "Azdata has been successfully installed if you see azdata version output above."
 
 # Install Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -322,11 +331,8 @@ sudo helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
 sudo helm install my-dashboard kubernetes-dashboard/kubernetes-dashboard
 
 echo "Kubernetes master setup done."
-
-Deploy azdata Azure Arc Data Cotnroller create cluster.
-echo ""
 echo "############################################################################"
-echo "Starting to deploy azdata cluster..." 
+echo "Starting to deploy Azure Arc data controller ..." 
 
 # Command to create cluster for single node cluster.
 

@@ -13,7 +13,7 @@
                 "server": "arc_sql_mi",
                 "database": "",
                 "authenticationType": "SqlLogin",
-                "user": "sa",
+                "user": "sa_username",
                 "password": "sa_password",
                 "applicationName": "azdata",
                 "groupId": "C777F06B-202E-4480-B475-FA416154D458",

@@ -1,6 +1,6 @@
 # Onboard a local Windows server hosted with Vagrant into Azure Arc
 
-The following README will guide you on how to deploy a local "Ready to Go" **Windows 10** virtual machine using [Vagrant](https://www.vagrantup.com/) and connect it as an Azure Arc server resource.
+The following README will guide you on how to deploy a local "Ready to Go" **Windows 10** virtual machine using [Vagrant](https://www.vagrantup.com/) and connect it as an Azure Arc enabled server resource.
 
 # Prerequisites
 
@@ -77,7 +77,7 @@ Once the download is complete, the actual provisioning will start. As you can se
 
 ![](../img/local_vagrant_windows/02.png)
 
-Upon completion, you will have a local Windows 10 VM deployed, connected as a new Azure Arc server inside a new Resource Group. 
+Upon completion, you will have a local Windows 10 VM deployed, connected as a new Azure Arc enabled server inside a new Resource Group. 
 
 ![](../img/local_vagrant_windows/03.png)
 
@@ -85,7 +85,7 @@ Upon completion, you will have a local Windows 10 VM deployed, connected as a ne
 
 # Semi-Automated Deployment (Optional)
 
-As you may noticed, the last step of the run is to register the VM as a new Arc server resource. 
+As you may noticed, the last step of the run is to register the VM as a new Azure Arc enabled server resource. 
 
 ![](../img/local_vagrant_windows/05.png)
 
