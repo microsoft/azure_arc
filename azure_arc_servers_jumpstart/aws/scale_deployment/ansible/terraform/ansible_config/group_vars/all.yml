@@ -1,8 +1,7 @@
 ---
     # Variables here are applicable to all host groups
     
-    # proxy: <Uncomment if connectivity is restricted by a proxy, format http://<proxyURL>:<proxyport> >
     resource_group: "Arc-AWS-Demo"
-    tenant_id: "72f988bf-86f1-41af-91ab-2d7cd011db47"
+    tenant_id: "<Azure Tenant ID>"
     azure_region: "westus2"
-    subscription_id: "28d8e88b-aee3-4342-8b17-95d5329f4ba9"
+    subscription_id: "<Azure Subscription ID>"

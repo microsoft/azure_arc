@@ -28,18 +28,19 @@ This guide can be used even if you do not already have an existing Ansible test 
 
 * To connect the AWS virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
-    ```bash
+    ```console
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
-
-    ```az ad sp create-for-rbac -n "http://AzureArcAWS" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcAWS" --role contributor
+    ```
 
     Output should look like this:
 
-    ```
+    ```console
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcAWS",
@@ -142,6 +143,11 @@ Before executing the Terraform plan, you must export the environment variables w
     export AWS_ACCESS_KEY_ID="XXXXXXXXXXXXXXXXX"
     export AWS_SECRET_ACCESS_KEY="XXXXXXXXXXXXXXX"
     ```
+
+* Replace the placeholder values for Azure tenant ID and subscription id in the [group_vars/all.yml](../aws/scale_deployment/ansible/terraform/ansible_config/group_vars/all.yml) with the appropriate values for your environment.
+
+    ![](../img/aws_scale_ansible/09.png)
+
 * Run the Ansible playbook by executing the following command, substituting your Azure service principal id and service principal secret.
 
     ```
