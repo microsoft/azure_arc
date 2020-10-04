@@ -168,7 +168,7 @@ To delete all the resources you created as part of this demo use the ```terrafor
 
 # <a name="option2"></a>Option 2 - Onboarding an existing AWS server inventory to Azure Arc using your own Ansible control server
 
-*Note: If you do not have an existing AWS server inventory and Ansible server, navigate back to [Option 1](#option1).*
+**Note: If you do not have an existing AWS server inventory and Ansible server, navigate back to [Option 1](#option1).**
 
 ## Review provided Ansible configuration and playbook
 
