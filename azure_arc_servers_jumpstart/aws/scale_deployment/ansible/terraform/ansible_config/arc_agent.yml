@@ -1,0 +1,14 @@
+---
+    - name: Provision Azure Arc connected machine agents on Windows and Linux servers
+      vars_files: 
+        - ./group_vars/all.yml
+      hosts: tag_AppGroup_LinuxFarm:tag_AppGroup_WindowsFarm
+      tasks: 
+    
+        - name: Performing Tasks for Linux
+          include_tasks: ./tasks/linux_arc.yml
+          when: ansible_system =='Linux'
+    
+        - name: Performing Tasks for Windows
+          include_tasks: ./tasks/windows_arc.yml
+          when: ansible_os_family =='Windows'
