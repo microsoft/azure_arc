@@ -1,0 +1,9 @@
+---
+    # Variables here are applicable to tag_AppGroup_WindowsFarm host group
+
+    ansible_connection: "winrm"
+    ansible_winrm_scheme: "http"
+    ansible_port: 5985
+    ansible_winrm_server_cert_validation: "ignore"
+    ansible_user: "Administrator"
+    ansible_password: "Pass@word123!"

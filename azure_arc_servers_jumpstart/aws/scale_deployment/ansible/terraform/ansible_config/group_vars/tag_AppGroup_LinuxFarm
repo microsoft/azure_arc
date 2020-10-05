@@ -1,0 +1,5 @@
+---
+    # Variables here are applicable to tag_AppGroup_LinuxFarm host group
+
+    ansible_user: "ubuntu"
+    private_key_file: "/home/centos/.ssh/id_rsa"

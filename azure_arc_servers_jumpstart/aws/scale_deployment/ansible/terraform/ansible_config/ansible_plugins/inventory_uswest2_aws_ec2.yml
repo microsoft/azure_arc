@@ -1,0 +1,15 @@
+# Minimal example using environment vars or instance role credentials
+# Fetch all hosts in us-west-2, the hostname is the public DNS if it exists, otherwise the private IP address
+plugin: aws_ec2
+regions:
+  - us-west-2
+strict_permissions: False
+keyed_groups:
+  # Add e.g. x86_64 hosts to an arch_x86_64 group
+  - prefix: arch
+    key: 'architecture'
+  # Add hosts to tag_Name_Value groups for each Name/Value tag pair
+  - prefix: tag
+    key: tags
+
+
