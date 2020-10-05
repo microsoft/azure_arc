@@ -147,8 +147,8 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
   - *export TF_VAR_AWS_SECRET_ACCESS_KEY*='Your AWS Secret Key (Created in the prerequisites section)'
   - *export TF_VAR_key_name*='Your AWS Key Pair name (Created in the prerequisites section)'
   - *export TF_VAR_key_pair_filename*='Your AWS Key Pair *.pem filename (Created in the prerequisites section)'
-  - *export TF_VAR_client_id*='Your Azure Service Principle name'
-  - *export TF_VAR_client_secret*='Your Azure Service Principle password'
+  - *export TF_VAR_client_id*='Your Azure Service Principal name'
+  - *export TF_VAR_client_secret*='Your Azure Service Principal password'
   - *export TF_VAR_tenant_id*='Your Azure tenant ID'
   - *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
   - *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)

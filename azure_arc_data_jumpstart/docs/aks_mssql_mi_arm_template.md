@@ -100,8 +100,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *dnsPrefix* - AKS unique DNS prefix
   * *nodeAdminUsername* - AKS Node Username
   * *sshRSAPublicKey* - Your ssh public key
-  * *servicePrincipalClientId* - Your Azure Service Principle name
-  * *servicePrincipalClientSecret* - Your Azure Service Principle password
+  * *servicePrincipalClientId* - Your Azure Service Principal name
+  * *servicePrincipalClientSecret* - Your Azure Service Principal password
   * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
   * *adminUsername* - Client Windows VM admin username
   * *adminPassword* - Client Windows VM admin password

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principle name --->
+# <--- Change the following environment variables according to your Azure Service Principal name --->
 
 echo "Exporting environment variables"
 export resourceGroup='<Azure Resource Group Name>'

@@ -143,8 +143,8 @@ As mentioned, the Terraform plan will deploy a GKE cluster and a Windows Server 
   - *export TF_VAR_gke_cluster_node_count*='GKE cluster number of worker nodes'
   - *export TF_VAR_windows_username*='Windows Server Client compute instance VM administrator username'
   - *export TF_VAR_windows_password*='Windows Server Client compute instance VM administrator password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols as well as **not containing** the user's account name or parts of the user's full name that exceed two consecutive characters)
-  - *export TF_VAR_client_id*='Your Azure Service Principle name'
-  - *export TF_VAR_client_secret*='Your Azure Service Principle password'
+  - *export TF_VAR_client_id*='Your Azure Service Principal name'
+  - *export TF_VAR_client_secret*='Your Azure Service Principal password'
   - *export TF_VAR_tenant_id*='Your Azure tenant ID'
   - *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
   - *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)

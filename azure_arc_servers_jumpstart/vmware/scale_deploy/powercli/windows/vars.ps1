@@ -1,10 +1,10 @@
 
-# <--- Change the following environment variables according to your Azure Service Principle name --->
+# <--- Change the following environment variables according to your Azure Service Principal name --->
 
 # Azure vars
 $env:subscription_id = 'Your Azure Subscription ID'
-$env:client_id = 'Your Azure Service Principle name'
-$env:client_secret = 'Your Azure Service Principle password'
+$env:client_id = 'Your Azure Service Principal name'
+$env:client_secret = 'Your Azure Service Principal password'
 $env:tenant_id = 'Your Azure tenant ID'
 $env:resourceGroup = 'Azure Resource Group Name where the Azure Arc servers will be onboarded to'
 $env:location = 'Azure Region' # For example: "eastus"
