@@ -53,11 +53,11 @@ The following README will guide you on how to deploy a local "Ready to Go" **Win
     
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.ps1*](../local/vagrant/windows/scripts/vars.ps1) Powershell script to match the Azure Service Principle you've just created. 
+* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.ps1*](../local/vagrant/windows/scripts/vars.ps1) Powershell script to match the Azure Service Principal you've just created. 
 
     * subscriptionId=Your Azure Subscription ID
-    * appId=Your Azure Service Principle name
-    * password=Your Azure Service Principle password
+    * appId=Your Azure Service Principal name
+    * password=Your Azure Service Principal password
     * tenantId=Your Azure tenant ID
     * resourceGroup=Azure Resource Group Name
     * location=Azure Region

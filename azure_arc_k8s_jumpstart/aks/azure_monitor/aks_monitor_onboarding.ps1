@@ -1,4 +1,4 @@
-# <--- Change the following environment variables according to your Azure Service Principle name --->
+# <--- Change the following environment variables according to your Azure Service Principal name --->
 
 Write-Output "Exporting environment variables"
 $env:subscriptionId="${subscriptionId}"
