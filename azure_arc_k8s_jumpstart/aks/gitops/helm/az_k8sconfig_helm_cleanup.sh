@@ -1,16 +1,16 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principle name --->
+# <--- Change the following environment variables according to your Azure Service Principal name --->
 
 echo "Exporting environment variables"
 export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principle password>'
+export password='<Your Azure Service Principal password>'
 export tenantId='<Your Azure tenant ID>'
 
 # Login to Azure using the service principal name
-echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
+echo "Log in to Azure with Service Principal & Getting AKS credentials (kubeconfig)"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 
@@ -20,7 +20,7 @@ az k8sconfiguration delete --name hello-arc --cluster-name $arcClusterName --res
 az k8sconfiguration delete --name nginx-ingress --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
 
 # Cleaning Kubernetes cluster
-echo "Cleaning Kubernetes cluster. You Can safely ignore non-exist resources"
+echo "Cleaning Kubernetes cluster. You can safely ignore non-exist resources"
 kubectl delete ns prod
 kubectl delete ns cluster-mgmt
 
