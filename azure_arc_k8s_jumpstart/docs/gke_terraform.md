@@ -103,7 +103,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 # Deployment
 
-The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure Service Principle you've just created and your subscription.  
+The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure Service Principal you've just created and your subscription.  
 
 * Export the environment variables needed for the Terraform plan.
 

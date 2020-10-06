@@ -1,15 +1,15 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principle name --->
+# <--- Change the following environment variables according to your Azure Service Principal name --->
 
 echo "Exporting environment variables"
-export appId='<Your Azure Service Principle name>'
-export password='<Your Azure Service Principle password>'
+export appId='<Your Azure Service Principal name>'
+export password='<Your Azure Service Principal password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
-echo "Log in to Azure with Service Principle & Getting Connected Cluster Azure Resource ID"
+echo "Log in to Azure with Service Principal & Getting Connected Cluster Azure Resource ID"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 export clusterId="$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id)"

@@ -111,12 +111,12 @@ variable "ARC_DC_REGION" {
 }
 
 variable "client_id" {
-  description = "Your Azure Service Principle name"
+  description = "Your Azure Service Principal name"
   type        = string
 }
 
 variable "client_secret" {
-  description = "Your Azure Service Principle password"
+  description = "Your Azure Service Principal password"
   type        = string
 }
 

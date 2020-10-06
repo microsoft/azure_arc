@@ -57,11 +57,11 @@ The following README will guide you on how to use the provided [Terraform](https
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
-* The Terraform plan execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](../rancher_k3s/azure/terraform/scripts/vars.sh) to match the Azure Service Principle you've just created. 
+* The Terraform plan execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](../rancher_k3s/azure/terraform/scripts/vars.sh) to match the Azure Service Principal you've just created. 
 
 # Deployment
 
-The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure Service Principle you've just created and your subscription.  
+The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure Service Principal you've just created and your subscription.  
 
 * Retrieve your Azure Subscription ID using the ```az account list``` command.
 
@@ -96,7 +96,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
     ![](../img/rancher_k3s/azure/terraform/05.png)
 
-* Using the Azure Service Principle you've created, run the below command to connect the cluster to Azure Arc.
+* Using the Azure Service Principal you've created, run the below command to connect the cluster to Azure Arc.
 
     ```az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure Resource Group Name>```
 
