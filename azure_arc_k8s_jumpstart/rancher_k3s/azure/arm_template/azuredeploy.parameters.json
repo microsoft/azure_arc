@@ -9,10 +9,10 @@
             "value": "<OS Password>"
         },
         "appId": {
-            "value": "<Your Azure Service Principle name>"
+            "value": "<Your Azure Service Principal name>"
         },
         "password": {
-            "value": "<Your Azure Service Principle password>"
+            "value": "<Your Azure Service Principal password>"
         },
         "tenantId": {
             "value": "<Your Azure tenant ID>"

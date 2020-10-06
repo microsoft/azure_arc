@@ -19,8 +19,8 @@ Set-Content -Path .\vars.sh -Value{
 #!/bin/sh
 # Azure vars
 export subscription_id='Your Azure Subscription ID'
-export client_id='Your Azure Service Principle name'
-export client_secret='Your Azure Service Principle password'
+export client_id='Your Azure Service Principal name'
+export client_secret='Your Azure Service Principal password'
 export tenant_id='Your Azure tenant ID'
 export resourceGroup='Azure Resource Group Name where the Azure Arc servers will be onboarded to'
 export location='Azure Region' # For example: "eastus"

@@ -62,8 +62,8 @@ Before executing the Terraform plan, you must set the environment variables whic
 * The Terraform plan creates resources in both Microsoft Azure and VMware vSphere. It then executes a script on the virtual machine to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your VMware vSphere and Azure environments. Edit [*scripts/vars.sh*](../vmware/winsrv/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
     
     * TF_VAR_subscription_id=Your Azure Subscription ID
-    * TF_VAR_client_id=Your Azure Service Principle name
-    * TF_VAR_client_secret=Your Azure Service Principle password
+    * TF_VAR_client_id=Your Azure Service Principal name
+    * TF_VAR_client_secret=Your Azure Service Principal password
     * TF_VAR_tenant_id=Your Azure tenant ID
     * TF_VAR_resourceGroup=Azure Resource Group Name
     * TF_VAR_location=Azure Region
