@@ -5,7 +5,7 @@
 echo "Exporting environment variables"
 export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
-export appId='<Your Azure Service Principle name>'
+export appId='<Your Azure Service Principal name>'
 export password='<Your Azure Service Principle password>'
 export tenantId='<Your Azure tenant ID>'
 
