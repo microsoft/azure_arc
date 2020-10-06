@@ -10,7 +10,7 @@ export password='<Your Azure Service Principle password>'
 export tenantId='<Your Azure tenant ID>'
 
 # Logging in to Azure using service principal
-echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
+echo "Log in to Azure with Service Principal"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
 # Deleting GitOps Configurations from Azure Arc Kubernetes cluster
