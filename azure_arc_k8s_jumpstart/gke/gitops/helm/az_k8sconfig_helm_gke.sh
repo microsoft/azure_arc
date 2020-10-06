@@ -1,10 +1,10 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principle name --->
+# <--- Change the following environment variables according to your Azure Service Principal name --->
 
 echo "Exporting environment variables"
-export appId='<Your Azure Service Principle name>'
-export password='<Your Azure Service Principle password>'
+export appId='<Your Azure Service Principal name>'
+export password='<Your Azure Service Principal password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure Resource Group Name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
@@ -33,7 +33,7 @@ az extension add --name connectedk8s
 az extension add --name k8sconfiguration
 
 # Login to Azure
-echo "Log in to Azure with Service Principle"
+echo "Log in to Azure with Service Principal"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
 # Create Cluster-level GitOps-Config for deploying nginx-ingress
