@@ -116,7 +116,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ```console
     az group create --name <Name of the Azure Resource Group> --location <Azure Region>
-    az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/zuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
+    az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
     > [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
