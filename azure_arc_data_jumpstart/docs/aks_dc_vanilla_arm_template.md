@@ -108,7 +108,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
   * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
   * *ACCEPT_EULA* - "yes" **Do not change**
-  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start d end with a alphanumeric character (This name will be used for k8s namespace as well).
+  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with an alphanumeric character. This name will be used for k8s namespace as well.
   * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
   * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
