@@ -192,13 +192,16 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 ## Azure Arc enabled Data Services
 
-The below deployment options are focused on Azure Arc enabled Data Services. They are designed to quickly spin up Azure data services in Kubernetes that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
+The below deployment options are focused on Azure Arc enabled Data Services. They are designed to quickly spin up a new Kubernetes cluster and deploy Azure Arc enabled data services that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
 
-**Disclaimer: Azure Arc enabled Data Services is currently in Private Preview.**
+> [!NOTE] Already have a Kubernetes cluster?
+[Deploy Azure Arc enabled data services to an existing Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-data-controller)
+
+**Disclaimer: Azure Arc enabled Data Services is currently in Public Preview.**
 
 #### Data Services on Azure Kubernetes Service (AKS)
 
-If you do not yet have a Kubernetes cluster, the following examples walk through creating an AKS cluster to simulate an "on-premises" or other cloud platform's Kubernetes cluster and deploy Azure Arc Data Services on top of it.
+If you do not yet have a Kubernetes cluster, the following examples walk through creating an AKS cluster and deploy Azure Arc Data Services on top of it.
 
 * [Azure Arc Data Controller Vanilla Deployment on AKS using Azure ARM template](azure_arc_data_jumpstart/docs/aks_dc_vanilla_arm_template.md)
 
@@ -220,7 +223,7 @@ If you do not yet have a Kubernetes cluster, the following examples walk through
 
 #### Data Services on Upstream Kubernetes (Kubeadm)
 
-If you do not yet have a Kubernetes cluster, the following examples walk through creating an single-node Kubernetes cluster to simulate an "on-premises" cluster and deploy Azure Arc Data Services on top of it.
+If you do not yet have a Kubernetes cluster, the following examples walk through creating an single-node Kubernetes cluster to simulate a full scale Kubernetes cluster and deploy Azure Arc Data Services on top of it.
 
 * [Azure Arc Data Controller Vanilla Deployment on Ubuntu Kubeadm VM using Azure ARM template](azure_arc_data_jumpstart/docs/kubeadm_dc_vanilla_arm_template.md)
 
