@@ -161,6 +161,11 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   ![](../img/local_microk8s/06.png)
 
+# Optional - Day 2 Operations
+
+Now that your Kubernetes cluster is connected to Azure Arc, you might want to explore the following Day 2 scenarios:
+
+- [Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster](./local_microk8s_gitops_helm.md)
 
 # Delete the deployment
 
