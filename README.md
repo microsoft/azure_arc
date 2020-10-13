@@ -190,6 +190,10 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 * [Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/local_kind_gitops_helm.md)
 
+#### MicroK8s
+
+* [Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster](azure_arc_k8s_jumpstart/docs/local_microk8s_gitops_helm.md)
+
 ## Azure Arc enabled Data Services
 
 The below deployment options are focused on Azure Arc enabled Data Services. They are designed to quickly spin up a new Kubernetes cluster and deploy Azure Arc enabled data services that are ready to be projected in Azure Arc and ready for use with Azure native tooling.

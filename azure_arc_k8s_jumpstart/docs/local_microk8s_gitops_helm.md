@@ -191,7 +191,7 @@ To delete the GitOps configuration and it's respective Kubernetes resources, we'
     ```
 * Windows
 
-    Edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup_microk8s](../microk8s/gitops/helm/az_k8sconfig_helm_cleanup_microk8s.sh) shell script, then run the file:
+    Edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup_microk8s_windows](../microk8s/gitops/helm/az_k8sconfig_helm_cleanup_microk8s_windows.bat) batch file, then run the file:
 
     ```terminal
     .\az_k8sconfig_helm_cleanup_microk8s_windows.bat
