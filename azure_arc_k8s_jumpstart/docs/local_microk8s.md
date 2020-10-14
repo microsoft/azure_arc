@@ -108,7 +108,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
 * Export MicroK8s cluster kubeconfig file path
 
-  MicroK8s will not update your .kube/config file, and accessing the cluster is done using the microk8s cli, eg: `microk8s kubectl get nodes`. To be able to use this config with the Azure Arc CLI, we need to export it into a file.
+MicroK8s will not update your .kube/config file, and accessing the cluster is done using the microk8s cli, eg: `microk8s kubectl get nodes`. To be able to use this config with the Azure Arc CLI, we need to export it into a file.
 
   Windows: 
   ```
