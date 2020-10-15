@@ -1,4 +1,3 @@
-@ECHO OFF
 # <--- Change the following environment variables according to your Azure Service Principal name --->
 
 Write-Output "Exporting environment variables"
