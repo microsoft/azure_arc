@@ -12,8 +12,6 @@ $appClonedRepo="<The URL for the 'Hello Arc' cloned GitHub repository>"
 Write-Output "Log in to Azure with Service Principal"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
-EXIT 0
-
 # Create Namespace-level GitOps-Config for deploying the "Hello Arc" application
 Write-Output "Create Namespace-level GitOps-Config for deploying the 'Hello Arc' application"
 az k8sconfiguration create `
