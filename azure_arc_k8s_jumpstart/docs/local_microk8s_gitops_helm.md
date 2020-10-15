@@ -81,7 +81,9 @@ The demo application that will be deployed later in this guide relies on an ingr
 
     ![](../img/local_microk8s_gitops_helm/05.png)
 
-* Combining the IP address from multipass and the NodePort assigned to the ingress controller, we can now test that the NGINX ingress controller has been deployed successfully. In our case, the full address becomes http://172.22.206.155:32106, so if you open that in a browser or command line, you should get a HTTP 404 reponse with a nginx footer. This shows that the ingress is working. The 404 response is to be expected since you haven't setup an ingress route yet. You will do that in the next section.
+* Combining the IP address from multipass and the NodePort assigned to the ingress controller, we can now test that the NGINX ingress controller has been deployed successfully. In our case, the full address becomes *`http://172.22.206.155:32106`*. 
+
+Using the below in your browser or command line, should get you with a HTTP 404 response with a nginx footer. This shows that the ingress is working. The 404 response is to be expected since you haven't setup an ingress route yet. You will do that in the next section.
 
     ![](../img/local_microk8s_gitops_helm/06.png)
     ![](../img/local_microk8s_gitops_helm/07.png)
