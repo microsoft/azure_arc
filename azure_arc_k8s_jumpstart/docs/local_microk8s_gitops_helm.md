@@ -34,6 +34,23 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
+* Export MicroK8s config
+
+    You can export MicroK8s cluster config to a file and use `kubectl` directly instead of `microk8s kubectl` command.
+
+    * Windows
+
+        ```terminal
+        microk8s config view > %HOMEPATH%\.kube\microk8s
+        ```
+    
+    * Linux
+
+        ```terminal
+        microk8s config view > ~\.kube\microk8s
+        ```
+    From this point forward, this guide assumes you have exported MicroK8s config file and have set it in kubectl using `--kubeconfig` flag or `$KUBECONFIG` environment variable. More information can be found in [Organizing Cluster Access Using kubeconfig Files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
+
 # Manually setting up an ingress contoller on MicroK8s
 
 The demo application that will be deployed later in this guide relies on an ingress controller. Given that MicroK8s needs [Multipass](https://multipass.run/) on Windows and MacOS, we'll be covering that scenario and assuming Multipass is running.
@@ -41,17 +58,17 @@ The demo application that will be deployed later in this guide relies on an ingr
 ## NGINX Controller Deployment
 * Run the following command to install the nginx ingress controller on MicroK8s:
     ```shell
-    microk8s kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.35.0/deploy/static/provider/baremetal/deploy.yaml
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.35.0/deploy/static/provider/baremetal/deploy.yaml
     ```
 * This command will create a new namespace and deploy the required components in this namespace. To verify the deployment of the ingress controller was successful, make sure the pod with name `ingress-nginx-controller-<random id>-<random id>` is in a running state with 1/1 containers ready and that a service has been exposed as NodePort.
 
     ```shell
-    microk8s kubectl get pods -n ingress-nginx
+    kubectl get pods -n ingress-nginx
     ```
     ![](../img/local_microk8s_gitops_helm/03.png)
 
     ```shell
-    microk8s kubectl get svc -n ingress-nginx
+    kubectl get svc -n ingress-nginx
     ```
 
     ![](../img/local_microk8s_gitops_helm/04.png)
@@ -116,7 +133,7 @@ To create the GitOps configuration and it's respective Kubernetes resources, we'
 
 * Windows
 
-    Edit the environment variables in the [*az_k8sconfig_helm_microk8s_windows*](../microk8s/gitops/helm/az_k8sconfig_helm_microk8s_windows.bat) batch file to match your parameters, and run it using the ```.\az_k8sconfig_helm_microk8s.bat``` command.
+    Edit the environment variables in the [*az_k8sconfig_helm_microk8s_windows*](../microk8s/gitops/helm/az_k8sconfig_helm_microk8s_windows.ps1) PowerShell file to match your parameters, and run it using the ```.\az_k8sconfig_helm_microk8s.ps1``` command.
 
 The `az_k8sconfig_helm_microk8s` and `az_k8sconfig_helm_microk8s_windows` scripts will:
 
@@ -135,9 +152,9 @@ The `az_k8sconfig_helm_microk8s` and `az_k8sconfig_helm_microk8s_windows` script
     * The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
 
         ```terminal
-        microk8s kubectl get pods -n prod
-        microk8s kubectl get svc -n prod
-        microk8s kubectl get ing -n prod
+        kubectl get pods -n prod
+        kubectl get svc -n prod
+        kubectl get ing -n prod
         ```
 
     ![](../img/local_microk8s_gitops_helm/12.png) 
@@ -154,7 +171,7 @@ The `az_k8sconfig_helm_microk8s` and `az_k8sconfig_helm_microk8s_windows` script
 
 * To show the above flow, open 2 (ideally 3) side-by-side windows:
 
-    - Local shell running ```microk8s kubectl get pods -n prod -w```
+    - Local shell running ```kubectl get pods -n prod -w```
 
     - In your own repository fork, open the "Hello Arc" [*hello-arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/releases/prod/hello-arc.yaml) Helm release file. 
 
@@ -182,7 +199,7 @@ The `az_k8sconfig_helm_microk8s` and `az_k8sconfig_helm_microk8s_windows` script
 
 # Cleanup
 
-To delete the GitOps configuration and it's respective Kubernetes resources, we've provided a script in a shell file (Linux, MacOS) and batch file (Windows). It is recommended to run this script locally, since it also removes elements from the local cluster.
+To delete the GitOps configuration and it's respective Kubernetes resources, we've provided a script in a shell file (Linux, MacOS) and a PowerShell file (Windows). It is recommended to run this script locally, since it also removes elements from the local cluster.
 
 * Linux and MacOS
 
@@ -193,10 +210,10 @@ To delete the GitOps configuration and it's respective Kubernetes resources, we'
     ```
 * Windows
 
-    Edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup_microk8s_windows](../microk8s/gitops/helm/az_k8sconfig_helm_cleanup_microk8s_windows.bat) batch file, then run the file:
+    Edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup_microk8s_windows](../microk8s/gitops/helm/az_k8sconfig_helm_cleanup_microk8s_windows.ps1) script, then run the file:
 
     ```terminal
-    .\az_k8sconfig_helm_cleanup_microk8s_windows.bat
+    .\az_k8sconfig_helm_cleanup_microk8s_windows.ps1
     ```
 You should see the resources being deleted:
 ![](../img/local_microk8s_gitops_helm/19.png)
