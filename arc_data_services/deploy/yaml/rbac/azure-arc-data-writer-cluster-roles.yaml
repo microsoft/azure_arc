@@ -1,0 +1,62 @@
+# This aggregated cluster role provides write access to all the custom resources for Azure Arc enabled data services
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: azure-arc-data:writer
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      arcdata.microsoft.com/aggregate-to-writer: "true"
+rules: []
+---
+# This aggregated cluster role provides read access to all the custom resources for Azure Arc enabled data services
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: azure-arc-data:database-instance:writer
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      arcdata.microsoft.com/aggregate-to-database-writer: "true"
+rules: []
+---
+# This cluster role provides read access to data controller for Azure Arc enabled data services
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: azure-arc-data:data-controller:writer
+    labels:
+      arcdata.microsoft.com/aggregate-to-writer: "true"
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["datacontrollers"]
+      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
+---
+# This cluster role provides write access to Azure SQL Managed Instance resource
+# Write access implies create, edit & delete of SQL Managed Instances
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: azure-arc-data:sql-managed-instance:writer
+    labels:
+      arcdata.microsoft.com/aggregate-to-writer: "true"
+      arcdata.microsoft.com/aggregate-to-database-writer: "true"
+rules:
+    - apiGroups: ["sql.arcdata.microsoft.com"]
+      resources: ["sqlmanagedinstances"]
+      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
+---
+# This cluster role provides write access to Azure PostgreSQL HyperScale resource
+# Write access implies create, edit & delete of Azure PostgreSQL HyperScale instances
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: azure-arc-data:postgresql-hyperscale:writer
+    labels:
+      arcdata.microsoft.com/aggregate-to-writer: "true"
+      arcdata.microsoft.com/aggregate-to-database-writer: "true"
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
+---
