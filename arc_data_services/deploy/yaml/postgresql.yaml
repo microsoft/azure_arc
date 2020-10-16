@@ -27,14 +27,14 @@ spec:
           cpu: "1"
           memory: 2Gi
   service:
-    type: LoadBalancer
+    type: LoadBalancer # Modify service type based on your Kubernetes environment
   storage:
     backups:
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 5Gi
     data:
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 5Gi
     logs:
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 1Gi
