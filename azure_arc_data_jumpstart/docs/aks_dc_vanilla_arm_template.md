@@ -125,7 +125,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ```console
     az group create --name Arc-Data-Vanilla-Demo --location "East US"
-    az deployment group create --resource-group Arc-Data-Vanilla-Demo --name arcdatademo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/zuredeploy.json --parameters azuredeploy.parameters.json
+    az deployment group create --resource-group Arc-Data-Vanilla-Demo --name arcdatademo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.json --parameters azuredeploy.parameters.json
     ```
 
 > [!NOTE] Deployment time of the Azure Resource (AKS + Windows VM) can take ~20-30min
