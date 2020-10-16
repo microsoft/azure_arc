@@ -1,0 +1,60 @@
+# This aggregated cluster role provides read access to all the custom resources for Azure Arc enabled data services
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: azure-arc-data:reader
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      arcdata.microsoft.com/aggregate-to-reader: "true"
+rules: []
+---
+# This aggregated cluster role provides read access to all the custom resources for Azure Arc enabled data services
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: azure-arc-data:database-instance:reader
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      arcdata.microsoft.com/aggregate-to-database-reader: "true"
+rules: []
+---
+# This cluster role provides read access to data controller for Azure Arc enabled data services
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: azure-arc-data:data-controller:reader
+    labels:
+      arcdata.microsoft.com/aggregate-to-reader: "true"
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["datacontrollers"]
+      verbs: ["get", "list", "watch"]
+---
+# This cluster role provides read access to Azure SQL Managed Instance resource
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: azure-arc-data:sql-managed-instance:reader
+    labels:
+      arcdata.microsoft.com/aggregate-to-reader: "true"
+      arcdata.microsoft.com/aggregate-to-database-reader: "true"
+rules:
+    - apiGroups: ["sql.arcdata.microsoft.com"]
+      resources: ["sqlmanagedinstances"]
+      verbs: ["get", "list", "watch"]
+---
+# This cluster role provides read access to Azure PostgreSQL HyperScale resource
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+    name: azure-arc-data:postgresql-hyperscale:reader
+    labels:
+      arcdata.microsoft.com/aggregate-to-reader: "true"
+      arcdata.microsoft.com/aggregate-to-database-reader: "true"
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch"]
+---
