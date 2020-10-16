@@ -106,21 +106,9 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
     [This blog post](https://ubuntu.com/blog/kubernetes-on-windows-with-microk8s-and-wsl-2) walks through an installation of MicroK8s in WSL 2.
 
-* Navigate to the folder that has the MicroK8s cluster definition.
-
-  Windows:
-    ```terminal
-    cd azure_arc\azure_arc_k8s_jumpstart\microk8s
-    ```
-
-  Linux and MacOS:
-    ```bash
-    cd azure_arc/azure_arc_k8s_jumpstart/microk8s
-    ```
-
 * Export MicroK8s cluster kubeconfig file path
 
-  MicroK8s will not update your .kube/config file, and accessing the cluster is done using the microk8s cli, eg: `microk8s kubectl get nodes`. To be able to use this config with the Azure Arc CLI, we need to export it into a file.
+MicroK8s will not update your .kube/config file, and accessing the cluster is done using the microk8s cli, eg: `microk8s kubectl get nodes`. To be able to use this config with the Azure Arc CLI, we need to export it into a file.
 
   Windows: 
   ```
@@ -173,6 +161,11 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   ![](../img/local_microk8s/06.png)
 
+# Optional - Day 2 Operations
+
+Now that your Kubernetes cluster is connected to Azure Arc, you might want to explore the following Day 2 scenarios:
+
+- [Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster](./local_microk8s_gitops_helm.md)
 
 # Delete the deployment
 
