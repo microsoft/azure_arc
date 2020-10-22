@@ -1,0 +1,61 @@
+# This role provides read access to Azure Arc enabled data services resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:reader
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["datacontrollers", "postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["sql.arcdata.microsoft.com"]
+      resources: ["sqlmanagedinstances"]
+      verbs: ["get", "list", "watch"]
+---
+# This role provides read access to Azure SQL Managed Instance & PostgreSQL Hyperscale resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:database-instance:reader
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["sql.arcdata.microsoft.com"]
+      resources: ["sqlmanagedinstances"]
+      verbs: ["get", "list", "watch"]
+---
+# This role provides read access to Azure Arc Data Controller resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:data-controller:reader
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["datacontrollers"]
+      verbs: ["get", "list", "watch"]
+---
+# This role provides read access to Azure SQL Managed Instance resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:sql-managed-instance:reader
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["sql.arcdata.microsoft.com"]
+      resources: ["sqlmanagedinstances"]
+      verbs: ["get", "list", "watch"]
+---
+# This role provides read access to Azure PostgreSQL Hyperscale resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:postgresql-hyperscale:reader
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch"]
+---

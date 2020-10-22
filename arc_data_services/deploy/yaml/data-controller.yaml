@@ -21,10 +21,10 @@ spec:
   services:
   - name: controller
     port: 30080
-    serviceType: LoadBalancer
+    serviceType: LoadBalancer # Modify serviceType based on your Kubernetes environment
   - name: serviceProxy
     port: 30777
-    serviceType: LoadBalancer
+    serviceType: LoadBalancer # Modify serviceType based on your Kubernetes environment
   settings:
     ElasticSearch:
       vm.max_map_count: "-1"
@@ -41,9 +41,9 @@ spec:
   storage:
     data:
       accessMode: ReadWriteOnce
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 15Gi
     logs:
       accessMode: ReadWriteOnce
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 10Gi

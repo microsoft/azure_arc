@@ -1,0 +1,208 @@
+#
+# This file contains sample ClusterRoleBindings for Azure Arc enabled data services that uses ClusterRoles.
+#
+# This rolebinding grants read permission to the user based on the azure-arc-data:reader role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:readers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "readers"
+subjects:
+- kind: User
+  name: hr-user # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# This rolebinding grants read permission to the user based on the azure-arc-data:sql-managed-instance:reader cluster role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:data-controller:readers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "readers"
+subjects:
+- kind: User
+  name: hr-user # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:data-controller:reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# This rolebinding grants permission to the user based on the aggregated azure-arc-data:database-instance:reader cluster role.
+# The aggregated role grants read permissions on both SQL Managed Instance(s) & PostgreSQL Hyperscale Instance(s).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:database-instance:readers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "readers"
+subjects:
+- kind: User
+  name: hr-user # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:database-instance:reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# This rolebinding grants permission to the user based on the azure-arc-data:sql-managed-instance:reader cluster role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:sql-managed-instance:readers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "readers"
+subjects:
+- kind: User
+  name: hr-user # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:sql-managed-instance:reader
+  apiGroup: rbac.authorization.k8s.io
+---
+# This rolebinding grants permission to the user based on the azure-arc-data:postgresql-hyperscale:reader cluster role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:postgresql-hyperscale:readers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "readers"
+subjects:
+- kind: User
+  name: hr-user # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:postgresql-hyperscale:reader
+  apiGroup: rbac.authorization.k8s.io
+---
+#
+# The rolebindings below are for writers.
+#
+# This rolebinding grants write permission to the user based on the azure-arc-data:writer cluster role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:writers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "writers"
+subjects:
+- kind: User
+  name: hr-admin # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:writer
+  apiGroup: rbac.authorization.k8s.io
+---
+# This rolebinding grants write permission to the user based on the azure-arc-data:sql-managed-instance:writer cluster role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:data-controller:writers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "writers"
+subjects:
+- kind: User
+  name: hr-admin # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:data-controller:writer
+  apiGroup: rbac.authorization.k8s.io
+---
+# This rolebinding grants permission to the user based on the aggregated azure-arc-data:database-instance:writer cluster role.
+# The aggregated role grants write permissions on both SQL Managed Instance(s) & PostgreSQL Hyperscale Instance(s).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:database-instance:writers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "writers"
+subjects:
+- kind: User
+  name: hr-admin # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:database-instance:writer
+  apiGroup: rbac.authorization.k8s.io
+---
+# This rolebinding grants permission to the user based on the azure-arc-data:sql-managed-instance:writer cluster role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:sql-managed-instance:writers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "writers"
+subjects:
+- kind: User
+  name: hr-admin # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:sql-managed-instance:writer
+  apiGroup: rbac.authorization.k8s.io
+---
+# This rolebinding grants permission to the user based on the azure-arc-data:postgresql-hyperscale:writer cluster role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: azure-arc-data:postgresql-hyperscale:writers
+  #
+  # The namespace of the RoleBinding determines where the permissions are granted.
+  # This only grants permissions within the namespace below.
+  namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-binding-type: "writers"
+subjects:
+- kind: User
+  name: hr-admin # Name is case sensitive
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: azure-arc-data:postgresql-hyperscale:writer
+  apiGroup: rbac.authorization.k8s.io
+---
