@@ -22,14 +22,14 @@ spec:
     type: LoadBalancer
   storage:
     backups:
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 5Gi
     data:
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 5Gi
     datalogs:
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 5Gi
     logs:
-      className: default
+      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 1Gi

@@ -1,0 +1,66 @@
+# This role provides writer access to Azure Arc enabled data services resources
+# Write access implies create, edit & delete of the resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:writer
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["datacontrollers", "postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+    - apiGroups: ["sql.arcdata.microsoft.com"]
+      resources: ["sqlmanagedinstances"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+---
+# This role provides writer access to Azure Arc SQL Managed Instance and PostgreSQL Hyperscale resources
+# Write access implies create, edit & delete of the resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:database-instance:writer
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+    - apiGroups: ["sql.arcdata.microsoft.com"]
+      resources: ["sqlmanagedinstances"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+---
+# This role provides write access to Azure Arc Data Controller resources
+# Write access implies create, edit & delete of the resources
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:data-controller:writer
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["datacontrollers"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+---
+# This role provides write access to Azure SQL Managed Instance resources
+# Write access implies create, edit & delete of SQL Managed Instances
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:sql-managed-instance:writer
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["sql.arcdata.microsoft.com"]
+      resources: ["sqlmanagedinstances"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+---
+# This role provides write access to Azure PostgreSQL Hyperscale resource
+# Write access implies create, edit & delete of Azure PostgreSQL Hyperscale instances
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+    name: azure-arc-data:postgresql-hyperscale:writer
+    namespace: azure-arc-data
+rules:
+    - apiGroups: ["arcdata.microsoft.com"]
+      resources: ["postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+---
