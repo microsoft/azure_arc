@@ -2,7 +2,7 @@
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server, VMware vSphere virtual machine and connect it as an Azure Arc enabled server resource.
 
-# Prerequisites
+## Prerequisites
 
 * Clone this repo
 
@@ -15,8 +15,6 @@ The following README will guide you on how to use the provided [Terraform](https
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 * A VMware vCenter Server user with [permissions to deploy](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.vm_admin.doc/GUID-8254CD05-CC06-491D-BA56-A773A32A8130.html) a Virtual Machine from a Template in the vSphere Web Client.
-
-* vSphere
 
 * Create Azure Service Principal (SP)   
 
@@ -45,15 +43,15 @@ The following README will guide you on how to use the provided [Terraform](https
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-## Preparing a Window Server VMware vSphere VM Template
+### Preparing a Window Server VMware vSphere VM Template
 
-Before using the below guide to deploy an Ubuntu Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](../docs/vmware_winsrv2k19_template.md) will instruct you how to easily create such a template using VMware vSphere 6.5 and above. 
+Before using the below guide to deploy a Windows Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](../docs/vmware_winsrv2k19_template.md) will instruct you how to easily create such a template using VMware vSphere 6.5 and above. 
 
 **The Terraform plan leveraged the *remote-exec* provisioner which uses the WinRM protocol to copy and execute the required Azure Arc script. To allow WinRM connectivity to the VM, run the [*allow_winrm*](../vmware/winsrv/terraform/scripts/allow_winrm.ps1) Powershell script on your VM before converting it to template.** 
 
 **Note:** If you already have a Windows Server VM template it is still recommended to use the guide as a reference. 
 
-# Deployment
+## Deployment
 
 Before executing the Terraform plan, you must set the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and your VMware vSphere credentials.
 
