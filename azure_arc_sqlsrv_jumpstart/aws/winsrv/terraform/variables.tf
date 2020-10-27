@@ -27,13 +27,13 @@ variable "AWS_SECRET_ACCESS_KEY" {
 }
 
 variable "hostname" {
-  description = "EC2 Client instance Windows hostname"
+  description = "EC2 instance Windows Computer Name"
   type        = string
   default     = "arc-sql-demo"
 }
 
 variable "instance_type" {
-  description = "EC2 Client instance Windows type"
+  description = "EC2 instance type"
   default     = "t3.xlarge"
   type        = string
 }
