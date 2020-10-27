@@ -53,11 +53,11 @@ Create AWS User IAM Key. An access key grants programmatic access to your resour
 
 * Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home).
 
-![](..\img\aws_terraform_winsrv\01.png)
+![](..\img\aws_terraform_winsrv\01.jpg)
 
 * Select the **Users** from the side menu.
 
-![](..\img\aws_terraform_winsrv\02.png)
+![](..\img\aws_terraform_winsrv\02.jpg)
     
 * Select the **User** you want to create the access key for.
 
