@@ -53,27 +53,27 @@ Create AWS User IAM Key. An access key grants programmatic access to your resour
 
 * Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home).
 
-![](..\img\aws_terraform_winsrv\01.jpg)
+![](..\img\aws_terraform_winsrv\01.png)
 
 * Select the **Users** from the side menu.
 
-![](..\img\aws_terraform_winsrv\02.jpg)
+![](..\img\aws_terraform_winsrv\02.png)
     
 * Select the **User** you want to create the access key for.
 
-![](..\img\aws_terraform_winsrv\03.jpg)
+![](..\img\aws_terraform_winsrv\03.png)
 
 * Select ***Security credentials** of the **User** selected.
 
-![](..\img\aws_terraform_winsrv\04.jpg)
+![](..\img\aws_terraform_winsrv\04.png)
 
 * Under **Access Keys** select **Create Access Keys**.
 
-![](..\img\aws_terraform_winsrv\05.jpg)
+![](..\img\aws_terraform_winsrv\05.png)
 
 * In the popup window it will show you the ***Access key ID*** and ***Secret access key***. Save both of these values to configure the **Terraform plan** variables later.
 
-![](..\img\aws_terraform_winsrv\06.jpg)
+![](..\img\aws_terraform_winsrv\06.png)
 
 ## Automation Flow
 
