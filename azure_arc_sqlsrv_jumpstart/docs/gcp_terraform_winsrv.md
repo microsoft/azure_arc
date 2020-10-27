@@ -1,4 +1,4 @@
-# Onboard a VMware GCP-based Windows Server with SQL to Azure Arc
+# Onboard a GCP VM instance with Windows Server & Microsoft SQL Server to Azure Arc
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Google Cloud Platform (GCP) virtual machine and connect it as an Azure Arc enabled SQL server resource.
 
@@ -20,7 +20,7 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
 
 * Create Azure Service Principal (SP)   
 
-    To connect the VMware vSphere virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```terminal
     az login
