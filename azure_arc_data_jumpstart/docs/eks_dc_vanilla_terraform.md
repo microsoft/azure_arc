@@ -78,7 +78,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
    ![](../img/eks_dc_vanilla_terraform/04.png)
 
-  5. Under **Access Keys** select **Create Access Keys**, this will download the
+  5. Under **Access Keys** select **Create Access Keys**.
 
   ![](../img/eks_dc_vanilla_terraform/05.png)
 

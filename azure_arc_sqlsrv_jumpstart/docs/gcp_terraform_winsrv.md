@@ -118,7 +118,7 @@ Before executing the Terraform plan, you must set the environment variables whic
 
 * The Terraform plan creates resources in both Microsoft Azure and GCP. It then executes a script on the virtual machine to install all the necessary artifacts. 
 
-Both the script requires and the Terraform plan itself requires certain information about your GCP and Azure environments. Edit variables according to your environment and export it using the below commands
+Both the script and the Terraform plan itself requires certain information about your GCP and Azure environments. Edit variables according to your environment and export it using the below commands
 
 ```bash
 export TF_VAR_subId='Your Azure Subscription ID'
@@ -154,11 +154,11 @@ Once the Terraform plan deployment has completed, a new Windows Server VM will b
 
 ![](..\img\gcp_terraform_winsrv\22.png)
 
-* Download the RDP file and log in to the VM using RDP which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed. 
+* Download the RDP file and log in to the VM (**using data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed. 
 
 ![](..\img\gcp_terraform_winsrv\23.png)
 
-**Note: The script runtime will take ~15min to complete**
+**Note: The script runtime will take ~10-15min to complete**
 
 ![](..\img\gcp_terraform_winsrv\24.png)
 
@@ -217,10 +217,8 @@ Initially, the amount of data will be limited as it take a while for the assessm
 
 ![](..\img\gcp_terraform_winsrv\43.png)
 
-![](..\img\gcp_terraform_winsrv\44.png)
-
 ## Cleanup
 
-To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the both GCP and Azure resources.
+To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the GCP and the Azure resources.
 
-![](..\img\gcp_terraform_winsrv\45.png)
+![](..\img\gcp_terraform_winsrv\44.png)
