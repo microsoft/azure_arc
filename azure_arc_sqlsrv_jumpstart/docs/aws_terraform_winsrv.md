@@ -85,7 +85,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     1. Create an Administrator Windows user account, enabling WinRM on the VM and change the Windows Computer Name.
 
-    2. Generate and execute the [*sql.ps1*](..\aws\winsrv\terraform\scripts\sql.ps1.tmpl) script. This script will:
+    2. Generate and execute the [*sql.ps1*](../aws/winsrv/terraform/scripts/sql.ps1.tmpl) script. This script will:
 
         1. Install Azure CLI, Azure PowerShell module and SQL Server Management Studio (SSMS) [Chocolaty packages](https://chocolatey.org/).
 
