@@ -51,7 +51,7 @@ By the end of the guide, you will have a VMware vSphere VM installed with Window
 
 Before using the below guide to deploy a Windows Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](..\..\azure_arc_servers_jumpstart\docs\vmware_terraform_winsrv.md) will instruct you how to easily create such a template using VMware vSphere 6.5 and above. 
 
-**The Terraform plan leveraged the *remote-exec* provisioner which uses the WinRM protocol to copy and execute the required Azure Arc script. To allow WinRM connectivity to the VM, run the [*allow_winrm*](..\vmware\winsrv\terraform\scripts\allow_winrm.ps1) Powershell script on your VM before converting it to template.** 
+**The Terraform plan leveraged the *remote-exec* provisioner which uses the WinRM protocol to copy and execute the required Azure Arc script. To allow WinRM connectivity to the VM, run the [*allow_winrm*](../vmware/winsrv/terraform/scripts/allow_winrm.ps1) Powershell script on your VM before converting it to template.** 
 
 **Note:** If you already have a Windows Server VM template it is still recommended to use the guide as a reference.
 
@@ -61,7 +61,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 1. User is exporting the Terraform environment variables (1-time export) which are being used throughout the deployment.
 
-2. User is executing the Terraform plan which will deploy the VM as well as generate and execute the [*sql.ps1*](..\vmware\winsrv\terraform\scripts\sql.ps1.tmpl) script. This script will:
+2. User is executing the Terraform plan which will deploy the VM as well as generate and execute the [*sql.ps1*](../vmware/winsrv/terraform/scripts/sql.ps1.tmpl) script. This script will:
 
     1. Install Azure CLI, Azure PowerShell module and SQL Server Management Studio (SSMS) [Chocolaty packages](https://chocolatey.org/).
 
