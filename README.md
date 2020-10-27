@@ -102,6 +102,28 @@ The following guides are designed to provide scaled onboarding experience to Azu
 
  * [Scaled Onboarding AWS EC2 instances to Azure Arc using Ansible](azure_arc_servers_jumpstart/docs/aws_scale_ansible.md)
 
+## Azure Arc enabled SQL Server
+
+The deployment scenarios below will guide you through onboarding Microsoft SQL Server, deployed on various platform to Azure Arc. 
+
+#### Amazon Web Services (AWS)
+
+The following guide provide end-to-end deployment of new Windows Server install with SQL Server in AWS and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
+
+* [Onboard a AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc](azure_arc_sqlsrv_jumpstart/docs/aws_terraform_winsrv.md)
+
+#### Google Cloud Platform (GCP)
+
+The following guide provide end-to-end deployment of new Windows Server install with SQL Server in GCP and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
+
+* [Onboard a GCP VM instance with Windows Server & Microsoft SQL Server to Azure Arc](azure_arc_sqlsrv_jumpstart/docs/gcp_terraform_winsrv.md)
+
+#### VMware
+
+The following guide provide end-to-end deployment of new Windows Server install with SQL Server in VMware vSphere and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
+
+*  [Onboard a VMware vSphere-based Windows Server with SQL to Azure Arc](azure_arc_sqlsrv_jumpstart/docs/vmware_terraform_winsrv.md)
+
 ## Azure Arc enabled Kubernetes
 
 The below deployment options are focused on Azure Arc enabled Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
