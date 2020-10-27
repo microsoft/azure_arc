@@ -119,7 +119,7 @@ export TF_VAR_admin_password='Guest OS Admin Password'
 
 **Note: Use the Terraform plan [*variables.tf*](..\vmware\winsrv\terraform\variables.tf) file for more details around VMware vSphere vars structure if needed**
 
-![](..\img\vmware_terraform_winsrv\01.jpg)
+![](../img/vmware_terraform_winsrv/01.jpg)
 
 * From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan. 
 
@@ -130,49 +130,49 @@ export TF_VAR_admin_password='Guest OS Admin Password'
 
 Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure Resource Group will be created. 
 
-![](..\img\vmware_terraform_winsrv\02.jpg)
+![](../img/vmware_terraform_winsrv/02.jpg)
 
-![](..\img\vmware_terraform_winsrv\03.jpg)
+![](../img/vmware_terraform_winsrv/03.jpg)
 
-![](..\img\vmware_terraform_winsrv\04.jpg)
+![](../img/vmware_terraform_winsrv/04.jpg)
 
 * og in to the VM (**using data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed. 
 
 **Note: The script runtime will take ~10-15min to complete**
 
-![](..\img\vmware_terraform_winsrv\05.jpg)
+![](../img/vmware_terraform_winsrv/05.jpg)
 
-![](..\img\vmware_terraform_winsrv\06.jpg)
+![](../img/vmware_terraform_winsrv/06.jpg)
 
-![](..\img\vmware_terraform_winsrv\07.jpg)
+![](../img/vmware_terraform_winsrv/07.jpg)
 
-![](..\img\vmware_terraform_winsrv\08.jpg)
+![](../img/vmware_terraform_winsrv/08.jpg)
 
-![](..\img\vmware_terraform_winsrv\09.jpg)
+![](../img/vmware_terraform_winsrv/09.jpg)
 
-![](..\img\vmware_terraform_winsrv\10.jpg)
+![](../img/vmware_terraform_winsrv/10.jpg)
 
-![](..\img\vmware_terraform_winsrv\11.jpg)
+![](../img/vmware_terraform_winsrv/11.jpg)
 
-![](..\img\vmware_terraform_winsrv\12.jpg)
+![](../img/vmware_terraform_winsrv/12.jpg)
 
-![](..\img\vmware_terraform_winsrv\13.jpg)
+![](../img/vmware_terraform_winsrv/13.jpg)
 
 * Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed as well.
 
-![](..\img\vmware_terraform_winsrv\14.jpg)
+![](../img/vmware_terraform_winsrv/14.jpg)
 
-![](..\img\vmware_terraform_winsrv\15.jpg)
+![](../img/vmware_terraform_winsrv/15.jpg)
 
 * In the Azure Portal, notice you now have an Azure Arc enabled Server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL resource and Azure Log Analytics deployed.
 
-![](..\img\vmware_terraform_winsrv\16.jpg)
+![](../img/vmware_terraform_winsrv/16.jpg)
 
-![](..\img\vmware_terraform_winsrv\17.jpg)
+![](../img/vmware_terraform_winsrv/17.jpg)
 
-![](..\img\vmware_terraform_winsrv\18.jpg)
+![](../img/vmware_terraform_winsrv/18.jpg)
 
-![](..\img\vmware_terraform_winsrv\19.jpg)
+![](../img/vmware_terraform_winsrv/19.jpg)
 
 ## Azure SQL Assessment
 
@@ -183,24 +183,24 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you safety ignore and delete the downloaded *AddSqlAssessment.ps1* file. 
 Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button. 
 
-![](..\img\vmware_terraform_winsrv\20.jpg)
+![](../img/vmware_terraform_winsrv/20.jpg)
 
-![](..\img\vmware_terraform_winsrv\21.jpg)
+![](../img/vmware_terraform_winsrv/21.jpg)
 
-![](..\img\vmware_terraform_winsrv\22.jpg)
+![](../img/vmware_terraform_winsrv/22.jpg)
 
 * After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs is getting injected to Azure Log Analytics. 
 
 Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-![](..\img\vmware_terraform_winsrv\23.jpg)
+![](../img/vmware_terraform_winsrv/23.jpg)
 
-![](..\img\vmware_terraform_winsrv\24.jpg)
+![](../img/vmware_terraform_winsrv/24.jpg)
 
-![](..\img\vmware_terraform_winsrv\25.jpg)
+![](../img/vmware_terraform_winsrv/25.jpg)
 
 ## Cleanup
 
 To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the VMware vSphere VM and the Azure Resource Group along with it's resources.
 
-![](..\img\vmware_terraform_winsrv\26.jpg)
+![](../img/vmware_terraform_winsrv/26.jpg)

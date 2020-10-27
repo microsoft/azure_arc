@@ -55,30 +55,30 @@ In order to deploy resources in GCP, we will create a new GCP Project as well as
 
 * Browse to https://console.cloud.google.com/ and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
-  ![](..\img\gcp_terraform_winsrv\01.png)
-  ![](..\img\gcp_terraform_winsrv\02.png)
-  ![](..\img\gcp_terraform_winsrv\03.png)
+  ![](../img/gcp_terraform_winsrv/01.png)
+  ![](../img/gcp_terraform_winsrv/02.png)
+  ![](../img/gcp_terraform_winsrv/03.png)
 
 * Enable the Compute Engine API for the project, create a project Owner service account credentials and download the private key JSON file and copy the file to the directory where Terraform files are located. Change the JSON file name (for example *account.json*). The Terraform plan will be using the credentials stored in this file to authenticate against your GCP project.
 
-  ![](..\img\gcp_terraform_winsrv\04.png)
-  ![](..\img\gcp_terraform_winsrv\05.png)
-  ![](..\img\gcp_terraform_winsrv\06.png)
-  ![](..\img\gcp_terraform_winsrv\07.png)
-  ![](..\img\gcp_terraform_winsrv\08.png)
-  ![](..\img\gcp_terraform_winsrv\09.png)
-  ![](..\img\gcp_terraform_winsrv\10.png)
-  ![](..\img\gcp_terraform_winsrv\11.png)
-  ![](..\img\gcp_terraform_winsrv\12.png)
-  ![](..\img\gcp_terraform_winsrv\13.png)
-  ![](..\img\gcp_terraform_winsrv\14.png)
-  ![](..\img\gcp_terraform_winsrv\15.png)
-  ![](..\img\gcp_terraform_winsrv\16.png)
+  ![](../img/gcp_terraform_winsrv/04.png)
+  ![](../img/gcp_terraform_winsrv/05.png)
+  ![](../img/gcp_terraform_winsrv/06.png)
+  ![](../img/gcp_terraform_winsrv/07.png)
+  ![](../img/gcp_terraform_winsrv/08.png)
+  ![](../img/gcp_terraform_winsrv/09.png)
+  ![](../img/gcp_terraform_winsrv/10.png)
+  ![](../img/gcp_terraform_winsrv/11.png)
+  ![](../img/gcp_terraform_winsrv/12.png)
+  ![](../img/gcp_terraform_winsrv/13.png)
+  ![](../img/gcp_terraform_winsrv/14.png)
+  ![](../img/gcp_terraform_winsrv/15.png)
+  ![](../img/gcp_terraform_winsrv/16.png)
 
 * Enable the Compute Engine API for the project
 
-  ![](..\img\gcp_terraform_winsrv\17.png)
-  ![](..\img\gcp_terraform_winsrv\18.png)
+  ![](../img/gcp_terraform_winsrv/17.png)
+  ![](../img/gcp_terraform_winsrv/18.png)
 
 ## Automation Flow
 
@@ -137,7 +137,7 @@ export TF_VAR_admin_user='Guest OS Admin Username'
 export TF_VAR_admin_password='Guest OS Admin Password'
 ```
 
-![](..\img\gcp_terraform_winsrv\19.png)
+![](../img/gcp_terraform_winsrv/19.png)
 
 * From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan. 
 
@@ -148,51 +148,51 @@ export TF_VAR_admin_password='Guest OS Admin Password'
 
 Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure Resource Group will be created. 
 
-![](..\img\gcp_terraform_winsrv\20.png)
+![](../img/gcp_terraform_winsrv/20.png)
 
-![](..\img\gcp_terraform_winsrv\21.png)
+![](../img/gcp_terraform_winsrv/21.png)
 
-![](..\img\gcp_terraform_winsrv\22.png)
+![](../img/gcp_terraform_winsrv/22.png)
 
 * Download the RDP file and log in to the VM (**using data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed. 
 
-![](..\img\gcp_terraform_winsrv\23.png)
+![](../img/gcp_terraform_winsrv/23.png)
 
 **Note: The script runtime will take ~10-15min to complete**
 
-![](..\img\gcp_terraform_winsrv\24.png)
+![](../img/gcp_terraform_winsrv/24.png)
 
-![](..\img\gcp_terraform_winsrv\25.png)
+![](../img/gcp_terraform_winsrv/25.png)
 
-![](..\img\gcp_terraform_winsrv\26.png)
+![](../img/gcp_terraform_winsrv/26.png)
 
-![](..\img\gcp_terraform_winsrv\27.png)
+![](../img/gcp_terraform_winsrv/27.png)
 
-![](..\img\gcp_terraform_winsrv\28.png)
+![](../img/gcp_terraform_winsrv/28.png)
 
-![](..\img\gcp_terraform_winsrv\29.png)
+![](../img/gcp_terraform_winsrv/29.png)
 
-![](..\img\gcp_terraform_winsrv\30.png)
+![](../img/gcp_terraform_winsrv/30.png)
 
-![](..\img\gcp_terraform_winsrv\31.png)
+![](../img/gcp_terraform_winsrv/31.png)
 
-![](..\img\gcp_terraform_winsrv\32.png)
+![](../img/gcp_terraform_winsrv/32.png)
 
 * Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed as well.
 
-![](..\img\gcp_terraform_winsrv\33.png)
+![](../img/gcp_terraform_winsrv/33.png)
 
-![](..\img\gcp_terraform_winsrv\34.png)
+![](../img/gcp_terraform_winsrv/34.png)
 
 * In the Azure Portal, notice you now have an Azure Arc enabled Server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL resource and Azure Log Analytics deployed.
 
-![](..\img\gcp_terraform_winsrv\35.png)
+![](../img/gcp_terraform_winsrv/35.png)
 
-![](..\img\gcp_terraform_winsrv\36.png)
+![](../img/gcp_terraform_winsrv/36.png)
 
-![](..\img\gcp_terraform_winsrv\37.png)
+![](../img/gcp_terraform_winsrv/37.png)
 
-![](..\img\gcp_terraform_winsrv\38.png)
+![](../img/gcp_terraform_winsrv/38.png)
 
 ## Azure SQL Assessment
 
@@ -203,22 +203,22 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you safety ignore and delete the downloaded *AddSqlAssessment.ps1* file. 
 Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button. 
 
-![](..\img\gcp_terraform_winsrv\39.png)
+![](../img/gcp_terraform_winsrv/39.png)
 
-![](..\img\gcp_terraform_winsrv\40.png)
+![](../img/gcp_terraform_winsrv/40.png)
 
-![](..\img\gcp_terraform_winsrv\41.png)
+![](../img/gcp_terraform_winsrv/41.png)
 
 * After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs is getting injected to Azure Log Analytics. 
 
 Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-![](..\img\gcp_terraform_winsrv\42.png)
+![](../img/gcp_terraform_winsrv/42.png)
 
-![](..\img\gcp_terraform_winsrv\43.png)
+![](../img/gcp_terraform_winsrv/43.png)
 
 ## Cleanup
 
 To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the GCP and the Azure resources.
 
-![](..\img\gcp_terraform_winsrv\44.png)
+![](../img/gcp_terraform_winsrv/44.png)
