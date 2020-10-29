@@ -1,13 +1,14 @@
 #  Onboard an Azure Linux Server VM with Azure Arc
 
-The following README will guide you on how onboard a Azure Linux VM on to Azure Arc. An ARM template is provided for the creation of the Azure Resouces, along with an script that will allow you to onboard Azure Arc, this step is requiered as Azure VMs are already part of ARM, therefore, the Azure Arc agent cannot be installed following the regular onboarding method. 
+The following README will guide you on how onboard a Azure Linux VM on to Azure Arc. An ARM template is provided for the creation of the Azure Resouces, along with an script that will allow you to onboard the Azure VM onto Azure Arc, this step is requiered as Azure VMs are already part of ARM, therefore, the Azure Arc agent cannot be installed following the regular onboarding method. 
 
-Please note that this scenario is only intended for demo purposes. 
+   > [!NOTE]Please note that this scenario is only intended for demo purposes. 
+
 # Azure Account  
 
 * You will need an Azure Account with an active and valid subscription so you can deploy the Azure VMs and then register and onboard them with Azure Arc. If you do not have an account already, you can start with a free-trial account. 
 
-* To create you Azure free account browse to [this link](https://azure.microsoft.com/en-us/free/) and select 'Start Free' to get access to a free trial subscription. 
+* To create an Azure free account browse to [this link](https://azure.microsoft.com/en-us/free/) and select 'Start Free' to get access to a free trial subscription. 
 
 # Prerequisites
 
@@ -35,6 +36,10 @@ Below you can find the automation flow for this scenario:
 
 * Create a new Azure Resource Group where you want your machine(s) to be deployed and then be registered as Azure Arc enabled Servers. 
 
+    ```terminal
+    az group create --name <Name of the Azure Resource Group> --location <Azure Region>
+    ```
+
 ![](../img/azure_linux/01.png)
 
 * Before executing the ARM template, you must set the parameters that match your environment. Edit the *azurevm_linux.parameters.json* file and provide: 
@@ -61,7 +66,7 @@ Below you can find the automation flow for this scenario:
 
     ```console
     sudo chmod +x allow_arc_agent.sh
-    sudo allow_arc_agent.sh
+    sudo ./allow_arc_agent.sh
     ```
    > [!NOTE] the script is prepared to run on Ubuntu VMs, if you are using other Linux distros you will need to customize it. 
 
