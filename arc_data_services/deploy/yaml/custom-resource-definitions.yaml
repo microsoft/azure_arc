@@ -27,6 +27,8 @@ spec:
     kind: postgresql-11
     plural: postgresql-11s
     categories: ["postgresqls"]
+    shortNames:
+    - pg11
   subresources:
     status: {}
   additionalPrinterColumns:
@@ -55,6 +57,8 @@ spec:
     kind: postgresql-12
     plural: postgresql-12s
     categories: ["postgresqls"]
+    shortNames:
+    - pg12
   subresources:
     status: {}
   additionalPrinterColumns:
