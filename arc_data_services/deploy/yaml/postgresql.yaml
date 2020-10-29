@@ -16,7 +16,7 @@ spec:
     extensions:
     - name: citus
   scale:
-    shards: 3
+    workers: 3
   scheduling:
     default:
       resources:
