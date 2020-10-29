@@ -44,6 +44,17 @@ The following examples can be used to connect existing Windows or Linux servers 
 
 * [Connect an existing Windows machine to Azure Arc](azure_arc_servers_jumpstart/docs/onboard_server_win.md)
 
+#### Azure 
+
+Azure Arc connected machine agent cannot be deployed on Azure VMs as they are already part of Azure Resource Manager. However, for demo purposes, you can use Azure VMs to host an Azure VM and onboard it to Azure Arc. This will allow you to simulate "on-premises" servers on Azure VMs.  
+
+* [Deploy an Ubuntu Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_windows.md)
+
+* [Deploy a Windows Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_linux.md)
+
+    **Note:** Use only for demo purposes
+
+
 #### Vagrant
 
 If you don't have any existing servers available, you can use [Vagrant](https://www.vagrantup.com/) to host a new server locally and onboard it to Azure. This will allow you to simulate "on-premises" servers from your local machine. 
