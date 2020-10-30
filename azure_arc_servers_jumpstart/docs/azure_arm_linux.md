@@ -1,6 +1,6 @@
 #  Onboard an Azure Linux Server VM with Azure Arc
 
-The following README will guide you on how onboard a Azure Linux VM on to Azure Arc. An ARM template is provided for the creation of the Azure Resouces, along with an script that will allow you to onboard the Azure VM onto Azure Arc, this step is requiered as Azure VMs are already part of ARM, therefore, the Azure Arc agent cannot be installed following the regular onboarding method. 
+The following README will guide you on how to onboard an Azure Linux VM on to Azure Arc. An ARM template is provided for the creation of the Azure Resouces, along with a script that will allow you to onboard the Azure VM onto Azure Arc, this step is required as Azure VMs are already part of ARM, therefore, the Azure Arc agent cannot be installed following the regular onboarding method. 
 
    > [!NOTE]Please note that this scenario is only intended for demo purposes. 
 
