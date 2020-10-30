@@ -54,13 +54,9 @@ However, **for demo purposes only**, the below guides will allow you to use and 
 
 **Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used only for demo and testing purposes.** 
 
-* [Deploy an Ubuntu Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_windows.md)
+* [Deploy an Ubuntu Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_linux.md)
 
-* [Deploy a Windows Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_linux.md)
-
-    **Note:** Use only for demo purposes
-
-
+* [Deploy a Windows Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_windows.md)
 #### Vagrant
 
 If you don't have any existing servers available, you can use [Vagrant](https://www.vagrantup.com/) to host a new server locally and onboard it to Azure. This will allow you to simulate "on-premises" servers from your local machine. 
