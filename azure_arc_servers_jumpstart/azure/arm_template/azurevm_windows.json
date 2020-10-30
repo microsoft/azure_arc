@@ -75,7 +75,7 @@
     },
     "vmName": {
       "type": "string",
-      "defaultValue": "arc-azurewin-demo",
+      "defaultValue": "Arc-Win-Demo",
       "metadata": {
         "description": "Name of the virtual machine."
       }
