@@ -6,7 +6,7 @@ The following README will guide you on how to onboard an Azure Linux VM on to Az
 
 # Azure Account  
 
-* You will need an Azure Account with an active and valid subscription so you can deploy the Azure VMs and then register and onboard them with Azure Arc. If you do not have an account already, you can start with a free-trial account. 
+* You will need an Azure Account with an active and valid subscription so you can deploy the Azure VMs and then register and onboard them with Azure Arc. If you do not have an account already, you can start with a free trial account. 
 
 * To create an Azure free account browse to [this link](https://azure.microsoft.com/en-us/free/) and select 'Start Free' to get access to a free trial subscription. 
 
