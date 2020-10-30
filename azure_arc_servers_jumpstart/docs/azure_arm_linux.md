@@ -26,7 +26,7 @@ Below you can find the automation flow for this scenario:
 
 1. Edit the *azurevm_linux.parameters.json* file 
 
-2. Upon execution of the *azurevm_linux.json* ARM template, an Azure VM will be created on your Azure Subscription
+2. Upon deployment of the *azurevm_linux.json* ARM template, an Azure VM will be created in your Azure Subscription
 
 3. Connect to the VM and run the *allow_arc_agent.sh* Shell script on the guest OS to: 
     * Prepare the OS for the installation of the "Azure Arc Connected Machine Agent".
