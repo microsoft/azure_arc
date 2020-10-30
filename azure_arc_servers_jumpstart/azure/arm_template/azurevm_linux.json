@@ -68,7 +68,7 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "vNet",
+      "defaultValue": "Azure-Arc-Demo",
       "metadata": {
         "description": "Name of the VNET"
       }
