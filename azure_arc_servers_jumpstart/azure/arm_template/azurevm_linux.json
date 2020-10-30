@@ -86,7 +86,37 @@
       "metadata": {
         "description": "Name of the Network Security Group"
       }
-    }
+    }, 
+    "subscriptionID": {
+      "type": "string",
+      "metadata": {
+        "description": "Subscription ID"
+      }
+    }, 
+    "servicePrincipalClient": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Service Principal name"
+      }
+    }, 
+    "servicePrincipalClientSecret": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Service Principal password"
+      }
+    }, 
+    "resourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Resource Group where all resource to be deployed"
+      }
+    }, 
+    "tenantID": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure tenant ID"
+      }
+    }    
   },
   "variables": {
     "publicIpAddressName": "[concat(parameters('vmName'), 'PublicIP' )]",
@@ -242,7 +272,28 @@
           "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
         }
       }
-    } 
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'),'/allowarc')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+      ],    
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.1",
+        "autoUpgradeMinorVersion": true,
+        "protectedSettings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/azure/scripts/allow_arc_agent.sh"
+          ],
+          "commandToExecute": "[concat('./allow_arc_agent.sh ', parameters('adminUsername'), ' ', parameters ('subscriptionID'), ' ', parameters('servicePrincipalClient'), ' ', parameters('servicePrincipalClientSecret'), ' ', parameters('tenantId'), ' ', parameters('resourceGroup'), ' ', parameters('location'), ' ', parameters('vmName') )]" 
+        }            
+      }
+    }
   ],
   "outputs": {
     "adminUsername": {
