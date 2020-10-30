@@ -34,7 +34,7 @@
     },
     "dnsLabelPrefix": {
       "type": "string",
-      "defaultValue": "[toLower(concat('simplelinuxvm-', uniqueString(resourceGroup().id)))]",
+      "defaultValue": "[toLower(concat('arclinuxvm-', uniqueString(resourceGroup().id)))]",
       "metadata": {
         "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
       }
@@ -68,21 +68,21 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "Azure-Arc-Demo",
+      "defaultValue": "ArcDemoLinux",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
     "subnetName": {
       "type": "string",
-      "defaultValue": "Subnet",
+      "defaultValue": "SubnetLinux",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
     "networkSecurityGroupName": {
       "type": "string",
-      "defaultValue": "SecGroupNet",
+      "defaultValue": "SecGrLinux",
       "metadata": {
         "description": "Name of the Network Security Group"
       }
