@@ -3,16 +3,31 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "adminUsername": {
-        "value": "GEN-UNIQUE"
+        "value": "<Username>"
       },
       "adminPasswordOrKey": {
-        "value": "GEN-PASSWORD"
+        "value": "<A password or SSH Key>"
       },
       "dnsLabelPrefix": {
-        "value": "GEN-UNIQUE"
+        "value": "<A DNS prefix for the Public IP>"
       }, 
       "vmName": {
-          "value": "GEN-UNIQUE"
-        }, 
+          "value": "<Name for your Linux VM>"
+      },
+      "subscriptionID": {
+        "value": "<Your Subscription ID>"
+      },
+      "servicePrincipalClient": {
+        "value": "<Your Azure Service Principal name>"
+      }, 
+      "servicePrincipalClientSecret": {
+        "value": "<Your Azure Service Principal password>"
+      }, 
+      "tenantID": {
+        "value": "<Your Azure AD Tenant ID>"
+      }, 
+      "resourceGroup": {
+        "value": "<Azure Resource Group where all resource to be deployed>"
       }
-  }
+    }
+}
