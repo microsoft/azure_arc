@@ -4,7 +4,7 @@
   "parameters": {
     "vmName": {
       "type": "string",
-      "defaultValue": "arc-linux-demo",
+      "defaultValue": "Arc-Linux-Demo",
       "metadata": {
         "description": "The name of you Virtual Machine."
       }
