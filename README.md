@@ -46,7 +46,13 @@ The following examples can be used to connect existing Windows or Linux servers 
 
 #### Azure 
 
-Azure Arc connected machine agent cannot be deployed on Azure VMs as they are already part of Azure Resource Manager. However, for demo purposes, you can use Azure VMs to host an Azure VM and onboard it to Azure Arc. This will allow you to simulate "on-premises" servers on Azure VMs.  
+Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) by default. 
+
+By projecting an Azure VM as an Azure Arc enabled server, a "conflict" is created which will not all the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM. 
+
+However, **for demo purposes only**, the below guides will allow you to use and onboard Azure VMs to Azure Arc and by that, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
+
+**Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used only for demo and testing purposes.** 
 
 * [Deploy an Ubuntu Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_windows.md)
 
