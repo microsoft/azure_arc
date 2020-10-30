@@ -76,7 +76,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 # Clean up environment
 
-Complete the following steps to clean up your environment.
+Complete the following steps to clean up your environment:
 
 * Remove the resource group that holds all the resources for this scenario. 
 
