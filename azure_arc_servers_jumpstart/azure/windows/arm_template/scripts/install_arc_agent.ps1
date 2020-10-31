@@ -38,10 +38,10 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
-Write-Host "Log in to Azure"
-$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal
+# Write-Host "Log in to Azure"
+# $azurePassword = ConvertTo-SecureString $env:password -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($env:appId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
 
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
 
