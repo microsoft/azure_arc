@@ -119,8 +119,8 @@
     }    
   },
   "variables": {
-    "publicIpAddressName": "[concat(parameters('vmName'), 'PublicIP' )]",
-    "networkInterfaceName": "[concat(parameters('vmName'),'NetInt')]",
+    "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
+    "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
     "osDiskType": "Standard_LRS",
     "subnetAddressPrefix": "10.1.0.0/24",
