@@ -6,7 +6,7 @@
         "value": "<Azure VM Size>"
       },
       "adminUsername": {
-        "value": "<Username>"
+        "value": "<Guest OS username>"
       },
       "adminPasswordOrKey": {
         "value": "<A password or SSH Key>"
