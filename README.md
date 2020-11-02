@@ -51,9 +51,9 @@ These guides, using Azure VM as the targeted Azure Arc server are designed **for
 
 In each guide, you find a detailed, technical explanation of the mechanism and why it is not expected to project an  Azure VM as an Azure Arc enabled server.
 
-* [Deploy an Ubuntu Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_template_win.md)
+* [Deploy a Windows Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_template_win.md)
 
-* [Deploy a Windows Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_template_linux.md)
+* [Deploy an Ubuntu Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_template_linux.md)
 
 #### Vagrant
 
