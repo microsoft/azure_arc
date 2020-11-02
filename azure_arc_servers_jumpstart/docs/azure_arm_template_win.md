@@ -6,7 +6,7 @@ Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://do
 
 By projecting an Azure VM as an Azure Arc enabled server, a "conflict" is created which will not allow for the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM. 
 
-However, **for demo purposes only**, the below guides will allow you to use and onboard Azure VMs to Azure Arc and by that, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
+However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc and by doing so, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
 **Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used ONLY for demo and testing purposes.**
 
