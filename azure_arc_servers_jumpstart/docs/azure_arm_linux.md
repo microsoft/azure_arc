@@ -127,7 +127,6 @@ Let the script to run its course and **do not close** the SSH session, this will
 
 ![](../img/azure_arm_template_linux/06.png)
 
-
 * Upon successful run, a new Azure Arc enabled server will be added to the Resource Group.
 
 ![](../img/azure_arm_template_linux/07.png)
