@@ -34,7 +34,7 @@ However, **for demo purposes only**, the below guides will allow you to use and 
     For example:
 
     ```console
-    az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
+    az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
     ```
 
     Output should look like this:
@@ -42,8 +42,8 @@ However, **for demo purposes only**, the below guides will allow you to use and 
     ```console
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcData",
-    "name": "http://AzureArcData",
+    "displayName": "AzureArcServers",
+    "name": "http://AzureArcServers",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
