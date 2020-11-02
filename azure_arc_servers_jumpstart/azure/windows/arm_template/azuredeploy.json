@@ -255,7 +255,7 @@
             "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
           ],
           "tags": {
-              "displayName": "config-choco"
+              "displayName": "Install Arc Agent"
           },          
           "properties": {
             "publisher": "Microsoft.Compute",

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "vmSize": {
+          "value": "<VM size>"
+      },
+      "vmName":{
+          "value": "<VM Name>"
+      },
+      "adminUsername": {
+        "value": "<Windows VM admin username>"
+      },
+      "adminPassword": {
+          "value": "<Windows VM admin password>"
+      },
+      "resourceGroup": {
+        "value": "<Azure Resource Group where all resource to be deployed>"
+      },      
+      "appId": {
+          "value": "<Azure Service Principal name>"
+      },
+      "password": {
+          "value": "<Azure Service Principal password>"
+      },
+      "tenantId": {
+          "value": "<Azure tenant ID>"
+      },
+      "subscriptionId": {
+          "value": "<Azure subscription ID>"
+      },
+      "location": {
+          "value": "eastus"
+      }
+    }
+}
