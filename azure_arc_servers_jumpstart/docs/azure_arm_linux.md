@@ -1,14 +1,12 @@
 #  Onboard an Azure Linux Server VM with Azure Arc
 
-The following README will guide you on how to automatically onboard a Azure Linux VM on to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible of creating the Azure resources as well as executing the Azure Arc onboard script on the VM. 
+The following README will guide you on how to automatically onboard a Azure Windows VM on to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible of creating the Azure resources as well as executing the Azure Arc onboard script on the VM. 
 
-Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/instance-metadata-service) by default. 
+Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) by default. By projecting an Azure VM as an Azure Arc enabled server, a "conflict" is created which will not allow for the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM. 
 
-By projecting an Azure VM as an Azure Arc enabled server, a "conflict" is created which will not all the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM. 
+However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc and by doing so, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
-However, **for demo purposes only**, the below guides will allow you to use and onboard Azure VMs to Azure Arc and by that, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
-
-**Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used ONLY for demo and testing purposes.**
+**Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
 ## Prerequisites
 
@@ -140,4 +138,3 @@ Let the script to run its course and **do not close** the SSH session, this will
 ## Cleanup
 
 To delete the entire deployment, simply delete the Resource Group from the Azure portal.
-
