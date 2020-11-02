@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmSize": {
+        "value": "<Azure VM Size>"
+      },
+      "adminUsername": {
+        "value": "<Guest OS username>"
+      },
+      "adminPasswordOrKey": {
+        "value": "<A password or SSH Key>"
+      },
+      "dnsLabelPrefix": {
+        "value": "<A DNS prefix for the Public IP>"
+      }, 
+      "vmName": {
+          "value": "<Name for your Linux VM>"
+      },
+      "subscriptionID": {
+        "value": "<Your Subscription ID>"
+      },
+      "servicePrincipalClient": {
+        "value": "<Your Azure Service Principal name>"
+      }, 
+      "servicePrincipalClientSecret": {
+        "value": "<Your Azure Service Principal password>"
+      }, 
+      "tenantID": {
+        "value": "<Your Azure AD Tenant ID>"
+      }, 
+      "resourceGroup": {
+        "value": "<Azure Resource Group where all resource to be deployed>"
+      }
+    }
+}
