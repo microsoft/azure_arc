@@ -1,83 +1,143 @@
 #  Onboard an Azure Linux Server VM with Azure Arc
 
-The following README will guide you on how to onboard an Azure Linux VM on to Azure Arc. An ARM template is provided for the creation of the Azure Resouces, along with a script that will allow you to onboard the Azure VM onto Azure Arc, this step is required as Azure VMs are already part of ARM, therefore, the Azure Arc agent cannot be installed following the regular onboarding method. 
+The following README will guide you on how to automatically onboard a Azure Linux VM on to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible of creating the Azure resources as well as executing the Azure Arc onboard script on the VM. 
 
-   > [!NOTE]Please note that this scenario is only intended for demo purposes. 
+Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/instance-metadata-service) by default. 
 
-At the end of this README you will have an Azure Linux VM connected as an Azure Arc enabled Server. 
+By projecting an Azure VM as an Azure Arc enabled server, a "conflict" is created which will not all the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM. 
 
-# Azure Account  
+However, **for demo purposes only**, the below guides will allow you to use and onboard Azure VMs to Azure Arc and by that, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
-* You will need an Azure Account with an active subscription so you can deploy the Azure VMs and then register and onboard them with Azure Arc. If you do not have an account already, you can start with a free trial account. 
+**Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used ONLY for demo and testing purposes.**
 
-* To create an Azure free account browse to [this link](https://azure.microsoft.com/en-us/free/) and select 'Start Free' to get access to a free trial subscription. 
-
-# Prerequisites
+## Prerequisites
 
 * Clone this repo
 
     ```terminal
     git clone https://github.com/microsoft/azure_arc.git
     ```
-    
+
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-# Automation Flow
+* In case you don't already have one, you can [Create a free Azure account](https://azure.microsoft.com/en-us/free/).
+
+* Create Azure Service Principal (SP)
+
+    In order for you to deploy the AKS cluster using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+
+    ```console
+    az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    ```
+
+    For example:
+
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
+    ```
+
+    Output should look like this:
+
+    ```console
+    {
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "displayName": "AzureArcServers",
+    "name": "http://AzureArcServers",
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+    ```
+
+> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+
+## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-1. User is editing the *azurevm_linux.parameters.json* file 
+1. User is editing the ARM template parameters file (1-time edit). These params values are being used throughout the deployment.
 
-2. User is executing the *azurevm_linux.json* ARM template which will create an Azure VM on the Azure Subscription
+2. The ARM template incl. an Azure VM Custom Script Extension which will deploy the the [*install_arc_agent.sh*](../azure/linux/arm_template/scripts/install_arc_agent.sh) Shell Script.
 
-3. Once the ARM template has completed, user will be logging in to the Linux OS. Upon first login a Shell script on the guest OS will run automatically, the script will: 
-    * Prepare the OS for the installation of the "Azure Arc Connected Machine Agent".
-    * Install and configure the "Azure Arc Connected Machine Agent". 
+3. In order to allow the Azure VM to successfully be projected as an Azure Arc enabled server, the script will:
 
-# Deployment
+    1. Set local OS environment variables
 
-* Before executing the ARM template, you must create a resource group and set the parameters that match your environment. Edit the *azurevm_linux.parameters.json* file and provide: 
-    - **adminUsername:** a username for Admin access to the Linux OS
-    - **adminPublicKey:** the public key for SSH access
-    - **dnsLabelPrefix:** a DNS prefix for the VM 
-    - **vmName:** a custom name for the Azure VM
-    - **subscriptionID:** the ID for your Azure Subscription 
-    - **servicePrincipalClient:** the Azure Service Principal name
-    - **servicePrincipalClientSecret:** Azure Service Principal password
-    - **tenantID:**  ID of your Azure AD Tenant 
-    - **resourceGroup:** Name of the resource group where all resource will be deployed
+    2. Generate a ~/.bash_profile file that will be initialized at user's first login to configure the environment. This script will:
 
+        - Stop and disable the "Linux Azure Guest Agent" service
 
-* To deploy the ARM template, navigate to the local cloned deployment folder and run the below command:
+        - Create a new OS Firewall rule to Block Azure IMDS outbound traffic to the *169.254.169.254* Remote Address
 
-    ```terminal
-    az group create --name Azure-Arc-Demo --location <Azure Region> --tags Project=jumpstart_azure_arc_servers
-    az deployment group create --resource-group Azure-Arc-Demo --name <The name of this deployment> \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/azure/arm_template/azurevm_linux.json \
-    --parameters <The *azurevm_linux.parameters.json* parameters file location>
+        - Install the Azure Arc connected Machine Agent 
+        
+        - Remove the ~/.bash_profile file so it will not run after first login
+
+4. User SSH to Linux VM which will start the *~/.bash_profile* script execution and will onboard the VM to Azure Arc
+
+## Deployment
+
+As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible for creating all the Azure resources in a single Resource Group as well onboarding the created VM to Azure Arc. 
+
+* Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command.
+
+* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../azure/linux/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../azure/linux/arm_template/azuredeploy.parameters.example.json).
+
+* To deploy the ARM template, navigate to the local cloned [deployment folder](../azure/linux/arm_template/) and run the below command:
+
+    ```console
+    az group create --name <Name of the Azure Resource Group> --location <Azure Region> --tags "Project=jumpstart_azure_arc_servers"
+    az deployment group create \
+    --resource-group <Name of the Azure Resource Group> \
+    --name <The name of this deployment> \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/azure/linux/arm_template/azuredeploy.json \
+    --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
-* Once Azure resources have been provisioned, you will be able to see them in Azure portal. 
 
-![](../img/azure_linux/01.png)
+    > [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
 
-# Azure Arc Agent Installation 
+    For example:
 
-* Using the public IP assigned to the Linux VM, SSH onto the recently created machine. 
+    ```console
+    az group create --name Arc-Servers-Lin-Demo --location "westeurope" --tags "Project=jumpstart_azure_arc_servers"
+    az deployment group create \
+    --resource-group Arc-Servers-Linux-Demo \
+    --name arclinuxdemo \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/azure/linux/arm_template/azuredeploy.json \
+    --parameters azuredeploy.parameters.json
+    ```
 
-![](../img/azure_linux/02.png)
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
-* Upon successful login an script will run automatically that will deploy the Azure Arc agent.
+    ![](../img/azure_arm_template_linux/01.png)
 
-![](../img/azure_linux/03.png)
+    ![](../img/azure_arm_template_linux/02.png)
 
-* Once the execution is complete you will see an Azure Arc enabled Server in your Resource Group. 
 
-![](../img/azure_linux/04.png)
+## Linux Login & Post Deployment
 
-# Clean up environment
+* Now that the Linux VM is created, it is time to login to it. Using it's public IP, SSH to the VM.
 
-Complete the following steps to clean up your environment:
+![](../img/azure_arm_template_linux/03.png)
 
-* Remove the resource group that holds all the resources for this scenario. 
+* At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
-![](../img/azure_linux/05.png)
+Let the script to run its course and **do not close** the SSH session, this will be done for you once completed.
+
+![](../img/azure_arm_template_linux/04.png)
+
+![](../img/azure_arm_template_linux/05.png)
+
+![](../img/azure_arm_template_linux/06.png)
+
+
+* Upon successful run, a new Azure Arc enabled server will be added to the Resource Group.
+
+![](../img/azure_arm_template_linux/07.png)
+
+![](../img/azure_arm_template_linux/08.png)
+
+## Cleanup
+
+To delete the entire deployment, simply delete the Resource Group from the Azure portal.
+
