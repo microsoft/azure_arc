@@ -82,7 +82,7 @@
     },
     "networkSecurityGroupName": {
       "type": "string",
-      "defaultValue": "SecGrLinux",
+      "defaultValue": "Arc-Linux-Demo-NSG",
       "metadata": {
         "description": "Name of the Network Security Group"
       }
