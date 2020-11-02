@@ -96,7 +96,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```console
-    az group create --name Arc-Servers-Lin-Demo --location "westeurope" --tags "Project=jumpstart_azure_arc_servers"
+    az group create --name Arc-Servers-Linux-Demo --location "westeurope" --tags "Project=jumpstart_azure_arc_servers"
     az deployment group create \
     --resource-group Arc-Servers-Linux-Demo \
     --name arclinuxdemo \
