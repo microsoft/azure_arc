@@ -13,7 +13,6 @@ VMNAME=$8
 touch /home/$USER/.bash_profile
 chmod +x /home/$USER/.bash_profile
 
-
 cat <<EOT > /home/$USER/.bash_profile
 #!/bin/bash
 ##Environment Variables
@@ -62,5 +61,4 @@ sudo azcmagent connect \
 rm -f /home/$USER/.bash_profile
 
 EOT
-
 
