@@ -8,7 +8,7 @@ By projecting an Azure VM as an Azure Arc enabled server, a "conflict" is create
 
 However, **for demo purposes only**, the below guides will allow you to use and onboard Azure VMs to Azure Arc and by that, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
-**> [!NOTE] It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used ONLY for demo and testing purposes.**
+**[!NOTE] It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used ONLY for demo and testing purposes.**
 
 ## Prerequisites
 
@@ -34,7 +34,7 @@ However, **for demo purposes only**, the below guides will allow you to use and 
     For example:
 
     ```console
-    az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
+    az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
     ```
 
     Output should look like this:
@@ -42,8 +42,8 @@ However, **for demo purposes only**, the below guides will allow you to use and 
     ```console
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcServers",
-    "name": "http://AzureArcServers",
+    "displayName": "AzureArcData",
+    "name": "http://AzureArcData",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
