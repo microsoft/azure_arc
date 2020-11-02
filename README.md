@@ -55,8 +55,6 @@ In each guide, you find a detailed, technical explanation of the mechanism and w
 
 * [Deploy a Windows Azure VM and connect it to Azure Arc using ARM](azure_arc_servers_jumpstart/docs/azure_arm_linux.md)
 
-    **Note:** Scenario intended only for demo purposes
-
 #### Vagrant
 
 If you don't have any existing servers available, you can use [Vagrant](https://www.vagrantup.com/) to host a new server locally and onboard it to Azure. This will allow you to simulate "on-premises" servers from your local machine. 
