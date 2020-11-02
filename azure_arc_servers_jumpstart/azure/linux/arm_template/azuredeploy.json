@@ -68,7 +68,7 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "ArcDemoLinux",
+      "defaultValue": "Arc-Demo-Linux-VNET",
       "metadata": {
         "description": "Name of the VNET"
       }
