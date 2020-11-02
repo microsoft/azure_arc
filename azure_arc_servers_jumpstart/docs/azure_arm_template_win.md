@@ -8,7 +8,7 @@ By projecting an Azure VM as an Azure Arc enabled server, a "conflict" is create
 
 However, **for demo purposes only**, the below guides will allow you to use and onboard Azure VMs to Azure Arc and by that, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
-**[!NOTE] It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used ONLY for demo and testing purposes.**
+**Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled Server. The below scenarios are unsupported and should be used ONLY for demo and testing purposes.**
 
 ## Prerequisites
 
