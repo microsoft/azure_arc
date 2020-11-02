@@ -9,6 +9,13 @@
         "description": "The name of you Virtual Machine."
       }
     },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_B2ms",
+      "metadata": {
+          "description": "The size of the VM"
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -57,13 +64,6 @@
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Azure region location for all resources."
-      }
-    },
-    "VmSize": {
-      "type": "string",
-      "defaultValue": "Standard_B2ms",
-      "metadata": {
-        "description": "The size of the VM"
       }
     },
     "virtualNetworkName": {
@@ -242,7 +242,7 @@
       ],
       "properties": {
         "hardwareProfile": {
-          "vmSize": "[parameters('VmSize')]"
+          "vmSize": "[parameters('vmSize')]"
         },
         "storageProfile": {
           "osDisk": {
@@ -288,9 +288,9 @@
         "autoUpgradeMinorVersion": true,
         "protectedSettings": {
           "fileUris": [
-            "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/azure/scripts/allow_arc_agent.sh"
+            "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/azure/linux/scripts/install_arc_agent.sh"
           ],
-          "commandToExecute": "[concat('./allow_arc_agent.sh ', parameters('adminUsername'), ' ', parameters ('subscriptionID'), ' ', parameters('servicePrincipalClient'), ' ', parameters('servicePrincipalClientSecret'), ' ', parameters('tenantId'), ' ', parameters('resourceGroup'), ' ', parameters('location'), ' ', parameters('vmName') )]" 
+          "commandToExecute": "[concat('./install_arc_agent.sh ', parameters('adminUsername'), ' ', parameters ('subscriptionID'), ' ', parameters('servicePrincipalClient'), ' ', parameters('servicePrincipalClientSecret'), ' ', parameters('tenantId'), ' ', parameters('resourceGroup'), ' ', parameters('location'), ' ', parameters('vmName') )]" 
         }            
       }
     }
