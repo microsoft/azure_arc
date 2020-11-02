@@ -75,7 +75,7 @@
     },
     "subnetName": {
       "type": "string",
-      "defaultValue": "SubnetLinux",
+      "defaultValue": "Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
