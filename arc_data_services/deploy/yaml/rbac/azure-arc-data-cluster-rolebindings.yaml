@@ -11,13 +11,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:reader
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -31,13 +32,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:data-controller:reader
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -52,13 +54,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:database-instance:reader
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -72,13 +75,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:sql-managed-instance:reader
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -92,13 +96,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:postgresql-hyperscale:reader
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -115,13 +120,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:writer
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -135,13 +141,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:data-controller:writer
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -156,13 +163,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:database-instance:writer
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -176,13 +184,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:sql-managed-instance:writer
   apiGroup: rbac.authorization.k8s.io
 ---
@@ -196,13 +205,14 @@ metadata:
   # This only grants permissions within the namespace below.
   namespace: azure-arc-data
   labels:
+    arcdata.microsoft.com/role-bindings: "true"
     arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
   apiGroup: rbac.authorization.k8s.io
 roleRef:
-  kind: Role
+  kind: ClusterRole
   name: azure-arc-data:postgresql-hyperscale:writer
   apiGroup: rbac.authorization.k8s.io
 ---

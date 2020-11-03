@@ -10,6 +10,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "azure-arc-data" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
@@ -28,6 +31,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "azure-arc-data" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
@@ -46,6 +52,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "azure-arc-data" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
@@ -64,6 +73,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "azure-arc-data" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
@@ -82,6 +94,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "azure-arc-data" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "readers"
 subjects:
 - kind: User
   name: hr-user # Name is case sensitive
@@ -102,6 +117,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "azure-arc-data" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
@@ -120,6 +138,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "azure-arc-data" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
@@ -138,6 +159,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "azure-arc-data" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
@@ -156,6 +180,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "development" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
@@ -174,6 +201,9 @@ metadata:
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "development" namespace.
   namespace: azure-arc-data
+  labels:
+    arcdata.microsoft.com/role-bindings: "true"
+    arcdata.microsoft.com/role-binding-type: "writers"
 subjects:
 - kind: User
   name: hr-admin # Name is case sensitive
