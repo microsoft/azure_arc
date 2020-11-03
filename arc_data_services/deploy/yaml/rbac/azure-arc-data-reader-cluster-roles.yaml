@@ -2,7 +2,9 @@
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: azure-arc-data:reader
+    name: azure-arc-data:reader
+    labels:
+      arcdata.microsoft.com/cluster-role: "true"
 aggregationRule:
   clusterRoleSelectors:
   - matchLabels:
@@ -13,7 +15,9 @@ rules: []
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: azure-arc-data:database-instance:reader
+    name: azure-arc-data:database-instance:reader
+    labels:
+      arcdata.microsoft.com/cluster-role: "true"
 aggregationRule:
   clusterRoleSelectors:
   - matchLabels:
@@ -26,6 +30,7 @@ kind: ClusterRole
 metadata:
     name: azure-arc-data:data-controller:reader
     labels:
+      arcdata.microsoft.com/cluster-role: "true"
       arcdata.microsoft.com/aggregate-to-reader: "true"
 rules:
     - apiGroups: ["arcdata.microsoft.com"]
@@ -38,6 +43,7 @@ kind: ClusterRole
 metadata:
     name: azure-arc-data:sql-managed-instance:reader
     labels:
+      arcdata.microsoft.com/cluster-role: "true"
       arcdata.microsoft.com/aggregate-to-reader: "true"
       arcdata.microsoft.com/aggregate-to-database-reader: "true"
 rules:
@@ -51,6 +57,7 @@ kind: ClusterRole
 metadata:
     name: azure-arc-data:postgresql-hyperscale:reader
     labels:
+      arcdata.microsoft.com/cluster-role: "true"
       arcdata.microsoft.com/aggregate-to-reader: "true"
       arcdata.microsoft.com/aggregate-to-database-reader: "true"
 rules:
