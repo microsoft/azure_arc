@@ -49,7 +49,7 @@ By the end of the guide, you will have a VMware vSphere VM installed with Window
 
 ### Preparing a Window Server VMware vSphere VM Template
 
-Before using the below guide to deploy a Windows Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](..\..\azure_arc_servers_jumpstart\docs\vmware_terraform_winsrv.md) will instruct you how to easily create such a template using VMware vSphere 6.5 and above. 
+Before using the below guide to deploy a Windows Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](../../azure_arc_servers_jumpstart/docs/vmware_terraform_winsrv.md) will instruct you how to easily create such a template using VMware vSphere 6.5 and above. 
 
 **The Terraform plan leveraged the *remote-exec* provisioner which uses the WinRM protocol to copy and execute the required Azure Arc script. To allow WinRM connectivity to the VM, run the [*allow_winrm*](../vmware/winsrv/terraform/scripts/allow_winrm.ps1) Powershell script on your VM before converting it to template.** 
 
