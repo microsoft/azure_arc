@@ -88,18 +88,14 @@ data "aws_ami" "Windows_2019" {
 }
 
 data "aws_ami" "centos" {
-  owners      = ["679593333241"]
+  owners      = ["125523088429"]
   most_recent = true
   filter {
     name   = "name"
-    values = ["CentOS Linux 7 x86_64 HVM EBS *"]
+    values = ["CentOS 7.8.2003 x86_64"]
   }
   filter {
     name   = "architecture"
     values = ["x86_64"]
-  }
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
   }
 }
