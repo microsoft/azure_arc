@@ -36,6 +36,9 @@ rules:
     - apiGroups: ["arcdata.microsoft.com"]
       resources: ["datacontrollers"]
       verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
+    - apiGroups: [""]
+      resources: ["secrets"]
+      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
 # This cluster role provides write access to Azure SQL Managed Instance resource
 # Write access implies create, edit & delete of SQL Managed Instances
@@ -50,6 +53,9 @@ rules:
     - apiGroups: ["sql.arcdata.microsoft.com"]
       resources: ["sqlmanagedinstances"]
       verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
+    - apiGroups: [""]
+      resources: ["secrets"]
+      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
 # This cluster role provides write access to Azure PostgreSQL HyperScale resource
 # Write access implies create, edit & delete of Azure PostgreSQL HyperScale instances
@@ -63,5 +69,8 @@ metadata:
 rules:
     - apiGroups: ["arcdata.microsoft.com"]
       resources: ["postgresql-11s", "postgresql-12s"]
+      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
+    - apiGroups: [""]
+      resources: ["secrets"]
       verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
