@@ -48,7 +48,7 @@ spec:
       - env:
         - name: ACCEPT_EULA
           value: "Y"
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:latest
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:public-preview-sep-2020     
         imagePullPolicy: IfNotPresent
         name: bootstrapper
         resources: {}

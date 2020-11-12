@@ -14,9 +14,6 @@ rules:
     - apiGroups: ["sql.arcdata.microsoft.com"]
       resources: ["sqlmanagedinstances"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
-    - apiGroups: [""]
-      resources: ["secrets"]
-      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
 # This role provides writer access to Azure Arc SQL Managed Instance and PostgreSQL Hyperscale resources
 # Write access implies create, edit & delete of the resources
@@ -34,9 +31,6 @@ rules:
     - apiGroups: ["sql.arcdata.microsoft.com"]
       resources: ["sqlmanagedinstances"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
-    - apiGroups: [""]
-      resources: ["secrets"]
-      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
 # This role provides write access to Azure Arc Data Controller resources
 # Write access implies create, edit & delete of the resources
@@ -51,9 +45,6 @@ rules:
     - apiGroups: ["arcdata.microsoft.com"]
       resources: ["datacontrollers"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
-    - apiGroups: [""]
-      resources: ["secrets"]
-      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
 # This role provides write access to Azure SQL Managed Instance resources
 # Write access implies create, edit & delete of SQL Managed Instances
@@ -68,9 +59,6 @@ rules:
     - apiGroups: ["sql.arcdata.microsoft.com"]
       resources: ["sqlmanagedinstances"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
-    - apiGroups: [""]
-      resources: ["secrets"]
-      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
 # This role provides write access to Azure PostgreSQL Hyperscale resource
 # Write access implies create, edit & delete of Azure PostgreSQL Hyperscale instances
@@ -85,7 +73,4 @@ rules:
     - apiGroups: ["arcdata.microsoft.com"]
       resources: ["postgresql-11s", "postgresql-12s"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
-    - apiGroups: [""]
-      resources: ["secrets"]
-      verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
