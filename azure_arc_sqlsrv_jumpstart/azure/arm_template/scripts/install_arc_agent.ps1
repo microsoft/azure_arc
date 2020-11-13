@@ -1,3 +1,5 @@
+Start-Transcript -Path C:\tmp\install_arc_agents.log
+
 # These settings will be replaced by the portal when the script is generated
 param (
     [string]$subscriptionId,
@@ -64,21 +66,21 @@ function registerArcForServers() {
     Write-Host "Running Azure Connected Machine Agent"
     $context = Get-AzContext
 
-    if ($appId -And $tenantId -And $password) {
+    if ($env:appId -And $env:tenantId -And $env:password) {
         & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-            --service-principal-id $appId `
-            --service-principal-secret $password `
-            --resource-group $resourceGroup `
-            --location $location `
-            --subscription-id $subscriptionId `
+            --service-principal-id $env:appId `
+            --service-principal-secret $env:password `
+            --resource-group $env:env:resourceGroup `
+            --location $env:location `
+            --subscription-id $env:subscriptionId `
             --tenant-id $context.Tenant `
             --tags "Project=jumpstart_azure_arc_sql"
     }
     else {
         & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-            --resource-group $resourceGroup `
-            --location $location `
-            --subscription-id $subscriptionId `
+            --resource-group $env:env:resourceGroup `
+            --location $env:location `
+            --subscription-id $env:subscriptionId `
             --tenant-id $context.Tenant `
             --tags "Project=jumpstart_azure_arc_sql"
     }
@@ -136,7 +138,7 @@ if (!$context) {
     return
 }
 
-Set-AzContext -Subscription $subscriptionId
+Set-AzContext -Subscription $env:subscriptionId
 $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
 
 if ($null -eq $arcResource) {
@@ -250,10 +252,12 @@ if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server') {
 
         # Create resource
         #
-        $newResource = New-AzResource -Location $location -Properties $instProp -ResourceName $resource_name -ResourceType Microsoft.AzureData/sqlServerInstances -ResourceGroupName $resourceGroup -Tag @{Project="jumpstart_azure_arc_sql"} -Force 
+        $newResource = New-AzResource -Location $env:location -Properties $instProp -ResourceName $resource_name -ResourceType Microsoft.AzureData/sqlServerInstances -ResourceGroupName $env:resourceGroup -Tag @{Project="jumpstart_azure_arc_sql"} -Force 
         checkResourceCreation -newResource $newResource -instProp $instProp -name $resource_name
     }
 }
 else {
     Write-Error -Category NotInstalled -Message "SQL Server is not installed on this machine." 
 }
+
+Stop-Transcript
