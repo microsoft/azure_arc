@@ -71,7 +71,7 @@ $Np
 Restart-Service -Name 'MSSQLSERVER'
 
 Write-Host "Restoring AdventureWorksLT2019 Sample Database"
-https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/restore_db.ps1
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/restore_db.ps1" -OutFile "C:\tmp\restore_db.ps1"
 $script = "C:\tmp\restore_db.ps1"
 $commandLine = "$script"
 Start-Process powershell.exe -ArgumentList $commandline
