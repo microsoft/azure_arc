@@ -35,9 +35,7 @@ echo "Configuring Firewall"
 
 sudo ufw --force enable
 sudo ufw deny out from any to 169.254.169.254
-sudo ufw allow 22 
-sudo ufw allow 80
-sudo ufw allow 443
+sudo ufw default allow incoming
 sudo apt-get update
 
 echo "Reconfiguring Hostname"
