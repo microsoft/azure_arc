@@ -1,41 +1,21 @@
-Start-Transcript -Path C:\tmp\install_arc_agents.log
-
 # These settings will be replaced by the portal when the script is generated
-param (
-    [string]$subscriptionId,
-    [string]$resourceGroup,
-    [string]$location
-)
+$subId = "${subscriptionId}"
+$resourceGroup = "${resourceGroup}"
+$location = "${location}"
 
 # These optional variables can be replaced with valid service principal details
 # if you would like to use this script for a registration at scale scenario, i.e. run it on multiple machines remotely
 # For more information, see https://docs.microsoft.com/sql/sql-server/azure-arc/connect-at-scale
+#
+$servicePrincipalAppId = "${appId}"
+$servicePrincipalTenantId = "${tenantId}"
+$servicePrincipalSecret = "${password}"
 
-param (
-    [string]$appId,
-    [string]$password,
-    [string]$tenantId
-)
-
-[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('location', $location,[System.EnvironmentVariableTarget]::Machine)
-
-$azurePassword = ConvertTo-SecureString $env:password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AzureData
-
-## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
-
-Write-Host "Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM"
-Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
-Stop-Service WindowsAzureGuestAgent -Force -Verbose
-New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254 
 
 function registerArcForServers() {
     # Download the package
@@ -66,21 +46,21 @@ function registerArcForServers() {
     Write-Host "Running Azure Connected Machine Agent"
     $context = Get-AzContext
 
-    if ($env:appId -And $env:tenantId -And $env:password) {
+    if ($servicePrincipalAppId -And $servicePrincipalTenantId -And $servicePrincipalSecret) {
         & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-            --service-principal-id $env:appId `
-            --service-principal-secret $env:password `
-            --resource-group $env:env:resourceGroup `
-            --location $env:location `
-            --subscription-id $env:subscriptionId `
+            --service-principal-id $servicePrincipalAppId `
+            --service-principal-secret $servicePrincipalSecret `
+            --resource-group $resourceGroup `
+            --location $location `
+            --subscription-id $subId `
             --tenant-id $context.Tenant `
             --tags "Project=jumpstart_azure_arc_sql"
     }
     else {
         & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-            --resource-group $env:env:resourceGroup `
-            --location $env:location `
-            --subscription-id $env:subscriptionId `
+            --resource-group $resourceGroup `
+            --location $location `
+            --subscription-id $subId `
             --tenant-id $context.Tenant `
             --tags "Project=jumpstart_azure_arc_sql"
     }
@@ -138,7 +118,7 @@ if (!$context) {
     return
 }
 
-Set-AzContext -Subscription $env:subscriptionId
+Set-AzContext -Subscription $subId
 $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
 
 if ($null -eq $arcResource) {
@@ -252,12 +232,10 @@ if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server') {
 
         # Create resource
         #
-        $newResource = New-AzResource -Location $env:location -Properties $instProp -ResourceName $resource_name -ResourceType Microsoft.AzureData/sqlServerInstances -ResourceGroupName $env:resourceGroup -Tag @{Project="jumpstart_azure_arc_sql"} -Force 
+        $newResource = New-AzResource -Location $location -Properties $instProp -ResourceName $resource_name -ResourceType Microsoft.AzureData/sqlServerInstances -ResourceGroupName $resourceGroup -Tag @{Project="jumpstart_azure_arc_sql"} -Force 
         checkResourceCreation -newResource $newResource -instProp $instProp -name $resource_name
     }
 }
 else {
     Write-Error -Category NotInstalled -Message "SQL Server is not installed on this machine." 
 }
-
-Stop-Transcript
