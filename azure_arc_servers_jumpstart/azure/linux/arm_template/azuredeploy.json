@@ -224,7 +224,7 @@
         "tier": "Regional"
       },
       "properties": {
-        "publicIpAllocationMethod": "Dynamic",
+        "publicIpAllocationMethod": "Static",
         "publicIPAddressVersion": "IPv4",
         "dnsSettings": {
           "domainNameLabel": "[parameters('dnsLabelPrefix')]"
