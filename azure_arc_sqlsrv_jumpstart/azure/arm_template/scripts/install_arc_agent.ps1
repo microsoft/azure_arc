@@ -1,5 +1,5 @@
 # These settings will be replaced by the portal when the script is generated
-$subId = "${subId}"
+$subscriptionId = "${subscriptionId}"
 $resourceGroup = "${resourceGroup}"
 $location = "${location}"
 
@@ -7,13 +7,13 @@ $location = "${location}"
 # if you would like to use this script for a registration at scale scenario, i.e. run it on multiple machines remotely
 # For more information, see https://docs.microsoft.com/sql/sql-server/azure-arc/connect-at-scale
 #
-$servicePrincipalAppId = "${servicePrincipalAppId}"
-$servicePrincipalTenantId = "${servicePrincipalTenantId}"
-$servicePrincipalSecret = "${servicePrincipalSecret}"
+$appId = "${appId}"
+$tenantId = "${tenantId}"
+$password = "${password}"
 
-$azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AzureData
 
@@ -53,13 +53,13 @@ function registerArcForServers() {
     Write-Host "Running Azure Connected Machine Agent"
     $context = Get-AzContext
 
-    if ($servicePrincipalAppId -And $servicePrincipalTenantId -And $servicePrincipalSecret) {
+    if ($appId -And $tenantId -And $password) {
         & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-            --service-principal-id $servicePrincipalAppId `
-            --service-principal-secret $servicePrincipalSecret `
+            --service-principal-id $appId `
+            --service-principal-secret $password `
             --resource-group $resourceGroup `
             --location $location `
-            --subscription-id $subId `
+            --subscription-id $subscriptionId `
             --tenant-id $context.Tenant `
             --tags "Project=jumpstart_azure_arc_sql"
     }
@@ -67,7 +67,7 @@ function registerArcForServers() {
         & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
             --resource-group $resourceGroup `
             --location $location `
-            --subscription-id $subId `
+            --subscription-id $subscriptionId `
             --tenant-id $context.Tenant `
             --tags "Project=jumpstart_azure_arc_sql"
     }
@@ -125,7 +125,7 @@ if (!$context) {
     return
 }
 
-Set-AzContext -Subscription $subId
+Set-AzContext -Subscription $subscriptionId
 $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
 
 if ($null -eq $arcResource) {

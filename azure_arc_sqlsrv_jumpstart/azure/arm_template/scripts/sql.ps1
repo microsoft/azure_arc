@@ -16,6 +16,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('location', $location,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
 
+New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 $chocolateyAppList = "az.powershell,azure-cli,sql-server-management-studio"
 
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
@@ -35,8 +36,6 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 # Creating PowerShell Logon Script
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
-
-New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 
 Write-Host "Installing SQL Server and PowerShell Module"
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
