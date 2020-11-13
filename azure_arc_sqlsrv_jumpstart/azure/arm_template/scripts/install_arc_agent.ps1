@@ -1,15 +1,23 @@
+[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('location', $location,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
+
 # These settings will be replaced by the portal when the script is generated
-$subId = "${subscriptionId}"
-$resourceGroup = "${resourceGroup}"
-$location = "${location}"
+$subId = "${env:subscriptionId}"
+$resourceGroup = "${env:resourceGroup}"
+$location = "${env:location}"
 
 # These optional variables can be replaced with valid service principal details
 # if you would like to use this script for a registration at scale scenario, i.e. run it on multiple machines remotely
 # For more information, see https://docs.microsoft.com/sql/sql-server/azure-arc/connect-at-scale
 #
-$servicePrincipalAppId = "${appId}"
-$servicePrincipalTenantId = "${tenantId}"
-$servicePrincipalSecret = "${password}"
+$servicePrincipalAppId = "${env:appId}"
+$servicePrincipalTenantId = "${env:tenantId}"
+$servicePrincipalSecret = "${env:password}"
 
 $azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
