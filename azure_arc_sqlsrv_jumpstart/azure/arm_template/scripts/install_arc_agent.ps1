@@ -1,15 +1,19 @@
 # These settings will be replaced by the portal when the script is generated
-$subscriptionId = "${subscriptionId}"
-$resourceGroup = "${resourceGroup}"
-$location = "${location}"
+param (
+    [string]$subscriptionId,
+    [string]$resourceGroup,
+    [string]$location
+)
 
 # These optional variables can be replaced with valid service principal details
 # if you would like to use this script for a registration at scale scenario, i.e. run it on multiple machines remotely
 # For more information, see https://docs.microsoft.com/sql/sql-server/azure-arc/connect-at-scale
-#
-$appId = "${appId}"
-$tenantId = "${tenantId}"
-$password = "${password}"
+
+param (
+    [string]$appId,
+    [string]$password,
+    [string]$tenantId
+)
 
 $azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
