@@ -15,9 +15,16 @@ param (
     [string]$tenantId
 )
 
-$azurePassword = ConvertTo-SecureString $password -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($appId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $tenantId -ServicePrincipal
+[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('location', $location,[System.EnvironmentVariableTarget]::Machine)
+
+$azurePassword = ConvertTo-SecureString $env:password -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:appId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AzureData
 
