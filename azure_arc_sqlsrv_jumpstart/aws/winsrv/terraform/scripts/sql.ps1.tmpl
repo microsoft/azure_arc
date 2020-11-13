@@ -19,7 +19,7 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
-Write-Host "Installing SQL Server Express and PowerShell Module"
+Write-Host "Installing SQL Server and PowerShell Module"
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 If(-not(Get-InstalledModule SQLServer -ErrorAction silentlycontinue)){
     Install-Module SQLServer -Confirm:$False -Force
