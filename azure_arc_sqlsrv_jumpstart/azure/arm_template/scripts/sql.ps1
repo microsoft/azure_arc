@@ -71,8 +71,10 @@ $Np
 Restart-Service -Name 'MSSQLSERVER'
 
 Write-Host "Restoring AdventureWorksLT2019 Sample Database"
-Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/AdventureWorksLT2019.bak" -OutFile "C:\tmp\AdventureWorksLT2019.bak"
-Restore-SqlDatabase -ServerInstance $env:COMPUTERNAME -Database "AdventureWorksLT2019" -BackupFile "C:\tmp\AdventureWorksLT2019.bak" -AutoRelocateFile -PassThru -Verbose
+https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/restore_db.ps1
+$script = "C:\tmp\restore_db.ps1"
+$commandLine = "$script"
+Start-Process powershell.exe -ArgumentList $commandline
 
 Write-Host "Creating SQL Server Management Studio Desktop shortcut"
 $TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Ssms.exe"
@@ -83,7 +85,6 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Azure Arc agent Installation
-
 Write-Host "Onboarding to Azure Arc"
 Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/install_arc_agent.ps1" -OutFile "C:\tmp\install_arc_agent.ps1"
 $script = "C:\tmp\install_arc_agent.ps1"
