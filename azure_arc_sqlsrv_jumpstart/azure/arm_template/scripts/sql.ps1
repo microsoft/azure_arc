@@ -86,12 +86,13 @@ $Shortcut.Save()
 
 # Azure Arc agent Installation
 Write-Host "Onboarding to Azure Arc"
-Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/install_arc_agent.ps1" -OutFile "C:\tmp\install_arc_agent.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/install_arc_agent.ps1" -OutFile "C:\tmp\install_arc_agent.ps1"
 $script = "C:\tmp\install_arc_agent.ps1"
 $commandLine = "$script"
 Start-Process powershell.exe -ArgumentList $commandline
 
 Write-Host "I am deploying Azure Log Analytics workspace and installing the MMA agent. This can take ~10min, hold tight..."
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
 az login --service-principal --username $env:servicePrincipalAppId --password $env:servicePrincipalSecret --tenant $env:servicePrincipalTenantId
 
 # Set Log Analytics Workspace Environment Variables
@@ -114,7 +115,6 @@ $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $Wo
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $WorkspaceName --query primarySharedKey -o tsv)
 
 # Deploy MMA Azure Extension ARM Template
-Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
 New-AzResourceGroupDeployment -Name MMA `
   -ResourceGroupName $env:resourceGroup `
   -arcServerName $env:computername `
@@ -122,6 +122,14 @@ New-AzResourceGroupDeployment -Name MMA `
   -workspaceId $workspaceId `
   -workspaceKey $workspaceKey `
   -TemplateFile C:\tmp\mma.json
+
+  Write-Host "Configuring SQL Azure Assessment"
+  Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
+  Expand-Archive "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
+  $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\'Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
+  Import-Module $env:ProgramFiles\'Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll'
+  $SecureString = ConvertTo-SecureString '${admin_password}' -AsPlainText -Force
+  Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
 Stop-Process -Name powershell -Force
