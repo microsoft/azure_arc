@@ -91,6 +91,38 @@ $script = "C:\tmp\install_arc_agent.ps1"
 $commandLine = "$script"
 Start-Process powershell.exe -ArgumentList $commandline
 
+Write-Host "I am deploying Azure Log Analytics workspace and installing the MMA agent. This can take ~10min, hold tight..."
+az login --service-principal --username $env:servicePrincipalAppId --password $env:servicePrincipalSecret --tenant $env:servicePrincipalTenantId
+
+# Set Log Analytics Workspace Environment Variables
+$WorkspaceName = "log-analytics-" + (Get-Random -Maximum 99999)
+
+# Get the Resource Group
+Get-AzResourceGroup -Name $env:resourceGroup -ErrorAction Stop -Verbose
+
+# Create the workspace
+New-AzOperationalInsightsWorkspace -Location $env:location -Name $WorkspaceName -Sku Standard -ResourceGroupName $env:resourceGroup -Verbose
+
+Write-Host "Enabling Log Analytics Solutions"
+$Solutions = "Security", "Updates", "SQLAssessment"
+foreach ($solution in $Solutions) {
+    Set-AzOperationalInsightsIntelligencePack -ResourceGroupName $env:resourceGroup -WorkspaceName $WorkspaceName -IntelligencePackName $solution -Enabled $true -Verbose
+}
+
+# Get the workspace ID and Key
+$workspaceId = $(az resource show --resource-group $env:resourceGroup --name $WorkspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $WorkspaceName --query primarySharedKey -o tsv)
+
+# Deploy MMA Azure Extension ARM Template
+Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
+New-AzResourceGroupDeployment -Name MMA `
+  -ResourceGroupName $env:resourceGroup `
+  -arcServerName $env:computername `
+  -location $env:location `
+  -workspaceId $workspaceId `
+  -workspaceKey $workspaceKey `
+  -TemplateFile C:\tmp\mma.json
+
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
 Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
