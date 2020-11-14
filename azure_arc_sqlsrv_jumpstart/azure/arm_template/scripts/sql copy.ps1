@@ -70,14 +70,11 @@ $Np
 
 Restart-Service -Name 'MSSQLSERVER'
 
-Write-Host "Config All"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/config.ps1" -OutFile "C:\tmp\config.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
-$script = "C:\tmp\config.ps1"
+Write-Host "Restoring AdventureWorksLT2019 Sample Database"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/restore_db.ps1" -OutFile "C:\tmp\restore_db.ps1"
+$script = "C:\tmp\restore_db.ps1"
 $commandLine = "$script"
 Start-Process powershell.exe -ArgumentList $commandline
-
-
 
 Write-Host "Creating SQL Server Management Studio Desktop shortcut"
 $TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Ssms.exe"
@@ -87,8 +84,19 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
+# Azure Arc agent Installation
+Write-Host "Onboarding to Azure Arc"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/install_arc_agent.ps1" -OutFile "C:\tmp\install_arc_agent.ps1"
+$script = "C:\tmp\install_arc_agent.ps1"
+$commandLine = "$script"
+Start-Process powershell.exe -ArgumentList $commandline
 
-
+Write-Host "I am deploying Azure Log Analytics workspace, installing the MMA agent and setting up SQL Assessment. This can take ~10min, hold tight..."
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/SQLAssessment.ps1" -OutFile "C:\tmp\SQLAssessment.ps1"
+$script = "C:\tmp\SQLAssessment.ps1"
+$commandLine = "$script"
+Start-Process powershell.exe -ArgumentList $commandline
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
 Stop-Process -Name powershell -Force
