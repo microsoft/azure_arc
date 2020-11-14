@@ -54,7 +54,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 1. User is editing the ARM template parameters file (1-time edit). These params values are being used throughout the deployment.
 
-2. The ARM template incl. an Azure VM Custom Script Extension which will deploy the the [*install_arc_agent.sh*](../azure/linux/arm_template/scripts/install_arc_agent.sh) Shell Script.
+2. The ARM template incl. an Azure VM Custom Script Extension which will deploy the [*install_arc_agent.sh*](../azure/linux/arm_template/scripts/install_arc_agent.sh) Shell Script.
 
 3. In order to allow the Azure VM to successfully be projected as an Azure Arc enabled server, the script will:
 
@@ -64,13 +64,16 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
         - Stop and disable the "Linux Azure Guest Agent" service
 
-        - Create a new OS Firewall rule to Block Azure IMDS outbound traffic to the *169.254.169.254* Remote Address
+        - Enable OS firewall, and create a new OS Firewall rule to Block Azure IMDS outbound traffic to the *169.254.169.254* Remote Address
 
         - Install the Azure Arc connected Machine Agent 
         
         - Remove the ~/.bash_profile file so it will not run after first login
 
 4. User SSH to Linux VM which will start the *~/.bash_profile* script execution and will onboard the VM to Azure Arc
+
+
+    > [!NOTE] The [*install_arc_agent.sh*](../azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* Remote Address. 
 
 ## Deployment
 
@@ -132,6 +135,8 @@ Let the script to run its course and **do not close** the SSH session, this will
 ![](../img/azure_arm_template_linux/07.png)
 
 ![](../img/azure_arm_template_linux/08.png)
+
+
 
 ## Cleanup
 
