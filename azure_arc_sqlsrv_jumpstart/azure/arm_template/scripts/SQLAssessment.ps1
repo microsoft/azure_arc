@@ -1,7 +1,7 @@
 $azurePassword = ConvertTo-SecureString $env:servicePrincipalSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalAppId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:servicePrincipalTenantId -ServicePrincipal
-# az login --service-principal --username $env:servicePrincipalAppId --password $env:servicePrincipalSecret --tenant $env:servicePrincipalTenantId
+az login --service-principal --username $env:servicePrincipalAppId --password $env:servicePrincipalSecret --tenant $env:servicePrincipalTenantId
 
 # Set Log Analytics Workspace Environment Variables
 $WorkspaceName = "log-analytics-" + (Get-Random -Maximum 99999)
