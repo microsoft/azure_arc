@@ -11,9 +11,9 @@ $servicePrincipalAppId = "${servicePrincipalAppId}"
 $servicePrincipalTenantId = "${servicePrincipalTenantId}"
 $servicePrincipalSecret = "${servicePrincipalSecret}"
 
-$azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $env:servicePrincipalSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalAppId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:servicePrincipalTenantId -ServicePrincipal
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AzureData
 
@@ -46,21 +46,21 @@ function registerArcForServers() {
     Write-Host "Running Azure Connected Machine Agent"
     $context = Get-AzContext
 
-    if ($servicePrincipalAppId -And $servicePrincipalTenantId -And $servicePrincipalSecret) {
+    if ($env:servicePrincipalAppId -And $env:servicePrincipalTenantId -And $env:servicePrincipalSecret) {
         & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-            --service-principal-id $servicePrincipalAppId `
-            --service-principal-secret $servicePrincipalSecret `
-            --resource-group $resourceGroup `
-            --location $location `
-            --subscription-id $subId `
+            --service-principal-id $env:servicePrincipalAppId `
+            --service-principal-secret $env:servicePrincipalSecret `
+            --resource-group $env:resourceGroup `
+            --location $env:location `
+            --subscription-id $env:subId `
             --tenant-id $context.Tenant `
             --tags "Project=jumpstart_azure_arc_sql"
     }
     else {
         & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-            --resource-group $resourceGroup `
-            --location $location `
-            --subscription-id $subId `
+            --resource-group $env:resourceGroup `
+            --location $env:location `
+            --subscription-id $env:subId `
             --tenant-id $context.Tenant `
             --tags "Project=jumpstart_azure_arc_sql"
     }
@@ -118,7 +118,7 @@ if (!$context) {
     return
 }
 
-Set-AzContext -Subscription $subId
+Set-AzContext -Subscription $env:subId
 $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
 
 if ($null -eq $arcResource) {
@@ -232,7 +232,7 @@ if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server') {
 
         # Create resource
         #
-        $newResource = New-AzResource -Location $location -Properties $instProp -ResourceName $resource_name -ResourceType Microsoft.AzureData/sqlServerInstances -ResourceGroupName $resourceGroup -Tag @{Project="jumpstart_azure_arc_sql"} -Force 
+        $newResource = New-AzResource -Location $env:location -Properties $instProp -ResourceName $resource_name -ResourceType Microsoft.AzureData/sqlServerInstances -ResourceGroupName $env:resourceGroup -Tag @{Project="jumpstart_azure_arc_sql"} -Force 
         checkResourceCreation -newResource $newResource -instProp $instProp -name $resource_name
     }
 }
