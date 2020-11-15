@@ -95,7 +95,6 @@ $Shortcut.Save()
 
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
-Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
 # Creating LogonScript Windows Scheduled Task
