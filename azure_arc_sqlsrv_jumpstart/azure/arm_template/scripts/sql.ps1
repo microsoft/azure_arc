@@ -35,6 +35,9 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
     }
 }
 
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/config.ps1" -OutFile "C:\tmp\config.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
+
 # Creating PowerShell Logon Script
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
@@ -73,8 +76,7 @@ $Np
 Restart-Service -Name 'MSSQLSERVER'
 
 Write-Host "Config All"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/config.ps1" -OutFile "C:\tmp\config.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
+#Start-Sleep -Seconds 3
 $script = "C:\tmp\config.ps1"
 $commandLine = "$script"
 Start-Process powershell.exe -ArgumentList $commandline
