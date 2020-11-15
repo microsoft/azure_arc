@@ -5,7 +5,8 @@ param (
     [string]$servicePrincipalTenantId,
     [string]$resourceGroup,
     [string]$location,
-    [string]$adminUsername
+    [string]$adminUsername,
+    [string]$adminPassword
 )
 
 [System.Environment]::SetEnvironmentVariable('subId', $subId,[System.EnvironmentVariableTarget]::Machine)
@@ -15,6 +16,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('location', $location,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword,[System.EnvironmentVariableTarget]::Machine)
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 $chocolateyAppList = "az.powershell,azure-cli,sql-server-management-studio"
