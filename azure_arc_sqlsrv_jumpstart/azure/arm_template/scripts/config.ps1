@@ -258,9 +258,6 @@ else {
     Write-Error -Category NotInstalled -Message "SQL Server is not installed on this machine." 
 }
 
-
-
-
 az login --service-principal --username $env:servicePrincipalAppId --password $env:servicePrincipalSecret --tenant $env:servicePrincipalTenantId
 
 # Set Log Analytics Workspace Environment Variables
@@ -300,6 +297,6 @@ Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Micr
 $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
 Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
-
-
 Stop-Transcript
+
+Restart-Computer -Force
