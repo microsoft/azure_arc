@@ -35,8 +35,11 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
     }
 }
 
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/config.ps1" -OutFile "C:\tmp\config.ps1"
+# Downloading artifacts & enabling Fusion logging
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Arc_Onboarding.ps1" -OutFile "C:\tmp\Arc_Onboarding.ps1"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
+
+New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -PropertyType "DWord"
 
 # Creating PowerShell Logon Script
 $LogonScript = @'
@@ -75,24 +78,11 @@ $Np
 
 Restart-Service -Name 'MSSQLSERVER'
 
-Write-Host "Config All"
+# Onboarding to Azure Arc, installing SQL and configuring SQL Azure Assessment
 #Start-Sleep -Seconds 3
-$script = "C:\tmp\config.ps1"
+$script = "C:\tmp\Arc_Onboarding.ps1"
 $commandLine = "$script"
 Start-Process powershell.exe -ArgumentList $commandline
-
-
-
-Write-Host "Creating SQL Server Management Studio Desktop shortcut"
-$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Ssms.exe"
-$ShortcutFile = "C:\Users\$env:USERNAME\Desktop\Microsoft SQL Server Management Studio.lnk"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-$Shortcut.TargetPath = $TargetFile
-$Shortcut.Save()
-
-
-
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
 '@ > C:\tmp\LogonScript.ps1

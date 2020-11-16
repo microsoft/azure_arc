@@ -4,6 +4,14 @@ Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_s
 Start-Sleep -Seconds 3
 Restore-SqlDatabase -ServerInstance $env:COMPUTERNAME -Database "AdventureWorksLT2019" -BackupFile "C:\tmp\AdventureWorksLT2019.bak" -AutoRelocateFile -PassThru -Verbose
 
+Write-Host "Creating SQL Server Management Studio Desktop shortcut"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Ssms.exe"
+$ShortcutFile = "C:\Users\$env:USERNAME\Desktop\Microsoft SQL Server Management Studio.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
 # These settings will be replaced by the portal when the script is generated
 $subId = "${subId}"
 $resourceGroup = "${resourceGroup}"
@@ -23,9 +31,6 @@ Write-Host "Configure the OS to allow Azure Arc Agent to be deploy on an Azure V
 Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
 New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
-# New-NetFirewallRule -Name AllowODS -DisplayName "Allow ODS opinsights" -Enabled True -Profile Any -Direction Outbound -Action Allow -RemoteAddress *.ods.opinsights.azure.com
-# New-NetFirewallRule -Name AllowODS -DisplayName "Allow OMS opinsights" -Enabled True -Profile Any -Direction Outbound -Action Allow -RemoteAddress *.ods.opinsights.azure.com
-# New-NetFirewallRule -Name AllowODS -DisplayName "Allow ODS opinsights" -Enabled True -Profile Any -Direction Outbound -Action Allow -RemoteAddress *.ods.opinsights.azure.com
 New-NetFirewallRule -Name AllowAnyInbound -DisplayName "Allow Any Inbound" -Enabled True -Profile Any -Direction Inbound -Protocol Any -Action Allow -RemoteAddress Any
 
 
@@ -291,12 +296,13 @@ New-AzResourceGroupDeployment -Name MMA `
 Write-Host "Configuring SQL Azure Assessment"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
 Expand-Archive "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
-New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -PropertyType "DWord"
+# New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -PropertyType "DWord"
 $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
 Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
 $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
 Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
+Get-ScheduledTask -TaskPath "\Microsoft\Operations Management Suite\*" | Start-ScheduledTask
 
 Stop-Transcript
 
-Restart-Computer -Force
+# Restart-Computer -Force
