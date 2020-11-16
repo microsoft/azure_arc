@@ -296,12 +296,11 @@ New-AzResourceGroupDeployment -Name MMA `
 Write-Host "Configuring SQL Azure Assessment"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
 Expand-Archive "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
-# New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -PropertyType "DWord"
 $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
 Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
 $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
 Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
-Get-ScheduledTask -TaskPath "\Microsoft\Operations Management Suite\*" | Start-ScheduledTask
+# Get-ScheduledTask -TaskPath "\Microsoft\Operations Management Suite\*" | Start-ScheduledTask
 
 Stop-Transcript
 
