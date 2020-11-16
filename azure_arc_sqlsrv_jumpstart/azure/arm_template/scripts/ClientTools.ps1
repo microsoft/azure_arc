@@ -79,7 +79,6 @@ $Np
 Restart-Service -Name 'MSSQLSERVER'
 
 # Onboarding to Azure Arc, installing SQL and configuring SQL Azure Assessment
-#Start-Sleep -Seconds 3
 $script = "C:\tmp\Arc_Onboarding.ps1"
 $commandLine = "$script"
 Start-Process powershell.exe -ArgumentList $commandline
