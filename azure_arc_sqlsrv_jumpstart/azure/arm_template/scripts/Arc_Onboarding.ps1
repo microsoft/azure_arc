@@ -305,4 +305,4 @@ Get-ScheduledTask -TaskPath "\Microsoft\Operations Management Suite\*" | Start-S
 
 Stop-Transcript
 
-# Restart-Computer -Force
+Restart-Computer -Force
