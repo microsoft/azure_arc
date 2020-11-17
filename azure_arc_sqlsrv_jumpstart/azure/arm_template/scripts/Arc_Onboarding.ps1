@@ -301,14 +301,14 @@ Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Micr
 $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
 Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
-$StartAssessment = @'
-Get-ScheduledTask -TaskPath "\Microsoft\Operations Management Suite\*" | Start-ScheduledTask
-# Unregister-ScheduledTask -TaskName "StartAssessment" -Confirm:$False
-'@ > C:\tmp\StartAssessment.ps1
+# $StartAssessment = @'
+# Get-ScheduledTask -TaskPath "\Microsoft\Operations Management Suite\*" | Start-ScheduledTask
+# # Unregister-ScheduledTask -TaskName "StartAssessment" -Confirm:$False
+# '@ > C:\tmp\StartAssessment.ps1
 
-$Trigger = New-ScheduledTaskTrigger -AtStartup
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartAssessment.ps1'
-Register-ScheduledTask -TaskName "StartAssessment" -Trigger $Trigger -User $env:adminUsername -Action $Action -RunLevel "Highest" -Force
+# $Trigger = New-ScheduledTaskTrigger -AtStartup
+# $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartAssessment.ps1'
+# Register-ScheduledTask -TaskName "StartAssessment" -Trigger $Trigger -User $env:adminUsername -Action $Action -RunLevel "Highest" -Force
 
 Stop-Transcript
 
