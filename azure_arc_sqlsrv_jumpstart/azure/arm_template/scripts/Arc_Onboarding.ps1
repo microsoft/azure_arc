@@ -303,4 +303,4 @@ Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql
 
 Stop-Transcript
 
-# Restart-Computer -Force
+Restart-Computer -Force
