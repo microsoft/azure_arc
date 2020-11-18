@@ -1,10 +1,10 @@
 # Deploy Update Management on Azure Arc enabled Servers
 
-The following guide will show you on how to onboard Azure Arc enabled Servers to use [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview), so you can manage operating system updates for your Azure Arc Windows and Linux virtual machines.
+The scenario will show you how to onboard Azure Arc enabled Servers to [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview), so that you can manage operating system updates for your Azure Arc enabled servers running Windows or Linux.
 
-In this guide, you will create and configure an Azure Automation account and Log Analytics workspace to support Update Management for Azure Arc enabled servers.
+In this guide, you will create and configure an Azure Automation account and Log Analytics workspace to support Update Management for Azure Arc enabled servers by doing the following:
 
-* Setup the Log Analytics Workspace and Azure Automation account. 
+* Setup a new Log Analytics Workspace and Azure Automation account. 
 
 * Enable Update Management on Azure Arc enabled servers. 
 
@@ -24,7 +24,7 @@ In this guide, you will create and configure an Azure Automation account and Log
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using a Amazon Web Services (AWS) instance that has been already connected to Azure Arc and is visible as a resource in Azure.
+* As mentioned, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using an Amazon Web Services (AWS) instance that has been already connected to Azure Arc and is visible as a resource in Azure.
 
     ![](../img/updateManagement/01.png)
 
