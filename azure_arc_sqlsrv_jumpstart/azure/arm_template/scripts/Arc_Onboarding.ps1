@@ -300,18 +300,6 @@ $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring 
 Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
 $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
 Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
-Start-Sleep -Seconds 5
-Get-ScheduledTask -TaskPath "\Microsoft\Operations Management Suite\*" | Start-ScheduledTask
-
-
-# $StartAssessment = @'
-# Get-ScheduledTask -TaskPath "\Microsoft\Operations Management Suite\*" | Start-ScheduledTask
-# # Unregister-ScheduledTask -TaskName "StartAssessment" -Confirm:$False
-# '@ > C:\tmp\StartAssessment.ps1
-
-# $Trigger = New-ScheduledTaskTrigger -AtStartup
-# $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\StartAssessment.ps1'
-# Register-ScheduledTask -TaskName "StartAssessment" -Trigger $Trigger -User $env:adminUsername -Action $Action -RunLevel "Highest" -Force
 
 Stop-Transcript
 
