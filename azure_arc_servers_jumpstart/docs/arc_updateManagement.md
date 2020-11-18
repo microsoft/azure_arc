@@ -1,6 +1,6 @@
 # Deploy Update Management on Azure Arc enabled Servers
 
-The following README will guide you on how to onboard Azure Arc enabled Servers to use [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview), so you can manage operating system updates for your Azure Arc Windows and Linux virtual machines.
+The following guide will show you on how to onboard Azure Arc enabled Servers to use [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview), so you can manage operating system updates for your Azure Arc Windows and Linux virtual machines.
 
 In this guide, you will create and configure an Azure Automation account and Log Analytics workspace to support Update Management for Azure Arc enabled servers.
 
