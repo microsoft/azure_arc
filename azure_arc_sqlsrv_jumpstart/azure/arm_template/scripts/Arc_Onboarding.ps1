@@ -302,5 +302,3 @@ $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
 Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
 Stop-Transcript
-
-Restart-Computer -Force
