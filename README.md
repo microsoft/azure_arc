@@ -103,6 +103,8 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 
 * [Integrate Azure Sentinel with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_azuresentinel.md)
 
+* [Deploy Update Management on Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_updateManagement.md)
+
 #### Azure Arc enabled Servers - Scaled Deployment Scenarios
 
 The following guides are designed to provide scaled onboarding experience to Azure Arc of virtual machines deployed in various platforms and existing environments.
