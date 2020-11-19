@@ -71,7 +71,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
 * Next, edit the ARM template [parameters file](../updateManagement/law-template.parameters.json), providing a name for your Log Analytics workspace, a location, and a name for your Azure Automation account as shown in the example below:
 
-    ![](../img/updateManagement/05.png)
+    ![](../img/updateManagement/04.png)
 
 * To deploy the ARM template, navigate to the [deployment folder](../updateManagement/) and run the below command:
 
@@ -81,7 +81,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
         --parameters law-template.parameters.json
     ```
 
-   ![](../img/updateManagement/04.png)
+   ![](../img/updateManagement/05.png)
 
 * When the deployment is complete, you should be able to see your Log Analytics workspace with the Update Management solution from the Azure Portal as shown below.
 
