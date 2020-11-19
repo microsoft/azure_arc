@@ -93,19 +93,19 @@ Once you have deployed the Update Management on your Log Analytics workspace, yo
 
 * Navigate to the Log Analytics workspace and copy the Workspace ID and Primary key for use later.
 
-    ![](../img/updateManagement/10.png)
+    ![](../img/updateManagement/07.png)
 
 * Navigate "Extensions" blade of your Azure Arc connected server as shown in the screenshot below.
 
-    ![](../img/updateManagement/07.png)
+    ![](../img/updateManagement/08.png)
 
 * Select the Log Analytics Agent extension.
 
-    ![](../img/updateManagement/08.png)
+    ![](../img/updateManagement/09.png)
 
 * Click Create.
 
-    ![](../img/updateManagement/09.png)
+    ![](../img/updateManagement/10.png)
 
 * Enter the values for the Workspace ID and key that you copied earlier. and then click through Review + Create.
 
