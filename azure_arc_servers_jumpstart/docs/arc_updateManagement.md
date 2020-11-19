@@ -31,7 +31,7 @@ In this guide, you will create and configure an Azure Automation account and Log
     ![](../img/updateManagement/02.png)
 
   
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14** or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
 
 * Create Azure Service Principal (SP).   
 
