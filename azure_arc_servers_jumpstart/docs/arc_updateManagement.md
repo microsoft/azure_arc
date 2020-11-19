@@ -92,7 +92,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
 # Onboarding on the Azure Arc enabled server to Update Management
 
-Once you have deployed the Update Management on your Log Analytics workspace, you will need to connect data sources to it. To do this for an Azure Arc enabled server, we must deploy the Log Analytics extension.
+Once you have deployed the Update Management on your Log Analytics workspace, you will need to connect data sources to it. To do this for an Azure Arc enabled server, we must deploy the Log Analytics extension. There are multiple ways to deploy the extension to an Azure Arc enabled server. In this scenario, we will be using the Azure Portal. Other common methods include using an [ARM template](arc_vm_extension_mma_arm.md) or [Azure Policy](https://docs.microsoft.com/en-us/azure/azure-arc/servers/policy-reference).
 
 * Navigate to the Log Analytics workspace and copy the Workspace ID and Primary key for use later.
 
