@@ -3,16 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "workspaceName": {
-            "value": "ArcWorkspaceDemo" // Name for your log analytics workspace
-        },
-        "location": {
-            "value": "westus2" // Azure Region to deploy the Log Analytics Workspace
+            "value": "<Name for your Log Analytics workspace>" // Name for your Log Analytics workspace
         },
         "sku": {
             "value": "pergb2018" // SKU, leave default
         },
         "automationAccountName": {
-            "value": "ArcAutomationDemo" // Name for your log analytics workspace
+            "value": "<Name for your Automation account>" // Name for your Automation account
         }
     }
 }

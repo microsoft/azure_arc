@@ -13,6 +13,7 @@ In this guide, you will create and configure an Azure Automation account and Log
 **If you haven't, this repository offers you a way to do so in an automated fashion:**
 - **[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)**
 - **[AWS Ubuntu VM](aws_terraform_ubuntu.md)**
+- **[Azure Ubuntu VM](azure_arm_template_linux.md) / [Azure Windows VM](azure_arm_template_win.md)**
 - **[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)**
 - **[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)**
 
@@ -65,7 +66,9 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 * First, create a new resource group for the Log Analytics workspace by running the below command, replacing the values in brackets with your own.
 
     ```bash
-    az group create --name <Name for your resource group> --location <Location for your resources>
+    az group create --name <Name for your resource group> \
+    --location <Location for your resources> \
+    --tags "Project=jumpstart_azure_arc_servers"
     ```
     ![](../img/updateManagement/03.png)
 
@@ -170,6 +173,7 @@ Complete the following steps to clean up your environment.
 
     - *[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)*
     - *[AWS Ubuntu VM](aws_terraform_ubuntu.md)*
+    - *[Azure Ubuntu VM](azure_arm_template_linux.md) / [Azure Windows VM](azure_arm_template_win.md)*
     - *[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)*
     - *[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)*
 
