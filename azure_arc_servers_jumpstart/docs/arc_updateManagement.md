@@ -188,3 +188,5 @@ Complete the following steps to clean up your environment.
     ```bash
     az group delete --name <Name of your resource group>
     ```
+
+    ![](../img/updateManagement/26.png)
