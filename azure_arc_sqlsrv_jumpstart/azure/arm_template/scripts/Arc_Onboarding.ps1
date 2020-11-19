@@ -284,21 +284,25 @@ foreach ($solution in $Solutions) {
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $WorkspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $WorkspaceName --query primarySharedKey -o tsv)
 
-# Deploy MMA Azure Extension ARM Template
-New-AzResourceGroupDeployment -Name MMA `
-  -ResourceGroupName $env:resourceGroup `
-  -arcServerName $env:computername `
-  -location $env:location `
-  -workspaceId $workspaceId `
-  -workspaceKey $workspaceKey `
-  -TemplateFile C:\tmp\mma.json
+# # Deploy MMA Azure Extension ARM Template
+# New-AzResourceGroupDeployment -Name MMA `
+#   -ResourceGroupName $env:resourceGroup `
+#   -arcServerName $env:computername `
+#   -location $env:location `
+#   -workspaceId $workspaceId `
+#   -workspaceKey $workspaceKey `
+#   -TemplateFile C:\tmp\mma.json
 
-# Write-Host "Configuring SQL Azure Assessment"
-# Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
-# Expand-Archive "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
-# $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
-# Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
-# $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
-# Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
+$Setting = @{ "workspaceId" = $workspaceId }
+$protectedSetting = @{ "workspaceKey" = $workspaceKey }
+New-AzConnectedMachineExtension -Name OMSLinuxAgent -ResourceGroupName $env:resourceGroup -MachineName $env:computername -Location $env:location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.10" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType OmsAgentforLinux
+
+Write-Host "Configuring SQL Azure Assessment"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
+Expand-Archive "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
+$env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
+Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
+$SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
+Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
 Stop-Transcript
