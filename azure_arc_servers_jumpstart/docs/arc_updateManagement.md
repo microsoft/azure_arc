@@ -124,11 +124,11 @@ Once you have deployed the Update Management on your Log Analytics workspace, yo
 
 * It may take several hours for Update Management to collect enough data to show an assessment for your VM. In the screen below we can see the assessment is being peformed.
 
-    ![](../img/updateManagement/15.png)
+    ![](../img/updateManagement/14.png)
 
 * When the assessment is complete, you will see an option to "View summary" on the Update Management blade.
 
-    ![](../img/updateManagement/14.png)
+    ![](../img/updateManagement/15.png)
 
 * Click View Summary and then click again to drill into the Update Management assessment. In the below example we can see there are updates missing from our Azure Arc enabled server.
 
