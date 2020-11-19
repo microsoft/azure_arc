@@ -38,12 +38,13 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 # Downloading artifacts & enabling Fusion logging
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Arc_Onboarding.ps1" -OutFile "C:\tmp\Arc_Onboarding.ps1"
 # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
-Install-Module -Name Az.ConnectedMachine -AllowClobber -Force
 New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -PropertyType "DWord"
 
 # Creating PowerShell Logon Script
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
+
+Install-Module -Name Az.ConnectedMachine -AllowClobber -Scope CurrentUser -Force
 
 Write-Host "Installing SQL Server and PowerShell Module"
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
