@@ -4,18 +4,19 @@ The scenario will show you how to onboard Azure Arc enabled Servers to [Update M
 
 In this guide, you will create and configure an Azure Automation account and Log Analytics workspace to support Update Management for Azure Arc enabled servers by doing the following:
 
-* Setup a new Log Analytics Workspace and Azure Automation account. 
+* Setup a new Log Analytics Workspace and Azure Automation account.
 
-* Enable Update Management on Azure Arc enabled servers. 
+* Enable Update Management on Azure Arc enabled servers.
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
 **If you haven't, this repository offers you a way to do so in an automated fashion:**
-- **[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)**
-- **[AWS Ubuntu VM](aws_terraform_ubuntu.md)**
-- **[Azure Ubuntu VM](azure_arm_template_linux.md) / [Azure Windows VM](azure_arm_template_win.md)**
-- **[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)**
-- **[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)**
+
+* **[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)**
+* **[AWS Ubuntu VM](aws_terraform_ubuntu.md)**
+* **[Azure Ubuntu VM](azure_arm_template_linux.md) / [Azure Windows VM](azure_arm_template_win.md)**
+* **[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)**
+* **[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)**
 
 ## Prerequisites
 
@@ -31,10 +32,9 @@ In this guide, you will create and configure an Azure Automation account and Log
 
     ![](../img/updateManagement/02.png)
 
-  
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP).   
+* Create Azure Service Principal (SP).
 
     To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
@@ -42,10 +42,12 @@ In this guide, you will create and configure an Azure Automation account and Log
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
+
     For example:
     ```az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor```
     Output should look like this:
-    ```
+
+    ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServers",
@@ -54,10 +56,10 @@ In this guide, you will create and configure an Azure Automation account and Log
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-    
+
   **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
-# Configuring Update Management
+## Configuring Update Management
 
 Update Management uses the Log Analytics agent to collect Windows and Linux server log files and the data collected is stored in a Log Analytics workspace. 
 
@@ -70,6 +72,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
     --location <Location for your resources> \
     --tags "Project=jumpstart_azure_arc_servers"
     ```
+
     ![](../img/updateManagement/03.png)
 
 * Next, edit the ARM template [parameters file](../updateManagement/law-template.parameters.json), providing a name for your Log Analytics workspace, a location, and a name for your Azure Automation account. You also need to supply the name of your Azure Arc enabled server, and the name of the resource group that contains the Arc enabled server as shown in the example below:
@@ -90,7 +93,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
     ![](../img/updateManagement/06.png)
 
-# Confirm that the Update Management solution is deployed on your Azure Arc enabled server.
+## Confirm that the Update Management solution is deployed on your Azure Arc enabled server
 
 * Click on the Solutions blade of the Log Analytics workspace and then click the Updates solution from the list to check the progress of the Update Management assessment.
 
@@ -108,7 +111,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
     ![](../img/updateManagement/16.png)
 
-# Schedule an Update
+## Schedule an Update
 
 Now that we have configured the Update Management solution, we can deploy updates on a set schedule for our Azure Arc enabled server.
 
@@ -137,19 +140,19 @@ Now that we have configured the Update Management solution, we can deploy update
 * From the Automation Account Update Management blade, you should be able to see your scheduled Update deployment from the Deployment Schedules tab. 
     ![](../img/updateManagement/24.png)
 
-The Update Management solution will now update your Azure Arc enabled servers in the deployment window based on the schedule you defined. There is a lot more you can do with [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) that is outside the scope of this scenario. Review the [documentation](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) for more information. 
+The Update Management solution will now update your Azure Arc enabled servers in the deployment window based on the schedule you defined. There is a lot more you can do with [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) that is outside the scope of this scenario. Review the [documentation](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) for more information.
 
-# Clean up environment
+## Clean up environment
 
 Complete the following steps to clean up your environment.
 
 * Remove the virtual machines from each environment by following the teardown instructions from each guide.
 
-    - *[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)*
-    - *[AWS Ubuntu VM](aws_terraform_ubuntu.md)*
-    - *[Azure Ubuntu VM](azure_arm_template_linux.md) / [Azure Windows VM](azure_arm_template_win.md)*
-    - *[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)*
-    - *[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)*
+  * *[GCP Ubuntu VM](gcp_terraform_ubuntu.md) / [GCP Windows VM](gcp_terraform_windows.md)*
+  * *[AWS Ubuntu VM](aws_terraform_ubuntu.md)*
+  * *[Azure Ubuntu VM](azure_arm_template_linux.md) / [Azure Windows VM](azure_arm_template_win.md)*
+  * *[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)*
+  * *[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)*
 
 * Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
