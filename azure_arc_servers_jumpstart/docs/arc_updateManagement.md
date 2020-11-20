@@ -139,7 +139,7 @@ Now that we have configured the Update Management solution, we can deploy update
 
 The Update Management solution will now update your Azure Arc enabled servers in the deployment window based on the schedule you defined. There is a lot more you can do with [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) that is outside the scope of this scenario. Review the [documentation](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) for more information. 
 
-# Clean up environment
+## Clean up environment
 
 Complete the following steps to clean up your environment.
 
