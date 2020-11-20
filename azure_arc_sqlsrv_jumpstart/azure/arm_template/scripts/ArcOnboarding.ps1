@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\tmp\config.log
+Start-Transcript -Path C:\tmp\ArcOnboarding.log
 
 Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/AdventureWorksLT2019.bak" -OutFile "C:\tmp\AdventureWorksLT2019.bak"
 Start-Sleep -Seconds 3
@@ -284,18 +284,9 @@ foreach ($solution in $Solutions) {
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $WorkspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $WorkspaceName --query primarySharedKey -o tsv)
 
-# # Deploy MMA Azure Extension ARM Template
-# New-AzResourceGroupDeployment -Name MMA `
-#   -ResourceGroupName $env:resourceGroup `
-#   -arcServerName $env:computername `
-#   -location $env:location `
-#   -workspaceId $workspaceId `
-#   -workspaceKey $workspaceKey `
-#   -TemplateFile C:\tmp\mma.json
-
 $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
-New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $env:resourceGroup -MachineName $env:computername -Location $env:location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18053.0" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
+New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $env:resourceGroup -MachineName $env:computername -Location $env:location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
 
 Write-Host "Configuring SQL Azure Assessment"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
