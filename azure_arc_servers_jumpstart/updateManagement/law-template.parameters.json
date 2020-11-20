@@ -3,13 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "workspaceName": {
-            "value": "<Name for your Log Analytics workspace>" // Name for your Log Analytics workspace
+            "value": "ArcWorkspaceDemo34" // Name for your Log Analytics workspace
         },
         "sku": {
             "value": "pergb2018" // SKU, leave default
         },
         "automationAccountName": {
-            "value": "<Name for your Automation account>" // Name for your Automation account
+            "value": "ArcAutomationDemo34" // Name for your Automation account
+        },
+        "arcVmName": {
+            "value": "arc-aws-demo" // Name of your Azure Arc enabled server
+        },
+        "arcVmResourceGroup": {
+            "value": "Arc-AWS-Demo" // the resource group of the Azure Arc enabled server
         }
     }
 }

@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+      "arcVmName": {
+          "type": "string",
+          "metadata": {
+              "description": "Azure Arc enabled server resource name"
+          }
+      },
       "workspaceName": {
           "type": "string",
           "metadata": {
@@ -40,6 +46,12 @@
               "description": "Specifies the location in which to create the workspace."
           }
       },
+      "arcVmResourceGroup": {
+        "type": "string",
+        "metadata": {
+            "description": "Specifies the resource group of your Azure Arc enabled server."
+        }
+      },
       "automationAccountName": {
           "type": "string",
           "metadata": {
@@ -70,22 +82,22 @@
           "type": "String",
           "defaultValue": " An example runbook that gets all the Resource Manager resources by using the Run As account (service principal)."
       },
-  "_artifactsLocation": {
-          "type": "string",
-          "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-automation/",
-          "metadata": {
-              "description": "URI to artifacts location"
-          }
+      "_artifactsLocation": {
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-automation/",
+            "metadata": {
+                "description": "URI to artifacts location"
+            }
       },
-  "_artifactsLocationSasToken": {
-          "type": "securestring",
-          "defaultValue": "",
-          "metadata": {
-              "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated"
-          }
+      "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated"
+            }
       }
   },
-"variables": {
+  "variables": {
   "Updates": {
       "name": "[concat('Updates', '(', parameters('workspaceName'), ')')]",
       "galleryName": "Updates"
@@ -212,6 +224,71 @@
           "properties": {
               "resourceId": "[resourceId('Microsoft.Automation/automationAccounts', parameters('automationAccountName'))]"
           }
-      }
+      },
+      {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2019-10-01",
+        "name": "nestedTemplate",
+        "resourceGroup": "[parameters('arcVmResourceGroup')]",
+        "dependsOn": [
+            "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+        ],
+        "properties": {
+            "mode": "Incremental",
+            "template": {
+                "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {
+                    "location": {
+                        "type": "string"
+                    },
+                    "workspaceName": {
+                        "type": "string"
+                    },
+                    "arcVmName": {
+                        "type": "string"
+                    },
+                    "arcVmResourceGroup": {
+                        "type": "string"
+                    }
+                },
+                "variables": {},
+                "resources": [
+                {
+                    "name": "[concat(parameters('arcVmName'),'/OMSAgentForLinux')]",
+                    "type": "Microsoft.HybridCompute/machines/extensions",
+                    "location": "[parameters('location')]",
+                    "apiVersion": "2020-08-02",
+                    "properties": {
+                        "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                        "type": "OMSAgentForLinux",
+                        "settings": {
+                            "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), '2020-03-01-preview').customerId]"
+                        },
+                        "protectedSettings": {
+                            "workspaceKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), '2020-03-01-preview').primarySharedKey]"
+                        }
+                    }
+                }
+                ]
+            },
+            "parameters": {
+                "location": {
+                    "value": "[parameters('location')]"
+                },
+                "workspaceName": {
+                    "value": "[parameters('workspaceName')]"
+                },
+                "arcVmName": {
+                    "value": "[parameters('arcVmName')]"
+                },
+                "arcVmResourceGroup": {
+                    "value": "[parameters('arcVmResourceGroup')]"
+                }
+            }
+        }
+    }
   ]
 }
+
+
