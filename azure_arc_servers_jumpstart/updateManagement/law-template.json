@@ -252,16 +252,15 @@
                         "type": "string"
                     }
                 },
-                "variables": {},
                 "resources": [
                 {
-                    "name": "[concat(parameters('arcVmName'),'/OMSAgentForLinux')]",
+                    "name": "[concat(parameters('arcVmName'),'/',if(equals(reference(resourceId(parameters('arcVmResourceGroup'),'Microsoft.HybridCompute/machines/', parameters('arcVmName')), '2020-08-02').osName, 'linux'),'OMSAgentForLinux','MicrosoftMonitoringAgent'))]",
                     "type": "Microsoft.HybridCompute/machines/extensions",
                     "location": "[parameters('location')]",
                     "apiVersion": "2020-08-02",
                     "properties": {
                         "publisher": "Microsoft.EnterpriseCloud.Monitoring",
-                        "type": "OMSAgentForLinux",
+                        "type": "[if(equals(reference(resourceId(parameters('arcVmResourceGroup'),'Microsoft.HybridCompute/machines/', parameters('arcVmName')), '2020-08-02').osName, 'linux'),'OMSAgentForLinux','MicrosoftMonitoringAgent')]",
                         "settings": {
                             "workspaceId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')), '2020-03-01-preview').customerId]"
                         },
