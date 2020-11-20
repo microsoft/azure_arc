@@ -90,7 +90,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
     ![](../img/updateManagement/06.png)
 
-# Confirm that the Update Management solution is deployed on your Azure Arc enabled server.
+## Confirm that the Update Management solution is deployed on your Azure Arc enabled server.
 
 * Click on the Solutions blade of the Log Analytics workspace and then click the Updates solution from the list to check the progress of the Update Management assessment.
 
