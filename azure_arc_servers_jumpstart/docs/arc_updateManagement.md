@@ -153,7 +153,7 @@ Complete the following steps to clean up your environment.
 
 * Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
-    ```bash
+    ```terminal
     az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
     ```
 
