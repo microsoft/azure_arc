@@ -163,7 +163,7 @@ Complete the following steps to clean up your environment.
 
 * Delete the resource group.
 
-    ```bash
+    ```terminal
     az group delete --name <Name of your resource group>
     ```
 
