@@ -72,53 +72,27 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
     ```
     ![](../img/updateManagement/03.png)
 
-* Next, edit the ARM template [parameters file](../updateManagement/law-template.parameters.json), providing a name for your Log Analytics workspace, a location, and a name for your Azure Automation account as shown in the example below:
+* Next, edit the ARM template [parameters file](../updateManagement/law-template.parameters.json), providing a name for your Log Analytics workspace, a location, and a name for your Azure Automation account. You also need to supply the name of your Azure Arc enabled server, and the name of the resource group that contains the Arc enabled server as shown in the example below:
 
     ![](../img/updateManagement/04.png)
 
 * To deploy the ARM template, navigate to the [deployment folder](../updateManagement/) and run the below command:
 
     ```bash
-    az deployment group create --resource-group <Name of your Azure Resource Group> \
+    az deployment group create --resource-group <Name of the Azure Resource Group you created> \
         --template-file law-template.json \
         --parameters law-template.parameters.json
     ```
 
    ![](../img/updateManagement/05.png)
 
-* When the deployment is complete, you should be able to see your Log Analytics workspace with the Update Management solution from the Azure Portal as shown below.
+* When the deployment is complete, you should be able to see the resource group with your Log Analytics workspace, automation account and Update Management solution from the Azure Portal. Drilling into the Log Analytics workspace Solutions blade should show the Update Management solution.
 
     ![](../img/updateManagement/06.png)
 
-# Onboarding on the Azure Arc enabled server to Update Management
+# Confirm that the Update Management solution is deployed on your Azure Arc enabled server.
 
-Once you have deployed the Update Management on your Log Analytics workspace, you will need to connect data sources to it. To do this for an Azure Arc enabled server, we must deploy the Log Analytics extension. There are multiple ways to deploy the extension to an Azure Arc enabled server. In this scenario, we will be using the Azure Portal. Other common methods include using an [ARM template](arc_vm_extension_mma_arm.md) or [Azure Policy](https://docs.microsoft.com/en-us/azure/azure-arc/servers/policy-reference).
-
-* Navigate to the Log Analytics workspace and copy the Workspace ID and Primary key for use later.
-
-    ![](../img/updateManagement/07.png)
-
-* Navigate "Extensions" blade of your Azure Arc connected server as shown in the screenshot below.
-
-    ![](../img/updateManagement/08.png)
-
-* Select the Log Analytics Agent extension.
-
-    ![](../img/updateManagement/09.png)
-
-* Click Create.
-
-    ![](../img/updateManagement/10.png)
-
-* Enter the values for the Workspace ID and key that you copied earlier. and then click through Review + Create.
-
-    ![](../img/updateManagement/11.png)
-
-* The extension should start to deploy and you should see a screen similar to the example below.
-
-    ![](../img/updateManagement/12.png)
-
-* Click on the Solutions blade of the Log Analytics workspace to check the progress of the Update Management assessment.
+* Click on the Solutions blade of the Log Analytics workspace and then click the Updates solution from the list to check the progress of the Update Management assessment.
 
     ![](../img/updateManagement/13.png)
 
@@ -130,7 +104,7 @@ Once you have deployed the Update Management on your Log Analytics workspace, yo
 
     ![](../img/updateManagement/15.png)
 
-* Click View Summary and then click again to drill into the Update Management assessment. In the below example we can see there are updates missing from our Azure Arc enabled server.
+* Click View Summary and then click again to drill into the Update Management assessment. In the below example we can see there are updates missing on our Azure Arc enabled server.
 
     ![](../img/updateManagement/16.png)
 
