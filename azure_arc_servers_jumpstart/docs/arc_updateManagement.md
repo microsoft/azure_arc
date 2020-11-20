@@ -108,7 +108,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
     ![](../img/updateManagement/16.png)
 
-# Schedule an Update
+## Schedule an Update
 
 Now that we have configured the Update Management solution, we can deploy updates on a set schedule for our Azure Arc enabled server.
 
