@@ -44,10 +44,12 @@ New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -P
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
+Write-Host "Installing ConnectedMachine PowerShell Module"
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force
 Install-Module -Name Az.ConnectedMachine -AllowClobber -Scope CurrentUser -Force
 
 Write-Host "Installing SQL Server and PowerShell Module"
-Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 If(-not(Get-InstalledModule SQLServer -ErrorAction silentlycontinue)){
     Install-Module SQLServer -Confirm:$False -Force
 }
