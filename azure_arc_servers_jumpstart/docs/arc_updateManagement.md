@@ -17,7 +17,7 @@ In this guide, you will create and configure an Azure Automation account and Log
 - **[VMware Ubuntu VM](vmware_terraform_ubuntu.md) / [VMware Windows Server VM](vmware_terraform_winsrv.md)**
 - **[Local Ubuntu VM](local_vagrant_ubuntu.md) / [Local Windows VM](local_vagrant_windows.md)**
 
-# Prerequisites
+## Prerequisites
 
 * Clone this repo
 
