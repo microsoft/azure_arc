@@ -36,8 +36,7 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 }
 
 # Downloading artifacts & enabling Fusion logging
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Arc_Onboarding.ps1" -OutFile "C:\tmp\Arc_Onboarding.ps1"
-# Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/mma.json" -OutFile "C:\tmp\mma.json"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/ArcOnboarding.ps1" -OutFile "C:\tmp\ArcOnboarding.ps1"
 New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -PropertyType "DWord"
 
 # Creating PowerShell Logon Script
@@ -82,7 +81,7 @@ $Np
 Restart-Service -Name 'MSSQLSERVER'
 
 # Onboarding to Azure Arc, installing SQL and configuring SQL Azure Assessment
-$script = "C:\tmp\Arc_Onboarding.ps1"
+$script = "C:\tmp\ArcOnboarding.ps1"
 $commandLine = "$script"
 Start-Process powershell.exe -ArgumentList $commandline
 
