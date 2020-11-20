@@ -305,4 +305,14 @@ Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Micr
 $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
 Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
+$name = "Recurring HealthService Restart"
+$repeat = (New-TimeSpan -Minutes 5)
+$action = New-ScheduledTaskAction –Execute "powershell.exe" -Argument 'Restart-Service -Name HealthService -Force'
+$duration = (New-TimeSpan -Days 1)
+$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval $repeat -RepetitionDuration $duration
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable -DontStopOnIdleEnd
+Register-ScheduledTask -TaskName $name -Action $action -Trigger $trigger -RunLevel Highest -User $env:adminUsername -Password $env:adminPassword -Settings $settings
+Start-Sleep -Seconds 3
+Start-ScheduledTask -TaskName $name
+
 Stop-Transcript
