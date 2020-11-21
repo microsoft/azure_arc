@@ -1,3 +1,13 @@
+##################################################################
+# 1. Restore AdventureWorksLT2019 Database
+# 2. Allow Azure VM to be onboarded to Arc
+# 3. Project VM as an Azure Arc enabled server resource
+# 4. Project SQL Server as an Azure Arc enabled SQL server resource
+# 5. Deploy Log Analytics workspace and Solutions
+# 6. Install Log Analytics agent
+# 7. Create SQL Assessment
+##################################################################
+
 Start-Transcript -Path C:\tmp\ArcOnboarding.log
 
 Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/AdventureWorksLT2019.bak" -OutFile "C:\tmp\AdventureWorksLT2019.bak"
@@ -288,7 +298,7 @@ $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
 New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $env:resourceGroup -MachineName $env:computername -Location $env:location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
 
-Write-Host "Configuring SQL Azure Assessment"
+Write-Host "Create SQL Azure Assessment"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
 Expand-Archive "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
 $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
@@ -298,7 +308,7 @@ Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql
 
 $name = "Recurring HealthService Restart"
 $repeat = (New-TimeSpan -Minutes 5)
-$action = New-ScheduledTaskAction –Execute "powershell.exe" -Argument "Restart-Service -Name HealthService -Force"
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "Restart-Service -Name HealthService -Force"
 $duration = (New-TimeSpan -Days 1)
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval $repeat -RepetitionDuration $duration
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable -DontStopOnIdleEnd
