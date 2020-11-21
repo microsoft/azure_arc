@@ -298,7 +298,7 @@ Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql
 
 $name = "Recurring HealthService Restart"
 $repeat = (New-TimeSpan -Minutes 5)
-$action = New-ScheduledTaskAction –Execute "powershell.exe" -Argument 'Restart-Service -Name HealthService -Force'
+$action = New-ScheduledTaskAction –Execute "powershell.exe" -Argument "Restart-Service -Name HealthService -Force"
 $duration = (New-TimeSpan -Days 1)
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval $repeat -RepetitionDuration $duration
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable -DontStopOnIdleEnd
