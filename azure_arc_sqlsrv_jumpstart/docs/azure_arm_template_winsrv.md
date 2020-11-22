@@ -49,7 +49,7 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
     }
     ```
 
-> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 ## Automation Flow
 
@@ -90,42 +90,116 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
-As mentioned, this deployment will use an ARM Template. You will deploy a single template, responsible for creating all the Azure resources in a single Resource Group as well onboarding the created VM to Azure Arc.
+As mentioned, this deployment will use an ARM Template. You will deploy a single template, responsible for creating all the Azure resources in a single resource group as well onboarding the created VM to Azure Arc.
 
 * Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command.
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../azure/arm_template/azuredeploy.parameters.example.json).
 
+* To deploy the ARM template, navigate to the local cloned [deployment folder](../azure/arm_template/) and run the below command:
 
+    ```console
+    az group create --name <Name of the Azure resource group> --location <Azure Region> --tags "Project=jumpstart_azure_arc_sql"
+    az deployment group create \
+    --resource-group <Name of the Azure resource group> \
+    --name <The name of this deployment> \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/azuredeploy.json \
+    --parameters <The *azuredeploy.parameters.json* parameters file location>
+    ```
 
+    > [!NOTE] Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file
 
+    For example:
 
+    ```console
+    az group create --name Arc-SQL-Demo --location "East US" --tags "Project=jumpstart_azure_arc_sql"
+    az deployment group create \
+    --resource-group Arc-Servers-Win-Demo \
+    --name arcsqlsrvdemo \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_sqlsrv_jumpstart/azure/arm_template/azuredeploy.json \
+    --parameters azuredeploy.parameters.json
+    ```
+
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal.
+
+    ![](../img/azure_arm_template_winsrv/01.jpg)
+
+    ![](../img/azure_arm_template_winsrv/02.jpg)
+
+## Windows Login & Post Deployment
+
+* Now that the Windows Server VM has been deployed, it is time to login to it. Using it's public IP, RDP to the VM.
+
+    ![](../img/azure_arm_template_winsrv/03.jpg)
+
+* At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
+
+Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed.
+
+> **[!NOTE] The script run time is ~10-15min long**
+
+![](../img/azure_arm_template_winsrv/04.jpg)
+
+![](../img/azure_arm_template_winsrv/05.jpg)
+
+![](../img/azure_arm_template_winsrv/06.jpg)
+
+![](../img/azure_arm_template_winsrv/07.jpg)
+
+![](../img/azure_arm_template_winsrv/08.jpg)
+
+![](../img/azure_arm_template_winsrv/09.jpg)
+
+![](../img/azure_arm_template_winsrv/10.jpg)
+
+![](../img/azure_arm_template_winsrv/11.jpg)
+
+![](../img/azure_arm_template_winsrv/12.jpg)
+
+![](../img/azure_arm_template_winsrv/13.jpg)
+
+* Upon successful run, in the Azure portal, notice you now have a new Azure Arc enabled server (with the Microsoft Monitoring agent installed via an extension) and Azure Arc enabled SQL resources as well as Azure Log Analytics added to the resource group.
+
+![](../img/azure_arm_template_winsrv/14.jpg)
+
+![](../img/azure_arm_template_winsrv/15.jpg)
+
+![](../img/azure_arm_template_winsrv/16.jpg)
+
+* Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed as well.
+
+![](../img/azure_arm_template_winsrv/17.jpg)
+
+![](../img/azure_arm_template_winsrv/18.jpg)
 
 ## Azure SQL Assessment
 
-Now that you have both the server and SQL projected as Azure Arc resources, the last step is complete the initiation of the SQL Assessment run. 
+Now that you have both the server and SQL projected as Azure Arc resources, the last step is complete the initiation of the SQL Assessment run.
 
-* On the SQL Azure Arc resource, click on "Environment Health" followed by clicking the "Download configuration script". 
+* On the SQL Azure Arc resource, click on "Environment Health" followed by clicking the "Download configuration script".
 
-Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you safety ignore and delete the downloaded *AddSqlAssessment.ps1* file. 
-Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button. 
+Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you can safely ignore and delete the downloaded *AddSqlAssessment.ps1* file.
 
-![](../img/gcp_terraform_winsrv/39.png)
+Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
-![](../img/gcp_terraform_winsrv/40.png)
+![](../img/azure_arm_template_winsrv/19.jpg)
 
-![](../img/gcp_terraform_winsrv/41.png)
+![](../img/azure_arm_template_winsrv/20.jpg)
 
-* After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs is getting injected to Azure Log Analytics. 
+![](../img/azure_arm_template_winsrv/21.jpg)
+
+![](../img/azure_arm_template_winsrv/22.jpg)
+
+It might take a bit of time, but after ~45-60min you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
 Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-![](../img/gcp_terraform_winsrv/42.png)
+![](../img/azure_arm_template_winsrv/23.jpg)
 
-![](../img/gcp_terraform_winsrv/43.png)
+![](../img/azure_arm_template_winsrv/24.jpg)
 
 ## Cleanup
 
-To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the GCP and the Azure resources.
+To delete the entire deployment, simply delete the Resource Group from the Azure portal.
 
-![](../img/gcp_terraform_winsrv/44.png)
+![](../img/azure_arm_template_winsrv/25.jpg)

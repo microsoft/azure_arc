@@ -11,7 +11,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
     ```terminal
     git clone https://github.com/microsoft/azure_arc.git
     ```
-    
+
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * [Create a free Amazon Web Services account](https://aws.amazon.com/free/) if you don't already have one.
@@ -140,9 +140,9 @@ export TF_VAR_admin_password='Guest OS Admin Password'
     ```terminal
     terraform init
     terraform apply --auto-approve
-    ``` 
+    ```
 
-Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure Resource Group will be created. 
+Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure Resource Group will be created.
 
 ![](../img/aws_terraform_winsrv/08.png)
 
@@ -194,12 +194,13 @@ Once the Terraform plan deployment has completed, a new Windows Server VM will b
 
 ## Azure SQL Assessment
 
-Now that you have both the server and SQL projected as Azure Arc resources, the last step is complete the initiation of the SQL Assessment run. 
+Now that you have both the server and SQL projected as Azure Arc resources, the last step is complete the initiation of the SQL Assessment run.
 
-* On the SQL Azure Arc resource, click on "Environment Health" followed by clicking the "Download configuration script". 
+* On the SQL Azure Arc resource, click on "Environment Health" followed by clicking the "Download configuration script".
 
-Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you safety ignore and delete the downloaded *AddSqlAssessment.ps1* file.
-Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button. 
+Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you can safely and delete the downloaded *AddSqlAssessment.ps1* file.
+
+Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
 ![](../img/aws_terraform_winsrv/28.png)
 
@@ -207,7 +208,7 @@ Clicking the "Download configuration script" will simply send a REST API call to
 
 ![](../img/aws_terraform_winsrv/30.png)
 
-* After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs is getting injected to Azure Log Analytics. 
+* After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
 Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 

@@ -113,10 +113,9 @@ As mentioned, this deployment will use ARM templates. You will deploy a single t
 
     ![](../img/azure_arm_template_linux/02.png)
 
-
 ## Linux Login & Post Deployment
 
-* Now that the Linux VM is created, it is time to login to it. Using it's public IP, SSH to the VM.
+* Now that the Linux VM has been deployed, it is time to login to it. Using it's public IP, SSH to the VM.
 
 ![](../img/azure_arm_template_linux/03.png)
 
@@ -135,8 +134,6 @@ Let the script to run its course and **do not close** the SSH session, this will
 ![](../img/azure_arm_template_linux/07.png)
 
 ![](../img/azure_arm_template_linux/08.png)
-
-
 
 ## Cleanup
 
