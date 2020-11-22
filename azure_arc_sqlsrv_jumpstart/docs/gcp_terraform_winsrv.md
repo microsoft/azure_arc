@@ -2,7 +2,7 @@
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Google Cloud Platform (GCP) virtual machine and connect it as an Azure Arc enabled SQL server resource.
 
-By the end of the guide, you will have a GCP VM instance installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL Server and a running Azure SQL assessment.
+By the end of the guide, you will have a GCP VM instance installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
 
 ## Prerequisites
 
@@ -47,7 +47,7 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-### Create a new GCP Project, IAM Role & Service Account
+## Create a new GCP Project, IAM Role & Service Account
 
 * Create a new GCP Project, IAM Role & Service Account
 

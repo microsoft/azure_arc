@@ -1,12 +1,12 @@
-##################################################################
+###########################################################################
 # 1. Restore AdventureWorksLT2019 Database
-# 2. Allow Azure VM to be onboarded to Arc
+# 2. Allow Azure VM to be onboard to Azure Arc
 # 3. Project VM as an Azure Arc enabled server resource
 # 4. Project SQL Server as an Azure Arc enabled SQL server resource
 # 5. Deploy Log Analytics workspace and Solutions
-# 6. Install Log Analytics agent
-# 7. Create SQL Assessment
-##################################################################
+# 6. Install Log Analytics agent using extension on Azure Arc server
+# 7. Create SQL Assessment and inject data to Azure Log Analytics workspace
+###########################################################################
 
 Start-Transcript -Path C:\tmp\ArcOnboarding.log
 
@@ -307,7 +307,7 @@ $SecureString = ConvertTo-SecureString $env:adminPassword -AsPlainText -Force
 Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
 $name = "Recurring HealthService Restart"
-$repeat = (New-TimeSpan -Minutes 5)
+$repeat = (New-TimeSpan -Minutes 10)
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "Restart-Service -Name HealthService -Force"
 $duration = (New-TimeSpan -Days 1)
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval $repeat -RepetitionDuration $duration
