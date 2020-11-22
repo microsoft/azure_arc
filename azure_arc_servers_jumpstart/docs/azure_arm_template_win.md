@@ -77,7 +77,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
-As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible for creating all the Azure resources in a single Resource Group as well onboarding the created VM to Azure Arc. 
+As mentioned, this deployment will use ARM templates. You will deploy a single template, responsible for creating all the Azure resources in a single Resource Group as well onboarding the created VM to Azure Arc.
 
 * Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command.
 
@@ -113,16 +113,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![](../img/azure_arm_template_win/02.jpg)
 
-
 ## Windows Login & Post Deployment
 
-* Now that the Windows Server VM is created, it is time to login to it. Using it's public IP, RDP to the VM.
+* Now that the Windows Server VM has been deployed, it is time to login to it. Using it's public IP, RDP to the VM.
 
 ![](../img/azure_arm_template_win/03.jpg)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
-Let the script to run its course and **do not close** the Powershell session, this will be done for you once completed.
+Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed.
 
 > [!NOTE] The script run time is ~1-2min long
 
