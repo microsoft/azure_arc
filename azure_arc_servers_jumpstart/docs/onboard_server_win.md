@@ -1,6 +1,6 @@
 # Onboard an existing Windows server with Azure Arc
 
-The following README will guide you on how to connect an Windows machine to Azure Arc using a simple Powershell script.
+The following README will guide you on how to connect an Windows machine to Azure Arc using a simple PowerShell script.
 
 # Prerequisites
 
@@ -8,16 +8,16 @@ The following README will guide you on how to connect an Windows machine to Azur
 
 * Create Azure Service Principal (SP)   
 
-    To connect a server to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect a server to Azure Arc, an Azure Service Principal assigned with the "Azure Connected Machine Onboarding" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```bash
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Azure Connected Machine Onboarding"
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor```
+    ```az ad sp create-for-rbac -n "http://AzureArcServers" --role "Azure Connected Machine Onboarding"```
 
     Output should look like this:
 
@@ -37,7 +37,7 @@ The following README will guide you on how to connect an Windows machine to Azur
 
 ![](../img/onboard_server_win/01.png)
 
-* Download the [az_connect_win](../scripts/az_connect_win.ps1) Powershell script.
+* Download the [az_connect_win](../scripts/az_connect_win.ps1) PowerShell script.
 
 * Change the environment variables according to your environment and copy the script to the designated machine.
 
@@ -45,13 +45,13 @@ The following README will guide you on how to connect an Windows machine to Azur
 
 # Deployment
 
-On the designated machine, Open Powershell ISE **as Administrator** and run the script. Note the script is using *$env:ProgramFiles* as the agent installation path so make sure **you are not using Powershell ISE (x86)**.
+On the designated machine, Open PowerShell ISE **as Administrator** and run the script. Note the script is using *$env:ProgramFiles* as the agent installation path so make sure **you are not using PowerShell ISE (x86)**.
 
 ![](../img/onboard_server_win/03.png)
 
 ![](../img/onboard_server_win/04.png)
 
-Upon completion, you will have your Windows server, connected as a new Azure Arc resource inside your Resource Group. 
+Upon completion, you will have your Windows server, connected as a new Azure Arc resource inside your resource group. 
 
 ![](../img/onboard_server_win/05.png)
 
@@ -65,6 +65,6 @@ The most straightforward way is to delete the server via the Azure Portal, just 
 
 ![](../img/onboard_server_win/08.png)
 
-If you want to nuke the entire environment, just delete the Azure Resource Group.
+If you want to nuke the entire environment, just delete the Azure resource group.
 
 ![](../img/onboard_server_win/09.png)
