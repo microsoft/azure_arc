@@ -94,7 +94,7 @@ To deploy the ARM template, navigate to the [deployment folder](../extensions/ar
     ```bash
     az deployment group create --resource-group <Name of the Azure Resource Group> \
     --template-file <The *mma-template.json* template file location> \
-    --parameters <The *mma-temaplte.parameters.json* template file location>
+    --parameters <The *mma-template.parameters.json* template file location>
     ```
    
 * Once the template has completed it's run, you should see an output as follows: 
