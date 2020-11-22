@@ -63,7 +63,7 @@ In this guide, you will create and configure an Azure Automation account and Log
 
 Update Management uses the Log Analytics agent to collect Windows and Linux server log files and the data collected is stored in a Log Analytics workspace. 
 
-* You will need to create a Log Analytics workspace. For that you can use this [ARM template](../updateManagement/law-template.json) that will create a new Log Analytics Workspace and define the Azure Sentinel solution and enable it for the workspace. 
+* You will need to create a Log Analytics workspace. For that you can use this [ARM template](../updateManagement/law-template.json) that will create a new Log Analytics Workspace and define the Update Management solution and enable it for the workspace. 
 
 * First, create a new resource group for the Log Analytics workspace by running the below command, replacing the values in brackets with your own.
 
