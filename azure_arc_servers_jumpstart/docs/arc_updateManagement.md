@@ -34,31 +34,6 @@ In this guide, you will create and configure an Azure Automation account and Log
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP).
-
-    To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
-
-    ```bash
-    az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
-    ```
-
-    For example:
-    ```az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor```
-    Output should look like this:
-
-    ```json
-    {
-    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcServers",
-    "name": "http://AzureArcServers",
-    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    }
-    ```
-
-  **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
-
 ## Configuring Update Management
 
 Update Management uses the Log Analytics agent to collect Windows and Linux server log files and the data collected is stored in a Log Analytics workspace. 
