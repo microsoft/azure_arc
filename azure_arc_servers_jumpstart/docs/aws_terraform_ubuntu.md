@@ -18,7 +18,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-## Create Azure Service Principal (SP)   
+## Create Azure Service Principal (SP)
 
 * To connect the AWS virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
@@ -44,6 +44,12 @@ The following README will guide you on how to use the provided [Terraform](https
     ```
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+
+* Azure Arc enabled servers is leveraging the *Microsoft.HybridCompute* resource provider (RP). Using the bellow command, register the RP.
+
+    ```console
+    az provider register --namespace 'Microsoft.HybridCompute'
+    ```
 
 # Create an AWS identity
 

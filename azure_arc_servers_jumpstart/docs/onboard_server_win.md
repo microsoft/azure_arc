@@ -33,6 +33,12 @@ The following README will guide you on how to connect an Windows machine to Azur
     
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
+* Azure Arc enabled servers is leveraging the *Microsoft.HybridCompute* resource provider (RP). Using the bellow command, register the RP.
+
+    ```console
+    az provider register --namespace 'Microsoft.HybridCompute'
+    ```
+
 * Create a new Azure Resource Group where you want your machine(s) to show up. 
 
 ![](../img/onboard_server_win/01.png)

@@ -65,6 +65,12 @@ The following README will guide you on how to use the provided [Terraform](https
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
+* Azure Arc enabled servers is leveraging the *Microsoft.HybridCompute* resource provider (RP). Using the bellow command, register the RP.
+
+    ```console
+    az provider register --namespace 'Microsoft.HybridCompute'
+    ```
+
 # Deployment
 
 Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and the GCP project name.

@@ -51,6 +51,12 @@ The following README will guide you on how to use the provided [Terraform](https
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
+* Azure Arc enabled servers is leveraging the *Microsoft.HybridCompute* resource provider (RP). Using the bellow command, register the RP.
+
+    ```console
+    az provider register --namespace 'Microsoft.HybridCompute'
+    ```
+
 # Create a new GCP Project
 
 * Browse to https://console.cloud.google.com and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
