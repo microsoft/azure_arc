@@ -117,7 +117,7 @@ The following guides are designed to provide scaled onboarding experience to Azu
 
 ## Azure Arc enabled SQL Server
 
-The deployment scenarios below will guide you through onboarding Microsoft SQL Server, deployed on various platform to Azure Arc.
+The deployment scenarios below will guide you through onboarding Microsoft SQL Server, deployed on various platforms to Azure Arc.
 
 ### Microsoft Azure
 
