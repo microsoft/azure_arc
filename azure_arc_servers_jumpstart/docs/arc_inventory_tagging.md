@@ -1,5 +1,5 @@
 # Arc Inventory Tagging
- 
+
 The following README will guide you on how to use Azure Arc enabled servers to provide server inventory management capabilities across hybrid multi-cloud and on-premises environments.
 
 Azure Arc enabled servers allows you to manage your Windows and Linux machines hosted outside of Azure on your corporate network or other cloud provider, similarly to how you manage native Azure virtual machines. When a hybrid machine is connected to Azure, it becomes a connected machine and is treated as a resource in Azure. Each connected machine has a Resource ID, is managed as part of a resource group inside a subscription, and benefits from standard Azure constructs such as Azure Policy and applying tags. The ability to easily organize and manage server inventory using Azure as a management engine greatly reduces administrative complexity and provides a consistent strategy for hybrid and multicloud environments.
@@ -8,7 +8,7 @@ In this guide, we will use [Resource Graph Explorer](https://docs.microsoft.com/
 
 *Note: This guide assumes you already deployed an Ubuntu VM in AWS and an Ubuntu VM in GCP and have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these guides.*
 * [GCP Ubuntu VM](../docs/gcp_terraform_ubuntu.md)
-* [AWS Ubuntu VM](../docs/aws_terraform_ubntu.md)
+* [AWS Ubuntu VM](../docs/aws_terraform_ubuntu.md)
 
 # Prerequisites
 

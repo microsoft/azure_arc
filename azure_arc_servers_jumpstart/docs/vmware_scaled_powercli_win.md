@@ -63,6 +63,12 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
 
     **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
+* Azure Arc enabled servers is leveraging the *Microsoft.HybridCompute* resource provider (RP). Using the bellow command, register the RP.
+
+    ```console
+    az provider register --namespace 'Microsoft.HybridCompute'
+    ```
+
 # Automation Flow
 
 Below you can find the automation flow for this scenario:
