@@ -29,7 +29,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
     Output should look like this:
 
-    ```
+    ```console
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcK8s",

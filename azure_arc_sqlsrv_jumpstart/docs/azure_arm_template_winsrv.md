@@ -49,8 +49,9 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
     }
     ```
 
-> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+> **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
+ **NOTE:**  The note content.
 ## Automation Flow
 
 The automation for this scenario include 3 PowerShell scripts executed in the following order:
