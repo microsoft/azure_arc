@@ -132,7 +132,7 @@ In each guide, you find a detailed, technical explanation of the mechanism and w
 
 The following guide provide end-to-end deployment of new Windows Server install with SQL Server in AWS and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
-* [Onboard a AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc](azure_arc_sqlsrv_jumpstart/docs/aws_terraform_winsrv.md)
+* [Onboard an AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc](azure_arc_sqlsrv_jumpstart/docs/aws_terraform_winsrv.md)
 
 ### Google Cloud Platform (GCP)
 
