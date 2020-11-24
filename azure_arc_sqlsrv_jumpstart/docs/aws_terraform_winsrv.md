@@ -1,4 +1,4 @@
-# Onboard a AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc
+# Onboard an AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Amazon Web Services (AWS) EC2 instance and connect it as an Azure Arc enabled SQL server resource.
 
@@ -35,7 +35,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
     Output should look like this:
 
-    ```
+    ```console
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServers",
