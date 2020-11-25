@@ -117,7 +117,7 @@ export TF_VAR_admin_user='Guest OS Admin Username'
 export TF_VAR_admin_password='Guest OS Admin Password'
 ```
 
-**Note: Use the Terraform plan [*variables.tf*](..\vmware\winsrv\terraform\variables.tf) file for more details around VMware vSphere vars structure if needed**
+**Note: Use the Terraform plan [*variables.tf*](../vmware/winsrv/terraform/variables.tf) file for more details around VMware vSphere vars structure if needed**
 
 ![](../img/vmware_terraform_winsrv/01.jpg)
 
