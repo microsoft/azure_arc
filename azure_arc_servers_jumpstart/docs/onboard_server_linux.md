@@ -2,13 +2,13 @@
 
 The following README will guide you on how to connect an Linux server to Azure Arc using a simple shell script.
 
-# Prerequisites
+## Prerequisites
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP)   
+* Create Azure Service Principal (SP)
 
-    To connect a server to Azure Arc, an Azure Service Principal assigned with the "Azure Connected Machine Onboarding" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect a server to Azure Arc, an Azure Service Principal assigned with the "Azure Connected Machine Onboarding" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -21,7 +21,7 @@ The following README will guide you on how to connect an Linux server to Azure A
 
     Output should look like this:
 
-    ```
+    ```console
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServers",
@@ -30,8 +30,8 @@ The following README will guide you on how to connect an Linux server to Azure A
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-    
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+
+> **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
 * Azure Arc enabled servers is leveraging the *Microsoft.HybridCompute* resource provider (RP). Using the bellow command, register the RP.
 
@@ -39,13 +39,13 @@ The following README will guide you on how to connect an Linux server to Azure A
     az provider register --namespace 'Microsoft.HybridCompute'
     ```
 
-* Create a new Azure resource group where you want your server(s) to show up. 
+* Create a new Azure resource group where you want your server(s) to show up.
 
 ![](../img/onboard_server_linux/01.png)
 
 * Download the [az_connect_linux](../scripts/az_connect_linux.sh) shell script.
 
-* Change the environment variables according to your environment. 
+* Change the environment variables according to your environment.
 
 ![](../img/onboard_server_linux/02.png)
 
@@ -53,13 +53,13 @@ The following README will guide you on how to connect an Linux server to Azure A
 
 ![](../img/onboard_server_linux/03.png)
 
-# Deployment
+## Deployment
 
-Run the script using the ```. ./az_connect_linux.sh``` command. 
+Run the script using the ```. ./az_connect_linux.sh``` command.
 
-**Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
+> **Note: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
-Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your resource group. 
+Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your resource group.
 
 ![](../img/onboard_server_linux/04.png)
 
@@ -67,9 +67,9 @@ Upon completion, you will have your Linux server, connected as a new Azure Arc r
 
 ![](../img/onboard_server_linux/06.png)
 
-# Delete the deployment
+## Delete the deployment
 
-The most straightforward way is to delete the server via the Azure Portal, just select server and delete it. 
+The most straightforward way is to delete the server via the Azure Portal, just select server and delete it.
 
 ![](../img/onboard_server_linux/07.png)
 

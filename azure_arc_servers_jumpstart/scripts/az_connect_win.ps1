@@ -21,4 +21,5 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
  --resource-group $env:resourceGroup `
  --tenant-id $env:tenantId `
  --location $env:location `
- --subscription-id $env:subscriptionId
+ --subscription-id $env:subscriptionId `
+ --tags "Project=jumpstart_azure_arc_servers"
