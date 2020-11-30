@@ -25,5 +25,4 @@ azcmagent connect \
   --resource-group "${resourceGroup}" \
   --tenant-id "${tenantId}" \
   --location "${location}" \
-  --subscription-id "${subscriptionId}" \
-  --tags "Project=jumpstart_azure_arc_servers"
+  --subscription-id "${subscriptionId}"
