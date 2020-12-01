@@ -4,7 +4,7 @@ linkTitle: "Azure Arc Overview"
 weight: 1
 ---
 
-# Azure Arc Overview -test
+# Azure Arc Overview
 
 For customers who want to simplify complex and distributed environments across on-premises, edge and multi-cloud, [Azure Arc](https://azure.microsoft.com/services/azure-arc/) enables deployment of Azure services anywhere and extends Azure management to any infrastructure.
 
