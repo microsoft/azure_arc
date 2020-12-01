@@ -5,6 +5,8 @@ weight: 2
 description: >
 ---
 
+# AKS Terraform
+
 ## Overview
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connected it as an Azure Arc cluster resource.

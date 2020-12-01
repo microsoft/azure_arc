@@ -5,7 +5,7 @@ weight: 1
 description: >
 ---
 
-# Overview
+# Create a VMware vSphere template for Ubuntu Server 18.04
 
 The following README will guide you on how to create an Ubuntu Server 18.04 VMware vSphere virtual machine template. 
 

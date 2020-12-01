@@ -1,9 +1,11 @@
 ---
-title: "AKS Policy"
+title: "Apply GitOps configurations on AKS as an Azure Arc Connected Cluster using Azure Policy for Kubernetes"
 linkTitle: "AKS Policy"
 weight: 4
 description: >
 ---
+
+# Apply GitOps configurations on AKS as an Azure Arc Connected Cluster using Azure Policy for Kubernetes
 
 ## Overview
 

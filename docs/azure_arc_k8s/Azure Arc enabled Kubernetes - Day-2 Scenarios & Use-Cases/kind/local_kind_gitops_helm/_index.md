@@ -1,9 +1,11 @@
 ---
-title: "Local Kind GitOps Helm"
+title: "Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster"
 linkTitle: "Local Kind GitOps Helm"
 weight: 1
 description: >
 ---
+
+# Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster
 
 ## Overview
 

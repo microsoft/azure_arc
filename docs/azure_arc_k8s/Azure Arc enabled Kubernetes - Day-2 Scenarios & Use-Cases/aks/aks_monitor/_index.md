@@ -1,9 +1,11 @@
 ---
-title: "AKS Monitor"
+title: "Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster"
 linkTitle: "AKS Monitor"
 weight: 3
 description: >
 ---
+
+# Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster
 
 ## Overview
 

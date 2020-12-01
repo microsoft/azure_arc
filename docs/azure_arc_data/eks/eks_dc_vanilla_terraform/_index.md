@@ -5,7 +5,7 @@ weight: 1
 description: >
 ---
 
-# Overview
+# Azure Arc Data Controller Vanilla Deployment on EKS (Terraform)
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on [Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks/) cluster, using [Terraform](https://www.terraform.io/).
 

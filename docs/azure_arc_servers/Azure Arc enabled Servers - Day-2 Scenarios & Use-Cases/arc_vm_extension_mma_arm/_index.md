@@ -5,7 +5,7 @@ weight: 2
 description: >
 ---
 
-# Overview
+# Azure Arc enabled servers MMA Extension
 
 The following README will guide you on how to manage extensions on Azure Arc connected machines. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
 

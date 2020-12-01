@@ -1,9 +1,11 @@
 ---
-title: "GKE GitOps Basic"
+title: "Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster"
 linkTitle: "GKE GitOps Basic"
 weight: 1
 description: >
 ---
+
+# Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster
 
 ## Overview
 

@@ -1,11 +1,11 @@
 ---
-title: "Local MicroK8s GitOps Helm"
+title: "Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster"
 linkTitle: "Local MicroK8s GitOps Helm"
 weight: 1
 description: >
 ---
 
-## Overview
+## Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster
 
 The following README will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on a [MicroK8s](https://microk8s.io/) cluster which is projected as an Azure Arc connected cluster resource.
 

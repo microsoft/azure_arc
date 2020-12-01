@@ -1,9 +1,11 @@
 ---
-title: "GKE GitOps Helm"
+title: "Deploy GitOps configurations and perform Helm-based GitOps flow on GKE as an Azure Arc Connected Cluster"
 linkTitle: "GKE GitOps Helm"
 weight: 2
 description: >
 ---
+
+# Deploy GitOps configurations and perform Helm-based GitOps flow on GKE as an Azure Arc Connected Cluster
 
 ## Overview
 

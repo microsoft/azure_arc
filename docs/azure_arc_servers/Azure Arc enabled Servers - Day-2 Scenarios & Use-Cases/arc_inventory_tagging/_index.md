@@ -1,11 +1,11 @@
 ---
-title: "Arc Inventory Tagging"
+title: "Tagging and querying server inventory across multiple clouds using Resource Graph Explorer"
 linkTitle: "Arc Inventory Tagging"
 weight: 1
 description: >
 ---
 
-# Overview
+# Tagging and querying server inventory across multiple clouds using Resource Graph Explorer
 
 The following README will guide you on how to use Azure Arc enabled servers to provide server inventory management capabilities across hybrid multi-cloud and on-premises environments.
 

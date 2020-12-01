@@ -4,7 +4,7 @@ linkTitle: "Onboard an Azure VM with Windows Server & Microsoft SQL Server to Az
 weight: 1
 ---
 
-# Overview
+# Onboard an Azure VM with Windows Server & Microsoft SQL Server to Azure Arc
 
 The following README will guide you on how to use the provided [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview) to deploy an Azure VM installed with Windows Server and Microsoft SQL Server 2019 (Developer edition) and connect it as an Azure Arc enabled SQL server resource.
 

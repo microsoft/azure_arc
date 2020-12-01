@@ -5,7 +5,7 @@ weight: 1
 description: >-
 ---
 
-# Overview
+# Onboard a GCP VM instance with Windows Server & Microsoft SQL Server to Azure Arc
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Google Cloud Platform (GCP) virtual machine and connect it as an Azure Arc enabled SQL server resource.
 

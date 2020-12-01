@@ -1,9 +1,11 @@
 ---
-title: "GKE Monitor"
+title: "Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster"
 linkTitle: "GKE Monitor"
 weight: 3
 description: >
 ---
+
+# Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster
 
 ## Overview
 

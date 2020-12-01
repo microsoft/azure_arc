@@ -1,9 +1,11 @@
 ---
-title: "AKS Gitops Helm"
+title: "Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster"
 linkTitle: "AKS Gitops Helm"
 weight: 2
 description: >
 ---
+
+# Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster
 
 ## Overview
 

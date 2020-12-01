@@ -5,7 +5,7 @@ weight: 1
 description: >
 ---
 
-# Overview
+# Onboard a local Ubuntu server hosted with Vagrant into Azure Arc
 
 The following README will guide you on how to deploy a local "Ready to Go" **Ubuntu** virtual machine using [Vagrant](https://www.vagrantup.com/) and connect it as an Azure Arc enabled server resource.
 

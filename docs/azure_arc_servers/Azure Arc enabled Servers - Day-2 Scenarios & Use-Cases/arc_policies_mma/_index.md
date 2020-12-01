@@ -5,7 +5,7 @@ weight: 4
 description: >
 ---
 
-# Overview
+# Manage Arc enabled servers with Azure Policy
 
 The following README will guide you on how to use Azure Arc enabled servers to assign Azure Policies to VMs outside of Azure, whether they are on-premises or other clouds. With this feature you can now use Azure Policies to audit settings in the operating system of an Azure Arc connected servers, if a setting is not compliant you can also trigger a remediation task. 
 

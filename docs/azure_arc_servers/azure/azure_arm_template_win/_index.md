@@ -5,7 +5,7 @@ weight: 2
 description: >
 ---
 
-# Overview
+# Onboard an Azure Windows Server VM with Azure Arc
 
 The following README will guide you on how to automatically onboard a Azure Windows VM on to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible of creating the Azure resources as well as executing the Azure Arc onboard script on the VM. 
 
