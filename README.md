@@ -1,7 +1,7 @@
 ---
 title: "Azure Arc Overview"
 linkTitle: "Azure Arc Overview"
-weigth: 1
+weight: 1
 ---
 
 # Azure Arc Overview
