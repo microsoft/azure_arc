@@ -1,4 +1,4 @@
-# Azure Arc Overview
+# Azure Arc Overview 
 
 For customers who want to simplify complex and distributed environments across on-premises, edge and multi-cloud, [Azure Arc](https://azure.microsoft.com/services/azure-arc/) enables deployment of Azure services anywhere and extends Azure management to any infrastructure.
 
@@ -57,7 +57,7 @@ In each guide, you find a detailed, technical explanation of the mechanism and w
 
 ### Vagrant
 
-If you don't have any existing servers available, you can use [Vagrant](https://www.vagrantup.com/) to host a new server locally and onboard it to Azure. This will allow you to simulate "on-premises" servers from your local machine. 
+If you don't have any existing servers available, you can use [Vagrant](https://www.vagrantup.com/) to host a new server locally and onboard it to Azure. This will allow you to simulate "on-premises" servers from your local machine.
 
 * [Deploy a local Ubuntu VM and connect it to Azure Arc using Vagrant](azure_arc_servers_jumpstart/docs/local_vagrant_ubuntu.md)
 
@@ -98,7 +98,7 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 * [Deploying Custom Script Extension to Azure Arc Linux and Windows VMs using Extension Management](azure_arc_servers_jumpstart/docs/arc_vm_extension_customscript_arm.md)
 
 * [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Azure Policies](azure_arc_servers_jumpstart/docs/arc_policies_mma.md)
- 
+
 * [Integrate Azure Security Center with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_securitycenter.md)
 
 * [Integrate Azure Sentinel with Azure Arc enabled Servers](azure_arc_servers_jumpstart/docs/arc_azuresentinel.md)
@@ -148,7 +148,7 @@ The following guide provide end-to-end deployment of new Windows Server install 
 
 ## Azure Arc enabled Kubernetes
 
-The below deployment options are focused on Azure Arc enabled Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
+The below deployment options are focused on Azure Arc enabled Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling.
 
 **Disclaimer: Azure Arc enabled Kubernetes is currently in Public Preview.**
 
@@ -180,7 +180,7 @@ This example uses Terraform to deploy a GKE cluster on Google Cloud and connect 
 
 ### Rancher k3s
 
-These examples deploy [Rancher k3s](https://github.com/rancher/k3s) on an Azure VM or VMware and onboards the cluster with Azure Arc.
+These examples deploy [Rancher k3s](https://github.com/rancher/k3s) on an Azure VM or VMware and onboard the cluster with Azure Arc.
 
 * [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](azure_arc_k8s_jumpstart/docs/rancher_k3s_azure_arm_template.md)
 
@@ -275,11 +275,11 @@ If you do not yet have a Kubernetes cluster, the following examples walk through
 
 * [Azure Arc Data Controller Vanilla Deployment on Ubuntu Kubeadm VM using Azure ARM template](azure_arc_data_jumpstart/docs/kubeadm_dc_vanilla_arm_template.md)
 
-# Repository Roadmap
+## Repository Roadmap
 
 Up-to-date roadmap for the Azure Arc scenarios to be covered can be found under [this repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
 
-# Contributing
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
@@ -297,7 +297,7 @@ Before contributing code, please see the [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 Issues, PRs and Feature Request have their own templates. Please fill out the whole template.
 
-# Legal Notices
+## Legal Notices
 
 Microsoft and any contributors grant you a license to the Microsoft documentation and other content
 in this repository under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/legalcode),
