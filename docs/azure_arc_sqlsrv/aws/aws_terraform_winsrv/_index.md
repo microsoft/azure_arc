@@ -14,7 +14,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -26,22 +26,22 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
 * Create Azure Service Principal (SP)
 
-    To connect the EC2 instance to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the EC2 instance to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```terminal
+    ```console
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```terminal
+    ```console
     az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
     ```
 
     Output should look like this:
 
-    ```
+    ```console
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServers",
@@ -64,7 +64,7 @@ Create AWS User IAM Key. An access key grants programmatic access to your resour
 * Select the **Users** from the side menu.
 
 ![](./02.png)
-    
+
 * Select the **User** you want to create the access key for.
 
 ![](./03.png)
@@ -101,7 +101,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
             * Create SQL Server Management Studio Desktop shortcut
             * Restore [*AdventureWorksLT2019*](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) Sample Database
             * Onboard both the server and SQL to Azure Arc
-            * Deploy Azure Log Analytics and a workspace 
+            * Deploy Azure Log Analytics and a workspace
             * Install the [Microsoft Monitoring Agent (MMA) agent](https://docs.microsoft.com/en-us/services-hub/health/mma-setup)
             * Enable Log Analytics Solutions
             * Deploy MMA Azure Extension ARM Template from within the VM
@@ -117,7 +117,7 @@ Before executing the Terraform plan, you must set the environment variables whic
 
 * Retrieve your Azure Subscription ID and tenant ID using the `az account list` command.
 
-* The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on the virtual machine to install all the necessary artifacts. 
+* The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on the virtual machine to install all the necessary artifacts.
 
 Both the script and the Terraform plan itself requires certain information about your AWS and Azure environments. Edit variables according to your environment and export it using the below commands
 
@@ -141,9 +141,9 @@ export TF_VAR_admin_password='Guest OS Admin Password'
 
 ![](./07.png)
 
-* From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan. 
+* From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan.
 
-    ```terminal
+    ```console
     terraform init
     terraform apply --auto-approve
     ```
@@ -156,13 +156,13 @@ Once the Terraform plan deployment has completed, a new Windows Server VM will b
 
 ![](./10.png)
 
-* Download the RDP file and log in to the VM (**using the data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed. 
+* Download the RDP file and log in to the VM (**using the data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed.
 
 ![](./11.png)
 
 ![](./12.png)
 
-**Note: The script runtime will take ~10-15min to complete**
+> **Note: The script runtime will take ~10-15min to complete**
 
 ![](./13.png)
 
