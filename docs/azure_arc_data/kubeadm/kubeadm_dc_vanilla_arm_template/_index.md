@@ -125,6 +125,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 * Once Azure resources have been provisioned, you will be able to see it in Azure portal.
 
     ![A successful ARM deployment](./01.png)
+
     ![Post-Deployment resource group](./02.png)
 
 ## Windows Login & Post Deployment
