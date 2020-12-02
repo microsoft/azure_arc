@@ -98,13 +98,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 For example:
 
- ```console
-    az group create --name Arc-Servers-Linux-Demo --location "westeurope" --tags "Project=jumpstart_azure_arc_servers"
-    az deployment group create \
-    --resource-group Arc-Servers-Linux-Demo \
-    --name arclinuxdemo \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/linux/arm_template/azuredeploy.json \
-    --parameters azuredeploy.parameters.json
+```console
+az group create --name Arc-Servers-Linux-Demo --location "westeurope" --tags "Project=jumpstart_azure_arc_servers"
+az deployment group create \
+--resource-group Arc-Servers-Linux-Demo \
+--name arclinuxdemo \
+--template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/linux/arm_template/azuredeploy.json \
+--parameters azuredeploy.parameters.json
 ```
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal.
