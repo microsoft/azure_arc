@@ -143,7 +143,9 @@ Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are crea
     Once the script will finish it's run, the logon script Powershell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
 
     ![PowerShell logon script run](./04.png)
+
     ![PowerShell logon script run](./05.png)
+
     ![PowerShell logon script run](./06.png)
 
 * To start interacting with the Azure Arc Data Controller, Open PowerShell and use the log in command bellow.
