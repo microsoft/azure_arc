@@ -105,7 +105,7 @@ For example:
     --name arclinuxdemo \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/linux/arm_template/azuredeploy.json \
     --parameters azuredeploy.parameters.json
-    ```
+```
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
