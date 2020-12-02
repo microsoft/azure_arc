@@ -1,6 +1,6 @@
 ---
-title: "Rancher K3s Vmware Terraform"
-linkTitle: "Rancher K3s Vmware Terraform"
+title: "Rancher K3s VMware Terraform"
+linkTitle: "Rancher K3s VMware Terraform"
 weight: 3
 description: >
 ---
