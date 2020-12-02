@@ -134,7 +134,7 @@ Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are crea
 
 * Using it's public IP, RDP to the **Client VM**
 
-![Client VM](./03.png)
+    ![Client VM](./03.png)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
