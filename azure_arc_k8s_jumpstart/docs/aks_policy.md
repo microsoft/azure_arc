@@ -164,7 +164,7 @@ Although you can [deploy GitOps configuration individually](aks_gitops.md) on ea
 
     ![](../img/aks_policy/27.png)                
 
-* In order to verify the "Hello Arc" application and it's component has been deployed, In the Google Cloud Shell, run the below commands.
+* In order to verify the "Hello Arc" application and it's component has been deployed, In the Azure Cloud Shell, run the below commands.
 
     ```bash
     kubectl get pods -n hello-arc
