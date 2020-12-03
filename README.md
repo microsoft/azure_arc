@@ -14,13 +14,13 @@ For customers who want to simplify complex and distributed environments across o
 
 * **Run data services anywhere** - Get automated patching, upgrades, security and scale on-demand across on-premises, edge and multi-cloud environments for your data estate.
 
-# Azure Arc Jumpstart
+## Azure Arc Jumpstart
 
 The following guides will walk you through the process of setting up demos that show how to get started with Azure Arc. They are designed with a "zero to hero" approach in mind and with as much automation as possible. The goal is for you to have a working Azure Arc demo environment spun up in no time so you can focus on showing the core values of the solution.
 
 **Disclaimer: The intention for this repo is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
 
-# Azure Arc Story Time
+## Azure Arc Story Time
 
 Fabrikam Global Manufacturing runs workloads on different hardware, across on-premises datacenters, and multiple public clouds, with Microsoft Azure being the primary cloud. They also support IoT workloads deployed on the edge. Workloads include very diverse services and are based on either virtual machines, managed Platform-as-a-Service (PaaS) services, and container-based applications.
 
@@ -212,11 +212,11 @@ This example walks you through how to create a Kubernetes cluster on your local 
 
 * [Deploy a local Kubernetes Cluster using MicroK8s and connect it to Azure Arc](../azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/)
 
-#### Azure Arc enabled Kubernetes - Day-2 Scenarios & Use-Cases
+### Azure Arc enabled Kubernetes - Day-2 Scenarios & Use-Cases
 
 Once you have Kubernetes clusters projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the clusters as native Azure resources. The following guides show examples of using Azure management tools such as Azure Monitor, GitOps configurations, and Azure Policy.
 
-##### AKS
+#### AKS
 
 * [Deploy GitOps configurations and perform basic GitOps flow on AKS as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/aks/aks_gitops_basic/)
 
@@ -226,7 +226,7 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 * [Apply GitOps configurations on AKS as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/aks/aks_policy/)
 
-##### GKE
+#### GKE
 
 * [Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/gke/gke_gitops_basic/)
 
@@ -236,11 +236,11 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 * [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/gke/gke_policy/)
 
-##### kind
+#### kind
 
 * [Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/kind/local_kind_gitops_helm/)
 
-##### MicroK8s
+#### MicroK8s
 
 * [Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/microk8s/local_microk8s_gitops_helm/)
 
@@ -282,11 +282,11 @@ If you do not yet have a Kubernetes cluster, the following examples walk through
 
 * [Azure Arc Data Controller Vanilla Deployment on Ubuntu Kubeadm VM using Azure ARM template](../azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_dc_vanilla_arm_template/)
 
-# Repository Roadmap
+## Repository Roadmap
 
 Up-to-date roadmap for the Azure Arc scenarios to be covered can be found under [this repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
 
-# Contributing
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
@@ -304,7 +304,7 @@ Before contributing code, please see the [CONTRIBUTING](../contributing/) guide.
 
 Issues, PRs and Feature Request have their own templates. Please fill out the whole template.
 
-# Legal Notices
+## Legal Notices
 
 Microsoft and any contributors grant you a license to the Microsoft documentation and other content
 in this repository under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/legalcode),
