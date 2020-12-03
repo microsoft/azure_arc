@@ -137,6 +137,6 @@ Let the script to run its course and **do not close** the SSH session, this will
 
 ## Cleanup
 
-To delete the entire deployment, simply delete the Resource Group from the Azure portal.
+To delete the entire deployment, simply delete the resource group from the Azure portal.
 
    ![Screenshot of how to delete resource group](../img/azure_arm_template_linux/09.png)
