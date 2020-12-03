@@ -49,7 +49,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
-### Automation Flow
+## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
@@ -75,7 +75,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 4. User RDP to Windows VM which will start the *LogonScript* script execution and will onboard the VM to Azure Arc
 
-### Deployment
+## Deployment
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible for creating all the Azure resources in a single resource group as well onboarding the created VM to Azure Arc.
 
@@ -113,7 +113,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Screenshot Azure Arc enabled server on resource group](../img/azure_arm_template_win/02.jpg)
 
-### Windows Login & Post Deployment
+## Windows Login & Post Deployment
 
 * Now that the Windows Server VM is created, it is time to login to it. Using its public IP, RDP to the VM.
 
@@ -139,7 +139,7 @@ Let the script to run its course and **do not close** the Powershell session, th
 
     ![Screenshot Azure Arc enabled server details](../img/azure_arm_template_win/09.jpg)
 
-### Cleanup
+## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
 
