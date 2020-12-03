@@ -97,17 +97,17 @@ The following guides provide end-to-end deployment of new Windows or Linux serve
 
 Once you have server resources projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the servers as native Azure resources. The following guides show examples of using Azure management tools such as resource tags, Azure Policy, Log Analytics, and more with Azure Arc enabled servers.
 
-* [Tagging and querying server inventory across multiple clouds using Resource Graph Explorer](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2-scenarios-use-cases/arc_inventory_tagging/)
+* [Tagging and querying server inventory across multiple clouds using Resource Graph Explorer](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2/arc_inventory_tagging/)
 
-* [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Extension Management](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2-scenarios-use-cases/arc_vm_extension_mma_arm/)
+* [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Extension Management](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2/arc_vm_extension_mma_arm/)
 
-* [Deploying Custom Script Extension to Azure Arc Linux and Windows VMs using Extension Management](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2-scenarios-use-cases/arc_vm_extension_customscript_arm/)
+* [Deploying Custom Script Extension to Azure Arc Linux and Windows VMs using Extension Management](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2/arc_vm_extension_customscript_arm/)
 
-* [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Azure Policies](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2-scenarios-use-cases/arc_policies_mma/)
+* [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Azure Policies](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2/arc_policies_mma/)
  
-* [Integrate Azure Security Center with Azure Arc enabled Servers](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2-scenarios-use-cases/arc_securitycenter/)
+* [Integrate Azure Security Center with Azure Arc enabled Servers](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2/arc_securitycenter/)
 
-* [Integrate Azure Sentinel with Azure Arc enabled Servers](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2-scenarios-use-cases/arc_azuresentinel/)
+* [Integrate Azure Sentinel with Azure Arc enabled Servers](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2/arc_azuresentinel/)
 
 * [Deploy Update Management on Azure Arc enabled Servers](../azure_arc_jumpstart/azure_arc_servers/azure-arc-enabled-servers-day-2-scenarios-use-cases/arc_updatemanagement/)
 
@@ -218,31 +218,31 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 #### AKS
 
-* [Deploy GitOps configurations and perform basic GitOps flow on AKS as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/aks/aks_gitops_basic/)
+* [Deploy GitOps configurations and perform basic GitOps flow on AKS as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/aks/aks_gitops_basic/)
 
-* [Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/aks/aks_gitops_helm/)
+* [Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/aks/aks_gitops_helm/)
 
-* [Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/aks/aks_monitor/)
+* [Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/aks/aks_monitor/)
 
-* [Apply GitOps configurations on AKS as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/aks/aks_policy/)
+* [Apply GitOps configurations on AKS as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/aks/aks_policy/)
 
 #### GKE
 
-* [Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/gke/gke_gitops_basic/)
+* [Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/gke/gke_gitops_basic/)
 
-* [Deploy GitOps configurations and perform Helm-based GitOps flow on GKE as an Azure Arc Connected Cluster](azure_arc_jumpstart/azure_arc_k8s/../azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/gke/gke_monitor/)
+* [Deploy GitOps configurations and perform Helm-based GitOps flow on GKE as an Azure Arc Connected Cluster](azure_arc_jumpstart/azure_arc_k8s/../azure-arc-enabled-kubernetes-day-2/gke/gke_monitor/)
 
-* [Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/gke/gke_monitor/)
+* [Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/gke/gke_monitor/)
 
-* [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/gke/gke_policy/)
+* [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/gke/gke_policy/)
 
 #### kind
 
-* [Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/kind/local_kind_gitops_helm/)
+* [Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/kind/local_kind_gitops_helm/)
 
 #### MicroK8s
 
-* [Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2-scenarios-use-cases/microk8s/local_microk8s_gitops_helm/)
+* [Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/azure-arc-enabled-kubernetes-day-2/microk8s/local_microk8s_gitops_helm/)
 
 ## Azure Arc enabled Data Services
 
