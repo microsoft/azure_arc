@@ -1,6 +1,6 @@
 ---
 title: "Microsoft Open Source Code of Conduct"
-linkTitle: "Code of Conduct"
+linkTitle: "Microsoft Open Source Code of Conduct"
 weight: 4
 ---
 

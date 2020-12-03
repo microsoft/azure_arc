@@ -1,6 +1,6 @@
 ---
 title: "Azure Arc enabled data services Deployment samples"
-linkTitle: "Deploy"
+linkTitle: "Azure Arc enabled data services Deployment samples"
 weight: 3
 ---
 
