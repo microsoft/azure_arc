@@ -11,6 +11,8 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
     ```terminal
     git clone https://github.com/microsoft/azure_arc.git
     ```
+    
+* Fork the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository. 
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
