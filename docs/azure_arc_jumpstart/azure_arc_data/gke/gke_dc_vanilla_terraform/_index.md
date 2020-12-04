@@ -5,7 +5,7 @@ weight: 1
 description: >
 ---
 
-# Azure Arc Data Controller Vanilla Deployment on GKE (Terraform)
+## Azure Arc Data Controller Vanilla Deployment on GKE (Terraform)
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster, using [Terraform](https://www.terraform.io/).
 
@@ -127,6 +127,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   2. *password_reset.ps1* script will be created automatically as part of the Terraform plan runtime and is responsible on creating the Windows username & password.
 
   3. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
+  
       * Create the *ClientTools.log* file  
       * Install the required tools – az cli, az cli Powershell module, kubernetes-cli (Chocolaty packages)
       * Download & install the Azure Data Studio & azdata cli
@@ -141,6 +142,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
       * Create the Windows schedule task to run the logon script at first login
 
   4. *LogonScript.ps1* script will run on user first logon to Windows and will:
+
       * Create the *LogonScript.log* file
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       * Create Arc Data Controller config file (*control.json*) to setup the use of the Storage Class and Kubernetes LoadBalancer service
