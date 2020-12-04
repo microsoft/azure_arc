@@ -11,7 +11,7 @@ The following README will guide you on how to use Azure Arc enabled servers to a
 
 In this case, you will assign a policy to audit if the Azure Arc connected machine has the (Microsoft Monitoring Agent) MMA agent installed, if not, you will use the extensions feature to automatically deploy it to the VM, an enrollment experience that levels to Azure VMs. This approach can be used to make sure all your servers are onboarded to services such as Azure Monitor, Azure Security Center, Azure Sentinel, etc. 
 
-You can use the Azure Portal, an ARM template or PowerShell script to assign policies to Azure Subscriptions or Resource Groups. In this guide, you will use an ARM template to assign built-in policies. 
+You can use the Azure Portal, an ARM template or PowerShell script to assign policies to Azure subscriptions or resource groups. In this guide, you will use an ARM template to assign built-in policies. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -41,9 +41,9 @@ Please review the [Azure Monitor Supported OS documentation](https://docs.micros
   
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a VM or bare-metal server to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -62,7 +62,7 @@ Please review the [Azure Monitor Supported OS documentation](https://docs.micros
     }
     ```
     
-  **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+  **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 * You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/policies/arm/log_analytics-template.parameters.json), provide a name and location for your workspace
 
@@ -71,7 +71,7 @@ Please review the [Azure Monitor Supported OS documentation](https://docs.micros
   To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/master/azure_arc_servers_jumpstart/policies/arm) and run the below command:
 
   ```bash
-    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    az deployment group create --resource-group <Name of the Azure resource group> \
     --template-file <The *log_analytics-template.json* template file location> \
     --parameters <The *log_analytics-template.parameters.json* template file location>
   ```
@@ -86,7 +86,7 @@ Please review the [Azure Monitor Supported OS documentation](https://docs.micros
 
   ```bash
   az policy assignment create --name 'Enable Azure Monitor for VMs' \
-  --scope '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure Resource Group>' \
+  --scope '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure resource group>' \
   --policy-set-definition '55f3eceb-5573-4f18-9695-226972c6d74a' \
   -p <The *policy.json* template file location> \
   --assign-identity --location <Azure Region>
@@ -131,5 +131,5 @@ Complete the following steps to clean up your environment.
 * Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
     ```bash
-    az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
+    az monitor log-analytics workspace delete --resource-group <Name of the Azure resource group> --workspace-name <Log Analytics Workspace Name> --yes
     ```

@@ -1,13 +1,13 @@
 ---
-title: "Deploy Update Management on Azure Arc enabled Servers"
-linkTitle: "Deploy Update Management on Azure Arc enabled Servers"
+title: "Deploy Update Management on Azure Arc enabled servers"
+linkTitle: "Deploy Update Management on Azure Arc enabled servers"
 weight: 7
 description: >
 ---
 
-# Deploy Update Management on Azure Arc enabled Servers
+# Deploy Update Management on Azure Arc enabled servers
 
-The scenario will show you how to onboard Azure Arc enabled Servers to [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview), so that you can manage operating system updates for your Azure Arc enabled servers running Windows or Linux.
+The scenario will show you how to onboard Azure Arc enabled servers to [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview), so that you can manage operating system updates for your Azure Arc enabled servers running Windows or Linux.
 
 In this guide, you will create and configure an Azure Automation account and Log Analytics workspace to support Update Management for Azure Arc enabled servers by doing the following:
 
@@ -63,7 +63,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 * To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/master/azure_arc_servers_jumpstart/updateManagement) and run the below command:
 
     ```bash
-    az deployment group create --resource-group <Name of the Azure Resource Group you created> \
+    az deployment group create --resource-group <Name of the Azure resource group you created> \
         --template-file law-template.json \
         --parameters law-template.parameters.json
     ```

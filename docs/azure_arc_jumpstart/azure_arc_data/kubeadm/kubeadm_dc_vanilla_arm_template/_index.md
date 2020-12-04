@@ -67,7 +67,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 * Runtime script will:
 
   * Inject user params values (from bullet point #1) to be used in both runtime and logon script
-  * Install the required tools – az cli, az cli Powershell module, kubernetes-cli and putty (Chocolaty packages)
+  * Install the required tools – az cli, az cli PowerShell module, kubernetes-cli and putty (Chocolaty packages)
   * Download & install the Azure Data Studio & azdata cli
   * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
   * Create the logon script
@@ -140,9 +140,9 @@ Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are crea
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
-    Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. **The logon script run time is approximately 30s long**.  
+    Let the script to run it's course and **do not close** the PowerShell session, this will be done for you once completed. **The logon script run time is approximately 30s long**.  
 
-    Once the script will finish it's run, the logon script Powershell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
+    Once the script will finish it's run, the logon script PowerShell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
 
     ![PowerShell logon script run](./04.png)
 

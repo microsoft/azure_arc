@@ -23,9 +23,9 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
 * [Install Helm 3](https://helm.sh/docs/intro/install/)
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -48,7 +48,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
   Registration is an asynchronous process, and registration may take approximately 10 minutes.
@@ -139,7 +139,7 @@ MicroK8s will not update your .kube/config file, and accessing the cluster is do
 
   ![](./01.png)
 
-* Create a Resource Group
+* Create a resource group
 
   ```
   az group create -n Arc-MicroK8s-Demo -l EastUS
@@ -162,7 +162,7 @@ MicroK8s will not update your .kube/config file, and accessing the cluster is do
 
   ![](./04.png)
 
-* Upon completion, you will have your MicroK8s cluster connected as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
+* Upon completion, you will have your MicroK8s cluster connected as a new Azure Arc Kubernetes cluster resource in a new resource group.
 
   ![](./05.png)
 
@@ -176,7 +176,7 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
 
 ## Delete the deployment
 
-* In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal or through the CLI.
+* In Azure, the most straightforward way is to delete the cluster or the resource group via the Azure Portal or through the CLI.
 
     ```bash
     az group delete --name Arc-MicroK8s-Demo

@@ -27,7 +27,7 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
     ![](./02.png)
 
-* Before installing the Azure Policy Add-on or enabling any of the service features, your subscription must enable the Microsoft.PolicyInsights resource provider and create a role assignment for the cluster service principal. To do that, open [Azure Cloud Shell](https://shell.azure.com/) and run either the Azure CLI or Azure Powershell command. 
+* Before installing the Azure Policy Add-on or enabling any of the service features, your subscription must enable the Microsoft.PolicyInsights resource provider and create a role assignment for the cluster service principal. To do that, open [Azure Cloud Shell](https://shell.azure.com/) and run either the Azure CLI or Azure PowerShell command. 
 
     ![](./03.png)
 
@@ -36,19 +36,19 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
     az provider register --namespace 'Microsoft.PolicyInsights'
     ```
 
-    Azure Powershell:
+    Azure PowerShell:
     ```powershell
     Register-AzResourceProvider -ProviderNamespace 'Microsoft.PolicyInsights'
     ```
 
-    To verify successful registration, run either the below Azure CLI or Azure Powershell command. 
+    To verify successful registration, run either the below Azure CLI or Azure PowerShell command. 
 
     Azure CLI:
     ```bash
     az provider show --namespace 'Microsoft.PolicyInsights'
     ```
 
-    Azure Powershell:
+    Azure PowerShell:
     ```powershell
     Get-AzResourceProvider -ProviderNamespace 'Microsoft.PolicyInsights'
     ```
@@ -57,11 +57,11 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
     ![](./05.png)
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
     **Note: This guide assumes you will be working with a service principal assigned with the 'Contributor' role as described below. If you want to further limit the RBAC scope of your service Principal, you can assign it with the 'Policy Insights Data Writer (Preview)' role the Azure Arc enabled Kubernetes cluster as described [here](https://github.com/MicrosoftDocs/azure-docs/edit/master/articles/governance/policy/concepts/policy-for-kubernetes#L247-L275).**
     
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in Azure Cloud Shell).
+    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in Azure Cloud Shell).
 
     ```bash
     az login
@@ -86,7 +86,7 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 ## Azure Policy for Azure Arc Connected Cluster Integration
 
@@ -120,7 +120,7 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
 ## Deploy GitOps to Azure Arc Kubernetes cluster using Azure Policy 
 
-Although you can [deploy GitOps configuration individually](gke_gitops.md) on each of your Azure Arc connected clusters, Azure Policy for Kubernetes allows to do the same on a broader scope (i.e Subscription or Resource Group). That way, you can guarantee existing and newly added Azure Arc connected clusters to all have the same GitOps configuration and as a result, the same cluster baseline and/or application version deployed.   
+Although you can [deploy GitOps configuration individually](gke_gitops.md) on each of your Azure Arc connected clusters, Azure Policy for Kubernetes allows to do the same on a broader scope (i.e Subscription or resource group). That way, you can guarantee existing and newly added Azure Arc connected clusters to all have the same GitOps configuration and as a result, the same cluster baseline and/or application version deployed.   
 
 * Before assigning the policy, in the Azure portal, click the *Configuration* setting in your GKE connected cluster. Notice how no GitOps configurations are deployed.
 
@@ -138,7 +138,7 @@ Although you can [deploy GitOps configuration individually](gke_gitops.md) on ea
 
     ![](./16.png)
 
-* In the below example, the scope of the policy represent the Resource Group where the GKE connected cluster Azure Arc resource is located. Alternatively, the scope could have been the entire Azure Subscription or a Resource Group with many Azure Arc connected clusters. Also, make sure *Policy enforcement* is set to *Enabled*.   
+* In the below example, the scope of the policy represent the resource group where the GKE connected cluster Azure Arc resource is located. Alternatively, the scope could have been the entire Azure subscription or a resource group with many Azure Arc connected clusters. Also, make sure *Policy enforcement* is set to *Enabled*.   
 
     For this GitOps configuration policy, we will be using the ["Hello Arc"](https://github.com/likamrat/hello_arc) application repository which includes the Kubernetes Service for external access, Deployment as well as the ingress rule to be used by the NGINX ingress controller.
 

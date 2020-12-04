@@ -13,9 +13,9 @@ The following README will guide you on how to connect an Linux server to Azure A
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a server to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect a server to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```bash
     az login
@@ -38,9 +38,9 @@ The following README will guide you on how to connect an Linux server to Azure A
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-* Create a new Azure Resource Group where you want your server(s) to show up. 
+* Create a new Azure resource group where you want your server(s) to show up. 
 
 ![](./01.png)
 
@@ -60,7 +60,7 @@ Run the script using the ```. ./az_connect_linux.sh``` command.
 
 **Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
 
-Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your Resource Group. 
+Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your resource group. 
 
 ![](./04.png)
 
@@ -74,6 +74,6 @@ The most straightforward way is to delete the server via the Azure Portal, just 
 
 ![](./07.png)
 
-If you want to nuke the entire environment, just delete the Azure Resource Group.
+If you want to nuke the entire environment, just delete the Azure resource group.
 
 ![](./08.png)

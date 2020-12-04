@@ -21,9 +21,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -46,7 +46,7 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
   Registration is an asynchronous process, and registration may take approximately 10 minutes.
@@ -64,21 +64,21 @@ The following README will guide you on how to use the provided [Terraform](https
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
-* The Terraform plan execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_k8s_jumpstart/rancher_k3s/azure/terraform/scripts/vars.sh) to match the Azure Service Principal you've just created. 
+* The Terraform plan execute a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_k8s_jumpstart/rancher_k3s/azure/terraform/scripts/vars.sh) to match the Azure service principal you've just created. 
 
 ## Deployment
 
-The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure Service Principal you've just created and your subscription.  
+The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure service principal you've just created and your subscription.  
 
-* Retrieve your Azure Subscription ID using the ```az account list``` command.
+* Retrieve your Azure subscription ID using the ```az account list``` command.
 
 * Export the environment variables needed for the Terraform plan.
 
     ```bash
-    export TF_VAR_subscription_id=<Your Azure Subscription ID>  
-    export TF_VAR_client_id=<Your Azure Service Principal App ID> 
-    export TF_VAR_client_secret=<Your Azure Service Principal App Password>  
-    export TF_VAR_tenant_id=<Your Azure Service Principal Tenant ID>
+    export TF_VAR_subscription_id=<Your Azure subscription ID>  
+    export TF_VAR_client_id=<Your Azure service principal App ID> 
+    export TF_VAR_client_secret=<Your Azure service principal App Password>  
+    export TF_VAR_tenant_id=<Your Azure service principal Tenant ID>
     ```
 
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
@@ -103,9 +103,9 @@ The only thing you need to do before executing the Terraform plan is to export t
 
     ![](./05.png)
 
-* Using the Azure Service Principal you've created, run the below command to connect the cluster to Azure Arc.
+* Using the Azure service principal you've created, run the below command to connect the cluster to Azure Arc.
 
-    ```az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure Resource Group Name>```
+    ```az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure resource group name>```
 
     For example:
 
@@ -145,7 +145,7 @@ The most straightforward way is to delete the cluster is via the Azure Portal, j
 
 ![](./15.png)
 
-If you want to nuke the entire environment, just delete the Azure Resource Group or alternatively, you can use the ```terraform destroy --auto-approve``` command.
+If you want to nuke the entire environment, just delete the Azure resource group or alternatively, you can use the ```terraform destroy --auto-approve``` command.
 
 ![](./16.png)
 

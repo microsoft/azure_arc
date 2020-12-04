@@ -7,7 +7,7 @@ description: >
 
 # Scaled Onboarding VMware vSphere Linux VMs to Azure Arc
 
-The following README will guide you on how to use the provided [VMware PowerCLI](https://code.vmware.com/web/dp/tool/vmware-powercli/) script so you can perform an automated scaled deployment of the "Azure Arc Connected Machine Agent" in multiple VMware vSphere virtual machines and as a result, onboarding these VMs as an Azure Arc enabled Servers.
+The following README will guide you on how to use the provided [VMware PowerCLI](https://code.vmware.com/web/dp/tool/vmware-powercli/) script so you can perform an automated scaled deployment of the "Azure Arc Connected Machine Agent" in multiple VMware vSphere virtual machines and as a result, onboarding these VMs as an Azure Arc enabled servers.
 
 This guide assumes you already have an exiting inventory of VMware Virtual Machines and will leverage the PowerCLI PowerShell module to automate the onboarding process of the VMs to Azure Arc. 
 
@@ -41,9 +41,9 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
 
     - VMware vCenter Server user assigned with a ["Read Only Role"](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.security.doc/GUID-93B962A7-93FA-4E96-B68F-AE66D3D6C663.html)
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect the VMware vSphere virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the VMware vSphere virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```console
     az login
@@ -68,7 +68,7 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 ## Automation Flow
 
@@ -86,7 +86,7 @@ Below you can find the automation flow for this scenario:
 
 ## Pre-Deployment
 
-To demonstrate the before & after for this scenario, the below screenshots shows a dedicated, empty Azure Resources Group, a vCenter VM folder with candidate VMs and the */var/opt/* directory showing no agent is installed.
+To demonstrate the before & after for this scenario, the below screenshots shows a dedicated, empty Azure resource group, a vCenter VM folder with candidate VMs and the */var/opt/* directory showing no agent is installed.
 
 ![](./01.png)
 
@@ -96,11 +96,11 @@ To demonstrate the before & after for this scenario, the below screenshots shows
 
 ## Deployment
 
-Before running the PowerCLI script, you must set the [environment variables](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/vmware/scale_deploy/powercli/linux/vars.ps1) which will be used by the *install_arc_agent.sh* script. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and your VMware vSphere credentials and data.
+Before running the PowerCLI script, you must set the [environment variables](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/vmware/scale_deploy/powercli/linux/vars.ps1) which will be used by the *install_arc_agent.sh* script. These variables are based on the Azure service principal you've just created, your Azure subscription and tenant, and your VMware vSphere credentials and data.
 
-* Retrieve your Azure Subscription ID and tenant ID using the ```az account list``` command
+* Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command
 
-* Use the Azure Service Principal ID and password created in the prerequisites section
+* Use the Azure service principal ID and password created in the prerequisites section
 
 ![](./04.png)
 
@@ -112,7 +112,7 @@ Before running the PowerCLI script, you must set the [environment variables](htt
 
 ![](./07.png)
 
-* Upon completion, the VM will have the "Azure Arc Connected Machine Agent" installed as well as the Azure Resource Group populated with the new Azure Arc enabled Servers.
+* Upon completion, the VM will have the "Azure Arc Connected Machine Agent" installed as well as the Azure resource group populated with the new Azure Arc enabled servers.
 
 ![](./08.png)
 

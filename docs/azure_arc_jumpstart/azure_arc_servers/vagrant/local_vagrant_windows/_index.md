@@ -62,13 +62,13 @@ The following README will guide you on how to deploy a local **Windows 10** virt
 
     > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
-* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/vars.ps1) Powershell script to match the Azure service principal you've just created.
+* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/vars.ps1) PowerShell script to match the Azure service principal you've just created.
 
   * subscriptionId=Your Azure subscription ID
   * appId=Your Azure service principal name
   * password=Your Azure service principal password
   * tenantId=Your Azure tenant ID
-  * resourceGroup=Azure resource group Name
+  * resourceGroup=Azure resource group name
   * location=Azure region
 
 ## Deployment
@@ -100,9 +100,9 @@ As you may noticed, the last step of the run is to register the VM as a new Azur
 
 In a case you want to demo/control the actual registration process, to the following:
 
-* In the [*install_arc_agent*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/install_arc_agent.ps1) Powershell script, comment out the "Run connect command" section and save the file. You can also comment out or change the creation of the Resource Group.
+* In the [*install_arc_agent*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/install_arc_agent.ps1) PowerShell script, comment out the "Run connect command" section and save the file. You can also comment out or change the creation of the resource group.
 
-    ![Screenshot of the install_arc_agent Powershell script](./06.png)
+    ![Screenshot of the install_arc_agent PowerShell script](./06.png)
 
     ![Screenshot of az group create being run](./07.png)
 
@@ -110,13 +110,13 @@ In a case you want to demo/control the actual registration process, to the follo
 
     ![Screenshot of RDP into a Vagrant server](./08.png)
 
-* Open Powershell ISE **as Administrator** and edit the *C:\runtime\vars.ps1* with your environment variables. 
+* Open PowerShell ISE **as Administrator** and edit the *C:\runtime\vars.ps1* with your environment variables. 
 
-    ![Screenshot of Powershell ISE](./09.png)
+    ![Screenshot of PowerShell ISE](./09.png)
 
 * Paste the ```Invoke-Expression "C:\runtime\vars.ps1"``` commmand, the ```az group create --location $env:location --name $env:resourceGroup --subscription $env:subscriptionId``` command and the same *azcmagent connect* command you've just commented and execute the script. 
 
-    ![Screenshot of Powershell ISE running a script](./10.png)
+    ![Screenshot of PowerShell ISE running a script](./10.png)
 
 ## Delete the deployment
 

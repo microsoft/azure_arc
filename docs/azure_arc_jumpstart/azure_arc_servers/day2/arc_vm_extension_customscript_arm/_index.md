@@ -35,9 +35,9 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a VM or bare-metal server to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -57,13 +57,13 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).   
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).   
 
 * In order to demonstrate the Custom Script Extention, we will use the below Linux and Windows scripts.
     - [*Linux*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/scripts/custom_script_linux.sh): The script will modify the message of the day (MOTD) on the operating system. 
     - [*Windows*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/scripts/custom_script_windows.ps1): The script will installs Windows Terminal, Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
 
-## Azure Arc enabled Servers Custom Script Extension Deployment
+## Azure Arc enabled servers Custom Script Extension Deployment
 
 * Edit the extensions parameters file for [*Windows*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/extensions/arm/customscript-templatewindows.parameters.json) or for[*Linux*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/extensions/arm/customscript-templatelinux.parameters.json)
 
@@ -97,7 +97,7 @@ You can use the Azure Portal, Azure CLI, an ARM template, PowerShell or Linux sh
 * To deploy the ARM template for Linux or Windows, navigate to the [deployment folder](../extensions/arm) and run the below command with the templates that match your operating system:
 
     ```bash
-    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    az deployment group create --resource-group <Name of the Azure resource group> \
     --template-file <The *customscript-template.json* template file location for Linux or Windows> \
     --parameters <The *customscript-template.parameters.json* template file location>
     ```

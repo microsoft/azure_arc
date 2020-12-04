@@ -87,17 +87,17 @@ Before converting the VM to a template, few actions needs to be taken.
 
 * Perform Windows Updates
 
-* Change Powershell Execution Policy to "bypass" by running the ```Set-ExecutionPolicy -ExecutionPolicy Bypass``` command in Powershell (can be later tuned on via Group Policy or a Powershell script).
+* Change PowerShell Execution Policy to "bypass" by running the ```Set-ExecutionPolicy -ExecutionPolicy Bypass``` command in PowerShell (can be later tuned on via Group Policy or a PowerShell script).
 
-* Allow WinRM communication to the OS buy running the [*allow_winrm*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/vmware/winsrv/terraform/scripts/allow_winrm.ps1) Powershell script. 
+* Allow WinRM communication to the OS buy running the [*allow_winrm*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/vmware/winsrv/terraform/scripts/allow_winrm.ps1) PowerShell script. 
 
 * None of the below are mandatory but should be considered for a Windows Template:
 
-    - Disabling User Account Control (can be later tuned on via Group Policy or a Powershell script)
-    - Turn off Windows Defender FW (can be later tuned on via Group Policy or a Powershell script)
-    - Disabling Internet Explorer Enhanced Security Configuration (ESC) (can be later tuned on via Group Policy or a Powershell script)
+    - Disabling User Account Control (can be later tuned on via Group Policy or a PowerShell script)
+    - Turn off Windows Defender FW (can be later tuned on via Group Policy or a PowerShell script)
+    - Disabling Internet Explorer Enhanced Security Configuration (ESC) (can be later tuned on via Group Policy or a PowerShell script)
     - Enable Remote Desktop
-    - In Powershell, install [Chocolaty](https://chocolatey.org/install)
+    - In PowerShell, install [Chocolaty](https://chocolatey.org/install)
 
         ```powershell
         Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))

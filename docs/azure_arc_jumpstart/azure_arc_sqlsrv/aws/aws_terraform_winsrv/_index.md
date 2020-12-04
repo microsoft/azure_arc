@@ -128,7 +128,7 @@ Before executing the Terraform plan, you must set the environment variables whic
     export TF_VAR_servicePrincipalSecret='Your Azure service principal  App Password'
     export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
     export TF_VAR_location='Azure region'
-    export TF_VAR_resourceGroup='Azure resource group Name'
+    export TF_VAR_resourceGroup='Azure resource group name'
     export TF_VAR_AWS_ACCESS_KEY_ID='Your AWS Access Key ID'
     export TF_VAR_AWS_SECRET_ACCESS_KEY='Your AWS Secret Key'
     export TF_VAR_key_name='Your AWS Key Pair name'

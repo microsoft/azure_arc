@@ -23,9 +23,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -48,7 +48,7 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
   Registration is an asynchronous process, and registration may take approximately 10 minutes.
@@ -110,7 +110,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ## Deployment
 
-The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure Service Principal you've just created and your subscription.  
+The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure service principal you've just created and your subscription.  
 
 * Export the environment variables needed for the Terraform plan.
 
@@ -150,7 +150,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 ## Connecting to Azure Arc
 
-* Now that you have a running GKE cluster, retrieve your Azure Subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_gke](https://github.com/microsoft/azure_arc/blob/master/azure_arc_k8s_jumpstart/gke/terraform/scripts/az_connect_gke.sh) shell script.
+* Now that you have a running GKE cluster, retrieve your Azure subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_gke](https://github.com/microsoft/azure_arc/blob/master/azure_arc_k8s_jumpstart/gke/terraform/scripts/az_connect_gke.sh) shell script.
 
 ![](./22.png)
 
@@ -172,7 +172,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 ![](./28.png)
 
-* Upon completion, you will have your GKE cluster connect as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
+* Upon completion, you will have your GKE cluster connect as a new Azure Arc Kubernetes cluster resource in a new resource group.
 
 ![](./29.png)
 
@@ -182,7 +182,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 ## Delete the deployment
 
-In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal.
+In Azure, the most straightforward way is to delete the cluster or the resource group via the Azure Portal.
 
 ![](./32.png)
 
