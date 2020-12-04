@@ -16,9 +16,9 @@ Vagrant.configure("2") do |config|
     config.vm.box = "ubuntu/xenial64"
     config.vm.hostname = "Arc-Ubuntu-Demo"
     config.vm.provision "file", source: "scripts/vars.sh", destination: "/tmp/vars.sh"
-    config.vm.provision "shell", path: "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/install_arc_agent.sh" 
+    config.vm.provision "shell", path: "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/install_arc_agent.sh" 
     ubuntu.trigger.before :destroy do |trigger|
-      trigger.warn = "Deleting Azure Resource Group"
+      trigger.warn = "Deleting Azure resource group"
       trigger.run_remote = {inline: "bash delete_rg.sh"}
     end
 end
