@@ -16,7 +16,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
 * Create Azure Service Principal (SP)
 
-    In order for you to deploy the Azure resources using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this canalso be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    In order for you to deploy the Azure resources using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```console
     az login
@@ -24,6 +24,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
     ```
 
     For example:
+
     ```console
     az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
     ```
@@ -40,7 +41,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
     }
     ```
 
-> [!NOTE] It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
 ## Automation Flow
 
@@ -57,8 +58,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
 * As part of the Windows Server 2019 VM deployment, there are 2 scripts executions; First script (ClientTools.ps1) at deployment runtime using the ARM *"CustomScriptExtension"* module and a second script (LogonScript.ps1) on user first logon to Windows.
 
 * Runtime script will:
+
   * Inject user params values (from bullet point #1) to be used in both runtime and logon script
-  * Install the required tools – az cli, az cli Powershell module, kubernetes-cli and putty (Chocolaty packages)
+  * Install the required tools – az cli, az cli PowerShell module, kubernetes-cli and putty (Chocolaty packages)
   * Download & install the Azure Data Studio & azdata cli
   * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
   * Create the logon script
@@ -66,6 +68,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * Disable Windows Server Manager from running at login
 
 * Logon script will:
+
   * Create the *LogonScript.log* file
   * Connect to Azure using SPN credentials (from bullet point #1)
   * Copy the kubeconfig file from the Ubuntu (Kubeadm) VM to the local Windows user profile
@@ -77,7 +80,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible on deploying Ubuntu VM install with Kubernetes and the Data Controller. Once Ubuntu VM deployment has finished, the template will then automatically execute another template which will deploy the Windows Server Azure VM which will be automatically connected to the Kubernetes cluster.
 
-* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../kubeadm/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../kubeadm/azure/arm_template/azuredeploy.parameters.example.json).
+* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.parameters.example.json).
 
   * *K8svmName* - Kubeadm Ubuntu
   * *vmName* - Client Windows
@@ -93,17 +96,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *ACCEPT_EULA* - "yes" **Do not change**
   * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for *s namespace as well).
   * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
-  * *ARC_DC_RG* - Azure Resource Group where all the resources get deploy
+  * *ARC_DC_RG* - Azure resource group where all the resources get deploy
   * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
-* To deploy the ARM template, navigate to the local cloned [deployment folder](../kubeadm/azure/arm_template) and run the below command:
+* To deploy the ARM template, navigate to the local cloned [deployment folder](../../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template/) and run the below command:
 
     ```console
-    az group create --name <Name of the Azure Resource Group> --location <Azure Region>
-    az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
+    az group create --name <Name of the Azure resource group> --location <Azure Region>
+    az deployment group create --resource-group <Name of the Azure resource group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file**
+    > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
 
     For example:
 
@@ -112,12 +115,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az deployment group create --resource-group Arc-Data-Kubeadm-Demo --name arcdatakubeadmdemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters azuredeploy.parameters.json
     ```
 
-> [!NOTE] Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20 minutes.
+    > **Note: Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20 minutes.**
 
 * Once Azure resources have been provisioned, you will be able to see it in Azure portal.
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/01.png)
-    ![](../img/kubeadm_dc_vanilla_arm_template/02.png)
+    ![Successful ARM template deployment](./01.png)
+
+    ![Post-Deployment Azure resource group](./02.png)
 
 ## Windows Login & Post Deployment
 
@@ -125,17 +129,19 @@ Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are crea
 
 * Using it's public IP, RDP to the **Client VM**
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/03.png)
+    ![Client VM](./03.png)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
-    Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. **The logon script run time is approximately 30s long**.  
+    Let the script to run it's course and **do not close** the PowerShell session, this will be done for you once completed. **The logon script run time is approximately 30min long**.  
 
-    Once the script will finish it's run, the logon script Powershell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
+    Once the script will finish it's run, the logon script PowerShell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/04.png)
-    ![](../img/kubeadm_dc_vanilla_arm_template/05.png)
-    ![](../img/kubeadm_dc_vanilla_arm_template/06.png)
+    ![logon script PowerShell runtime](./04.png)
+
+    ![logon script PowerShell runtime](./05.png)
+
+    ![Windows VM azdata login](./06.png)
 
 * To start interacting with the Azure Arc Data Controller, Open PowerShell and use the log in command bellow.
 
@@ -146,8 +152,9 @@ Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are crea
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/07.png)
-    ![](../img/kubeadm_dc_vanilla_arm_template/08.png)
+    ![Azure Data Studio shortcut](./07.png)
+
+    ![Azure Data Studio extension](./08.png)
 
 ## Using the Ubuntu Kubernetes VM
 
@@ -155,19 +162,19 @@ Even though everything you need is installed in the Windows client VM, it is pos
 
 * SSH to the Ubuntu VM using it public IP.
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/09.png)
+    ![Ubuntu Kubernetes VM](./09.png)
 
 * To start interacting with the Azure Arc Data Controller, use the log in command bellow.
 
-    ```bash
+    ```console
     azdata login --namespace $ARC_DC_NAME
     azdata arc dc status show
     ```
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/10.png)
+    ![Ubuntu VM azdata login](./10.png)
 
 ## Cleanup
 
-* To delete the entire environment, simply delete the deployment Resource Group from the Azure portal.
+* To delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![](../img/kubeadm_dc_vanilla_arm_template/11.png)
+    ![Delete Azure resource group](./11.png)
