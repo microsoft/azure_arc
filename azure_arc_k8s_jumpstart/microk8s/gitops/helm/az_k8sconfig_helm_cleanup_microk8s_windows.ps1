@@ -1,10 +1,10 @@
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 Write-Output "Exporting environment variables"
 $resourceGroup="<Your resource group name>"
 $arcClusterName="<Your Arc cluster name>"
-$appId="<Your Azure Service Principal name>"
-$password="<Your Azure Service Principal password>"
+$appId="<Your Azure service principal name>"
+$password="<Your Azure service principal password>"
 $tenantId="<Your Azure tenant ID>"
 
 Write-Output "Log in to Azure with Service Principal"

@@ -21,10 +21,10 @@
             "value": "<Client Windows VM size>"
         },
         "servicePrincipalClientId": {
-            "value": "<Your Azure Service Principal name>"
+            "value": "<Your Azure service principal name>"
         },
         "servicePrincipalClientSecret": {
-            "value": "<Your Azure Service Principal password>"
+            "value": "<Your Azure service principal password>"
         },
         "tenantId": {
             "value": "<Azure tenant ID>"
@@ -45,7 +45,7 @@
             "value": "<Azure Arc Data Controller Azure subscription ID>"
         },
         "ARC_DC_RG": {
-            "value": "<Azure Resource Group where all the resources get deploy>"
+            "value": "<Azure resource group where all the resources get deploy>"
         },
         "ARC_DC_REGION": {
             "value": "eastus"

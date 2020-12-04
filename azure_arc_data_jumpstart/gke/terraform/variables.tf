@@ -101,7 +101,7 @@ variable "ARC_DC_SUBSCRIPTION" {
 }
 
 variable "ARC_DC_RG" {
-  description = "Azure Resource Group where all future Azure Arc resources will be deployed"
+  description = "Azure resource group where all future Azure Arc resources will be deployed"
   type        = string
 }
 
@@ -111,12 +111,12 @@ variable "ARC_DC_REGION" {
 }
 
 variable "client_id" {
-  description = "Your Azure Service Principal name"
+  description = "Your Azure service principal name"
   type        = string
 }
 
 variable "client_secret" {
-  description = "Your Azure Service Principal password"
+  description = "Your Azure service principal password"
   type        = string
 }
 

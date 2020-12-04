@@ -15,8 +15,8 @@ subId=$($az account show --query id -o tsv 2>/dev/null)
 
 echo "==============================================================================================================================================================="
 if [ ! "$($az group show -n $RESOURCEGROUP --query tags.currentStatus -o tsv 2>/dev/null)" = "groupCreated" ]; then
-    # Deploy the Resource Group and update Status Tag
-    echo "Deploying the Resource Group."
+    # Deploy the resource group and update Status Tag
+    echo "Deploying the resource group."
     $az group create -g "$RESOURCEGROUP" -l "$LOCATION" -o none 2>/dev/null
     $az group update -n $RESOURCEGROUP --tag currentStatus=groupCreated 2>/dev/null
     echo "done."
