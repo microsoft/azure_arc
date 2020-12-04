@@ -4,11 +4,11 @@ linkTitle: "Onboard a AWS EC2 instance with Windows Server & Microsoft SQL Serve
 weight: 1
 ---
 
-# Onboard a AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc
+## Onboard a AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Amazon Web Services (AWS) EC2 instance and connect it as an Azure Arc enabled SQL server resource.
 
-By the end of the guide, you will have an AWS EC2 instance installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
+By the end of the guide, you will have an AWS EC2 instance installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL server and a running SQL assessment with data injected to Azure Log Analytics workspace.
 
 ## Prerequisites
 
@@ -51,7 +51,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
 ## Create a new AWS IAM Role & Key
 
@@ -59,27 +59,27 @@ Create AWS User IAM Key. An access key grants programmatic access to your resour
 
 * Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home).
 
-![](./01.png)
+    ![Create AWS IAM Role & Key](./01.png)
 
 * Select the **Users** from the side menu.
 
-![](./02.png)
+    ![Create AWS IAM Role & Key](./02.png)
 
 * Select the **User** you want to create the access key for.
 
-![](./03.png)
+    ![Create AWS IAM Role & Key](./03.png)
 
 * Select ***Security credentials** of the **User** selected.
 
-![](./04.png)
+    ![Create AWS IAM Role & Key](./04.png)
 
 * Under **Access Keys** select **Create Access Keys**.
 
-![](./05.png)
+    ![Create AWS IAM Role & Key](./05.png)
 
 * In the popup window it will show you the ***Access key ID*** and ***Secret access key***. Save both of these values to configure the **Terraform plan** variables later.
 
-![](./06.png)
+    ![Create AWS IAM Role & Key](./06.png)
 
 ## Automation Flow
 
@@ -96,6 +96,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         1. Install Azure CLI, Azure PowerShell module and SQL Server Management Studio (SSMS) [Chocolaty packages](https://chocolatey.org/).
 
         2. Create a runtime logon script (*LogonScript.ps1*) which will run upon the user first logon to Windows. Runtime script will:
+
             * Install SQL Server Developer Edition
             * Enable SQL TCP protocol on the default instance
             * Create SQL Server Management Studio Desktop shortcut
@@ -119,27 +120,27 @@ Before executing the Terraform plan, you must set the environment variables whic
 
 * The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on the virtual machine to install all the necessary artifacts.
 
-Both the script and the Terraform plan itself requires certain information about your AWS and Azure environments. Edit variables according to your environment and export it using the below commands
+    Both the script and the Terraform plan itself requires certain information about your AWS and Azure environments. Edit variables according to your environment and export it using the below commands
 
-```bash
-export TF_VAR_subId='Your Azure Subscription ID'
-export TF_VAR_servicePrincipalAppId='Your Azure Service Principal App ID'
-export TF_VAR_servicePrincipalSecret='Your Azure Service Principal App Password'
-export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
-export TF_VAR_location='Azure Region'
-export TF_VAR_resourceGroup='Azure Resource Group Name'
-export TF_VAR_AWS_ACCESS_KEY_ID='Your AWS Access Key ID'
-export TF_VAR_AWS_SECRET_ACCESS_KEY='Your AWS Secret Key'
-export TF_VAR_key_name='Your AWS Key Pair name'
-export TF_VAR_aws_region='AWS region'
-export TF_VAR_aws_availabilityzone='AWS Availability Zone region'
-export TF_VAR_instance_type='EC2 instance type'
-export TF_VAR_hostname='EC2 instance Windows Computer Name'
-export TF_VAR_admin_user='Guest OS Admin Username'
-export TF_VAR_admin_password='Guest OS Admin Password'
-```
+    ```console
+    export TF_VAR_subId='Your Azure Subscription ID'
+    export TF_VAR_servicePrincipalAppId='Your Azure Service Principal App ID'
+    export TF_VAR_servicePrincipalSecret='Your Azure Service Principal App Password'
+    export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
+    export TF_VAR_location='Azure Region'
+    export TF_VAR_resourceGroup='Azure resource group Name'
+    export TF_VAR_AWS_ACCESS_KEY_ID='Your AWS Access Key ID'
+    export TF_VAR_AWS_SECRET_ACCESS_KEY='Your AWS Secret Key'
+    export TF_VAR_key_name='Your AWS Key Pair name'
+    export TF_VAR_aws_region='AWS region'
+    export TF_VAR_aws_availabilityzone='AWS Availability Zone region'
+    export TF_VAR_instance_type='EC2 instance type'
+    export TF_VAR_hostname='EC2 instance Windows Computer Name'
+    export TF_VAR_admin_user='Guest OS Admin Username'
+    export TF_VAR_admin_password='Guest OS Admin Password'
+    ```
 
-![](./07.png)
+    ![Export terraform variables](./07.png)
 
 * From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan.
 
@@ -148,55 +149,55 @@ export TF_VAR_admin_password='Guest OS Admin Password'
     terraform apply --auto-approve
     ```
 
-Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure Resource Group will be created.
+    Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure resource group will be created.
 
-![](./08.png)
+    ![terraform apply completed](./08.png)
 
-![](./09.png)
+    ![New AWS EC2 instance](./09.png)
 
-![](./10.png)
+    ![An empty Azure resource group](./10.png)
 
 * Download the RDP file and log in to the VM (**using the data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed.
 
-![](./11.png)
+    ![Connect to AWS EC2 instance](./11.png)
 
-![](./12.png)
+    ![Connect to AWS EC2 instance](./12.png)
 
-> **Note: The script runtime will take ~10-15min to complete**
+    > **Note: The script runtime will take ~10-15min to complete**
 
-![](./13.png)
+    ![PowerShell LogonScript run](./13.png)
 
-![](./14.png)
+    ![PowerShell LogonScript run](./14.png)
 
-![](./15.png)
+    ![PowerShell LogonScript run](./15.png)
 
-![](./16.png)
+    ![PowerShell LogonScript run](./16.png)
 
-![](./17.png)
+    ![PowerShell LogonScript run](./17.png)
 
-![](./18.png)
+    ![PowerShell LogonScript run](./18.png)
 
-![](./19.png)
+    ![PowerShell LogonScript run](./19.png)
 
-![](./20.png)
+    ![PowerShell LogonScript run](./20.png)
 
-![](./21.png)
+    ![PowerShell LogonScript run](./21.png)
 
 * Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed as well.
 
-![](./22.png)
+    ![Microsoft SQL Server Management Studio](./22.png)
 
-![](./23.png)
+    ![AdventureWorksLT2019 sample database ](./23.png)
 
-* In the Azure Portal, notice you now have an Azure Arc enabled Server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL resource and Azure Log Analytics deployed.
+* In the Azure Portal, notice you now have an Azure Arc enabled server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL server resource and Azure Log Analytics deployed.
 
-![](./24.png)
+    ![An Azure resource group with deployed resources](./24.png)
 
-![](./25.png)
+    ![Azure Arc enabled server resource](./25.png)
 
-![](./26.png)
+    ![MMA agent installed via an Extension](./26.png)
 
-![](./27.png)
+    ![Azure Arc enabled SQL server resources](./27.png)
 
 ## Azure SQL Assessment
 
@@ -204,26 +205,26 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 
 * On the SQL Azure Arc resource, click on "Environment Health" followed by clicking the "Download configuration script".
 
-Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you can safely and delete the downloaded *AddSqlAssessment.ps1* file.
+    Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you can safely and delete the downloaded *AddSqlAssessment.ps1* file.
 
-Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
+    Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
-![](./28.png)
+    ![SQL Assessment Environment Health](./28.png)
 
-![](./29.png)
+    ![SQL Assessment Environment Health](./29.png)
 
-![](./30.png)
+    ![View SQL Assessment Results](./30.png)
 
 * After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
-Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
+    Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-![](./31.png)
+    ![SQL Assessment results](./31.png)
 
-![](./32.png)
+    ![SQL Assessment results](./32.png)
 
 ## Cleanup
 
 To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the AWS and the Azure resources.
 
-![](./33.png)
+![terraform destroy completed](./33.png)
