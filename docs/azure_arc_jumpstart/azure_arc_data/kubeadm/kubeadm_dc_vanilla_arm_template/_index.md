@@ -21,9 +21,9 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP)
+* Create Azure service principal (SP)
 
-    In order for you to deploy the Azure resources using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    In order for you to deploy the Azure resources using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```console
     az login
@@ -38,7 +38,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
     Output should look like this:
 
-    ```console
+    ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcData",
@@ -109,7 +109,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template) and run the below command:
 
     ```console
-    az group create --name <Name of the Azure resource group> --location <Azure Region>
+    az group create --name <Name of the Azure resource group> --location <Azure region>
     az deployment group create --resource-group <Name of the Azure resource group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 

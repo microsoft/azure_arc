@@ -35,9 +35,9 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure Service Principal (SP)
+* Create Azure service principal (SP)
 
-To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure CloudShell](https://shell.azure.com/))
+To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure CloudShell](https://shell.azure.com/))
 
 ```console
 az login
@@ -52,7 +52,7 @@ az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
 
 Output should look like this:
 
-```console
+```json
 {
 "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
 "displayName": "AzureArcK8s",
@@ -167,8 +167,8 @@ As mentioned, the Terraform plan will deploy a GKE cluster and a Windows Server 
   * *export TF_VAR_gke_cluster_node_count*='GKE cluster number of worker nodes'
   * *export TF_VAR_windows_username*='Windows Server Client compute instance VM administrator username'
   * *export TF_VAR_windows_password*='Windows Server Client compute instance VM administrator password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols as well as **not containing** the user's account name or parts of the user's full name that exceed two consecutive characters)
-  * *export TF_VAR_client_id*='Your Azure Service Principal name'
-  * *export TF_VAR_client_secret*='Your Azure Service Principal password'
+  * *export TF_VAR_client_id*='Your Azure service principal name'
+  * *export TF_VAR_client_secret*='Your Azure service principal password'
   * *export TF_VAR_tenant_id*='Your Azure tenant ID'
   * *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
   * *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
