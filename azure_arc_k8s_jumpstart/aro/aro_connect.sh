@@ -252,7 +252,7 @@ if [ ! "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioni
     sleep 60s
     # Connect ARO to Arc
     echo "==============================================================================================================================================================="
-    echo "Lets connect the RedHat Openshift Cluster to Arc for Kubernetes"
+    echo "Lets connect the Red Hat Openshift Cluster to Arc for Kubernetes"
     $az connectedk8s connect -n $ARC -g $RESOURCEGROUP
     $az group update -n $RESOURCEGROUP --tag currentStatus=ArcConnected fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
     sleep 60s
