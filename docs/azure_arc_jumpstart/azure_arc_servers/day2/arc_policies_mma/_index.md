@@ -128,12 +128,12 @@ Remove the virtual machines from each environment by following the teardown inst
 
 Remove the Azure Policy assignment by executing the following script in Azure CLI.
 
-   ```console
+  ```console
     az policy assignment delete --name 'Enable Azure Monitor for VMs' --resource-group <resource_group>
-    ```
+  ```
 
 Remove the Log Analytics workspace by executing the following script in Azure CLI. Provide the workspace name you used when creating the Log Analytics workspace.
 
-    ```console
+  ```console
     az monitor log-analytics workspace delete --resource-group <Name of the Azure resource group> --workspace-name <Log Analytics workspace Name> --yes
-    ```
+  ```
