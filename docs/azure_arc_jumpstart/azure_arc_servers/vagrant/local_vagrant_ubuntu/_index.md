@@ -100,17 +100,17 @@ As you may noticed, the last step of the run is to register the VM as a new Azur
 
 In a case you want to demo/control the actual registration process, to the following:
 
-1. In the [*install_arc_agent*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/install_arc_agent.sh) shell script, comment out the "Run connect command" section and save the file. You can also comment out or change the creation of the Resource Group.
+* In the [*install_arc_agent*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/install_arc_agent.sh) shell script, comment out the "Run connect command" section and save the file. You can also comment out or change the creation of the Resource Group.
 
     ![Screenshot of the azcmagent connect command](./06.png)
 
     ![Screenshot of the az group create command](./07.png)
 
-1. SSH the VM using the ```vagrant ssh``` command.
+* SSH the VM using the ```vagrant ssh``` command.
 
     ![Screenshot of of SSH to the Vagrant machine](./08.png)
 
-1. Run the same *azcmagent connect* command you've just commented out using your environment variables.
+* Run the same *azcmagent connect* command you've just commented out using your environment variables.
 
     ![Screenshot of the azcmagent connect](./09.png)
 
