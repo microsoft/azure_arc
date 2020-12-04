@@ -97,7 +97,7 @@ ClientTools_02 | ft
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating Powershell Logon Script
+# Creating PowerShell Logon Script
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
@@ -136,7 +136,7 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Deploying Azure Arc Data Controller
-start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
+start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
 azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
 if(($env:DOCKER_REGISTRY -ne $NULL) -or ($env:DOCKER_REGISTRY -ne ""))
 {

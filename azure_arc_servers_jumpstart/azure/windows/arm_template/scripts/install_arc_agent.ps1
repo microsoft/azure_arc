@@ -18,7 +18,7 @@ param (
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 
-# Creating Powershell Logon Script
+# Creating PowerShell Logon Script
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
