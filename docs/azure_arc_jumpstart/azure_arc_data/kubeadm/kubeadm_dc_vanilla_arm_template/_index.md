@@ -65,6 +65,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 * As part of the Windows Server 2019 VM deployment, there are 2 scripts executions; First script (ClientTools.ps1) at deployment runtime using the ARM *"CustomScriptExtension"* module and a second script (LogonScript.ps1) on user first logon to Windows.
 
 * Runtime script will:
+
   * Inject user params values (from bullet point #1) to be used in both runtime and logon script
   * Install the required tools – az cli, az cli Powershell module, kubernetes-cli and putty (Chocolaty packages)
   * Download & install the Azure Data Studio & azdata cli
@@ -74,6 +75,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * Disable Windows Server Manager from running at login
 
 * Logon script will:
+
   * Create the *LogonScript.log* file
   * Connect to Azure using SPN credentials (from bullet point #1)
   * Copy the kubeconfig file from the Ubuntu (Kubeadm) VM to the local Windows user profile
