@@ -121,7 +121,7 @@ After few seconds, by running the the ```kubectl get pods -A``` command, you wil
 
 ## Deploy GitOps to Azure Arc Kubernetes cluster using Azure Policy
 
-Although you can [deploy GitOps configuration individually](https://github.com/microsoft/azure_arc/blob/d26593e63e39844c7ce7d0359917a072af4ad5e1/docs%2Fazure_arc_k8s%2FAzure%20Arc%20enabled%20Kubernetes%20-%20Day-2%20Scenarios%20%26%20Use-Cases%2Faks%2Faks_gitops_helm%2F_index.md) on each of your Azure Arc connected clusters, Azure Policy for Kubernetes allows to do the same on a broader scope (i.e Subscription or resource group). That way, you can guarantee existing and newly added Azure Arc connected clusters to all have the same GitOps configuration and as a result, the same cluster baseline and/or application version deployed.
+Although you can [deploy GitOps configuration individually](../aks_gitops_helm/_index.md) on each of your Azure Arc connected clusters, Azure Policy for Kubernetes allows to do the same on a broader scope (i.e Subscription or resource group). That way, you can guarantee existing and newly added Azure Arc connected clusters to all have the same GitOps configuration and as a result, the same cluster baseline and/or application version deployed.
 
 * Before assigning the policy, in the Azure portal, click the *Configuration* setting in your AKS connected cluster. Notice how no GitOps configurations are deployed.
 
