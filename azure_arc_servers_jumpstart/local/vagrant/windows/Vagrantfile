@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
     config.vm.hostname = "Arc-Win10-Demo"
     config.vm.provision "file", source: "vars.ps1", destination: "C:/runtime/vars.ps1"
     config.vm.provision "shell", inline: $script, privileged: true, powershell_elevated_interactive: true
-    config.vm.provision "shell", privileged: true, path: "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/install_arc_agent.ps1"
+    config.vm.provision "shell", privileged: true, path: "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/local/vagrant/windows/scripts/install_arc_agent.ps1"
 
     windows.trigger.before :destroy do |trigger|
       trigger.warn = "Deleting Azure Resource Group"
