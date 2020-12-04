@@ -85,7 +85,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible on deploying Ubuntu VM install with Kubernetes and the Data Controller. Once Ubuntu VM deployment has finished, the template will then automatically execute another template which will deploy the Windows Server Azure VM which will be automatically connected to the Kubernetes cluster.
 
-* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.parameters.example.json).
+* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](../../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](../../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.parameters.example.json).
 
   * *K8svmName* - Kubeadm Ubuntu
   * *vmName* - Client Windows
@@ -104,7 +104,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *ARC_DC_RG* - Azure resource group where all the resources get deploy
   * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
-* To deploy the ARM template, navigate to the local cloned [deployment folder](../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template) and run the below command:
+* To deploy the ARM template, navigate to the local cloned [deployment folder](../../../../../azure_arc_data_jumpstart/kubeadm/azure/arm_template) and run the below command:
 
     ```console
     az group create --name <Name of the Azure resource group> --location <Azure Region>
