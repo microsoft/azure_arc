@@ -71,7 +71,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
 ## Azure Arc enabled Servers Custom Script Extension Deployment
 
-* Edit the extensions parameters file for [*Windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/customscript-templatewindows.parameters.json) or for[*Linux*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/customscript-templatelinux.parameters.json)
+* Edit the extensions parameters file for [*Windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/customscript-templatewindows.parameters.json) or for [*Linux*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/customscript-templatelinux.parameters.json)
 
    ![Screenshot parameters file](./03.png)
 
@@ -81,7 +81,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
     ![Screenshot Azure Arc enabled server machine name](./04.png)
 
-  * The location of the resource group where you registered the Azure Arc connected VM.
+  * The location of the resource group where you registered the Azure Arc enabled server.
 
     ![Screenshot Azure region](./05.png)
 
@@ -115,7 +115,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
     ![Screenshot ARM template output](./06.png)
 
-* To verify a successful deployment on the Azure Arc connected server, in the Azure Portal, by clicking on "Extensions" settings. You should see the Custom Script extension installed.
+* To verify a successful deployment on the Azure Arc enabled server, in the Azure Portal, by clicking on "Extensions" settings. You should see the Custom Script extension installed.
 
     ![Screenshot custom script extension](./07.png)
 
@@ -133,7 +133,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
 Complete the following steps to clean up your environment.
 
-* Remove the virtual machines from each environment by following the teardown instructions from each guide.
+Remove the virtual machines from each environment by following the teardown instructions from each guide.
 
 * **[GCP Ubuntu VM](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/_index.md) / [GCP Windows VM](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/_index.md)**
 * **[AWS Ubuntu VM](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/_index.md)**
