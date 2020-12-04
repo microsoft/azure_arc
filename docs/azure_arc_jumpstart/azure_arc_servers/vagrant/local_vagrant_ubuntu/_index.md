@@ -64,12 +64,12 @@ The following README will guide you on how to deploy a local **Ubuntu** virtual 
 
 * The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/vars.sh) shell script to match the Azure Service Principal you've just created. 
 
-  * subscriptionId=Your Azure Subscription ID
-  * appId=Your Azure Service Principal name
-  * password=Your Azure Service Principal password
+  * subscriptionId=Your Azure subscription ID
+  * appId=Your Azure service principal name
+  * password=Your Azure service principal password
   * tenantId=Your Azure tenant ID
-  * resourceGroup=Azure Resource Group Name
-  * location=Azure Region
+  * resourceGroup=Azure resource group Name
+  * location=Azure region
 
 ## Deployment
 
