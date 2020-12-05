@@ -128,8 +128,8 @@ Before converting the VM to a template, few actions are needed.
 
 ### Convert to Template
 
-Reduce the VM CPU count & memory resources to the minimum and convert the VM to template.
+Reduce the VM CPU count & memory resources to the minimum and convert the VM to template, switch the CD/DVD drive to client device as well disconnect it and convert the VM to template.
 
-![Reduce the VM CPU count & Memory ](./31.png)
+![Reduce the VM CPU count & Memory](./31.png)
 
 ![Convert the VM to template](./32.png)
