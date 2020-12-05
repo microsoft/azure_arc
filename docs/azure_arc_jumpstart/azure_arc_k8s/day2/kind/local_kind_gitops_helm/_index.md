@@ -86,11 +86,11 @@ The demo application that will be deployed later in this guide relies on an ingr
 
     ![Running ingress nginx controller](./03.png)
 
-* Finally, test that the ingress is responding to traffic. To test this, either browse to [http://localhost](http://localhost) or use the command line to connect to `localhost`. You should get a HTTP 404 reponse with a nginx footer. This shows that the ingress is working. The 404 response is to be expected since you haven't setup an ingress route yet. You will do that in the next section.
+* Finally, test that the ingress is responding to traffic. To test this, either browse to [http://localhost](http://localhost) or use the command line to connect to `localhost`. You should get a HTTP 404 response with a nginx footer. This shows that the ingress is working. The 404 response is to be expected since you haven't setup an ingress route yet. You will do that in the next section.
 
-    ![HTTP 404 reponse in a web browser](./04.png)
+    ![HTTP 404 response in a web browser](./04.png)
 
-    ![HTTP 404 reponse in a terminal](./05.png)
+    ![HTTP 404 response in a terminal](./05.png)
 
 ## Cluster-level Config vs. Namespace-level Config
 
@@ -180,7 +180,7 @@ For our scenario, we will deploy the "Hello Arc" application from the ["demo rep
 
     ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./12.png)
 
-    As mentioned in the Prerequisites above, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
+    As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
 
     !["Tab Auto Refresh" extension](./13.png)
 
