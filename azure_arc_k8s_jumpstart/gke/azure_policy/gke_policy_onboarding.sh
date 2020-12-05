@@ -37,7 +37,7 @@ helm install hello-arc stable/nginx-ingress \
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
 
-echo "Log in to Azure with Service Principal & Getting Connected Cluster Azure Resource ID"
+echo "Log in to Azure with service principal & Getting Connected Cluster Azure resource ID"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 export clusterId="$(az resource show --resource-group $resourceGroup --name $arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id)"
 export clusterId="$(echo "$clusterId" | sed -e 's/^"//' -e 's/"$//')" 
