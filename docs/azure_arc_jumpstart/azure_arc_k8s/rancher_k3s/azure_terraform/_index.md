@@ -46,7 +46,7 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-> **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes.
   
