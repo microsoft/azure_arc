@@ -100,7 +100,7 @@ Before running the PowerCLI script, you must set the [environment variables](htt
 
 ![Export environment variables](./04.png)
 
-* From the [*azure_arc_servers_jumpstart\vmware\scale_deploy\powercli\windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/vmware/scaled_deploy/powercli/windows/) folder, open PowerShell session as an Administrator and run the [*scale_deploy.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/vmware/scaled_deploy/powercli/windows/scale_deploy.ps1) script.
+* From the [*azure_arc_servers_jumpstart\vmware\scaled_deploy\powercli\windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/vmware/scaled_deploy/powercli/windows/) folder, open PowerShell session as an Administrator and run the [*scale_deploy.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/vmware/scaled_deploy/powercli/windows/scale_deploy.ps1) script.
 
     ![scale_deploy PowerShell script](./05.png)
 
