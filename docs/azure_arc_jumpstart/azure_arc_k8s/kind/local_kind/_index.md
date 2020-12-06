@@ -33,32 +33,32 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Create Azure service principal (SP)
 
-    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+  To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
-    az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
-    ```
+  ```console
+  az login
+  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+  ```
 
-    For example:
+  For example:
 
-    ```console
-    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
-    ```
+  ```console
+  az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+  ```
 
-    Output should look like this:
+  Output should look like this:
 
-    ```json
-    {
-    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcK8s",
-    "name": "http://AzureArcK8s",
-    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    }
-    ```
+  ```json
+  {
+  "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "displayName": "AzureArcK8s",
+  "name": "http://AzureArcK8s",
+  "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  }
+  ```
 
-  > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+> **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes.
   
