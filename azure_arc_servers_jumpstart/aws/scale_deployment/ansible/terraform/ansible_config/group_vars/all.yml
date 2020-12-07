@@ -5,4 +5,4 @@
     resource_group: "Arc-AWS-Demo"
     tenant_id: "<Azure Tenant ID>"
     azure_region: "westus2"
-    subscription_id: "<Azure Subscription ID>"
+    subscription_id: "<Azure subscription ID>"

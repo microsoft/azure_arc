@@ -27,9 +27,9 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 * In case you don't already have one, you can [Create a free Azure account](https://azure.microsoft.com/en-us/free/).
 
-* Create Azure Service Principal (SP)
+* Create Azure service principal (SP)
 
-    In order for you to deploy the Azure resources using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    In order for you to deploy the Azure resources using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
     ```console
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
@@ -53,7 +53,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
     }
     ```
 
-> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 ## Automation Flow
 
@@ -84,7 +84,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
-As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible for creating all the Azure resources in a single Resource Group as well onboarding the created VM to Azure Arc. 
+As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible for creating all the Azure resources in a single resource group as well onboarding the created VM to Azure Arc. 
 
 * Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command.
 
@@ -93,15 +93,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/master/azure_arc_servers_jumpstart/azure/linux/arm_template) and run the below command:
 
     ```console
-    az group create --name <Name of the Azure Resource Group> --location <Azure Region> --tags "Project=jumpstart_azure_arc_servers"
+    az group create --name <Name of the Azure resource group> --location <Azure Region> --tags "Project=jumpstart_azure_arc_servers"
     az deployment group create \
-    --resource-group <Name of the Azure Resource Group> \
+    --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/azure/linux/arm_template/azuredeploy.json \
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
+    > [!NOTE] Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file
 
     For example:
 
@@ -137,7 +137,7 @@ Let the script to run its course and **do not close** the SSH session, this will
 
 ![](./06.png)
 
-* Upon successful run, a new Azure Arc enabled server will be added to the Resource Group.
+* Upon successful run, a new Azure Arc enabled server will be added to the resource group.
 
 ![](./07.png)
 
@@ -145,6 +145,6 @@ Let the script to run its course and **do not close** the SSH session, this will
 
 ## Cleanup
 
-To delete the entire deployment, simply delete the Resource Group from the Azure portal.
+To delete the entire deployment, simply delete the resource group from the Azure portal.
 
 ![](./09.png)

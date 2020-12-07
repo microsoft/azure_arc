@@ -23,9 +23,9 @@ git clone https://github.com/microsoft/azure_arc.git
 
 * [Generate SSH Key](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
 
-* Create Azure Service Principal (SP)
+* Create Azure service principal (SP)
 
-    In order for you to deploy the AKS cluster using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    In order for you to deploy the AKS cluster using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```console
     az login
@@ -50,7 +50,7 @@ git clone https://github.com/microsoft/azure_arc.git
     }
     ```
 
-> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 ## Automation Flow
 
@@ -68,10 +68,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   * Runtime script will:
     * Inject user params values (from bullet point #1) to be used in both runtime and logon script
-    * Install the required tools – az cli, az cli Powershell module, kube-cli (Chocolaty packages)
+    * Install the required tools – az cli, az cli PowerShell module, kube-cli (Chocolaty packages)
     * Download & install the Azure Data Studio & azdata cli
     * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-    * Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
+    * Download the *DC_Cleanup* and *DC_Deploy* PowerShell scripts
     * Create the logon script
     * Create the Windows schedule task to run the logon script at first login
     * Disable Windows Server Manager from running at login
@@ -82,7 +82,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Create the *azdata* config file in user Windows profile
     * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
     * Create the Azure Data Studio desktop shortcut
-    * Open another Powershell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
+    * Open another PowerShell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
     * Deploy the Arc Data Controller using the user params values
     * Unregister the logon script Windows schedule task so it will not run after first login
 
@@ -102,14 +102,14 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *dnsPrefix* - AKS unique DNS prefix
   * *nodeAdminUsername* - AKS Node Username
   * *sshRSAPublicKey* - Your ssh public key
-  * *servicePrincipalClientId* - Your Azure Service Principal name
-  * *servicePrincipalClientSecret* - Your Azure Service Principal password
+  * *servicePrincipalClientId* - Your Azure service principal name
+  * *servicePrincipalClientSecret* - Your Azure service principal password
   * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
   * *adminUsername* - Client Windows VM admin username
   * *adminPassword* - Client Windows VM admin password
   * *vmSize* - Client Windows VM size
   * *tenantId* - Azure tenant ID
-  * *resourceGroup* - Azure Resource Group where all the resources get deploy
+  * *resourceGroup* - Azure resource group where all the resources get deploy
   * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
   * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
   * *ACCEPT_EULA* - "yes" **Do not change**
@@ -120,15 +120,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 * To deploy the ARM template, navigate to the local cloned [deployment folder](.) and run the below command:
 
     ```console
-    az group create --name <Name of the Azure Resource Group> --location <Azure Region>
+    az group create --name <Name of the Azure resource group> --location <Azure Region>
     az deployment group create \
-    --resource-group <Name of the Azure Resource Group> \
+    --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.json \
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file
+    > [!NOTE] Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file
 
     For example:
 
@@ -159,9 +159,9 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
-    Let the script to run its course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is approximately 10min long**.  
+    Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is approximately 10min long**.  
 
-    Once the script will finish it's run, the logon script Powershell session will be closed and the Azure Arc Data Controller will be deployed on the AKS cluster and be ready to use.
+    Once the script will finish it's run, the logon script PowerShell session will be closed and the Azure Arc Data Controller will be deployed on the AKS cluster and be ready to use.
 
     ![](./04.png)
 
@@ -169,7 +169,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
     ![](./06.png)
 
-* Using Powershell, login to the Data Controller and check it's health using the below commands.
+* Using PowerShell, login to the Data Controller and check it's health using the below commands.
 
     ```powershell
     azdata login --namespace $env:ARC_DC_NAME
@@ -186,19 +186,19 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
 ## Cleanup
 
-* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is approximately 5min long**.
+* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is approximately 5min long**.
 
     ![](./10.png)
 
     ![](./11.png)
 
-* If you want to delete the entire environment, simply delete the deployment Resource Group from the Azure portal.
+* If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
     ![](./12.png)
 
 ## Re-Deploy Azure Arc Data Controller
 
-In case you deleted the Azure Arc Data Controller from the AKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 5-10min long**
+In case you deleted the Azure Arc Data Controller from the AKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 5-10min long**
 
 ![](./13.png)
 

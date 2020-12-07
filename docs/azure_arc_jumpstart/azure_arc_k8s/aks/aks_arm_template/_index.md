@@ -22,9 +22,9 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 * [Generate SSH Key](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```bash
     az login
@@ -47,7 +47,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
@@ -78,9 +78,9 @@ The deployment is using the template parameters file. Before initiating the depl
 To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/master/azure_arc_k8s_jumpstart/aks/arm_template) and run the below command:
 
 ```bash
-az group create --name <Name of the Azure Resource Group> --location <Azure Region>
+az group create --name <Name of the Azure resource group> --location <Azure Region>
 az deployment group create \
---resource-group <Name of the Azure Resource Group> \
+--resource-group <Name of the Azure resource group> \
 --name <The name of this deployment> \
 --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_k8s_jumpstart/aks/arm_template/azuredeploy.json \
 --parameters <The *azuredeploy.parameters.json* parameters file location>
@@ -97,7 +97,7 @@ az deployment group create \
 --parameters azuredeploy.parameters.json
 ```
 
-Once the ARM template deployment is completed, a new AKS cluster in a new Azure Resource Group is created. 
+Once the ARM template deployment is completed, a new AKS cluster in a new Azure resource group is created. 
 
 ![](./02.png)
 
@@ -139,9 +139,9 @@ The most straightforward way is to delete the Azure Arc cluster resource via the
 
 If you want to nuke the entire environment, run the below commands.
 
-```az deployment group delete --name <Deployment name> --resource-group <Azure Resource Group Name>```
+```az deployment group delete --name <Deployment name> --resource-group <Azure resource group name>```
 
-```az group delete --name <Azure Resource Group Name> --yes```
+```az group delete --name <Azure resource group name> --yes```
 
 For example:
 

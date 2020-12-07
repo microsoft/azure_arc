@@ -34,7 +34,7 @@ With Azure Arc, Fabrikam is able to project resources and register them into Azu
 
 ![architecture](://github.com/microsoft/azure_arc/blob/main/img/architecture_white.jpg)
 
-## Azure Arc enabled Servers
+## Azure Arc enabled servers
 
 The deployment scenarios below will guide you through onboarding various Windows and Linux server deployments to Azure with Azure Arc.
 
@@ -91,7 +91,7 @@ The following guides provide end-to-end deployment of new Windows or Linux serve
 
 * [Deploy a VMware vSphere Windows Server VM and connect it to Azure Arc using Terraform](../azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_winsrv/)
 
-### Azure Arc enabled Servers - Day-2 Scenarios & Use-Cases
+### Azure Arc enabled servers - Day-2 Scenarios & Use-Cases
 
 Once you have server resources projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the servers as native Azure resources. The following guides show examples of using Azure management tools such as resource tags, Azure Policy, Log Analytics, and more with Azure Arc enabled servers.
 
@@ -103,13 +103,13 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 
 * [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Azure Policies](../azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/)
  
-* [Integrate Azure Security Center with Azure Arc enabled Servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_securitycenter/)
+* [Integrate Azure Security Center with Azure Arc enabled servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_securitycenter/)
 
-* [Integrate Azure Sentinel with Azure Arc enabled Servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_azuresentinel/)
+* [Integrate Azure Sentinel with Azure Arc enabled servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_azuresentinel/)
 
-* [Deploy Update Management on Azure Arc enabled Servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_updatemanagement/)
+* [Deploy Update Management on Azure Arc enabled servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_updatemanagement/)
 
-### Azure Arc enabled Servers - Scaled Deployment Scenarios
+### Azure Arc enabled servers - Scaled Deployment Scenarios
 
 The following guides are designed to provide scaled onboarding experience to Azure Arc of virtual machines deployed in various platforms and existing environments.
 
@@ -242,14 +242,14 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 * [Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster](../azure_arc_jumpstart/azure_arc_k8s/day2/microk8s/local_microk8s_gitops_helm/)
 
-## Azure Arc enabled Data Services
+## Azure Arc enabled data services
 
-The below deployment options are focused on Azure Arc enabled Data Services. They are designed to quickly spin up a new Kubernetes cluster and deploy Azure Arc enabled data services that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
+The below deployment options are focused on Azure Arc enabled data services. They are designed to quickly spin up a new Kubernetes cluster and deploy Azure Arc enabled data services that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
 
 > [!NOTE] Already have a Kubernetes cluster?
 [Deploy Azure Arc enabled data services to an existing Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-data-controller)
 
-**Disclaimer: Azure Arc enabled Data Services is currently in Public Preview.**
+**Disclaimer: Azure Arc enabled data services is currently in Public Preview.**
 
 ### Data Services on Azure Kubernetes Service (AKS)
 

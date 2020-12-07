@@ -21,9 +21,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -46,7 +46,7 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
   Registration is an asynchronous process, and registration may take approximately 10 minutes.
@@ -66,7 +66,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ## Deployment
 
-The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure Service Principal you've just created and your subscription.  
+The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure service principal you've just created and your subscription.  
 
 In addition, validate that the AKS Kubernetes version is available in your region using the below Azure CLI command.
 
@@ -76,8 +76,8 @@ In case the AKS service is not available in your region, you can change the AKS 
 
 * Export the environment variables needed for the Terraform plan.
 
-    ```export TF_VAR_client_id=<Your Azure Service Principal App ID>```   
-    ```export TF_VAR_client_secret=<Your Azure Service Principal App Password>```
+    ```export TF_VAR_client_id=<Your Azure service principal App ID>```   
+    ```export TF_VAR_client_secret=<Your Azure service principal App Password>```
 
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
 
@@ -85,7 +85,7 @@ In case the AKS service is not available in your region, you can change the AKS 
 
 * Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. 
 
-Once the Terraform deployment is completed, a new AKS cluster in a new Azure Resource Group is created. 
+Once the Terraform deployment is completed, a new AKS cluster in a new Azure resource group is created. 
 
 ![](./02.png)
 
@@ -125,7 +125,7 @@ The most straightforward way is to delete the Azure Arc cluster resource via the
 
 ![](./13.png)
 
-If you want to nuke the entire environment, delete both the AKS and the AKS resources Resource Groups or run the ```terraform destroy -auto-approve``` command.
+If you want to nuke the entire environment, delete both the AKS and the AKS resources resource groups or run the ```terraform destroy -auto-approve``` command.
 
 ![](./14.png)
 

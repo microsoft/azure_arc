@@ -21,9 +21,9 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 * [Install Helm 3](https://helm.sh/docs/intro/install/). If you are on a Windows environment, a recommended and easy way is to use the [Helm 3 Chocolatey package](https://chocolatey.org/packages/kubernetes-helm). 
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -46,7 +46,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 * Enable subscription for two providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
@@ -69,9 +69,9 @@ The following README will guide you on how to connect an existing Kubernetes clu
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
-* Create a new Azure Resource Group where you want your cluster(s) to show up. 
+* Create a new Azure resource group where you want your cluster(s) to show up. 
 
-  ```az group create -l <Azure Region> -n <Resource Group Name>```
+  ```az group create -l <Azure Region> -n <resource group name>```
 
   For example:
 
@@ -81,25 +81,25 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 ![](./01.png)
 
-* Change the following environment variables according to your Azure Service Principal name and Azure environment.
+* Change the following environment variables according to your Azure service principal name and Azure environment.
 
 If using shell:
 
 ```bash
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 ```
 
 If using PowerShell:
 
 ```powershell
-$env:appId=<Your Azure Service Principal name>
-$env:password=<Your Azure Service Principal password>
+$env:appId=<Your Azure service principal name>
+$env:password=<Your Azure service principal password>
 $env:tenantId=<Your Azure tenant ID>
-$env:resourceGroup=<Azure Resource Group Name>
+$env:resourceGroup=<Azure resource group name>
 $env:arcClusterName=<The name of your k8s cluster as it will be shown in Azure Arc>
 ```
 
@@ -114,7 +114,7 @@ $env:arcClusterName=<The name of your k8s cluster as it will be shown in Azure A
 
 **Note: If you already used this guide before and/or have the extensions installed, use the ```az extension update --name connectedk8s``` and the ```az extension update --name k8sconfiguration``` commands.**
 
-* Login to your Azure Subscription using the SP you created.  
+* Login to your Azure subscription using the SP you created.  
 
   If using shell:
 
@@ -122,7 +122,7 @@ $env:arcClusterName=<The name of your k8s cluster as it will be shown in Azure A
   az login --service-principal --username $appId --password $password --tenant $tenantId
   ```
 
-  If using Powershell:
+  If using PowerShell:
 
   ```powershell
   az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
@@ -147,13 +147,13 @@ $env:arcClusterName=<The name of your k8s cluster as it will be shown in Azure A
   az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup
   ```
 
-  If using Powershell:
+  If using PowerShell:
 
   ```powershell
   az connectedk8s connect --name $env:arcClusterName --resource-group $env:resourceGroup
   ```
 
-Upon completion, you will have your Kubernetes cluster, connected as a new Azure Arc cluster inside your Resource Group. 
+Upon completion, you will have your Kubernetes cluster, connected as a new Azure Arc cluster inside your resource group. 
 
 ![](./02.png)
 
@@ -167,6 +167,6 @@ The most straightforward way is to delete the cluster is via the Azure Portal, j
 
 ![](./05.png)
 
-If you want to nuke the entire environment, just delete the Azure Resource Group.
+If you want to nuke the entire environment, just delete the Azure resource group.
 
 ![](./06.png)

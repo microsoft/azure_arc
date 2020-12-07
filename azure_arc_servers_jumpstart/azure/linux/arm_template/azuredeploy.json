@@ -96,19 +96,19 @@
     "servicePrincipalClient": {
       "type": "string",
       "metadata": {
-        "description": "Azure Service Principal name"
+        "description": "Azure service principal name"
       }
     }, 
     "servicePrincipalClientSecret": {
       "type": "string",
       "metadata": {
-        "description": "Azure Service Principal password"
+        "description": "Azure service principal password"
       }
     }, 
     "resourceGroup": {
       "type": "string",
       "metadata": {
-        "description": "Azure Resource Group where all resource to be deployed"
+        "description": "Azure resource group where all resource to be deployed"
       }
     }, 
     "tenantID": {

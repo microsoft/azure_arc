@@ -5,7 +5,7 @@ weight: 1
 description: >
 ---
 
-# Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc
+## Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc
 
 The following README will guide you on how to use [kind](https://kind.sigs.k8s.io/) to run a Kubernetes cluster locally and connect it as an Azure Arc enabled Kubernetes cluster resource.
 
@@ -13,10 +13,10 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
-    
+
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
@@ -24,146 +24,163 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 * [Install Helm 3](https://helm.sh/docs/intro/install/)
 
 * Kind leverages Docker to run the Kubernetes nodes. You will need to install Docker locally:
+
   * If you are a Windows user, install [Docker Desktop](https://www.docker.com/products/docker-desktop). You can also use the [Chocolatey package](https://chocolatey.org/packages/docker-desktop) to automate the installation.
   * If you are a MacOS User, install [Docker Desktop for Mac](https://docs.docker.com/docker-for-mac/).
   * If you are a Linux user, use your package manager to install the [Docker engine](https://docs.docker.com/engine/install/).
 
 * Install the [Go programming language](https://golang.org/dl/).
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+  To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```bash
-    az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
-    ```
-
-    For example:
-
-    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
-
-    Output should look like this:
-
-    ```
-    {
-    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcK8s",
-    "name": "http://AzureArcK8s",
-    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    }
-    ```
-    
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
-
-* Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
-  Registration is an asynchronous process, and registration may take approximately 10 minutes.
-  ```bash
-  az provider register --namespace Microsoft.Kubernetes
-  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.Kubernetes'
-
-  az provider register --namespace Microsoft.KubernetesConfiguration
-  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.KubernetesConfiguration'
+  ```console
+  az login
+  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
   ```
+
+  For example:
+
+  ```console
+  az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+  ```
+
+  Output should look like this:
+
+  ```json
+  {
+  "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "displayName": "AzureArcK8s",
+  "name": "http://AzureArcK8s",
+  "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  }
+  ```
+
+> **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+
+* Enable subscription for two providers for Azure Arc enabled Kubernetes.
+  
+  ```console
+  az provider register --namespace Microsoft.Kubernetes
+  az provider register --namespace Microsoft.KubernetesConfiguration
+  ```
+
   You can monitor the registration process with the following commands:
-  ```bash
+
+  ```console
   az provider show -n Microsoft.Kubernetes -o table
- 
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
 * Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
 
-  ```bash
+  ```console
   az extension add --name connectedk8s
   az extension add --name k8sconfiguration
   ```
 
-**Note: If you already used this guide before and/or have the extensions installed, use the ```az extension update --name connectedk8s``` and the ```az extension update --name k8sconfiguration``` commands.**
- 
+  > **Note: If you already used this guide before and/or have the extensions installed, use the ```az extension update --name connectedk8s``` and the ```az extension update --name k8sconfiguration``` commands.**
+
 ## Deployment
 
 * Install kind
-  * On Linux: 
 
-    ```bash
-    curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
-    chmod +x ./kind
-    sudo mv ./kind /usr/local/bin/kind
-    ```
-  * On MacOS:
+  On Linux:
 
-    ```bash
-    brew install kind
-    ```
-  * On Windows:
-       ```powershell
-       choco install kind
-       ```
+  ```console
+  curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+  chmod +x ./kind
+  sudo mv ./kind /usr/local/bin/kind
+  ```
+  
+  On MacOS:
 
-* Navigate to the folder that has the kind cluster definition.
-  ```bash
+  ```console
+  brew install kind
+  ```
+
+  On Windows:
+
+  ```powershell
+  choco install kind
+  ```
+
+  * Navigate to the folder that has the kind cluster definition.
+
+  ```console
   cd azure_arc/azure_arc_k8s_jumpstart/kind
   ```
 
-* Create the kind cluster. We are using a configuration file called `kind_cluster.yaml` to specify our cluster configuration. This will create a 3 node cluster, with 1 master node and 2 worker nodes.
-    ```bash
-    kind create cluster --config kind_cluster.yaml --name arc-cluster
-    ```
-    ![](./01.png)
-**Note**: By default, kind will store the kubeconfig file used to connect to your cluster in the ~/.kube directory. If you want to use a custom directory to store the kubeconfig file, use the `--kube-config` flag. 
-If you did chose a specific location for the cluster's *kubeconfig* file make sure you are exporting its location as an environment variable using the `export KUBECONFIG=kubeconfig location` or in Windows, add this location to your PATH.
-    
+  * Create the kind cluster. We are using a configuration file called `kind_cluster.yaml` to specify our cluster configuration. This will create a 3 node cluster, with 1 master node and 2 worker nodes.
+
+  ```console
+  kind create cluster --config kind_cluster.yaml --name arc-cluster
+  ```
+
+  ![kind create cluster](./01.png)
+
+  > **Note: By default, kind will store the kubeconfig file used to connect to your cluster in the ~/.kube directory. If you want to use a custom directory to store the kubeconfig file, use the `--kube-config` flag.**
+
+  If you did chose a specific location for the cluster's *kubeconfig* file make sure you are exporting its location as an environment variable using the `export KUBECONFIG=kubeconfig location` or in Windows, add this location to your PATH.
+  
 * Verify your cluster was created successfully and you can access the cluster using `kubectl`.
-    ```bash
-    kubectl get nodes
-    ```
-    ![](./02.png)
+
+  ```console
+  kubectl get nodes
+  ```
+  
+  ![kubectl get nodes](./02.png)
 
 ## Connecting to Azure Arc
 
-Now that you have a running kind cluster, lets connect the kind cluster to Azure Arc.
-    ```bash
-    az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
-    ```
+* Now that you have a running kind cluster, lets connect the kind cluster to Azure Arc.
 
- * Create a resource group<br> 
-   ```bash
-   az group create --name Arc-kind-Demo -l EastUS -o table
-   ```
-   **Note: Azure Arc enabled Kubernetes is currently supported in *East US* and *West Europe***
-  ![](./03.png)
+  ```console
+  az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
+  ```
 
-  
+* Create a resource group
+
+  ```console
+  az group create --name Arc-kind-Demo -l EastUS -o table
+  ```
+
+  > **Note: Azure Arc enabled Kubernetes is currently supported in *East US* and *West Europe***
+
+  ![Create Azure resource group](./03.png)
+
 * Deploy the Arc binaries using Azure CLI:
-  ```bash
+
+  ```console
   az connectedk8s connect -n Arc-kind-Demo -g Arc-kind-Demo --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
-* Upon completion, you will have your kind cluster connected as a new Azure Arc Kubernetes cluster resource in a new Resource Group.
+* Upon completion, you will have your kind cluster connected as a new Azure Arc Kubernetes cluster resource in a new resource group.
 
-  ![](./04.png)
+  ![New Azure Arc enabled Kubernetes cluster](./04.png)
 
-  ![](./05.png)
+  ![New Azure Arc enabled Kubernetes cluster](./05.png)
 
-  ![](./06.png)
+  ![New Azure Arc enabled Kubernetes cluster](./06.png)
 
 ## Delete the deployment
 
-* In Azure, the most straightforward way is to delete the cluster or the Resource Group via the Azure Portal or through the CLI.
+* In Azure, the most straightforward way is to delete the cluster or the resource group via the Azure Portal or through the CLI.
 
-    ```bash
-    az group delete --name Arc-kind-Demo
-    ```
+  ```console
+  az group delete --name Arc-kind-Demo
+  ```
+
+  ![Delete the Azure Arc enabled Kubernetes cluster](./07.png)
+
+  ![Delete Azure resource group](./08.png)
 
 * To delete the kind cluster locally, use the following command:
-    ```bash
-    kind delete cluster --name arc-cluster
-    ```
 
-  ![](./07.png)
+  ```console
+  kind delete cluster --name arc-cluster
+  ```
 
-  ![](./08.png)
-
-  ![](./09.png)
+  ![kind delete cluster](./09.png)
