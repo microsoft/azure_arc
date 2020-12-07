@@ -79,7 +79,7 @@ $resourceGroup = "${resourceGroup}"
 $WorkspaceName = "log-analytics-" + (Get-Random -Maximum 99999)
 $Location = "${location}"
 
-# Get the Resource Group
+# Get the resource group
 Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
 
 # Create the workspace

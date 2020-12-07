@@ -1,12 +1,12 @@
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 # Azure vars
-$env:subscription_id = 'Your Azure Subscription ID'
-$env:client_id = 'Your Azure Service Principal name'
-$env:client_secret = 'Your Azure Service Principal password'
+$env:subscription_id = 'Your Azure subscription ID'
+$env:client_id = 'Your Azure service principal name'
+$env:client_secret = 'Your Azure service principal password'
 $env:tenant_id = 'Your Azure tenant ID'
-$env:resourceGroup = 'Azure Resource Group Name where the Azure Arc servers will be onboarded to'
+$env:resourceGroup = 'Azure resource group name where the Azure Arc servers will be onboarded to'
 $env:location = 'Azure Region' # For example: "eastus"
 
 # VMware vSphere vars

@@ -1,10 +1,10 @@
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 Write-Output "Exporting environment variables"
-$appId="<Your Azure Service Principal name>"
-$password="<Your Azure Service Principal password>"
+$appId="<Your Azure service principal name>"
+$password="<Your Azure service principal password>"
 $tenantId="<Your Azure tenant ID>"
-$resourceGroup="<Azure Resource Group Name>"
+$resourceGroup="<Azure resource group name>"
 $arcClusterName="<The name of your k8s cluster as it will be shown in Azure Arc>"
 $appClonedRepo="<The URL for the 'Hello Arc' cloned GitHub repository>"
 

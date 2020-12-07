@@ -98,7 +98,7 @@ ClientTools_02 | ft
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating Powershell Logon Script
+# Creating PowerShell Logon Script
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
