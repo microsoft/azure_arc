@@ -18,10 +18,10 @@ $env:SrcPath = 'Folder location of the downloaded scripts' # For example: C:\Use
 Set-Content -Path .\vars.sh -Value{
 #!/bin/sh
 # Azure vars
-export subscription_id='Your Azure Subscription ID'
-export client_id='Your Azure Service Principal name'
-export client_secret='Your Azure Service Principal password'
+export subscription_id='Your Azure subscription ID'
+export client_id='Your Azure service principal name'
+export client_secret='Your Azure service principal password'
 export tenant_id='Your Azure tenant ID'
-export resourceGroup='Azure Resource Group Name where the Azure Arc servers will be onboarded to'
+export resourceGroup='Azure resource group name where the Azure Arc servers will be onboarded to'
 export location='Azure Region' # For example: "eastus"
 }

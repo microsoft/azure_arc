@@ -133,7 +133,7 @@
         "resourceGroup": {
             "type": "string",
             "metadata": {
-                "description": "Target AKS cluster Resource Group"
+                "description": "Target AKS cluster resource group"
             }
         },
         "AZDATA_USERNAME": {

@@ -1,13 +1,13 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export subscriptionId='<Your Azure Subscription ID>'
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export subscriptionId='<Your Azure subscription ID>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
 echo "Downloading the Azure Monitor onboarding script"

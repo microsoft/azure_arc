@@ -38,9 +38,9 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 - [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-- Create Azure Service Principal (SP)
+- Create Azure service principal (SP)
 
-    To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
   ```console
   az login
@@ -65,7 +65,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
   }
   ```
 
-> [!NOTE] It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+> [!NOTE] It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 - Create AWS User IAM Key. An access key grants programmatic access to your resources which we will be using later on in this guide.
 
@@ -115,7 +115,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User is editing and exporting Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables values are being used throughout the deployment.
 
-- User deploys the Terraform plan which will deploy the EKS cluster and the EC2 Windows Client instance as well as an Azure Resource Group. The Azure Resource Group is required to host the Azure Arc services you will be able to deploy such as Azure SQL Managed Instance and PostgresSQL Hyperscale.
+- User deploys the Terraform plan which will deploy the EKS cluster and the EC2 Windows Client instance as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services you will be able to deploy such as Azure SQL Managed Instance and PostgresSQL Hyperscale.
 
 - In addition, the plan will copy the EKS *kubeconfig* file as well as the *configmap.yml* file (which is responsible for having the EKS nodes communicate with the cluster control plane) on to the Windows instance.
 
@@ -125,20 +125,20 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   2. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
       - Create the *ClientTools.log* file  
-      - Install the required tools – az cli, az cli Powershell module, kubernetes-cli, aws-iam-authenticator (Chocolaty packages)
+      - Install the required tools – az cli, az cli PowerShell module, kubernetes-cli, aws-iam-authenticator (Chocolaty packages)
       - Download & install the Azure Data Studio & azdata cli
       - Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       - Apply the *configmap.yml* file on the EKS cluster
       - Create the *azdata* config file in user Windows profile
       - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       - Create the Azure Data Studio desktop shortcut
-      - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
+      - Download the *DC_Cleanup* and *DC_Deploy* PowerShell scripts
       - Create the logon script
       - Create the Windows schedule task to run the logon script at first login
 
   3. *LogonScript.ps1* script will run on user first logon to Windows and will:
       - Create the *LogonScript.log* file
-      - Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
+      - Open another PowerShell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       - Deploy the Arc Data Controller using the *TF_VAR* variables values
       - Unregister the logon script Windows schedule task so it will not run after first login
 
@@ -154,14 +154,14 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
   - *export TF_VAR_AWS_SECRET_ACCESS_KEY*='Your AWS Secret Key (Created in the prerequisites section)'
   - *export TF_VAR_key_name*='Your AWS Key Pair name (Created in the prerequisites section)'
   - *export TF_VAR_key_pair_filename*='Your AWS Key Pair *.pem filename (Created in the prerequisites section)'
-  - *export TF_VAR_client_id*='Your Azure Service Principal name'
-  - *export TF_VAR_client_secret*='Your Azure Service Principal password'
+  - *export TF_VAR_client_id*='Your Azure service principal name'
+  - *export TF_VAR_client_secret*='Your Azure service principal password'
   - *export TF_VAR_tenant_id*='Your Azure tenant ID'
   - *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
   - *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
   - *export TF_VAR_ARC_DC_NAME*='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
   - *export TF_VAR_ARC_DC_SUBSCRIPTION*='Azure Arc Data Controller Azure subscription ID'
-  - *export TF_VAR_ARC_DC_RG*='Azure Resource Group where all future Azure Arc resources will be deployed'
+  - *export TF_VAR_ARC_DC_RG*='Azure resource group where all future Azure Arc resources will be deployed'
   - *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
 - Navigate to the folder that has Terraform binaries.
@@ -189,7 +189,7 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
   ![](./21.png)
   ![](./22.png)
 
-- In the Azure Portal, a new empty Azure Resource Group was created. As mentioned, this Resource Group will be used for Azure Arc Data Service you will be deploying in the future.
+- In the Azure Portal, a new empty Azure resource group was created. As mentioned, this resource group will be used for Azure Arc Data Service you will be deploying in the future.
 
   ![](./23.png)
 
@@ -207,15 +207,15 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
 - At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
-Let the script to run it's course and **do not close** the Powershell session, this will be done for you onccompleted. You will notice that the Azure Arc Data Controller gets deployed on the EKS cluster. **The logoscript run time is approximately 10min long**
+Let the script to run it's course and **do not close** the PowerShell session, this will be done for you onccompleted. You will notice that the Azure Arc Data Controller gets deployed on the EKS cluster. **The logoscript run time is approximately 10min long**
 
-Once the script will finish it's run, the logon script Powershell session will be close and the Azure Arc DatController will be deployed on the EKS cluster and be ready to use.
+Once the script will finish it's run, the logon script PowerShell session will be close and the Azure Arc DatController will be deployed on the EKS cluster and be ready to use.
 
   ![](./27.png)
   ![](./28.png)
   ![](./29.png)
 
-- Using Powershell, login to the Data Controller and check it's health using the below commands.
+- Using PowerShell, login to the Data Controller and check it's health using the below commands.
 
   ```console
   azdata login --namespace $env:ARC_DC_NAME
@@ -231,14 +231,14 @@ Once the script will finish it's run, the logon script Powershell session will b
 
 ## Cleanup
 
-- To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client instance. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is ~2-3min long**.
+- To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is ~2-3min long**.
 
   ![](./33.png)
   ![](./34.png)
 
 ## Re-Deploy Azure Arc Data Controller
 
-In case you deleted the Azure Arc Data Controller from the EKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long** 
+In case you deleted the Azure Arc Data Controller from the EKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long** 
 
   ![](./35.png)
   ![](./36.png) 
@@ -247,9 +247,9 @@ In case you deleted the Azure Arc Data Controller from the EKS cluster, you can 
 
 To completely delete the environment, follow the below steps:
 
-  1. on the Windows Client instance, run the *DC_Cleanup.ps1* Powershell script.
+  1. on the Windows Client instance, run the *DC_Cleanup.ps1* PowerShell script.
 
-  2. Run the ```terraform destroy --auto-approve``` which will delete all of the AWS resources as well as the Azure Resource Group. **The *terraform destroy* run time is approximately ~8-9min long**.
+  2. Run the ```terraform destroy --auto-approve``` which will delete all of the AWS resources as well as the Azure resource group. **The *terraform destroy* run time is approximately ~8-9min long**.
 
     ![](./37.png)
     ![](./38.png)

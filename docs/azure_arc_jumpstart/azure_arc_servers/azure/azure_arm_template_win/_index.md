@@ -95,7 +95,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     ```console
     az group create --name <Name of the Azure resource group> --location <Azure Region> --tags "Project=jumpstart_azure_arc_servers"
     az deployment group create \
-    --resource-group <Name of the Azure Resource Group> \
+    --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/windows/arm_template/azuredeploy.json \
     --parameters <The *azuredeploy.parameters.json* parameters file location>

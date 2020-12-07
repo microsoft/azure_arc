@@ -27,7 +27,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 * In case you don't already have one, you can [Create a free Azure account](https://azure.microsoft.com/en-us/free/).
 
-* Create Azure Service Principal (SP).
+* Create Azure service principal (SP).
 
     In order for you to deploy the Azure resources using the ARM template, Azure service principal assigned with the "contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
