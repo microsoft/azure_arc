@@ -24,9 +24,9 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure Service Principal (SP)
+* Create Azure service principal  (SP)
 
-    To connect the EC2 instance to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect the EC2 instance to Azure Arc, an Azure service principal  assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```console
     az login
@@ -41,7 +41,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
     Output should look like this:
 
-    ```console
+    ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServers",
@@ -114,21 +114,21 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
-Before executing the Terraform plan, you must set the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and your AWS account.
+Before executing the Terraform plan, you must set the environment variables which will be used by the plan. These variables are based on the Azure service principal  you've just created, your Azure subscription and tenant, and your AWS account.
 
-* Retrieve your Azure Subscription ID and tenant ID using the `az account list` command.
+* Retrieve your Azure subscription ID and tenant ID using the `az account list` command.
 
 * The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on the virtual machine to install all the necessary artifacts.
 
     Both the script and the Terraform plan itself requires certain information about your AWS and Azure environments. Edit variables according to your environment and export it using the below commands
 
     ```console
-    export TF_VAR_subId='Your Azure Subscription ID'
-    export TF_VAR_servicePrincipalAppId='Your Azure Service Principal App ID'
-    export TF_VAR_servicePrincipalSecret='Your Azure Service Principal App Password'
+    export TF_VAR_subId='Your Azure subscription ID'
+    export TF_VAR_servicePrincipalAppId='Your Azure service principal  App ID'
+    export TF_VAR_servicePrincipalSecret='Your Azure service principal  App Password'
     export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
-    export TF_VAR_location='Azure Region'
-    export TF_VAR_resourceGroup='Azure resource group Name'
+    export TF_VAR_location='Azure region'
+    export TF_VAR_resourceGroup='Azure resource group name'
     export TF_VAR_AWS_ACCESS_KEY_ID='Your AWS Access Key ID'
     export TF_VAR_AWS_SECRET_ACCESS_KEY='Your AWS Secret Key'
     export TF_VAR_key_name='Your AWS Key Pair name'

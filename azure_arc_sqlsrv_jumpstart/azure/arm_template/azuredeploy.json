@@ -65,7 +65,7 @@
         "resourceGroup": {
             "type": "string",
             "metadata": {
-                "description": "Azure Resource Group"
+                "description": "Azure resource group"
             }
         },
         "subId": {

@@ -36,6 +36,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
+
 * Create Azure Service Principal (SP)
 
     To connect a VM or bare-metal server to Azure Arc, Azure service srincipal assigned with the "contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure cloud shell](https://shell.azure.com/)).
@@ -62,14 +63,14 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-
-    > **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+    
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
 * In order to demonstrate the custom script extension, we will use the below Linux and Windows scripts.
   * [*Linux*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/custom_script_linux.sh): The script will modify the message of the day (MOTD) on the operating system.
   * [*Windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/custom_script_windows.ps1): The script will install Windows Terminal, Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
 
-## Azure Arc enabled Servers Custom Script Extension Deployment
+## Azure Arc enabled servers Custom Script Extension Deployment
 
 * Edit the extensions parameters file for [*Windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/customscript-templatewindows.parameters.json) or for [*Linux*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/customscript-templatelinux.parameters.json)
 

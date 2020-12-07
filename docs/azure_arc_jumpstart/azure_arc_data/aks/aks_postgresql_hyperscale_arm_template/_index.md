@@ -23,9 +23,9 @@ git clone https://github.com/microsoft/azure_arc.git
 
 * [Generate SSH Key](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
 
-* Create Azure Service Principal (SP)
+* Create Azure service principal (SP)
 
-    In order for you to deploy the AKS cluster using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    In order for you to deploy the AKS cluster using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```console
     az login
@@ -50,7 +50,7 @@ git clone https://github.com/microsoft/azure_arc.git
     }
     ```
 
-> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 ## Automation Flow
 
@@ -68,10 +68,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   * Runtime script will:
     * Inject user params values (from bullet point #1) to be used in both runtime and logon script
-    * Install the required tools – az cli, az cli Powershell module, kube-cli (Chocolaty packages)
+    * Install the required tools – az cli, az cli PowerShell module, kube-cli (Chocolaty packages)
     * Download & install the Azure Data Studio & azdata cli
     * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-    * Download the *Postgres_Cleanup* and *Postgres_Deploy* Powershell scripts
+    * Download the *Postgres_Cleanup* and *Postgres_Deploy* PowerShell scripts
     * Create the Postgres Connectivity script
     * Create the logon script 
     * Create the Windows schedule task to run the logon script at first login
@@ -83,7 +83,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Create the *azdata* config file in user Windows profile
     * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
     * Create the Azure Data Studio desktop shortcut
-    * Open another Powershell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
+    * Open another PowerShell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
     * Deploy the Arc Data Controller using the user params values
     * Deploy Azure Postgres server group **(with 5 workers)** on the AKS cluster
     * Creating Postgres connectivity details using the Postgres Connectivity script
@@ -105,14 +105,14 @@ az aks get-versions -l "<Your Azure Region>"
   * *dnsPrefix* - AKS unique DNS prefix
   * *nodeAdminUsername* - AKS Node Username
   * *sshRSAPublicKey* - Your ssh public key
-  * *servicePrincipalClientId* - Your Azure Service Principal name
-  * *servicePrincipalClientSecret* - Your Azure Service Principal password
+  * *servicePrincipalClientId* - Your Azure service principal name
+  * *servicePrincipalClientSecret* - Your Azure service principal password
   * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
   * *adminUsername* - Client Windows VM admin username
   * *adminPassword* - Client Windows VM admin password
   * *vmSize* - Client Windows VM size
   * *tenantId* - Azure tenant ID
-  * *resourceGroup* - Azure Resource Group where all the resources get deploy
+  * *resourceGroup* - Azure resource group where all the resources get deploy
   * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
   * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
   * *ACCEPT_EULA* - "yes" **Do not change**
@@ -126,11 +126,11 @@ az aks get-versions -l "<Your Azure Region>"
  * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs) and run the below command:
 
     ```console
-    az group create --name <Name of the Azure Resource Group> --location <Azure Region>
-    az deployment group create --resource-group <Name of the Azure Resource Group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
+    az group create --name <Name of the Azure resource group> --location <Azure Region>
+    az deployment group create --resource-group <Name of the Azure resource group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > [!NOTE] Make sure that you are using the same Azure Resource Group name as the one you've just used in the *azuredeploy.parameters.json* file.
+    > [!NOTE] Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file.
 
     For example:
 
@@ -157,9 +157,9 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
-    Let the script to run it's course and **do not close** the Powershell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is 10-15min long**.  
+    Let the script to run it's course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is 10-15min long**.  
 
-    Once the script will finish it's run, the logon script Powershell session will be closed and the Azure Arc Data Controller and an Azure Postgres Hyperscale (and a sample DB) will be deployed on the AKS cluster and be ready to use. 
+    Once the script will finish it's run, the logon script PowerShell session will be closed and the Azure Arc Data Controller and an Azure Postgres Hyperscale (and a sample DB) will be deployed on the AKS cluster and be ready to use. 
 
     ![](./04.png)
 
@@ -179,7 +179,7 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
     ![](./11.png)
 
-* (Optional) In Powershell, login to the Data Controller and check it's health using the below commands.
+* (Optional) In PowerShell, login to the Data Controller and check it's health using the below commands.
 
     ```powershell
     azdata login --namespace $env:ARC_DC_NAME
@@ -190,19 +190,19 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
 ## Cleanup
 
-* To delete the Azure Arc Data Controller and all of it's Kubernetes resources as well as Postgres Hyperscale, run the *Postgres_Cleanup.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all Powershell sessions. **The Cleanup script run time is 5-10min long**.
+* To delete the Azure Arc Data Controller and all of it's Kubernetes resources as well as Postgres Hyperscale, run the *Postgres_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is 5-10min long**.
 
     ![](./13.png)
 
     ![](./14.png)
 
-* If you want to delete the entire environment, simply delete the deployment Resource Group from the Azure portal.
+* If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
     ![](./15.png)
 
 ## Re-Deploy Azure Arc Data Controller & Postgres
 
-In case you deleted the Azure Arc Data Controller and Postgres Hyperscale from the Kubernetes cluster, you can re-deploy it by running the *Postgres_Deploy.ps1* Powershell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 15min long**.
+In case you deleted the Azure Arc Data Controller and Postgres Hyperscale from the Kubernetes cluster, you can re-deploy it by running the *Postgres_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 15min long**.
 
 ![](./16.png)
 

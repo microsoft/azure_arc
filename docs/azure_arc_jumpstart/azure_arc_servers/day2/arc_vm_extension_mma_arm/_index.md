@@ -79,7 +79,7 @@ To deploy the ARM template, navigate to the "deployment folder" ***../extensions
     --parameters <The *log_analytics-template.parameters.json* template file location>
   ```
 
-## Azure Arc enabled Servers Microsoft Monitoring Agent Extension Deployment
+## Azure Arc enabled servers Microsoft Monitoring Agent Extension Deployment
 
 * Edit the [*extensions parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/mma-template.parameters.json)
 
@@ -104,7 +104,7 @@ To deploy the ARM template, navigate to the "deployment folder" ***../extensions
 * Choose the ARM template that matches your operating system, for [*Windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/mma-template-windows.json) and [*Linux*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/mma-template-linux.json), deploy the template by running the following command:
 
     ```console
-    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    az deployment group create --resource-group <Name of the Azure resource group> \
     --template-file <The *mma-template.json* template file location> \
     --parameters <The *mma-temaplte.parameters.json* template file location>
     ```
