@@ -21,7 +21,7 @@ The following README will guide you on how to deploy a local **Ubuntu** virtual 
 
 * Vagrant relies on an underlying hypervisor. For the purpose of this guide, we will be using "Oracle VM VirtualBox".
 
-  * Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads). 
+  * Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
 
     * If you are an OSX user, simply run ```brew cask install virtualbox```
     * If you are a Windows user, you can use the [Chocolatey package](https://chocolatey.org/packages/virtualbox)
@@ -29,7 +29,7 @@ The following README will guide you on how to deploy a local **Ubuntu** virtual 
 
   * Install [Vagrant](https://www.vagrantup.com/docs/installation/)
 
-    * If you are an OSX user, simply run ```brew cask install vagrant``` 
+    * If you are an OSX user, simply run ```brew cask install vagrant```
     * If you are a Windows user, you can use the [Chocolatey package](https://chocolatey.org/packages/vagrant)
     * If you are a Linux user, look [here](https://www.vagrantup.com/downloads.html)
 
@@ -62,7 +62,7 @@ The following README will guide you on how to deploy a local **Ubuntu** virtual 
 
     > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
-* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/vars.sh) shell script to match the Azure service principal you've just created. 
+* The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/vars.sh) shell script to match the Azure service principal you've just created.
 
   * subscriptionId=Your Azure subscription ID
   * appId=Your Azure service principal name

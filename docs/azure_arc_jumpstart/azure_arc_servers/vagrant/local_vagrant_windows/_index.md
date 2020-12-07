@@ -106,15 +106,15 @@ In a case you want to demo/control the actual registration process, to the follo
 
     ![Screenshot of az group create being run](./07.png)
 
-* RDP the VM using the ```vagrant rdp``` command. Use *vagrant/vagrant* as the username/password. 
+* RDP the VM using the ```vagrant rdp``` command. Use *vagrant/vagrant* as the username/password.
 
     ![Screenshot of RDP into a Vagrant server](./08.png)
 
-* Open PowerShell ISE **as Administrator** and edit the *C:\runtime\vars.ps1* with your environment variables. 
+* Open PowerShell ISE **as Administrator** and edit the *C:\runtime\vars.ps1* with your environment variables.
 
     ![Screenshot of PowerShell ISE](./09.png)
 
-* Paste the ```Invoke-Expression "C:\runtime\vars.ps1"``` commmand, the ```az group create --location $env:location --name $env:resourceGroup --subscription $env:subscriptionId``` command and the same *azcmagent connect* command you've just commented and execute the script. 
+* Paste the ```Invoke-Expression "C:\runtime\vars.ps1"``` commmand, the ```az group create --location $env:location --name $env:resourceGroup --subscription $env:subscriptionId``` command and the same *azcmagent connect* command you've just commented and execute the script.
 
     ![Screenshot of PowerShell ISE running a script](./10.png)
 
