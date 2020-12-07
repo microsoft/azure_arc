@@ -1,5 +1,5 @@
 variable "resource_group_name" {
-  description = "The Azure Resource Group this AKS Managed Kubernetes Cluster should be provisioned"
+  description = "The Azure resource group this AKS Managed Kubernetes Cluster should be provisioned"
   default     = "Arc-AKS-Demo"
 }
 

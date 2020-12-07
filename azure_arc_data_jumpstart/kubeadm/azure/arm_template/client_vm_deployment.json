@@ -117,7 +117,7 @@
         "ARC_DC_RG": {
             "type": "string",
             "metadata": {
-                "description": "Arc Data Controller Resource Group"
+                "description": "Arc Data Controller resource group"
             }
         },
         "ARC_DC_REGION": {

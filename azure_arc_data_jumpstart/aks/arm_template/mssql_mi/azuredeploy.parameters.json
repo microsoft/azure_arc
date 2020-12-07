@@ -15,10 +15,10 @@
             "value": "<Your ssh public key>"
         },
         "servicePrincipalClientId": {
-            "value": "<Your Azure Service Principal name>"
+            "value": "<Your Azure service principal name>"
         },
         "servicePrincipalClientSecret": {
-            "value": "<Your Azure Service Principal password>"
+            "value": "<Your Azure service principal password>"
         },
         "kubernetesVersion": {
             "value": "<Kubernetes Version, e.g. 1.18.6>"
@@ -36,7 +36,7 @@
             "value": "<Azure tenant ID>"
         },
         "resourceGroup": {
-            "value": "<Azure Resource Group where all resource to be deployed>"
+            "value": "<Azure resource group where all resource to be deployed>"
         },
         "AZDATA_USERNAME": {
             "value": "<Azure Arc Data Controller admin username>"
