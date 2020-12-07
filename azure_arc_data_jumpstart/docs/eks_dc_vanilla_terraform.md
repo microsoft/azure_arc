@@ -17,21 +17,21 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 ## Prerequisites
 
-- Clone this repo
+* Clone this repo
 
   ```console
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
-- [Install AWS IAM Authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
+* [Install AWS IAM Authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
 
-- [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-- [Create a free Amazon Web Services account](https://aws.amazon.com/free/) if you don't already have one.
+* [Create a free Amazon Web Services account](https://aws.amazon.com/free/) if you don't already have one.
 
-- [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-- Create Azure Service Principal (SP)
+* Create Azure Service Principal (SP)
 
     To connect a Kubernetes cluster to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
@@ -119,18 +119,18 @@ For you to get familiar with the automation and deployment flow, below is an exp
   2. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
       - Create the *ClientTools.log* file  
       - Install the required tools – az cli, az cli Powershell module, kubernetes-cli, aws-iam-authenticator (Chocolaty packages)
-      - Download & install the Azure Data Studio & azdata cli
-      - Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      - Apply the *configmap.yml* file on the EKS cluster
-      - Create the *azdata* config file in user Windows profile
-      - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      - Create the Azure Data Studio desktop shortcut
+      - Download Azure Data Studio & Azure Data CLI
       - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
       - Create the logon script
       - Create the Windows schedule task to run the logon script at first login
 
   3. *LogonScript.ps1* script will run on user first logon to Windows and will:
       - Create the *LogonScript.log* file
+      - Install Azure Data Studio & Azure Data CLI
+      - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
+      - Apply the *configmap.yml* file on the EKS cluster
+      - Create the *azdata* config file in user Windows profile
+      - Create the Azure Data Studio desktop shortcut
       - Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       - Deploy the Arc Data Controller using the *TF_VAR* variables values
       - Unregister the logon script Windows schedule task so it will not run after first login
@@ -244,6 +244,6 @@ To completely delete the environment, follow the below steps:
 
   2. Run the ```terraform destroy --auto-approve``` which will delete all of the AWS resources as well as the Azure Resource Group. **The *terraform destroy* run time is approximately ~8-9min long**.
 
-    ![](../img/eks_dc_vanilla_terraform/37.png)
-    ![](../img/eks_dc_vanilla_terraform/38.png)
-    ![](../img/eks_dc_vanilla_terraform/39.png)
+![](../img/eks_dc_vanilla_terraform/37.png)
+![](../img/eks_dc_vanilla_terraform/38.png)
+![](../img/eks_dc_vanilla_terraform/39.png)
