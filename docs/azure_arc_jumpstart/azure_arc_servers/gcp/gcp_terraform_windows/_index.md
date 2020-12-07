@@ -62,7 +62,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ## Create a new GCP Project
 
-* Browse to https://console.cloud.google.com and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
+* Browse to <https://console.cloud.google.com> and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
     ![Screenshot of GCP Cloud console create project screen](./01.png)
 
@@ -118,7 +118,7 @@ Before executing the Terraform plan, you must set and then export the environmen
 The Terraform plan automatically installs the Azure Arc agent and connects the VM to Azure as a managed resource by executing a PowerShell script when the VM is first booted.
     ![Screenshot showing azcmagent connect script](./12.png)
 
-If you want to demo/control the actual registration process, do the following: 
+If you want to demo/control the actual registration process, do the following:
 
 * Before running the ```terraform apply``` command, open [*main.tf*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/gcp/windows/terraform/main.tf) and comment out the ```windows-startup-script-ps1 = local_file.install_arc_agent_ps1.content``` line and save the file.
 
@@ -126,7 +126,7 @@ If you want to demo/control the actual registration process, do the following:
 
 * Run ```terraform apply --auto-approve``` as instructed above.
 
-* Open the Google Cloud console and navigate to the [Compute Instance page](https://console.cloud.google.com/compute/instances), then click on the VM that was created. 
+* Open the Google Cloud console and navigate to the [Compute Instance page](https://console.cloud.google.com/compute/instances), then click on the VM that was created.
 
     ![Screenshot showing GCP cloud console with GCP server](./14.png)
 

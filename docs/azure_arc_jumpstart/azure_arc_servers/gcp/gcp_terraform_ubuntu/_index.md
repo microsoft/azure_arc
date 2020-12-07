@@ -56,7 +56,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ## Create a new GCP Project
 
-* Browse to https://console.developers.google.com and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
+* Browse to <https://console.developers.google.com> and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
     ![Screenshot of GCP Cloud console create project screen](./01.png)
 
