@@ -134,25 +134,25 @@ Before executing the Terraform plan, you must export the environment variables w
 As you may have noticed, the last step of the run is to register the VM as a new Azure Arc enabled server resource.
     ![Screenshot showing azcmagent connect script](./11.png)
 
-If you want to demo/control the actual registration process, do the following: 
+If you want to demo/control the actual registration process, do the following:
 
-1. In the [*install_arc_agent.sh.tmpl*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/aws/ubuntu/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file.
+* In the [*install_arc_agent.sh.tmpl*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/aws/ubuntu/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file.
 
     ![Screenshot showing azcmagent connect script commented out](./12.png)
 
-2. Get the public IP of the AWS VM by running ```terraform output```
+* Get the public IP of the AWS VM by running ```terraform output```
 
     ![Screenshot of terraform output being run](./13.png)
 
-3. SSH the VM using the ```ssh ubuntu@x.x.x.x``` where x.x.x.x is the host ip. 
+* SSH the VM using the ```ssh ubuntu@x.x.x.x``` where x.x.x.x is the host ip.
 
     ![Screenshot of SSH into EC2 server](./14.png)
 
-4. Export all the environment variables in [*vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/aws/ubuntu/terraform/scripts/vars.sh)
+* Export all the environment variables in [*vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/aws/ubuntu/terraform/scripts/vars.sh)
 
     ![Screenshot showing export of environment variables in var.sh](./15.png)
 
-5. Run the following command
+* Run the following command
 
     ```console
     azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-AWS-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id
@@ -160,7 +160,7 @@ If you want to demo/control the actual registration process, do the following:
 
     ![Screenshot of azcmagent connect being run](./16.png)
 
-6. When complete, your VM will be registered with Azure Arc and visible in the resource group inside Azure Portal.
+* When complete, your VM will be registered with Azure Arc and visible in the resource group inside Azure Portal.
 
 ## Delete the deployment
 
