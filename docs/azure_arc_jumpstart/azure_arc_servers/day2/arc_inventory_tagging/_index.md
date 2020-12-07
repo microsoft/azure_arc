@@ -45,7 +45,7 @@ We will be using Resource Graph Explorer during this exercise to query and view 
     | where type =~ 'Microsoft.HybridCompute/machines'
     ```
 
-* If you have correctly connected servers via Arc, they should be listed in the Results pane of Resource Graph Explorer. You can also view the Arc connected resources from the Azure portal.
+* If you have correctly created Azure Arc enabled servers, they should be listed in the Results pane of Resource Graph Explorer. You can also view the Azure Arc enabled serves from the Azure portal.
 
     ![Screenshot showing Resource Graph Explorer query](./02.png)
 
@@ -69,11 +69,11 @@ We will be using Resource Graph Explorer during this exercise to query and view 
 
 ## Tag Arc resources
 
-Now that we have created a basic taxonomy structure, we will apply tags to our Arc server resources. In this guide, we will demonstrate tagging resources in both AWS and GCP. If you only have resources in one of these providers, you can skip to the appropriate section for AWS or GCP.
+Now that we have created a basic taxonomy structure, we will apply tags to our Azure Arc enabled server resources. In this guide, we will demonstrate tagging resources in both AWS and GCP. If you only have resources in one of these providers, you can skip to the appropriate section for AWS or GCP.
 
 ### Tag Arc-connected AWS Ubuntu server
 
-* In AZ CLI, run the following commands to apply the "Hosting Platform : AWS" tag to your Arc AWS servers.
+* In AZ CLI, run the following commands to apply the "Hosting Platform : AWS" tag to your AWS Azure Arc enabled servers.
 
     > *Note: If you connected your AWS servers using a method other than the one described in [this tutorial](../../aws/aws_terraform_ubuntu/), then you will need to adjust the values for `awsResourceGroup` and `awsMachineName` to match values specific to your environment.*
 
@@ -89,7 +89,7 @@ Now that we have created a basic taxonomy structure, we will apply tags to our A
 
 ### Tag Arc-connected GCP Ubuntu server
 
-* In AZ CLI, run the following commands to apply the "Hosting Platform : GCP" tag to your Arc GCP servers.
+* In AZ CLI, run the following commands to apply the "Hosting Platform : GCP" tag to your GCP Azure Arc enabled servers.
 
     > *Note: If you connected your GCP servers using a method other than the one described in [this tutorial](../../gcp/gcp_terraform_ubuntu/), then you will need to adjust the values for `gcpResourceGroup` and `gcpMachineName` to match values specific to your environment.*
 
@@ -118,7 +118,7 @@ Now that we have applied tags to our resources that are hosted in multiple cloud
 
     ![Screenshot showing Resource Graph Explorer query](./04.png)
 
-* Click "Run Query" and then select the Formatted Results toggle. If done correctly, you should see all Arc-connected servers and their assigned "Hosting Platform" tag values.
+* Click "Run Query" and then select the Formatted Results toggle. If done correctly, you should see all Azure Arc enabled servers and their assigned "Hosting Platform" tag values.
 
     ![Screenshot showing results of Resource Graph Explorer query](./06.png)
 
