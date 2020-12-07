@@ -29,18 +29,23 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
     }
 }
 
-# Download & Install Azure Data Studio and azdata CLI
-Write-Host "Download & Install Azure Data Studio and azdata CLI"
+# Downloading Azure Data Studio and azdata CLI
+Write-Host "Downloading Azure Data Studio and azdata CLI"
 Write-Host "`n"
-Invoke-WebRequest "https://go.microsoft.com/fwlink/?linkid=2142211" -OutFile "C:\tmp\azuredatastudio.zip"
+Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip" | Out-Null
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/gke/terraform/settings.json" -OutFile "C:\tmp\settings.json"
-Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi"
+Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi" | Out-Null
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/gke/terraform/scripts/DC_Cleanup.ps1" -OutFile "C:\tmp\DC_Cleanup.ps1"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/gke/terraform/scripts/DC_Deploy.ps1" -OutFile "C:\tmp\DC_Deploy.ps1"
 
-Expand-Archive C:\tmp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
 
-Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
+$LogonScript = @'
+Start-Transcript -Path C:\tmp\LogonScript.log
+
+Write-Host "Installing Azure Data Studio and azdata CLI"
+Write-Host "`n"
+Expand-Archive 'C:\tmp\azuredatastudio.zip' -DestinationPath 'C:\Program Files\Azure Data Studio'
+Start-Process msiexec.exe -Wait -ArgumentList '/I "C:\tmp\AZDataCLI.msi" /quiet'
 
 $SettingsDestination = "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User"
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Hidden
@@ -80,9 +85,6 @@ kubectl apply -f 'C:\tmp\local_ssd_sc.yaml'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 azdata --version
 
-$LogonScript = @'
-Start-Transcript -Path C:\tmp\LogonScript.log
-
 azdata arc dc config init --source azure-arc-kubeadm --path "C:\tmp\custom" --force
 azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=local-ssd"
 azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=local-ssd"
@@ -120,5 +122,5 @@ Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User "$env:win
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-# Stopping log for ClientTools.ps1
+#Stopping log for ClientTools.ps1
 Stop-Transcript
