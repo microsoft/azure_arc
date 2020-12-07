@@ -31,9 +31,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the GCP virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```bash
     az login
@@ -56,7 +56,7 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 ## Create a new GCP Project
 
@@ -78,15 +78,15 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ## Deployment
 
-Before executing the Terraform plan, you must set and then export the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and the GCP project name.
+Before executing the Terraform plan, you must set and then export the environment variables which will be used by the plan. These variables are based on the Azure service principal you've just created, your Azure subscription and tenant, and the GCP project name.
 
-* Retrieve your Azure Subscription ID and tenant ID using the ```az account list``` command.
+* Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command.
 
 * The Terraform plan creates resources in both Microsoft Azure and Google Cloud. It then executes a script on a Google Cloud virtual machine to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your Google Cloud and Azure environments. Edit [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/gcp/windows/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
     
-    * TF_VAR_subscription_id=Your Azure Subscription ID
-    * TF_VAR_client_id=Your Azure Service Principal app id
-    * TF_VAR_client_secret=Your Azure Service Principal password
+    * TF_VAR_subscription_id=Your Azure subscription ID
+    * TF_VAR_client_id=Your Azure service principal app id
+    * TF_VAR_client_secret=Your Azure service principal password
     * TF_VAR_tenant_id=Your Azure tenant ID
     * TF_VAR_gcp_project_id=GCP project id
     * TF_VAR_gcp_credentials_filename=GCP credentials json filename
@@ -101,7 +101,7 @@ Before executing the Terraform plan, you must set and then export the environmen
 
     ![](./08.png)
 
-* Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion of the Terraform script, you will have deployed a GCP Windows Server 2019 VM and initiated a script to download the Azure Arc agent to the VM and connect the VM as a new Azure Arc enabled server inside a new Azure Resource Group. It will take a few minutes for the agent to finish provisioning so grab a coffee.
+* Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion of the Terraform script, you will have deployed a GCP Windows Server 2019 VM and initiated a script to download the Azure Arc agent to the VM and connect the VM as a new Azure Arc enabled server inside a new Azure resource group. It will take a few minutes for the agent to finish provisioning so grab a coffee.
 
     ![](./09.png)
 
@@ -111,7 +111,7 @@ Before executing the Terraform plan, you must set and then export the environmen
 
 ## Semi-Automated Deployment (Optional)
 
-The Terraform plan automatically installs the Azure Arc agent and connects the VM to Azure as a managed resource by executing a Powershell script when the VM is first booted.
+The Terraform plan automatically installs the Azure Arc agent and connects the VM to Azure as a managed resource by executing a PowerShell script when the VM is first booted.
     ![](./12.png)
 
 If you want to demo/control the actual registration process, do the following: 
@@ -136,7 +136,7 @@ If you want to demo/control the actual registration process, do the following:
 
     ![](./18.png)
 
-6. Once logged in, open Powershell ISE **as Administrator**. Make sure you are running the x64 version of Powershell ISE and not x86. Once open, select File->New to create an empty .ps1 file. Then paste in the entire contents of ***./scripts/install_arc_agent.ps1]***. Click the play button to execute the script. When complete, you should see the output showing successful onboarding of the machine.
+6. Once logged in, open PowerShell ISE **as Administrator**. Make sure you are running the x64 version of PowerShell ISE and not x86. Once open, select File->New to create an empty .ps1 file. Then paste in the entire contents of ***./scripts/install_arc_agent.ps1]***. Click the play button to execute the script. When complete, you should see the output showing successful onboarding of the machine.
 
     ![](./19.png)
 

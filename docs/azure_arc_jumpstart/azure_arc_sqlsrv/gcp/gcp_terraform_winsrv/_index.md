@@ -25,9 +25,9 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the GCP virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```terminal
     az login
@@ -52,7 +52,7 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 ## Create a new GCP Project, IAM Role & Service Account
 
@@ -119,21 +119,21 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
-Before executing the Terraform plan, you must set the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and your GCP project.
+Before executing the Terraform plan, you must set the environment variables which will be used by the plan. These variables are based on the Azure service principal you've just created, your Azure subscription and tenant, and your GCP project.
 
-* Retrieve your Azure Subscription ID and tenant ID using the `az account list` command.
+* Retrieve your Azure subscription ID and tenant ID using the `az account list` command.
 
 * The Terraform plan creates resources in both Microsoft Azure and GCP. It then executes a script on the virtual machine to install all the necessary artifacts. 
 
 Both the script and the Terraform plan itself requires certain information about your GCP and Azure environments. Edit variables according to your environment and export it using the below commands
 
 ```bash
-export TF_VAR_subId='Your Azure Subscription ID'
-export TF_VAR_servicePrincipalAppId='Your Azure Service Principal App ID'
-export TF_VAR_servicePrincipalSecret='Your Azure Service Principal App Password'
+export TF_VAR_subId='Your Azure subscription ID'
+export TF_VAR_servicePrincipalAppId='Your Azure service principal App ID'
+export TF_VAR_servicePrincipalSecret='Your Azure service principal App Password'
 export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
 export TF_VAR_location='Azure Region'
-export TF_VAR_resourceGroup='Azure Resource Group Name'
+export TF_VAR_resourceGroup='Azure resource group name'
 export TF_VAR_gcp_project_id='GCP Project ID'
 export TF_VAR_gcp_credentials_filename='GCP Project credentials filename'
 export TF_VAR_gcp_region='GCP region where resource will be created'
@@ -153,7 +153,7 @@ export TF_VAR_admin_password='Guest OS Admin Password'
     terraform apply --auto-approve
     ``` 
 
-Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure Resource Group will be created. 
+Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure resource group will be created. 
 
 ![](./20.png)
 

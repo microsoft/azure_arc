@@ -1,11 +1,11 @@
 ---
-title: "Azure Arc enabled Servers on Azure Security Center"
-linkTitle: "Azure Arc enabled Servers on Azure Security Center"
+title: "Azure Arc enabled servers on Azure Security Center"
+linkTitle: "Azure Arc enabled servers on Azure Security Center"
 weight: 5
 description: >
 ---
 
-# Azure Arc enabled Servers on Azure Security Center
+# Azure Arc enabled servers on Azure Security Center
 
 The following README will guide you on how to onboard an Azure Arc enabled Machine on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), so you can start collecting security-related configurations as well as event logs as a way to recommend actions and improve your overall Azure security posture.
 
@@ -17,7 +17,7 @@ In this guide, you will enable and configure Standard tier ASC on your Azure sub
 
 * Review Azure Security Center's recommendations.
 
-* Apply recommended configurations on Azure Arc enabled Servers using the ***Quick Fix*** remediations. 
+* Apply recommended configurations on Azure Arc enabled servers using the ***Quick Fix*** remediations. 
 
 **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc.**
 
@@ -44,9 +44,9 @@ In this guide, you will enable and configure Standard tier ASC on your Azure sub
   
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP).   
+* Create Azure service principal (SP).   
 
-    To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a VM or bare-metal server to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```bash
     az login
@@ -65,7 +65,7 @@ In this guide, you will enable and configure Standard tier ASC on your Azure sub
     }
     ```
     
-  **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+  **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
 
 ## Onboarding Azure Security Center
 
@@ -76,7 +76,7 @@ In this guide, you will enable and configure Standard tier ASC on your Azure sub
 * To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/master/azure_arc_servers_jumpstart/securitycenter/arm) and run the below command:
 
   ```bash
-    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    az deployment group create --resource-group <Name of the Azure resource group> \
     --template-file <The *log_analytics-template.json* template file location> \
     --parameters <The *log_analytics-template.parameters.json* template file location>
   ```
@@ -85,7 +85,7 @@ In this guide, you will enable and configure Standard tier ASC on your Azure sub
 
   ```bash
     az security workspace-setting create --name default \
-    --target-workspace '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure Resource Group>/providers/Microsoft.OperationalInsights/workspaces/<Name of the Log Analytics Workspace>'
+    --target-workspace '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure resource group>/providers/Microsoft.OperationalInsights/workspaces/<Name of the Log Analytics Workspace>'
   ```
 
 * Select the Azure Security Center tier, the Free tier is enabled on all your Azure subscriptions by default and will provide continuous security assessment and actionable security recommendations. In this guide, you will use the Standard tier for Virtual Machines that extends these capabilities providing unified security management and threat protection across your hybrid cloud workloads. To enable the Standard tier of Azure Security Center for VMs run the command below: 
@@ -145,5 +145,5 @@ Complete the following steps to clean up your environment.
 * Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
     ```bash
-    az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
+    az monitor log-analytics workspace delete --resource-group <Name of the Azure resource group> --workspace-name <Log Analytics Workspace Name> --yes
     ```

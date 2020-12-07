@@ -21,16 +21,16 @@
         "value": "<Your Subscription ID>"
       },
       "servicePrincipalClient": {
-        "value": "<Your Azure Service Principal name>"
+        "value": "<Your Azure service principal name>"
       }, 
       "servicePrincipalClientSecret": {
-        "value": "<Your Azure Service Principal password>"
+        "value": "<Your Azure service principal password>"
       }, 
       "tenantID": {
         "value": "<Your Azure AD Tenant ID>"
       }, 
       "resourceGroup": {
-        "value": "<Azure Resource Group where all resource to be deployed>"
+        "value": "<Azure resource group where all resource to be deployed>"
       }
     }
 }

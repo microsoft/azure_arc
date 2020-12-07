@@ -28,9 +28,9 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
 
 * In case you don't already have one, you can [Create a free Azure account](https://azure.microsoft.com/en-us/free/).
 
-* Create Azure Service Principal (SP)
+* Create Azure service principal (SP)
 
-    In order for you to deploy the Azure resources using the ARM template, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    In order for you to deploy the Azure resources using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```console
     az login
@@ -206,6 +206,6 @@ Initially, the amount of data will be limited as it take a while for the assessm
 
 ## Cleanup
 
-To delete the entire deployment, simply delete the Resource Group from the Azure portal.
+To delete the entire deployment, simply delete the resource group from the Azure portal.
 
 ![](./25.jpg)
