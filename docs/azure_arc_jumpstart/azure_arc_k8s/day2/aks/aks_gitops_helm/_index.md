@@ -199,7 +199,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
     !["Hello Arc" rolling upgrade](./21.png)
 
-    ![New Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./22.png)
+    ![New side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./22.png)
 
 ## Cleanup
 
