@@ -96,7 +96,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User deploys the Terraform plan which will deploy the GKE cluster and the GCP compute instance VM as well as an Azure Resource Group. The Azure Resource Group is required to host the Azure Arc services you will be able to deploy such as Azure SQL Managed Instance and PostgresSQL Hyperscale.
 
-- In addition, the plan will copy the *faster_sc.yaml* file which will be used to create a Kubernetes Storage Class that will get leveraged by Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
+- In addition, the plan will copy the *local_ssd_sc.yaml* file which will be used to create a Kubernetes Storage Class that will get leveraged by Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
 
 - As part of the Windows Server 2019 VM deployment, there are 4 scripts executions:
 
@@ -107,12 +107,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   3. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
       - Create the *ClientTools.log* file  
       - Install the required tools – az cli, az cli Powershell module, kubernetes-cli (Chocolaty packages)
-      - Download & install the Azure Data Studio & azdata cli
-      - Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      - Apply the *faster_sc.yaml* file on the GKE cluster
-      - Create the *azdata* config file in user Windows profile
-      - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      - Create the Azure Data Studio desktop shortcut
+      - Download Azure Data Studio & Azure Data CLI
       - Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
       - Disable Windows Server Manager
       - Create the logon script
@@ -120,6 +115,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   4. *LogonScript.ps1* script will run on user first logon to Windows and will:
       - Create the *LogonScript.log* file
+      - Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
+      - Create the Azure Data Studio desktop shortcut
+      - Apply the *local_ssd_sc.yaml* file on the GKE cluster
+      - Create the *azdata* config file in user Windows profile
       - Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       - Create Arc Data Controller config file (*control.json*) to setup the use of the Storage Class and Kubernetes LoadBalancer service
       - Deploy the Arc Data Controller using the *TF_VAR* variables values
