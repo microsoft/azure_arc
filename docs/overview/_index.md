@@ -113,11 +113,11 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 
 The following guides are designed to provide scaled onboarding experience to Azure Arc of virtual machines deployed in various platforms and existing environments.
 
-* [Scaled Onboarding VMware vSphere Windows Server VMs to Azure Arc](../azure_arc_jumpstart/azure_arc_servers/sacled_deployment/vmware_scaled_powercli_win/)
+* [Scaled Onboarding VMware vSphere Windows Server VMs to Azure Arc](../azure_arc_jumpstart/azure_arc_servers/scaled_deployment/vmware_scaled_powercli_win/)
 
-* [Scaled Onboarding VMware vSphere Linux VMs to Azure Arc](../azure_arc_jumpstart/azure_arc_servers/sacled_deployment/vmware_scaled_powercli_linux/)
+* [Scaled Onboarding VMware vSphere Linux VMs to Azure Arc](../azure_arc_jumpstart/azure_arc_servers/scaled_deployment/vmware_scaled_powercli_linux/)
 
-* [Scaled Onboarding AWS EC2 instances to Azure Arc using Ansible](../azure_arc_jumpstart/azure_arc_servers/sacled_deployment/aws_scale_ansible/)
+* [Scaled Onboarding AWS EC2 instances to Azure Arc using Ansible](../azure_arc_jumpstart/azure_arc_servers/scaled_deployment/aws_scaled_ansible/)
 
 ## Azure Arc enabled SQL Server
 
