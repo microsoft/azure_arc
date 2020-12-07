@@ -98,9 +98,9 @@ In order for Terraform to create resources in AWS, we will need to create a new 
 
 ## Option 1- Creating a sample AWS server inventory and Ansible control server using Terraform and onboarding the servers to Azure Arc
 
-**Note: If you already have an existing AWS server inventory and Ansible server, skip below to [Option 2](#option2).**
+**Note: If you already have an existing AWS server inventory and Ansible server, skip below to Option 2.**
 
-## Configure Terraform
+### Configure Terraform
 
 Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on your Azure subscription and tenant, the Azure service principal, and the AWS IAM user and keys you just created.
 
@@ -129,7 +129,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
     ![Screenshot of terraform init being run](./01.png)
 
-## Deploy server infrastructure
+### Deploy server infrastructure
 
 * From the *azure_arc_servers_jumpstart/aws/scaled_deployment/ansible/terraform* directory, run ```terraform apply --auto-approve``` and wait for the plan to finish. Upon successful completion, you will have four (4) Windows Server 2019 servers, four (4) Ubuntu servers, and one (1) CentOS 7 Ansible control server.
 
@@ -137,7 +137,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
     ![Screenshot of AWS console showing EC2 instances](./02.png)
 
-## Run the Ansible playbook to onboard the AWS servers as Azure Arc enabled servers
+### Run the Ansible playbook to onboard the AWS servers as Azure Arc enabled servers
 
 * When the Terraform plan completes, it will display the public IP of the Ansible control server in an output variable named *ansible_ip*. SSH into the Ansible server by running the ```ssh centos@XX.XX.XX.XX``` where XX.XX.XX.XX is substituted for your Ansible server's IP address.
 
@@ -172,7 +172,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
     ![Screenshot of Azure Portal showing onboarded Azure Arc enabled servers](./06.png)
 
-## Clean up environment by deleting resources
+### Clean up environment by deleting resources
 
 To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
 
@@ -180,9 +180,9 @@ To delete all the resources you created as part of this demo use the ```terrafor
 
 ## Option 2 - Onboarding an existing AWS server inventory to Azure Arc using your own Ansible control server
 
-> **Note: If you do not have an existing AWS server inventory and Ansible server, navigate back to [Option 1]**
+> **Note: If you do not have an existing AWS server inventory and Ansible server, navigate back to Option 1**
 
-## Review provided Ansible configuration and playbook
+### Review provided Ansible configuration and playbook
 
 Navigate to the *ansible_config* directory and review the provided configuration. The provided configuration contains a basic *ansible.cfg* file. This file enables the [amazon.aws.aws_ec2](https://docs.ansible.com/ansible/latest/collections/amazon/aws/aws_ec2_inventory.html) Ansible plugin which dynamically loads your server inventory by using an AWS IAM role. Ensure that the IAM role you are using has sufficient privileges to access the inventory you wish to onboard.
 
