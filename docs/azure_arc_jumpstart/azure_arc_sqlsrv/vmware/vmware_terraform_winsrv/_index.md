@@ -25,9 +25,9 @@ By the end of the guide, you will have a VMware vSphere VM installed with Window
 
 * A VMware vCenter Server user with [permissions to deploy](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.vm_admin.doc/GUID-8254CD05-CC06-491D-BA56-A773A32A8130.html) a Virtual Machine from a Template in the vSphere Web Client.
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect the VMware vSphere virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the VMware vSphere virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```terminal
     az login
@@ -52,13 +52,13 @@ By the end of the guide, you will have a VMware vSphere VM installed with Window
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 ### Preparing a Window Server VMware vSphere VM Template
 
 Before using the below guide to deploy a Windows Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](../../../azure_arc_servers/docs/vmware/vmware_terraform_winsrv) will instruct you how to easily create such a template using VMware vSphere 6.5 and above. 
 
-**The Terraform plan leveraged the *remote-exec* provisioner which uses the WinRM protocol to copy and execute the required Azure Arc script. To allow WinRM connectivity to the VM, run the [*allow_winrm*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/scripts/allow_winrm.ps1) Powershell script on your VM before converting it to template.** 
+**The Terraform plan leveraged the *remote-exec* provisioner which uses the WinRM protocol to copy and execute the required Azure Arc script. To allow WinRM connectivity to the VM, run the [*allow_winrm*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/scripts/allow_winrm.ps1) PowerShell script on your VM before converting it to template.** 
 
 **Note:** If you already have a Windows Server VM template it is still recommended to use the guide as a reference.
 
@@ -92,21 +92,21 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
-Before executing the Terraform plan, you must set the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and your VMware vSphere environment.
+Before executing the Terraform plan, you must set the environment variables which will be used by the plan. These variables are based on the Azure service principal you've just created, your Azure subscription and tenant, and your VMware vSphere environment.
 
-* Retrieve your Azure Subscription ID and tenant ID using the `az account list` command.
+* Retrieve your Azure subscription ID and tenant ID using the `az account list` command.
 
 * The Terraform plan creates resources in both Microsoft Azure and VMware vSphere. It then executes a script on the virtual machine to install all the necessary artifacts. 
 
 Both the script and the Terraform plan itself requires certain information about your VMware vSphere and Azure environments. Edit variables according to your environment and export it using the below commands
 
 ```bash
-export TF_VAR_subId='Your Azure Subscription ID'
-export TF_VAR_servicePrincipalAppId='Your Azure Service Principal App ID'
-export TF_VAR_servicePrincipalSecret='Your Azure Service Principal App Password'
+export TF_VAR_subId='Your Azure subscription ID'
+export TF_VAR_servicePrincipalAppId='Your Azure service principal App ID'
+export TF_VAR_servicePrincipalSecret='Your Azure service principal App Password'
 export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
 export TF_VAR_location='Azure Region'
-export TF_VAR_resourceGroup='Azure Resource Group Name'
+export TF_VAR_resourceGroup='Azure resource group name'
 export TF_VAR_vsphere_datacenter='VMware vSphere Datacenter Name'
 export TF_VAR_vsphere_datastore='VMware vSphere Datastore Name'
 export TF_VAR_vsphere_resource_pool='VMware vSphere Cluster or Resource Pool Name'
@@ -135,7 +135,7 @@ export TF_VAR_admin_password='Guest OS Admin Password'
     terraform apply --auto-approve
     ``` 
 
-Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure Resource Group will be created. 
+Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure resource group will be created. 
 
 ![](./02.jpg)
 
@@ -209,6 +209,6 @@ Initially, the amount of data will be limited as it take a while for the assessm
 
 ## Cleanup
 
-To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the VMware vSphere VM and the Azure Resource Group along with it's resources.
+To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the VMware vSphere VM and the Azure resource group along with it's resources.
 
 ![](./26.jpg)

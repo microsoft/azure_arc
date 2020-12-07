@@ -25,9 +25,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-## Create Azure Service Principal (SP)   
+## Create Azure service principal (SP)   
 
-* To connect the AWS virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following commands:
+* To connect the AWS virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the following commands:
 
     ```bash
     az login
@@ -47,7 +47,7 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 ## Create an AWS identity
 
@@ -87,15 +87,15 @@ In order for Terraform to create resources in AWS, we will need to create a new 
 
 ## Configure Terraform
 
-Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on your Azure subscription and tenant, the Azure Service Principal, and the AWS IAM user and keys you just created.
+Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on your Azure subscription and tenant, the Azure service principal, and the AWS IAM user and keys you just created.
 
-* Retrieve your Azure Subscription ID and tenant ID using the ```az account list``` command.
+* Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command.
 
 * The Terraform plan creates resources in both Microsoft Azure and AWS. It then executes a script on an AWS EC2 virtual machine to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your AWS and Azure environments. Edit [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/aws/AL2/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
     
-    * TF_VAR_subscription_id=Your Azure Subscription ID
-    * TF_VAR_client_id=Your Azure Service Principal app id
-    * TF_VAR_client_secret=Your Azure Service Principal password
+    * TF_VAR_subscription_id=Your Azure subscription ID
+    * TF_VAR_client_id=Your Azure service principal app id
+    * TF_VAR_client_secret=Your Azure service principal password
     * TF_VAR_tenant_id=Your Azure tenant ID
     * AWS_ACCESS_KEY_ID=AWS access key
     * AWS_SECRET_ACCESS_KEY=AWS secret key
@@ -116,7 +116,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 ## Deployment
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have an AWS Amazon Linux 2 VM deployed and connected as a new Azure Arc enabled server inside a new Resource Group.
+* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have an AWS Amazon Linux 2 VM deployed and connected as a new Azure Arc enabled server inside a new resource group.
 
 * Open the Azure portal and navigate to the resource group "Arc-Servers-Demo". The virtual machine created in AWS will be visible as a resource.
 

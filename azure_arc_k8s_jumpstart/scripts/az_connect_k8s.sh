@@ -2,13 +2,13 @@
 
 sudo apt-get update
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
 # Installing Helm 3

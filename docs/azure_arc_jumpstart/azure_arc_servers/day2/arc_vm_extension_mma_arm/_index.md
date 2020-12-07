@@ -40,9 +40,9 @@ Please review the [Azure Monitor Supported OS documentation](https://docs.micros
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect a VM or bare-metal server to Azure Arc, Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a VM or bare-metal server to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
   ```bash
     az login
@@ -61,7 +61,7 @@ Please review the [Azure Monitor Supported OS documentation](https://docs.micros
     }
     ```
     
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
 * You will also need to have a Log Analytics Workspace deployed. You can automate the deployment by editing the ARM template [parameters file](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/extensions/arm/log_analytics-template.parameters.json) and provide a name and location for your workspace. 
 
@@ -70,12 +70,12 @@ Please review the [Azure Monitor Supported OS documentation](https://docs.micros
 To deploy the ARM template, navigate to the "deployment folder"-***../extensions/arm*** and run the below command:
 
   ```bash
-    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    az deployment group create --resource-group <Name of the Azure resource group> \
     --template-file <The *log_analytics-template.json* template file location> \
     --parameters <The *log_analytics-template.parameters.json* template file location>
   ```
 
-## Azure Arc enabled Servers Microsoft Monitoring Agent Extension Deployment
+## Azure Arc enabled servers Microsoft Monitoring Agent Extension Deployment
 
 * Edit the [*extensions parameters file*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/extensions/arm/mma-template.parameters.json) 
 
@@ -99,7 +99,7 @@ To deploy the ARM template, navigate to the "deployment folder"-***../extensions
 * Choose the ARM template that matches your Operating System, for [*Windows*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/extensions/arm/mma-template-windows.json) and [*Linux*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/extensions/arm/mma-template-linux.json), deploy the template by running the following command: 
 
     ```bash
-    az deployment group create --resource-group <Name of the Azure Resource Group> \
+    az deployment group create --resource-group <Name of the Azure resource group> \
     --template-file <The *mma-template.json* template file location> \
     --parameters <The *mma-temaplte.parameters.json* template file location>
     ```
@@ -128,6 +128,6 @@ Complete the following steps to clean up your environment.
 * Remove the Log Analytics workspace by executing the following command in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
     ```bash
-    az monitor log-analytics workspace delete --resource-group <Name of the Azure Resource Group> --workspace-name <Log Analytics Workspace Name> --yes
+    az monitor log-analytics workspace delete --resource-group <Name of the Azure resource group> --workspace-name <Log Analytics Workspace Name> --yes
     ```
     

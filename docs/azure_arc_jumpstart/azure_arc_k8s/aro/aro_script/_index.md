@@ -13,7 +13,7 @@ The following is a guide on how to use the Azure Cloud Shell to deploy an [Azure
 Ensure the user logging into Azure portal as admin or co-admin rights to be able to create service principals and/or assign policies to those service principals.
 
 ## Deployment
-There are two sets of resources that will be deployed, first is the Azure RedHat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
+There are two sets of resources that will be deployed, first is the Azure Red Hat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
 
 The deployment of all resources is going to be done via Azure Cloud Shell.
 
@@ -43,7 +43,7 @@ The deployment of all resources is going to be done via Azure Cloud Shell.
   
     ![](./image3.png)
     
-  * Close the Cloud Shell and navigate to the Resource Group
+  * Close the Cloud Shell and navigate to the resource group
 
     ![](./image4.png)
 

@@ -278,7 +278,7 @@ az login --service-principal --username $env:servicePrincipalAppId --password $e
 # Set Log Analytics Workspace Environment Variables
 $WorkspaceName = "log-analytics-" + (Get-Random -Maximum 99999)
 
-# Get the Resource Group
+# Get the resource group
 Get-AzResourceGroup -Name $env:resourceGroup -ErrorAction Stop -Verbose
 
 # Create the workspace

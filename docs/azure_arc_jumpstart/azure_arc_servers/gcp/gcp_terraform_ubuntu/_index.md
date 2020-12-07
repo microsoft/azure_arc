@@ -45,9 +45,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Finally, make sure your SSH keys are available in *~/.ssh* and named *id_rsa.pub* and *id_rsa*. If you followed the ssh-keygen guide above to create your key then this should already be setup correctly. If not, you may need to modify [*main.tf*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/gcp/ubuntu/terraform/main.tf) to use a key with a different path.
 
-* Create Azure Service Principal (SP)   
+* Create Azure service principal (SP)   
 
-    To connect the GCP virtual machine to Azure Arc, an Azure Service Principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the GCP virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```bash
     az login
@@ -70,19 +70,19 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and Resource Group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
 ## Deployment
 
-Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on the Azure Service Principal you've just created, your Azure subscription and tenant, and the GCP project name.
+Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on the Azure service principal you've just created, your Azure subscription and tenant, and the GCP project name.
 
-* Retrieve your Azure Subscription ID and tenant ID using the ```az account list``` command.
+* Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command.
 
 * The Terraform plan creates resources in both Microsoft Azure and Google Cloud. It then executes a script on a Google Cloud virtual machine to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your Google Cloud and Azure environments. Edit [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_servers_jumpstart/gcp/ubuntu/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
     
-    * TF_VAR_subscription_id=Your Azure Subscription ID
-    * TF_VAR_client_id=Your Azure Service Principal app id
-    * TF_VAR_client_secret=Your Azure Service Principal password
+    * TF_VAR_subscription_id=Your Azure subscription ID
+    * TF_VAR_client_id=Your Azure service principal app id
+    * TF_VAR_client_secret=Your Azure service principal password
     * TF_VAR_tenant_id=Your Azure tenant ID
     * TF_VAR_gcp_project_id=GCP project id
     * TF_VAR_gcp_credentials_filename=GCP credentials json filename
@@ -97,7 +97,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
     ![](./08.png)
 
-* Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have a GCP Ubuntu VM deployed and connected as a new Azure Arc enabled server inside a new Resource Group.
+* Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have a GCP Ubuntu VM deployed and connected as a new Azure Arc enabled server inside a new resource group.
 
 * Open the Azure portal and navigate to the resource group "Arc-GCP-Demo". The virtual machine created in GCP will be visible as a resource.
 

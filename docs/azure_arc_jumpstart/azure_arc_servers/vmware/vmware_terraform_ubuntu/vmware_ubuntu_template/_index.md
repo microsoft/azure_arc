@@ -5,106 +5,109 @@ weight: 1
 description: >
 ---
 
-# Create a VMware vSphere template for Ubuntu Server 18.04
+## Create a VMware vSphere template for Ubuntu Server 18.04
 
-The following README will guide you on how to create an Ubuntu Server 18.04 VMware vSphere virtual machine template. 
+The following README will guide you on how to create an Ubuntu Server 18.04 VMware vSphere virtual machine template.
 
 ## Prerequisites
 
-**Note:** This guide assumes that you have some VMware vSphere familiarity. It is also does not designed to go over either VMware and/or Ubuntu best-practices. 
+> **Note: This guide assumes that you have some VMware vSphere familiarity. It is also does not designed to go over either VMware and/or Ubuntu best-practices.**
 
 * [Download the latest Ubuntu Server 18.04 ISO file](https://releases.ubuntu.com/18.04/)
 
 * VMware vSphere 6.5 and above
 
-* Although it can be used locally, for faster deployment, it is recommended to upload the file to a vSphere datastore or to vCenter Content Library. 
+* Although it can be used locally, for faster deployment, it is recommended to upload the file to a vSphere datastore or to vCenter Content Library.
 
 ## Creating Ubuntu 18.04 VM Template
 
 ### Deploying & Installing Ubuntu
 
-![](./01.png)
+* Deploy new virtual machine
 
-![](./02.png)
+    ![Create new VMware vSphere VM](./01.png)
 
-![](./03.png)
+    ![Create new VMware vSphere VM](./02.png)
 
-![](./04.png)
+    ![Create new VMware vSphere VM](./03.png)
 
-![](./05.png)
+    ![Create new VMware vSphere VM](./04.png)
 
-![](./06.png)
+    ![Create new VMware vSphere VM](./05.png)
 
-Make sure to select *Ubuntu Linux (64-bit)* as the Guest OS. 
+    ![Create new VMware vSphere VM](./06.png)
 
-![](./07.png)
+* Make sure to select *Ubuntu Linux (64-bit)* as the Guest OS.
 
-Point to the Ubuntu Server ISO file location. 
+    ![Ubuntu Linux (64-bit) Guest OS](./07.png)
 
-![](./08.png)
+* Point to the Ubuntu Server ISO file location.
 
-![](./09.png)
+    ![Create new VMware vSphere VM](./08.png)
 
-Power-on the VM and start the Ubuntu installation. No specific instructions here but:
-1. (Optional) Consider using static IP 
-2. Install OpenSSH server
+    ![Create new VMware vSphere VM](./09.png)
 
-![](./10.png)
+* Power-on the VM and start the Ubuntu installation. No specific instructions here but:
 
-![](./11.png)
+    * (Optional) Consider using static IP
+    * Install OpenSSH server
 
-![](./12.png)
+    ![Power-on the VM](./10.png)
 
-![](./13.png)
+    ![Ubuntu installation](./11.png)
 
-![](./14.png)
+    ![Ubuntu installation](./12.png)
 
-![](./15.png)
+    ![Ubuntu installation](./13.png)
 
-![](./16.png)
+    ![Ubuntu installation](./14.png)
 
-![](./17.png)
+    ![Ubuntu installation](./15.png)
 
-![](./18.png)
+    ![Ubuntu installation](./16.png)
 
-![](./19.png)
+    ![Ubuntu installation](./17.png)
 
-![](./20.png)
+    ![Ubuntu installation](./18.png)
 
-![](./21.png)
+    ![Ubuntu installation](./19.png)
 
-![](./22.png)
+    ![Ubuntu installation](./20.png)
 
-![](./23.png)
+    ![Ubuntu installation](./21.png)
 
-![](./24.png)
+    ![Ubuntu installation](./22.png)
 
-![](./25.png)
+    ![Ubuntu installation](./23.png)
 
-![](./26.png)
+    ![Ubuntu installation](./24.png)
 
-![](./27.png)
+    ![Ubuntu installation](./25.png)
 
-![](./28.png)
+    ![Ubuntu installation](./26.png)
 
-![](./29.png)
+    ![Ubuntu installation](./27.png)
 
-![](./30.png)
+    ![Ubuntu installation](./28.png)
 
-### Post-installation 
+    ![Ubuntu installation](./29.png)
+
+    ![Ubuntu installation](./30.png)
+
+### Post-installation
 
 Before converting the VM to a template, few actions are needed.
 
 * It's better to have your OS packages up-to-date
 
-    ```bash
+    ```console
     sudo apt-get update
     sudo apt-get upgrade -y
     ```
 
 * Prevent cloudconfig from preserving the original hostname and reset the hostname
 
-    ```bash
+    ```console
     sudo sed -i 's/preserve_hostname: false/preserve_hostname: true/g' /etc/cloud/cloud.cfg
     sudo truncate -s0 /etc/hostname
     sudo hostnamectl set-hostname localhost
@@ -112,21 +115,21 @@ Before converting the VM to a template, few actions are needed.
 
 * Remove the current network configuration
 
-    ```bash
+    ```console
     sudo rm /etc/netplan/50-cloud-init.yaml
     ```
 
 * Clean shell history and shutdown the VM
 
-    ```bash
+    ```console
     cat /dev/null > ~/.bash_history && history -c
     sudo shutdown now
     ```
 
 ### Convert to Template
 
-Reduce the CPU & Memory resources to the minimum and convert the VM to template.
+Reduce the VM CPU count & memory resources to the minimum and convert the VM to template, switch the CD/DVD drive to client device as well disconnect it and convert the VM to template.
 
-![](./31.png)
+![Reduce the VM CPU count & Memory](./31.png)
 
-![](./32.png)
+![Convert the VM to template](./32.png)
