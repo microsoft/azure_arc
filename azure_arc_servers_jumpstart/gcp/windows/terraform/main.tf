@@ -1,6 +1,6 @@
 // Terraform plugin for creating random ids
 
-// An Azure Resource Group
+// An Azure resource group
 resource "azurerm_resource_group" "azure_rg" {
   name     = var.azure_resource_group
   location = var.azure_location

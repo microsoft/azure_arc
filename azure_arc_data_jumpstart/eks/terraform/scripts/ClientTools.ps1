@@ -86,7 +86,7 @@ azdata --version
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
-start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
+start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
 azdata arc dc config init --source azure-arc-eks --path "C:\tmp\custom"
 if(($env:DOCKER_REGISTRY -ne $NULL) -or ($env:DOCKER_REGISTRY -ne ""))
 {
