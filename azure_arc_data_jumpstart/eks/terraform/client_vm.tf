@@ -114,7 +114,7 @@ resource "aws_instance" "windows" {
       timeout  = "5m"
       type     = "winrm"
       user     = "Administrator"
-      password = rsadecrypt(self.password_data, file("terraform.pem"))
+      password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
   }
 
@@ -129,7 +129,7 @@ resource "aws_instance" "windows" {
       timeout  = "5m"
       type     = "winrm"
       user     = "Administrator"
-      password = rsadecrypt(self.password_data, file("terraform.pem"))
+      password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
   }
 
@@ -144,7 +144,7 @@ resource "aws_instance" "windows" {
       timeout  = "5m"
       type     = "winrm"
       user     = "Administrator"
-      password = rsadecrypt(self.password_data, file("terraform.pem"))
+      password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
   }
 
@@ -159,7 +159,7 @@ resource "aws_instance" "windows" {
       timeout  = "5m"
       type     = "winrm"
       user     = "Administrator"
-      password = rsadecrypt(self.password_data, file("terraform.pem"))
+      password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
   }
 
@@ -175,7 +175,7 @@ resource "aws_instance" "windows" {
       timeout  = "5m"
       type     = "winrm"
       user     = "Administrator"
-      password = rsadecrypt(self.password_data, file("terraform.pem"))
+      password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
   }
 
@@ -191,7 +191,7 @@ resource "aws_instance" "windows" {
       timeout  = "5m"
       type     = "winrm"
       user     = "Administrator"
-      password = rsadecrypt(self.password_data, file("terraform.pem"))
+      password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
   }
 
