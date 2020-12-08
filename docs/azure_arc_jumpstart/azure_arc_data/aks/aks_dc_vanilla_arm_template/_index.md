@@ -16,9 +16,9 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 * Clone this repo
 
-```console
-git clone https://github.com/microsoft/azure_arc.git
-```
+    ```console
+    git clone https://github.com/microsoft/azure_arc.git
+    ```
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
