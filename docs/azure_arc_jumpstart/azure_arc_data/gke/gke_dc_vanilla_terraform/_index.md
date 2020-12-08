@@ -116,7 +116,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 * User deploys the Terraform plan which will deploy the GKE cluster and the GCP compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services you will be able to deploy such as Azure SQL Managed Instance and PostgreSQL Hyperscale.
 
-* In addition, the plan will copy the *local_ssd_sc.yaml* file which will be used to create a Kubernetes Storage Class that will get leveraged by Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
+* In addition, the plan will copy the *local_ssd_sc.yaml* file which will be used to create a Kubernetes Storage Class backed by SSD disks that will be used by Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
+
+  > **Note: Depending on the GCP region, make sure you do not have any [SSD quota limit in the region](https://cloud.google.com/compute/quotas), otherwise, the Azure Arc Data Controller kubernetes resources will fail to deploy.**
 
 * As part of the Windows Server 2019 VM deployment, there are 4 scripts executions:
 
@@ -125,24 +127,21 @@ For you to get familiar with the automation and deployment flow, below is an exp
   2. *password_reset.ps1* script will be created automatically as part of the Terraform plan runtime and is responsible on creating the Windows username & password.
 
   3. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
-  
       * Create the *ClientTools.log* file  
-      * Install the required tools – az cli, az cli PowerShell module, kubernetes-cli (Chocolaty packages)
-      * Download & install the Azure Data Studio & azdata cli
-      * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      * Apply the *local_ssd_sc.yaml* file on the GKE cluster
-      * Create the *azdata* config file in user Windows profile
-      * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      * Create the Azure Data Studio desktop shortcut
-      * Download the *DC_Cleanup* and *DC_Deploy* PowerShell scripts
+      * Install the required tools – az cli, az cli Powershell module, kubernetes-cli (Chocolaty packages)
+      * Download Azure Data Studio & Azure Data CLI
+      * Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
       * Disable Windows Server Manager
       * Create the logon script
       * Create the Windows schedule task to run the logon script at first login
 
   4. *LogonScript.ps1* script will run on user first logon to Windows and will:
-
       * Create the *LogonScript.log* file
-      * Open another PowerShell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
+      * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
+      * Create the Azure Data Studio desktop shortcut
+      * Apply the *local_ssd_sc.yaml* file on the GKE cluster
+      * Create the *azdata* config file in user Windows profile
+      * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       * Create Arc Data Controller config file (*control.json*) to setup the use of the Storage Class and Kubernetes LoadBalancer service
       * Deploy the Arc Data Controller using the *TF_VAR* variables values
       * Unregister the logon script Windows schedule task so it will not run after first login
@@ -231,6 +230,10 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   ![PowerShell login script run](./33.png)
 
+  ![PowerShell login script run](./34.png)
+
+  ![PowerShell login script run](./35.png)
+
 * Using PowerShell, login to the Data Controller and check it's health using the below commands.
 
     ```powershell
@@ -238,30 +241,28 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
     azdata arc dc status show
     ```
 
-  ![azdata login](./34.png)
+  ![azdata login](./36.png)
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Azure Data Studio shortcut](./35.png)
+  ![Azure Data Studio shortcut](./37.png)
 
-  ![Azure Data Studio extension](./36.png)
+  ![Azure Data Studio extension](./38.png)
 
 ## Cleanup
 
 * To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is ~2-3min long**.
 
-  ![DC_Cleanup PowerShell script run](./37.png)
+  ![DC_Cleanup PowerShell script run](./39.png)
   
-  ![DC_Cleanup PowerShell script run](./38.png)
-
 ## Re-Deploy Azure Arc Data Controller
 
 In case you deleted the Azure Arc Data Controller from the GKE cluster, you can re-deploy it by running the *DC_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long**.
 
-  ![Re-Deploy Azure Arc Data Controller PowerShell script](./39.png)
+  ![Re-Deploy Azure Arc Data Controller PowerShell script](./40.png)
 
 ## Delete the deployment
 
 To completely delete the environment, follow the below steps run the ```terraform destroy --auto-approve``` command which will delete all of the GCP resources as well as the Azure resource group. **The *terraform destroy* run time is approximately ~5-6min long**.
 
-  ![terraform destroy](./40.png)
+  ![terraform destroy](./41.png)
