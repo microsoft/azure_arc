@@ -5,7 +5,7 @@ weight: 1
 description: >-
 ---
 
-# Onboard a VMware vSphere-based Windows Server with SQL to Azure Arc
+## Onboard a VMware vSphere-based Windows Server with SQL to Azure Arc
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a VMware vSphere virtual machine and connect it as an Azure Arc enabled SQL server resource.
 
@@ -15,7 +15,7 @@ By the end of the guide, you will have a VMware vSphere VM installed with Window
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -25,24 +25,24 @@ By the end of the guide, you will have a VMware vSphere VM installed with Window
 
 * A VMware vCenter Server user with [permissions to deploy](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.vm_admin.doc/GUID-8254CD05-CC06-491D-BA56-A773A32A8130.html) a Virtual Machine from a Template in the vSphere Web Client.
 
-* Create Azure service principal (SP)   
+* Create Azure service principal (SP)
 
-    To connect the VMware vSphere virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the VMware vSphere virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```terminal
+    ```console
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```terminal
+    ```console
     az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
     ```
 
     Output should look like this:
 
-    ```
+    ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServers",
@@ -52,15 +52,15 @@ By the end of the guide, you will have a VMware vSphere VM installed with Window
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
 ### Preparing a Window Server VMware vSphere VM Template
 
-Before using the below guide to deploy a Windows Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](../../../azure_arc_servers/docs/vmware/vmware_terraform_winsrv) will instruct you how to easily create such a template using VMware vSphere 6.5 and above. 
+Before using the below guide to deploy a Windows Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_winsrv/_index.md) will instruct you how to easily create such a template using VMware vSphere 6.5 and above.
 
-**The Terraform plan leveraged the *remote-exec* provisioner which uses the WinRM protocol to copy and execute the required Azure Arc script. To allow WinRM connectivity to the VM, run the [*allow_winrm*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/scripts/allow_winrm.ps1) PowerShell script on your VM before converting it to template.** 
+**The Terraform plan uses the *remote-exec* provisioner which uses the WinRM protocol to copy and execute the required Azure Arc script. To allow WinRM connectivity to the VM, run the [*allow_winrm*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/scripts/allow_winrm.ps1) PowerShell script on your VM before converting it to template.**
 
-**Note:** If you already have a Windows Server VM template it is still recommended to use the guide as a reference.
+> **Note: If you already have a Windows Server VM template it is still recommended to use the guide as a reference.**
 
 ## Automation Flow
 
@@ -68,7 +68,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 1. User is exporting the Terraform environment variables (1-time export) which are being used throughout the deployment.
 
-2. User is executing the Terraform plan which will deploy the VM as well as generate and execute the [*sql.ps1*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/scripts/sql.ps1.tmpl) script. This script will:
+2. User is executing the Terraform plan which will deploy the VM as well as generate and execute the [*sql.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/scripts/sql.ps1.tmpl) script. This script will:
 
     1. Install Azure CLI, Azure PowerShell module and SQL Server Management Studio (SSMS) [Chocolaty packages](https://chocolatey.org/).
 
@@ -78,7 +78,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         * Create SQL Server Management Studio Desktop shortcut
         * Restore [*AdventureWorksLT2019*](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) Sample Database
         * Onboard both the server and SQL to Azure Arc
-        * Deploy Azure Log Analytics and a workspace 
+        * Deploy Azure Log Analytics and a workspace
         * Install the [Microsoft Monitoring Agent (MMA) agent](https://docs.microsoft.com/en-us/services-hub/health/mma-setup)
         * Enable Log Analytics Solutions
         * Deploy MMA Azure Extension ARM Template from within the VM
@@ -96,90 +96,90 @@ Before executing the Terraform plan, you must set the environment variables whic
 
 * Retrieve your Azure subscription ID and tenant ID using the `az account list` command.
 
-* The Terraform plan creates resources in both Microsoft Azure and VMware vSphere. It then executes a script on the virtual machine to install all the necessary artifacts. 
+* The Terraform plan creates resources in both Microsoft Azure and VMware vSphere. It then executes a script on the virtual machine to install all the necessary artifacts.
 
-Both the script and the Terraform plan itself requires certain information about your VMware vSphere and Azure environments. Edit variables according to your environment and export it using the below commands
+* Both the script and the Terraform plan itself requires certain information about your VMware vSphere and Azure environments. Edit variables according to your environment and export it using the below commands
 
-```bash
-export TF_VAR_subId='Your Azure subscription ID'
-export TF_VAR_servicePrincipalAppId='Your Azure service principal App ID'
-export TF_VAR_servicePrincipalSecret='Your Azure service principal App Password'
-export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
-export TF_VAR_location='Azure Region'
-export TF_VAR_resourceGroup='Azure resource group name'
-export TF_VAR_vsphere_datacenter='VMware vSphere Datacenter Name'
-export TF_VAR_vsphere_datastore='VMware vSphere Datastore Name'
-export TF_VAR_vsphere_resource_pool='VMware vSphere Cluster or Resource Pool Name'
-export TF_VAR_network_cards='VMware vSphere Network Name'
-export TF_VAR_vsphere_folder='VMware vSphere Folder Name'
-export TF_VAR_vsphere_vm_template_name='VMware vSphere VM Template Name'
-export TF_VAR_vsphere_virtual_machine_name='VMware vSphere VM Name'
-export TF_VAR_vsphere_virtual_machine_cpu_count='VMware vSphere VM CPU Count'
-export TF_VAR_vsphere_virtual_machine_memory_size='VMware vSphere VM Memory Size in Megabytes'
-export TF_VAR_domain='Domain'
-export TF_VAR_vsphere_user='VMware vSphere vCenter Admin Username'
-export TF_VAR_vsphere_password='VMware vSphere vCenter Admin Password'
-export TF_VAR_vsphere_server='VMware vSphere vCenter server FQDN/IP'
-export TF_VAR_admin_user='Guest OS Admin Username'
-export TF_VAR_admin_password='Guest OS Admin Password'
-```
+    ```console
+    export TF_VAR_subId='Your Azure subscription ID'
+    export TF_VAR_servicePrincipalAppId='Your Azure service principal App ID'
+    export TF_VAR_servicePrincipalSecret='Your Azure service principal App Password'
+    export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
+    export TF_VAR_location='Azure Region'
+    export TF_VAR_resourceGroup='Azure resource group name'
+    export TF_VAR_vsphere_datacenter='VMware vSphere Datacenter Name'
+    export TF_VAR_vsphere_datastore='VMware vSphere Datastore Name'
+    export TF_VAR_vsphere_resource_pool='VMware vSphere Cluster or Resource Pool Name'
+    export TF_VAR_network_cards='VMware vSphere Network Name'
+    export TF_VAR_vsphere_folder='VMware vSphere Folder Name'
+    export TF_VAR_vsphere_vm_template_name='VMware vSphere VM Template Name'
+    export TF_VAR_vsphere_virtual_machine_name='VMware vSphere VM Name'
+    export TF_VAR_vsphere_virtual_machine_cpu_count='VMware vSphere VM CPU Count'
+    export TF_VAR_vsphere_virtual_machine_memory_size='VMware vSphere VM Memory Size in Megabytes'
+    export TF_VAR_domain='Domain'
+    export TF_VAR_vsphere_user='VMware vSphere vCenter Admin Username'
+    export TF_VAR_vsphere_password='VMware vSphere vCenter Admin Password'
+    export TF_VAR_vsphere_server='VMware vSphere vCenter server FQDN/IP'
+    export TF_VAR_admin_user='Guest OS Admin Username'
+    export TF_VAR_admin_password='Guest OS Admin Password'
+    ```
 
-**Note: Use the Terraform plan [*variables.tf*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/variables.tf) file for more details around VMware vSphere vars structure if needed**
+    > **Note: Use the Terraform plan [*variables.tf*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/variables.tf) file for more details around VMware vSphere vars structure if needed**
 
-![](./01.jpg)
+    ![Screenshot of environment variables exporting in shell](./01.jpg)
 
-* From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan. 
+* From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan.
 
-    ```terminal
+    ```console
     terraform init
     terraform apply --auto-approve
-    ``` 
+    ```
 
-Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure resource group will be created. 
+    Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure resource group will be created.
 
-![](./02.jpg)
+    ![Screenshot of terraform plan completing](./02.jpg)
 
-![](./03.jpg)
+    ![Screenshot of SQL Server in vCenter](./03.jpg)
 
-![](./04.jpg)
+    ![Screenshot of Azure Portal showing empty resource group](./04.jpg)
 
-* og in to the VM (**using data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed. 
+* Log in to the VM (**using data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed.
 
-**Note: The script runtime will take ~10-15min to complete**
+    > **Note: The script runtime will take ~10-15min to complete**
 
-![](./05.jpg)
+    ![Screenshot of PowerShell script being run](./05.jpg)
 
-![](./06.jpg)
+    ![Screenshot of PowerShell script being run](./06.jpg)
 
-![](./07.jpg)
+    ![Screenshot of PowerShell script being run](./07.jpg)
 
-![](./08.jpg)
+    ![Screenshot of PowerShell script being run](./08.jpg)
 
-![](./09.jpg)
+    ![Screenshot of PowerShell script being run](./09.jpg)
 
-![](./10.jpg)
+    ![Screenshot of PowerShell script being run](./10.jpg)
 
-![](./11.jpg)
+    ![Screenshot of PowerShell script being run](./11.jpg)
 
-![](./12.jpg)
+    ![Screenshot of PowerShell script being run](./12.jpg)
 
-![](./13.jpg)
+    ![Screenshot of PowerShell script being run](./13.jpg)
 
 * Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed as well.
 
-![](./14.jpg)
+    ![Screenshot of SQL Server Management Studio](./14.jpg)
 
-![](./15.jpg)
+    ![Screenshot of SQL Server Management Studio](./15.jpg)
 
 * In the Azure Portal, notice you now have an Azure Arc enabled Server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL resource and Azure Log Analytics deployed.
 
-![](./16.jpg)
+    ![Screenshot of Azure Portal showing Azure Arc enabled SQL server resources](./16.jpg)
 
-![](./17.jpg)
+    ![Screenshot of Azure Portal showing Azure Arc enabled SQL server resources](./17.jpg)
 
-![](./18.jpg)
+    ![Screenshot of Azure Portal showing Azure Arc enabled SQL server resources](./18.jpg)
 
-![](./19.jpg)
+    ![Screenshot of Azure Portal showing Azure Arc enabled SQL server resources](./19.jpg)
 
 ## Azure SQL Assessment
 
@@ -187,28 +187,28 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 
 * On the SQL Azure Arc resource, click on "Environment Health" followed by clicking the "Download configuration script".
 
-Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you can safely and delete the downloaded *AddSqlAssessment.ps1* file.
+    Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you can safely and delete the downloaded *AddSqlAssessment.ps1* file.
 
-Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
+    Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
-![](./20.jpg)
+    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./20.jpg)
 
-![](./21.jpg)
+    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./21.jpg)
 
-![](./22.jpg)
+    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./22.jpg)
 
 * After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
-Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
+    Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-![](./23.jpg)
+    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./23.jpg)
 
-![](./24.jpg)
+    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./24.jpg)
 
-![](./25.jpg)
+    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./25.jpg)
 
 ## Cleanup
 
 To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the VMware vSphere VM and the Azure resource group along with it's resources.
 
-![](./26.jpg)
+![Screenshot showing terraform destroy being run](./26.jpg)
