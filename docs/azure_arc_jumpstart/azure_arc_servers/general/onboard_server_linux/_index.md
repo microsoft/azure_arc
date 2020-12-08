@@ -5,7 +5,7 @@ weight: 1
 description: >
 ---
 
-# Onboard an existing Linux server with Azure Arc
+## Onboard an existing Linux server with Azure Arc
 
 The following README will guide you on how to connect an Linux server to Azure Arc using a simple shell script.
 
@@ -13,22 +13,24 @@ The following README will guide you on how to connect an Linux server to Azure A
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-* Create Azure service principal (SP)   
+* Create Azure service principal (SP)
 
-    To connect a server to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect a server to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```bash
+    ```console
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
+    ```
 
     Output should look like this:
 
-    ```
+    ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServers",
@@ -37,43 +39,43 @@ The following README will guide you on how to connect an Linux server to Azure A
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-    
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
 
-* Create a new Azure resource group where you want your server(s) to show up. 
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
-![](./01.png)
+* Create a new Azure resource group where you want your server(s) to show up.
+
+    ![Screenshot showing Azure Portal with empty resource group](./01.png)
 
 * Download the [az_connect_linux](../scripts/az_connect_linux.sh) shell script.
 
-* Change the environment variables according to your environment. 
+* Change the environment variables according to your environment.
 
-![](./02.png)
+    ![Screenshot showing az_connect_linux shell script](./02.png)
 
 * Copy the script to the designated server using your preferred tool of choice (or copy/paste the script to a new file inside the server). Below example shows copy the script from MacOS to the server using SCP.
 
-![](./03.png)
+    ![Screenshot showing scp being run](./03.png)
 
 ## Deployment
 
-Run the script using the ```. ./az_connect_linux.sh``` command. 
+Run the script using the ```. ./az_connect_linux.sh``` command.
 
-**Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
+> **Note: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
-Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your resource group. 
+Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your resource group.
 
-![](./04.png)
+![Screenshot showing az_connect_linux script being run](./04.png)
 
-![](./05.png)
+![Screenshot showing Azure Portal with Azure Arc enabled resource](./05.png)
 
-![](./06.png)
+![Screenshot showing Azure Portal with Azure Arc enabled resource detail](./06.png)
 
 ## Delete the deployment
 
-The most straightforward way is to delete the server via the Azure Portal, just select server and delete it. 
+The most straightforward way is to delete the server via the Azure Portal, just select server and delete it.
 
-![](./07.png)
+![Screenshot showing delete resource function in Azure Portal](./07.png)
 
 If you want to nuke the entire environment, just delete the Azure resource group.
 
-![](./08.png)
+![Screenshot showing delete resource group function in Azure Portal](./08.png)
