@@ -5,7 +5,7 @@ weight: 1
 description: >-
 ---
 
-# Onboard a GCP VM instance with Windows Server & Microsoft SQL Server to Azure Arc
+## Onboard a GCP VM instance with Windows Server & Microsoft SQL Server to Azure Arc
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Google Cloud Platform (GCP) virtual machine and connect it as an Azure Arc enabled SQL server resource.
 
@@ -15,34 +15,34 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
-    
+
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * [Create a free Google Cloud account](https://cloud.google.com/free) if you don't have one already.
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure service principal (SP)   
+* Create Azure service principal (SP)
 
-    To connect the GCP virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    To connect the GCP virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```terminal
+    ```console
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```terminal
+    ```console
     az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
     ```
 
     Output should look like this:
 
-    ```
+    ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcServers",
@@ -52,40 +52,53 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
     }
     ```
 
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
 ## Create a new GCP Project, IAM Role & Service Account
 
-* Create a new GCP Project, IAM Role & Service Account
-
 In order to deploy resources in GCP, we will create a new GCP Project as well as a service account to allow Terraform to authenticate against GCP APIs and run the plan to deploy resources.
 
-* Browse to https://console.cloud.google.com/ and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
+* Browse to <https://console.cloud.google.com/> and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
-  ![](./01.png)
-  ![](./02.png)
-  ![](./03.png)
+  ![Screenshot showing GCP cloud console dashboard](./01.png)
+
+  ![Screenshot showing GCP console new project creation](./02.png)
+
+  ![Screenshot showing GCP console new project creation](./03.png)
 
 * Enable the Compute Engine API for the project, create a project Owner service account credentials and download the private key JSON file and copy the file to the directory where Terraform files are located. Change the JSON file name (for example *account.json*). The Terraform plan will be using the credentials stored in this file to authenticate against your GCP project.
 
-  ![](./04.png)
-  ![](./05.png)
-  ![](./06.png)
-  ![](./07.png)
-  ![](./08.png)
-  ![](./09.png)
-  ![](./10.png)
-  ![](./11.png)
-  ![](./12.png)
-  ![](./13.png)
-  ![](./14.png)
-  ![](./15.png)
-  ![](./16.png)
+  ![Screenshot showing enabling Compute Engine API in GCP](./04.png)
 
-* Enable the Compute Engine API for the project
+  ![Screenshot showing enabling Compute Engine API in GCP](./05.png)
 
-  ![](./17.png)
-  ![](./18.png)
+  ![Screenshot showing creating a GCP service account](./06.png)
+
+  ![Screenshot showing creating a GCP service account](./07.png)
+
+  ![Screenshot showing creating a GCP service account](./08.png)
+
+  ![Screenshot showing creating a GCP service account](./09.png)
+
+  ![Screenshot showing creating a GCP service account](./10.png)
+
+  ![Screenshot showing creating a GCP service account](./11.png)
+
+  ![Screenshot showing creating a GCP service account key](./12.png)
+
+  ![Screenshot showing creating a GCP service account key](./13.png)
+
+  ![Screenshot showing creating a GCP service account key](./14.png)
+
+  ![Screenshot showing creating a GCP service account key](./15.png)
+
+  ![Screenshot GCP service account key saved to project folder in Visual Studio Code](./16.png)
+
+* Enable the Kubernetes Engine API for the project
+
+  ![Screenshot showing enabling the Kubernetes Engine API](./17.png)
+
+  ![Screenshot showing enabling the Kubernetes Engine API](./18.png)
 
 ## Automation Flow
 
@@ -97,7 +110,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     1. Create an Administrator Windows user account and enabling WinRM on the VM
 
-    2. Generate and execute the [*sql.ps1*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_sqlsrv_jumpstart/gcp/winsrv/terraform/scripts/sql.ps1.tmpl) script. This script will:
+    2. Generate and execute the [*sql.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/gcp/winsrv/terraform/scripts/sql.ps1.tmpl) script. This script will:
 
         1. Install Azure CLI, Azure PowerShell module and SQL Server Management Studio (SSMS) [Chocolaty packages](https://chocolatey.org/).
 
@@ -107,7 +120,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
             * Create SQL Server Management Studio Desktop shortcut
             * Restore [*AdventureWorksLT2019*](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) Sample Database
             * Onboard both the server and SQL to Azure Arc
-            * Deploy Azure Log Analytics and a workspace 
+            * Deploy Azure Log Analytics and a workspace
             * Install the [Microsoft Monitoring Agent (MMA) agent](https://docs.microsoft.com/en-us/services-hub/health/mma-setup)
             * Enable Log Analytics Solutions
             * Deploy MMA Azure Extension ARM Template from within the VM
@@ -123,83 +136,83 @@ Before executing the Terraform plan, you must set the environment variables whic
 
 * Retrieve your Azure subscription ID and tenant ID using the `az account list` command.
 
-* The Terraform plan creates resources in both Microsoft Azure and GCP. It then executes a script on the virtual machine to install all the necessary artifacts. 
+* The Terraform plan creates resources in both Microsoft Azure and GCP. It then executes a script on the virtual machine to install all the necessary artifacts.
 
-Both the script and the Terraform plan itself requires certain information about your GCP and Azure environments. Edit variables according to your environment and export it using the below commands
+  Both the script and the Terraform plan itself requires certain information about your GCP and Azure environments. Edit variables according to your environment and export it using the below commands
 
-```bash
-export TF_VAR_subId='Your Azure subscription ID'
-export TF_VAR_servicePrincipalAppId='Your Azure service principal App ID'
-export TF_VAR_servicePrincipalSecret='Your Azure service principal App Password'
-export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
-export TF_VAR_location='Azure Region'
-export TF_VAR_resourceGroup='Azure resource group name'
-export TF_VAR_gcp_project_id='GCP Project ID'
-export TF_VAR_gcp_credentials_filename='GCP Project credentials filename'
-export TF_VAR_gcp_region='GCP region where resource will be created'
-export TF_VAR_gcp_zone='GCP zone where resource will be created'
-export TF_VAR_gcp_instance_name='GCP VM instance name'
-export TF_VAR_gcp_instance_machine_type='GCP VM instance type'
-export TF_VAR_admin_user='Guest OS Admin Username'
-export TF_VAR_admin_password='Guest OS Admin Password'
-```
+  ```console
+  export TF_VAR_subId='Your Azure subscription ID'
+  export TF_VAR_servicePrincipalAppId='Your Azure service principal App ID'
+  export TF_VAR_servicePrincipalSecret='Your Azure service principal App Password'
+  export TF_VAR_servicePrincipalTenantId='Your Azure tenant ID'
+  export TF_VAR_location='Azure Region'
+  export TF_VAR_resourceGroup='Azure resource group name'
+  export TF_VAR_gcp_project_id='GCP Project ID'
+  export TF_VAR_gcp_credentials_filename='GCP Project credentials filename'
+  export TF_VAR_gcp_region='GCP region where resource will be created'
+  export TF_VAR_gcp_zone='GCP zone where resource will be created'
+  export TF_VAR_gcp_instance_name='GCP VM instance name'
+  export TF_VAR_gcp_instance_machine_type='GCP VM instance type'
+  export TF_VAR_admin_user='Guest OS Admin Username'
+  export TF_VAR_admin_password='Guest OS Admin Password'
+  ```
 
-![](./19.png)
+  ![Screenshot showing exporting environment variables in shell](./19.png)
 
-* From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan. 
+* From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan.
 
-    ```terminal
+    ```console
     terraform init
     terraform apply --auto-approve
-    ``` 
+    ```
 
-Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure resource group will be created. 
+  Once the Terraform plan deployment has completed, a new Windows Server VM will be up & running as well as an empty Azure resource group will be created.
 
-![](./20.png)
+  ![Screenshot showing terraform apply being run](./20.png)
 
-![](./21.png)
+  ![Screenshot showing GCP cloud console with server](./21.png)
 
-![](./22.png)
+  ![Screenshot showing Azure Portal with empty resource group](./22.png)
 
-* Download the RDP file and log in to the VM (**using data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed. 
+* Download the RDP file and log in to the VM (**using data from the *TF_VAR_admin_user* and *TF_VAR_admin_password* environment variables**) which will initiate the *LogonScript* run. Let the script to run it's course and which will also close the PowerShell session when completed.
 
-![](./23.png)
+  ![Screenshot showing link to download RDP file in GCP cloud console](./23.png)
 
-**Note: The script runtime will take ~10-15min to complete**
+  > **Note: The script runtime will take ~10-15min to complete**
 
-![](./24.png)
+  ![Screenshot showing PowerShell script being run in server](./24.png)
 
-![](./25.png)
+  ![Screenshot showing PowerShell script being run in server](./25.png)
 
-![](./26.png)
+  ![Screenshot showing PowerShell script being run in server](./26.png)
 
-![](./27.png)
+  ![Screenshot showing PowerShell script being run in server](./27.png)
 
-![](./28.png)
+  ![Screenshot showing PowerShell script being run in server](./28.png)
 
-![](./29.png)
+  ![Screenshot showing PowerShell script being run in server](./29.png)
 
-![](./30.png)
+  ![Screenshot showing PowerShell script being run in server](./30.png)
 
-![](./31.png)
+  ![Screenshot showing PowerShell script being run in server](./31.png)
 
-![](./32.png)
+  ![Screenshot showing PowerShell script being run in server](./32.png)
 
 * Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed as well.
 
-![](./33.png)
+  ![Screenshot showing SQL Management Studio](./33.png)
 
-![](./34.png)
+  ![Screenshot showing SQL Management Studio](./34.png)
 
-* In the Azure Portal, notice you now have an Azure Arc enabled Server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL resource and Azure Log Analytics deployed.
+* In the Azure Portal, notice you now have an Azure Arc enabled server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL resource and Azure Log Analytics deployed.
 
-![](./35.png)
+  ![Screenshot showing Azure Portal with Azure Arc enabled SQL resources](./35.png)
 
-![](./36.png)
+  ![Screenshot showing Azure Portal with Azure Arc enabled SQL resources](./36.png)
 
-![](./37.png)
+  ![Screenshot showing Azure Portal with Azure Arc enabled SQL resources](./37.png)
 
-![](./38.png)
+  ![Screenshot showing Azure Portal with Azure Arc enabled SQL resources](./38.png)
 
 ## Azure SQL Assessment
 
@@ -207,26 +220,26 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 
 * On the SQL Azure Arc resource, click on "Environment Health" followed by clicking the "Download configuration script".
 
-Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you can safely and delete the downloaded *AddSqlAssessment.ps1* file.
+  Since the *LogonScript* run in the deployment step took care of deploying and installing the required binaries, you can safely and delete the downloaded *AddSqlAssessment.ps1* file.
 
-Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
+  Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
-![](./39.png)
+  ![Screenshot showing Azure Arc enabled SQL Server Environment Health blade](./39.png)
 
-![](./40.png)
+  ![Screenshot showing Azure Arc enabled SQL Server Environment Health blade](./40.png)
 
-![](./41.png)
+  ![Screenshot showing Azure Arc enabled SQL Server Environment Health blade](./41.png)
 
 * After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
-Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
+  Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-![](./42.png)
+  ![Screenshot showing SQL Assessment Results in Azure Portal](./42.png)
 
-![](./43.png)
+  ![Screenshot showing SQL Assessment Results in Azure Portal](./43.png)
 
 ## Cleanup
 
 To delete the environment, use the *`terraform destroy --auto-approve`* command which will delete the GCP and the Azure resources.
 
-![](./44.png)
+![Screenshot showing terraform destroy being run](./44.png)
