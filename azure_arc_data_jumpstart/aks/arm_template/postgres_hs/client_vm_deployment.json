@@ -363,7 +363,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/ClientTools.ps1"
+                "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/ClientTools.ps1"
               ],
               "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalClientId ', parameters('servicePrincipalClientId'), ' -servicePrincipalClientSecret ', parameters('servicePrincipalClientSecret'), ' -adminUsername ', parameters('adminUsername'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'), ' -clusterName ', parameters('clusterName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -REGISTRY_USERNAME ', parameters('REGISTRY_USERNAME'), ' -REGISTRY_PASSWORD ', parameters('REGISTRY_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -DOCKER_REGISTRY ', parameters('DOCKER_REGISTRY'), ' -DOCKER_REPOSITORY ', parameters('DOCKER_REPOSITORY'), ' -DOCKER_TAG ', parameters('DOCKER_TAG'), ' -POSTGRES_NAME ', parameters('POSTGRES_NAME'), ' -POSTGRES_WORKER_NODE_COUNT ', parameters('POSTGRES_WORKER_NODE_COUNT'), ' -POSTGRES_DATASIZE ', parameters('POSTGRES_DATASIZE'), ' -POSTGRES_SERVICE_TYPE ', parameters('POSTGRES_SERVICE_TYPE'))]" 
             }            
