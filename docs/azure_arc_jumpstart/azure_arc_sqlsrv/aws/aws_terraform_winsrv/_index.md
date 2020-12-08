@@ -69,7 +69,7 @@ Create AWS User IAM Key. An access key grants programmatic access to your resour
 
     ![Create AWS IAM Role & Key](./03.png)
 
-* Select ***Security credentials** of the **User** selected.
+* Select **Security credentials** of the **User** selected.
 
     ![Create AWS IAM Role & Key](./04.png)
 

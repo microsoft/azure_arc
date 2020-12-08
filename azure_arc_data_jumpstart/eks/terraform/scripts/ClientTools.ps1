@@ -29,21 +29,29 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
     }
 }
 
-# Download & Install Azure Data Studio and azdata CLI
-Write-Host "Download & Install Azure Data Studio and azdata CLI"
+# Downloading Azure Data Studio and azdata CLI
+Write-Host "Downloading Azure Data Studio and azdata CLI"
 Write-Host "`n"
+Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip" | Out-Null
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/eks/terraform/settings.json" -OutFile "C:\tmp\settings.json"
+Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi" | Out-Null
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/eks/terraform/scripts/DC_Cleanup.ps1" -OutFile "C:\tmp\DC_Cleanup.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/eks/terraform/scripts/DC_Deploy.ps1" -OutFile "C:\tmp\DC_Deploy.ps1"
 
-Invoke-WebRequest "https://go.microsoft.com/fwlink/?linkid=2142211" -OutFile "C:\tmp\azuredatastudio.zip"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/eks/terraform/settings.json" -OutFile "C:\tmp\settings.json"
-Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/eks/terraform/scripts/DC_Cleanup.ps1" -OutFile "C:\tmp\DC_Cleanup.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/eks/terraform/scripts/DC_Deploy.ps1" -OutFile "C:\tmp\DC_Deploy.ps1"
+Write-Host "Deleting AWS Desktop shortcuts"
+Write-Host "`n"
+Remove-Item -Path "C:\Users\$env:USERNAME\Desktop\EC2 Microsoft Windows Guide.website" -Force
+Remove-Item -Path "C:\Users\$env:USERNAME\Desktop\EC2 Feedback.website" -Force
 
-Expand-Archive C:\tmp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
+$LogonScript = @'
+Start-Transcript -Path C:\tmp\LogonScript.log
 
-Start-Process msiexec.exe -Wait -ArgumentList '/I C:\tmp\AZDataCLI.msi /quiet'
+Write-Host "Installing Azure Data Studio and azdata CLI"
+Write-Host "`n"
+Expand-Archive 'C:\tmp\azuredatastudio.zip' -DestinationPath 'C:\Program Files\Azure Data Studio'
+Start-Process msiexec.exe -Wait -ArgumentList '/I "C:\tmp\AZDataCLI.msi" /quiet'
 
-$SettingsDestination = "C:\Users\Administrator\AppData\Roaming\azuredatastudio\User"
+$SettingsDestination = "C:\Users\$env:USERNAME\AppData\Roaming\azuredatastudio\User"
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Hidden
 Start-Sleep -s 5
 Stop-Process -Name "azuredatastudio" -Force
@@ -62,16 +70,11 @@ $env:argument3="microsoft.azuredatastudio-postgresql"
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
-$ShortcutFile = "C:\Users\Administrator\Desktop\Azure Data Studio.lnk"
+$ShortcutFile = "C:\Users\$env:USERNAME\Desktop\Azure Data Studio.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
-
-Write-Host "Deleting AWS Desktop shortcuts"
-Write-Host "`n"
-Remove-Item -Path "C:\Users\Administrator\Desktop\EC2 Microsoft Windows Guide.website" -Force
-Remove-Item -Path "C:\Users\Administrator\Desktop\EC2 Feedback.website" -Force
 
 # Setting up the kubectl & azdata environment
 Write-Host "Setting up the kubectl & azdata environment"
@@ -80,13 +83,11 @@ New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cl
 kubectl version
 kubectl apply -f "C:\tmp\configmap.yml"
 kubectl get nodes
+
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 azdata --version
 
-$LogonScript = @'
-Start-Transcript -Path C:\tmp\LogonScript.log
-
-start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
+start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
 azdata arc dc config init --source azure-arc-eks --path "C:\tmp\custom"
 if(($env:DOCKER_REGISTRY -ne $NULL) -or ($env:DOCKER_REGISTRY -ne ""))
 {
@@ -114,7 +115,7 @@ Stop-Process -Name powershell -Force
 # Creating LogonScript Windows Scheduled Task
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\LogonScript.ps1'
-Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User "Administrator" -Action $Action -RunLevel "Highest" -Force
+Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $env:USERNAME -Action $Action -RunLevel "Highest" -Force
 
 # Stopping log for ClientTools.ps1
 Stop-Transcript
