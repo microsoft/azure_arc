@@ -105,7 +105,7 @@ New-AzResourceGroupDeployment -Name MMA `
   -TemplateFile C:\tmp\mma.json
 
 Write-Host "Configuring SQL Azure Assessment"
-Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/gcp/winsrv/terraform/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
+Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/main/azure_arc_sqlsrv_jumpstart/gcp/winsrv/terraform/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
 Expand-Archive "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
 $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\'Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
 Import-Module $env:ProgramFiles\'Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll'
