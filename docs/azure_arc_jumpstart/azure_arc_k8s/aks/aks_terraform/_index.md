@@ -5,38 +5,40 @@ weight: 2
 description: >
 ---
 
-# Deploy AKS cluster and connect it to Azure Arc using Terraform
+## Deploy AKS cluster and connect it to Azure Arc using Terraform
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connected it as an Azure Arc cluster resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connected it as an Azure Arc enabled Kubernetes resource.
 
 ## Prerequisites
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
-    
+
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure service principal (SP)   
+* Create Azure service principal (SP)
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```bash
+    ```console
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    ```
 
     Output should look like this:
 
-    ```
+    ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcK8s",
@@ -45,22 +47,22 @@ The following README will guide you on how to use the provided [Terraform](https
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-    
-    **Note**: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) 
 
-* Enable subscription for two providers for Azure Arc enabled Kubernetes<br> 
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+
+* Enable subscription for two providers for Azure Arc enabled Kubernetes
+
   Registration is an asynchronous process, and registration may take approximately 10 minutes.
-  ```bash
+  
+  ```console
   az provider register --namespace Microsoft.Kubernetes
-  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.Kubernetes'
-
   az provider register --namespace Microsoft.KubernetesConfiguration
-  Registering is still on-going. You can monitor using 'az provider show -n Microsoft.KubernetesConfiguration'
   ```
+
   You can monitor the registration process with the following commands:
-  ```bash
+  
+  ```console
   az provider show -n Microsoft.Kubernetes -o table
- 
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
@@ -70,63 +72,67 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 In addition, validate that the AKS Kubernetes version is available in your region using the below Azure CLI command.
 
-```az aks get-versions -l "<Your Azure Region>"```
+```console
+az aks get-versions -l "<Your Azure Region>"
+```
 
-In case the AKS service is not available in your region, you can change the AKS Kubernetes version in the [*variables.tf*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_k8s_jumpstart/aks/terraform/variables.tf) file by searching for *kubernetes_version*.
+In case the AKS service is not available in your region, you can change the AKS Kubernetes version in the [*variables.tf*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/terraform/variables.tf) file by searching for *kubernetes_version*.
 
 * Export the environment variables needed for the Terraform plan.
 
-    ```export TF_VAR_client_id=<Your Azure service principal App ID>```   
-    ```export TF_VAR_client_secret=<Your Azure service principal App Password>```
+    ```console
+    export TF_VAR_client_id=<Your Azure service principal App ID>
+    export TF_VAR_client_secret=<Your Azure service principal App Password>
+    ```
 
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
 
-![](./01.png)
+    ![Screenshot showing terraform init being run](./01.png)
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. 
+* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish.
 
-Once the Terraform deployment is completed, a new AKS cluster in a new Azure resource group is created. 
+    Once the Terraform deployment is completed, a new AKS cluster in a new Azure resource group is created.
 
-![](./02.png)
+    ![Screenshot showing terraform plan completing](./02.png)
 
-![](./03.png)
+    ![Screenshot showing Azure Portal with AKS resource](./03.png)
 
-![](./04.png)
+    ![Screenshot showing Azure Portal with AKS resource](./04.png)
 
-* Now that you have a running AKS cluster, edit the environment variables section in the included [az_connect_aks](https://github.com/microsoft/azure_arc/blob/master/azure_arc_k8s_jumpstart/aks/terraform/scripts/az_connect_aks.sh) shell script.
+* Now that you have a running AKS cluster, edit the environment variables section in the included [az_connect_aks](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/terraform/scripts/az_connect_aks.sh) shell script.
 
-![](./05.png)
+    ![Screenshot showing az_connect_aks shell script](./05.png)
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. **Make sure Cloud Shell is configured to use Bash.** 
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. **Make sure Cloud Shell is configured to use Bash.**
 
-![](./06.png)
+    ![Screenshot showing how to access Cloud Shell in Visual Studio Code](./06.png)
 
-* Edit the environment variables in the [*az_connect_aks*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_k8s_jumpstart/aks/terraform/scripts/az_connect_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_connect_aks.sh``` command.
+* Edit the environment variables in the [*az_connect_aks*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/terraform/scripts/az_connect_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_connect_aks.sh``` command.
 
-**Note**: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands. 
+    > **Note: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
-![](./07.png)
+    ![Screenshot showing Cloud Shell upload functionality](./07.png)
 
-![](./08.png)
+    ![Screenshot showing Cloud Shell upload functionality](./08.png)
 
-![](./09.png)
+    ![Screenshot showing Cloud Shell upload functionality](./09.png)
 
-![](./10.png)
+    ![Screenshot showing Cloud Shell upload functionality](./10.png)
 
-* Once the script run has finished, the AKS cluster will be projected as a new Azure Arc cluster resource.
+* Once the script run has finished, the AKS cluster will be projected as a new Azure Arc enabled Kubernetes resource.
 
-![](./11.png)
+    ![Screenshot showing Azure Portal with Azure Arc enabled resource](./11.png)
 
-![](./12.png)
+    ![Screenshot showing Azure Portal with Azure Arc enabled resource](./12.png)
 
 ## Delete the deployment
 
-The most straightforward way is to delete the Azure Arc cluster resource via the Azure Portal, just select the cluster and delete it. 
+The most straightforward way is to delete the Azure Arc enabled Kubernetes resource via the Azure Portal, just select the cluster and delete it.
 
-![](./13.png)
+![Screenshot showing delete function in Azure Portal](./13.png)
 
 If you want to nuke the entire environment, delete both the AKS and the AKS resources resource groups or run the ```terraform destroy -auto-approve``` command.
 
-![](./14.png)
+![Screenshot showing terraform destroy being run](./14.png)
 
-![](./15.png)
+![Screenshot showing terraform destroy being run](./15.png)
