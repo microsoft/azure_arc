@@ -6,7 +6,7 @@ weight: 3
 description: >
 ---
 
-# Azure PostgreSQL Hyperscale Deployment on AKS (ARM Template)
+## Azure PostgreSQL Hyperscale Deployment on AKS (ARM Template)
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services with Azure PostgreSQL Hyperscale (Citus) deployed on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
@@ -16,9 +16,9 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 * Clone this repo
 
-```console
-git clone https://github.com/microsoft/azure_arc.git
-```
+    ```console
+    git clone https://github.com/microsoft/azure_arc.git
+    ```
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
@@ -26,7 +26,7 @@ git clone https://github.com/microsoft/azure_arc.git
 
 * Create Azure service principal (SP)
 
-    In order for you to deploy the AKS cluster using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
+    In order for you to deploy the AKS cluster using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```console
     az login
@@ -41,7 +41,7 @@ git clone https://github.com/microsoft/azure_arc.git
 
     Output should look like this:
 
-    ```console
+    ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcData",
@@ -51,7 +51,7 @@ git clone https://github.com/microsoft/azure_arc.git
     }
     ```
 
-> [!Note] It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).
+    > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
 ## Automation Flow
 
@@ -74,7 +74,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
     * Download the *Postgres_Cleanup* and *Postgres_Deploy* PowerShell scripts
     * Create the Postgres Connectivity script
-    * Create the logon script 
+    * Create the logon script
     * Create the Windows schedule task to run the logon script at first login
     * Disable Windows Server Manager from running at login
 
@@ -96,89 +96,97 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command. To determine which AKS Kubernetes versions are available in your region use the below Azure CLI command.
 
-```console
-az aks get-versions -l "<Your Azure Region>"
-```
+    ```console
+    az aks get-versions -l "<Your Azure Region>"
+    ```
 
-* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/master/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.parameters.example.json).
+* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.parameters.example.json).
 
-  * *clusterName* - AKS cluster name
-  * *dnsPrefix* - AKS unique DNS prefix
-  * *nodeAdminUsername* - AKS Node Username
-  * *sshRSAPublicKey* - Your ssh public key
-  * *servicePrincipalClientId* - Your Azure service principal name
-  * *servicePrincipalClientSecret* - Your Azure service principal password
-  * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
-  * *adminUsername* - Client Windows VM admin username
-  * *adminPassword* - Client Windows VM admin password
-  * *vmSize* - Client Windows VM size
-  * *tenantId* - Azure tenant ID
-  * *resourceGroup* - Azure resource group where all the resources get deploy
-  * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
-  * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
-  * *ACCEPT_EULA* - "yes" **Do not change**
-  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start d end with a alphanumeric character (This name will be used for k8s namespace as well).
-  * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
-  * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
-  * *POSTGRES_NAME* - PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster. Names must be 10 characters or fewer in length and conform to DNS naming conventions.
-  * *POSTGRES_WORKER_NODE_COUNT* - PostgreSQL Hyperscale server group number of workers
-  * *POSTGRES_DATASIZE* - PostgreSQL Hyperscale size of data volumes in MB (Recommended to use at least 1GB (1024 MB)).* *POSTGRES_SERVICE_TYPE* - Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort. As AKS supports Load Balancers, leave configured with *LoadBalancer*.
+    * *clusterName* - AKS cluster name
+    * *dnsPrefix* - AKS unique DNS prefix
+    * *nodeAdminUsername* - AKS Node Username
+    * *sshRSAPublicKey* - Your ssh public key
+    * *servicePrincipalClientId* - Your Azure service principal name
+    * *servicePrincipalClientSecret* - Your Azure service principal password
+    * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
+    * *adminUsername* - Client Windows VM admin username
+    * *adminPassword* - Client Windows VM admin password
+    * *vmSize* - Client Windows VM size
+    * *tenantId* - Azure tenant ID
+    * *resourceGroup* - Azure resource group where all the resources get deploy
+    * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
+    * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
+    * *ACCEPT_EULA* - "yes" **Do not change**
+    * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start d end with a alphanumeric character (This name will be used for k8s namespace as well).
+    * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
+    * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+    * *POSTGRES_NAME* - PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster. Names must be 10 characters or fewer in length and conform to DNS naming conventions.
+    * *POSTGRES_WORKER_NODE_COUNT* - PostgreSQL Hyperscale server group number of workers
+    * *POSTGRES_DATASIZE* - PostgreSQL Hyperscale size of data volumes in MB (Recommended to use at least 1GB (1024 MB)).*
+    * *POSTGRES_SERVICE_TYPE* - Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort. As AKS supports Load Balancers, leave configured with *LoadBalancer*.
 
- * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs) and run the below command:
+* To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs) and run the below command:
 
     ```console
     az group create --name <Name of the Azure resource group> --location <Azure Region>
-    az deployment group create --resource-group <Name of the Azure resource group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
+    az deployment group create \
+    --resource-group <Name of the Azure resource group> \
+    --name <The name of this deployment> \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.jsonpostgres_hs/azuredeploy.json \
+    --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > [!NOTE] Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file.
+    > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file.**
 
     For example:
 
     ```console
     az group create --name Arc-Data-Postgres-Demo --location "East US"
-    az deployment group create --resource-group Arc-Data-Postgres-Demo --name arcdatapostgresdemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json --parameters azuredeploy.parameters.json
+    az deployment group create --resource-group Arc-Data-Postgres-Demo \
+    --name arcdatapostgresdemo \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json \
+    --parameters azuredeploy.parameters.json
     ```
 
-> [!NOTE] Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30min long
+    > **Note: Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30min long**
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
-    ![](./01.png)
+    ![ARM template deployment completed](./01.jpg)
 
-    ![](./02.png)
+    ![New Azure resource group with all resources](./02.jpg)
 
 ## Windows Login & Post Deployment
 
-Now that both the AKS cluster and the Windows Server client VM are created, it is time to login the Client VM. 
+Now that both the AKS cluster and the Windows Server client VM are created, it is time to login the Client VM.
 
 * Using it's public IP, RDP to the **Client VM**
 
-    ![](./03.png)
+    ![Data Client VM public IP](./03.jpg)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
     Let the script to run it's course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the AKS cluster. **The logon script run time is 10-15min long**.  
 
-    Once the script will finish it's run, the logon script PowerShell session will be closed and the Azure Arc Data Controller and an Azure Postgres Hyperscale (and a sample DB) will be deployed on the AKS cluster and be ready to use. 
+    Once the script will finish it's run, the logon script PowerShell session will be closed and the Azure Arc Data Controller and an Azure Postgres Hyperscale (and a sample DB) will be deployed on the AKS cluster and be ready to use.
 
-    ![](./04.png)
+    ![PowerShell logon script run](./04.jpg)
 
-    ![](./05.png)
+    ![PowerShell logon script run](./05.jpg)
 
-    ![](./06.png)
+    ![PowerShell logon script run](./06.jpg)
 
-    ![](./07.png)
+    ![PowerShell logon script run](./07.jpg)
 
-    ![](./08.png)
+    ![PowerShell logon script run](./08.jpg)
 
-* Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. At the end of the logon script run, Azure Data Studio will automatically be open and connected to the Azure Postgres Hyperscale server with the sample DB.
+* Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. At the end of the logon script run, Azure Data Studio will automatically be open and connected to the Azure PostgreSQL Hyperscale server with the sample DB.
 
-    ![](./09.png)
+  ![Azure Data Studio shortcut](./09.jpg)
 
-    ![](./10.png)
+  ![Azure Data Studio extension](./10.jpg)
 
-    ![](./11.png)
+  ![Azure PostgreSQL Hyperscale server with the sample DB](./11.jpg)
 
 * (Optional) In PowerShell, login to the Data Controller and check it's health using the below commands.
 
@@ -187,28 +195,24 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
     azdata arc dc status show
     ```
 
-    ![](./12.png)
+  ![azdata login](./12.jpg)
 
 ## Cleanup
 
 * To delete the Azure Arc Data Controller and all of it's Kubernetes resources as well as Postgres Hyperscale, run the *Postgres_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is 5-10min long**.
 
-    ![](./13.png)
-
-    ![](./14.png)
+    ![Postgres_Cleanup PowerShell script run](./13.jpg)
 
 * If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![](./15.png)
+    ![Delete Azure resource group](./14.jpg)
 
 ## Re-Deploy Azure Arc Data Controller & Postgres
 
 In case you deleted the Azure Arc Data Controller and Postgres Hyperscale from the Kubernetes cluster, you can re-deploy it by running the *Postgres_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 15min long**.
 
-![](./16.png)
+![Re-Deploy Azure Arc Data Controller + PostgreSQL PowerShell script](./15.jpg)
 
-![](./17.png)
+![Re-Deploy Azure Arc Data Controller + PostgreSQL PowerShell script](./16.jpg)
 
-![](./18.png)
-
-![](./19.png)
+![Re-Deploy Azure Arc Data Controller + PostgreSQL PowerShell script](./17.jpg)

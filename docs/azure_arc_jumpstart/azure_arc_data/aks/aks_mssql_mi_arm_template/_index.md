@@ -203,9 +203,9 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
 * To delete the Azure Arc Data Controller and all of it's Kubernetes resources as well as the SQL MI, run the *MSSQL_MI_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client VM. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is approximately 10min long**.
 
-    ![DC_Cleanup PowerShell script run](./14.jpg)
+    ![MSSQL_MI_Cleanup PowerShell script run](./14.jpg)
 
-    ![DC_Cleanup PowerShell script run](./15.jpg)
+    ![MSSQL_MI_Cleanup PowerShell script run](./15.jpg)
 
 * If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
@@ -215,6 +215,6 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
 In case you deleted the Azure Arc Data Controller and the SQL MI from the Kubernetes cluster, you can re-deploy it by running the *MSSQL_MI_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client VM. **The Deploy script run time is approximately 15min long**.
 
-![Re-Deploy Azure Arc Data Controller PowerShell script](./17.jpg)
+![Re-Deploy Azure Arc Data Controller + MSSQL PowerShell script](./17.jpg)
 
-![Re-Deploy Azure Arc Data Controller PowerShell script](./18.jpg)
+![Re-Deploy Azure Arc Data Controller + MSSQL PowerShell script](./18.jpg)
