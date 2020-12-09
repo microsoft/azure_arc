@@ -129,7 +129,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   3. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
       * Create the *ClientTools.log* file  
-      * Install the required tools – az cli, az cli Powershell module, kubernetes-cli (Chocolaty packages)
+      * Install the required tools – az cli, az cli Powershell module, kubernetes-cli, Visual C++ Redistributable (Chocolaty packages)
       * Download Azure Data Studio & Azure Data CLI
       * Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
       * Disable Windows Server Manager

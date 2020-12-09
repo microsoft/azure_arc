@@ -41,7 +41,7 @@ param (
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140'
             #Run commands in parallel.
             Parallel 
                 {
