@@ -16,7 +16,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

@@ -23,7 +23,7 @@ In this guide, we will use [Resource Graph Explorer](https://docs.microsoft.com/
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

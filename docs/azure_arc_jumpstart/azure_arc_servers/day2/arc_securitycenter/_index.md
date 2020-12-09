@@ -29,7 +29,7 @@ In this guide, you will enable and configure Azure Security Center Standard tier
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

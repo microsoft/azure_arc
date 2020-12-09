@@ -13,7 +13,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

@@ -16,7 +16,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * Create AWS IAM Role
 * Create & download AWS Key Pair
-* Clone this repository
+* Clone the Azure Arc Jumpstart repositorysitory
 * Edit *TF_VAR* variables values
 * *terraform init*
 * *terraform apply*
@@ -25,7 +25,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
   ```console
   git clone https://github.com/microsoft/azure_arc.git

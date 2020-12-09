@@ -18,7 +18,7 @@ This guide can be used even if you do not already have an existing Ansible test 
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

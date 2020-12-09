@@ -25,7 +25,7 @@ In this guide, you will create and configure an Azure Automation account and Log
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

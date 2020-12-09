@@ -27,7 +27,7 @@ In this guide, you will enable and configure Azure Sentinel on your Azure subscr
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

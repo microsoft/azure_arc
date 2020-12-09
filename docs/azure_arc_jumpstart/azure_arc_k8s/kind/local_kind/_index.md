@@ -12,7 +12,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

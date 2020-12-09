@@ -18,7 +18,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

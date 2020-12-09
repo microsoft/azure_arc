@@ -14,7 +14,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git
