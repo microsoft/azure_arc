@@ -149,8 +149,8 @@ Remove-Item "C:\tmp\out.txt" -Force
 # Restoring demo database
 $podname = "$env:POSTGRES_NAME" + "-0"
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
-kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- psql --username postgres -c 'CREATE DATABASE "adventureworks";'
-kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- psql --username postgres -d adventureworks -f /tmp/AdventureWorks.sql
+kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres
+kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql
 
 Stop-Transcript
 
