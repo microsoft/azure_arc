@@ -18,7 +18,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

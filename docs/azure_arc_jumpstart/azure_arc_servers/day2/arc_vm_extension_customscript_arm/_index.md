@@ -23,7 +23,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

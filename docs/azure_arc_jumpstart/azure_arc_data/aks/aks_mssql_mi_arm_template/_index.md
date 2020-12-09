@@ -14,7 +14,7 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

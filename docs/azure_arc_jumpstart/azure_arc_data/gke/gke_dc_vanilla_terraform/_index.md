@@ -16,7 +16,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 * Create a Google Cloud Platform (GCP) project, IAM Role & Service Account
 * Download credentials file
-* Clone this repository
+* Clone the Azure Arc Jumpstart repositorysitory
 * Edit *TF_VAR* variables values
 * *terraform init*
 * *terraform apply*
@@ -24,7 +24,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
   ```console
   git clone https://github.com/microsoft/azure_arc.git

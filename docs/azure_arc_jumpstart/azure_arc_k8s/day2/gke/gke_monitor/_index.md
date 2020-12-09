@@ -16,7 +16,7 @@ In this guide, you will hook the GKE cluster to Azure Monitor by deploying the [
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

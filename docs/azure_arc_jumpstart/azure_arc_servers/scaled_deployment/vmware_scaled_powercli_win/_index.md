@@ -14,7 +14,7 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

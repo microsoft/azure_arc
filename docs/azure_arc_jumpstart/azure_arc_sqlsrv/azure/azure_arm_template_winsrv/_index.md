@@ -19,7 +19,7 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git

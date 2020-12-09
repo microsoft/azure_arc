@@ -25,7 +25,7 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
     ```console
     git clone https://github.com/microsoft/azure_arc.git
