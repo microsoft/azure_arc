@@ -5,7 +5,7 @@ Param(
     [string]$chocolateyAppList  
 )
 
-$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli"
+$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140"
 
 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
