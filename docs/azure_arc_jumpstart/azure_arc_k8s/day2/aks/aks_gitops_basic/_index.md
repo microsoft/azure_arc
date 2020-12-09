@@ -26,11 +26,11 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
-    * [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
+    *   [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
 
-    * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
+    *   [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-    * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+    *   [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
 
@@ -142,7 +142,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
         ![kubectl get svc -n hello-arc](./15.png)
 
-    * End result should look something like that:
+    * End result should look like that:
 
         ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./16.png)
 

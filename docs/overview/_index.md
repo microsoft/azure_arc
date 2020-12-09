@@ -19,7 +19,7 @@ For customers who want to simplify complex and distributed environments across o
 
 The following guides will walk you through the process of setting up demos that show how to get started with Azure Arc. They are designed with a "zero to hero" approach in mind and with as much automation as possible. The goal is for you to have a working Azure Arc demo environment spun up in no time so you can focus on showing the core values of the solution.
 
-**Disclaimer: The intention for this repo is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
+> **Disclaimer: The intention for this repo is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
 
 ## Azure Arc Story Time
 
@@ -62,7 +62,7 @@ In each guide, you find a detailed, technical explanation of the mechanism and w
 
 ### Vagrant
 
-If you don't have any existing servers available, you can use [Vagrant](https://www.vagrantup.com/) to host a new server locally and onboard it to Azure. This will allow you to simulate "on-premises" servers from your local machine. 
+If you don't have any existing servers available, you can use [Vagrant](https://www.vagrantup.com/) to host a new server locally and onboard it to Azure. This will allow you to simulate "on-premises" servers from your local machine.
 
 * [Deploy a local Ubuntu VM and connect it to Azure Arc using Vagrant](../azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)
 
@@ -103,7 +103,7 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 * [Deploying Custom Script Extension to Azure Arc Linux and Windows VMs using Extension Management](../azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_customscript_arm/)
 
 * [Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Azure Policies](../azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/)
- 
+
 * [Integrate Azure Security Center with Azure Arc enabled servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_securitycenter/)
 
 * [Integrate Azure Sentinel with Azure Arc enabled servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_azuresentinel/)
@@ -153,9 +153,9 @@ The following guide provide end-to-end deployment of new Windows Server install 
 
 ## Azure Arc enabled Kubernetes
 
-The below deployment options are focused on Azure Arc enabled Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling. 
+The below deployment options are focused on Azure Arc enabled Kubernetes. They are designed to quickly spin up a Kubernetes cluster that is ready to be projected in Azure Arc and ready for use with Azure native tooling.
 
-**Disclaimer: Azure Arc enabled Kubernetes is currently in Public Preview.**
+> **Disclaimer: Azure Arc enabled Kubernetes is currently in Public Preview.**
 
 ### General
 
@@ -185,7 +185,7 @@ This example uses Terraform to deploy a GKE cluster on Google Cloud and connect 
 
 ### Rancher k3s
 
-These examples deploy [Rancher k3s](https://github.com/rancher/k3s) on an Azure VM or VMware and onboards the cluster with Azure Arc. 
+These examples deploy [Rancher k3s](https://github.com/rancher/k3s) on an Azure VM or VMware and onboards the cluster with Azure Arc.
 
 * [Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Azure ARM template](../azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_arm_template/)
 
@@ -197,7 +197,7 @@ These examples deploy [Rancher k3s](https://github.com/rancher/k3s) on an Azure 
 
 Azure Arc can also support Azure Red Hat OpenShift (ARO). This example uses Terraform to deploy a new ARO cluster and onboards it to Azure with Azure Arc.
 
-* [Deploy Azure Redhat Openshift Cluster and connect it to Azure Arc using automation](../azure_arc_jumpstart/azure_arc_k8s/aro/aro_script/)
+* [Deploy Azure Red Hat  Openshift Cluster and connect it to Azure Arc using automation](../azure_arc_jumpstart/azure_arc_k8s/aro/aro_script/)
 
 ### kind
 
@@ -247,10 +247,10 @@ Once you have Kubernetes clusters projected into Azure with Azure Arc, you can s
 
 The below deployment options are focused on Azure Arc enabled data services. They are designed to quickly spin up a new Kubernetes cluster and deploy Azure Arc enabled data services that are ready to be projected in Azure Arc and ready for use with Azure native tooling.
 
-> [!NOTE] Already have a Kubernetes cluster?
-[Deploy Azure Arc enabled data services to an existing Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-data-controller)
+> **Disclaimer: Azure Arc enabled data services is currently in Public Preview.**
 
-**Disclaimer: Azure Arc enabled data services is currently in Public Preview.**
+> **Note: Already have a Kubernetes cluster?
+[Deploy Azure Arc enabled data services to an existing Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-arc/data/create-data-controller)**
 
 ### Data Services on Azure Kubernetes Service (AKS)
 

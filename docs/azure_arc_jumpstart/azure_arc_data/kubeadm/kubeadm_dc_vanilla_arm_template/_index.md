@@ -55,7 +55,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-* User is editing the ARM template parameters file (1-time edit). These params values are being used throughout the deployment.
+* User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
 * Main ARM template will deploy an Ubuntu VM. The ARM template will call the the Azure [Linux Custom Script Extension](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/custom-script-linux) to:
 
@@ -67,7 +67,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 * Runtime script will:
 
-  * Inject user params values (from bullet point #1) to be used in both runtime and logon script
+  * Inject user parameters values (from bullet point #1) to be used in both runtime and logon script
   * Install the required tools – az cli, az cli PowerShell module, kubernetes-cli and putty (Chocolaty packages)
   * Download & install the Azure Data Studio & azdata cli
   * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions

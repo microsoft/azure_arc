@@ -28,11 +28,11 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
-    * [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
+    *   [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
 
-    * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
+    *   [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-    * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+    *   [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
 
@@ -126,8 +126,8 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
     * Login to your Azure subscription using the SPN credentials
     * Retrieve the cluster credentials (KUBECONFIG)
     * Create two GitOps configurations for the Azure Arc Connected Cluster. Both configurations will be using the Helm charts located in the "Hello Arc" repository.
-        * Cluster-level config to deploy nginx-ingress controller Helm chart
-        * Namespace-level config to deploy the "Hello Arc" application Helm chart
+        *   Cluster-level config to deploy nginx-ingress controller Helm chart
+        *   Namespace-level config to deploy the "Hello Arc" application Helm chart
 
     > **Disclaimer: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval to rapidly track changes on the repository but it is recommended to have longer interval in your production environment (default value is 5min)**
 
@@ -182,7 +182,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
         ![kubectl get svc -n hello-arc](./16.png)
 
-    * End result should look something like that:
+    * End result should look like that:
 
         ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./17.png)
 

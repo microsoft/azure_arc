@@ -1,12 +1,12 @@
 ---
 type: docs
-title: "Deploy Azure Redhat Openshift Cluster and connect it to Azure Arc using automation"
-linkTitle: "Deploy Azure Redhat Openshift Cluster and connect it to Azure Arc using automation"
+title: "Deploy Azure Red Hat  Openshift Cluster and connect it to Azure Arc using automation"
+linkTitle: "Deploy Azure Red Hat  Openshift Cluster and connect it to Azure Arc using automation"
 weight: 1
 description: >-
 ---
 
-## Deploy Azure Redhat Openshift Cluster and connect it to Azure Arc using automation
+## Deploy Azure Red Hat  Openshift Cluster and connect it to Azure Arc using automation
 
 The following is a guide on how to use the Azure Cloud Shell to deploy an [Azure Red Hat OpenShift](https://azure.microsoft.com/en-us/services/openshift/) 4 cluster and have it as a connected Azure Arc Kubernetes resource.
 
@@ -36,7 +36,7 @@ The deployment of all resources is going to be done via Azure Cloud Shell.
 
     * Azure Container Instance
     * Azure VNet
-    * Azure Redhat OpenShift (```aro```) cluster
+    * Azure Red Hat  OpenShift (```aro```) cluster
     * Azure Arc K8s connected resource
     * Ensure required providers are registered
   

@@ -37,10 +37,9 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
-
 * Create Azure Service Principal (SP)
 
-    To connect a VM or bare-metal server to Azure Arc, Azure service srincipal assigned with the "contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure cloud shell](https://shell.azure.com/)).
+    To connect a VM or bare-metal server to Azure Arc, Azure service principal assigned with the "contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```console
     az login
@@ -64,7 +63,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
-    
+
     > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
 * In order to demonstrate the custom script extension, we will use the below Linux and Windows scripts.
@@ -125,7 +124,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
   * For the Linux VM, use SSH to connect the VM and check out the message of the day which was customized by the script:
 
-    ![Screenshot mesaage of the day changed](./08.png)
+    ![Screenshot message of the day changed](./08.png)
 
   * For the Windows VM, use RDP to connect the VM and verify that the additional software has been installed: Microsoft Edge, 7zip and Visual Studio Code.
 

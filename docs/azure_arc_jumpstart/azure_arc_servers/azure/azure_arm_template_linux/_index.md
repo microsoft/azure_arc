@@ -20,7 +20,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -61,7 +61,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-1. User is editing the ARM template parameters file (1-time edit). These params values are being used throughout the deployment.
+1. User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
 2. The ARM template includes an Azure VM custom script extension which will deploy the the [*install_arc_agent.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) Shell script.
 

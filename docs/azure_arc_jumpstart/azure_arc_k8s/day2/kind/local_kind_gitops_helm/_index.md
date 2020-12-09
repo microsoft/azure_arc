@@ -28,11 +28,11 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
-    * [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
+    *   [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
 
-    * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
+    *   [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-    * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+    *   [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected kind cluster to Azure Arc.
 
@@ -177,7 +177,7 @@ For our scenario, we will deploy the "Hello Arc" application from the ["demo rep
 
     * Another browser window that has the webpage <http://localhost> open  
 
-* End result should look something like this:
+* End result should look like this:
 
     ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./12.png)
 

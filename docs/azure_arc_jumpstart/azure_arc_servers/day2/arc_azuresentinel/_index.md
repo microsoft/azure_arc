@@ -81,9 +81,9 @@ Azure Sentinel uses the Log Analytics agent to collect Windows and Linux server'
 * To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/azuresentinel/arm) and run the below command:
 
   ```console
-    az deployment group create --resource-group <Name of the Azure resource group> \
-    --template-file <The *sentinel-template.json* template file location> \
-    --parameters <The *sentinel-template.parameters.json* template file location>
+  az deployment group create --resource-group <Name of the Azure resource group> \
+  --template-file <The *sentinel-template.json* template file location> \
+  --parameters <The *sentinel-template.parameters.json* template file location>
   ```
 
 For example:

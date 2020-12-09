@@ -46,7 +46,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    ```
 
     Output should look like this:
 
