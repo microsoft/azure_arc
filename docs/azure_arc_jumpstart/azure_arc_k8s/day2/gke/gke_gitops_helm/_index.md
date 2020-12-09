@@ -129,8 +129,8 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
     *   Install Azure CLI & Azure Arc Extensions
     *   Login to your Azure subscription using the SPN credentials
     *   Create two GitOps configurations for the Azure Arc Connected Cluster. Both configurations will be using the Helm charts located in the "Hello Arc" repository.
-    *   Cluster-level config to deploy nginx-ingress controller Helm chart
-    *   Namespace-level config to deploy the "Hello Arc" application Helm chart
+        *   Cluster-level config to deploy nginx-ingress controller Helm chart
+        *   Namespace-level config to deploy the "Hello Arc" application Helm chart
 
     > **Disclaimer: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval to rapidly track changes on the repository but it is recommended to have longer interval in your production environment (default value is 5min)**
 
@@ -146,24 +146,24 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
     ![New GitOps configurations](./13.png)
 
-    *   The Cluster-level config initiated the nginx-ingress Pods and Service resource deployment (along with the Flux operator and Memcached). To see it's resource, use the below *kubectl* commands.
+    The Cluster-level config initiated the nginx-ingress Pods and Service resource deployment (along with the Flux operator and Memcached). To see it's resource, use the below *kubectl* commands.
 
-        ```console
-        kubectl get pods -n cluster-mgmt
-        kubectl get svc -n cluster-mgmt
-        ```
+    ```console
+    kubectl get pods -n cluster-mgmt
+    kubectl get svc -n cluster-mgmt
+    ```
 
-        ![Cluster-level GitOps configurations](./14.png)
+    ![Cluster-level GitOps configurations](./14.png)
 
-    *   The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
+    The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
 
-        ```console
-        kubectl get pods -n prod
-        kubectl get svc -n prod
-        kubectl get ing -n prod
-        ```
+    ```console
+    kubectl get pods -n prod
+    kubectl get svc -n prod
+    kubectl get ing -n prod
+    ```
 
-        ![Namespace-level GitOps configurations](./15.png)
+    ![Namespace-level GitOps configurations](./15.png)
 
 ## Initiating "Hello Arc" Application GitOps
 

@@ -20,7 +20,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
 

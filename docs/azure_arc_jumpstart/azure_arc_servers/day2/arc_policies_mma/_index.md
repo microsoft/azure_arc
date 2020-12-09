@@ -27,7 +27,7 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
 

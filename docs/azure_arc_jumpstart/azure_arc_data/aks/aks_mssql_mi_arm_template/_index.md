@@ -57,7 +57,7 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-* User is editing the ARM template parameters file (1-time edit). These params values are being used throughout the deployment.
+* User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
 * Main ARM template will deploy AKS.
 
@@ -68,7 +68,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 * As part of the Windows Server 2019 VM deployment, there are 2 scripts executions; First script (ClientTools.ps1) at deployment runtime using the ARM *"CustomScriptExtension"* module and a second script (LogonScript.ps1) on user first logon to Windows.
 
   * Runtime script will:
-    * Inject user params values (from bullet point #1) to be used in both runtime and logon script
+    * Inject user parameters values (from bullet point #1) to be used in both runtime and logon script
     * Install the required tools – az cli, az cli PowerShell module, kube-cli (Chocolaty packages)
     * Download & install the Azure Data Studio & azdata cli
     * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
@@ -85,7 +85,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
     * Create the Azure Data Studio desktop shortcut
     * Open another PowerShell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
-    * Deploy the Arc Data Controller using the user params values
+    * Deploy the Arc Data Controller using the user parameters values
     * Deploy Azure SQL Managed Instance on the AKS cluster
     * Creating MSSQL Instance connectivity details using the SQL Connectivity script
     * Unregister the logon script Windows schedule task so it will not run after first login

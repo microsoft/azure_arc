@@ -85,7 +85,7 @@ The automation for this scenario include 3 PowerShell scripts executed in the fo
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-1. User is editing the ARM template parameters file (1-time edit). These params values are being used throughout the deployment.
+1. User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
 2. The ARM template incl. an Azure VM Custom Script Extension which will deploy the the [*ClientTools.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/ClientTools.ps1) PowerShell Script. The script will:
 

@@ -14,7 +14,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 * Clone this repo
 
-    ```terminal
+    ```console
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -31,7 +31,9 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
     For example:
 
-    ```az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor```
+    ```console
+    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    ```
 
     Output should look like this:
 
@@ -68,23 +70,23 @@ The deployment is using the template parameters file. Before initiating the depl
 * To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template) and run the below command:
 
   ```console
-    az group create --name <Name of the Azure resource group> --location <Azure Region>
-    az deployment group create \
-    --resource-group <Name of the Azure resource group> \
-    --name <The name of this deployment> \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
-    --parameters <The *azuredeploy.parameters.json* parameters file location>
+  az group create --name <Name of the Azure resource group> --location <Azure Region>
+  az deployment group create \
+  --resource-group <Name of the Azure resource group> \
+  --name <The name of this deployment> \
+  --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
+  --parameters <The *azuredeploy.parameters.json* parameters file location>
   ```
 
   For example:
 
   ```console
-    az group create --name Arc-K3s-Demo --location "East US"
-    az deployment group create \
-    --resource-group Arc-K3s-Demo \
-    --name arck3sdemo01 \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
-    --parameters azuredeploy.parameters.json
+  az group create --name Arc-K3s-Demo --location "East US"
+  az deployment group create \
+  --resource-group Arc-K3s-Demo \
+  --name arck3sdemo01 \
+  --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.json \
+  --parameters azuredeploy.parameters.json
   ```
 
   Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc enabled Kubernetes cluster in a new resource group.
