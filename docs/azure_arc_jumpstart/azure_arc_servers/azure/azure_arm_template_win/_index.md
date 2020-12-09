@@ -1,7 +1,7 @@
 ---
 type: docs
 title: "Onboard an Azure Windows Server VM with Azure Arc"
-linkTitle: "Onboard an Azure Windows Server VM with Azure Arc"
+linkTitle: "Windows Server Virtual Machine"
 weight: 2
 description: >
 ---
