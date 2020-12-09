@@ -1,11 +1,17 @@
 ---
 type: docs
-title: "Azure Arc Overview"
-linkTitle: "Azure Arc Overview"
+title: "Azure Arc Jumpstart"
+linkTitle: "Azure Arc Jumpstart"
 weight: 1
 ---
 
-# Azure Arc Overview
+# Azure Arc Jumpstart
+
+The following guides will walk you through the process of setting up demos that show how to get started with Azure Arc. They are designed with a "zero to hero" approach in mind and with as much automation as possible. The goal is for you to have a working Azure Arc demo environment spun up in no time so you can focus on showing the core values of the solution.
+
+> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
+
+## Azure Arc Overview
 
 For customers who want to simplify complex and distributed environments across on-premises, edge and multi-cloud, [Azure Arc](https://azure.microsoft.com/services/azure-arc/) enables deployment of Azure services anywhere and extends Azure management to any infrastructure.
 
@@ -14,12 +20,6 @@ For customers who want to simplify complex and distributed environments across o
 * **Manage Kubernetes Apps at scale** - Deploy and manage Kubernetes applications across environments using DevOps techniques. Ensure that applications are deployed and configured from source control consistently.
 
 * **Run data services anywhere** - Get automated patching, upgrades, security and scale on-demand across on-premises, edge and multi-cloud environments for your data estate.
-
-## Azure Arc Jumpstart
-
-The following guides will walk you through the process of setting up demos that show how to get started with Azure Arc. They are designed with a "zero to hero" approach in mind and with as much automation as possible. The goal is for you to have a working Azure Arc demo environment spun up in no time so you can focus on showing the core values of the solution.
-
-> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
 
 ## Azure Arc Story Time
 
