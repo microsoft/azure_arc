@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard a local Windows server hosted with Vagrant into Azure Arc"
-linkTitle: "Onboard a local Windows server hosted with Vagrant into Azure Arc"
+title: "Windows Vagrant box"
+linkTitle: "Windows Vagrant box"
 weight: 2
 description: >
 ---

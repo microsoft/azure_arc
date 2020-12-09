@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard a GCP Windows server with Azure Arc"
-linkTitle: "Onboard a GCP Windows server with Azure Arc"
+title: "Windows GCP instance"
+linkTitle: "Windows GCP instance"
 weight: 2
 description: >
 ---

@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard a GCP Ubuntu server with Azure Arc"
-linkTitle: "Onboard a GCP Ubuntu server with Azure Arc"
+title: "Ubuntu GCP instance"
+linkTitle: "Ubuntu GCP instance"
 weight: 1
 description: >
 ---

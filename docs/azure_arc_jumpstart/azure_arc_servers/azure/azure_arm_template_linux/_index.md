@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard an Azure Linux Server VM with Azure Arc"
-linkTitle: "Onboard an Azure Linux Server VM with Azure Arc"
+title: "Linux Virtual Machine"
+linkTitle: "Linux Virtual Machine"
 weight: 1
 description: >
 ---

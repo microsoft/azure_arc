@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Scaled Onboarding VMware vSphere Windows Server VMs to Azure Arc"
-linkTitle: "Scaled Onboarding VMware vSphere Windows Server VMs to Azure Arc"
+title: "vSphere Windows Server VMs"
+linkTitle: "vSphere Windows Server VMs"
 weight: 1
 description: >
 ---
