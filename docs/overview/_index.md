@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure Arc Jumpstart"
-linkTitle: "Azure Arc Jumpstart"
+title: "Azure Arc Overview"
+linkTitle: "Azure Arc Overview"
 weight: 1
 ---
 
