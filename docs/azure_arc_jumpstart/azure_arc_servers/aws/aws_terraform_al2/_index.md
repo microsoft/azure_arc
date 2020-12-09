@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard an AWS Amazon Linux 2 server with Azure Arc"
-linkTitle: "Onboard an AWS Amazon Linux 2 server with Azure Arc"
+title: "Amazon Linux 2 EC2 instance"
+linkTitle: "Amazon Linux 2 EC2 instance"
 weight: 2
 description: >
 ---

@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Scaled Onboarding VMware vSphere Linux VMs to Azure Arc"
-linkTitle: "Scaled Onboarding VMware vSphere Linux VMs to Azure Arc"
+title: "vSphere Linux VMs"
+linkTitle: "vSphere Linux VMs"
 weight: 2
 description: >
 ---

@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Scaled Onboarding AWS EC2 instances to Azure Arc using Ansible"
-linkTitle: "Scaled Onboarding AWS EC2 instances to Azure Arc using Ansible"
+title: "Dynamic AWS EC2 inventory with Ansible"
+linkTitle: "Dynamic AWS EC2 inventory with Ansible"
 weight: 3
 description: >
 ---

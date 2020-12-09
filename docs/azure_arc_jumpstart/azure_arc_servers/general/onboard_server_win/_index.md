@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard an existing Windows server with Azure Arc"
-linkTitle: "Onboard an existing Windows server with Azure Arc"
+title: "Existing Windows server"
+linkTitle: "Existing Windows server"
 weight: 2
 description: >
 ---

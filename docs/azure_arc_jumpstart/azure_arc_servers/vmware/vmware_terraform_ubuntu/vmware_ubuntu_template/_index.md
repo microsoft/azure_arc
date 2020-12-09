@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Create a VMware vSphere template for Ubuntu Server 18.04"
-linkTitle: "Create a VMware vSphere template for Ubuntu Server 18.04"
+title: "Create Ubuntu vSphere template"
+linkTitle: "Create Ubuntu vSphere template"
 weight: 1
 description: >
 ---

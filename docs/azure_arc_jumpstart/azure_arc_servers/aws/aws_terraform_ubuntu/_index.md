@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard an AWS Ubuntu server with Azure Arc"
-linkTitle: "Onboard an AWS Ubuntu server with Azure Arc"
+title: "Ubuntu EC2 instance"
+linkTitle: "Ubuntu EC2 instance"
 weight: 1
 description: >
 ---

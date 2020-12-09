@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard a local Ubuntu server hosted with Vagrant into Azure Arc"
-linkTitle: "Onboard a local Ubuntu server hosted with Vagrant into Azure Arc"
+title: "Ubuntu Vagrant box"
+linkTitle: "Ubuntu Vagrant box"
 weight: 1
 description: >
 ---
