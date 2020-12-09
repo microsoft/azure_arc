@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Arc Server Custom Script Extension"
-linkTitle: "Arc Server Custom Script Extension"
+title: "Custom Script Extension"
+linkTitle: "Custom Script Extension"
 weight: 3
 description: >
 ---
