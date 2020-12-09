@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure Arc enabled servers on Azure Security Center"
-linkTitle: "Azure Arc enabled servers on Azure Security Center"
+title: "Security Center"
+linkTitle: "Security Center"
 weight: 5
 description: >
 ---

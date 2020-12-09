@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure Arc enabled servers MMA Extension"
-linkTitle: "Azure Arc enabled servers MMA Extension"
+title: "Monitoring Agent Extension"
+linkTitle: "Monitoring Agent Extension"
 weight: 2
 description: >
 ---
