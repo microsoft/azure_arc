@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Deploy a local Kubernetes Cluster using MicroK8s and connect it to Azure Arc"
-linkTitle: "Deploy a local Kubernetes Cluster using MicroK8s and connect it to Azure Arc"
+title: "MicroK8s cluster"
+linkTitle: "MicroK8s cluster"
 weight: 1
 description: >
 ---

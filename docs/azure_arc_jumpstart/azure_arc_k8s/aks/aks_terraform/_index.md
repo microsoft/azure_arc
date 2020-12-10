@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Deploy AKS cluster and connect it to Azure Arc using Terraform"
-linkTitle: "Deploy AKS cluster and connect it to Azure Arc using Terraform"
+title: "AKS Cluster Terraform plan"
+linkTitle: "AKS Cluster Terraform plan"
 weight: 2
 description: >
 ---

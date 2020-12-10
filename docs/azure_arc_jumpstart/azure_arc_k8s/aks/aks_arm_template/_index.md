@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Deploy AKS cluster and connect it to Azure Arc using Azure ARM template"
-linkTitle: "Deploy AKS cluster and connect it to Azure Arc using Azure ARM template"
+title: "AKS cluster ARM template"
+linkTitle: "AKS cluster ARM template"
 weight: 1
 description: >
 ---

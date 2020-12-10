@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Deploy EKS cluster and connect it to Azure Arc using Terraform"
-linkTitle: "Deploy EKS cluster and connect it to Azure Arc using Terraform"
+title: "EKS cluster Terraform plan"
+linkTitle: "EKS cluster Terraform plan"
 weight: 1
 description: >
 ---
