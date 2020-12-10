@@ -1,12 +1,12 @@
 ---
 type: docs
-title: "Arc Inventory Tagging"
-linkTitle: "Arc Inventory Tagging"
+title: "Inventory Tagging"
+linkTitle: "Inventory Tagging"
 weight: 1
 description: >
 ---
 
-## Arc Inventory Tagging
+## Inventory Tagging
 
 The following README will guide you on how to use Azure Arc enabled servers to provide server inventory management capabilities across hybrid multi-cloud and on-premises environments.
 

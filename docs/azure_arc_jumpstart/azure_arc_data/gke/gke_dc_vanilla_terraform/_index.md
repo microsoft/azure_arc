@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Data Controller from Terraform plan"
-linkTitle: "Data Controller from Terraform plan"
+title: "Data Controller Terraform plan"
+linkTitle: "Data Controller Terraform plan"
 weight: 1
 description: >
 ---
@@ -79,7 +79,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 * Create a new GCP Project, IAM Role & Service Account. In order to deploy resources in GCP, we will create a new GCP Project as well as a service account to allow Terraform to authenticate against GCP APIs and run the plan to deploy resources.
 
-* Browse to https://console.cloud.google.com/ and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
+* Browse to <https://console.cloud.google.com/> and login with your Google Cloud account. Once logged in, [create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo". After creating it, be sure to copy down the project id as it is usually different then the project name.
 
   ![GCP new project](./01.png)
 

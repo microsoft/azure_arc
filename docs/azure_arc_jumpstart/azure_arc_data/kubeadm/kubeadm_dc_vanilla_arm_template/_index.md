@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Data Controller Azure VM from ARM Template"
-linkTitle: "Data Controller Azure VM from ARM Template"
+title: "Data Controller Azure VM ARM Template"
+linkTitle: "Data Controller Azure VM ARM Template"
 weight: 1
 description: >
 ---

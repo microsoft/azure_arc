@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Data Controller from Terraform plan"
-linkTitle: "Data Controller from Terraform plan"
+title: "Data Controller Terraform plan"
+linkTitle: "Data Controller Terraform plan"
 weight: 1
 description: >
 ---
