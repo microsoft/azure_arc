@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Ubuntu server"
-linkTitle: "Ubuntu server"
+title: "Ubuntu VM"
+linkTitle: "Ubuntu VM"
 weight: 1
 description: >
 ---

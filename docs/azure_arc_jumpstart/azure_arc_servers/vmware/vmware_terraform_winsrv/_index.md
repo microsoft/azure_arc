@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Windows server"
-linkTitle: "Windows server"
+title: "Windows VM"
+linkTitle: "Windows VM"
 weight: 2
 description: >
 ---

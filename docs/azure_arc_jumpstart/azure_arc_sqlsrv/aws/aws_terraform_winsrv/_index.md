@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard a AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc"
-linkTitle: "Onboard a AWS EC2 instance with Windows Server & Microsoft SQL Server to Azure Arc"
+title: "SQL Server EC2 instance"
+linkTitle: "SQL Server EC2 instance"
 weight: 1
 ---
 

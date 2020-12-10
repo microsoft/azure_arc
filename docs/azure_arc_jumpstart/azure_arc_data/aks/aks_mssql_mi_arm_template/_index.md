@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure SQL Managed Instance Deployment on AKS (ARM Template)"
-linkTitle: "Azure SQL Managed Instance Deployment on AKS (ARM Template)"
+title: "SQL Managed Instance from ARM Template"
+linkTitle: "SQL Managed Instance from ARM Template"
 weight: 2
 description: >
 ---

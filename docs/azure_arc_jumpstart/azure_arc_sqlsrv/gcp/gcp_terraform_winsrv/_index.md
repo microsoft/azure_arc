@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard a GCP VM instance with Windows Server & Microsoft SQL Server to Azure Arc"
-linkTitle: "Onboard a GCP VM instance with Windows Server & Microsoft SQL Server to Azure Arc"
+title: "SQL Server GCP instance"
+linkTitle: "SQL Server GCP instance"
 weight: 1
 description: >-
 ---

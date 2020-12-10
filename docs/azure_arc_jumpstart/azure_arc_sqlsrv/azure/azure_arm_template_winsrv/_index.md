@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard an Azure VM with Windows Server & Microsoft SQL Server to Azure Arc"
-linkTitle: "Onboard an Azure VM with Windows Server & Microsoft SQL Server to Azure Arc"
+title: "SQL Server Virtual Machine"
+linkTitle: "SQL Server Virtual Machine"
 weight: 1
 ---
 

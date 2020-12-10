@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure PostgreSQL Hyperscale Deployment on AKS (ARM Template)"
-linkTitle: "Azure PostgreSQL Hyperscale Deployment on AKS (ARM Template)"
+title: "PostgreSQL Hyperscale from ARM Template"
+linkTitle: "PostgreSQL Hyperscale from ARM Template"
 weight: 3
 description: >
 ---

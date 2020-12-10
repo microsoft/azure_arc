@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Onboard a VMware vSphere-based Windows Server with SQL to Azure Arc"
-linkTitle: "Onboard a VMware vSphere-based Windows Server with SQL to Azure Arc"
+title: "SQL Server VM"
+linkTitle: "SQL Server VM"
 weight: 1
 description: >-
 ---

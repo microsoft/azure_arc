@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform"
-linkTitle: "Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform"
+title: "k3s from Azure Terraform plan"
+linkTitle: "k3s from Azure Terraform plan"
 weight: 2
 description: >
 ---

@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc"
-linkTitle: "Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc"
+title: "Kind cluster"
+linkTitle: "Kind cluster"
 weight: 1
 description: >
 ---

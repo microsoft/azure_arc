@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Create Windows Server 2019 vSphere template"
-linkTitle: "Create Windows Server 2019 vSphere template"
+title: "Create Windows vSphere template"
+linkTitle: "Create Windows vSphere template"
 weight: 1
 description: >
 ---

@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure Arc Data Controller Vanilla Deployment on EKS (Terraform)"
-linkTitle: "Azure Arc Data Controller Vanilla Deployment on EKS (Terraform)"
+title: "Data Controller from Terraform plan"
+linkTitle: "Data Controller from Terraform plan"
 weight: 1
 description: >
 ---
