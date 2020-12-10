@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "k3s on VMware from Terraform plan"
-linkTitle: "k3s on VMware from Terraform plan"
+title: "k3s on VMware Terraform plan"
+linkTitle: "k3s on VMware Terraform plan"
 weight: 3
 description: >
 ---
