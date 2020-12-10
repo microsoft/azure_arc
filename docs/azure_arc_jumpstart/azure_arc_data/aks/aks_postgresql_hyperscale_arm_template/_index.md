@@ -53,6 +53,18 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
     > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
+* Enable subscription for the Microsoft.AzureArcData resource provider for Azure Arc enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  ```console
+  az provider register --namespace Microsoft.AzureArcData
+  ```
+
+  You can monitor the registration process with the following commands:
+
+  ```console
+  az provider show -n Microsoft.AzureArcData -o table
+  ```
+
 ## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
@@ -102,28 +114,30 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.parameters.example.json).
 
-    * *clusterName* - AKS cluster name
-    * *dnsPrefix* - AKS unique DNS prefix
-    * *nodeAdminUsername* - AKS Node Username
-    * *sshRSAPublicKey* - Your ssh public key
-    * *servicePrincipalClientId* - Your Azure service principal name
-    * *servicePrincipalClientSecret* - Your Azure service principal password
-    * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
-    * *adminUsername* - Client Windows VM admin username
-    * *adminPassword* - Client Windows VM admin password
-    * *vmSize* - Client Windows VM size
-    * *tenantId* - Azure tenant ID
-    * *resourceGroup* - Azure resource group where all the resources get deploy
-    * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
-    * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
-    * *ACCEPT_EULA* - "yes" **Do not change**
-    * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start d end with a alphanumeric character (This name will be used for k8s namespace as well).
-    * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
-    * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
-    * *POSTGRES_NAME* - PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster. Names must be 10 characters or fewer in length and conform to DNS naming conventions.
-    * *POSTGRES_WORKER_NODE_COUNT* - PostgreSQL Hyperscale server group number of workers
-    * *POSTGRES_DATASIZE* - PostgreSQL Hyperscale size of data volumes in MB (Recommended to use at least 1GB (1024 MB)).*
-    * *POSTGRES_SERVICE_TYPE* - Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort. As AKS supports Load Balancers, leave configured with *LoadBalancer*.
+    > **Note: Currently, On Azure Kubernetes Service (AKS), [Kubernetes version 1.19.x is not supported](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes#known-issues).**
+
+  * *clusterName* - AKS cluster name
+  * *dnsPrefix* - AKS unique DNS prefix
+  * *nodeAdminUsername* - AKS Node Username
+  * *sshRSAPublicKey* - Your ssh public key
+  * *servicePrincipalClientId* - Your Azure service principal name
+  * *servicePrincipalClientSecret* - Your Azure service principal password
+  * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
+  * *adminUsername* - Client Windows VM admin username
+  * *adminPassword* - Client Windows VM admin password
+  * *vmSize* - Client Windows VM size
+  * *tenantId* - Azure tenant ID
+  * *resourceGroup* - Azure resource group where all the resources get deploy
+  * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
+  * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
+  * *ACCEPT_EULA* - "yes" **Do not change**
+  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start d end with a alphanumeric character (This name will be used for k8s namespace as well).
+  * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
+  * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+  * *POSTGRES_NAME* - PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster. Names must be 10 characters or fewer in length and conform to DNS naming conventions.
+  * *POSTGRES_WORKER_NODE_COUNT* - PostgreSQL Hyperscale server group number of workers
+  * *POSTGRES_DATASIZE* - PostgreSQL Hyperscale size of data volumes in MB (Recommended to use at least 1GB (1024 MB)).*
+  * *POSTGRES_SERVICE_TYPE* - Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort. As AKS supports Load Balancers, leave configured with *LoadBalancer*.
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs) and run the below command:
 

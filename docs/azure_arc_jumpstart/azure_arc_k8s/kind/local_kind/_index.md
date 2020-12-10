@@ -61,8 +61,8 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
-* Enable subscription for two providers for Azure Arc enabled Kubernetes.
-  
+* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
   ```console
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration

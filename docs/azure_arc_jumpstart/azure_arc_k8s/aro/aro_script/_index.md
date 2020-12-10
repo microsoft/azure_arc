@@ -12,11 +12,25 @@ The following is a guide on how to use the Azure Cloud Shell to deploy an [Azure
 
 ## Prerequisites
 
-Ensure the user logging into Azure portal as admin or co-admin rights to be able to create service principals and/or assign policies to those service principals.
+* Ensure the user logging into Azure portal as admin or co-admin rights to be able to create service principals and/or assign policies to those service principals.
+
+* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  ```console
+  az provider register --namespace Microsoft.Kubernetes
+  az provider register --namespace Microsoft.KubernetesConfiguration
+  ```
+
+  You can monitor the registration process with the following commands:
+
+  ```console
+  az provider show -n Microsoft.Kubernetes -o table
+  az provider show -n Microsoft.KubernetesConfiguration -o table
+  ```
 
 ## Deployment
 
-There are two sets of resources that will be deployed, first is the Azure Red Hat Openshift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
+There are two sets of resources that will be deployed, first is the Azure Red Hat OpenShift Container cluster. Second is the Azure Arc Kubernetes resource that will connect the ```aro``` cluster to Azure Arc.
 
 The deployment of all resources is going to be done via Azure Cloud Shell.
 
@@ -54,7 +68,7 @@ The deployment of all resources is going to be done via Azure Cloud Shell.
 
   ![Screenshot showing Azure Portal](./image5.png)
 
-* To track progress navigate to the logs of the container by selecting **Containers** under **Settings** and then selecting **Logs**. This deployment can take upto ***50 mins***.
+* To track progress navigate to the logs of the container by selecting **Containers** under **Settings** and then selecting **Logs**. This deployment can take up to ***50 mins***.
 
   ![Screenshot showing Azure Portal container deployment](./image6.png)
 
