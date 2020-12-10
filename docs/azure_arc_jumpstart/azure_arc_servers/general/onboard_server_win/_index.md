@@ -6,7 +6,7 @@ weight: 2
 description: >
 ---
 
-## Onboard an existing Windows server with Azure Arc
+## Connect an existing Windows server to Azure Arc
 
 The following README will guide you on how to connect an Windows machine to Azure Arc using a simple PowerShell script.
 
