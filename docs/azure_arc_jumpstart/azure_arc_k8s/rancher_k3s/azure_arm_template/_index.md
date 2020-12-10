@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "k3s from Azure ARM template"
-linkTitle: "k3s from Azure ARM template"
+title: "k3s Azure ARM template"
+linkTitle: "k3s Azure ARM template"
 weight: 1
 description: >
 ---
