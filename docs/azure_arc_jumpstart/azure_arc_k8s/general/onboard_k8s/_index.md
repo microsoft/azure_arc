@@ -51,18 +51,15 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
     > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
-* Enable subscription for two providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```console
   az provider register --namespace Microsoft.Kubernetes
-  ```
-
-  ```console
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```
 
-  Registration is still on-going. You can monitor using ```az provider show -n Microsoft.KubernetesConfiguration```. You can monitor the registration process with the following commands:
-  
+  You can monitor the registration process with the following commands:
+
   ```console
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
