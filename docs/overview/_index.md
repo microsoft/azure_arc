@@ -13,7 +13,7 @@ The provided step-by-step guides will allow you to go through independent scenar
 
 Our goal is for you to have a working Azure Arc environment spun-up in no time so you can focus on the core values of the platform, regardless of where your infrastructure may be, either on-premises or in the cloud.
 
-<p align="center"><img src="/img/jumpstart-logo.png" alt="jumpstart-logo" width="250"></p>
+<p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="250"></p>
 
 > **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
 
