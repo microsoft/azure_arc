@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "k3s from Azure Terraform plan"
-linkTitle: "k3s from Azure Terraform plan"
+title: "k3s Azure Terraform plan"
+linkTitle: "k3s Azure Terraform plan"
 weight: 2
 description: >
 ---
