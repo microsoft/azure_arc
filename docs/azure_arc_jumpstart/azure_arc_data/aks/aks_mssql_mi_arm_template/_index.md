@@ -53,6 +53,18 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
     > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
+* Enable subscription for the Microsoft.AzureArcData resource provider for Azure Arc enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  ```console
+  az provider register --namespace Microsoft.AzureArcData
+  ```
+
+  You can monitor the registration process with the following commands:
+
+  ```console
+  az provider show -n Microsoft.AzureArcData -o table
+  ```
+
 ## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
@@ -101,6 +113,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     ```
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.parameters.example.json).
+
+    > **Note: Currently, On Azure Kubernetes Service (AKS), [Kubernetes version 1.19.x is not supported](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes#known-issues).**
 
   * *clusterName* - AKS cluster name
   * *dnsPrefix* - AKS unique DNS prefix
