@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Onboard an existing Linux server with Azure Arc
+## Connect an existing Linux server to Azure Arc
 
 The following README will guide you on how to connect an Linux server to Azure Arc using a simple shell script.
 
