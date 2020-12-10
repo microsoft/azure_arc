@@ -6,7 +6,7 @@ weight: 2
 description: >
 ---
 
-## Deploying Microsoft Monitoring Agent Extension (MMA) to Azure Arc Linux and Windows VMs using Extension Management
+## Deploy Monitoring Agent Extension on Azure Arc Linux and Windows servers using Extension Management
 
 The following README will guide you on how to manage extensions on Azure Arc enabled servers. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
 

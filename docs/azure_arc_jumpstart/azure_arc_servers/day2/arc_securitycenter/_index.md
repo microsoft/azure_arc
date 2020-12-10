@@ -6,7 +6,7 @@ weight: 5
 description: >
 ---
 
-## Azure Arc enabled servers on Azure Security Center
+## Connect Azure Arc enabled servers to Azure Security Center
 
 The following README will guide you on how to onboard an Azure Arc enabled server on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), so you can start collecting security-related configurations as well as event logs to recommend actions and improve your overall Azure security posture.
 

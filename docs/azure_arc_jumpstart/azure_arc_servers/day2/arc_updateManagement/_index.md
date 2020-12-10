@@ -6,7 +6,7 @@ weight: 7
 description: >
 ---
 
-## Deploy Update Management on Azure Arc enabled servers
+## Enable Update Management on Azure Arc enabled servers
 
 The scenario will show you how to onboard Azure Arc enabled servers to [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview), so that you can manage operating system updates for your Azure Arc enabled servers running Windows or Linux.
 

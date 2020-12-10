@@ -6,7 +6,7 @@ weight: 6
 description: >
 ---
 
-## Azure Arc enabled servers on Azure Sentinel
+## Connect Azure Arc enabled servers to Azure Sentinel
 
 The following README will guide you on how to onboard Azure Arc enabled servers on to [Azure Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources.
 

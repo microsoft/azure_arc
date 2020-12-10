@@ -6,7 +6,7 @@ weight: 2
 description: >
 ---
 
-## Onboard an AWS Amazon Linux 2 server with Azure Arc
+## Deploy an AWS Amazon Linux 2 server and connect it to Azure Arc using a Terraform plan
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an AWS Amazon Linux 2 virtual machine and connect it as an Azure Arc enabled server resource.
 

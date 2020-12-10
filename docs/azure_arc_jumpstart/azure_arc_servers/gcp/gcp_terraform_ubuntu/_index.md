@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Onboard a GCP Ubuntu server with Azure Arc
+## Deploy a GCP Ubuntu instance and connect it to Azure Arc using a Terraform plan
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Ubuntu Server GCP virtual machine and connect it as an Azure Arc enabled server resource.
 

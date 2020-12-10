@@ -6,7 +6,7 @@ weight: 3
 description: >
 ---
 
-## Deploying Custom Script Extension to Azure Arc Linux and Windows VMs using Extension Management
+## Deploy Custom Script Extension on Azure Arc Linux and Windows servers using Extension Management
 
 The following README will guide you on how to execute custom scripts on Azure Arc enabled servers by using Virtual Machine extensions. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
 

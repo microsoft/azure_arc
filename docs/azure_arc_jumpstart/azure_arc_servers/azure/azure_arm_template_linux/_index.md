@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Deploy an Ubuntu Azure VM and connect it to Azure Arc using ARM Template
+## Deploy an Ubuntu Azure Virtual Machine and connect it to Azure Arc using ARM Template
 
 The following README will guide you on how to automatically onboard a Azure Ubuntu VM on to Azure Arc using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview). The provided ARM template is responsible of creating the Azure resources as well as executing the Azure Arc onboard script on the VM.
 
