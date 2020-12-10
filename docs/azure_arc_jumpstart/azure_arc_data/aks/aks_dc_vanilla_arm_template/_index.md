@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Data Controller from ARM Template"
-linkTitle: "Data Controller from ARM Template"
+title: "Data Controller ARM Template"
+linkTitle: "Data Controller ARM Template"
 weight: 1
 description: >
 ---

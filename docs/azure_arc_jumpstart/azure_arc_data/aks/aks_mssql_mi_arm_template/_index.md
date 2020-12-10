@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "SQL Managed Instance from ARM Template"
-linkTitle: "SQL Managed Instance from ARM Template"
+title: "SQL Managed Instance ARM Template"
+linkTitle: "SQL Managed Instance ARM Template"
 weight: 2
 description: >
 ---

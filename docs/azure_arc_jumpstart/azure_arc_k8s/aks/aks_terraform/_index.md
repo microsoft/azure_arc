@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "AKS Cluster Terraform plan"
-linkTitle: "AKS Cluster Terraform plan"
+title: "AKS cluster Terraform plan"
+linkTitle: "AKS cluster Terraform plan"
 weight: 2
 description: >
 ---
