@@ -9,7 +9,11 @@ weight: 1
 
 The Azure Arc Jumpstart project is designed to provide a "zero to hero" experience so you can start working with Azure Arc right away!
 
-The provided step-by-step guides will allow you to go through independent scenarios that incorporate as much automation as possible, detailed screenshots and code samples, and an overall rich and comprehensive experience while getting started with the Azure Arc platform. Our goal is for you to have a working Azure Arc environment spun-up in no time so you can focus on the core values of the platform, regardless of where your infrastructure may be, either on-premises or in the cloud. 
+The provided step-by-step guides will allow you to go through independent scenarios that incorporate as much automation as possible, detailed screenshots and code samples, and an overall rich and comprehensive experience while getting started with the Azure Arc platform.
+
+Our goal is for you to have a working Azure Arc environment spun-up in no time so you can focus on the core values of the platform, regardless of where your infrastructure may be, either on-premises or in the cloud.
+
+<p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="250"></p>
 
 > **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
 

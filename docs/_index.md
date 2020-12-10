@@ -2,6 +2,6 @@
 type: docs
 ---
 
-# Documentation
+<!-- # Documentation -->
 
 # <img src="/img/jumpstart-logo.png" alt="jumpstart-logo" width=600>
