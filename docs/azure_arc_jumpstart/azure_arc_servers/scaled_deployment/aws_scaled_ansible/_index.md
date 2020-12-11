@@ -138,7 +138,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
     ![Screenshot of AWS console showing EC2 instances](./02.png)
 
-### Run the Ansible playbook to onboard the AWS servers as Azure Arc enabled servers
+### Run the Ansible playbook to onboard the AWS EC2 instances as Azure Arc enabled servers
 
 * When the Terraform plan completes, it will display the public IP of the Ansible control server in an output variable named *ansible_ip*. SSH into the Ansible server by running the ```ssh centos@XX.XX.XX.XX``` where XX.XX.XX.XX is substituted for your Ansible server's IP address.
 
@@ -171,7 +171,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Open Azure Portal and navigate to the Arc-AWS-Demo resource group. You should see the Azure Arc enabled servers listed.
 
-    ![Screenshot of Azure Portal showing onboarded Azure Arc enabled servers](./06.png)
+    ![Screenshot of Azure Portal showing onboard Azure Arc enabled servers](./06.png)
 
 ### Clean up environment by deleting resources
 

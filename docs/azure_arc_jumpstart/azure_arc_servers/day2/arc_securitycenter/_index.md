@@ -20,12 +20,12 @@ In this guide, you will enable and configure Azure Security Center Standard tier
 
 * Apply recommended configurations on Azure Arc enabled servers using the ***Quick Fix*** remediations.
 
-> **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion:**
+> **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
-* [GCP Ubuntu VM](../../gcp/gcp_terraform_ubuntu/) / [GCP Windows VM](../../gcp/gcp_terraform_windows)
-* [AWS Ubuntu VM](../../aws/aws_terraform_ubuntu/)
-* [VMware Ubuntu VM](../../vmware/vmware_terraform_ubuntu/) / [VMware Windows Server VM](../../vmware/vmware_terraform_winsrv)
-* [Local Ubuntu VM](../../vagrant/local_vagrant_ubuntu/) / [Local Windows VM](../../vagrant/local_vagrant_windows)
+* **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/) / [GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
+* **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
+* **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/) / [VMware vSphere Windows Server VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_winsrv/)**
+* **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/) / [Vagrant Windows box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_windows/)**
 
 ## Prerequisites
 
@@ -109,11 +109,11 @@ In this guide, you will enable and configure Azure Security Center Standard tier
 
 ## Azure Arc and Azure Security Center Integration
 
-Now that you have successfully onboarded ASC, you will get recommendations to help you protect your resources, including your Azure Arc enabled servers. ASC will then periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
+Now that you have successfully onboard ASC, you will get recommendations to help you protect your resources, including your Azure Arc enabled servers. ASC will then periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
 
 * In the "Compute & apps" section under "VM and Servers", ASC will provide you with an overview of all the discovered security recommendations for your VMs and computers, including Azure VMs, Azure Classic VMs, servers and **Azure Arc Machines**.
 
-    ![Screenshot showing Azure Securit Center compute and apps](./04.png)
+    ![Screenshot showing Azure Security Center compute and apps](./04.png)
 
 * On the Azure Arc enabled servers, ASC will provide a recommendation to install the Log Analytics agent. In addition, each recommendation will include:
   * A short description of what is being recommended.
@@ -142,10 +142,10 @@ Complete the following steps to clean up your environment.
 
 * Remove the virtual machines from each environment by following the teardown instructions from each guide.
 
-  * *[GCP Ubuntu VM](../../gcp/gcp_terraform_ubuntu/) / [GCP Windows VM](../../gcp/gcp_terraform_windows)*
-  * *[AWS Ubuntu VM](../../aws/aws_terraform_ubuntu/)*
-  * *[VMware Ubuntu VM](../../vmware/vmware_terraform_ubuntu/) / [VMware Windows Server VM](../../vmware/vmware_terraform_winsrv)*
-  * *[Local Ubuntu VM](../../vagrant/local_vagrant_ubuntu/) / [Local Windows VM](../../vagrant/local_vagrant_windows)*
+  * **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/) / [GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
+  * **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
+  * **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/) / [VMware vSphere Windows Server VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_winsrv/)**
+  * **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/) / [Vagrant Windows box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_windows/)**
 
 * Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 

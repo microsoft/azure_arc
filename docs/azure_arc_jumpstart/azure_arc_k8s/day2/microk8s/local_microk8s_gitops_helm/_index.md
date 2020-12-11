@@ -14,7 +14,7 @@ In this guide, you will first deploy a nginx ingress controller to your cluster.
 
 By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-**Note: This guide assumes you already deployed MicroK8s and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [MicroK8s onboarding guide](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/_index.md).**
+> **Note: This guide assumes you already deployed MicroK8s and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [MicroK8s onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/).**
 
 ## Prerequisites
 
@@ -28,11 +28,11 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
-    *   [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
+  * [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
 
-    *   [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
+  * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-    *   [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+  * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected MicroK8s cluster to Azure Arc.
 
@@ -75,13 +75,13 @@ By doing so, you will be able to make real-time changes to the application and s
 
     You can export MicroK8s cluster config to a file and use `kubectl` directly instead of `microk8s kubectl` command.
 
-    * Windows
+  * Windows
 
     ```console
     microk8s config view > %HOMEPATH%\.kube\microk8s
     ```
 
-    * Linux
+  * Linux
 
     ```console
     microk8s config view > ~\.kube\microk8s
@@ -137,7 +137,7 @@ The demo application that will be deployed later in this guide relies on an ingr
 
 With Cluster-level GitOps config, the goal is to have "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Meshes, Security products, Monitoring solutions, etc.
 
-> **Note: You will not be creating a cluster-level config in this guide. For an example of a cluster-level configuration please refer to either the [Helm-based GitOps on AKS scenario](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/day2/aks/aks_gitops_helm/_index.md) or the [GKE one](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_helm/_index.md).**
+> **Note: You will not be creating a cluster-level config in this guide. For an example of a cluster-level configuration please refer to either the [Helm-based GitOps on AKS scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks/aks_gitops_helm/) or the [GKE one](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_helm/).**
 
 ### Namespace-level Config
 
@@ -218,17 +218,17 @@ The `az_k8sconfig_helm_microk8s` and `az_k8sconfig_helm_microk8s_windows` script
 
 * To show the above flow, open 2 (ideally 3) side-by-side windows:
 
-    * Local shell running ```kubectl get pods -n prod -w```
+  * Local shell running ```kubectl get pods -n prod -w```
 
-    * In your own repository fork, open the "Hello Arc" [*hello-arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/releases/prod/hello-arc.yaml) Helm release file.
+  * In your own repository fork, open the "Hello Arc" [*hello-arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/releases/prod/hello-arc.yaml) Helm release file.
 
-    * Another browser window that has the webpage <http://172.22.206.155:32106> open **(replace with your own values)**  
+  * Another browser window that has the webpage <http://172.22.206.155:32106> open **(replace with your own values)**  
 
-    End result should look like this:
+  * End result should look like this:
 
     ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./13.png)
 
-    As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
+* As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
 
     !["Tab Auto Refresh" extension](./14.png)
 

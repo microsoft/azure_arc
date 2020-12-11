@@ -96,17 +96,17 @@ Before converting the VM to a template, few actions needs to be taken.
 
 * None of the below are mandatory but should be considered for a Windows Template:
 
-    * Disabling User Account Control (can be later tuned on via Group Policy or a PowerShell script)
-    * Turn off Windows Defender FW (can be later tuned on via Group Policy or a PowerShell script)
-    * Disabling Internet Explorer Enhanced Security Configuration (ESC) (can be later tuned on via Group Policy or a PowerShell script)
-    * Enable Remote Desktop
-    * In PowerShell, install [Chocolaty](https://chocolatey.org/install)
+  * Disabling User Account Control (can be later tuned on via Group Policy or a PowerShell script)
+  * Turn off Windows Defender FW (can be later tuned on via Group Policy or a PowerShell script)
+  * Disabling Internet Explorer Enhanced Security Configuration (ESC) (can be later tuned on via Group Policy or a PowerShell script)
+  * Enable Remote Desktop
+  * In PowerShell, install [Chocolaty](https://chocolatey.org/install)
 
-        ```powershell
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-        ```
+    ```powershell
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    ```
 
-    * Install all baseline apps you may want to include in your template.
+  * Install all baseline apps you may want to include in your template.
 
 ### Convert to Template
 

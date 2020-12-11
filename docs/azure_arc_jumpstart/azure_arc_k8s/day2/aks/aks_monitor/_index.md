@@ -12,7 +12,7 @@ The following README will guide you on how to onboard an Azure Kubernetes Servic
 
 In this guide, you will hook the AKS cluster to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster to start collecting telemetry.  
 
-> **Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/_index.md) or [Terraform](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/_index.md).**
+> **Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/) or [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/).**
 
 ## Prerequisites
 
@@ -79,11 +79,11 @@ In this guide, you will hook the AKS cluster to Azure Monitor by deploying the [
 
     The script will:
 
-    * Login to your Azure subscription using the SPN credentials
-    * Download the OMS script
-    * Retrieve the Azure Arc Connected Cluster Azure Resource ID as well as the cluster credentials (KUBECONFIG)
-    * Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
-    * Delete the downloaded script
+  * Login to your Azure subscription using the SPN credentials
+  * Download the OMS script
+  * Retrieve the Azure Arc Connected Cluster Azure Resource ID as well as the cluster credentials (KUBECONFIG)
+  * Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
+  * Delete the downloaded script
 
 * Once the script will complete it's run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers. At the end of it's run, the script generates URL for you to click on. This URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
 

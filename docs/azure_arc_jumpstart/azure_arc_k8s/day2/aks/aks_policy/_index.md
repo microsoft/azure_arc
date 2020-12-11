@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to enable [Azure Policy for Kubernetes](https://docs.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes#:~:text=Azure%20Policy%20extends%20Gatekeeper%20v3,Kubernetes%20clusters%20from%20one%20place.) on an Azure Kubernetes Service (AKS) cluster that is projected as an Azure Arc connected cluster as well as how to create GitOps policy to apply on the cluster.
 
-> **Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](../../../aks/aks_arm_template) or [Terraform](../../../aks/aks_terraform).**
+> **Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/) or [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/).**
 
 ## Prerequisites
 
@@ -97,7 +97,7 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
 ## Azure Policy for Azure Arc Connected Cluster Integration
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *aks_policy_onboarding* script against the AKS connected cluster. For your convenient, both shell and PowerShell scripts are [provided](../../../../../azure_arc_k8s_jumpstart/aks/azure_policy/aks_policy_onboarding.sh).
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *aks_policy_onboarding* script against the AKS connected cluster. For your convenient, shell script is [provided to you](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/azure_policy/aks_policy_onboarding.sh).
 
 * Edit the environment variables in the script to match your environment parameters, upload it to the Cloud Shell environment and run it using the ```. ./aks_policy_onboarding.sh``` command. **If you decided to use the 'Policy Insights Data Writer (Preview)' role assignment as described in the perquisites section, make sure to use it's respective *appId*, *password* and *tenantId***
 
@@ -122,7 +122,7 @@ After few seconds, by running the the ```kubectl get pods -A``` command, you wil
 
 ## Deploy GitOps to Azure Arc Kubernetes cluster using Azure Policy
 
-Although you can [deploy GitOps configuration individually](../aks_gitops_helm/_index.md) on each of your Azure Arc connected clusters, Azure Policy for Kubernetes allows to do the same on a broader scope (i.e subscription or resource group). That way, you can guarantee existing and newly added Azure Arc connected clusters to all have the same GitOps configuration and as a result, the same cluster baseline and/or application version deployed.
+Although you can [deploy GitOps configuration individually](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks/aks_gitops_helm/) on each of your Azure Arc connected clusters, Azure Policy for Kubernetes allows to do the same on a broader scope (i.e subscription or resource group). That way, you can guarantee existing and newly added Azure Arc connected clusters to all have the same GitOps configuration and as a result, the same cluster baseline and/or application version deployed.
 
 * Before assigning the policy, in the Azure portal, click the *Configuration* setting in your AKS connected cluster. Notice how no GitOps configurations are deployed.
 
@@ -198,7 +198,7 @@ Although you can [deploy GitOps configuration individually](../aks_gitops_helm/_
 
 Complete the following steps to clean up your environment.
 
-* Delete the AKS cluster as described in the [ARM Template teardown instructions](../../../aks/aks_arm_template) or the [Terraform teardown instructions](../../../aks/aks_terraform).
+* Delete the AKS cluster as described in the [ARM Template teardown instructions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/) or the [Terraform teardown instructions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/).
 
 * From the Policy page in the Azure portal, remove the "[Preview]: Deploy GitOps to Kubernetes cluster" policy assignment from the cluster.
 

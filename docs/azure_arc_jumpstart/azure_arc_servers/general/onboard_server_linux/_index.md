@@ -47,7 +47,7 @@ The following README will guide you on how to connect an Linux server to Azure A
 
     ![Screenshot showing Azure Portal with empty resource group](./01.png)
 
-* Download the [az_connect_linux](../scripts/az_connect_linux.sh) shell script.
+* Download the [az_connect_linux](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_linux.sh) shell script.
 
 * Change the environment variables according to your environment.
 

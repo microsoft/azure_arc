@@ -45,7 +45,7 @@ The following README will guide you on how to connect an Windows machine to Azur
 
 * Create a new Azure resource group where you want your machine(s) to show up.
 
-    ![Screenshot showing Azure Portal wtih empty resource group](./01.png)
+    ![Screenshot showing Azure Portal with empty resource group](./01.png)
 
 * Download the [az_connect_win](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script.
 

@@ -55,7 +55,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ### Preparing an Ubuntu Server VMware vSphere VM Template
 
-Before using the below guide to deploy an Ubuntu Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](./vmware_ubuntu_template) will instruct you how to easily create such a template using VMware vSphere 6.5 and above.
+Before using the below guide to deploy an Ubuntu Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/vmware_ubuntu_template/) will instruct you how to easily create such a template using VMware vSphere 6.5 and above.
 
 > **Note: If you already have an Ubuntu Server VM template it is still recommended to use the guide as a reference.**
 
@@ -67,17 +67,17 @@ Before executing the Terraform plan, you must set the environment variables whic
 
 * The Terraform plan creates resources in both Microsoft Azure and VMware vSphere. It then executes a script on the virtual machine to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your VMware vSphere and Azure environments. Edit [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/vmware/ubuntu/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
 
-    * TF_VAR_subscription_id=Your Azure subscription ID
-    * TF_VAR_client_id=Your Azure service principal name
-    * TF_VAR_client_secret=Your Azure service principal password
-    * TF_VAR_tenant_id=Your Azure tenant ID
-    * TF_VAR_resourceGroup=Azure resource group name
-    * TF_VAR_location=Azure Region
-    * TF_VAR_vsphere_user=vCenter Admin Username
-    * TF_VAR_vsphere_password=vCenter Admin Password
-    * TF_VAR_vsphere_server=vCenter server FQDN/IP
-    * TF_VAR_admin_user=OS Admin Username
-    * TF_VAR_admin_password=OS Admin Password
+  * TF_VAR_subscription_id=Your Azure subscription ID
+  * TF_VAR_client_id=Your Azure service principal name
+  * TF_VAR_client_secret=Your Azure service principal password
+  * TF_VAR_tenant_id=Your Azure tenant ID
+  * TF_VAR_resourceGroup=Azure resource group name
+  * TF_VAR_location=Azure Region
+  * TF_VAR_vsphere_user=vCenter Admin Username
+  * TF_VAR_vsphere_password=vCenter Admin Password
+  * TF_VAR_vsphere_server=vCenter server FQDN/IP
+  * TF_VAR_admin_user=OS Admin Username
+  * TF_VAR_admin_password=OS Admin Password
 
 * From CLI, navigate to the *azure_arc_servers_jumpstart/vmware/ubuntu/terraform* directory of the cloned repo.
 

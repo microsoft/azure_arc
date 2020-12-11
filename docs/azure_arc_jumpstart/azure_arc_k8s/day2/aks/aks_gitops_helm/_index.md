@@ -14,7 +14,7 @@ In this guide, you will deploy & attach 2 GitOps configuration to your cluster, 
 
 By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-> **Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](../../../aks/aks_arm_template) or [Terraform](../../../aks/aks_terraform).**
+> **Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/) or [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/).**
 
 ## Prerequisites
 
@@ -28,11 +28,11 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
-    *   [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
+  * [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
 
-    *   [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
+  * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-    *   [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+  * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
 
@@ -123,11 +123,11 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
     The script will:
 
-    * Login to your Azure subscription using the SPN credentials
-    * Retrieve the cluster credentials (KUBECONFIG)
-    * Create two GitOps configurations for the Azure Arc Connected Cluster. Both configurations will be using the Helm charts located in the "Hello Arc" repository.
-        *   Cluster-level config to deploy nginx-ingress controller Helm chart
-        *   Namespace-level config to deploy the "Hello Arc" application Helm chart
+  * Login to your Azure subscription using the SPN credentials
+  * Retrieve the cluster credentials (KUBECONFIG)
+  * Create two GitOps configurations for the Azure Arc Connected Cluster. Both configurations will be using the Helm charts located in the "Hello Arc" repository.
+  * Cluster-level config to deploy nginx-ingress controller Helm chart
+  * Namespace-level config to deploy the "Hello Arc" application Helm chart
 
     > **Disclaimer: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval to rapidly track changes on the repository but it is recommended to have longer interval in your production environment (default value is 5min)**
 
@@ -172,23 +172,23 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
 * To show the above flow, open 2 (ideally 3) side-by-side browser windows:
 
-    * Azure Cloud Shell open running the ```kubectl get pods -n prod -w```
+  * Azure Cloud Shell open running the ```kubectl get pods -n prod -w```
 
-        ![kubectl get pods -n prod -w](./15.png)
+    ![kubectl get pods -n prod -w](./15.png)
 
-    * In your own repository fork, open the "Hello Arc" [*hello-arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/releases/prod/hello-arc.yaml) Helm release file.
+  * In your own repository fork, open the "Hello Arc" [*hello-arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/releases/prod/hello-arc.yaml) Helm release file.
 
-    * The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n hello-arc``` command.
+  * The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n hello-arc``` command.
 
-        ![kubectl get svc -n hello-arc](./16.png)
+    ![kubectl get svc -n hello-arc](./16.png)
 
-    * End result should look like that:
+  * End result should look like that:
 
-        ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./17.png)
+    ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./17.png)
 
-    * As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
+* As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
 
-        ![Tab Auto Refresh](./18.png)
+    ![Tab Auto Refresh](./18.png)
 
 * In the repository window showing the *hello-arc.yaml* file, change the number of *replicaCount* to 3 as well as the the message text and commit your changes. Alternatively, you can open the forked repository in your IDE, make the change, commit and push it.
 
