@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Dynamic AWS EC2 inventory with Ansible"
-linkTitle: "Dynamic AWS EC2 inventory with Ansible"
+title: "AWS EC2 dynamic inventory with Ansible"
+linkTitle: "AWS EC2 dynamic inventory with Ansible"
 weight: 3
 description: >
 ---
