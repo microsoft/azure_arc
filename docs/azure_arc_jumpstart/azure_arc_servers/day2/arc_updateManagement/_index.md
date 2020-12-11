@@ -16,12 +16,12 @@ In this guide, you will create and configure an Azure Automation account and Log
 
 * Enable Update Management on Azure Arc enabled servers.
 
-> **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion:**
+> **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
-* [GCP Ubuntu VM](../../gcp/gcp_terraform_ubuntu/) / [GCP Windows VM](../../gcp/gcp_terraform_windows)
-* [AWS Ubuntu VM](../../aws/aws_terraform_ubuntu/)
-* [VMware Ubuntu VM](../../vmware/vmware_terraform_ubuntu/) / [VMware Windows Server VM](../../vmware/vmware_terraform_winsrv)
-* [Local Ubuntu VM](../../vagrant/local_vagrant_ubuntu/) / [Local Windows VM](../../vagrant/local_vagrant_windows)
+* **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/) / [GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
+* **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
+* **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/) / [VMware vSphere Windows Server VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_winsrv/)**
+* **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/) / [Vagrant Windows box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_windows/)**
 
 ## Prerequisites
 
@@ -79,7 +79,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
     ![Screenshot showing Solutions Blade of Log Analytics workspace](./13.png)
 
-* It may take several hours for Update Management to collect enough data to show an assessment for your VM. In the screen below we can see the assessment is being peformed.
+* It may take several hours for Update Management to collect enough data to show an assessment for your VM. In the screen below we can see the assessment is being performed.
 
     ![Screenshot showing Update Management overview blade](./14.png)
 
@@ -118,7 +118,7 @@ Now that we have configured the Update Management solution, we can deploy update
     ![Screenshot showing scheduling an update with Update Management](./23.png)
 
 * From the Automation Account Update Management blade, you should be able to see your scheduled Update deployment from the Deployment Schedules tab.
-    ![Screenshot showing scheduled udpate](./24.png)
+    ![Screenshot showing scheduled update](./24.png)
 
 The Update Management solution will now update your Azure Arc enabled servers in the deployment window based on the schedule you defined. There is a lot more you can do with [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) that is outside the scope of this scenario. Review the [documentation](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) for more information.
 
@@ -128,10 +128,10 @@ Complete the following steps to clean up your environment.
 
 * Remove the virtual machines from each environment by following the teardown instructions from each guide.
 
-  * [GCP Ubuntu VM](../../gcp/gcp_terraform_ubuntu/) / [GCP Windows VM](../../gcp/gcp_terraform_windows)
-  * [AWS Ubuntu VM](../../aws/aws_terraform_ubuntu/)
-  * [VMware Ubuntu VM](../../vmware/vmware_terraform_ubuntu/) / [VMware Windows Server VM](../../vmware/vmware_terraform_winsrv)
-  * [Local Ubuntu VM](../../vagrant/local_vagrant_ubuntu/) / [Local Windows VM](../../vagrant/local_vagrant_windows)
+  * **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/) / [GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
+  * **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
+  * **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/) / [VMware vSphere Windows Server VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_winsrv/)**
+  * **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/) / [Vagrant Windows box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_windows/)**
 
 * Delete the resource group.
 

@@ -95,12 +95,12 @@ In this guide, you will hook the GKE cluster to Azure Monitor by deploying the [
 
 * Click the "Connected Clusters" tab and see the Azure Arc connected cluster was added. Now that your cluster is being monitored, navigate trough the different tabs and sections and watch the monitoring telemetry for the cluster nodes and pods.  
 
-    ![Screenshot showing Azure Portal wtih connected cluster detail](./10.png)
+    ![Screenshot showing Azure Portal with connected cluster detail](./10.png)
 
-    ![Screenshot showing Azure Portal wtih connected cluster detail](./11.png)
+    ![Screenshot showing Azure Portal with connected cluster detail](./11.png)
 
-    ![Screenshot showing Azure Portal wtih connected cluster detail](./12.png)
+    ![Screenshot showing Azure Portal with connected cluster detail](./12.png)
 
-    ![Screenshot showing Azure Portal wtih connected cluster detail](./13.png)
+    ![Screenshot showing Azure Portal with connected cluster detail](./13.png)
 
-    ![Screenshot showing Azure Portal wtih connected cluster detail](./14.png)
+    ![Screenshot showing Azure Portal with connected cluster detail](./14.png)

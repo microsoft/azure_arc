@@ -50,8 +50,8 @@ The following README will guide you on how to create an Ubuntu Server 18.04 VMwa
 
 * Power-on the VM and start the Ubuntu installation. No specific instructions here but:
 
-    * (Optional) Consider using static IP
-    * Install OpenSSH server
+  * (Optional) Consider using static IP
+  * Install OpenSSH server
 
     ![Power-on the VM](./10.png)
 

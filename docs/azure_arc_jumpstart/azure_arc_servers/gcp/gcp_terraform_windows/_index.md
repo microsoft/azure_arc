@@ -71,9 +71,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Once the new project is created and selected in the dropdown at the top of the page, you must enable Compute Engine API access for the project. Click on "+Enable APIs and Services" and search for "Compute Engine". Then click Enable to enable API access.
 
-    ![Screenshot of GCP console showing enabling Compue Engine API](./03.png)
+    ![Screenshot of GCP console showing enabling Compute Engine API](./03.png)
 
-    ![Screenshot of GCP console showing enabling Compue Engine API](./04.png)
+    ![Screenshot of GCP console showing enabling Compute Engine API](./04.png)
 
 * Next, set up a service account key, which Terraform will use to create and manage resources in your GCP project. Go to the [create service account key page](https://console.cloud.google.com/apis/credentials/serviceaccountkey). Select "New Service Account" from the dropdown, give it a name, select Project then Owner as the role, JSON as the key type, and click Create. This downloads a JSON file with all the credentials that will be needed for Terraform to manage the resources. Copy the downloaded JSON file to the *azure_arc_servers_jumpstart/gcp/windows/terraform* directory.
 

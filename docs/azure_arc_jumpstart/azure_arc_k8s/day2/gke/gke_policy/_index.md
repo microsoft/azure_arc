@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to enable [Azure Policy for Kubernetes](https://docs.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes#:~:text=Azure%20Policy%20extends%20Gatekeeper%20v3,Kubernetes%20clusters%20from%20one%20place.) on a Google Kubernetes Engine (GKE) cluster that is projected as an Azure Arc connected cluster as well as how to create GitOps policy to apply on the cluster.
 
-> **Note: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/_index.md).**
+> **Note: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).**
 
 ## Prerequisites
 
@@ -113,11 +113,11 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
     The script will:
 
-    * Install Helm 3 & Azure CLI
-    * Install NGINX Ingress Controller
-    * Login to your Azure subscription using the SPN credentials
-    * Retrieve cluster Azure Resource ID
-    * Install the 'azure-policy-addon' helm chart & Gatekeeper
+  * Install Helm 3 & Azure CLI
+  * Install NGINX Ingress Controller
+  * Login to your Azure subscription using the SPN credentials
+  * Retrieve cluster Azure Resource ID
+  * Install the 'azure-policy-addon' helm chart & Gatekeeper
 
     After few seconds, by running the the ```kubectl get pods -A``` command, you will notice all pods have been deployed.
 
@@ -125,7 +125,7 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
 ## Deploy GitOps to Azure Arc Kubernetes cluster using Azure Policy
 
-Although you can [deploy GitOps configuration individually](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_basic/_index.md) on each of your Azure Arc connected clusters, Azure Policy for Kubernetes allows to do the same on a broader scope (i.e Subscription or resource group). That way, you can guarantee existing and newly added Azure Arc connected clusters to all have the same GitOps configuration and as a result, the same cluster baseline and/or application version deployed.
+Although you can [deploy GitOps configuration individually](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_basic/) on each of your Azure Arc connected clusters, Azure Policy for Kubernetes allows to do the same on a broader scope (i.e Subscription or resource group). That way, you can guarantee existing and newly added Azure Arc connected clusters to all have the same GitOps configuration and as a result, the same cluster baseline and/or application version deployed.
 
 * Before assigning the policy, in the Azure portal, click the *Configuration* setting in your GKE connected cluster. Notice how no GitOps configurations are deployed.
 
@@ -199,7 +199,7 @@ Although you can [deploy GitOps configuration individually](https://github.com/m
 
 Complete the following steps to clean up your environment.
 
-* Delete the GKE cluster as described in the [teardown instructions](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/_index.md#delete-the-deployment).
+* Delete the GKE cluster as described in the [teardown instructions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).
 
 * From the Policy page in the Azure portal, remove the "[Preview]: Deploy GitOps to Kubernetes cluster" policy assignment from the cluster.
 

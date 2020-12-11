@@ -26,21 +26,20 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
 
     > **Note: This guide was tested with the latest version of PowerCLI as of date (12.0.0) but earlier versions are expected to work as well**
 
-    * Supported PowerShell Versions - VMware PowerCLI 12.0.0 is compatible with the following PowerShell versions:
-        * Windows PowerShell 5.1
-        * PowerShell 7
+  * Supported PowerShell Versions - VMware PowerCLI 12.0.0 is compatible with the following PowerShell versions:
+  * Windows PowerShell 5.1
+  * PowerShell 7
+  * Detailed installation instructions can be found [here](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.esxi.install.doc/GUID-F02D0C2D-B226-4908-9E5C-2E783D41FE2D.html) but the easiest way is to use the VMware.PowerCLI module from the PowerShell Gallery using the below command.
 
-    * Detailed installation instructions can be found [here](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.esxi.install.doc/GUID-F02D0C2D-B226-4908-9E5C-2E783D41FE2D.html) but the easiest way is to use the VMware.PowerCLI module from the PowerShell Gallery using the below command.
-
-        ```powershell
-        Install-Module -Name VMware.PowerCLI
-        ```
+    ```powershell
+    Install-Module -Name VMware.PowerCLI
+    ```
 
 * To be able to read the VM inventory from vCenter as well as invoke a script on the VM OS-level, the following permissions are needed:
 
-    * [VirtualMachine.GuestOperations](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.security.doc/GUID-6A952214-0E5E-4CCF-9D2A-90948FF643EC.html) user account
+  * [VirtualMachine.GuestOperations](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.security.doc/GUID-6A952214-0E5E-4CCF-9D2A-90948FF643EC.html) user account
 
-    * VMware vCenter Server user assigned with a ["Read Only Role"](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.security.doc/GUID-93B962A7-93FA-4E96-B68F-AE66D3D6C663.html)
+  * VMware vCenter Server user assigned with a ["Read Only Role"](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.security.doc/GUID-93B962A7-93FA-4E96-B68F-AE66D3D6C663.html)
 
 * Create Azure service principal (SP)
 

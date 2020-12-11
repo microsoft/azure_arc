@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Deploy an AWS Ubuntu server and connect it to Azure Arc using a Terraform plan
+## Deploy an AWS Ubuntu EC2 instance and connect it to Azure Arc using a Terraform plan
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an AWS EC2 virtual machine and connect it as an Azure Arc enabled server resource.
 

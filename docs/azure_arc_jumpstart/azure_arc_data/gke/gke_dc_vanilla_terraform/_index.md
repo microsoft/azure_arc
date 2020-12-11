@@ -16,7 +16,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 * Create a Google Cloud Platform (GCP) project, IAM Role & Service Account
 * Download credentials file
-* Clone the Azure Arc Jumpstart repositorysitory
+* Clone the Azure Arc Jumpstart repository
 * Edit *TF_VAR* variables values
 * *terraform init*
 * *terraform apply*
@@ -163,7 +163,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 As mentioned, the Terraform plan will deploy a GKE cluster and a Windows Server 2019 Client GCP compute instance.
 
-* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](../../../../azure_arc_data_jumpstart/gke/terraform/example/TF_VAR_example.sh)
+* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/terraform/example/TF_VAR_example.sh)
 
   ![Terraform vars export](./19.png)
 

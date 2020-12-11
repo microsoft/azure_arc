@@ -12,7 +12,7 @@ The following README will guide you on how to create GitOps configuration on a G
 
 In this guide, you will deploy & attach GitOps configuration to your cluster which will also include deploying an "Hello World" Azure Arc web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-**Note: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/_index.md).**
+**Note: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).**
 
 ## Prerequisites
 
@@ -26,11 +26,11 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
-    *   [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
+  * [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
 
-    *   [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
+  * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-    *   [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+  * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected GKE cluster to Azure Arc.
 
@@ -87,13 +87,13 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
     ![Upload a file to Cloud Shell](./07.png)
 
-    *  The script will:
+    The script will:
 
-        *   Login to your Azure subscription using the SPN credentials
-        *   Retrieve the cluster credentials (KUBECONFIG)
-        *   Will use Helm to deploy NGINX ingress controller
-        *   Create the GitOps configurations and deploy the Flux operator and Memcached on the Azure Arc connected cluster
-        *   Deploy the ["Hello Arc"](https://github.com/likamrat/hello_arc) application along side an Ingress rule to make it available from outside the cluster
+  * Login to your Azure subscription using the SPN credentials
+  * Retrieve the cluster credentials (KUBECONFIG)
+  * Will use Helm to deploy NGINX ingress controller
+  * Create the GitOps configurations and deploy the Flux operator and Memcached on the Azure Arc connected cluster
+  * Deploy the ["Hello Arc"](https://github.com/likamrat/hello_arc) application along side an Ingress rule to make it available from outside the cluster
 
     > **Disclaimer: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval to rapidly track changes on the repository but it is recommended to have longer interval in your production environment (default value is 5min)**
 
@@ -107,10 +107,13 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * Before kicking the GitOps flow, let's verify and zoom-in to the Kubernetes resources deployed by running few *kubectl* commands.
 
-    * ```kubectl get pods -n cluster-config``` - Will show the Flux operator and the Memcached pods.
-    * ```kubectl get pods -n hello-arc``` - Will show 3 replicas of the "Hello Arc" application and the NGINX controller.
-    * ```kubectl get svc -n hello-arc``` - Will show NGINX controller Kubernetes Service (Type LoadBalancer).
-    * ```kubectl get ing -n hello-arc``` - Will show NGINX rule which will route the traffic to the "Hello Arc" application from outside the cluster.
+    ```kubectl get pods -n cluster-config``` - Will show the Flux operator and the Memcached pods.
+
+    ```kubectl get pods -n hello-arc``` - Will show 3 replicas of the "Hello Arc" application and the NGINX controller.
+
+    ```kubectl get svc -n hello-arc``` - Will show NGINX controller Kubernetes Service (Type LoadBalancer).
+
+    ```kubectl get ing -n hello-arc``` - Will show NGINX rule which will route the traffic to the "Hello Arc" application from outside the cluster.
 
     ![kubectl get pods -n cluster-config](./10.png)
 
@@ -130,23 +133,23 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * To show the above flow, open 2 (ideally 3) side-by-side browser windows:
 
-    * Google Cloud Shell open running the ```kubectl get pods -n hello-arc -w```
+  * Google Cloud Shell open running the ```kubectl get pods -n hello-arc -w```
 
-        ![kubectl get pods -n hello-arc -w](./14.png)
+    ![kubectl get pods -n hello-arc -w](./14.png)
 
-    * Your clone of the "Hello Arc" application repository. Open the [*hello_arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/yaml/hello_arc.yaml) file.
+  * Your clone of the "Hello Arc" application repository. Open the [*hello_arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/yaml/hello_arc.yaml) file.
 
-    * The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n hello-arc``` command.
+  * The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n hello-arc``` command.
 
-        ![kubectl get svc -n hello-arc](./15.png)
+    ![kubectl get svc -n hello-arc](./15.png)
 
-    * End result should look like that:
+  * End result should look like that:
 
-        ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./16.png)
+    ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./16.png)
 
-    * As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
+* As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
 
-        ![Tab Auto Refresh](./17.png)
+    ![Tab Auto Refresh](./17.png)
 
 * In the repository window showing the *hello_arc.yaml* file, change the text under "MESSAGE" section commit the change. Alternatively, you can open the clone repository in your IDE, make the change, commit and push it.
 
