@@ -4,5 +4,5 @@ title: "Amazon Web Services"
 linkTitle: "Amazon Web Services"
 weight: 4
 description: >-
-  Azure Arc can project servers into Azure from any public cloud. The following guides provide end-to-end deployment of new Linux servers in AWS EC2 and onboarding to Azure with Azure Arc using Terraform..
+  If you are working in a multi-cloud environment, you can deploy new AWS EC2 instances in an automated fashion using Terraform and onboard it as Azure Arc enabled servers.
 ---

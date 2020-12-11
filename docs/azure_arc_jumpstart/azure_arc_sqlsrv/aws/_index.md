@@ -4,6 +4,6 @@ title: "Amazon Web Services"
 linkTitle: "Amazon Web Services"
 weight: 2
 description: >-
-  The following guide provide end-to-end deployment of new Windows Server install with SQL Server in AWS and onboarding to Azure with Azure Arc using Terraform.
+  If you are working in a multi-cloud environment, you can deploy new a AWS EC2 instance installed with SQL Server in an automated fashion using Terraform and onboard it as Azure Arc enabled SQL Server.
 ---
 

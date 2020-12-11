@@ -4,5 +4,5 @@ title: "VMware vSphere"
 linkTitle: "VMware vSphere"
 weight: 4
 description: >-
-  The following guide provide end-to-end deployment of new Windows Server install with SQL Server in VMware vSphere and onboarding to Azure with Azure Arc using Terraform.
+  If you are working with an on-premises VMware vSphere infrastructure, you can deploy new Windows virtual machine installed with SQL Server in an automated fashion using Terraform and onboard it as Azure Arc enabled server.
 ---

@@ -4,5 +4,5 @@ title: "VMware vSphere"
 linkTitle: "VMware vSphere"
 weight: 6
 description: >-
-  The guides in this section provide end-to-end deployment of new Windows or Linux servers in VMware and onboarding to Azure with Azure Arc using Terraform.
+  If you are working with an on-premises VMware vSphere infrastructure, you can deploy new Windows or Linux virtual machines in an automated fashion using Terraform and onboard it as Azure Arc enabled servers.
 ---
