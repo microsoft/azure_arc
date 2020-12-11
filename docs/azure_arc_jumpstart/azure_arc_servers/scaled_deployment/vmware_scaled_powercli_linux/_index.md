@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "vSphere Linux VMs"
-linkTitle: "vSphere Linux VMs"
+title: "VMware vSphere Linux VMs"
+linkTitle: "VMware vSphere Linux VMs"
 weight: 2
 description: >
 ---
