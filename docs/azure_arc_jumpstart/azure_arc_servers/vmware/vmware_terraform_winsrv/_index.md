@@ -6,7 +6,7 @@ weight: 2
 description: >
 ---
 
-## Onboard a VMware Windows server with Azure Arc
+## Deploy a VMware Windows VM and connect it to Azure Arc using Terraform
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server, VMware vSphere virtual machine and connect it as an Azure Arc enabled server resource.
 
