@@ -4,5 +4,5 @@ title: "Upstream Kubernetes (Kubeadm)"
 linkTitle: "Upstream Kubernetes (Kubeadm)"
 weight: 4
 description: >-
-  If you do not yet have a Kubernetes cluster, the examples in this section walk through creating an single-node Kubernetes cluster to simulate a full scale Kubernetes cluster and deploy Azure Arc Data Services on top of it.
+  If you do not have a Kubernetes cluster, the scenario in this section will guide on creating a Kubernetes cluster using kubeadm in an Azure VM with Azure Arc enabled data services integration in an automated fashion using ARM template.
 ---

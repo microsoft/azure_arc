@@ -4,5 +4,5 @@ title: "Amazon Elastic Kubernetes Service"
 linkTitle: "Amazon Elastic Kubernetes Service"
 weight: 2
 description: >-
-  If you do not yet have a Kubernetes cluster, the examples in this section walk through creating an EKS cluster and deploy Azure Arc Data Services on top of it.
+  If you are working in a multi-cloud environment, the scenario in this section will guide on creating an Amazon Elastic Kubernetes Service (EKS) with Azure Arc enabled data services integration in an automated fashion using Terraform.
 ---

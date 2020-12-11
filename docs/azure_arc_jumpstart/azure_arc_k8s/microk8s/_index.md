@@ -4,5 +4,5 @@ title: "MicroK8s"
 linkTitle: "MicroK8s"
 weight: 8
 description: >-
-  This example walks you through how to create a Kubernetes cluster on your local machine using MicroK8s, and onboard it as an Azure Arc enabled Kubernetes cluster
+  If you do not have a Kubernetes cluster, the scenario in this section will guide on creating a MicroK8s Kubernetes cluster on your local machine and onboard it as an Azure Arc enabled Kubernetes cluster in an automated fashion.
 ---

@@ -4,5 +4,5 @@ title: "Kind"
 linkTitle: "Kind"
 weight: 7
 description: >-
-  This example walks you through how to create a Kubernetes cluster on your local machine using kind (kubernetes in docker), and onboard it as an Azure Arc enabled Kubernetes cluster
+  If you do not have a Kubernetes cluster, the scenario in this section will guide on creating a kind (kubernetes in docker) cluster on your local machine and onboard it as an Azure Arc enabled Kubernetes cluster in an automated fashion.
 ---

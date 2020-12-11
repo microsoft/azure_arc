@@ -4,5 +4,5 @@ title: "Google Kubernetes Engine"
 linkTitle: "Google Kubernetes Engine"
 weight: 4
 description: >-
-  This example uses Terraform to deploy a GKE cluster on Google Cloud and connect it to Azure with Azure Arc.
+  If you are working in a multi-cloud environment, the scenario in this section will guide on creating a Google Kubernetes Engine (GKE) and onboard it as an Azure Arc enabled Kubernetes cluster in an automated fashion using Terraform.
 ---

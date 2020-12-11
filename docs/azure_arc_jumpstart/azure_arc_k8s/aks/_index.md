@@ -4,5 +4,5 @@ title: "Azure Kubernetes Service"
 linkTitle: "Azure Kubernetes Service"
 weight: 2
 description: >-
-  If you do not yet have a Kubernetes cluster, the examples in this section walk through creating an AKS cluster to simulate an "on-premises" cluster. Examples are provided for deploying with either Terraform or with an ARM template.
+  If you do not yet have a Kubernetes cluster, the scenarios in this section will guide on creating an AKS cluster in order to simulate an "on-premises" cluster in an automated fashion using either ARM template or Terraform.
 ---
