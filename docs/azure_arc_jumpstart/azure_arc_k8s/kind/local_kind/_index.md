@@ -36,14 +36,14 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
   To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-  ```console
+  ```terminal
   az login
   az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
   ```
 
   For example:
 
-  ```console
+  ```shell
   az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
   ```
 
@@ -63,7 +63,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```bash
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```

@@ -29,8 +29,7 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
   * Supported PowerShell Versions - VMware PowerCLI 12.0.0 is compatible with the following PowerShell versions:
     * Windows PowerShell 5.1
     * PowerShell 7
-
-  * Detailed installation instructions can be found [here](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.esxi.install.doc/GUID-F02D0C2D-B226-4908-9E5C-2E783D41FE2D.html) but the easiest way is to use the VMware.PowerCLI module from the PowerShell Gallery using the below command.
+    * Detailed installation instructions can be found [here](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.esxi.install.doc/GUID-F02D0C2D-B226-4908-9E5C-2E783D41FE2D.html) but the easiest way is to use the VMware.PowerCLI module from the PowerShell Gallery using the below command.
 
     ```powershell
     Install-Module -Name VMware.PowerCLI
