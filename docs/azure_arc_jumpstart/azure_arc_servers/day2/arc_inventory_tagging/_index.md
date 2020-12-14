@@ -29,13 +29,13 @@ In this guide, we will use [Resource Graph Explorer](https://docs.microsoft.com/
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -66,7 +66,7 @@ We will be using Resource Graph Explorer during this exercise to query and view 
 
 * Open AZ CLI and run the following commands to create a basic taxonomy structure that will allow us to easily query and report on where our server resources are hosted (i.e., Azure vs AWS vs GCP vs On-premises). For more guidance on building out a tag taxonomy please review the [Resource naming and tagging decision guide](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/decision-guides/resource-tagging/).
 
-    ```console
+    ```shell
     az tag create --name "Hosting Platform"
     az tag add-value --name "Hosting Platform" --value "Azure"
     az tag add-value --name "Hosting Platform" --value "AWS"
@@ -86,7 +86,7 @@ Now that we have created a basic taxonomy structure, we will apply tags to our A
 
     > **Note: If you connected your AWS EC2 instances using a method other than the one described in [this tutorial](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/), then you will need to adjust the values for `awsResourceGroup` and `awsMachineName` to match values specific to your environment.**
 
-    ```console
+    ```shell
     export awsResourceGroup="arc-aws-demo"
     export awsMachineName="arc-aws-demo"
     export awsMachineResourceId="$(az resource show --resource-group $awsResourceGroup --name $awsMachineName --resource-type "Microsoft.HybridCompute/machines" --query id)"
@@ -102,7 +102,7 @@ Now that we have created a basic taxonomy structure, we will apply tags to our A
 
     > **Note: If you connected your GCP instances using a method other than the one described in [this tutorial](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/), then you will need to adjust the values for `gcpResourceGroup` and `gcpMachineName` to match values specific to your environment.**
 
-    ```console
+    ```shell
     export gcpResourceGroup="arc-gcp-demo"
     export gcpMachineName="arc-gcp-demo"
     export gcpMachineResourceId="$(az resource show --resource-group $gcpResourceGroup --name $gcpMachineName --resource-type "Microsoft.HybridCompute/machines" --query id)"
@@ -150,7 +150,7 @@ Complete the following steps to clean up your environment.
 
 * Remove tags created as part of this guide by executing the following script in AZ CLI.
 
-    ```console
+    ```shell
     az tag remove-value --name "Hosting Platform" --value "Azure"
     az tag remove-value --name "Hosting Platform" --value "AWS"
     az tag remove-value --name "Hosting Platform" --value "GCP"

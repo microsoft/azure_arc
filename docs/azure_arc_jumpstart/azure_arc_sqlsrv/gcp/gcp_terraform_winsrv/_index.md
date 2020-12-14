@@ -16,13 +16,13 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -34,14 +34,14 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
 
     To connect the GCP virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
     ```
 
@@ -145,7 +145,7 @@ Before executing the Terraform plan, you must set the environment variables whic
 
   Both the script and the Terraform plan itself requires certain information about your GCP and Azure environments. Edit variables according to your environment and export it using the below commands
 
-  ```console
+  ```shell
   export TF_VAR_subId='Your Azure subscription ID'
   export TF_VAR_servicePrincipalAppId='Your Azure service principal App ID'
   export TF_VAR_servicePrincipalSecret='Your Azure service principal App Password'
@@ -166,7 +166,7 @@ Before executing the Terraform plan, you must set the environment variables whic
 
 * From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan.
 
-    ```console
+    ```shell
     terraform init
     terraform apply --auto-approve
     ```

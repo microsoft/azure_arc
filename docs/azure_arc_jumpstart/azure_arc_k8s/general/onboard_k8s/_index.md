@@ -18,7 +18,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -30,14 +30,14 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -57,27 +57,27 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 * Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
 * Create a new Azure resource group where you want your cluster(s) to show up.
 
-  ```console
+  ```shell
   az group create -l <Azure Region> -n <resource group name>
   ```
 
   For example:
 
-  ```console
+  ```shell
   az group create -l eastus -n Arc-k8s-Clusters
   ```
 
@@ -89,7 +89,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
   If using shell:
 
-  ```console
+  ```shell
   export appId='<Your Azure service principal name>'
   export password='<Your Azure service principal password>'
   export tenantId='<Your Azure tenant ID>'
@@ -111,14 +111,14 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 * Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
 
-  ```console
+  ```shell
   az extension add --name connectedk8s
   az extension add --name k8sconfiguration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
-  ```console
+  ```shell
   az extension update --name connectedk8s
   az extension update --name k8sconfiguration
   ```
@@ -127,7 +127,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
   If using shell:
 
-  ```console
+  ```shell
   az login --service-principal --username $appId --password $password --tenant $tenantId
   ```
 
@@ -139,7 +139,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 * If you are working in a Linux OS or MacOS environment, make sure you are the owner of the following:
 
-  ```console
+  ```shell
   sudo chown -R $USER /home/${USER}/.kube
   sudo chown -R $USER /home/${USER}/.kube/config
   sudo chown -R $USER /home/${USER}/.azure/config
@@ -152,7 +152,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
   If using shell:
 
-  ```console
+  ```shell
   az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup
   ```
 

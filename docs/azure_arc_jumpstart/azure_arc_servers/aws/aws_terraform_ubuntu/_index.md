@@ -14,13 +14,13 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -34,14 +34,14 @@ The following README will guide you on how to use the provided [Terraform](https
 
     To connect the AWS virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcAWS" --role contributor
     ```
 
@@ -114,7 +114,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Export the environment variables you edited by running [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/aws/ubuntu/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly. Note that this script will also be automatically executed remotely on the AWS virtual machine as part of the Terraform deployment.
 
-    ```console
+    ```shell
     source ./scripts/vars.sh
     ```
 
@@ -159,7 +159,7 @@ If you want to demo/control the actual registration process, do the following:
 
 * Run the following command
 
-    ```console
+    ```shell
     azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-AWS-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id
     ```
 

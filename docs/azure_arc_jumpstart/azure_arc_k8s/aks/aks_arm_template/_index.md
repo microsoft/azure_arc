@@ -14,13 +14,13 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
   
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -30,14 +30,14 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -57,14 +57,14 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 * Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
@@ -73,7 +73,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 * Before deploying the ARM template, determine which AKS Kubernetes versions are available in your region using the below Azure CLI command.
 
-  ```console
+  ```shell
   az aks get-versions -l "<Your Azure Region>"
   ```
 
@@ -83,7 +83,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
   To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/aks/arm_template) and run the below command:
 
-  ```console
+  ```shell
   az group create --name <Name of the Azure resource group> --location <Azure Region>
   az deployment group create \
   --resource-group <Name of the Azure resource group> \
@@ -94,7 +94,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
   For example:
 
-  ```console
+  ```shell
   az group create --name Arc-AKS-Demo --location "East US"
   az deployment group create \
   --resource-group Arc-AKS-Demo \
@@ -145,20 +145,20 @@ The most straightforward way is to delete the Azure Arc cluster resource via the
 
 If you want to nuke the entire environment, run the below commands.
 
-```console
+```shell
 az deployment group delete --name <Deployment name> --resource-group <Azure resource group name>
 ```
 
-```console
+```shell
 az group delete --name <Azure resource group name> --yes
 ```
 
 For example:
 
-```console
+```shell
 az deployment group delete --name arcaksdemo01 --resource-group Arc-AKS-Demo
 ```
 
-```console
+```shell
 az group delete --name Arc-AKS-Demo --yes
 ```

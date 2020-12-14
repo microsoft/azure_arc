@@ -31,7 +31,7 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -47,14 +47,14 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
     To connect a VM or bare-metal server to Azure Arc, Azure service principal assigned with the "contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
     ```
 
@@ -78,7 +78,7 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
   To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/policies/arm) and run the below command:
 
-  ```console
+  ```shell
     az deployment group create --resource-group <Name of the Azure resource group> \
     --template-file <The *log_analytics-template.json* template file location> \
     --parameters <The *log_analytics-template.parameters.json* template file location>
@@ -92,7 +92,7 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
   To start the deployment, use the below command:
 
-  ```console
+  ```shell
   az policy assignment create --name 'Enable Azure Monitor for VMs' \
   --scope '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure resource group>' \
   --policy-set-definition '55f3eceb-5573-4f18-9695-226972c6d74a' \
@@ -133,12 +133,12 @@ Remove the virtual machines from each environment by following the teardown inst
 
 Remove the Azure Policy assignment by executing the following script in Azure CLI.
 
-  ```console
+  ```shell
   az policy assignment delete --name 'Enable Azure Monitor for VMs' --resource-group <resource_group>
   ```
 
 Remove the Log Analytics workspace by executing the following script in Azure CLI. Provide the workspace name you used when creating the Log Analytics workspace.
 
-  ```console
+  ```shell
   az monitor log-analytics workspace delete --resource-group <Name of the Azure resource group> --workspace-name <Log Analytics workspace Name> --yes
   ```

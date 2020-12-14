@@ -16,14 +16,14 @@ The following is a guide on how to use the Azure Cloud Shell to deploy an [Azure
 
 * Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
@@ -40,7 +40,7 @@ The deployment of all resources is going to be done via Azure Cloud Shell.
 
 * Run the following script:
 
-  ```console
+  ```shell
   wget -O - https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aro/run.sh | bash
   ```
 

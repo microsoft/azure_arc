@@ -20,7 +20,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -42,7 +42,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -50,14 +50,14 @@ By doing so, you will be able to make real-time changes to the application and s
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -147,7 +147,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
 * The Cluster-level config initiated the nginx-ingress Pods and Service resource deployment (along with the Flux operator and Memcached). To see it's resource, use the below *kubectl* commands.
 
-    ```console
+    ```shell
     kubectl get pods -n cluster-mgmt
     kubectl get svc -n cluster-mgmt
     ```
@@ -156,7 +156,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
 * The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
 
-    ```console
+    ```shell
     kubectl get pods -n prod
     kubectl get svc -n prod
     kubectl get ing -n prod

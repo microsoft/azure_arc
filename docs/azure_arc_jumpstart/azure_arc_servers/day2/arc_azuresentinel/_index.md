@@ -33,7 +33,7 @@ In this guide, you will enable and configure Azure Sentinel on your Azure subscr
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -49,14 +49,14 @@ In this guide, you will enable and configure Azure Sentinel on your Azure subscr
 
     To connect a VM or bare-metal server to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
     ```
 
@@ -84,7 +84,7 @@ Azure Sentinel uses the Log Analytics agent to collect Windows and Linux server'
 
 * To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/azuresentinel/arm) and run the below command:
 
-  ```console
+  ```shell
   az deployment group create --resource-group <Name of the Azure resource group> \
   --template-file <The *sentinel-template.json* template file location> \
   --parameters <The *sentinel-template.parameters.json* template file location>
@@ -123,6 +123,6 @@ Complete the following steps to clean up your environment.
 
 * Remove the Log Analytics workspace by executing the following script in AZ CLI. Provide the workspace name you used when creating the Log Analytics Workspace.
 
-    ```console
+    ```shell
     az monitor log-analytics workspace delete --resource-group <Name of the Azure resource group> --workspace-name <Log Analytics Workspace Name> --yes
     ```

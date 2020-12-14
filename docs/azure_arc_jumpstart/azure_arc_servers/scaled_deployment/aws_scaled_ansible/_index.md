@@ -20,13 +20,13 @@ This guide can be used even if you do not already have an existing Ansible test 
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -40,14 +40,14 @@ This guide can be used even if you do not already have an existing Ansible test 
 
     To connect the AWS virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcAWS" --role contributor
     ```
 
@@ -124,7 +124,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Export the environment variables you edited by running [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/aws/scaled_deployment/ansible/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly.
 
-    ```console
+    ```shell
     source ./scripts/vars.sh
     ```
 
@@ -154,7 +154,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * The aws_ec2 Ansible plugin requires AWS credentials to dynamically read your AWS server inventory. We will export these as environment variables. Run the commands below, replacing the values for AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY with AWS credentials you created earlier.
 
-    ```console
+    ```shell
     export AWS_ACCESS_KEY_ID="XXXXXXXXXXXXXXXXX"
     export AWS_SECRET_ACCESS_KEY="XXXXXXXXXXXXXXX"
     ```
@@ -165,7 +165,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Run the Ansible playbook by executing the following command, substituting your Azure service principal id and service principal secret.
 
-    ```console
+    ```shell
     ansible-playbook arc_agent.yml -i ansible_plugins/inventory_uswest2_aws_ec2.yml --extra-vars '{"service_principal_id": "XXXXXXX-XXXXX-XXXXXXX", "service_principal_secret": "XXXXXXXXXXXXXXXXXXXXXXXX"}'
     ```
 
@@ -199,7 +199,7 @@ The files in ***./ansible_config/group_vars*** should be adjusted to provide the
 
 When you have adjusted the provided config to support your environment, run the Ansible playbook by executing the following command, substituting your Azure service principal id and service principal secret.
 
-```console
+```shell
 ansible-playbook arc_agent.yml -i ansible_plugins/inventory_uswest2_aws_ec2.yml --extra-vars '{"service_principal_id": "XXXXXXX-XXXXX-XXXXXXX", "service_principal_secret": "XXXXXXXXXXXXXXXXXXXXXXXX"}'
 ```
 

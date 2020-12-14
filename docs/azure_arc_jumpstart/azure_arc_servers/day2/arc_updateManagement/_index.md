@@ -31,7 +31,7 @@ In this guide, you will create and configure an Azure Automation account and Log
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -51,7 +51,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
 * First, create a new resource group for the Log Analytics workspace by running the below command, replacing the values in brackets with your own.
 
-    ```console
+    ```shell
     az group create --name <Name for your resource group> \
     --location <Location for your resources> \
     --tags "Project=jumpstart_azure_arc_servers"
@@ -65,7 +65,7 @@ Update Management uses the Log Analytics agent to collect Windows and Linux serv
 
 * To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_servers_jumpstart/updateManagement) and run the below command:
 
-    ```console
+    ```shell
     az deployment group create --resource-group <Name of the Azure resource group you created> \
         --template-file law-template.json \
         --parameters law-template.parameters.json
@@ -139,7 +139,7 @@ Complete the following steps to clean up your environment.
 
 * Delete the resource group.
 
-    ```console
+    ```shell
     az group delete --name <Name of your resource group>
     ```
 

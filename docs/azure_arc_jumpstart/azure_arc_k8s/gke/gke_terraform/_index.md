@@ -14,13 +14,13 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -32,14 +32,14 @@ The following README will guide you on how to use the provided [Terraform](https
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -59,28 +59,28 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
 * Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
 
-  ```console
+  ```shell
   az extension add --name connectedk8s
   az extension add --name k8sconfiguration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
-  ```console
+  ```shell
   az extension update --name connectedk8s
   az extension update --name k8sconfiguration
   ```
@@ -133,7 +133,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Export the environment variables needed for the Terraform plan.
 
-  ```console
+  ```shell
   export TF_VAR_gcp_project_id=<Your GCP Project ID
   export TF_VAR_gcp_credentials_filename=<Location on the Keys JSON file
   export TF_VAR_gcp_region=<GCP Region to deploy resources
@@ -145,7 +145,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
   For example:
 
-  ```console
+  ```shell
   export TF_VAR_gcp_project_id=azure-arc-demo-273150
   export TF_VAR_gcp_credentials_filename=account.json
   export TF_VAR_gcp_region=us-west1

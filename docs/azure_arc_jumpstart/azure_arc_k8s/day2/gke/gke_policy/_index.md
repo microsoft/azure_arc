@@ -16,13 +16,13 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -38,7 +38,7 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
     Azure CLI:
 
-    ```console
+    ```shell
     az provider register --namespace 'Microsoft.PolicyInsights'
     ```
 
@@ -52,7 +52,7 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
     Azure CLI:
 
-    ```console
+    ```shell
     az provider show --namespace 'Microsoft.PolicyInsights'
     ```
 
@@ -72,14 +72,14 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
 * To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in Azure Cloud Shell).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -185,7 +185,7 @@ Although you can [deploy GitOps configuration individually](https://azurearcjump
 
 * In order to verify the "Hello Arc" application and it's component has been deployed, In the Google Cloud Shell, run the below commands.
 
-    ```console
+    ```shell
     kubectl get pods -n hello-arc
     kubectl get ing -n hello-arc
     kubectl get svc -n hello-arc

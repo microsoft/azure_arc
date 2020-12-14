@@ -16,13 +16,13 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -32,14 +32,14 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
     In order for you to deploy the AKS cluster using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
     ```
 
@@ -59,13 +59,13 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 * Enable subscription for the Microsoft.AzureArcData resource provider for Azure Arc enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.AzureArcData
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.AzureArcData -o table
   ```
 
@@ -112,7 +112,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command. To determine which AKS Kubernetes versions are available in your region use the below Azure CLI command.
 
-    ```console
+    ```shell
     az aks get-versions -l "<Your Azure Region>"
     ```
 
@@ -142,7 +142,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/aks/arm_template/mssql_mi) and run the below command:
 
-    ```console
+    ```shell
     az group create --name <Name of the Azure resource group> --location <Azure Region>
     az deployment group create \
     --resource-group <Name of the Azure resource group> \
@@ -155,7 +155,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     For example:
 
-    ```console
+    ```shell
     az group create --name Arc-Data-SQLMI-Demo --location "East US"
     az deployment group create \
     --resource-group Arc-Data-SQLMI-Demo \

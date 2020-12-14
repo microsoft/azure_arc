@@ -21,13 +21,13 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -37,14 +37,14 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
 
     In order for you to deploy the Azure resources using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
     ```
 
@@ -109,7 +109,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_sqlsrv_jumpstart/azure/arm_template) and run the below command:
 
-    ```console
+    ```shell
     az group create --name <Name of the Azure resource group> --location <Azure Region> --tags "Project=jumpstart_azure_arc_sql"
     az deployment group create \
     --resource-group <Name of the Azure resource group> \
@@ -122,7 +122,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
     For example:
 
-    ```console
+    ```shell
     az group create --name Arc-SQL-Demo --location "East US" --tags "Project=jumpstart_azure_arc_sql"
     az deployment group create \
     --resource-group Arc-Servers-Win-Demo \

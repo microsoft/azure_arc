@@ -14,13 +14,13 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -32,14 +32,14 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-  ```console
+  ```shell
   az login
   az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
   ```
 
   For example:
 
-  ```console
+  ```shell
   az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
   ```
 
@@ -59,28 +59,28 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
 * Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
 * Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
 
-  ```console
+  ```shell
   az extension add --name connectedk8s
   az extension add --name k8sconfiguration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
-  ```console
+  ```shell
   az extension update --name connectedk8s
   az extension update --name k8sconfiguration
   ```
@@ -97,14 +97,14 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
     Once installed, enable MicroK8s with:
 
-    ```console
+    ```shell
     microk8s status --wait-ready
     microk8s enable dns
     ```
 
   Linux:
 
-    ```console
+    ```shell
     sudo snap install microk8s --classic
     microk8s status --wait-ready
     microk8s enable dns
@@ -112,7 +112,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   MacOS:
 
-    ```console
+    ```shell
     brew install ubuntu/microk8s/microk8s
     microk8s install
     microk8s status --wait-ready
@@ -131,13 +131,13 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   Windows:
 
-    ```console
+    ```shell
     microk8s config view > %HOMEPATH%\.kube\microk8s
     ```
 
   Linux and MacOS:
 
-    ```console
+    ```shell
     microk8s config view > ~/.kube/microk8s
     ```
 
@@ -147,7 +147,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   We'll start by authenticating our CLI with Azure, **replacing the values below** with the output from the command we issued to create service principal earlier (`az ad sp create-for-rbac`) in the prerequisite section of this guide.
 
-  ```console
+  ```shell
   az login --service-principal -u appId -p password --tenant tenant
   ```
 
@@ -155,7 +155,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
 * Create a resource group
 
-  ```console
+  ```shell
   az group create -n Arc-MicroK8s-Demo -l EastUS
   ```
 
@@ -167,13 +167,13 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   Windows:
 
-  ```console
+  ```shell
   az connectedk8s connect --name Arc-MicroK8s-Demo --resource-group Arc-MicroK8s-Demo --kube-config %HOMEPATH%\.kube\microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
   Linux and MacOS:
 
-  ```console
+  ```shell
   az connectedk8s connect --name Arc-MicroK8s-Demo --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
@@ -195,7 +195,7 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
 
 * In Azure, the most straightforward way is to delete the cluster or the resource group via the Azure Portal or through the CLI.
 
-  ```console
+  ```shell
   az group delete --name Arc-MicroK8s-Demo
   ```
 
@@ -203,7 +203,7 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
 
 * To stop the MicroK8s cluster locally, use the following command:
 
-  ```console
+  ```shell
   microk8s stop
   ```
 
@@ -213,7 +213,7 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
 
     Stop the MicroK8s VM in Multipass:
 
-    ```console
+    ```shell
     multipass stop microk8s-vm
     ```
 
@@ -221,7 +221,7 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
 
     ![Uninstall MicroK8s from Windows](./08.png)
 
-    ```console
+    ```shell
     multipass delete microk8s-vm
     multipass purge
     ```
@@ -232,12 +232,12 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
 
   Linux:
 
-    ```console
+    ```shell
     sudo snap remove microk8s
     ```
   
   MacOS:
 
-    ```console
+    ```shell
     brew uninstall ubuntu/microk8s/microk8s
     ```

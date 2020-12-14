@@ -20,7 +20,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -42,7 +42,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -50,14 +50,14 @@ By doing so, you will be able to make real-time changes to the application and s
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -83,7 +83,7 @@ The demo application that will be deployed later in this guide relies on an ingr
 
 * Run the following command to install the nginx ingress controller on kind:
 
-    ```console
+    ```shell
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/kind/deploy.yaml
     ```
 
@@ -153,7 +153,7 @@ For our scenario, we will deploy the "Hello Arc" application from the ["demo rep
 
 * The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
 
-    ```console
+    ```shell
     kubectl get pods -n prod
     kubectl get svc -n prod
     kubectl get ing -n prod
@@ -205,7 +205,7 @@ For our scenario, we will deploy the "Hello Arc" application from the ["demo rep
 
 * To delete the GitOps configuration and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup_kind](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/kind/gitops/helm/az_k8sconfig_helm_cleanup_kind.sh) shell script.It is recommended to run this script locally, since it also removes elements from the local cluster.
 
-    ```console
+    ```shell
     . ./az_k8sconfig_helm_cleanup_kind.sh
     ```
 
@@ -213,7 +213,7 @@ For our scenario, we will deploy the "Hello Arc" application from the ["demo rep
 
 * If you also wish to remove the local kind cluster and the Arc connected cluster from Azure, you can run the following commands:
 
-    ```console
+    ```shell
     kind delete cluster --name <cluster-name>
     az group delete -n <resource group name>
     ```

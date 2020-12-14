@@ -14,13 +14,13 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -81,14 +81,14 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
 
-  ```console
+  ```shell
   az extension add --name connectedk8s
   az extension add --name k8sconfiguration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
-  ```console
+  ```shell
   az extension update --name connectedk8s
   az extension update --name k8sconfiguration
   ```
@@ -99,7 +99,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
   On Linux:
 
-  ```console
+  ```shell
   curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
   chmod +x ./kind
   sudo mv ./kind /usr/local/bin/kind
@@ -107,7 +107,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   
   On MacOS:
 
-  ```console
+  ```shell
   brew install kind
   ```
 
@@ -119,13 +119,13 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
   * Navigate to the folder that has the kind cluster definition.
 
-  ```console
+  ```shell
   cd azure_arc/azure_arc_k8s_jumpstart/kind
   ```
 
   * Create the kind cluster. We are using a configuration file called `kind_cluster.yaml` to specify our cluster configuration. This will create a 3 node cluster, with 1 master node and 2 worker nodes.
 
-  ```console
+  ```shell
   kind create cluster --config kind_cluster.yaml --name arc-cluster
   ```
 
@@ -137,7 +137,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   
 * Verify your cluster was created successfully and you can access the cluster using `kubectl`.
 
-  ```console
+  ```shell
   kubectl get nodes
   ```
   
@@ -147,13 +147,13 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Now that you have a running kind cluster, lets connect the kind cluster to Azure Arc.
 
-  ```console
+  ```shell
   az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
   ```
 
 * Create a resource group
 
-  ```console
+  ```shell
   az group create --name Arc-kind-Demo -l EastUS -o table
   ```
 
@@ -163,7 +163,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Deploy the Arc binaries using Azure CLI:
 
-  ```console
+  ```shell
   az connectedk8s connect -n Arc-kind-Demo -g Arc-kind-Demo --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
@@ -179,7 +179,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * In Azure, the most straightforward way is to delete the cluster or the resource group via the Azure Portal or through the CLI.
 
-  ```console
+  ```shell
   az group delete --name Arc-kind-Demo
   ```
 
@@ -189,7 +189,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * To delete the kind cluster locally, use the following command:
 
-  ```console
+  ```shell
   kind delete cluster --name arc-cluster
   ```
 

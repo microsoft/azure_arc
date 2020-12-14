@@ -14,7 +14,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -29,7 +29,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -43,14 +43,14 @@ The following README will guide you on how to use the provided [Terraform](https
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -70,28 +70,28 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
 * Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
 
-  ```console
+  ```shell
   az extension add --name connectedk8s
   az extension add --name k8sconfiguration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
-  ```console
+  ```shell
   az extension update --name connectedk8s
   az extension update --name k8sconfiguration
   ```
@@ -126,7 +126,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
   * Set your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key.
 
-      ```console
+      ```shell
       export AWS_ACCESS_KEY_ID="an access key"
       export AWS_SECRET_ACCESS_KEY="a secret key"
       export AWS_DEFAULT_REGION="us-west-2"
@@ -136,7 +136,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Navigate to the folder that has **EKS** terraform binaries.
 
-  ```console
+  ```shell
   cd azure_arc_k8s_jumpstart/eks/terraform
   ```
 
@@ -151,20 +151,20 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
 
-  ```console
+  ```shell
   mkdir ~/.kube/
   terraform output kubeconfig>~/.kube/config
   ```
   
   Check to see if cluster is discoverable by ```kubectl``` by running:
 
-  ```console
+  ```shell
   kubectl version
   ```
 
   Output should look similar to this:
   
-  ```console
+  ```shell
   Client Version: version.Info{Major:"1", Minor:"15", GitVersion:"v1.15.5", GitCommit:"20c265fef0741dd71a66480e35bd69f18351daea", GitTreeState:"clean", BuildDate:"2019-10-15T19:16:51Z", GoVersion:"go1.12.10", Compiler:"gc", Platform:"darwin/amd64"}
   Server Version: version.Info{Major:"1", Minor:"16+", GitVersion:"v1.16.8-eks-e16311", GitCommit:"e163110a04dcb2f39c3325af96d019b4925419eb", GitTreeState:"clean", BuildDate:"2020-03-27T22:37:12Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
   ```
@@ -173,7 +173,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
   Now let’s add the ConfigMap to the cluster from Terraform as well. The ConfigMap is a Kubernetes configuration, in this case for granting access to our EKS cluster. This ConfigMap allows our ec2 instances in the cluster to communicate with the EKS master, as well as allowing our user account access to run commands against the cluster. You’ll run the Terraform output command to a file, and the kubectl apply command to apply that file:
 
-  ```console
+  ```shell
   terraform output config_map_aws_auth > configmap.yml
   kubectl apply -f configmap.yml
   ```
@@ -182,7 +182,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
   Once this is complete, you should see your nodes from your autoscaling group either starting to join or joined to the cluster. Once the second column reads Ready the node can have deployments pushed to it. Again, your output may vary here:
 
-  ```console
+  ```shell
   kubectl get nodes -o wide
   ```
 
@@ -202,13 +202,13 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
 
 * Login to previously created [***Service Principal***](#prerequisites)
 
-    ```console
+    ```shell
     az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
     ```
 
 * Create a resource group
 
-   ```console
+   ```shell
    az group create --name arceksdemo -l EastUS -o table
    ```
 
@@ -216,7 +216,7 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
 
 * Deploy Arc binaries using Azure CLI:
 
-  ```console
+  ```shell
   az connectedk8s connect --name arceksdemo --resource-group arceksdemo --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
@@ -232,7 +232,7 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
 
 In Azure, the most straightforward way is to delete the cluster or the resource group via the Azure Portal or through the CLI.
 
-```console
+```shell
 az group delete --name arceksdemo
 ```
 

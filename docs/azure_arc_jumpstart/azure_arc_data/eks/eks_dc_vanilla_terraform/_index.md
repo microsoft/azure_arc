@@ -27,7 +27,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * Clone the Azure Arc Jumpstart repository
 
-  ```console
+  ```shell
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
@@ -35,7 +35,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -47,14 +47,14 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
   To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-  ```console
+  ```shell
   az login
   az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
   ```
 
   For example:
 
-  ```console
+  ```shell
   az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
   ```
 
@@ -74,13 +74,13 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * Enable subscription for the Microsoft.AzureArcData resource provider for Azure Arc enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.AzureArcData
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.AzureArcData -o table
   ```
 
@@ -189,7 +189,7 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
 
 * Navigate to the folder that has Terraform binaries.
 
-  ```console
+  ```shell
   cd azure_arc_data_jumpstart/eks/terraform
   ```
 
@@ -255,7 +255,7 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
 * Using PowerShell, login to the Data Controller and check it's health using the below commands.
 
-  ```console
+  ```shell
   azdata login --namespace $env:ARC_DC_NAME
   azdata arc dc status show
   ```

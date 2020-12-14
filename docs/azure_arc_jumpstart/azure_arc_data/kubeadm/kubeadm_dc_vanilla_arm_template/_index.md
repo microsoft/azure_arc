@@ -16,13 +16,13 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -30,14 +30,14 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
     In order for you to deploy the Azure resources using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
     ```
 
@@ -113,7 +113,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template) and run the below command:
 
-    ```console
+    ```shell
     az group create --name <Name of the Azure resource group> --location <Azure region>
     az deployment group create --resource-group <Name of the Azure resource group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
@@ -122,7 +122,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     For example:
 
-    ```console
+    ```shell
     az group create --name Arc-Data-Kubeadm-Demo --location "East US"
     az deployment group create --resource-group Arc-Data-Kubeadm-Demo --name arcdatakubeadmdemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters azuredeploy.parameters.json
     ```
@@ -178,7 +178,7 @@ Even though everything you need is installed in the Windows client VM, it is pos
 
 * To start interacting with the Azure Arc Data Controller, use the log in command bellow.
 
-    ```console
+    ```shell
     azdata login --namespace $ARC_DC_NAME
     azdata arc dc status show
     ```

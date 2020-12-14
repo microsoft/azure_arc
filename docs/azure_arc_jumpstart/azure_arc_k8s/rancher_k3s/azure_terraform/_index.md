@@ -14,13 +14,13 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -30,14 +30,14 @@ The following README will guide you on how to use the provided [Terraform](https
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -57,14 +57,14 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
-  ```console
+  ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
   ```
 
   You can monitor the registration process with the following commands:
 
-  ```console
+  ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
@@ -79,7 +79,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Export the environment variables needed for the Terraform plan.
 
-    ```console
+    ```shell
     export TF_VAR_subscription_id=<Your Azure subscription ID>  
     export TF_VAR_client_id=<Your Azure service principal App ID>
     export TF_VAR_client_secret=<Your Azure service principal App password>  
@@ -108,13 +108,13 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Using the Azure service principal you've created, run the below command to connect the cluster to Azure Arc.
 
-    ```console
+    ```shell
     az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure resource group name>
     ```
 
     For example:
 
-    ```console
+    ```shell
     az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo
     ```
 

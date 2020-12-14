@@ -20,7 +20,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
@@ -42,7 +42,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```console
+  ```shell
   az --version
   ```
 
@@ -50,14 +50,14 @@ By doing so, you will be able to make real-time changes to the application and s
 
     To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```console
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
 
     For example:
 
-    ```console
+    ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
     ```
 
@@ -81,13 +81,13 @@ By doing so, you will be able to make real-time changes to the application and s
 
   * Windows
 
-    ```console
+    ```shell
     microk8s config view > %HOMEPATH%\.kube\microk8s
     ```
 
   * Linux
 
-    ```console
+    ```shell
     microk8s config view > ~\.kube\microk8s
     ```
 
@@ -101,19 +101,19 @@ The demo application that will be deployed later in this guide relies on an ingr
 
 * Run the following command to install the nginx ingress controller on MicroK8s:
 
-    ```console
+    ```shell
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.35.0/deploy/static/provider/baremetal/deploy.yaml
     ```
 
 * This command will create a new namespace and deploy the required components in this namespace. To verify the deployment of the ingress controller was successful, make sure the pod with name `ingress-nginx-controller-<random id>-<random id>` is in a running state with 1/1 containers ready and that a service has been exposed as NodePort.
 
-    ```console
+    ```shell
     kubectl get pods -n ingress-nginx
     ```
 
     ![Running ingress nginx controller](./03.png)
 
-    ```console
+    ```shell
     kubectl get svc -n ingress-nginx
     ```
 
@@ -121,7 +121,7 @@ The demo application that will be deployed later in this guide relies on an ingr
 
 * Take note of the port where the ingress has been exposed (in the image above it was assigned port **32106**). We now need to get the IP address assigned to our microk8s-vm instance in multipass:
 
-    ```console
+    ```shell
     multipass list
     ```
 
@@ -175,7 +175,7 @@ To create the GitOps configuration and it's respective Kubernetes resources, we'
 
     Edit the environment variables in the [*az_k8sconfig_helm_microk8s*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/microk8s/gitops/helm/az_k8sconfig_helm_microk8s.sh) shell script to match your parameters, and run the below command.
 
-    ```console
+    ```shell
     . ./az_k8sconfig_helm_microk8s.sh
     ```
 
@@ -202,7 +202,7 @@ The `az_k8sconfig_helm_microk8s` and `az_k8sconfig_helm_microk8s_windows` script
 
 * The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
 
-    ```console
+    ```shell
     kubectl get pods -n prod
     kubectl get svc -n prod
     kubectl get ing -n prod
@@ -256,7 +256,7 @@ To delete the GitOps configuration and it's respective Kubernetes resources, we'
 
     Edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup_microk8s](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/microk8s/gitops/helm/az_k8sconfig_helm_cleanup_microk8s.sh) shell script, then run the file:
 
-    ```console
+    ```shell
     ./az_k8sconfig_helm_cleanup_microk8s.sh
     ```
 
@@ -264,7 +264,7 @@ To delete the GitOps configuration and it's respective Kubernetes resources, we'
 
     Edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup_microk8s_windows](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/microk8s/gitops/helm/az_k8sconfig_helm_cleanup_microk8s_windows.ps1) script, then run the file:
 
-    ```console
+    ```shell
     .\az_k8sconfig_helm_cleanup_microk8s_windows.ps1
     ```
 
