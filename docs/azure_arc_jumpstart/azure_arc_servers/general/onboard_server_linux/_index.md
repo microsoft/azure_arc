@@ -12,7 +12,11 @@ The following README will guide you on how to connect an Linux server to Azure A
 
 ## Prerequisites
 
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+
+  ```console
+  az --version
+  ```
 
 * Create Azure service principal (SP)
 

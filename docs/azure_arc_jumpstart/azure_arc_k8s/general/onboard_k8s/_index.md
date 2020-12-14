@@ -16,7 +16,11 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 * (Optional) To simplify work against multiple k8s contexts, consider using [kubectx](https://github.com/ahmetb/kubectx).
 
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). **Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+
+  ```console
+  az --version
+  ```
 
 * [Install and Set Up kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
@@ -112,7 +116,12 @@ The following README will guide you on how to connect an existing Kubernetes clu
   az extension add --name k8sconfiguration
   ```
 
-  > **Note: If you already used this guide before and/or have the extensions installed, use the ```az extension update --name connectedk8s``` and the ```az extension update --name k8sconfiguration``` commands.**
+  > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
+
+  ```console
+  az extension update --name connectedk8s
+  az extension update --name k8sconfiguration
+  ```
 
 * Login to your Azure subscription using the SP you created.  
 

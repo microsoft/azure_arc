@@ -9,13 +9,19 @@ weight: 1
 
 The Azure Arc Jumpstart project is designed to provide a "zero to hero" experience so you can start working with Azure Arc right away!
 
-The provided step-by-step guides will allow you to go through independent scenarios that incorporate as much automation as possible, detailed screenshots and code samples, and an overall rich and comprehensive experience while getting started with the Azure Arc platform.
+The provided step-by-step scenarios will allow you to go through independent scenarios that incorporate as much automation as possible, detailed screenshots and code samples, and an overall rich and comprehensive experience while getting started with the Azure Arc platform.
 
 Our goal is for you to have a working Azure Arc environment spun-up in no time so you can focus on the core values of the platform, regardless of where your infrastructure may be, either on-premises or in the cloud.
 
 <p align="center"><img src="/img/jumpstart_logo.png" alt="jumpstart-logo" width="250"></p>
 
-> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the guides and code.**
+## Jumpstart Scenarios
+
+Ready to get going?! This website offers you detailed guides, automation, code samples, screenshots and everything you really need to get going with Azure Arc!
+
+Hope over to the [Jumpstart Scenarios](https://azurearcjumpstart.io/azure_arc_jumpstart/) section and enjoy the ride.
+
+> **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the scenarios and code.**
 
 ## Azure Arc Overview
 
@@ -41,6 +47,8 @@ With Azure Arc, Fabrikam is able to project resources and register them into Azu
 
 ![architecture](/img/architecture_white.jpg)
 
+<!-- 
+
 ## Azure Arc enabled servers
 
 The deployment scenarios below will guide you through onboarding various Windows and Linux server deployments to Azure with Azure Arc.
@@ -57,8 +65,8 @@ The following examples can be used to connect existing Windows or Linux servers 
 
 ### Microsoft Azure
 
-The following guides in this section will walk you through how to project an Azure VM as an Azure Arc enabled server.
-These guides, using Azure VM as the targeted Azure Arc server are designed **for demo and testing purposes ONLY and are not supported.**
+The following scenarios in this section will walk you through how to project an Azure VM as an Azure Arc enabled server.
+These scenarios, using Azure VM as the targeted Azure Arc server are designed **for demo and testing purposes ONLY and are not supported.**
 
 In each guide, you find a detailed, technical explanation of the mechanism and why **it is not expected to project an Azure VM as an Azure Arc enabled server**.
 
@@ -76,7 +84,7 @@ If you don't have any existing servers available, you can use [Vagrant](https://
 
 ### Amazon Web Services (AWS)
 
-Azure Arc can project servers into Azure from any public cloud. The following guides provide end-to-end deployment of new Linux servers in AWS EC2 and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
+Azure Arc can project servers into Azure from any public cloud. The following scenarios provide end-to-end deployment of new Linux servers in AWS EC2 and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
 * [Deploy an AWS EC2, Ubuntu VM and connect it to Azure Arc using Terraform](../azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)
 
@@ -84,7 +92,7 @@ Azure Arc can project servers into Azure from any public cloud. The following gu
 
 ### Google Cloud Platform (GCP)
 
-The following guides provide end-to-end deployment of new Windows or Linux servers in Google Cloud and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
+The following scenarios provide end-to-end deployment of new Windows or Linux servers in Google Cloud and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
 * [Deploy a GCP Ubuntu VM and connect it to Azure Arc using Terraform](../azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)
 
@@ -92,15 +100,15 @@ The following guides provide end-to-end deployment of new Windows or Linux serve
 
 ### VMware
 
-The following guides provide end-to-end deployment of new Windows or Linux servers in VMware and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
+The following scenarios provide end-to-end deployment of new Windows or Linux servers in VMware and onboarding to Azure with Azure Arc using [Terraform](https://www.terraform.io/).
 
 * [Deploy a VMware vSphere Ubuntu Server VM and connect it to Azure Arc using Terraform](../azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/)
 
 * [Deploy a VMware vSphere Windows Server VM and connect it to Azure Arc using Terraform](../azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_winsrv/)
 
-### Azure Arc enabled servers - Day-2 Scenarios & Use-Cases
+### Azure Arc enabled servers - Unified Operations Use-Cases
 
-Once you have server resources projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the servers as native Azure resources. The following guides show examples of using Azure management tools such as resource tags, Azure Policy, Log Analytics, and more with Azure Arc enabled servers.
+Once you have server resources projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the servers as native Azure resources. The following scenarios show examples of using Azure management tools such as resource tags, Azure Policy, Log Analytics, and more with Azure Arc enabled servers.
 
 * [Tagging and querying server inventory across multiple clouds using Resource Graph Explorer](../azure_arc_jumpstart/azure_arc_servers/day2/arc_inventory_tagging/)
 
@@ -116,9 +124,9 @@ Once you have server resources projected into Azure with Azure Arc, you can star
 
 * [Deploy Update Management on Azure Arc enabled servers](../azure_arc_jumpstart/azure_arc_servers/day2/arc_updatemanagement/)
 
-### Azure Arc enabled servers - Scaled Deployment Scenarios
+### Azure Arc enabled servers - Scaled Deployment
 
-The following guides are designed to provide scaled onboarding experience to Azure Arc of virtual machines deployed in various platforms and existing environments.
+The following scenarios are designed to provide scaled onboarding experience to Azure Arc of virtual machines deployed in various platforms and existing environments.
 
 * [Scaled Onboarding VMware vSphere Windows Server VMs to Azure Arc](../azure_arc_jumpstart/azure_arc_servers/scaled_deployment/vmware_scaled_powercli_win/)
 
@@ -203,7 +211,7 @@ These examples deploy [Rancher k3s](https://github.com/rancher/k3s) on an Azure 
 
 Azure Arc can also support Azure Red Hat OpenShift (ARO). This example uses Terraform to deploy a new ARO cluster and onboards it to Azure with Azure Arc.
 
-* [Deploy Azure Red Hat  Openshift Cluster and connect it to Azure Arc using automation](../azure_arc_jumpstart/azure_arc_k8s/aro/aro_script/)
+* [Deploy Azure Red Hat  OpenShift Cluster and connect it to Azure Arc using automation](../azure_arc_jumpstart/azure_arc_k8s/aro/aro_script/)
 
 ### kind
 
@@ -217,9 +225,9 @@ This example walks you through how to create a Kubernetes cluster on your local 
 
 * [Deploy a local Kubernetes Cluster using MicroK8s and connect it to Azure Arc](../azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/)
 
-### Azure Arc enabled Kubernetes - Day-2 Scenarios & Use-Cases
+### Azure Arc enabled Kubernetes - Unified Operations Use-Cases
 
-Once you have Kubernetes clusters projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the clusters as native Azure resources. The following guides show examples of using Azure management tools such as Azure Monitor, GitOps configurations, and Azure Policy.
+Once you have Kubernetes clusters projected into Azure with Azure Arc, you can start to use native Azure tooling to manage the clusters as native Azure resources. The following scenarios show examples of using Azure management tools such as Azure Monitor, GitOps configurations, and Azure Policy.
 
 #### AKS
 
@@ -285,13 +293,13 @@ If you do not yet have a Kubernetes cluster, the following examples walk through
 
 If you do not yet have a Kubernetes cluster, the following examples walk through creating an single-node Kubernetes cluster to simulate a full scale Kubernetes cluster and deploy Azure Arc Data Services on top of it.
 
-* [Azure Arc Data Controller Vanilla Deployment on Ubuntu Kubeadm VM using Azure ARM template](../azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_dc_vanilla_arm_template/)
+* [Azure Arc Data Controller Vanilla Deployment on Ubuntu Kubeadm VM using Azure ARM template](../azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_dc_vanilla_arm_template/) -->
 
-## Repository Roadmap
+## Jumpstart Roadmap
 
-Up-to-date roadmap for the Azure Arc scenarios to be covered can be found under [this repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
+Up-to-date roadmap for the Azure Arc Jumpstart scenarios can be found under [the repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
 
-## Contributing
+<!-- ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
@@ -324,4 +332,4 @@ Microsoft's general trademark guidelines can be found at http://go.microsoft.com
 Privacy information can be found at https://privacy.microsoft.com/
 
 Microsoft and any contributors reserve all other rights, whether under their respective copyrights, patents,
-or trademarks, whether by implication, estoppel or otherwise.
+or trademarks, whether by implication, estoppel or otherwise. -->
