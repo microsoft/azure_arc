@@ -4,7 +4,7 @@ If you are looking to explore the Jumpstart documentation, please go to the docu
 
 https://azurearcjumpstart.io
 
-This repo contains the markdown files which generate the above website. See below for guidance on running with a local environment to contribute to the docs.
+This repository contains the markdown files which generate the above website. See below for guidance on running with a local environment to contribute to the docs.
 
 ## Want to help and contribute?
 
