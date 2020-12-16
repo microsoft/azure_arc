@@ -14,9 +14,10 @@ Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://do
 However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc and by doing so, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
 > **Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
-> **Note: Currently, Azure Arc enabled SQL Server is in [public preview](https://docs.microsoft.com/en-us/sql/sql-server/azure-arc/overview?view=sql-server-ver15)**.
 
 By the end of the guide, you will have an Azure VM installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
+
+> **Note: Currently, Azure Arc enabled SQL Server is in [public preview](https://docs.microsoft.com/en-us/sql/sql-server/azure-arc/overview?view=sql-server-ver15)**.
 
 ## Prerequisites
 
