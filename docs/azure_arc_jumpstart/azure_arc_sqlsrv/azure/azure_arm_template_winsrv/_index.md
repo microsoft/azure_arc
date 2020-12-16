@@ -93,7 +93,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 2. The ARM template incl. an Azure VM Custom Script Extension which will deploy the the [*ClientTools.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/ClientTools.ps1) PowerShell Script. The script will:
 
-    1. Download the [*ArcOnboarding.ps1*] PowerShell script
+    1. Download the *ArcOnboarding.ps1* PowerShell script
 
     2. Set local OS environment variables
 
