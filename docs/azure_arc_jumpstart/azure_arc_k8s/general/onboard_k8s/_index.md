@@ -10,6 +10,8 @@ description: >
 
 The following README will guide you on how to connect an existing Kubernetes cluster to Azure Arc using a simple shell script.
 
+> **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/)**.
+
 ## Prerequisites
 
 * Make sure your *kubeconfig* file is configured properly and you are working against your [k8s cluster context](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).

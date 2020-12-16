@@ -12,6 +12,8 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
+> **Note: Currently, Azure Arc enabled data service is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+
 ## Prerequisites
 
 * Clone the Azure Arc Jumpstart repository
@@ -115,7 +117,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/azuredeploy.parameters.example.json).
 
-    > **Note: Currently, On Azure Kubernetes Service (AKS), [Kubernetes version 1.19.x is not supported](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes#known-issues).**
+  > **Note: Currently, On Azure Kubernetes Service (AKS), [Kubernetes version 1.19.x is not supported](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes#known-issues).**
 
   * *clusterName* - AKS cluster name
   * *dnsPrefix* - AKS unique DNS prefix

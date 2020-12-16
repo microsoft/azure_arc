@@ -10,6 +10,8 @@ description: >
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connected it as an Azure Arc enabled Kubernetes resource.
 
+> **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/)**.
+
 ## Prerequisites
 
 * Clone the Azure Arc Jumpstart repository

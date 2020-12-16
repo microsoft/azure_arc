@@ -12,6 +12,7 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
+> **Note: Currently, Azure Arc enabled data service is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 ## Prerequisites
 
 * Clone the Azure Arc Jumpstart repository
@@ -53,7 +54,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
     }
     ```
 
-> **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
 ## Automation Flow
 
