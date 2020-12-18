@@ -23,9 +23,9 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
 * [Install or update Azure CLI to version 2.7 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
-  ```shell
-  az --version
-  ```
+    ```shell
+    az --version
+    ```
 
 * [Create a free Amazon Web Services account](https://aws.amazon.com/free/) if you don't already have one.
 
