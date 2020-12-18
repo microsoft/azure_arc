@@ -26,7 +26,7 @@
           "protectedSettings": {
             "commandToExecute": "./keyvault-install-nginx.sh",
             "fileUris": [
-              "https://arcdemostoragedk.blob.core.windows.net/artifacts/keyvault-install-nginx.sh"
+              "https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/keyvault-install-nginx.sh"
             ]
           }
         }
