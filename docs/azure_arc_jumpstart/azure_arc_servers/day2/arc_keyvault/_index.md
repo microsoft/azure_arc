@@ -118,12 +118,6 @@ We will use the Azure Custom Script extension on your Azure Arc enabled server t
 
   ![Screenshot showing SSH into Azure Arc enabled server](./17.png)
 
-  * Run the following command to get root access to the server.
-  
-    ```shell
-    sudo -s
-    ```
-
   * Open */etc/nginx/conf.d/ssl.conf*  using nano or your preferred text editor.
 
     ```shell
@@ -170,6 +164,14 @@ We will use the Azure Custom Script extension on your Azure Arc enabled server t
 ## Clean up environment
 
 Complete the following steps to clean up your environment.
+
+* Delete the keyvault by running the following command in Az CLI.
+
+  ```shell
+  az keyvault delete --name <name of your keyvault>
+  ```
+
+  ![Screenshot showing Key Vault being deleted from Az CLI](./26.png)
 
 * Remove the virtual machines from each environment by following the teardown instructions from each guide.
 
