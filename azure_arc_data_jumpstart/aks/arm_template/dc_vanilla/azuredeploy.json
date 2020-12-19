@@ -60,13 +60,13 @@
                 "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
             }
         },
-        "servicePrincipalClientId": {
+        "SPN_CLIENT_ID": {
             "metadata": {
                 "description": "Client ID (used by cloudprovider)"
             },
             "type": "securestring"
         },
-        "servicePrincipalClientSecret": {
+        "SPN_CLIENT_SECRET": {
             "metadata": {
                 "description": "The Service Principal Client Secret."
             },
@@ -124,7 +124,7 @@
                 "description": "The size of the VM"
             }
         },
-        "tenantId": {
+        "SPN_TENANT_ID": {
             "type": "string",
             "metadata": {
                 "description": "Unique SPN tenant ID"
@@ -247,8 +247,8 @@
                     }
                 },
                 "servicePrincipalProfile": {
-                    "clientId": "[parameters('servicePrincipalClientId')]",
-                    "Secret": "[parameters('servicePrincipalClientSecret')]"
+                    "clientId": "[parameters('SPN_CLIENT_ID')]",
+                    "Secret": "[parameters('SPN_CLIENT_SECRET')]"
                 }
             }
         },
@@ -270,9 +270,9 @@
             "adminUsername":{"value": "[parameters('adminUsername')]"},
             "adminPassword":{"value": "[parameters('adminPassword')]"},
             "vmSize":{"value": "[parameters('vmSize')]"},
-            "servicePrincipalClientId":{"value": "[parameters('servicePrincipalClientId')]"},
-            "servicePrincipalClientSecret":{"value": "[parameters('servicePrincipalClientSecret')]"},
-            "tenantId":{"value": "[parameters('tenantId')]"},
+            "SPN_CLIENT_ID":{"value": "[parameters('SPN_CLIENT_ID')]"},
+            "SPN_CLIENT_SECRET":{"value": "[parameters('SPN_CLIENT_SECRET')]"},
+            "SPN_TENANT_ID":{"value": "[parameters('SPN_TENANT_ID')]"},
             "resourceGroup":{"value": "[parameters('resourceGroup')]"},
             "clusterName":{"value": "[parameters('clusterName')]"},
             "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
