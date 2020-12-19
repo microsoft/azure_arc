@@ -103,7 +103,7 @@ Start-Transcript -Path C:\tmp\LogonScript.log
 
 $azurePassword = ConvertTo-SecureString $env:SPN_CLIENT_SECRET -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:SPN_CLIENT_ID , $azurePassword)
-Connect-AzAccount -Credential $psCred -SPN_TENANT_ID $env:SPN_TENANT_ID -ServicePrincipal
+Connect-AzAccount -Credential $psCred -TenantId $env:SPN_TENANT_ID -ServicePrincipal
 Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
 
 kubectl get nodes
