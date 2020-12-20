@@ -45,7 +45,7 @@ First, we will create a new Azure resource group, Azure Key Vault and a self-sig
 
 * Create a new resource group to hold the keyvault.
 
-    ```console
+    ```shell
     az group create --name <name for your resource group> --location <location for your resource group>
     ```
 
