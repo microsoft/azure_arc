@@ -8,7 +8,9 @@ description: >
 
 ## Deploy Monitoring Agent Extension to Azure Arc Linux and Windows servers using Azure Policy
 
-The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/key-vault-windows) extension on an Azure Arc enabled Server, and then use a certificate managed by keyvault to secure web traffic with TLS on a web server. In this guide, we will focus on securing an Ubuntu web server. The only prerequiste you need to complete this scenario is an existing Azure Arc enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
+The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/key-vault-windows) extension on an Azure Arc enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server. 
+
+In this guide, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
 
 **If you don't yet have an Ubuntu server that is Azure Arc enabled, this repository offers you a way to do so in an automated fashion. Complete one of the scenarios below before proceeding:**
 
