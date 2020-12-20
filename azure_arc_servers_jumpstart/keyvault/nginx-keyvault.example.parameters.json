@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "arc-aws-demo" // Arc VM name as it is registered in ARM
+        },
+        "location": {
+            "value": "westus2" // Azure Region where the Arc VM is registered
+        },
+        "keyvaultCertPath": {
+            "value": "https://arckeyvault1.vault.azure.net/secrets/cert1" // path to your certificate stored in Key Vault
+        }
+    }
+}
