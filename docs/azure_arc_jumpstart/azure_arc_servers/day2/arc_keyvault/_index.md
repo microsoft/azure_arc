@@ -170,7 +170,7 @@ We will use the Azure Custom Script extension on your Azure Arc enabled server t
 
 Complete the following steps to clean up your environment.
 
-* Delete the keyvault by running the following command in Az CLI.
+* Delete the key vault resource by running the following command in Az CLI.
 
   ```shell
   az keyvault delete --name <name of your keyvault>
