@@ -39,7 +39,7 @@ In this guide, we will focus on securing an Ubuntu web server. The only prerequi
   ```shell
   az --version
 
-## Create an Azure Keyvault and a new self-signed certificate
+## Create an Azure Key Vault and a new self-signed certificate
 
 First, we will create a new Azure resource group, Azure Key Vault and a self-signed certificate from an Az CLI.
 
