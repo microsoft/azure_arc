@@ -12,13 +12,13 @@ The scenario will show you how to onboard the [Azure Key Vault](https://docs.mic
 
 In this guide, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
 
-**If you don't yet have an Ubuntu server that is Azure Arc enabled, this repository offers you a way to do so in an automated fashion. Complete one of the scenarios below before proceeding:**
+> **Note: This guide assumes you already deployed an Ubuntu server that is running on-premises or in other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
-* **[GCP Ubuntu VM](gcp_terraform_ubuntu.md)**
-* **[AWS Ubuntu VM](aws_terraform_ubuntu.md)**
-* **[Azure Ubuntu VM](azure_arm_template_linux.md)**
-* **[VMware Ubuntu VM](vmware_terraform_ubuntu.md)**
-* **[Local Ubuntu VM](local_vagrant_ubuntu.md)**
+* **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
+* **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
+* **[Azure Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/)**
+* **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/)**
+* **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)**
 
 ## Prerequisites
 
