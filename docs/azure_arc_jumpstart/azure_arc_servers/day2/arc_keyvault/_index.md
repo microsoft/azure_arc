@@ -6,7 +6,7 @@ weight: 4
 description: >
 ---
 
-## Deploy Azure Key Vault Extension to Azure Arc enabled Ubuntu server and use a Key Vault managed certificate with an Nginx web server
+## Deploy Azure Key Vault Extension to Azure Arc enabled Ubuntu server and use a Key Vault managed certificate with Nginx
 
 The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/key-vault-linux) extension on an Azure Arc enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server.
 
