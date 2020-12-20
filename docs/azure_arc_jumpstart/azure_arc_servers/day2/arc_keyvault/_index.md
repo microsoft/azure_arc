@@ -22,9 +22,9 @@ In this guide, we will focus on securing an Ubuntu web server. The only prerequi
 
 ## Prerequisites
 
-* Clone this repo
+* Clone the Azure Arc Jumpstart repository
 
-    ```console
+    ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
