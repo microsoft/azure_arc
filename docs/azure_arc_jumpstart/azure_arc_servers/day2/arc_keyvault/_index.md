@@ -61,7 +61,7 @@ First, we will create a new Azure resource group, Azure Key Vault and a self-sig
 
 * Create a new self-signed certificate with keyvault.
 
-    ```console
+    ```shell
     az keyvault certificate create --vault-name arckeyvault1 -n cert1 -p "$(az keyvault certificate get-default-policy)"
     ```
 
