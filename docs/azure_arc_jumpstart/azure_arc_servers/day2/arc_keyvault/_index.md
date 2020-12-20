@@ -6,9 +6,9 @@ weight: 4
 description: >
 ---
 
-## Deploy Monitoring Agent Extension to Azure Arc Linux and Windows servers using Azure Policy
+## Deploy Azure Key Vault Extension to Azure Arc enabled Ubuntu server and use a Key Vault managed certificate with an Nginx web server
 
-The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/key-vault-windows) extension on an Azure Arc enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server. 
+The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/key-vault-linux) extension on an Azure Arc enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server.
 
 In this guide, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
 
@@ -182,6 +182,6 @@ Complete the following steps to clean up your environment.
 
   * **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
   * **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
- * **[Azure Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/)**
+  * **[Azure Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/)**
   * **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/)**
   * **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)**
