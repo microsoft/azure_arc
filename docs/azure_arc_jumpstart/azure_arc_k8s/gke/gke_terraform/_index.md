@@ -136,81 +136,89 @@ The only thing you need to do before executing the Terraform plan is to export t
 * Export the environment variables needed for the Terraform plan.
 
   ```shell
-  export TF_VAR_gcp_project_id=<Your GCP Project ID
-  export TF_VAR_gcp_credentials_filename=<Location on the Keys JSON file
-  export TF_VAR_gcp_region=<GCP Region to deploy resources
-  export TF_VAR_gke_cluster_name=<GKE cluster name>
-  export TF_VAR_admin_username=<GKE cluster admin username>
-  export TF_VAR_admin_password=<GKE cluster admin password>
-  export TF_VAR_gke_cluster_node_count<GKE cluster node count>
+  export TF_VAR_subscriptionId='<Your Azure subscription ID>'
+  export TF_VAR_servicePrincipalAppId='<Your Azure service principal App ID>'
+  export TF_VAR_servicePrincipalSecret='<Your Azure service principal App Password>'
+  export TF_VAR_servicePrincipalTenantId='<Your Azure tenant ID'
+  export TF_VAR_gcp_project_id='<Your GCP Project ID>'
+  export TF_VAR_location='<Azure Region>'
+  export TF_VAR_resourceGroup='<Azure resource group name>'
+  export TF_VAR_gcp_credentials_filename='<Location on the Keys JSON file>'
+  export TF_VAR_gcp_region='<GCP Region to deploy resources>'
+  export TF_VAR_gke_cluster_name='<GKE cluster name>'
+  export TF_VAR_admin_username='<GKE control plane administrator username>'
+  export TF_VAR_admin_password='<GKE control plane administrator password>'
+  export TF_VAR_gke_cluster_node_count='<GKE cluster node count>'
+  export TF_VAR_gke_cluster_node_machine_type='<GKE cluster node machine type>'
   ```  
 
   For example:
 
   ```shell
-  export TF_VAR_gcp_project_id=azure-arc-demo-273150
-  export TF_VAR_gcp_credentials_filename=account.json
-  export TF_VAR_gcp_region=us-west1
-  export TF_VAR_gke_cluster_name=arc-gke-demo
-  export TF_VAR_admin_username=arcdemo
-  export TF_VAR_admin_password='arcdemo1234567!!'
+  export TF_VAR_subscriptionId='XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+  export TF_VAR_servicePrincipalAppId='XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+  export TF_VAR_servicePrincipalSecret='XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+  export TF_VAR_servicePrincipalTenantId='XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+  export TF_VAR_location='eastus'
+  export TF_VAR_resourceGroup='Arc-GKE-Demo'
+  export TF_VAR_gcp_project_id='azure-arc-demo-111111'
+  export TF_VAR_gcp_credentials_filename='account.json'
+  export TF_VAR_gcp_region='us-west1'
+  export TF_VAR_gke_cluster_name='arc-gke-demo'
+  export TF_VAR_admin_username='arcdemo'
+  export TF_VAR_admin_password='ArcDemo1234567!!'
   export TF_VAR_gke_cluster_node_count=1
+  export TF_VAR_gke_cluster_node_machine_type='n1-standard-2'
   ```
 
-* Run the ```terraform init``` command which will download the Terraform Google provider.
+* Run the ```terraform init``` command which will download the required terraform providers.
 
   ![terraform init](./18.png)
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Once done, you will have a ready GKE cluster under the *Kubernetes Engine* page in your GCP console.
+* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Once done, you will have a new empty Azure resource group and and a GKE cluster under the *Kubernetes Engine* page in your GCP console.
 
   ![terraform apply](./19.png)
 
-  ![New GKE cluster in the Google Console](./20.png)
+  ![An empty Azure resource group](./20.png)  
 
   ![New GKE cluster in the Google Console](./21.png)
+
+  ![New GKE cluster in the Google Console](./22.png)
 
 ## Connecting to Azure Arc
 
 * Now that you have a running GKE cluster, retrieve your Azure subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_gke](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/terraform/scripts/az_connect_gke.sh) shell script.
 
-  ![Export environment variables](./22.png)
+  ![Export environment variables](./23.png)
 
 * Open a new Cloud Shell session which will pre-authenticated against your GKE cluster.
-
-  ![Open Google Cloud Shell session and authenticate against the GKE cluster](./23.png)
 
   ![Open Google Cloud Shell session and authenticate against the GKE cluster](./24.png)
 
   ![Open Google Cloud Shell session and authenticate against the GKE cluster](./25.png)
 
+  ![Open Google Cloud Shell session and authenticate against the GKE cluster](./26.png)
+
 * Upload the *az_connect_gke* shell script and run it using the ```. ./az_connect_gke.sh``` command.
 
   > **Note: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
-
-  ![Upload a file to Cloud Shell](./26.png)
 
   ![Upload a file to Cloud Shell](./27.png)
 
   ![Upload a file to Cloud Shell](./28.png)
 
-* Upon completion, you will have your GKE cluster connect as a new Azure Arc Kubernetes cluster resource in a new resource group.
+  ![Upload a file to Cloud Shell](./29.png)
 
-  ![New Azure Arc enabled Kubernetes cluster](./29.png)
+* Upon completion, you will have your GKE cluster connect as a new Azure Arc Kubernetes cluster resource in the new Azure resource group.
 
   ![New Azure Arc enabled Kubernetes cluster](./30.png)
 
   ![New Azure Arc enabled Kubernetes cluster](./31.png)
 
+  ![New Azure Arc enabled Kubernetes cluster](./32.png)
+
 ## Delete the deployment
 
-* In Azure, the most straightforward way is to delete the cluster or the resource group via the Azure Portal.
+To delete the environment, use the *`terraform destroy --auto-approve`* command.
 
-  ![Delete the Azure Arc enabled Kubernetes cluster](./32.png)
-
-  ![Delete the Azure resource group](./33.png)
-
-* On your GCP console, select the cluster and delete it or alternatively, you can use the ```terraform destroy --auto-approve``` command.
-
-  ![Delete the GKE cluster from the GCP console](./34.png)
-
-  ![terraform destroy](./35.png)
+  ![terraform destroy](./33.png)

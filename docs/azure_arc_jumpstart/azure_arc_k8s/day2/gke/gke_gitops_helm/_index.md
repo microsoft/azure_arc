@@ -115,22 +115,24 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
 * Edit the environment variables in the [*az_k8sconfig_helm_gke*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/gitops/helm/az_k8sconfig_helm_gke.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_helm_gke``` command.
 
-    > **Note: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+    > **Note: The extra dot is due to the script has an *export* function and needs to have the variables exported in the same shell session as the rest of the commands.**
 
-    ![Open Google Cloud Shell session and authenticate against the GKE cluster](./05.png)
+    ![Export environment variables](./05.png)
 
     ![Open Google Cloud Shell session and authenticate against the GKE cluster](./06.png)
 
-    ![Upload a file to Cloud Shell](./07.png)
+    ![Open Google Cloud Shell session and authenticate against the GKE cluster](./07.png)
 
     ![Upload a file to Cloud Shell](./08.png)
 
     ![Upload a file to Cloud Shell](./09.png)
 
+    ![Upload a file to Cloud Shell](./10.png)
+
     The script will:
 
   * Install Helm 3 in Google Cloud Shell
-  * Install Azure CLI & Azure Arc Extensions
+  * Install Azure CLI & Azure Arc extensions
   * Login to your Azure subscription using the SPN credentials
   * Create two GitOps configurations for the Azure Arc Connected Cluster. Both configurations will be using the Helm charts located in the "Hello Arc" repository.
   * Cluster-level config to deploy nginx-ingress controller Helm chart
@@ -142,13 +144,13 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
     > **Note: that it takes few min for the configuration change it's Operator state status from "Pending" to Install.**
 
-    ![New GitOps configurations](./10.png)
+    ![Cluster-level GitOps configurations](./11.png)
 
-    ![New GitOps configurations](./11.png)
+    ![Namespace-level GitOps configurations](./12.png)
 
-    ![New GitOps configurations](./12.png)
+    ![Azure Arc enabled Kubernetes GitOps configurations](./13.png)
 
-    ![New GitOps configurations](./13.png)
+    ![New GitOps configurations in Azure portal](./14.png)
 
     The Cluster-level config initiated the nginx-ingress Pods and Service resource deployment (along with the Flux operator and Memcached). To see it's resource, use the below *kubectl* commands.
 
@@ -157,7 +159,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
     kubectl get svc -n cluster-mgmt
     ```
 
-    ![Cluster-level GitOps configurations](./14.png)
+    ![cluster-mgmt namespace resources](./15.png)
 
     The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
 
@@ -167,7 +169,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
     kubectl get ing -n prod
     ```
 
-    ![Namespace-level GitOps configurations](./15.png)
+    ![prod namespace resources](./16.png)
 
 ## Initiating "Hello Arc" Application GitOps
 
@@ -183,34 +185,40 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
   * Google Cloud Shell open running the ```kubectl get pods -n prod -w```
 
-    ![kubectl get pods -n prod -w](./16.png)
+    ![kubectl get pods -n prod -w](./17.png)
 
   * In your own repository fork, open the "Hello Arc" [*hello-arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/releases/prod/hello-arc.yaml) Helm release file.
 
   * The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n prod``` command.
 
-    ![kubectl get svc -n prod](./17.png)
+    ![kubectl get svc -n prod](./18.png)
 
   * End result should look like that:
 
-    ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./18.png)
+    ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./19.png)
 
 * As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
 
-    ![Tab Auto Refresh](./19.png)
+    ![Tab Auto Refresh](./20.png)
 
 * In the repository window showing the *hello-arc.yaml* file, change the number of *replicaCount* to 3 as well as the the message text and commit your changes. Alternatively, you can open the forked repository in your IDE, make the change, commit and push it.
 
-    ![Making a change to the replica count and the "MESSAGE" section](./20.png)
+    ![Making a change to the replica count and the "MESSAGE" section](./21.png)
 
 * Upon committing the changes, notice how the rolling upgrade starts. Once the Pods are up & running, the new "Hello Arc" application version window will show the new messages as well as the additional pods replicas, showing the rolling upgrade is completed and the GitOps flow is successful.
-
-    !["Hello Arc" rolling upgrade](./21.png)
 
     !["Hello Arc" rolling upgrade](./22.png)
 
     ![New side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./23.png)
 
+    ![New pods deployed](./24.png)
+
 ## Cleanup
 
-To delete the GitOps configuration and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/gitops/helm/az_k8sconfig_helm_cleanup.sh) script, upload it to Cloud Shell and run it using the ```. ./az_k8sconfig_helm_cleanup.sh``` command.
+To delete the GitOps configuration and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/gitops/helm/az_k8sconfig_helm_cleanup.sh) shell script, upload it to Cloud Shell and run it using the ```. ./az_k8sconfig_helm_cleanup.sh``` command.
+
+![Edit environment variables](./25.png)
+
+![GitOps configuration deleted](./26.png)
+
+![Empty GitOps configuration](./27.png)

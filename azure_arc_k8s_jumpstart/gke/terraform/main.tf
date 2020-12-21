@@ -1,3 +1,8 @@
+resource "azurerm_resource_group" "arcdemo" {
+  name     = var.resource_group_name
+  location = var.location
+}
+
 resource "google_container_cluster" "arcdemo" {
   name     = var.gke_cluster_name
   location = var.gcp_region
@@ -26,7 +31,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
 
   node_config {
     preemptible  = true
-    machine_type = "n1-standard-2"
+    machine_type = var.gke_cluster_node_machine_type
 
     metadata = {
       disable-legacy-endpoints = "true"
