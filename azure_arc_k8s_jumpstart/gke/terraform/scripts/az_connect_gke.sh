@@ -5,9 +5,9 @@ sudo apt-get update
 # <--- Change the following environment variables according to your Azure service principal name --->
 
 export subscriptionId='<Your Azure subscription ID>'
-export appId='<Your Azure service principal name>'
-export password='<Your Azure service principal password>'
-export tenantId='<Your Azure tenant ID>'
+export servicePrincipalAppId='<Your Azure service principal name>'
+export servicePrincipalSecret='<Your Azure service principal password>'
+export servicePrincipalTenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export location='<Azure Region>'
 export arcClusterName='<Azure Arc GKE Cluster Name>'
@@ -31,12 +31,15 @@ sudo tee /etc/apt/sources.list.d/azure-cli.list
 sudo apt-get update
 sudo apt-get install azure-cli
 
+az extension remove --name connectedk8s
+az extension remove --name k8sconfiguration
+rm -rf ~/.azure/AzureArcCharts
 az extension add --name connectedk8s
 az extension add --name k8sconfiguration
 
 echo "Log in to Azure using service principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
+az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_azure_arc_k8s'
