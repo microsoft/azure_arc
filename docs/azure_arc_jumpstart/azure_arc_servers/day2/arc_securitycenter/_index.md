@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to onboard an Azure Arc enabled server on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), so you can start collecting security-related configurations as well as event logs to recommend actions and improve your overall Azure security posture.
 
-In this guide, you will enable and configure Azure Security Center Standard tier on your Azure subscription, which will provide you with advanced threat protection (ATP) and detection capabilities. To complete this process you will:
+In this guide, you will enable and configure Azure Defender on your Azure subscription, which will provide you with advanced threat protection (ATP) and detection capabilities. To complete this process you will:
 
 * Setup a Log Analytics Workspace where logs and events will be aggregated for analysis.
 
@@ -99,10 +99,10 @@ In this guide, you will enable and configure Azure Security Center Standard tier
     --target-workspace '/subscriptions/<Your subscription ID>/resourceGroups/<Name of the Azure resource group>/providers/Microsoft.OperationalInsights/workspaces/<Name of the Log Analytics Workspace>'
   ```
 
-* Select the Azure Security Center tier. The Free tier is enabled on all your Azure subscriptions by default and will provide continuous security assessment and actionable security recommendations. In this guide, you will use the Standard tier for Virtual Machines that extends these capabilities providing unified security management and threat protection across your hybrid cloud workloads. To enable the Standard tier of Azure Security Center for VMs run the command below:
+* Azure Security Center is enabled on all your Azure subscriptions by default and will provide continuous security assessment and actionable security recommendations. In this guide, you will use Azure Defender for Virtual Machines that extends these capabilities providing unified security management and threat protection across your hybrid cloud workloads. To enable Azure Defender for VMs run the command below:
 
     ```shell
-    az security pricing create -n VirtualMachines --tier 'standard'
+    az security pricing create -n default --tier 'standard'
     ```
 
 * Now you need to assign the default Security Center policy initiative. ASC makes its security recommendations based on policies. There is an specific initiative that groups Security Center policies with the definition ID '1f3afdf9-d0c9-4c3d-847f-89da613e70a8'. The command below will assign the ASC initiative to your subscription:
@@ -113,34 +113,38 @@ In this guide, you will enable and configure Azure Security Center Standard tier
     --policy-set-definition '1f3afdf9-d0c9-4c3d-847f-89da613e70a8'
     ```
 
-## Azure Arc and Azure Security Center Integration
+## Azure Arc and Azure Defender Integration
 
-Now that you have successfully onboard ASC, you will get recommendations to help you protect your resources, including your Azure Arc enabled servers. ASC will then periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
+Now that you have successfully onboarded Azure Defender, you will get recommendations to help you protect your resources, including your Azure Arc enabled servers. Azure Defender will then periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
 
-* In the "Compute & apps" section under "VM and Servers", ASC will provide you with an overview of all the discovered security recommendations for your VMs and computers, including Azure VMs, Azure Classic VMs, servers and **Azure Arc Machines**.
+Azure Security Center will collect data from your Arc enabled servers to monitor for security vulnerabilities and threats. The data collection will allow greater visibility into missing updates, non-secure OS settings, endpoint protection status, health and threat protection. You will get recommendations even if you do not provision an agent, however to fully benefit it is recommended to install the Log Analytics agent. The agent will read security-related configurations and event logs from the Arc enabled server and send the data to the corresponding Log Analytics workspace where you enabled Azure Security Center. To install the agent on your Arc enabled server you can use the extension management feature as it is described [here](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_mma_arm/_index.md) or by configuring policies as shown [here](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/_index.md)
 
-    ![Screenshot showing Azure Security Center compute and apps](./04.png)
+>**Note: it may take upto 30 minutes for your Azure Arc enabled server to be shown in Azure Security Center Dashboard**
 
-* On the Azure Arc enabled servers, ASC will provide a recommendation to install the Log Analytics agent. In addition, each recommendation will include:
+* Once you have configured your workspace and deployed the MMA agent, using the [Azure Portal](https://portal.azure.com/) navigate to Azure Security Center. In the "Inventory" section under "VM and Servers", ASC will provide you with an overview of all the discovered security recommendations for your VMs and computers, including Azure VMs, Azure Classic VMs, servers and **Azure Arc Machines**.
+
+    ![Screenshot showing Azure Security Center Inventory](./04.png)
+
+* Select your Azure Arc enabled server, ASC will provide security recommendation. Each of them will include:
   * A short description of what is being recommended.
-  * A Secure Score impact, in this case, with a status of *High*.
-  * The remediation steps to carry out in order to implement the recommendation. For specific recommendations, like this one, you will also get a ***Quick Fix*** that enables you to quickly remediate a recommendation on multiple resources.
+  * A secure score impact.
+  * The remediation steps to carry out in order to implement the recommendation. For specific recommendations, you may also get a ***Quick Fix*** that enables you to quickly remediate a recommendation on multiple resources.
 
     ![Screenshot showing ASC recommendation on Azure Arc enabled server](./05.png)
 
-    ![Screenshot showing ASC recommendation to install Log Analytics](./06.png)
+* For this Azure Arc enabled server the recommendation "A vulnerability assessment solution should be enabled on your virtual machine" provides a ***Quick Fix***. It is using an ARM template to deploy the an extention to enable a vulnerability assessment solution on the Azure Arc machine.
 
-* This remediation ***Quick Fix*** is using an ARM template to deploy the Microsoft Monitoring Agent extension on the Azure Arc machine.
+    ![Screenshot showing ASC Quick Fix ARM template](./06.png)
 
-    ![Screenshot showing ASC Quick Fix ARM template](./07.png)
+* You can trigger the remediation and selecting: "Recommended: Deploy ASC integrated vulnerability scanner powered by Qualys (included in Azure Defender for servers)" and clicking on "Remediate 1 resource".
 
-* You can trigger the remediation with the ARM template from the Azure Security Center dashboard, by selecting the Log Analytics Workspace used for ASC and clicking on "Remediate 1 resource".
+    ![Screenshot showing triggering of remediation step of ASC](./07.png)
 
-    ![Screenshot showing triggering of remediation step of ASC](./08.png)
+* After you apply the recommendation it will be now marked as healthy.
 
-* After you apply the recommendation on the Azure Arc enabled server the resource will be now marked as healthy.
+    ![Screenshot showing healthy Azure Arc enabled server](./08.png)
 
-    ![Screenshot showing healthy Azure Arc enabled server](./09.png)
+> **Note:It can take several minutes after remediation completes to see the resources in the 'healthy resources' tab**
 
 ## Clean up environment
 
