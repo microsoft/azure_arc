@@ -134,6 +134,8 @@ Create AWS User IAM Key. An access key grants programmatic access to your resour
 
   ![Create EC2 Key Pair](./13.png)
 
+  > **Note: EC2 Key Pairs are regional.**
+
 ## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
@@ -179,6 +181,8 @@ As mentioned, the Terraform plan will deploy an EKS cluster and an EC2 Windows S
   * *export TF_VAR_AWS_SECRET_ACCESS_KEY*='Your AWS Secret Key (Created in the prerequisites section)'
   * *export TF_VAR_key_name*='Your AWS Key Pair name (Created in the prerequisites section)'
   * *export TF_VAR_key_pair_filename*='Your AWS Key Pair *.pem filename (Created in the prerequisites section)'
+  * *export TF_VAR_aws_region*='Your AWS region where resources will get deployed' (Since key pairs are regional, make sure both AWS region and availability zone matches the ones where the key pair was created)
+  * *export TF_VAR_aws_availabilityzone*='Your AWS availability zone' (Since key pairs are regional, make sure both AWS region and availability zone matches the ones where the key pair was created)
   * *export TF_VAR_client_id*='Your Azure service principal name'
   * *export TF_VAR_client_secret*='Your Azure service principal password'
   * *export TF_VAR_tenant_id*='Your Azure tenant ID'
