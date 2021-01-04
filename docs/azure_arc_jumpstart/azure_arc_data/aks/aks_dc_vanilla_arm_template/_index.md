@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller ([in Directly Connected mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)) and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)) and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
 > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -102,7 +102,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
     * Create the Azure Data Studio desktop shortcut
     * Open another PowerShell session which will execute the ```kubectl get pods -n <Arc Data Controller namespace> -w``` command
-    * Deploy the Arc Data Controller in **Directly Connected mode** using the user parameters values
+    * Deploy the Arc Data Controller in **"Directly Connected" mode** using the user parameters values
     * Unregister the logon script Windows schedule task so it will not run after first login
 
 ## Deployment
@@ -195,7 +195,7 @@ Now that both the AKS cluster and the Windows Server VM are created, it is time 
 
     ![PowerShell logon script run](./08.jpg)
 
-* Initially, since the Data Controller was deployed in Directly Connected mode, only after the logon script run is will be completed, a new Azure resource for the controller will be created as well.
+* Initially, since the data controller was deployed in "Directly Connected" mode, only after the logon script run is will be completed, a new Azure resource for the controller will be created as well.
 
     ![Data Controller in a resource group](./09.jpg)
 
