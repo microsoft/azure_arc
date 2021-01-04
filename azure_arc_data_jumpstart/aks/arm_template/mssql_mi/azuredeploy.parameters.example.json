@@ -12,7 +12,7 @@
             "value": "arcdemo"
         },
         "sshRSAPublicKey": {
-            "value": "ssh-rsa THISISTOPSECRETSTUFF1234XXXXXXXXXXXXXtEbhbVqD bilbo@MacBook-Pro.localdoaks_sqlmi_direct"
+            "value": "ssh-rsa THISISTOPSECRETSTUFF1234XXXXXXXXXXXXXtEbhbVqD bilbo@MacBook-Pro.localdomain"
         },
         "SPN_CLIENT_ID": {
             "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
