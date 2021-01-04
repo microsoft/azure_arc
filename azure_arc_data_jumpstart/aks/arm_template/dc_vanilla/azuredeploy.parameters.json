@@ -14,10 +14,10 @@
         "sshRSAPublicKey": {
             "value": "<Your ssh public key>"
         },
-        "servicePrincipalClientId": {
+        "SPN_CLIENT_ID": {
             "value": "<Your Azure service principal name>"
         },
-        "servicePrincipalClientSecret": {
+        "SPN_CLIENT_SECRET": {
             "value": "<Your Azure service principal password>"
         },
         "kubernetesVersion": {
@@ -32,8 +32,11 @@
         "vmSize": {
             "value": "<Client Windows VM size>"
         },
-        "tenantId": {
+        "SPN_TENANT_ID": {
             "value": "<Azure tenant ID>"
+        },
+        "SPN_AUTHORITY": {
+            "value": "https://login.microsoftonline.com"
         },
         "resourceGroup": {
             "value": "<Azure resource group where all resource to be deployed>"
