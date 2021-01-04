@@ -60,18 +60,30 @@
                 "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
             }
         },
-        "servicePrincipalClientId": {
+        "SPN_CLIENT_ID": {
             "metadata": {
                 "description": "Client ID (used by cloudprovider)"
             },
             "type": "securestring"
         },
-        "servicePrincipalClientSecret": {
+        "SPN_CLIENT_SECRET": {
             "metadata": {
                 "description": "The Service Principal Client Secret."
             },
             "type": "securestring"
         },
+        "SPN_TENANT_ID": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN tenant ID"
+            }
+        },
+        "SPN_AUTHORITY": {
+            "type": "string",
+            "metadata": {
+                "description": "The Service Principal authority"
+            }
+        },        
         "enableRBAC": {
             "defaultValue": true,
             "type": "bool",
@@ -90,7 +102,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.18.2",
+            "defaultValue": "1.18.10",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes."
@@ -122,12 +134,6 @@
             "defaultValue": "Standard_D8s_v3",
             "metadata": {
                 "description": "The size of the VM"
-            }
-        },
-        "tenantId": {
-            "type": "string",
-            "metadata": {
-                "description": "Unique SPN tenant ID"
             }
         },
         "resourceGroup": {
@@ -253,8 +259,8 @@
                     }
                 },
                 "servicePrincipalProfile": {
-                    "clientId": "[parameters('servicePrincipalClientId')]",
-                    "Secret": "[parameters('servicePrincipalClientSecret')]"
+                    "clientId": "[parameters('SPN_CLIENT_ID')]",
+                    "Secret": "[parameters('SPN_CLIENT_SECRET')]"
                 }
             }
         },
@@ -268,7 +274,7 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-            "uri":"https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/client_vm_deployment.json",
+            "uri":"https://raw.githubusercontent.com/microsoft/azure_arc/aks_sqlmi_direct/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/client_vm_deployment.json",
             "contentVersion":"1.0.0.0"
             },
             "parameters": {
@@ -276,9 +282,10 @@
             "adminUsername":{"value": "[parameters('adminUsername')]"},
             "adminPassword":{"value": "[parameters('adminPassword')]"},
             "vmSize":{"value": "[parameters('vmSize')]"},
-            "servicePrincipalClientId":{"value": "[parameters('servicePrincipalClientId')]"},
-            "servicePrincipalClientSecret":{"value": "[parameters('servicePrincipalClientSecret')]"},
-            "tenantId":{"value": "[parameters('tenantId')]"},
+            "SPN_CLIENT_ID":{"value": "[parameters('SPN_CLIENT_ID')]"},
+            "SPN_CLIENT_SECRET":{"value": "[parameters('SPN_CLIENT_SECRET')]"},
+            "SPN_TENANT_ID":{"value": "[parameters('SPN_TENANT_ID')]"},
+            "SPN_AUTHORITY":{"value": "[parameters('SPN_AUTHORITY')]"},            
             "resourceGroup":{"value": "[parameters('resourceGroup')]"},
             "clusterName":{"value": "[parameters('clusterName')]"},
             "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
