@@ -6,6 +6,9 @@ azdata arc postgres server delete --name $env:POSTGRES_NAME
 azdata arc dc delete --name $env:ARC_DC_NAME --namespace $env:ARC_DC_NAME --force
 kubectl delete ns $env:ARC_DC_NAME
 
+az login --service-principal -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET --tenant $env:SPN_TENANT_ID --output none
+az resource delete -g $env:resourceGroup -n $env:ARC_DC_NAME --namespace "Microsoft.AzureArcData" --resource-type "dataControllers"
+
 # Restoring State
 Copy-Item -Path "C:\tmp\hosts_backup" -Destination "C:\Windows\System32\drivers\etc\hosts" -Recurse -Force -ErrorAction Continue
 Copy-Item -Path "C:\tmp\settings_template_backup.json" -Destination "C:\tmp\settings_template.json" -Recurse -Force -ErrorAction Continue
