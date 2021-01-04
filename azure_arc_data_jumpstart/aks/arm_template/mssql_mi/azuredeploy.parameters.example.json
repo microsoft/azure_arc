@@ -25,7 +25,7 @@
         },
         "SPN_AUTHORITY": {
             "value": "https://login.microsoftonline.com"
-        },        
+        },
         "kubernetesVersion": {
             "value": "1.18.10"
         },

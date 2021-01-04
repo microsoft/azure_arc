@@ -6,14 +6,14 @@
             "type": "string",
             "defaultValue": "Arc-Data-Client",
             "metadata": {
-                "description": "The name of you Virtual Machine."
+                "description": "The name of you Virtual Machine"
             }
         },
         "adminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
             "metadata": {
-                "description": "Username for the Virtual Machine."
+                "description": "Username for the Virtual Machine"
             }
         },
         "adminPassword": {
@@ -27,14 +27,14 @@
         "type": "string",
         "defaultValue": "2019-Datacenter",
         "metadata": {
-            "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+            "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
             }
         },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
-                "description": "Location for all resources."
+                "description": "Location for all resources"
             }
         },
         "vmSize": {
@@ -132,7 +132,7 @@
         "DOCKER_REGISTRY": {
             "type": "string",
             "metadata": {
-                "description": "Private Azure Arc Data Container Registry "
+                "description": "Private Azure Arc Data Container Registry"
             }
         },
         "DOCKER_REPOSITORY": {
