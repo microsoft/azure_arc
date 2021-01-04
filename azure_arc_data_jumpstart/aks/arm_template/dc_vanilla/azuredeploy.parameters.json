@@ -35,6 +35,9 @@
         "SPN_TENANT_ID": {
             "value": "<Azure tenant ID>"
         },
+        "SPN_AUTHORITY": {
+            "value": "<Azure tenant ID>"
+        },
         "resourceGroup": {
             "value": "<Azure resource group where all resource to be deployed>"
         },
