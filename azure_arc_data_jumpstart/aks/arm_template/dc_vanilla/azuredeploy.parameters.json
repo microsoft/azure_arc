@@ -20,6 +20,12 @@
         "SPN_CLIENT_SECRET": {
             "value": "<Your Azure service principal password>"
         },
+        "SPN_TENANT_ID": {
+            "value": "<Azure tenant ID>"
+        },
+        "SPN_AUTHORITY": {
+            "value": "https://login.microsoftonline.com"
+        },        
         "kubernetesVersion": {
             "value": "<Kubernetes Version, e.g. 1.18.10>"
         },
@@ -31,12 +37,6 @@
         },
         "vmSize": {
             "value": "<Client Windows VM size>"
-        },
-        "SPN_TENANT_ID": {
-            "value": "<Azure tenant ID>"
-        },
-        "SPN_AUTHORITY": {
-            "value": "https://login.microsoftonline.com"
         },
         "resourceGroup": {
             "value": "<Azure resource group where all resource to be deployed>"
