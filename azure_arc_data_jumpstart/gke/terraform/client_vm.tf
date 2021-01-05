@@ -150,23 +150,24 @@ resource "local_file" "password_reset" {
 resource "local_file" "azure_arc" {
   content = templatefile("scripts/azure_arc.ps1.tmpl", {
     gcp_credentials_filename = var.gcp_credentials_filename
-    gke_cluster_name          = var.gke_cluster_name
-    gcp_region                = var.gcp_region
-    client_id                 = var.client_id
-    client_secret             = var.client_secret
-    tenant_id                 = var.tenant_id
-    AZDATA_USERNAME           = var.AZDATA_USERNAME
-    AZDATA_PASSWORD           = var.AZDATA_PASSWORD
-    ACCEPT_EULA               = var.ACCEPT_EULA
-    REGISTRY_USERNAME         = var.REGISTRY_USERNAME
-    REGISTRY_PASSWORD         = var.REGISTRY_PASSWORD
-    ARC_DC_NAME               = var.ARC_DC_NAME
-    ARC_DC_SUBSCRIPTION       = var.ARC_DC_SUBSCRIPTION
-    ARC_DC_RG                 = var.ARC_DC_RG
-    ARC_DC_REGION             = var.ARC_DC_REGION
-    DOCKER_REGISTRY           = var.DOCKER_REGISTRY
-    DOCKER_REPOSITORY         = var.DOCKER_REPOSITORY
-    DOCKER_TAG                = var.DOCKER_TAG
+    gke_cluster_name         = var.gke_cluster_name
+    gcp_region               = var.gcp_region
+    SPN_CLIENT_ID            = var.SPN_CLIENT_ID
+    SPN_CLIENT_SECRET        = var.SPN_CLIENT_SECRET
+    SPN_TENANT_ID            = var.SPN_TENANT_ID
+    SPN_AUTHORITY            = var.SPN_AUTHORITY
+    AZDATA_USERNAME          = var.AZDATA_USERNAME
+    AZDATA_PASSWORD          = var.AZDATA_PASSWORD
+    ACCEPT_EULA              = var.ACCEPT_EULA
+    REGISTRY_USERNAME        = var.REGISTRY_USERNAME
+    REGISTRY_PASSWORD        = var.REGISTRY_PASSWORD
+    ARC_DC_NAME              = var.ARC_DC_NAME
+    ARC_DC_SUBSCRIPTION      = var.ARC_DC_SUBSCRIPTION
+    ARC_DC_RG                = var.ARC_DC_RG
+    ARC_DC_REGION            = var.ARC_DC_REGION
+    DOCKER_REGISTRY          = var.DOCKER_REGISTRY
+    DOCKER_REPOSITORY        = var.DOCKER_REPOSITORY
+    DOCKER_TAG               = var.DOCKER_TAG
     }
   )
   filename = "scripts/azure_arc.ps1"
