@@ -15,10 +15,10 @@ echo $ACCEPT_EULA:${10} | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_REGISTRY:${11} | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_REPOSITORY:${12} | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_TAG:${13} | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_CLIENT_ID:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_CLIENT_SECRET:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_TENANT_ID:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_AUTHORITY:$2 | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_CLIENT_ID:${14} | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_CLIENT_SECRET:${15} | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_TENANT_ID:${16} | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_AUTHORITY:${17} | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
