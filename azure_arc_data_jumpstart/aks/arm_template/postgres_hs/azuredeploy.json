@@ -7,27 +7,27 @@
       "type": "string",
       "defaultValue": "Arc-Data-Demo",
       "metadata": {
-        "description": "The name of the Managed Cluster resource."
+        "description": "The name of the Managed Cluster resource"
       }
     },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
-        "description": "The location of the Managed Cluster resource."
+        "description": "The location of the Managed Cluster resource"
       }
     },
     "dnsPrefix": {
       "type": "string",
       "metadata": {
-        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
       }
     },
     "osDiskSizeGB": {
       "type": "int",
       "defaultValue": 0,
       "metadata": {
-        "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agent VM size."
+        "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agent VM size"
       },
       "minValue": 0,
       "maxValue": 1023
@@ -36,7 +36,7 @@
       "type": "int",
       "defaultValue": 3,
       "metadata": {
-        "description": "The number of nodes for the cluster."
+        "description": "The number of nodes for the cluster"
       },
       "minValue": 1,
       "maxValue": 50
@@ -45,13 +45,13 @@
       "type": "string",
       "defaultValue": "Standard_D8s_v3",
       "metadata": {
-        "description": "The size of the Virtual Machine."
+        "description": "The size of the Virtual Machine"
       }
     },
     "nodeAdminUsername": {
       "type": "string",
       "metadata": {
-        "description": "User name for the Linux Virtual Machines."
+        "description": "User name for the Linux Virtual Machines"
       }
     },
     "sshRSAPublicKey": {
@@ -60,18 +60,30 @@
         "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
       }
     },
-    "servicePrincipalClientId": {
+    "SPN_CLIENT_ID": {
       "metadata": {
         "description": "Client ID (used by cloudprovider)"
       },
       "type": "securestring"
     },
-    "servicePrincipalClientSecret": {
+    "SPN_CLIENT_SECRET": {
       "metadata": {
-        "description": "The Service Principal Client Secret."
+        "description": "The Service Principal Client Secret"
       },
       "type": "securestring"
     },
+    "SPN_TENANT_ID": {
+      "type": "string",
+      "metadata": {
+        "description": "Unique SPN tenant ID"
+      }
+    },
+    "SPN_AUTHORITY": {
+      "type": "string",
+      "metadata": {
+        "description": "The Service Principal authority"
+      }
+    },     
     "enableRBAC": {
       "defaultValue": true,
       "type": "bool",
@@ -86,28 +98,28 @@
         "Linux"
       ],
       "metadata": {
-        "description": "The type of operating system."
+        "description": "The type of operating system"
       }
     },
     "kubernetesVersion": {
-      "defaultValue": "1.18.2",
+      "defaultValue": "1.18.10",
       "type": "string",
       "metadata": {
-        "description": "The version of Kubernetes."
+        "description": "The version of Kubernetes"
       }
     },
     "vmName": {
       "type": "string",
       "defaultValue": "Arc-Data-Client",
       "metadata": {
-        "description": "TThe name of the Client Virtual Machine."
+        "description": "TThe name of the Client Virtual Machine"
       }
     },
     "adminUsername": {
       "type": "string",
       "defaultValue": "arcdemo",
       "metadata": {
-        "description": "Username for the Virtual Machine."
+        "description": "Username for the Virtual Machine"
       }
     },
     "adminPassword": {
@@ -123,13 +135,7 @@
       "metadata": {
         "description": "The size of the VM"
       }
-    },
-    "tenantId": {
-      "type": "string",
-      "metadata": {
-        "description": "Unique SPN tenant ID"
-      }
-    },
+    },   
     "resourceGroup": {
       "type": "string",
       "metadata": {
@@ -266,8 +272,8 @@
           }
         },
         "servicePrincipalProfile": {
-          "clientId": "[parameters('servicePrincipalClientId')]",
-          "Secret": "[parameters('servicePrincipalClientSecret')]"
+          "clientId": "[parameters('SPN_CLIENT_ID')]",
+          "Secret": "[parameters('SPN_CLIENT_SECRET')]"
         }
       }
     },
@@ -289,9 +295,10 @@
         "adminUsername":{"value": "[parameters('adminUsername')]"},
         "adminPassword":{"value": "[parameters('adminPassword')]"},
         "vmSize":{"value": "[parameters('vmSize')]"},
-        "servicePrincipalClientId":{"value": "[parameters('servicePrincipalClientId')]"},
-        "servicePrincipalClientSecret":{"value": "[parameters('servicePrincipalClientSecret')]"},
-        "tenantId":{"value": "[parameters('tenantId')]"},
+        "SPN_CLIENT_ID":{"value": "[parameters('SPN_CLIENT_ID')]"},
+        "SPN_CLIENT_SECRET":{"value": "[parameters('SPN_CLIENT_SECRET')]"},
+        "SPN_TENANT_ID":{"value": "[parameters('SPN_TENANT_ID')]"},
+        "SPN_AUTHORITY":{"value": "[parameters('SPN_AUTHORITY')]"}, 
         "resourceGroup":{"value": "[parameters('resourceGroup')]"},
         "clusterName":{"value": "[parameters('clusterName')]"},
         "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
