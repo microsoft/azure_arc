@@ -102,7 +102,7 @@ if(($env:DOCKER_TAG -ne $NULL) -or ($env:DOCKER_TAG -ne ""))
     azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.docker.imageTag=$env:DOCKER_TAG"
 }
 
-azdata arc dc create --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:ARC_DC_RG --location $env:ARC_DC_REGION --connectivity-mode indirect --path "C:\tmp\custom"
+azdata arc dc create --namespace $env:ARC_DC_NAME --name $env:ARC_DC_NAME --subscription $env:ARC_DC_SUBSCRIPTION --resource-group $env:ARC_DC_RG --location $env:ARC_DC_REGION --connectivity-mode direct --path "C:\tmp\custom"
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 

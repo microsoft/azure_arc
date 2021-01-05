@@ -2,9 +2,10 @@ resource "local_file" "azure_arc" {
   content = templatefile("scripts/azure_arc.ps1.tmpl", {
     AWS_ACCESS_KEY_ID     = var.AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
-    client_id             = var.client_id
-    client_secret         = var.client_secret
-    tenant_id             = var.tenant_id
+    SPN_CLIENT_ID         = var.SPN_CLIENT_ID
+    SPN_CLIENT_SECRET     = var.SPN_CLIENT_SECRET
+    SPN_TENANT_ID         = var.SPN_TENANT_ID
+    SPN_AUTHORITY         = var.SPN_AUTHORITY
     AZDATA_USERNAME       = var.AZDATA_USERNAME
     AZDATA_PASSWORD       = var.AZDATA_PASSWORD
     ACCEPT_EULA           = var.ACCEPT_EULA
