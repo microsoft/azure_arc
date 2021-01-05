@@ -2,9 +2,12 @@ Start-Transcript -Path C:\tmp\postgres_cleanup.log
 
 # Deleting Azure Arc Data Controller namespace and it's resources (PostgreSQL incl.)
 Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc postgres server delete --name $env:POSTGRES_NAME
+azdata arc postgres server delete --name $env:POSTGRES_NAME --force
 azdata arc dc delete --name $env:ARC_DC_NAME --namespace $env:ARC_DC_NAME --force
 kubectl delete ns $env:ARC_DC_NAME
+
+az login --service-principal -u $env:SPN_CLIENT_ID -p $env:SPN_CLIENT_SECRET --tenant $env:SPN_TENANT_ID --output none
+az resource delete -g $env:resourceGroup -n $env:ARC_DC_NAME --namespace "Microsoft.AzureArcData" --resource-type "dataControllers"
 
 # Restoring State
 Copy-Item -Path "C:\tmp\hosts_backup" -Destination "C:\Windows\System32\drivers\etc\hosts" -Recurse -Force -ErrorAction Continue
