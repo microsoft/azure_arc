@@ -110,17 +110,22 @@ variable "ARC_DC_REGION" {
   type        = string
 }
 
-variable "client_id" {
+variable "SPN_CLIENT_ID" {
   description = "Your Azure service principal name"
   type        = string
 }
 
-variable "client_secret" {
+variable "SPN_CLIENT_SECRET" {
   description = "Your Azure service principal password"
   type        = string
 }
 
-variable "tenant_id" {
+variable "SPN_TENANT_ID" {
   description = "Your Azure tenant ID"
+  type        = string
+}
+
+variable "SPN_AUTHORITY" {
+  description = "The Service Principal authority"
   type        = string
 }
