@@ -24,8 +24,8 @@ data "aws_availability_zones" "available" {}
 
 provider "azurerm" {
   subscription_id = var.ARC_DC_SUBSCRIPTION
-  client_id       = var.client_id
-  client_secret   = var.client_secret
-  tenant_id       = var.tenant_id
+  client_id       = var.SPN_CLIENT_ID
+  client_secret   = var.SPN_CLIENT_SECRET
+  tenant_id       = var.SPN_TENANT_ID
   features {}
 }
