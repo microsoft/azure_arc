@@ -82,9 +82,9 @@ workflow ClientTools_01
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_pg_direct/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/Postgres_Cleanup.ps1" -OutFile "C:\tmp\Postgres_Cleanup.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_pg_direct/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/Postgres_Deploy.ps1" -OutFile "C:\tmp\Postgres_Deploy.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_pg_direct/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/settings_template.json" -OutFile "C:\tmp\settings_template.json"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/Postgres_Cleanup.ps1" -OutFile "C:\tmp\Postgres_Cleanup.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/scripts/Postgres_Deploy.ps1" -OutFile "C:\tmp\Postgres_Deploy.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/settings_template.json" -OutFile "C:\tmp\settings_template.json"
                 }
         }
 
@@ -150,7 +150,7 @@ Remove-Item "C:\tmp\out.txt" -Force
 
 # Restoring demo database
 $podname = "$env:POSTGRES_NAME" + "r-0"
-kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/aks_pg_direct/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
+kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql
 
