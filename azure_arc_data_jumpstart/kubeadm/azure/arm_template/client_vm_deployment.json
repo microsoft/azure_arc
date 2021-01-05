@@ -250,7 +250,20 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "1443"
                         }
-                    }                                                                                                                  
+                    },
+                    {
+                        "name": "allow_https_443",
+                        "properties": {
+                            "priority": 1003,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "443"
+                        }
+                    }                    
                 ]
             }
         },
