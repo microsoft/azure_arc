@@ -47,13 +47,13 @@ New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMD
 New-NetFirewallRule -Name AllowAnyInbound -DisplayName "Allow Any Inbound" -Enabled True -Profile Any -Direction Inbound -Protocol Any -Action Allow -RemoteAddress Any
 
 
-$azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $env:servicePrincipalSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalAppId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:servicePrincipalTenantId -ServicePrincipal
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AzureData
 
-$unattended = $servicePrincipalAppId -And $servicePrincipalTenantId -And $servicePrincipalSecret
+$unattended = $env:servicePrincipalAppId -And $env:servicePrincipalTenantId -And $env:servicePrincipalSecret
 
 function registerArcForServers() {
     # Download the package
@@ -86,13 +86,13 @@ function registerArcForServers() {
     $params = @("connect", "--resource-group", $resourceGroup, "--location", $location, "--subscription-id", $subId, "--tenant-id", $context.Tenant, "--tags", "Project=jumpstart_azure_arc_sql")
 
     if ($unattended) {
-        $password = $servicePrincipalSecret
-        if ($servicePrincipalSecret -is [SecureString]) {
-            $cred = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalAppId, $servicePrincipalSecret)
+        $password = $env:servicePrincipalSecret
+        if ($env:servicePrincipalSecret -is [SecureString]) {
+            $cred = New-Object -TypeName System.Management.Automation.PSCredential($env:servicePrincipalAppId, $env:servicePrincipalSecret)
             $password = $cred.GetNetworkCredential().Password
         } 
         $params += "--service-principal-id"
-        $params += $servicePrincipalAppId
+        $params += $env:servicePrincipalAppId
         $params += "--service-principal-secret"
         $params += $password
     }
@@ -186,13 +186,13 @@ function installPowershellModule() {
 $context = Get-AzContext
 if (!$context) {
     if ($unattended) {
-        $securePassword = $servicePrincipalSecret
-        if ($servicePrincipalSecret -is [String]) {
+        $securePassword = $env:servicePrincipalSecret
+        if ($env:servicePrincipalSecret -is [String]) {
             Write-Warning -Message "Saving a plaintext password presents a security risk. Consider storing your password in a secure file."
-            $securePassword = ConvertTo-SecureString -String $servicePrincipalSecret -AsPlainText -Force
+            $securePassword = ConvertTo-SecureString -String $env:servicePrincipalSecret -AsPlainText -Force
         } 
-        $pscredential = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalAppId, $securePassword)
-        Connect-AzAccount -ServicePrincipal -Credential $pscredential -Tenant $servicePrincipalTenantId
+        $pscredential = New-Object -TypeName System.Management.Automation.PSCredential($env:servicePrincipalAppId, $securePassword)
+        Connect-AzAccount -ServicePrincipal -Credential $pscredential -Tenant $env:servicePrincipalTenantId
     }
     else {
         Connect-AzAccount -UseDeviceAuthentication
