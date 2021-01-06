@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on single-node Kubernetes cluster deployed with [Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) in az Azure Ubuntu VM, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)) and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
 > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -66,10 +66,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
 * Main ARM template will deploy an Ubuntu VM. The ARM template will call the the Azure [Linux Custom Script Extension](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/custom-script-linux) to:
 
 * Deploy a single-node Kubernetes cluster using Kubeadm.
-* Deploy the Azure Arc Data Controller on that cluster.
+* Deploy the Azure Arc Data Controller in **"Directly Connected" mode** on that cluster.
 * Once Ubuntu VM deployment has finished, the main ARM template will call a secondary ARM template which is depended on a successful Ubuntu VM deployment.
 * Secondary ARM template will deploy a client Windows Server 2019 VM.
-* As part of the Windows Server 2019 VM deployment, there are 2 scripts executions; First script (ClientTools.ps1) at deployment runtime using the ARM *"CustomScriptExtension"* module and a second script (LogonScript.ps1) on user first logon to Windows.
+* As part of the Windows Server 2019 VM deployment, there are 2 script executions; First PowerShell script [ClientTools.ps1](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/ClientTools.ps1) at deployment runtime using the ARM *CustomScriptExtension* module and the second PowerShell script *LogonScript.ps1* on user first logon to Windows.
 
 * Runtime script will:
 
@@ -102,9 +102,10 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *adminPassword* - Client Windows VM
   * *K8sVMSize* - Kubeadm Ubuntu
   * *vmSize* - Client Windows
-  * *servicePrincipalClientId* - Your Azure Service
-  * *servicePrincipalClientSecret* - Your Azure Service
-  * *tenantId* - Azure
+  * *SPN_CLIENT_ID* - Your Azure service principal name
+  * *SPN_CLIENT_SECRET* - Your Azure service principal password
+  * *SPN_TENANT_ID* - Your Azure tenant ID
+  * *SPN_AUTHORITY* - *https://login.microsoftonline.com* **Do not change**
   * *AZDATA_USERNAME* - Azure Arc Data Controller
   * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
   * *ACCEPT_EULA* - "yes" **Do not change**
@@ -117,7 +118,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ```shell
     az group create --name <Name of the Azure resource group> --location <Azure region>
-    az deployment group create --resource-group <Name of the Azure resource group> --name <The name of this deployment> --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters <The *azuredeploy.parameters.json* parameters file location>
+    az deployment group create \
+    --resource-group <Name of the Azure resource group> \
+    --name <The name of this deployment> \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json \
+    --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
     > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
@@ -125,13 +130,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```shell
-    az group create --name Arc-Data-Kubeadm-Demo --location "East US"
-    az deployment group create --resource-group Arc-Data-Kubeadm-Demo --name arcdatakubeadmdemo --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json --parameters azuredeploy.parameters.json
+    az group create --name rc-Data-Kubeadm-Demo --location "East US"
+    az deployment group create \
+    --resource-group Arc-Data-Kubeadm-Demo \
+    --name arcdatakubeadmdemo \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.json \
+    --parameters azuredeploy.parameters.json
     ```
 
     > **Note: Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20 minutes.**
 
-* Once Azure resources have been provisioned, you will be able to see it in Azure portal.
+* Once Azure resources have been provisioned, you will be able to see it in Azure portal with the Azure Arc Data Controller included. 
 
     ![A successful ARM deployment](./01.png)
 
