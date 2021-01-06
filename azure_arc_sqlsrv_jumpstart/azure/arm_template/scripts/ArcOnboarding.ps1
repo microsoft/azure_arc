@@ -22,11 +22,6 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-# These settings will be replaced by the portal when the script is generated
-$subId = "${subId}"
-$resourceGroup = "${resourceGroup}"
-$location = "${location}"
-$proxy=""
 $resourceTags= @{"Project"="jumpstart_azure_arc_sql"}
 
 # These optional variables can be replaced with valid service principal details
@@ -83,7 +78,7 @@ function registerArcForServers() {
 
     Write-Host "Connecting Azure Connected Machine Agent"
     $context = Get-AzContext
-    $params = @("connect", "--resource-group", $resourceGroup, "--location", $location, "--subscription-id", $subId, "--tenant-id", $context.Tenant, "--tags", "Project=jumpstart_azure_arc_sql")
+    $params = @("connect", "--resource-group", $env:resourceGroup, "--location", $env:location, "--subscription-id", $env:subId, "--tenant-id", $context.Tenant, "--tags", "Project=jumpstart_azure_arc_sql")
 
     if ($unattended) {
         $password = $env:servicePrincipalSecret
@@ -203,7 +198,7 @@ if (!$context) {
             return
        }
 }
-Set-AzContext -Subscription $subId
+Set-AzContext -Subscription $env:subId
 
 # Check if machine is registered with Azure Arc for Servers
 # Register machine if necessary
@@ -317,7 +312,7 @@ if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server') {
 
         # Create resource
         #
-    $newResource = New-AzResource -Location $location -Properties $instProp -ResourceName $resource_name -Tags $resourceTags -ResourceType Microsoft.AzureArcData/sqlServerInstances -ResourceGroupName $resourceGroup -Force
+    $newResource = New-AzResource -Location $env:location -Properties $instProp -ResourceName $resource_name -Tags $resourceTags -ResourceType Microsoft.AzureArcData/sqlServerInstances -ResourceGroupName $env:resourceGroup -Force
     checkResourceCreation -newResource $newResource -instProp $instProp -name $resource_name
 }
 }
