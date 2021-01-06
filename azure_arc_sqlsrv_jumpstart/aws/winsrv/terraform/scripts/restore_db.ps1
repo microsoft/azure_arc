@@ -1,6 +1,6 @@
 Start-Transcript -Path C:\tmp\restore_db.log
 
-Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/sql_script/azure_arc_sqlsrv_jumpstart/aws/winsrv/terraform/scripts/AdventureWorksLT2019.bak" -OutFile "C:\tmp\AdventureWorksLT2019.bak"
+Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/main/azure_arc_sqlsrv_jumpstart/aws/winsrv/terraform/scripts/AdventureWorksLT2019.bak" -OutFile "C:\tmp\AdventureWorksLT2019.bak"
 Start-Sleep -Seconds 3
 Restore-SqlDatabase -ServerInstance $env:COMPUTERNAME -Database "AdventureWorksLT2019" -BackupFile "C:\tmp\AdventureWorksLT2019.bak" -AutoRelocateFile -PassThru -Verbose
 
