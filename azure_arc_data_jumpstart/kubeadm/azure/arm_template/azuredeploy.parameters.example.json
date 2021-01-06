@@ -20,15 +20,18 @@
         "vmSize": {
             "value": "Standard_D4s_v3"
         },
-        "servicePrincipalClientId": {
+        "SPN_CLIENT_ID": {
             "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
         },
-        "servicePrincipalClientSecret": {
+        "SPN_CLIENT_SECRET": {
             "value": "33333333-XXXX-YTYT-9c21-7777777777"
         },
-        "tenantId": {
+        "SPN_TENANT_ID": {
             "value": "33333333-XXXX-41af-1111-7777777777"
-        },
+        },        
+        "SPN_AUTHORITY": {
+            "value": "https://login.microsoftonline.com"
+        }, 
         "AZDATA_USERNAME": {
             "value": "arcdemo"
         },

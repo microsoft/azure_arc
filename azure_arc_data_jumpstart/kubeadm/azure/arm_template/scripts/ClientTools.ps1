@@ -1,10 +1,11 @@
 param (
-    [string]$servicePrincipalClientId,
-    [string]$servicePrincipalClientSecret,
     [string]$adminUsername,
     [string]$adminPassword,
     [string]$K8svmName,
-    [string]$tenantId,
+    [string]$SPN_CLIENT_ID,
+    [string]$SPN_CLIENT_SECRET,
+    [string]$SPN_TENANT_ID,
+    [string]$SPN_AUTHORITY,
     [string]$ARC_DC_RG,
     [string]$AZDATA_USERNAME,
     [string]$AZDATA_PASSWORD,
@@ -20,12 +21,13 @@ param (
     [string]$DOCKER_TAG
 )
 
-[System.Environment]::SetEnvironmentVariable('servicePrincipalClientId', $servicePrincipalClientId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('servicePrincipalClientSecret', $servicePrincipalClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('K8svmName', $K8svmName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $SPN_CLIENT_ID,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $SPN_CLIENT_SECRET,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $SPN_TENANT_ID,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $SPN_AUTHORITY,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('ARC_DC_RG', $ARC_DC_RG,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $AZDATA_USERNAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $AZDATA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
@@ -72,10 +74,9 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    Invoke-WebRequest "https://go.microsoft.com/fwlink/?linkid=2142211" -OutFile "C:\tmp\azuredatastudio.zip"
+                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/settings.json" -OutFile "C:\tmp\settings.json"
-                    C:\Users\Lior\git\azure_arc\azure_arc_data_jumpstart\kubeadm\azure\arm_template\settings.json
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/kubeadm_vanilla/azure_arc_data_jumpstart/kubeadm/azure/arm_template/settings.json" -OutFile "C:\tmp\settings.json"
                 }
         }
 
@@ -104,9 +105,9 @@ Start-Transcript -Path C:\tmp\LogonScript.log
 
 Write-Host "Connecting to Azure account"
 Write-Host "`n"
-$azurePassword = ConvertTo-SecureString $env:servicePrincipalClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:tenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $env:SPN_CLIENT_SECRET -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:SPN_CLIENT_ID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:SPN_TENANT_ID -ServicePrincipal
 
 Write-Host "Copying kubeconfig file from Kubernetes VM"
 Write-Host "`n"
