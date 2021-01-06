@@ -74,10 +74,9 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    Invoke-WebRequest "https://go.microsoft.com/fwlink/?linkid=2142211" -OutFile "C:\tmp\azuredatastudio.zip"
+                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/kubeadm_vanilla/azure_arc_data_jumpstart/kubeadm/azure/arm_template/settings.json" -OutFile "C:\tmp\settings.json"
-                    C:\Users\Lior\git\azure_arc\azure_arc_data_jumpstart\kubeadm\azure\arm_template\settings.json
                 }
         }
 
