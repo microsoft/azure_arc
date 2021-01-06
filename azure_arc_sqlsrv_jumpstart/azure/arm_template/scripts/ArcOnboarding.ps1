@@ -47,9 +47,9 @@ New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMD
 New-NetFirewallRule -Name AllowAnyInbound -DisplayName "Allow Any Inbound" -Enabled True -Profile Any -Direction Inbound -Protocol Any -Action Allow -RemoteAddress Any
 
 
-$azurePassword = ConvertTo-SecureString $env:servicePrincipalSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:servicePrincipalAppId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:servicePrincipalTenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
 
 Register-AzResourceProvider -ProviderNamespace Microsoft.AzureData
 
