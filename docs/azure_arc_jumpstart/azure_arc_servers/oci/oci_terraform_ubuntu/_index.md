@@ -155,7 +155,6 @@ Before executing the Terraform plan, you must export the environment variables w
 
 As you may have noticed, the last step of the run is to register the VM as a new Azure Arc enabled server resource.
 
-   
 ![Screenshot showing azcmagent connect script](./08.png)
 
 If you want to demo/control the actual registration process, do the following:
