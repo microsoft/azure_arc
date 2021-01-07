@@ -5,7 +5,7 @@
 export TF_VAR_tenancy_ocid=<Oracle tenanacy OCID>
 export TF_VAR_user_ocid=<Oracle user OCID>
 export TF_VAR_fingerprint=<Oracle API FingerPrint>
-export TF_VAR_private_key_path=oci_api_key.pem
+export TF_VAR_private_key_path=<path to pem key>
 export TF_VAR_ssh_public_key=$(cat my_oci_key.pub) 
 ### OCI Region
 export TF_VAR_region=us-ashburn-1
