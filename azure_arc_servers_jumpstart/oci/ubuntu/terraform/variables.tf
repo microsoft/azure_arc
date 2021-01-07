@@ -5,7 +5,7 @@ variable "azure_location" {
 }
 
 variable "hostname" {
-  default = "arc-OCI-demo"
+  default = "Arc-OCI-Demo"
 }
 
 variable "azure_resource_group" {
