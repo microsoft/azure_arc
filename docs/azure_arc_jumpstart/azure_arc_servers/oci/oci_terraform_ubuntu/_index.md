@@ -143,7 +143,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 # Deployment
 
-* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have an OCI Virtual Machine Instance deployed and connected as a new Azure Arc enabled server inside a new Resource Group.
+* Run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have an OCI virtual machine instance deployed and connected as a new Azure Arc enabled server inside a new Resource Group.
 
 * Open the Azure portal and navigate to the resource group "Arc-OCI-Demo". The virtual machine created on OCI will be visible as a resource.
 
