@@ -36,7 +36,7 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 }
 
 # Downloading artifacts & enabling Fusion logging
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/sql_script/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/ArcOnboarding.ps1" -OutFile "C:\tmp\ArcOnboarding.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/ArcOnboarding.ps1" -OutFile "C:\tmp\ArcOnboarding.ps1"
 New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -PropertyType "DWord"
 
 # Creating PowerShell Logon Script
