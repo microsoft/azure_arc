@@ -2,7 +2,7 @@
 type: docs
 title: "Ubuntu OCI compute instance"
 linkTitle: "Ubuntu OCI compute instance"
-weight: 2
+weight: 1
 description: >
 ---
 
