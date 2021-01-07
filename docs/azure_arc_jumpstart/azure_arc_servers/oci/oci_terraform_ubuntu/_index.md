@@ -105,7 +105,7 @@ The following README will guide you on how to use the provided [Terraform](https
      $cat oci_api_key_public.pem | gvim &
   ```
 
-The public key needs to be added to your user account in the OCI console. Open the [account page](https://cloud.oracle.com/identity/users/) for your user, navigate to "API Keys" and select the "Add Public Key" button. Copy and paste the contents of the oci_api_key_public.pem file in the box of the "Add Public Key" dialog as shown below.
+* The public key needs to be added to your user account in the OCI console. Open the [account page](https://cloud.oracle.com/identity/users/) for your user, navigate to "API Keys" and select the "Add Public Key" button. Copy and paste the contents of the oci_api_key_public.pem file in the box of the "Add Public Key" dialog as shown below.
 
   ![Screenshot of OCI cloud console](./04.png)
 
