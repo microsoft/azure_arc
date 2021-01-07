@@ -18,7 +18,7 @@ provider "google" {
 }
 
 provider "azurerm" {
-  subscription_id = var.subscriptionId
+  subscription_id = var.subId
   client_id       = var.servicePrincipalAppId
   client_secret   = var.servicePrincipalSecret
   tenant_id       = var.servicePrincipalTenantId
