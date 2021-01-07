@@ -129,7 +129,7 @@ Before executing the Terraform plan, you must export the environment variables w
     * TF_VAR_client_secret=Your Azure service principal password
     * TF_VAR_tenant_id=Your Azure tenant ID
 
-* From CLI, navigate to the "azure_arc_servers_jumpstart/oci/ubuntu/terraform"  directory of the cloned repo.    
+* From CLI, navigate to the "*azure_arc_servers_jumpstart/oci/ubuntu/terraform*"  directory of the cloned repo.    
   
 * Export the environment variables you edited by running [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/oci/ubuntu/terraform/scripts/vars.sh) with the source command as shown below. Terraform requires these to be set for the plan to execute properly. Note that this script will also be automatically executed remotely on the OCI virtual machine instance as part of the Terraform deployment. 
 * 
