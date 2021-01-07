@@ -173,7 +173,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 As mentioned, the Terraform plan will deploy an EKS cluster, the Azure Arc Data Controller on that cluster and an EC2 Windows Server 2019 Client instance.
 
-* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/eks/terraform/example/TF_VAR_example.sh)
+* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/eks/dc_vanilla/terraform/example/TF_VAR_example.sh)
 
   ![Export environment variables](./14.png)
 
@@ -197,7 +197,7 @@ As mentioned, the Terraform plan will deploy an EKS cluster, the Azure Arc Data 
 * Navigate to the folder that has Terraform binaries.
 
   ```shell
-  cd azure_arc_data_jumpstart/eks/terraform
+  cd azure_arc_data_jumpstart/eks/dc_vanilla/terraform
   ```
 
 * Run the ```terraform init``` command which is used to initialize a working directory containing Terraform configuration files and load the required Terraform providers.
