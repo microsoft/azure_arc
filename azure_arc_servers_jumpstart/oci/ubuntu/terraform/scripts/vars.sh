@@ -8,7 +8,7 @@ export TF_VAR_fingerprint=<Oracle API FingerPrint>
 export TF_VAR_private_key_path=<path to pem key>
 export TF_VAR_ssh_public_key=$(cat my_oci_key.pub) 
 ### OCI Region
-export TF_VAR_region=us-ashburn-1
+export TF_VAR_region=<OCI region>
 ### Compartment
 export TF_VAR_compartment_ocid=<Oracle compartment OCID>
 
