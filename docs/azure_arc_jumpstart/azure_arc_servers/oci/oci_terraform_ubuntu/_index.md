@@ -153,7 +153,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 ## Semi-Automated Deployment (Optional)
 
-As you may have noticed, the last step of the run is to register the VM as a new Azure Arc enabled server resource.
+As you may have noticed, the last step of the automation is to register the VM as a new Azure Arc enabled server resource.
 
 ![Screenshot showing azcmagent connect script](./08.png)
 
