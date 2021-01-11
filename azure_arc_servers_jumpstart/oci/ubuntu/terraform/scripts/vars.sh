@@ -18,3 +18,4 @@ export TF_VAR_subscription_id=<Azure subscription ID>
 export TF_VAR_client_id=<Azure service principal ID>
 export TF_VAR_client_secret=<Azure service principal password>
 export TF_VAR_tenant_id=<Azure tenant ID>
+export TF_VAR_azure_location=<Azure region e.g. westus2>
