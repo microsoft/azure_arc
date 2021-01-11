@@ -45,3 +45,13 @@ variable "region" {
 variable "ssh_public_key" {
 }
 
+variable "ad_region_mapping" {
+  type = map(string)
+  default = {
+    us-phoenix-1 = 2
+    us-ashburn-1 = 1
+  }
+}
+
+
+
