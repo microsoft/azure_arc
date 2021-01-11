@@ -149,7 +149,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
     ![Screenshot of Azure portal showing Azure Arc enabled server](./06.png)
 
-    ![Screenshot of OCI console showing OCI compute instance](./07.png)
+    ![Screenshot of OCI console showing OCI Virtual Machine instance](./07.png)
 
 ## Semi-Automated Deployment (Optional)
 
