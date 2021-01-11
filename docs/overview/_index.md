@@ -5,7 +5,7 @@ linkTitle: "Overview"
 weight: 1
 ---
 
-## Azure Arc Jumpstart
+## Azure Arc Jumpstart1
 
 The Azure Arc Jumpstart project is designed to provide a "zero to hero" experience so you can start working with Azure Arc right away!
 
