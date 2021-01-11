@@ -191,7 +191,7 @@ If you want to demo/control the actual registration process, do the following:
 
   ![Screenshot showing terraform destroy being run](./14.png)
 
-* Alternatively, you can delete the OCI compute instance directly by terminating it from the [OCI Console](https://cloud.oracle.com/compute/instances). Note that it will take a few minutes for the instance to actually be removed.
+* Alternatively, you can delete the OCI Virtual Machine instance directly by terminating it from the [OCI Console](https://cloud.oracle.com/compute/instances). Note that it will take a few minutes for the instance to actually be removed.
 
   ![Screenshot of OCI cloud console showing terminating instance](./15.png)
 
