@@ -113,7 +113,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on your Azure subscription and tenant, the Azure service principal, and the OCI OCIDs and keys you just created.
 
-* Retrieve your Azure Subscription ID and tenant ID using the ```az account list``` command.
+* Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command.
 
 * The Terraform plan creates resources in both Microsoft Azure and OCI. It then executes a script on an OCI compute instance to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your OCI and Azure environments. Edit [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/oci/ubuntu/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
 
