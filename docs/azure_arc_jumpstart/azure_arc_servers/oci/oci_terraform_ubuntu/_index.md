@@ -164,8 +164,6 @@ If you want to demo/control the actual registration process, do the following:
 
      ![Screenshot showing azcmagent connect script commented out](./09.png)
 
-* Get the public IP of the OCI instance by running ```terraform output```
-
 * Get the public IP of the OCI Virtual Machine instance by running ```terraform output```
 
     ![Screenshot of terraform output being run](./10.png)
