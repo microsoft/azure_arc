@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure Provider"
-linkTitle: "Azure Provider"
+title: "Cluster API Azure Provider"
+linkTitle: "Cluster API Azure Provider"
 weight: 1
 description: >
 ---
