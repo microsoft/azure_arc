@@ -32,7 +32,7 @@ The following README will guide you on how to use the provided [Terraform](https
   
 * Create Azure Service Principal (SP)
 
-  To connect the OCI virtual machine instance to Azure Arc, an Azure Service Principal assigned with the  
+  To connect the OCI Virtual Machine instance to Azure Arc an Azure Service Principal assigned with the  
   "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)). 
 
     ```shell
