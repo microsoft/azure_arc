@@ -83,7 +83,7 @@ The following README will guide you on how to use the provided [Terraform](https
   
  Create the API SSL Key
  
- * You will need an SSL key pair to enable Terraform to connect to the OCI API under your identity. Start by generating a key
+ * You will need an SSL key pair to enable Terraform to connect to the OCI API under your identity. Start by generating a key.
 
     ```shell
     $openssl genrsa -out oci_api_key.pem 2048
