@@ -93,7 +93,7 @@ The following README will guide you on how to use the provided [Terraform](https
   ```shell
    $chmod go-rwx oci_api_key.pem
   ```
-* generate the public half of the key pair
+* Generate the public half of the key pair
  
    ```shell
     $openssl rsa -pubout -in oci_api_key.pem -out oci_api_key_public.pem
