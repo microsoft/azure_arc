@@ -111,7 +111,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
  ## Configure Terraform
 
-Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on your Azure subscription and tenant, the Azure service principal, and the OCI OCIDs and keys you just created.
+Before executing the Terraform plan, you must export the environment variables which will be used by the plan. These variables are based on your Azure subscription and tenant, the Azure service principal, and the OCIDs and keys you just created.
 
 * Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command.
 
