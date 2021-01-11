@@ -88,7 +88,7 @@ The following README will guide you on how to use the provided [Terraform](https
     ```shell
     $openssl genrsa -out oci_api_key.pem 2048
     ```
-* set file access to owner only read and write
+* Set file access to owner only read and write
 
   ```shell
    $chmod go-rwx oci_api_key.pem
