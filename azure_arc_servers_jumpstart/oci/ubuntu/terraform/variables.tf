@@ -23,3 +23,25 @@ variable "client_secret" {
 
 variable "tenant_id" {
 }
+
+variable "tenancy_ocid" {
+}
+
+variable "user_ocid" {
+}
+
+variable "fingerprint" {
+}
+
+variable "private_key_path" {
+}
+
+variable "compartment_ocid" {
+}
+
+variable "region" {
+}
+
+variable "ssh_public_key" {
+}
+
