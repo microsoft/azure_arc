@@ -1,7 +1,6 @@
 # Declare TF variables
 
 variable "azure_location" {
-  default = "westus2"
 }
 
 variable "hostname" {
