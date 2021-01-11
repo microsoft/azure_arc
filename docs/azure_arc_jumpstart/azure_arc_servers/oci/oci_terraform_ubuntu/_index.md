@@ -128,6 +128,7 @@ Before executing the Terraform plan, you must export the environment variables w
     * TF_VAR_client_id=Your Azure service principal app id
     * TF_VAR_client_secret=Your Azure service principal password
     * TF_VAR_tenant_id=Your Azure tenant ID
+    * TF_VAR_location=Your Azure Region
 
 * From CLI, navigate to the "*azure_arc_servers_jumpstart/oci/ubuntu/terraform*"  directory of the cloned repo.    
   
@@ -180,7 +181,7 @@ If you want to demo/control the actual registration process, do the following:
 * Run the following command
 
     ```shell
-    sudo azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-OCI-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id --tags "Project=jumpstart_azure_arc_servers"
+    sudo azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-OCI-Demo" --tenant-id $TF_VAR_tenant_id --location TF_VAR_location --subscription-id $TF_VAR_subscription_id --tags "Project=jumpstart_azure_arc_servers"
     ```
 
     ![Screenshot of azcmagent connect being run](./13.png)
