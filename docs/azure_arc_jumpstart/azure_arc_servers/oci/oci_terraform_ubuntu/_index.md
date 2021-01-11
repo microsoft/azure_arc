@@ -1,7 +1,7 @@
 ---
 type: docs
 title: "Ubuntu OCI Virtual Machine"
-linkTitle: "Ubuntu OCI compute instance"
+linkTitle: "Ubuntu OCI Virtual Machine"
 weight: 1
 description: >
 ---
