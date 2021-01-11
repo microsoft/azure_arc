@@ -115,7 +115,7 @@ Before executing the Terraform plan, you must export the environment variables w
 
 * Retrieve your Azure subscription ID and tenant ID using the ```az account list``` command.
 
-* The Terraform plan creates resources in both Microsoft Azure and OCI. It then executes a script on an OCI compute instance to install the Azure Arc agent and all necessary artifacts. This script requires certain information about your OCI and Azure environments. Edit [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/oci/ubuntu/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
+* The Terraform plan creates resources in both Microsoft Azure and OCI. It then executes a script on an OCI Virtual Machine instance to install the Azure Arc connected machine agent and all necessary artifacts. This script requires certain information about your OCI and Azure environments. Edit [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/oci/ubuntu/terraform/scripts/vars.sh) and update each of the variables with the appropriate values.
 
     * TF_VAR_tenancy_ocid=Oracle tenanacy OCID
     * TF_VAR_user_ocid=Oracle user OCID
