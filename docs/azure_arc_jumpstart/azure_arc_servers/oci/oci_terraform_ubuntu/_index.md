@@ -151,6 +151,18 @@ Before executing the Terraform plan, you must export the environment variables w
     ![Screenshot of Azure portal showing Azure Arc enabled server](./06.png)
 
     ![Screenshot of OCI console showing OCI Virtual Machine instance](./07.png)
+    
+## Delete the deployment
+
+* To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
+
+  ![Screenshot showing terraform destroy being run](./14.png)
+
+* Alternatively, you can delete the OCI Virtual Machine instance directly by terminating it from the [OCI Console](https://cloud.oracle.com/compute/instances). Note that it will take a few minutes for the instance to actually be removed.
+
+  ![Screenshot of OCI cloud console showing terminating instance](./15.png)
+
+* If you delete the instance manually, then you should also delete *./scripts/install_arc_agent.sh* which is created by the Terraform plan.
 
 ## Semi-Automated Deployment (Optional)
 
@@ -160,7 +172,7 @@ As you may have noticed, the last step of the automation is to register the VM a
 
 If you want to demo/control the actual registration process, do the following:
 
-* In the [*install_arc_agent.sh.tmpl*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/oci/ubuntu/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file.
+* In the [*install_arc_agent.sh.tmpl*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/oci/ubuntu/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file. 
 
      ![Screenshot showing azcmagent connect script commented out](./09.png)
 
