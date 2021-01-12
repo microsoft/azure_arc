@@ -191,7 +191,13 @@ If you want to demo/control the actual registration process, do the following:
 * Run the following command
 
     ```shell
-    sudo azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-OCI-Demo" --tenant-id $TF_VAR_tenant_id --location $TF_VAR_azure_location --subscription-id $TF_VAR_subscription_id --tags "Project=jumpstart_azure_arc_servers"
+    sudo azcmagent connect --service-principal-id $TF_VAR_client_id \
+    --service-principal-secret $TF_VAR_client_secret \
+    --resource-group "Arc-OCI-Demo" \
+    --tenant-id $TF_VAR_tenant_id 
+    --location $TF_VAR_azure_location \
+    --subscription-id $TF_VAR_subscription_id \
+    --tags "Project=jumpstart_azure_arc_servers"
     ```
 
     ![Screenshot of azcmagent connect being run](./13.png)
