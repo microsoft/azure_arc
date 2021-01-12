@@ -166,13 +166,13 @@ Before executing the Terraform plan, you must export the environment variables w
 
 ## Semi-Automated Deployment (Optional)
 
-As you may have noticed, the last step of the automation is to register the VM as a new Azure Arc enabled server resource.
+As you may have noticed, the last step of the automation is to register the VM as a new Azure Arc enabled server resource. Make sure you have deleted your orginal deployment before proceeding. 
 
 ![Screenshot showing azcmagent connect script](./08.png)
 
 If you want to demo/control the actual registration process, do the following:
 
-* In the [*install_arc_agent.sh.tmpl*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/oci/ubuntu/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file. 
+* In the [*install_arc_agent.sh.tmpl*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/oci/ubuntu/terraform/scripts/install_arc_agent.sh.tmpl) script template, comment out the "Run connect command" section and save the file. Rerun the steps above to deploy your OCI environment via Terraform.  
 
      ![Screenshot showing azcmagent connect script commented out](./09.png)
 
