@@ -10,13 +10,17 @@ description: >
 
 The following README will guide you on how to onboard an Azure Arc enabled server on to [Azure Security Center (ASC)](https://docs.microsoft.com/en-us/azure/security-center/), so you can start collecting security-related configurations as well as event logs to recommend actions and improve your overall Azure security posture.
 
-In this guide, you will enable and configure Azure Defender on your Azure subscription, which will provide you with advanced threat protection (ATP) and detection capabilities. To complete this process you will:
+Azure Defender is Security Center's integrated cloud workload protection platform, it provides advance thread protection for Azure and hybrid resources. To access Azure Defender you need to enable the plan on Azure Security Center.
+
+In this guide, you will enable and configure Azure Defender on your Azure subscription, which will provide you with advanced threat protection (ATP) and detection capabilities for your hybrid resources. To complete this process you will:
 
 * Setup a Log Analytics Workspace where logs and events will be aggregated for analysis.
 
+* Enable Azure Defender.
+
 * Assign Security Center’s default security policies.
 
-* Review Azure Security Center's recommendations.
+* Review Azure Defender recommendations.
 
 * Apply recommended configurations on Azure Arc enabled servers using the ***Quick Fix*** remediations.
 
@@ -78,7 +82,7 @@ In this guide, you will enable and configure Azure Defender on your Azure subscr
 
   > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
-## Onboarding Azure Security Center
+## Onboarding Azure Defender
 
 * Data collected by Azure Security Center is stored in a Log Analytics workspace. You can either use the default one created by ASC or a custom one created by you. If you want to create a dedicated workspace, you can automate the deployment by editing the ARM template [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/securitycenter/arm/log_analytics-template.parameters.json), provide a name and location for your workspace:
 
@@ -117,15 +121,15 @@ In this guide, you will enable and configure Azure Defender on your Azure subscr
 
 Now that you have successfully onboarded Azure Defender, you will get recommendations to help you protect your resources, including your Azure Arc enabled servers. Azure Defender will then periodically analyze the security state of your Azure resources to identify potential security vulnerabilities.
 
-Azure Security Center will collect data from your Arc enabled servers to monitor for security vulnerabilities and threats. The data collection will allow greater visibility into missing updates, non-secure OS settings, endpoint protection status, health and threat protection. You will get recommendations even if you do not provision an agent, however to fully benefit it is recommended to install the Log Analytics agent. The agent will read security-related configurations and event logs from the Arc enabled server and send the data to the corresponding Log Analytics workspace where you enabled Azure Security Center. To install the agent on your Arc enabled server you can use the extension management feature as it is described [here](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_mma_arm/_index.md) or by configuring policies as shown [here](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/_index.md)
+Azure Defender will collect data from your Arc enabled servers to monitor for security vulnerabilities and threats. The data collection will allow greater visibility into missing updates, non-secure OS settings, endpoint protection status, health and threat protection. You will get recommendations even if you do not provision an agent, however to fully benefit it is recommended to install the Log Analytics agent. The agent will read security-related configurations and event logs from the Arc enabled server and send the data to the corresponding Log Analytics workspace where you enabled Azure Defender. To install the agent on your Arc enabled server you can use the extension management feature as it is described [here](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_mma_arm/_index.md) or by configuring policies as shown [here](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/_index.md)
 
->**Note: it may take upto 30 minutes for your Azure Arc enabled server to be shown in Azure Security Center Dashboard**
+>**Note: it may take upto 30 minutes for your Azure Arc enabled server to be shown in Azure Defender Dashboard**
 
 * Once you have configured your workspace and deployed the MMA agent, using the [Azure Portal](https://portal.azure.com/) navigate to Azure Security Center. In the "Inventory" section under "VM and Servers", ASC will provide you with an overview of all the discovered security recommendations for your VMs and computers, including Azure VMs, Azure Classic VMs, servers and **Azure Arc Machines**.
 
     ![Screenshot showing Azure Security Center Inventory](./04.png)
 
-* Select your Azure Arc enabled server, ASC will provide security recommendation. Each of them will include:
+* Select your Azure Arc enabled server, Azure Defender will provide security recommendation. Each of them will include:
   * A short description of what is being recommended.
   * A secure score impact.
   * The remediation steps to carry out in order to implement the recommendation. For specific recommendations, you may also get a ***Quick Fix*** that enables you to quickly remediate a recommendation on multiple resources.
