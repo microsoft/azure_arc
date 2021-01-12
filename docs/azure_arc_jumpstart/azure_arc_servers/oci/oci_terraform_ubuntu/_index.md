@@ -8,7 +8,7 @@ description: >
 
 ## Deploy an Ubuntu OCI Virtual Machine and connect it to Azure Arc using a Terraform plan
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an OCI instance virtual machine and connect it as an Azure Arc enabled server resource. 
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an OCI Virtual Machine and connect it as an Azure Arc enabled server resource. 
 
 ## Prerequisites
 
