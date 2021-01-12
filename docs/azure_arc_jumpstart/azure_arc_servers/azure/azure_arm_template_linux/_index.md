@@ -34,7 +34,7 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 * Create Azure service principal (SP).
 
-    In order for you to deploy the Azure resources using the ARM template, Azure service principal assigned with the "contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login

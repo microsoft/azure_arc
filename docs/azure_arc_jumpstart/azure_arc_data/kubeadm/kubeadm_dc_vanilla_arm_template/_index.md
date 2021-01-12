@@ -30,7 +30,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
 * Create Azure service principal (SP)
 
-    In order for you to deploy the Azure resources using the ARM template, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login

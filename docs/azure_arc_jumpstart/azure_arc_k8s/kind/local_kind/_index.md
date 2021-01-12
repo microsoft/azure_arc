@@ -40,7 +40,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Create Azure service principal (SP)
 
-  To connect a Kubernetes cluster to Azure Arc, Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+  To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
   ```shell
   az login
