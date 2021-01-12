@@ -128,7 +128,7 @@ Before executing the Terraform plan, you must export the environment variables w
     * TF_VAR_client_id=Your Azure service principal app id
     * TF_VAR_client_secret=Your Azure service principal password
     * TF_VAR_tenant_id=Your Azure tenant ID
-    * TF_VAR_azure_location=Your Azure Region
+    * TF_VAR_azure_location=Your Azure region
 
 * From CLI, navigate to the "*azure_arc_servers_jumpstart/oci/ubuntu/terraform*"  directory of the cloned repo.    
   
