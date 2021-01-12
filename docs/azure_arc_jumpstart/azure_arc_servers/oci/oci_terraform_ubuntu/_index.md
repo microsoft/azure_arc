@@ -198,7 +198,7 @@ If you want to demo/control the actual registration process, do the following:
 
 * When complete, your VM will be registered with Azure Arc and visible in the resource group inside Azure Portal.
 
-## Delete the deployment
+## Delete the (Semi-Automated) deployment
 
 * To delete all the resources you created as part of this demo use the ```terraform destroy --auto-approve``` command as shown below.
 
