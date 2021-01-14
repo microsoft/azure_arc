@@ -78,7 +78,7 @@ resource "oci_core_instance" "Arc-OCI-Demo" {
     subnet_id        = oci_core_subnet.arc_subnet1.id
     display_name     = "primaryvnic"
     assign_public_ip = true
-    hostname_label   = "ociarc1"
+    hostname_label   = "Arc-OCI-Demo"
   }
 
   source_details {
