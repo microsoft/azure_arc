@@ -71,7 +71,8 @@ The following README will guide you on how to use the provided [Terraform](https
  * Login to the [OCI cloud console](https://www.oracle.com/cloud/sign-in.html) and select your profile. Open your user OCID, and click on show to reveal. Copy User OCID to clipboard and paste to your editor of choice.
  
       ![Screenshot of OCI cloud console](./01.png)
-    
+ 
+ Compartment OCID
  * After obtaining User OCID, navigate to [Compartments](https://cloud.oracle.com/identity/compartments). Click on the Tenancy name and find the OCID, then click on show. Copy the Compartment OCID to clipboard and paste it to the editor of choice..   
  
     ![Screenshot of CompartmentID OCI cloud console](./02.png)
