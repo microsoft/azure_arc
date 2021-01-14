@@ -68,10 +68,10 @@ resource "oci_core_security_list" "arc_security_list" {
   }
 }
 
-resource "oci_core_instance" "oci_arc1" {
+resource "oci_core_instance" "Arc-OCI-Demo" {
   availability_domain = data.oci_identity_availability_domain.ad.name
   compartment_id      = var.compartment_ocid
-  display_name        = "ociArc1"
+  display_name        = "Arc-OCI-Demo"
   shape               = "VM.Standard.E2.1.Micro"
 
   create_vnic_details {
