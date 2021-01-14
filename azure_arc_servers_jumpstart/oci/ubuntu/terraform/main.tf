@@ -94,7 +94,7 @@ connection {
     user        = "ubuntu"
     private_key = file("my_oci_key")
     agent       = false
-    host        = oci_core_instance.oci_arc1.public_ip
+    host        = oci_core_instance.Arc-OCI-Demo.public_ip
   }
 
   provisioner "file" {
@@ -131,5 +131,5 @@ data "template_file" "user_data" {
 }
 
 output "your_instance_public_ip" {
-  value = oci_core_instance.oci_arc1.*.public_ip
+  value = oci_core_instance.Arc-OCI-Demo.*.public_ip
 }
