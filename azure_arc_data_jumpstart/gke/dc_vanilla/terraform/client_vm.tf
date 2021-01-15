@@ -43,7 +43,7 @@ resource "google_compute_instance" "default" {
 
 
   provisioner "file" {
-    source      = "account.json"
+    source      = var.gcp_credentials_filename
     destination = "C:/tmp/account.json"
 
     connection {
