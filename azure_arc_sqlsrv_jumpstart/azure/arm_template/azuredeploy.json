@@ -264,7 +264,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/microsoft/azure_arc/sql_script/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/ClientTools.ps1"
+                "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/ClientTools.ps1"
               ],
               "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -servicePrincipalAppId ', parameters('servicePrincipalAppId'), ' -servicePrincipalSecret ', parameters('servicePrincipalSecret'), ' -servicePrincipalTenantId ', parameters('servicePrincipalTenantId'), ' -resourceGroup ', parameters('resourceGroup'),  ' -subId ', parameters('subId'), ' -location ', parameters('location'), ' -adminUsername ', parameters('adminUsername'), ' -adminPassword ', parameters('adminPassword'))]" 
             }            
