@@ -121,7 +121,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
   ![account.json](./16.png)
 
-* Enable the Kubernetes Engine API for the project 
+* Enable the Kubernetes Engine API for the project
 
   ![Enable the Kubernetes Engine API](./17.png)
 
