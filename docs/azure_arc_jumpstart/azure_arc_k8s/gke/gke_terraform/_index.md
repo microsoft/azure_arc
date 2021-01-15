@@ -123,7 +123,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
   ![account.json](./15.png)
 
-* Enable the Compute Engine API for the project
+* Enable the Kubernetes Engine API for the project
 
   ![Enable the Kubernetes Engine API](./16.png)
 
