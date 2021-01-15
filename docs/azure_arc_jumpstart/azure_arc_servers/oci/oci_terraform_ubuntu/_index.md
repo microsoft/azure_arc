@@ -92,18 +92,18 @@ The following README will guide you on how to use the provided [Terraform](https
 * Set file access to owner only read and write
 
   ```shell
-   $chmod go-rwx oci_api_key.pem
+  $chmod go-rwx oci_api_key.pem
   ```
 * Generate the public half of the key pair
  
    ```shell
-    $openssl rsa -pubout -in oci_api_key.pem -out oci_api_key_public.pem
+   $openssl rsa -pubout -in oci_api_key.pem -out oci_api_key_public.pem
   ```
 
 * Copy the contents of the public key to the clipboard using gvim, pbcopy, xclip or a similar tool (you'll need to paste the value into the Console later).
  
    ```shell
-     $cat oci_api_key_public.pem | gvim &
+   $cat oci_api_key_public.pem | gvim &
   ```
 
 * The public key needs to be added to your user account in the OCI console. Open the [account page](https://cloud.oracle.com/identity/users/) for your user, navigate to "API Keys" and select the "Add Public Key" button. Copy and paste the contents of the oci_api_key_public.pem file in the box of the "Add Public Key" dialog as shown below.
