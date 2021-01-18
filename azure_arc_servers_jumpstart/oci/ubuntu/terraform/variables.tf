@@ -6,87 +6,85 @@ variable "azure_location" {
   description = "Sets location of Azure resource group"
 }
 
-# Sets hostname for the Oracle Virtual Machine
 variable "hostname" {
   type = string 
   default = "Arc-OCI-Demo"
+  description = "Sets hostname for the Oracle Virtual Machine"
 }
 
-# name of Azure resource group
 variable "azure_resource_group" {
   type = string
-  default = "Arc-OCI-Demo"
+  default = "Arc-OCI-Demo"\
+  description = "Azure resource group name" 
 }
 
-# Azure subscription ID
 variable "subscription_id" {
   type = string
+  description = "Azure subscription ID" 
 }
 
-# Azure client ID, also known as the Azure service principal ID
 variable "client_id" {
   type = string
+  description = "Azure client ID, also known as the Azure service principal ID"  
 }
 
-# Azure client secret also known as the Azure service principal password
 variable "client_secret" {
   type = string
+  description = "Azure client secret also known as the Azure service principal password" 
 }
 
-# Azure tenant ID 
 variable "tenant_id" {
   type = string
+  description = "Azure tenant ID" 
 }
 
-# Oracle tenancy OCID
 variable "tenancy_ocid" {
   type = string
+  description = "Oracle tenancy OCID"
 }
 
-# Oracle user OCID
 variable "user_ocid" {
   type = string
+  description = "Oracle user OCID"
 }
 
-# Oracle api fingerprint
 variable "fingerprint" {
   type = string
+  description = "Oracle api fingerprint"
 }
 
-# path to private ssh key
 variable "private_key_path" {
   type = string
+  description = "path to private ssh key"
 }
 
-# Oracle compartment id
 variable "compartment_ocid" {
   type = string
+  description = # Oracle compartment id
 }
 
-# Oracle region 
 variable "region" {
   type = string
+  description = "Oracle region" 
 }
 
-# public key for Virtual Machine 
 variable "ssh_public_key" {
   type = string
+  description = "public key for Virtual Machine"
 }
 
-# Oracle avalability domain map
 variable "ad_region_mapping" {
   type = map(string)
-  default = {
+  description = "Oracle avalability domain map"
+  default = { 
     us-phoenix-1 = 2
     us-ashburn-1 = 1
   }
 }
 
-# Oracle Virtual Machine Image
-# See https://docs.us-phoenix-1.oraclecloud.com/images/
-# Oracle-provided image "Ubuntu-Linux-18.4-lts"
 variable "images" {
   type = map(string)
+  description = "Oracle Virtual Machine Image, Oracle-provided image "Ubuntu-Linux-18.4-lts"
   default = {
     us-phoenix-1 = "ocid1.image.oc3.us-gov-phoenix-1.aaaaaaaaqhxpqz5jrml5twxtoe7z37fw7qnprlpi4gbx6rgprfwg3vpup2zq"
     us-ashburn-1 = "ocid1.image.oc1.iad.aaaaaaaah2ms24xr6slrtpppgaipfixozl7utwnf2qwqonb2muk4g43wfzgq"
