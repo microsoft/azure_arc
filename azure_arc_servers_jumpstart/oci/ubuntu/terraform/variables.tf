@@ -1,9 +1,9 @@
 # Declare TF variables
 
-# Sets location of Azure resource group
 variable "azure_location" {
   type = string 
   default = "westus2"
+  description = "Sets location of Azure resource group"
 }
 
 # Sets hostname for the Oracle Virtual Machine
