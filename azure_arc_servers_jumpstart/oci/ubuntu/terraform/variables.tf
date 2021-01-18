@@ -14,7 +14,7 @@ variable "hostname" {
 
 variable "azure_resource_group" {
   type = string
-  default = "Arc-OCI-Demo"\
+  default = "Arc-OCI-Demo"
   description = "Azure resource group name" 
 }
 
