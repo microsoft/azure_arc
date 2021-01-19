@@ -17,8 +17,6 @@ $env:DOCKER_REGISTRY="${DOCKER_REGISTRY}"
 $env:DOCKER_REPOSITORY="${DOCKER_REPOSITORY}"
 $env:DOCKER_TAG="${DOCKER_TAG}"
 $env:adminUsername="${adminUsername}"
-$env:clusterName="${cluster-name}"
-$env:resourceGroup="${resourceGroup}"
 $env:REGISTRY_USERNAME="${REGISTRY_USERNAME}"
 $env:REGISTRY_PASSWORD="${REGISTRY_PASSWORD}"
 $env:MSSQL_MI_NAME="${MSSQL_MI_NAME}"
@@ -41,8 +39,6 @@ $env:MSSQL_MI_NAME="${MSSQL_MI_NAME}"
 [System.Environment]::SetEnvironmentVariable('DOCKER_REPOSITORY', $env:DOCKER_REPOSITORY,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('DOCKER_TAG', $env:DOCKER_TAG,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $env:adminUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('clusterName', $env:clusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('resourceGroup', $env:resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('REGISTRY_USERNAME', $env:REGISTRY_USERNAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('REGISTRY_PASSWORD', $env:REGISTRY_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('MSSQL_MI_NAME', $env:MSSQL_MI_NAME,[System.EnvironmentVariableTarget]::Machine)
