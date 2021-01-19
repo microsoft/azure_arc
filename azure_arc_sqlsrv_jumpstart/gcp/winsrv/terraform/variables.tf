@@ -71,7 +71,7 @@ variable "servicePrincipalTenantId" {
 }
 
 variable "admin_user" {
-  description = "Guest OS Admin Username" 
+  description = "Guest OS Admin Username"
   type        = string
   default     = "arcdemo" # do not set this to "Administrator"
 }
