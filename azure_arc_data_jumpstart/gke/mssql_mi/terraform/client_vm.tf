@@ -166,6 +166,10 @@ resource "local_file" "azure_arc" {
     DOCKER_REGISTRY          = var.DOCKER_REGISTRY
     DOCKER_REPOSITORY        = var.DOCKER_REPOSITORY
     DOCKER_TAG               = var.DOCKER_TAG
+    adminUsername            = var.adminUsername
+    REGISTRY_USERNAME        = var.REGISTRY_USERNAME
+    REGISTRY_PASSWORD        = var.REGISTRY_PASSWORD
+    MSSQL_MI_NAME            = var.MSSQL_MI_NAME
     }
   )
   filename = "scripts/azure_arc.ps1"
