@@ -34,11 +34,6 @@ Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi" | 
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/eks_sqlmi/azure_arc_data_jumpstart/eks/mssql_mi/terraform/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\DC_Cleanup.ps1"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/eks_sqlmi/azure_arc_data_jumpstart/eks/mssql_mi/terraform/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\DC_Deploy.ps1"
 
-Write-Host "Deleting AWS Desktop shortcuts"
-Write-Host "`n"
-Remove-Item -Path "C:\Users\$env:USERNAME\Desktop\EC2 Microsoft Windows Guide.website" -Force
-Remove-Item -Path "C:\Users\$env:USERNAME\Desktop\EC2 Feedback.website" -Force
-
 # Creating PowerShell sql_connectivity Script
 $sql_connectivity = @'
 
@@ -153,15 +148,21 @@ $Shortcut.Save()
 Write-Host "Setting up the kubectl & azdata environment"
 Write-Host "`n"
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
+$env:gcp_credentials_file_path="C:\tmp\$env:gcp_credentials_filename"
+gcloud auth activate-service-account --key-file $env:gcp_credentials_file_path
+gcloud container clusters get-credentials $env:gke_cluster_name --region $env:gcp_region  
 kubectl version
-kubectl apply -f "C:\tmp\configmap.yml"
-kubectl get nodes
+kubectl apply -f 'C:\tmp\local_ssd_sc.yaml'
 
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 azdata --version
 
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc dc config init --source azure-arc-eks --path "C:\tmp\custom"
+azdata arc dc config init --source azure-arc-gke --path "C:\tmp\custom" --force
+azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=local-ssd"
+azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=local-ssd"
+azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "$.spec.services[*].serviceType=LoadBalancer"
+
 if(($env:DOCKER_REGISTRY -ne $NULL) -or ($env:DOCKER_REGISTRY -ne ""))
 {
     azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.docker.registry=$env:DOCKER_REGISTRY"
