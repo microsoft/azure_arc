@@ -101,12 +101,6 @@ In order to deploy resources in GCP, we will create a new GCP Project as well as
 
   ![Screenshot GCP service account key saved to project folder in Visual Studio Code](./16.png)
 
-* Enable the Kubernetes Engine API for the project
-
-  ![Screenshot showing enabling the Kubernetes Engine API](./17.png)
-
-  ![Screenshot showing enabling the Kubernetes Engine API](./18.png)
-
 ## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
@@ -160,9 +154,11 @@ Before executing the Terraform plan, you must set the environment variables whic
   export TF_VAR_gcp_zone='GCP zone where resource will be created'
   export TF_VAR_gcp_instance_name='GCP VM instance name'
   export TF_VAR_gcp_instance_machine_type='GCP VM instance type'
-  export TF_VAR_admin_user='Guest OS Admin Username'
+  export TF_VAR_admin_user='Guest OS Admin Username' # Note: do not set this to "Administrator" 
   export TF_VAR_admin_password='Guest OS Admin Password'
   ```
+
+  > **Note: Do not set the TF_VAR_admin_user variable to "Administrator". GCP Windows images have the administrator account [disabled by default](https://cloud.google.com/compute/docs/images/os-details#windows_server). Therefore, you must use a different username for your TF_VAR_admin_user (e.g., "arcdemo")**
 
   ![Screenshot showing exporting environment variables in shell](./19.png)
 
