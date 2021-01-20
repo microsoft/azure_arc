@@ -61,6 +61,18 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
 
     > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
+* Enable subscription for the Microsoft.AzureArcData resource provider for Azure Arc enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  ```shell
+  az provider register --namespace Microsoft.AzureArcData
+  ```
+
+  You can monitor the registration process with the following commands:
+
+  ```shell
+  az provider show -n Microsoft.AzureArcData -o table
+  ```
+
 ## Create a new GCP Project, IAM Role & Service Account
 
 In order to deploy resources in GCP, we will create a new GCP Project as well as a service account to allow Terraform to authenticate against GCP APIs and run the plan to deploy resources.

@@ -60,6 +60,18 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
     > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
 
+* Enable subscription for the Microsoft.AzureArcData resource provider for Azure Arc enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  ```shell
+  az provider register --namespace Microsoft.AzureArcData
+  ```
+
+  You can monitor the registration process with the following commands:
+
+  ```shell
+  az provider show -n Microsoft.AzureArcData -o table
+  ```
+
 ## Create a new AWS IAM Role & Key
 
 Create AWS User IAM Key. An access key grants programmatic access to your resources which we will be using later on in this guide.
