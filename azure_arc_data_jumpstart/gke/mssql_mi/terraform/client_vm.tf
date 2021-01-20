@@ -127,7 +127,7 @@ resource "google_compute_instance" "default" {
       host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
       https    = false
       insecure = true
-      timeout  = "15m"
+      timeout  = "20m"
       type     = "winrm"
       user     = var.windows_username
       password = var.windows_password
