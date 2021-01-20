@@ -31,8 +31,11 @@ Write-Host "`n"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip" | Out-Null
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_sqlmi/azure_arc_data_jumpstart/gke/mssql_mi/terraform/settings.json" -OutFile "C:\tmp\settings.json"
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi" | Out-Null
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_sqlmi/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\DC_Cleanup.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_sqlmi/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\DC_Deploy.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_sqlmi/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\MSSQL_MI_Cleanup.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_sqlmi/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\MSSQL_MI_Deploy.ps1"
+
+New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
+New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
 # Creating PowerShell sql_connectivity Script
 $sql_connectivity = @'
@@ -85,13 +88,13 @@ $s = Get-Content "C:\tmp\sql_instance_list.txt"
 $s.Split(' ')[-1] | Out-File -FilePath "C:\tmp\sql_instance_settings.txt" -Encoding ascii -NoNewline
 
 # Creating Azure Data Studio settings for SQL Managed Instance connection
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\tmp\settings_backup.json" -Recurse -Force -ErrorAction Continue
 $s = Get-Content "C:\tmp\sql_instance_settings.txt"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$s | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
+(Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'arc_sql_mi',$s | Set-Content -Path "C:\tmp\settings.json"
+(Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path "C:\tmp\settings.json"
+(Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings.json"
+(Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings.json"
+Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
 # Cleaning garbage
 Remove-Item "C:\tmp\sql_instance_settings.txt" -Force
@@ -144,14 +147,12 @@ $Shortcut.Save()
 # Setting up the kubectl & azdata environment
 Write-Host "Setting up the kubectl & azdata environment"
 Write-Host "`n"
-New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 $env:gcp_credentials_file_path="C:\tmp\$env:gcp_credentials_filename"
 gcloud auth activate-service-account --key-file $env:gcp_credentials_file_path
 gcloud container clusters get-credentials $env:gke_cluster_name --region $env:gcp_region  
 kubectl version
 kubectl apply -f 'C:\tmp\local_ssd_sc.yaml'
 
-New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 azdata --version
 
 start Powershell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
