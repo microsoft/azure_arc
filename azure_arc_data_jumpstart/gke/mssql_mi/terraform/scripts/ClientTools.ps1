@@ -1,7 +1,7 @@
 Start-Transcript -Path C:\tmp\ClientTools.log
 
 # Installing Chocolatey packages
-$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,aws-iam-authenticator,vcredist140"
+$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140"
 
 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
@@ -36,9 +36,6 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/eks_sql
 
 # Creating PowerShell sql_connectivity Script
 $sql_connectivity = @'
-
-Start-Transcript "C:\tmp\sql_connectivity.log"
-New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 Start-Transcript "C:\tmp\sql_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
