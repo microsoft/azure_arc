@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\tmp\dc_deploy.log
+Start-Transcript -Path C:\tmp\mssql_mi_deploy.log
 
 # Deploying Azure Arc Data Controller
 start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
@@ -9,7 +9,7 @@ azdata login --namespace $env:ARC_DC_NAME
 azdata arc sql mi create --name $env:MSSQL_MI_NAME
 azdata arc sql mi list
 
-# Cleaning MSSQL Instance connectivity details
+# Configuring MSSQL Instance connectivity details
 Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Stop-Transcript
