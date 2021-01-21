@@ -15,7 +15,7 @@ Copy-Item -Path "C:\tmp\settings_template_backup.json" -Destination "C:\tmp\sett
 
 Remove-Item "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Force
 Remove-Item "C:\tmp\hosts_backup" -Force
-Remove-Item "C:\tmp\settings_template_backup.json" -Force
+Remove-Item "C:\tmp\settings_backup.json" -Force
 
 Stop-Transcript
 
