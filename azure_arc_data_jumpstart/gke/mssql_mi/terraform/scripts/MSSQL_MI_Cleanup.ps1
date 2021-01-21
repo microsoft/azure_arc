@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\tmp\dc_cleanup.log
+Start-Transcript -Path C:\tmp\mssql_mi_cleanup.log
 
 # Deleting Azure Arc Data Controller namespace and it's resources
 start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
@@ -11,7 +11,7 @@ az resource delete -g $env:ARC_DC_RG -n $env:ARC_DC_NAME --namespace "Microsoft.
 
 # Restoring State
 Copy-Item -Path "C:\tmp\hosts_backup" -Destination "C:\Windows\System32\drivers\etc\hosts" -Recurse -Force -ErrorAction Continue
-Copy-Item -Path "C:\tmp\settings_template_backup.json" -Destination "C:\tmp\settings_template.json" -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\tmp\settings_backup.json" -Destination "C:\tmp\settings.json" -Recurse -Force -ErrorAction Continue
 
 Remove-Item "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Force
 Remove-Item "C:\tmp\hosts_backup" -Force
