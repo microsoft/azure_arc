@@ -188,9 +188,10 @@ Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyl
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
-# Stopping log for LogonScript.ps1
 Stop-Transcript
 
+# Starting Azure Data Studio
+Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
 Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
