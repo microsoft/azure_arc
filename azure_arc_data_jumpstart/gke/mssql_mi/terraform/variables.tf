@@ -127,6 +127,7 @@ variable "SPN_TENANT_ID" {
 
 variable "SPN_AUTHORITY" {
   description = "The Service Principal authority"
+  default    = "https://login.microsoftonline.com"
   type        = string
 }
 
