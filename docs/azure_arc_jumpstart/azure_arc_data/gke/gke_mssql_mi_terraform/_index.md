@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Deploy an Azure SQL Managed Instance Deployment on GKE using a Terraform plan
+## Deploy an Azure SQL Managed Instance on GKE using a Terraform plan
 
 The following scenario will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc enabled data services and deploy a SQL Managed Instance on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster by using [Terraform](https://www.terraform.io/).
 
