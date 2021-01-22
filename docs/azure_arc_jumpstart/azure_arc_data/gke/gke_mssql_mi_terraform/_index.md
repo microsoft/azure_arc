@@ -174,7 +174,7 @@ Read the below explanation to get familiar with the automation and deployment fl
 
 As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data Controller on that cluster, a SQL Managed Instance with sample database, and a Windows Server 2019 Client GCP compute instance.
 
-* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/dc_vanilla/terraform/example/TF_VAR_example.sh)
+* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/mssql_mi/terraform/example/TF_VAR_example.sh)
 
   ![Terraform vars export](./19.png)
 
