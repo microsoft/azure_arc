@@ -38,7 +38,7 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_pos
 $postgres_connectivity = @'
 
 Start-Transcript "C:\tmp\postgres_connectivity.log"
-New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+New-Item -Path "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving PostgreSQL Server IP
 azdata arc postgres endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
@@ -68,7 +68,7 @@ $s = (Get-Content "C:\tmp\merge.txt").Trim()
 (Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'arc_postgres',$s | Set-Content -Path "C:\tmp\settings.json"
 (Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings.json"
 (Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings.json"
-Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
 # Cleaning garbage
 Remove-Item "C:\tmp\postgres_instance_endpoint.txt" -Force
