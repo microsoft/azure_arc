@@ -29,10 +29,10 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 Write-Host "Downloading Azure Data Studio and azdata CLI"
 Write-Host "`n"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip" | Out-Null
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_sqlmi/azure_arc_data_jumpstart/gke/mssql_mi/terraform/settings.json" -OutFile "C:\tmp\settings.json"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/mssql_mi/terraform/settings.json" -OutFile "C:\tmp\settings.json"
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi" | Out-Null
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_sqlmi/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\MSSQL_MI_Cleanup.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_sqlmi/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\MSSQL_MI_Deploy.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\MSSQL_MI_Cleanup.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\MSSQL_MI_Deploy.ps1"
 
 # Creating PowerShell sql_connectivity Script
 $sql_connectivity = @'
