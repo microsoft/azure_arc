@@ -13,7 +13,7 @@ az resource delete -g $env:ARC_DC_RG -n $env:ARC_DC_NAME --namespace "Microsoft.
 Copy-Item -Path "C:\tmp\hosts_backup" -Destination "C:\Windows\System32\drivers\etc\hosts" -Recurse -Force -ErrorAction Continue
 Copy-Item -Path "C:\tmp\settings_backup.json" -Destination "C:\tmp\settings.json" -Recurse -Force -ErrorAction Continue
 
-Remove-Item "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Force
+Remove-Item "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json" -Force
 Remove-Item "C:\tmp\hosts_backup" -Force
 Remove-Item "C:\tmp\settings_backup.json" -Force
 
