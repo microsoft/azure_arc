@@ -6,3 +6,4 @@ backup/
 *.log
 .vagrant
 *.pem
+.terraform.lock.hcl
