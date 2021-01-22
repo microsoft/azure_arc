@@ -31,7 +31,7 @@ Write-Host "`n"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip" | Out-Null
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_postgres/azure_arc_data_jumpstart/gke/postgres_hs/terraform/settings.json" -OutFile "C:\tmp\settings.json"
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi" | Out-Null
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/mgke_postgresain/azure_arc_data_jumpstart/gke/postgres_hs/terraform/scripts/Postgres_HS_Cleanup.ps1" -OutFile "C:\tmp\Postgres_HS_Cleanup.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_postgres/azure_arc_data_jumpstart/gke/postgres_hs/terraform/scripts/Postgres_HS_Cleanup.ps1" -OutFile "C:\tmp\Postgres_HS_Cleanup.ps1"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_postgres/azure_arc_data_jumpstart/gke/postgres_hs/terraform/scripts/Postgres_HS_Deploy.ps1" -OutFile "C:\tmp\Postgres_HS_Deploy.ps1"
 
 # Creating PowerShell postgres_connectivity Script
