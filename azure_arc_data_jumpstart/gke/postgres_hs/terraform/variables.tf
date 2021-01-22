@@ -145,7 +145,7 @@ variable "REGISTRY_PASSWORD" {
 
 variable "POSTGRES_NAME" {
   description = "PostgreSQL instance name to be deployed on the Kubernetes cluster"
-  default     = "arcpostgresdemo"
+  default     = "arcpgdemo"
   type        = string
 }
 
