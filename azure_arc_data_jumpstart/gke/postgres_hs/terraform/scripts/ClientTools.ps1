@@ -29,10 +29,10 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 Write-Host "Downloading Azure Data Studio and azdata CLI"
 Write-Host "`n"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip" | Out-Null
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_postgres/azure_arc_data_jumpstart/gke/postgres_hs/terraform/settings.json" -OutFile "C:\tmp\settings.json"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/postgres_hs/terraform/settings.json" -OutFile "C:\tmp\settings.json"
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi" | Out-Null
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_postgres/azure_arc_data_jumpstart/gke/postgres_hs/terraform/scripts/Postgres_HS_Cleanup.ps1" -OutFile "C:\tmp\Postgres_HS_Cleanup.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_postgres/azure_arc_data_jumpstart/gke/postgres_hs/terraform/scripts/Postgres_HS_Deploy.ps1" -OutFile "C:\tmp\Postgres_HS_Deploy.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/postgres_hs/terraform/scripts/Postgres_HS_Cleanup.ps1" -OutFile "C:\tmp\Postgres_HS_Cleanup.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/postgres_hs/terraform/scripts/Postgres_HS_Deploy.ps1" -OutFile "C:\tmp\Postgres_HS_Deploy.ps1"
 
 # Creating PowerShell postgres_connectivity Script
 $postgres_connectivity = @'
@@ -41,6 +41,7 @@ Start-Transcript "C:\tmp\postgres_connectivity.log"
 New-Item -Path "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 # Retreving PostgreSQL Server IP
+New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 azdata arc postgres endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
 Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
@@ -58,7 +59,7 @@ Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding as
 
 # Creating Azure Data Studio settings for PostgreSQL connection
 azdata arc postgres endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
-Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\tmp\settings.json" -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\tmp\settings_backup.json" -Recurse -Force -ErrorAction Continue
 Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
 $s = Get-Content "C:\tmp\out.txt" 
 $s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
@@ -77,7 +78,7 @@ Remove-Item "C:\tmp\out.txt" -Force
 
 # Restoring demo database
 $podname = "$env:POSTGRES_NAME" + "r-0"
-kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/gke_postgres/azure_arc_data_jumpstart/gke//postgres_hs/terraform/AdventureWorks.sql"
+kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/postgres_hs/terraform/AdventureWorks.sql"
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql
 
