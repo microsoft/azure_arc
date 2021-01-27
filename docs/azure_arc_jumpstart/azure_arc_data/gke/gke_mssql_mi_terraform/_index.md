@@ -1,8 +1,8 @@
 ---
 type: docs
-title: "SQL Managed Instance Terraform plan"
-linkTitle: "SQL Managed Instance Terraform plan"
-weight: 3
+title: "SQL Managed Instance Terraform Plan"
+linkTitle: "SQL Managed Instance Terraform Plan"
+weight: 2
 description: >
 ---
 
