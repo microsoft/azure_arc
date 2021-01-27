@@ -267,24 +267,24 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   > **Note: To connect to the Postgres instance use the AZDATA_USERNAME and AZDATA_PASSWORD values specified in the azuredeploy.parameters.json file. The “sa” login is disabled.**
 
-  ![Azure Data Studio shortcut](./39.png)
+  ![Azure Data Studio shortcut](./38.png)
 
-  ![Azure Data Studio extension](./40.png)
+  ![Azure Data Studio extension](./39.png)
 
-  ![Azure Data studio sample database](./41.png)
+  ![Azure Data studio sample database](./40.png)
 
 ## Cleanup and delete the deployment
 
 * To delete the Postgres instance and Azure Arc Data Controller and all of it's Kubernetes resources, using Administrator rights run the *POSTGRES_HS_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. At the end of its run, the script will close all PowerShell sessions. **The Cleanup script run time is ~2-3min long**.
 
-  ![DC_Cleanup PowerShell script run](./42.png)
+  ![DC_Cleanup PowerShell script run](./41.png)
 
 * To finish completely deletimg the environment, follow the below steps run the ```terraform destroy --auto-approve``` command which will delete all of the GCP resources as well as the Azure resource group. **The *terraform destroy* run time is approximately ~5-6min long**.
 
-  ![terraform destroy](./43.png)
+  ![terraform destroy](./42.png)
 
 ## Re-Deploy Azure Arc Data Controller and Postgres instance
 
 * In case you deleted the Azure Arc Data Controller from the GKE cluster, you can re-deploy it by running the *POSTGRES_HS_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long**.
 
-  ![Re-Deploy Azure Arc Data Controller PowerShell script](./44.png)
+  ![Re-Deploy Azure Arc Data Controller PowerShell script](./43.png)
