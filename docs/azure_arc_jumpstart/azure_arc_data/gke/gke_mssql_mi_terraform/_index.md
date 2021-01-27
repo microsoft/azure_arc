@@ -2,7 +2,7 @@
 type: docs
 title: "SQL Managed Instance Terraform plan"
 linkTitle: "SQL Managed Instance Terraform plan"
-weight: 1
+weight: 3
 description: >
 ---
 

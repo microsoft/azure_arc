@@ -1,0 +1,31 @@
+{
+    "workbench.enablePreviewFeatures": true,
+    "datasource.connectionGroups": [
+        {
+            "name": "ROOT",
+            "id": "C777F06B-202E-4480-B475-FA416154D458"
+        }
+    ],
+    "datasource.connections": [
+        {
+            "options": {
+                "connectionName": "",
+                "host": "arc_postgres",
+                "authenticationType": "SqlLogin",
+                "dbname": "",
+                "user": "postgres",
+                "password": "ps_password",
+                "port": "5432",
+                "connectTimeout": "15",
+                "applicationName": "azdata",
+                "sslmode": "prefer",
+                "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+                "databaseDisplayName": ""
+            },
+            "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+            "providerName": "PGSQL",
+            "savePassword": false,
+            "id": "4b0e89a5-0376-492d-aa14-791667f51253"
+        }
+    ]
+}
