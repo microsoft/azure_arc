@@ -1,8 +1,8 @@
 ---
 type: docs
-title: "Postgres Hyperscale Terraform plan"
-linkTitle: "Postgres Hyperscale Terraform plan"
-weight: 2
+title: "PostgreSQL Hyperscale Terraform Plan"
+linkTitle: "PostgreSQL Hyperscale Terraform Plan"
+weight: 3
 description: >
 ---
 
