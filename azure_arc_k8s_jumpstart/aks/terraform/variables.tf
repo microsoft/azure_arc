@@ -18,6 +18,11 @@ variable "location" {
   default     = "East US"
 }
 
+variable "kubernetes_version" {
+  description = "Kubernetes version deployed"
+  default     = "1.18.14"
+}
+
 variable "node_count" {
   description = "The number of Azure VMs for this AKS Managed Kubernetes Cluster node pool"
   default     = 1
