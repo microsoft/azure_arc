@@ -42,6 +42,8 @@ In this guide, you will create and configure an Azure Automation account and Log
     ![Screenshot showing AWS cloud console with EC2 instance](./01.png)
 
     ![Screenshot showing Azure Portal with Azure Arc enabled server](./02.png)
+    
+    > **Note: Ensure that the server you will use for this scenario is running an [OS supported by Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview#supported-operating-systems)and meets the [system requirements](https://docs.microsoft.com/en-us/azure/automation/update-management/overview#system-requirements).
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
 
