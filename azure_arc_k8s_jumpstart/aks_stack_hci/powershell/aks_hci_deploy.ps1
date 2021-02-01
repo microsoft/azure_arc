@@ -20,4 +20,3 @@ Get-AksHciCredential -clusterName clustergroup-management
 New-AksHciCluster -clusterName $clusterName -controlPlaneNodeCount $controlPlaneNodeCount -linuxNodeCount $linuxNodeCount -windowsNodeCount $windowsNodeCount
 
 Get-AksHciCluster
-
