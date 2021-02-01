@@ -81,11 +81,11 @@ This guide assumes you already have an existing 2-4 node Azure Stack HCI cluster
   Initialize-AksHciNode
   ```
 
-* Now that all nodes are ready, you will deploy an AKS cluster to your Azure Stack HCI using this [PowerShell script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/azure_stack_hci/powershell/aks_hci_deploy.ps1). Note, that the script will deploy a simple DHCP based cluster on your Azure Stack HCI, there are additional optional parameters that you could use to customize the deployment to your own environment as described [here] (https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell). 
+* Now that all nodes are ready, you will deploy an AKS cluster to your Azure Stack HCI using this [PowerShell script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_stack_hci/powershell/aks_hci_deploy.ps1). Note, that the script will deploy a simple DHCP based cluster on your Azure Stack HCI, there are additional optional parameters that you could use to customize the deployment to your own environment as described [here] (https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell). 
 
 ![Screenshot showing the AKS on HCI deployment script](./01.png)
 
-* To run the script open PowerShell as an administrator, navigate to the [script folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/azure_stack_hci/powershell/) and run: 
+* To run the script open PowerShell as an administrator, navigate to the [script folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_stack_hci/powershell/) and run: 
 
   ```powershell
   .\aks_hci_deploy.ps1
@@ -116,7 +116,7 @@ This guide assumes you already have an existing 2-4 node Azure Stack HCI cluster
 
 ## Connecting to Azure Arc
 
-* Now that you have a running AKS cluster, edit the environment variables section in the included [az_connect_aks](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/azure_stack_hci/powershell/aks_hci_connect.ps1) shell script.
+* Now that you have a running AKS cluster, edit the environment variables section in the included [az_connect_aks](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_stack_hci/powershell/aks_hci_connect.ps1) shell script.
 
 ![Screenshot showing environment variables aks_hci_connect.ps1](./05.png)
 
