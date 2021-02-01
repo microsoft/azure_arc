@@ -18,8 +18,6 @@ Azure Kubernetes Service on Azure Stack HCI is an implementation of AKS on-premi
 
 This guide assumes you already have an existing 2-4 node Azure Stack HCI cluster and will leverage PowerShell to automate the AKS creation and onboarding process of the cluster to Azure Arc. 
 
-  > **Note: If you do not Azure Stack HCI you could use this [evaluation guide](https://github.com/mattmcspirit/aks-hci-evalguide) to create a sandboxed, isolated AKS on Azure Stack HCI environment using nested virtualization in Azure. Please not that this is not designed as a production scenario, it is only intended for testing purposes.**
-
 ## Prerequisites
 
 * Clone the Azure Arc Jumpstart repository
