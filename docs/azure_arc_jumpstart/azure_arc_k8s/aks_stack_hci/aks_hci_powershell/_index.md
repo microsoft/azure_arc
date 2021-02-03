@@ -16,7 +16,7 @@ Azure Kubernetes Service on Azure Stack HCI is an implementation of AKS on-premi
 
   > **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/).**
 
-This guide assumes you already have an existing 2-4 node Azure Stack HCI cluster and will leverage PowerShell to automate the AKS creation and onboarding process of the cluster to Azure Arc. 
+This guide will not provide instructions on how to deploy and set up Azure Stack HCI, it assumes you already have a configured cluster. This README will guide you on how to create an AKS cluster on your HCI and onboard it to Azure Arc in an automated fashion using PowerShell. 
 
 ## Prerequisites
 
@@ -68,20 +68,71 @@ This guide assumes you already have an existing 2-4 node Azure Stack HCI cluster
   Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
   Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
   ```
-* Since AKS on Azure Stack HCI is in public preview you will need to download the required software for evaluation from the [registration page](https://aka.ms/AKS-HCI-Evaluate). Complete the preview registration form and safe the zip file to the "Downloads" folder.
+* Since AKS on Azure Stack HCI is in public preview you will need to download the required software for evaluation from the [registration page](https://aka.ms/AKS-HCI-Evaluate). Complete the preview registration form and save the zip file to the "Downloads" folder.
 
-* Perform a clean install of the AksHci PowerShell module. To install the AksHci Powershell module found in the zip file you just downloaded follow [this guide.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell#step-1-download-and-install-the-akshci-powershell-module)
+* Perform a clean install of the AksHci PowerShell module. To install the AksHci Powershell module found in the zip file you just downloaded follow [this guide.](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell#step-1-download-and-install-the-akshci-powershell-module) or run the commands below: 
 
+  ```powershell
+  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+  Install-Module -Name AksHci -Repository PSGallery -RequiredVersion 0.2.15
+  Get-Command -Module AksHci
+  Import-Module AksHci
+  ```
  
+## Automation Flow
+
+For you to get familiar with the automation and deployment flow, below is an explanation.
+
+* User is editing the PowerShell script environment variables (1-time edit). These variables values are being used throughout the deployment and Azure Arc onboarding. 
+
+* User is running checks on every physical node of Azure Stack HCI to see if all the requirements are satisfied. 
+
+* User is running the PowerShell script to deploy a basic DHCP AKS cluster on Azure Stack HCI and onboard onto Azure Arc. Runtime script will:
+
+  * Configure the Azure Kubernetes Service cluster management services using Set-AksHciConfig cmdlet.
+  * Start the deployment of the AKS cluster management services using the Install-AksHci cmdlet. 
+  * Retrieve the Azure Kubernetes Service cluster credentials.  
+  * Create a target cluster with the number Linux and Windows nodes specified. 
+  * Onboard the AKS cluster on Azure Arc. 
+  
 ## Deployment
 
-* Before running the PowerShell Script to deploy your AKS cluster, it is important to verify each physical node of your Azure Stack HCI to validate all of the requirements are satisfied. To do that, open PowerShell as an administrator and run:
+* Before deploying AKS on Azure Stack HCI, you need to run checks on every physical node to see if all the requirements are satisfied. Open PowerShell as an administrator and run the following command.
 
   ```powershell
   Initialize-AksHciNode
   ```
+* Now that all nodes are ready, you will deploy the AKS control management and the target cluster to your Azure Stack HCI using this [PowerShell script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_stack_hci/powershell/aks_hci_deploy.ps1). Edit the file to provide the environment variables that match the parameters of your environment: 
+    - **imageDir:** path to the directory where AKS on Azure Stack HCI will store its VHD images, provide a shared path or SMB for multinode
+    - **cloudConfigLocation:** path to the directory where the cloud agent will store its configuration, provide a shared path or SMB for multinode
+    - **vnetName:** the name of the virtual switch to connect the virtual machines to. If you already have an external switch on the host, you should pass the name of the switch here. 
+    - **clusterName:** a name for your AKS cluster, must be lowercase. 
+    - **controlPlaneNodeCount:** number of nodes for your control plane, should be an odd number 1, 3 or 5.
+    - **linuxNodeCount:** number of Linux node VMs for your cluster, if you do not need Linux nodes input 0.
+    - **windowsNodeCount:** number of Windows node VMs for your cluster, if you do not need Windows nodes input 0.
+    - **resourceGroup:** resource group to connect your Azure Arc enabled Kubernetes.
+    - **location:** Azure region to connect your Azure Arc enabled Kubernetes.
+    - **subscriptionId:** subscription to connect your Azure Arc enabled Kubernetes.
+    - **appId:** the appID of the service principal created previously.
+    - **password:** the password of the service principal created.
+    - **tenant:** your tenantID.
 
-* Now that all nodes are ready, you will deploy an AKS cluster to your Azure Stack HCI using this [PowerShell script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_stack_hci/powershell/aks_hci_deploy.ps1). Note, that the script will deploy a simple DHCP based cluster on your Azure Stack HCI, there are additional optional parameters that you could use to customize the deployment to your own environment as described [here] (https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell). 
+As an example: 
+    - **imageDir:** "V:\AKS-HCI\Images"
+    - **cloudConfigLocation:** "V:\AKS-HCI\Images"
+    - **vnetName:** "InternalNAT"
+    - **clusterName:** "archcidemo"
+    - **controlPlaneNodeCount:** 1
+    - **linuxNodeCount:** 1
+    - **windowsNodeCount:** 0
+    - **resourceGroup:** "Arc-AKS-HCI-Demo"
+    - **location:** westeurope
+    - **subscriptionId:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
+    - **appId:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
+    - **password:** "XXXXXXXXXX"
+    - **tenant:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
+
+Note, that the script will deploy a simple DHCP based cluster on your Azure Stack HCI, there are additional optional parameters that you could use to customize the deployment to your own environment as described [here] (https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell). 
 
 ![Screenshot showing the AKS on HCI deployment script](./01.png)
 
@@ -90,50 +141,33 @@ This guide assumes you already have an existing 2-4 node Azure Stack HCI cluster
   ```powershell
   .\aks_hci_deploy.ps1
   ```
-![Screenshot showing the script input](./02.png)
+![Screenshot showing the AKS on HCI deployment script running](./02.png)
 
-* The script will prompt to provide a set of parameters to configure your cluster: 
-    - **imageDir:** path to the directory where AKS on Azure Stack HCI will store its VHD images, provide a shared path or SMB for multinode
-    - **cloudConfigLocation:** path to the directory where the cloud agent will store its configuration, provide a shared path or SMB for multinode
-    - **vnetName:** the name of the virtual switch to connect the virtual machines to. If you already have an external switch on the host, you should pass the name of the switch here. 
-    - **clusterName:** a name for your AKS cluster, must be lowercase. 
-    - **controlPlaneNodeCount:** number of nodes for your control plane, should be an odd number 1, 3 or 5.
-    - **linuxNodeCount:** number of Linux node VMs for your cluster, if you do not need Linux nodes input 0.
-    - **windowsNodeCount:** number of Windows node VMs for your cluster, if you do not need Windows nodes input 0.
+![Screenshot showing the AKS on HCI deployment script running](./03.png)
 
-    > **Note: the script may take upto 30 minutes to run**
+  > **Note: the script may take around 30 minutes to run**
 
-* Once the script has completed its run, you will see an output as follows: 
+![Screenshot showing the script output](./04.png)
 
-![Screenshot showing the script output](./03.png)
+* You should also see the new AKS cluster on Windows Admin Center. 
 
-* To be able to connect to the Azure Kubernetes Service cluster run the command: 
-
-  ```powershell
-  Get-AksHciCredential -clusterName <cluster_name>
-  ```
-![Screenshot showing the output retrieving credentials](./04.png)
-
-## Connecting to Azure Arc
-
-* Now that you have a running AKS cluster, edit the environment variables section in the included [az_connect_aks](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_stack_hci/powershell/aks_hci_connect.ps1) shell script.
-
-![Screenshot showing environment variables aks_hci_connect.ps1](./05.png)
-
-* After editing the environment variables in the aks_hci_connect PowerShell script to match your parameters, save the file and then run it using the .\aks_hci_connect.ps1 command.
+![Screenshot showing the AKS on HCI deployment Windows Admin Center](./05.png)
 
 * Once the script run has finished, the AKS cluster on HCI will be projected as a new Azure Arc cluster resource.
 
-![Screenshot showing environment variables aks_hci_connect.ps1](./06.png)
+![Screenshot showing Arc Enabled Kubernetes in RG](./06.png)
+
+![Screenshot showing Arc Enabled Kubernetes](./07.png)
 
 ## Delete the deployment
 
 The most straightforward way is to delete the Azure Arc cluster resource via the Azure Portal, just select the cluster and delete it.
 
-![Screenshot showing how to delete Azure Arc enabled Kubernetes resource](./07.png)
+![Screenshot showing how to delete Azure Arc enabled Kubernetes resource](./08.png)
 
-If you want to delete the AKS cluster on HCI run the below command.
+If you want to delete the AKS cluster on HCI run the below command, this will delete all of your AKS clusters on HCI if any and the Azure Kubernetes Service host. It will also uninstall the Azure Kubernetes Service on Azure Stack HCI agents and services from the nodes. 
 
 ```powershell
-Uninstall-AksHci -Force
+Uninstall-AksHci
 ```
+![Screenshot showing how to delete AKS cluster on HCI](./09.png)
