@@ -36,7 +36,7 @@
             "type": "int",
             "defaultValue": 3,
             "metadata": {
-                "description": "The number of nodes for the cluster."
+                "description": "The number of nodes for the cluster"
             },
             "minValue": 1,
             "maxValue": 50
@@ -45,13 +45,13 @@
             "type": "string",
             "defaultValue": "Standard_D8s_v3",
             "metadata": {
-                "description": "The size of the Virtual Machine."
+                "description": "The size of the Virtual Machine"
             }
         },
         "nodeAdminUsername": {
             "type": "string",
             "metadata": {
-                "description": "User name for the Linux Virtual Machines."
+                "description": "User name for the Linux Virtual Machines"
             }
         },
         "sshRSAPublicKey": {
@@ -68,7 +68,7 @@
         },
         "SPN_CLIENT_SECRET": {
             "metadata": {
-                "description": "The Service Principal Client Secret."
+                "description": "The Service Principal Client Secret"
             },
             "type": "securestring"
         },
@@ -98,28 +98,28 @@
                 "Linux"
             ],
             "metadata": {
-                "description": "The type of operating system."
+                "description": "The type of operating system"
             }
         },
         "kubernetesVersion": {
             "defaultValue": "1.18.10",
             "type": "string",
             "metadata": {
-                "description": "The version of Kubernetes."
+                "description": "The version of Kubernetes"
             }
         },
         "vmName": {
             "type": "string",
             "defaultValue": "Arc-Data-Client",
             "metadata": {
-                "description": "The name of the Client Virtual Machine."
+                "description": "The name of the Client Virtual Machine"
             }
         },
         "adminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
             "metadata": {
-                "description": "Username for the Virtual Machine."
+                "description": "Username for the Virtual Machine"
             }
         },
         "adminPassword": {

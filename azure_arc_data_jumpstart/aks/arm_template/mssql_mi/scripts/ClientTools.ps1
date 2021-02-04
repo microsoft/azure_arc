@@ -2,7 +2,7 @@ param (
     [string]$SPN_CLIENT_ID,
     [string]$SPN_CLIENT_SECRET,
     [string]$SPN_TENANT_ID,
-    [string]$SPN_AUTHORITY,    
+    [string]$SPN_AUTHORITY,
     [string]$adminUsername,
     [string]$clusterName,
     [string]$resourceGroup,
