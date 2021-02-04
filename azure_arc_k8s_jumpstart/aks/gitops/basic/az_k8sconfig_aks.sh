@@ -19,7 +19,7 @@ az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --
 kubectl create namespace hello-arc
 
 # Add the official stable repo
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo add stable https://charts.helm.sh/stable
 
 # Use Helm to deploy an NGINX ingress controller
 helm install nginx stable/nginx-ingress \
