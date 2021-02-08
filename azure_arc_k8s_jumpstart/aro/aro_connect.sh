@@ -198,7 +198,7 @@ if [ ! "$($az aro show -g "$RESOURCEGROUP" -n "$AROCLUSTER" --query provisioning
     echo " "
     $az aro create -g "$RESOURCEGROUP" -n "$AROCLUSTER" --vnet="$vnetName" --master-subnet="$vnetName-master" --worker-subnet="$vnetName-worker" --worker-vm-size "Standard_D4as_v4" --master-vm-size "Standard_D8s_v3" -o table --no-wait
     $az aro wait -n "$AROCLUSTER" -g $RESOURCEGROUP --created
-    sleep 20s
+    sleep 50s
 fi
 
 # Setting up credentials
@@ -213,26 +213,26 @@ echo "adminPassword=$adminPassword"
 echo "apiServer=$apiServer"
 echo "done"
 
-sleep 10s
+sleep 30s
 
 # Log into the OC command
 echo "==============================================================================================================================================================="
 oc login $apiServer -u $adminUser -p $adminPassword
 echo "==============================================================================================================================================================="
 
-# echo "Upload kubeconfig to blob."
-# storageName="arcstoragearo$RAND$RAND"
-# if [ "$($az storage account check-name --name $storageName --query nameAvailable -o tsv 2>/dev/null)" = "true" ]; then
-#     $az storage account create --name $storageName --resource-group $RESOURCEGROUP --location $LOCATION --sku Standard_ZRS -o none 2>/dev/null
-#     $az storage container create --alsccount-name $storageName --name arccontainer --public-access blob -o none 2>/dev/null
-#     $az storage blob upload --account-name $storageName --container-name arccontainer --name config --auth-mode key --file /root/.kube/config -o table
-#     $az group update -n $RESOURCEGROUP --tag currentStatus=kubectlUploaded fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
-#     echo "File Uploaded."
-# else
-#     $az group update -n $RESOURCEGROUP --tag currentStatus=kubectlFailed 2>/dev/null
-#     echo "File Upload Failed"
-# fi
-# echo "done."
+echo "Upload kubeconfig to blob."
+storageName="arcstoragearo$RAND$RAND"
+if [ "$($az storage account check-name --name $storageName --query nameAvailable -o tsv 2>/dev/null)" = "true" ]; then
+    $az storage account create --name $storageName --resource-group $RESOURCEGROUP --location $LOCATION --sku Standard_ZRS -o none 2>/dev/null
+    $az storage container create --alsccount-name $storageName --name arccontainer --public-access blob -o none 2>/dev/null
+    $az storage blob upload --account-name $storageName --container-name arccontainer --name config --auth-mode key --file /root/.kube/config -o table
+    $az group update -n $RESOURCEGROUP --tag currentStatus=kubectlUploaded fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
+    echo "File Uploaded."
+else
+    $az group update -n $RESOURCEGROUP --tag currentStatus=kubectlFailed 2>/dev/null
+    echo "File Upload Failed"
+fi
+echo "done."
 
 if [ ! "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
     # Create a Service Principal
