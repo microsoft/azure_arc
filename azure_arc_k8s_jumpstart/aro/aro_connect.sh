@@ -86,22 +86,22 @@ else
     echo "ARC Kubernetes Provider is registered"
 fi
 
-echo "==============================================================================================================================================================="
-echo "Checking to see if ARO AZ extension is installed."
-if [ -z "$($az extension list --query '[].path' -o tsv | grep aro)" ]; then
-    echo "The Azure CLI extension for ARO has not been installed."
-    echo -n "I will attempt to register the extension now (this may take a few minutes)..."
-    $az extension add -n aro --index https://az.aroapp.io/stable >/dev/null
-    echo "done."
-    echo -n "Verifying the Azure CLI extension exists..."
-    if [ -z "$($az extension list --query '[].path' -o tsv | grep aro)" ]; then
-        echo "error! Unable to add the Azure CLI extension for ARO. Please remediate this."
-        exit 1
-    fi
-    echo "done."
-else
-    echo "The extension is installed"
-fi
+# echo "==============================================================================================================================================================="
+# echo "Checking to see if ARO AZ extension is installed."
+# if [ -z "$($az extension list --query '[].path' -o tsv | grep aro)" ]; then
+#     echo "The Azure CLI extension for ARO has not been installed."
+#     echo -n "I will attempt to register the extension now (this may take a few minutes)..."
+#     $az extension add -n aro --index https://az.aroapp.io/stable >/dev/null
+#     echo "done."
+#     echo -n "Verifying the Azure CLI extension exists..."
+#     if [ -z "$($az extension list --query '[].path' -o tsv | grep aro)" ]; then
+#         echo "error! Unable to add the Azure CLI extension for ARO. Please remediate this."
+#         exit 1
+#     fi
+#     echo "done."
+# else
+#     echo "The extension is installed"
+# fi
 
 echo "==============================================================================================================================================================="
 echo "Checking to see if connectedk8s AZ extension is installed."

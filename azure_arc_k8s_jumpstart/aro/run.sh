@@ -24,21 +24,21 @@ fi
 
 echo "==============================================================================================================================================================="
 
-if [ ! "$($az group show -n $RESOURCEGROUP --query tags.currentStatus -o tsv 2>/dev/null)" = "containerCreated" ]; then
-    echo "Deploying the container (might take 2-3 minutes)..."
-    $az container create -g $RESOURCEGROUP --name arcarodemo --image azuretemplate.azurecr.io/arc:aro --registry-password $regPassword --registry-username azuretemplate --restart-policy Never --environment-variables subId=$subId RAND=$RAND -o none 2>/dev/null
-    $az group update -n $RESOURCEGROUP --tag currentStatus=containerCreated 2>/dev/null
-    echo "done."
-fi
+# if [ ! "$($az group show -n $RESOURCEGROUP --query tags.currentStatus -o tsv 2>/dev/null)" = "containerCreated" ]; then
+#     echo "Deploying the container (might take 2-3 minutes)..."
+#     $az container create -g $RESOURCEGROUP --name arcarodemo --image azuretemplate.azurecr.io/arc:aro --registry-password $regPassword --registry-username azuretemplate --restart-policy Never --environment-variables subId=$subId RAND=$RAND -o none 2>/dev/null
+#     $az group update -n $RESOURCEGROUP --tag currentStatus=containerCreated 2>/dev/null
+#     echo "done."
+# fi
 
-echo "==============================================================================================================================================================="
-echo "==============================================================================================================================================================="
-echo "If cloudshell times out copy this command and run it again when cloud shell is restarted:"
-echo "     az container logs --follow -n arcarodemo -g $RESOURCEGROUP"
-echo "==============================================================================================================================================================="
-echo "==============================================================================================================================================================="
+# echo "==============================================================================================================================================================="
+# echo "==============================================================================================================================================================="
+# echo "If cloudshell times out copy this command and run it again when cloud shell is restarted:"
+# echo "     az container logs --follow -n arcarodemo -g $RESOURCEGROUP"
+# echo "==============================================================================================================================================================="
+# echo "==============================================================================================================================================================="
 
-if [ "$($az group show -n $RESOURCEGROUP --query tags.currentStatus -o tsv 2>/dev/null)" = "containerCreated" ]; then
-    echo "Trail Logs"
-    $az container logs -n arcarodemo -g $RESOURCEGROUP 2>/dev/null
-fi
+# if [ "$($az group show -n $RESOURCEGROUP --query tags.currentStatus -o tsv 2>/dev/null)" = "containerCreated" ]; then
+#     echo "Trail Logs"
+#     $az container logs -n arcarodemo -g $RESOURCEGROUP 2>/dev/null
+# fi
