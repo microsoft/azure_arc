@@ -67,6 +67,7 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
   ```powershell
   Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
   Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
+  Get-AzResourceProvider -ListAvailable | Select-Object ProviderNamespace, RegistrationState | Select-String  -Pattern "Microsoft.Kubernetes"
   ```
 * Perform a clean install of the AksHci PowerShell module. To install the AksHci Powershell module remove previous versions by running the commands below: 
 
