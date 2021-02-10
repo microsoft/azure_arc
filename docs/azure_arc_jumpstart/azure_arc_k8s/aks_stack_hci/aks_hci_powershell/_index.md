@@ -127,9 +127,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
     - **controlPlaneNodeCount:** number of nodes for your control plane, should be an odd number 1, 3 or 5.
     - **linuxNodeCount:** number of Linux node VMs for your cluster, if you do not need Linux nodes input 0.
     - **windowsNodeCount:** number of Windows node VMs for your cluster, if you do not need Windows nodes input 0.
-    - **resourceGroup:** resource group to connect your Azure Arc enabled Kubernetes.
-    - **location:** Azure region to connect your Azure Arc enabled Kubernetes.
-    - **subscriptionId:** subscription to connect your Azure Arc enabled Kubernetes.
+    - **resourceGroup:** resource group to connect your Azure Arc enabled Kubernetes cluster.
+    - **location:** Azure region to connect your Azure Arc enabled Kubernetes cluster.
+    - **subscriptionId:** subscription to connect your Azure Arc enabled Kubernetes cluster.
     - **appId:** the appID of the service principal created previously.
     - **password:** the password of the service principal created.
     - **tenant:** your tenantID.
