@@ -153,7 +153,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     - **password:** "XXXXXXXXXX"
     - **tenant:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
 
-* Note, that the script will deploy a simple DHCP based cluster on your Azure Stack HCI, there are additional optional parameters that you could use to customize the deployment to your own environment as described [here] (https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell). 
+* Note that the script will deploy a simple DHCP-based cluster on your Azure Stack HCI and there are additional optional parameters that you could use to customize the deployment to your own environment as described [here] (https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell). 
 
 * To run the script open PowerShell as an administrator, navigate to the [script folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_stack_hci/powershell/) and run: 
 
