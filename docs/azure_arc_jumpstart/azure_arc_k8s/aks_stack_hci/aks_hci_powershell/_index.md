@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Deploy AKS cluster on Azure Stack HCI and connect it to Azure Arc using PoweSh
+## Deploy AKS cluster on Azure Stack HCI and connect it to Azure Arc using PoweShell
 
 The following README will guide you on how to use the provided PowerShell script to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster on [Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/hci/overview) and connected it as an Azure Arc cluster resource.
 
