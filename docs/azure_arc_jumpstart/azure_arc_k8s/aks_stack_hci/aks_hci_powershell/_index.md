@@ -154,7 +154,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * **subscriptionId:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
   * **appId:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
   * **password:** "XXXXXXXXXX"
-  * **tenant:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
+  * **tenant:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"  
 
 * Note that the script will deploy a simple DHCP-based cluster on your Azure Stack HCI and there are additional optional parameters that you could use to customize the deployment to your own environment as described [here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/setup-powershell).
 
