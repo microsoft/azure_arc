@@ -166,7 +166,6 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   > **Note: the script may take around 30 minutes to run**
 
-* Once the script has completed its run 
 
 ![Screenshot showing the script output](./05.png)
 
