@@ -185,7 +185,7 @@ The most straightforward way is to delete the Azure Arc enabled Kubernetes clust
 
 ![Screenshot showing how to delete Azure Arc enabled Kubernetes resource](./09.png)
 
-If you want to delete the AKS cluster on HCI run the below command, this will delete all of your AKS clusters on HCI if any and the Azure Kubernetes Service host. It will also uninstall the Azure Kubernetes Service on Azure Stack HCI agents and services from the nodes. 
+To delete the AKS cluster on HCI run the below command. This will delete all of your AKS clusters on HCI (if any) and the Azure Kubernetes Service host as well as uninstall the Azure Kubernetes Service on Azure Stack HCI agents and services from the nodes. 
 
 ```powershell
 Uninstall-AksHci
