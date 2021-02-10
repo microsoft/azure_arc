@@ -123,7 +123,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     - **imageDir:** path to the directory where AKS on Azure Stack HCI will store its VHD images, provide a shared path or SMB for multinode
     - **cloudConfigLocation:** path to the directory where the cloud agent will store its configuration, provide a shared path or SMB for multinode
     - **vnetName:** the name of the virtual switch to connect the virtual machines to. If you already have an external switch on the host, you should pass the name of the switch here. 
-    - **clusterName:** a name for your AKS cluster, must be lowercase. 
+    - **clusterName:** a name for your AKS cluster, **must be lowercase**. 
     - **controlPlaneNodeCount:** number of nodes for your control plane, should be an odd number 1, 3 or 5.
     - **linuxNodeCount:** number of Linux node VMs for your cluster, if you do not need Linux nodes input 0.
     - **windowsNodeCount:** number of Windows node VMs for your cluster, if you do not need Windows nodes input 0.
