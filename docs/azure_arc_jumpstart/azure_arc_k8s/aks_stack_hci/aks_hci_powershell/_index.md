@@ -181,7 +181,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Delete the deployment
 
-The most straightforward way is to delete the Azure Arc cluster resource via the Azure Portal, just select the cluster and delete it.
+The most straightforward way is to delete the Azure Arc enabled Kubernetes cluster resource via the Azure Portal, just select the cluster and delete it.
 
 ![Screenshot showing how to delete Azure Arc enabled Kubernetes resource](./09.png)
 
