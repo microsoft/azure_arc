@@ -27,12 +27,12 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
   
 * Create Azure service principal (SP)
 
-    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account using PowerShell run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```powershell
     Connect-AzAccount
     $sp = New-AzADServicePrincipal -DisplayName "<Unique SP Name>" -Role 'Contributor'
-   ```
+    ```
 
     For example:
 
@@ -40,9 +40,9 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
     $sp = New-AzADServicePrincipal -DisplayName "<Unique SP Name>" -Role 'Contributor'
     ```
 
-   This command will return a secure string as shown below:
+    This command will return a secure string as shown below:
 
-    ```poweshell
+    ```shell
     Secret                : System.Security.SecureString
     ServicePrincipalNames : {XXXXXXXXXXXXXXXXXXXXXXXXXXXX, http://AzureArcK8s}
     ApplicationId         : XXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -54,7 +54,7 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
 
     To expose the generated password use this code to export the secret:
 
-    ```poweshell
+    ```powershell
     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
     $UnsecureSecret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     ```
