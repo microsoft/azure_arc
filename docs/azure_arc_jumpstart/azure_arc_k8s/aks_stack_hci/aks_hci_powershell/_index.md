@@ -173,7 +173,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ![Screenshot showing the AKS on HCI deployment Windows Admin Center](./06.png)
 
-* Once the script run has finished, the AKS cluster on HCI will be projected as a new Azure Arc cluster resource.
+* Once the script run has finished, the AKS cluster on HCI will be projected as a new Azure Arc enabled Kubernetes cluster resource.
 
 ![Screenshot showing Arc Enabled Kubernetes in RG](./07.png)
 
