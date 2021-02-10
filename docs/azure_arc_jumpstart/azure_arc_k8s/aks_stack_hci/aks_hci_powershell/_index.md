@@ -16,7 +16,7 @@ Azure Kubernetes Service on Azure Stack HCI is an implementation of AKS on-premi
 
   > **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/).**
 
-This guide will not provide instructions on how to deploy and set up Azure Stack HCI, it assumes you already have a configured cluster. This README will guide you on how to create an AKS cluster on your HCI and onboard it to Azure Arc in an automated fashion using PowerShell. 
+This guide will not provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have a configured cluster. 
 
 ## Prerequisites
 
