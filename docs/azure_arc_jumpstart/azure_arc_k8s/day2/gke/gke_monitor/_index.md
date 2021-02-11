@@ -12,7 +12,7 @@ The following README will guide you on how to enable [Azure Monitor for Containe
 
 In this guide, you will hook the GKE cluster to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster in order to start collecting telemetry.  
 
-> **Note: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/docs/gke_terraform.md).**
+> **Note: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).**
 
 ## Prerequisites
 
