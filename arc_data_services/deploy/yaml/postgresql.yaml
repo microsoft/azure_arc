@@ -3,14 +3,14 @@ data:
   password: <your base64 encoded password>
 kind: Secret
 metadata:
-  name: example-login-secret
+  name: pg1-login-secret
 type: Opaque
 ---
 apiVersion: arcdata.microsoft.com/v1alpha1
 kind: postgresql-12
 metadata:
   generation: 1
-  name: example
+  name: pg1
 spec:
   engine:
     extensions:
