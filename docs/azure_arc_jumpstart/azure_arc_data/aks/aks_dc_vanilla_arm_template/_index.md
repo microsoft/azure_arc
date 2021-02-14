@@ -126,6 +126,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *SPN_CLIENT_ID* - Your Azure service principal name
   * *SPN_CLIENT_SECRET* - Your Azure service principal password
   * *SPN_TENANT_ID* - Your Azure tenant ID
+  * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
+  * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)  
   * *SPN_AUTHORITY* - *https://login.microsoftonline.com* **Do not change**
   * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
   * *adminUsername* - Client Windows VM admin username
@@ -136,8 +138,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
   * *ACCEPT_EULA* - "yes" **Do not change**
   * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with an alphanumeric character. This name will be used for k8s namespace as well.
-  * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
-  * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](.) and run the below command:
 

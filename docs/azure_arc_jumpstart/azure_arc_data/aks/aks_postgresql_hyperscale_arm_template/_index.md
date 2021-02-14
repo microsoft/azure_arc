@@ -126,20 +126,20 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *dnsPrefix* - AKS unique DNS prefix
   * *nodeAdminUsername* - AKS Node Username
   * *sshRSAPublicKey* - Your ssh public key
-  * *servicePrincipalClientId* - Your Azure service principal name
-  * *servicePrincipalClientSecret* - Your Azure service principal password
+  * *SPN_CLIENT_ID* - Your Azure service principal name
+  * *SPN_CLIENT_SECRET* - Your Azure service principal password
+  * *SPN_TENANT_ID* - Azure tenant ID
+  * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
+  * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)  
   * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
   * *adminUsername* - Client Windows VM admin username
   * *adminPassword* - Client Windows VM admin password
   * *vmSize* - Client Windows VM size
-  * *tenantId* - Azure tenant ID
   * *resourceGroup* - Azure resource group where all the resources get deploy
   * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
   * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
   * *ACCEPT_EULA* - "yes" **Do not change**
   * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start d end with a alphanumeric character (This name will be used for k8s namespace as well).
-  * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
-  * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
   * *POSTGRES_NAME* - PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster. Names must be 10 characters or fewer in length and conform to DNS naming conventions.
   * *POSTGRES_WORKER_NODE_COUNT* - PostgreSQL Hyperscale server group number of workers
   * *POSTGRES_DATASIZE* - PostgreSQL Hyperscale size of data volumes in MB (Recommended to use at least 1GB (1024 MB)).*
