@@ -23,6 +23,12 @@
         "SPN_TENANT_ID": {
             "value": "<Azure tenant ID>"
         },
+        "ARC_DC_SUBSCRIPTION": {
+            "value": "<Azure Arc Data Controller Azure subscription ID>"
+        },
+        "ARC_DC_REGION": {
+            "value": "eastus"
+        },        
         "SPN_AUTHORITY": {
             "value": "https://login.microsoftonline.com"
         },        
@@ -52,12 +58,6 @@
         },
         "ARC_DC_NAME": {
             "value": "<Azure Arc Data Controller name (will be used for k8s Arc namespace as well)>"
-        },
-        "ARC_DC_SUBSCRIPTION": {
-            "value": "<Azure Arc Data Controller Azure subscription ID>"
-        },
-        "ARC_DC_REGION": {
-            "value": "eastus"
         },
         "POSTGRES_NAME": {
             "value": "arcpg"
