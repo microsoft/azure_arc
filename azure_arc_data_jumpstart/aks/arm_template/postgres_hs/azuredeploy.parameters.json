@@ -27,7 +27,7 @@
             "value": "https://login.microsoftonline.com"
         },        
         "kubernetesVersion": {
-            "value": "<Kubernetes Version, e.g. 1.18.10>"
+            "value": "<Kubernetes Version, e.g. 1.18.14>"
         },
         "adminUsername": {
             "value": "<Client Windows VM admin username>"
