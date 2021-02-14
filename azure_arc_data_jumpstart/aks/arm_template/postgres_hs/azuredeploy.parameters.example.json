@@ -27,7 +27,7 @@
             "value": "https://login.microsoftonline.com"
         },
         "kubernetesVersion": {
-            "value": "1.18.10"
+            "value": "1.18.14"
         },
         "adminUsername": {
             "value": "arcdemo"
@@ -39,7 +39,7 @@
             "value": "Standard_D4s_v3"
         },      
         "resourceGroup": {
-            "value": "Arc-Data-SQLMI-Demo"
+            "value": "Arc-Data-Postgres-Demo"
         },
         "AZDATA_USERNAME": {
             "value": "arcdemo"
