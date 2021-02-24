@@ -35,7 +35,7 @@ If(!(test-path $cloudConfigLocation))
 
 $vnet = New-AksHciNetworkSetting -vnetName $vnetName -vipPoolStart $vipPoolStart -vipPoolEnd $vipPoolEnd
 
-Set-AksHciConfig -usePreview -vnet $vnet -imageDir $imageDir -cloudConfigLocation $cloudConfigLocation -enableDiagnosticData -Verbose
+Set-AksHciConfig -vnet $vnet -imageDir $imageDir -cloudConfigLocation $cloudConfigLocation -enableDiagnosticData -Verbose
 
 Install-AksHci
 
