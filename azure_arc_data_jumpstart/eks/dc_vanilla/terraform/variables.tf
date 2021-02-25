@@ -48,6 +48,16 @@ variable "ACCEPT_EULA" {
   default     = "yes"
 }
 
+variable "REGISTRY_USERNAME" {
+  description = "Azure Arc Data private container registry username"
+  type        = string
+}
+
+variable "REGISTRY_PASSWORD" {
+  description = "Azure Arc Data private container registry password"
+  type        = string
+}
+
 variable "DOCKER_REGISTRY" {
   description = "Azure Arc Data Container Registry"
   type        = string
@@ -64,6 +74,12 @@ variable "DOCKER_TAG" {
   description = "Azure Arc Data Container Tag"
   type        = string
   default     = "latest"
+}
+
+variable "AZDATA_URL" {
+  description = "azdata download url"
+  type        = string
+  default     = "https://aka.ms/azdata-msi"
 }
 
 variable "ARC_DC_NAME" {
