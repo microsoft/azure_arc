@@ -2,7 +2,7 @@
 type: docs
 title: "Jumpstart Release Notes"
 linkTitle: "Jumpstart Release Notes"
-weight: 3
+weight: 4
 ---
 
 # Azure Arc Jumpstart release notes
