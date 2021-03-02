@@ -12,7 +12,7 @@ We know you are busy and sometimes all you need is just a good, short, solid rec
 <center>:movie_camera: https://aka.ms/AzureArcJumpstartDemo :movie_camera:</center>
 <br>
 
-<p align="center"><img src="/img/youtube_banner.png" alt="jumpstart-logo" width="250"></p>
+<p align="center"><img src="/img/youtube_banner.png" alt="jumpstart-logo" width="600"></p>
 
 All the demos in the channel are "bite-size" versions of the Azure Arc Jumpstart written scenarios we have on our website so make sure to check those as well.
 
