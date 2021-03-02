@@ -24,7 +24,7 @@ requiredDropCapabilities:
 runAsUser:
   type: MustRunAsNonRoot
 seLinuxContext:
-  type: MustRunAsNonRoot
+  type: MustRunAs
 supplementalGroups:
   type: RunAsAny
 volumes:
