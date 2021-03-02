@@ -23,6 +23,16 @@ Hop over to the [Jumpstart Scenarios](https://azurearcjumpstart.io/azure_arc_jum
 
 > **Disclaimer: The intention for the Azure Arc Jumpstart project is to focus on the core Azure Arc capabilities, deployment scenarios, use-cases, and ease of use. It does not focus on Azure best-practices or the other tech and OSS projects being leveraged in the scenarios and code.**
 
+## Jumpstart YouTube Channel
+
+We know you are busy and sometimes all you need is just a good, short, solid recorded demo and we hope that here you will be able to find just that.
+
+All the demos in the [Azure Arc Jumpstart YouTube channel](https://aka.ms/AzureArcJumpstartDemos) are "bite-size" versions of the Azure Arc Jumpstart written scenarios we have on our website so make sure to check those as well.
+
+Oh, and one last thing before you go. Please consider subscribing to the channel so you will know when we have a new awesome demo for you!
+
+Enjoy!
+
 ## Azure Arc Overview
 
 For customers who want to simplify complex and distributed environments across on-premises, edge and multi-cloud, [Azure Arc](https://azure.microsoft.com/services/azure-arc/) enables deployment of Azure services anywhere and extends Azure management to any infrastructure.
