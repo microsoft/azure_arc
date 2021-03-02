@@ -79,7 +79,9 @@ images = [  'arc-bootstrapper',
             'arc-monitor-kibana',
             'arc-monitor-telegraf',
             'arc-server-controller',
-            'arc-service-proxy']
+            'arc-service-proxy',
+            'arc-ha-supervisor',
+            'mssql-ha-operator']
 
 taggedimages = [image + ":" + SOURCE_DOCKER_TAG for image in images]
 
