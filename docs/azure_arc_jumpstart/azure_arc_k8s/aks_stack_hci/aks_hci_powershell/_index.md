@@ -13,7 +13,6 @@ The following guide will guide you on how to use the provided PowerShell script 
 Azure Kubernetes Service on Azure Stack HCI is an implementation of AKS on-premises using hyperconverged infrastructure operating system that is delivered as an Azure service.  
 
   > **Note: Azure Kubernetes Service is now in preview on Azure Stack HCI and on Windows Server 2019 Datacenter.**
-  > **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/).**
 
 This guide will not provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have a configured cluster.
 
