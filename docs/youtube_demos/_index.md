@@ -9,17 +9,10 @@ weight: 3
 
 We know you are busy and sometimes all you need is just a good, short, solid recorded demo and we hope that here you will be able to find just that.
 
-<center>:movie_camera: https://aka.ms/AzureArcJumpstartDemo :movie_camera:</center>
-<br>
-
-<p align="center"><img src="/img/youtube_banner.png" alt="jumpstart-logo" width="600"></p>
-
-All the demos in the channel are "bite-size" versions of the Azure Arc Jumpstart written scenarios we have on our website so make sure to check those as well.
+All the demos in the [Azure Arc Jumpstart YouTube channel](https://aka.ms/AzureArcJumpstartDemo) are "bite-size" versions of the Azure Arc Jumpstart written scenarios we have on our website so make sure to check those as well.
 
 Oh, and one last thing before you go. Please consider subscribing to the channel so you will know when we have a new awesome demo for you!
 
-<!-- [![](/img/unblogged.jpg)](http://www.youtube.com/watch?v=YCGKW4pDrXI "Intro to Jumpstart in Azure UNBLOGGED") -->
-
-[![](/img/unblogged.jpg)](https://www.youtube.com/watch?v=gNJaJgSbvtM&ab_channel=EposVox "Intro to Jumpstart in Azure UNBLOGGED")
+[![](/img/unblogged.jpg)](http://www.youtube.com/watch?v=YCGKW4pDrXI "Intro to Jumpstart in Azure UNBLOGGED")
 
 Enjoy!
