@@ -30,7 +30,7 @@ sudo apt-get update
 sudo apt-get install azure-cli
 
 az extension add --name connectedk8s
-az extension add --name k8sconfiguration
+az extension add --name k8s-configuration
 
 # Login to Azure
 echo "Log in to Azure with Service Principal"
@@ -49,7 +49,7 @@ helm install nginx stable/nginx-ingress \
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
 
-az k8sconfiguration create \
+az k8s-configuration create \
 --name cluster-config \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name cluster-config --operator-namespace cluster-config \

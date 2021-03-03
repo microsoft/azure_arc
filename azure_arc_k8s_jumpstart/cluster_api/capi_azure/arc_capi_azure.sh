@@ -79,13 +79,13 @@ rm extension_output
 fi
 echo ""
 
-echo "Checking if you have up-to-date Azure Arc AZ CLI 'k8sconfiguration' extension..."
-az extension show --name "k8sconfiguration" &> extension_output
+echo "Checking if you have up-to-date Azure Arc AZ CLI 'k8s-configuration' extension..."
+az extension show --name "k8s-configuration" &> extension_output
 if cat extension_output | grep -q "not installed"; then
-az extension add --name "k8sconfiguration"
+az extension add --name "k8s-configuration"
 rm extension_output
 else
-az extension update --name "k8sconfiguration"
+az extension update --name "k8s-configuration"
 rm extension_output
 fi
 echo ""
