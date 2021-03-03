@@ -21,7 +21,7 @@ sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 sudo az extension add --name connectedk8s
-sudo az extension add --name k8sconfiguration
+sudo az extension add --name k8s-configuration
 
 sudo az login --service-principal --username $appId --password $password --tenant $tenantId
 
