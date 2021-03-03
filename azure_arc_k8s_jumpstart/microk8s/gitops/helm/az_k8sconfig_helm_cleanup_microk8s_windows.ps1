@@ -11,7 +11,7 @@ Write-Output "Log in to Azure with Service Principal"
 call az login --service-principal --username $appId --password $password --tenant $tenantId
 
 Write-Output "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
-call az k8sconfiguration delete --name hello-arc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
+call az k8s-configuration delete --name hello-arc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
 
 Write-Output "Cleaning Kubernetes cluster. You Can safely ignore non-exist resources"
 microk8s kubectl delete ns prod
