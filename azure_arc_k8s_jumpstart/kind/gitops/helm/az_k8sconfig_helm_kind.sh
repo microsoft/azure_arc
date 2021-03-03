@@ -16,7 +16,7 @@ az login --service-principal --username $appId --password $password --tenant $te
 
 # Create Namespace-level GitOps-Config for deploying the "Hello Arc" application
 echo "Create Namespace-level GitOps-Config for deploying the 'Hello Arc' application"
-az k8sconfiguration create \
+az k8s-configuration create \
 --name hello-arc \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name hello-arc --operator-namespace prod \

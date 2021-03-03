@@ -21,7 +21,7 @@ sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 sudo az extension add --name connectedk8s
-sudo az extension add --name k8sconfiguration
+sudo az extension add --name k8s-configuration
 
 sudo chown -R $TF_VAR_admin_user /home/$TF_VAR_admin_user/.kube
 sudo chown -R $TF_VAR_admin_user /home/$TF_VAR_admin_user/.kube/config
