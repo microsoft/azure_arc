@@ -79,18 +79,18 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
-* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
+* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8s-configuration***:
 
   ```shell
   az extension add --name connectedk8s
-  az extension add --name k8sconfiguration
+  az extension add --name k8s-configuration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
   ```shell
   az extension update --name connectedk8s
-  az extension update --name k8sconfiguration
+  az extension update --name k8s-configuration
   ```
 
 ## Deployment
