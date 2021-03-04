@@ -18,9 +18,12 @@ az account set --subscription $subscriptionId
 #Get AKS on Azure Stack HCI cluster credentials
 Get-AksHciCredential -Name $ClusterName 
 
-
 # Create a namespace for your ingress resources
 kubectl create namespace hello-arc
+
+# Helm Install 
+
+choco install kubernetes-helm
 
 # Add the official stable repo
 helm repo add stable https://charts.helm.sh/stable
