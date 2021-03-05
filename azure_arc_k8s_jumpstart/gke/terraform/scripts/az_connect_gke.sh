@@ -31,10 +31,10 @@ sudo tee /etc/apt/sources.list.d/azure-cli.list
 sudo apt-get update
 sudo apt-get install azure-cli
 
-az extension remove --name connected8s
+az extension remove --name connectedk8ss
 az extension remove --name k8s-configuration
 rm -rf ~/.azure/AzureArcCharts
-az extension add --name connected8s
+az extension add --name connectedk8ss
 az extension add --name k8s-configuration
 
 echo "Log in to Azure using service principal"
@@ -42,4 +42,4 @@ az login --service-principal --username $servicePrincipalAppId --password $servi
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
 echo "Connecting the cluster to Azure Arc"
-az connected8s connect --name $arcClusterName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_azure_arc_k8s'
+az connectedk8ss connect --name $arcClusterName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_azure_arc_k8s'
