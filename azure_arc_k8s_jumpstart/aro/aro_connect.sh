@@ -104,15 +104,15 @@ else
 fi
 
 echo "==============================================================================================================================================================="
-echo "Checking to see if connectedk8ss AZ extension is installed."
-if [ -z "$($az extension list --query '[].path' -o tsv | grep connectedk8ss)" ]; then
-    echo "The Azure CLI extension for connectedk8ss has not been installed."
+echo "Checking to see if connectedk8s AZ extension is installed."
+if [ -z "$($az extension list --query '[].path' -o tsv | grep connectedk8s)" ]; then
+    echo "The Azure CLI extension for connectedk8s has not been installed."
     echo -n "I will attempt to register the extension now (this may take a few minutes)..."
-    $az extension add --name connectedk8ss >/dev/null
+    $az extension add --name connectedk8s >/dev/null
     echo "done."
     echo -n "Verifying the Azure CLI extension exists..."
-    if [ -z "$($az extension list --query '[].path' -o tsv | grep connectedk8ss)" ]; then
-        echo "error! Unable to add the Azure CLI extension for connectedk8ss. Please remediate this."
+    if [ -z "$($az extension list --query '[].path' -o tsv | grep connectedk8s)" ]; then
+        echo "error! Unable to add the Azure CLI extension for connectedk8s. Please remediate this."
         exit 1
     fi
     echo "done."
@@ -220,7 +220,7 @@ echo "==========================================================================
 oc login $apiServer -u $adminUser -p $adminPassword
 echo "==============================================================================================================================================================="
 
-if [ ! "$($az connectedk8ss show -g "$RESOURCEGROUP" -n "$ARC" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
+if [ ! "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
     # Create a Service Principal
     sleep 30s
     echo "==============================================================================================================================================================="
@@ -253,7 +253,7 @@ if [ ! "$($az connectedk8ss show -g "$RESOURCEGROUP" -n "$ARC" --query provision
     # Connect ARO to Arc
     echo "==============================================================================================================================================================="
     echo "Lets connect the Red Hat Openshift Cluster to Arc for Kubernetes"
-    $az connectedk8ss connect -n $ARC -g $RESOURCEGROUP
+    $az connectedk8s connect -n $ARC -g $RESOURCEGROUP
     $az group update -n $RESOURCEGROUP --tag currentStatus=ArcConnected fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
     sleep 60s
     echo "done"
@@ -279,7 +279,7 @@ echo "To delete the Service Principal execute the following command:"
 echo "az ad sp delete --id $appId"
 
 # Set the container to not keep restarting
-if [ "$($az connectedk8ss show -g "$RESOURCEGROUP" -n "$ARC" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
+if [ "$($az connectedk8s show -g "$RESOURCEGROUP" -n "$ARC" --query provisioningState -o tsv 2>/dev/null)" = "Succeeded" ]; then
     echo "==============================================================================================================================================================="
     echo "Terminating the container since all resources are deployed:"
     echo "done."
