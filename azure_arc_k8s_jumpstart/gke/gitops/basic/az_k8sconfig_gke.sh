@@ -29,7 +29,7 @@ sudo tee /etc/apt/sources.list.d/azure-cli.list
 sudo apt-get update
 sudo apt-get install azure-cli
 
-az extension add --name connectedk8s
+az extension add --name connected8s
 az extension add --name k8s-configuration
 
 # Login to Azure
