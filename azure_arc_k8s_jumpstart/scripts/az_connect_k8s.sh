@@ -19,7 +19,7 @@ sudo snap install helm --classic
 echo "Installing Azure CLI & Azure Arc Extensions"
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-sudo az extension add --name connectedk8ss
+sudo az extension add --name connectedk8s
 sudo az extension add --name k8s-configuration
 
 echo "Log in to Azure using service principal"
@@ -39,4 +39,4 @@ sudo chmod +x az.sh
 sudo rm az.sh
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8ss connect --name $arcClusterName --resource-group $resourceGroup
+az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup
