@@ -20,7 +20,7 @@ sudo snap install helm --classic
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-sudo az extension add --name connected8s
+sudo az extension add --name connectedk8ss
 sudo az extension add --name k8s-configuration
 
 sudo az login --service-principal --username $appId --password $password --tenant $tenantId
@@ -40,4 +40,4 @@ sudo rm az.sh
 
 # Onboard the cluster to Azure Arc
 resourceGroup=$(az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
-az connected8s connect --name $vmName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
+az connectedk8ss connect --name $vmName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
