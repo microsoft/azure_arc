@@ -71,7 +71,7 @@ rm -rf ~/.azure/AzureArcCharts
 echo "Checking if you have up-to-date Azure Arc AZ CLI 'connectedk8s' extension..."
 az extension show --name "connectedk8s" &> extension_output
 if cat extension_output | grep -q "not installed"; then
-az extension add --name "connectedk8ss"
+az extension add --name "connectedk8s"
 rm extension_output
 else
 az extension update --name "connectedk8s"
@@ -90,4 +90,4 @@ rm extension_output
 fi
 echo ""
 
-az connectedk8ss connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
+az connectedk8s connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
