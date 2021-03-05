@@ -31,10 +31,10 @@ sudo tee /etc/apt/sources.list.d/azure-cli.list
 sudo apt-get update
 sudo apt-get install azure-cli
 
-az extension remove --name connectedk8ss
+az extension remove --name connectedk8s
 az extension remove --name k8s-configuration
 rm -rf ~/.azure/AzureArcCharts
-az extension add --name connectedk8ss
+az extension add --name connectedk8s
 az extension add --name k8s-configuration
 
 echo "Log in to Azure using service principal"
