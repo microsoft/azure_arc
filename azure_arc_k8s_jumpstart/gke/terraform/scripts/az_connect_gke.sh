@@ -42,4 +42,4 @@ az login --service-principal --username $servicePrincipalAppId --password $servi
 az group create --location $location --name $resourceGroup --subscription $subscriptionId
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8ss connect --name $arcClusterName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_azure_arc_k8s'
+az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_azure_arc_k8s'
