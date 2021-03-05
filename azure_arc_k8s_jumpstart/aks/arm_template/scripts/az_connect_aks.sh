@@ -17,13 +17,13 @@ az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --
 rm -rf ~/.azure/AzureArcCharts
 
 # Installing Azure Arc k8s CLI extensions
-echo "Checking if you have up-to-date Azure Arc AZ CLI 'connectedk8' extension..."
-az extension show --name "connectedk8" &> extension_output
+echo "Checking if you have up-to-date Azure Arc AZ CLI 'connected8' extension..."
+az extension show --name "connected8" &> extension_output
 if cat extension_output | grep -q "not installed"; then
-az extension add --name "connectedk8s"
+az extension add --name "connected8s"
 rm extension_output
 else
-az extension update --name "connectedk8"
+az extension update --name "connected8"
 rm extension_output
 fi
 echo ""
@@ -40,4 +40,4 @@ fi
 echo ""
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8s connect --name $arcClusterName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
+az connected8s connect --name $arcClusterName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
