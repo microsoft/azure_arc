@@ -259,6 +259,8 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
 * Since the data controller was deployed in "Directly Connected" mode, after the logon script run is completed a new Azure resource for the controller will be created and visible in the Azure Portal.
 
+  > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
+
     ![Data Controller in a resource group](./36.png)
 
     ![Data Controller resource](./37.png)
