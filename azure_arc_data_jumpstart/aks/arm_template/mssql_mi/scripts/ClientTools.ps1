@@ -113,7 +113,7 @@ azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $file = "C:\tmp\sql_instance_list.txt"
 (Get-Content $file | Select-Object -Skip 2) | Set-Content $file
 $string = Get-Content $file
-$string.Substring(0, $s.IndexOf(',')) | Set-Content $file
+$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
 $sql = Get-Content $file
 
 (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path "C:\tmp\settings_template.json"
