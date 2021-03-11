@@ -107,7 +107,9 @@ $sql_connectivity = @'
 Start-Transcript "C:\tmp\sql_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
-# Creating Azure Data Studio settings for SQL Managed Instance connection
+New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
+New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
+
 Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
 azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $file = "C:\tmp\sql_instance_list.txt"
