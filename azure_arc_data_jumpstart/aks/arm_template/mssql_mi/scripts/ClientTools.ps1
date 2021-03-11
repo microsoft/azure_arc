@@ -105,12 +105,15 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 $sql_connectivity = @'
 
 Start-Transcript "C:\tmp\sql_connectivity.log"
+$ErrorActionPreference = 'SilentlyContinue'
+
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
 Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
+Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\tmp\settings_backup.json" -Recurse -Force -ErrorAction Continue
 azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $file = "C:\tmp\sql_instance_list.txt"
 (Get-Content $file | Select-Object -Skip 2) | Set-Content $file
@@ -139,6 +142,7 @@ Stop-Transcript
 # Creating PowerShell Logon Script
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
+$ErrorActionPreference = 'SilentlyContinue'
 
 $azurePassword = ConvertTo-SecureString $env:SPN_CLIENT_SECRET -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:SPN_CLIENT_ID , $azurePassword)
