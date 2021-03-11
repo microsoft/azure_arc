@@ -15,11 +15,14 @@ Write-Host "Log in to Azure with Service Principal & Getting AKS credentials (ku
 az login --service-principal --username $appId --password $password --tenant $tenant
 az account set --subscription $subscriptionId
 
+#Configure Extension install
+az config set extension.use_dynamic_install=yes_without_prompt
+
 #Get AKS on Azure Stack HCI cluster credentials
 Get-AksHciCredential -Name $ClusterName 
 
 # Create a namespace for your ingress resources
-kubectl create namespace hello-arc
+
 
 # Helm Install 
 
