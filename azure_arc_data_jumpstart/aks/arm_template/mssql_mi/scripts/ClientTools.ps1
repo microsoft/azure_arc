@@ -113,7 +113,7 @@ New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cl
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
 Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
-Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\tmp\settings_backup.json" -Recurse -Force -ErrorAction Continue
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
 azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $file = "C:\tmp\sql_instance_list.txt"
 (Get-Content $file | Select-Object -Skip 2) | Set-Content $file
