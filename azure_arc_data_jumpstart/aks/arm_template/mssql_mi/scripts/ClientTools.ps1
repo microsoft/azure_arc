@@ -104,8 +104,8 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 # Creating PowerShell sql_connectivity Script
 $sql_connectivity = @'
 
-Start-Transcript "C:\tmp\sql_connectivity.log"
-$ErrorActionPreference = 'SilentlyContinue'
+# Start-Transcript "C:\tmp\sql_connectivity.log"
+# $ErrorActionPreference = 'SilentlyContinue'
 
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
@@ -127,8 +127,7 @@ Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:admi
 # Cleaning garbage
 Remove-Item "C:\tmp\sql_instance_list.txt" -Force
 
-Stop-Transcript
-
+# Stop-Transcript
 '@ > C:\tmp\sql_connectivity.ps1
 
 # Creating PowerShell Logon Script
@@ -188,7 +187,7 @@ azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-
 azdata arc sql mi list
 
 # Creating MSSQL Instance connectivity details
-Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyle Hidden
+& "C:\tmp\sql_connectivity.ps1"
 
 Start-Sleep -s 3
 
