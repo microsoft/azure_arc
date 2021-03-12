@@ -101,39 +101,85 @@ ClientTools_02 | Format-Table
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# # Creating PowerShell sql_connectivity Script
-# $sql_connectivity = @'
+# Creating PowerShell sql_connectivity Script
+$sql_connectivity = @'
 
-# # Start-Transcript "C:\tmp\sql_connectivity.log"
-# # $ErrorActionPreference = 'SilentlyContinue'
+Start-Transcript "C:\tmp\sql_connectivity.log"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
-# New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Start-Transcript "C:\tmp\sql_connectivity.log"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
-# Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
-# Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
-# azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-# $file = "C:\tmp\sql_instance_list.txt"
-# (Get-Content $file | Select-Object -Skip 2) | Set-Content $file
-# $string = Get-Content $file
-# $string.Substring(0, $string.IndexOf(',')) | Set-Content $file
-# $sql = Get-Content $file
+# Retreving SQL Managed Instance IP
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
+$lines = Get-Content "C:\tmp\sql_instance_list.txt"
+$first = $lines[0]
+$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
+$lines = Get-Content "C:\tmp\sql_instance_list.txt"
+$first = $lines[0]
+$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
+$s = Get-Content "C:\tmp\sql_instance_list.txt"
+$s.Substring(0, $s.LastIndexOf(':')) | Out-File "C:\tmp\sql_instance_list.txt"
+$s = Get-Content "C:\tmp\sql_instance_list.txt"
+$s.Split(' ')[-1] | Out-File -FilePath "C:\tmp\merge.txt" -Encoding ascii -NoNewline
 
-# (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path "C:\tmp\settings_template.json"
-# (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path "C:\tmp\settings_template.json"
-# (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
-# (Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
-# Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
+# Retreving SQL Managed Instance FQDN
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
+$lines = Get-Content "C:\tmp\sql_instance_list.txt"
+$first = $lines[0]
+$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
+$lines = Get-Content "C:\tmp\sql_instance_list.txt"
+$first = $lines[0]
+$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
+$s = Get-Content "C:\tmp\sql_instance_list.txt"
+$s.Substring(0, $s.IndexOf(' ')) | Out-File "C:\tmp\sql_instance_list.txt"
+$s = Get-Content "C:\tmp\sql_instance_list.txt"
+Add-Content -Path "C:\tmp\merge.txt" -Value ("   ",$s) -Encoding ascii -NoNewline
 
-# # Cleaning garbage
-# Remove-Item "C:\tmp\sql_instance_list.txt" -Force
+# Adding SQL Instance FQDN & IP to Hosts file
+Copy-Item -Path "C:\Windows\System32\drivers\etc\hosts" -Destination "C:\tmp\hosts_backup" -Recurse -Force -ErrorAction Continue
+$s = Get-Content "C:\tmp\merge.txt"
+Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
-# # Stop-Transcript
-# '@ > C:\tmp\sql_connectivity.ps1
+# Retreving SQL Managed Instance FQDN & Port
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
+$lines = Get-Content "C:\tmp\sql_instance_list.txt"
+$first = $lines[0]
+$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
+$lines = Get-Content "C:\tmp\sql_instance_list.txt"
+$first = $lines[0]
+$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
+$s = Get-Content "C:\tmp\sql_instance_list.txt"
+$s.Substring(0, $s.LastIndexOf(':')) | Out-File "C:\tmp\sql_instance_list.txt"
+$s = Get-Content "C:\tmp\sql_instance_list.txt"
+$s.Split(' ')[-1] | Out-File -FilePath "C:\tmp\sql_instance_settings.txt" -Encoding ascii -NoNewline
+
+# Creating Azure Data Studio settings for SQL Managed Instance connection
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
+$s = Get-Content "C:\tmp\sql_instance_settings.txt"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$s | Set-Content -Path "C:\tmp\settings_template.json"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path "C:\tmp\settings_template.json"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
+(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
+
+# Cleaning garbage
+Remove-Item "C:\tmp\sql_instance_settings.txt" -Force
+Remove-Item "C:\tmp\sql_instance_list.txt" -Force
+Remove-Item "C:\tmp\merge.txt" -Force
+
+# Downloading demo database
+$podname = "$env:MSSQL_MI_NAME" + "-0"
+kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
+kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
+
+Stop-Transcript
+
+'@ > C:\tmp\sql_connectivity.ps1
 
 # Creating PowerShell Logon Script
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
-$ErrorActionPreference = 'SilentlyContinue'
 
 $azurePassword = ConvertTo-SecureString $env:SPN_CLIENT_SECRET -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:SPN_CLIENT_ID , $azurePassword)
@@ -187,32 +233,7 @@ azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-
 azdata arc sql mi list
 
 # Creating MSSQL Instance connectivity details
-# & "C:\tmp\sql_connectivity.ps1"
-
-New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-
-Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
-azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-$file = "C:\tmp\sql_instance_list.txt"
-(Get-Content $file | Select-Object -Skip 2) | Set-Content $file
-$string = Get-Content $file
-$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
-$sql = Get-Content $file
-
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
-
-# Cleaning garbage
-Remove-Item "C:\tmp\sql_instance_list.txt" -Force
-
-# Downloading demo database
-$podname = "$env:MSSQL_MI_NAME" + "-0"
-kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
-kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
+Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyle Hidden -Wait
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
