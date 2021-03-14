@@ -76,9 +76,9 @@ workflow ClientTools_01
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\MSSQL_MI_Cleanup.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\MSSQL_MI_Deploy.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/settings_template.json" -OutFile "C:\tmp\settings_template.json"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/sqlmi/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\MSSQL_MI_Cleanup.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/sqlmi/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\MSSQL_MI_Deploy.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/sqlmi/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/settings_template.json" -OutFile "C:\tmp\settings_template.json"
                 }
         }
 
@@ -104,35 +104,35 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 # Creating PowerShell sql_connectivity Script
 $sql_connectivity = @'
 
-#Start-Transcript "C:\tmp\sql_connectivity.log"
-#Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-#New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-#Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings_template.json" -Recurse -Force -ErrorAction Continue
-#$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings_template.json"
+Start-Transcript "C:\tmp\sql_connectivity.log"
+Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings_template.json" -Recurse -Force -ErrorAction Continue
+$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings_template.json"
 
-#azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-#$file = "C:\tmp\sql_instance_list.txt"
-#(Get-Content $file | Select-Object -Skip 2) | Set-Content $file
-#$string = Get-Content $file
-#$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
-#$sql = Get-Content $file
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
+$file = "C:\tmp\sql_instance_list.txt"
+(Get-Content $file | Select-Object -Skip 2) | Set-Content $file
+$string = Get-Content $file
+$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
+$sql = Get-Content $file
 
-#(Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
-#(Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
-#(Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
-#(Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
-#Copy-Item -Path $settingsFile -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
+(Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
+Copy-Item -Path $settingsFile -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
-# Cleaning garbage
-#Remove-Item "C:\tmp\sql_instance_list.txt" -Force
-#Remove-Item $settingsFile -Force
+Write-Host "Cleaning garbage"
+Remove-Item "C:\tmp\sql_instance_list.txt" -Force
+Remove-Item $settingsFile -Force
 
 # Downloading demo database
-$podname = "$env:MSSQL_MI_NAME" + "-0"
-kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
-kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
+#$podname = "$env:MSSQL_MI_NAME" + "-0"
+#kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
+#kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
 
-#Stop-Transcript
+Stop-Transcript
 
 '@ > C:\tmp\sql_connectivity.ps1
 
@@ -169,7 +169,7 @@ $Shortcut.Save()
 
 # Deploying Azure Arc Data Controller
 start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; sleep 5; clear }}
-azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
+azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom --force
 if(($env:DOCKER_REGISTRY -ne $NULL) -or ($env:DOCKER_REGISTRY -ne ""))
 {
     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.registry=$env:DOCKER_REGISTRY"
@@ -190,13 +190,29 @@ azdata login --namespace $env:ARC_DC_NAME
 azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-premium --storage-class-logs managed-premium
 
 azdata arc sql mi list
+Start-Sleep -Seconds 30
 
 # Creating MSSQL Instance connectivity details
 Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyle Hidden -Wait
 
-Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
+# Restoring demo database
+Write-Host "Restoring demo database"
+Invoke-Command -ComputerName localhost -ScriptBlock{  
+$podname = "$env:MSSQL_MI_NAME" + "-0"
+kubectl exec "$podname" -n "$env:ARC_DC_NAME" -c arc-sqlmi -- ls -la
+kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
+kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
+}
+
+Start-Sleep -Seconds 15
+#Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
 Stop-Transcript
+
+# Starting Azure Data Studio
+Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
+
+Stop-Process -Name powershell -Force
 
 # Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
