@@ -107,63 +107,24 @@ $sql_connectivity = @'
 Start-Transcript "C:\tmp\sql_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
-# Retreving SQL Managed Instance IP
+Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-$lines = Get-Content "C:\tmp\sql_instance_list.txt"
-$first = $lines[0]
-$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
-$lines = Get-Content "C:\tmp\sql_instance_list.txt"
-$first = $lines[0]
-$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
-$s = Get-Content "C:\tmp\sql_instance_list.txt"
-$s.Substring(0, $s.LastIndexOf(':')) | Out-File "C:\tmp\sql_instance_list.txt"
-$s = Get-Content "C:\tmp\sql_instance_list.txt"
-$s.Split(' ')[-1] | Out-File -FilePath "C:\tmp\merge.txt" -Encoding ascii -NoNewline
+$file = "C:\tmp\sql_instance_list.txt"
+(Get-Content $file | Select-Object -Skip 2) | Set-Content $file
+$string = Get-Content $file
+$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
+$sql = Get-Content $file
 
-# Retreving SQL Managed Instance FQDN
-azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-$lines = Get-Content "C:\tmp\sql_instance_list.txt"
-$first = $lines[0]
-$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
-$lines = Get-Content "C:\tmp\sql_instance_list.txt"
-$first = $lines[0]
-$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
-$s = Get-Content "C:\tmp\sql_instance_list.txt"
-$s.Substring(0, $s.IndexOf(' ')) | Out-File "C:\tmp\sql_instance_list.txt"
-$s = Get-Content "C:\tmp\sql_instance_list.txt"
-Add-Content -Path "C:\tmp\merge.txt" -Value ("   ",$s) -Encoding ascii -NoNewline
-
-# Adding SQL Instance FQDN & IP to Hosts file
-Copy-Item -Path "C:\Windows\System32\drivers\etc\hosts" -Destination "C:\tmp\hosts_backup" -Recurse -Force -ErrorAction Continue
-$s = Get-Content "C:\tmp\merge.txt"
-Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
-
-# Retreving SQL Managed Instance FQDN & Port
-azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-$lines = Get-Content "C:\tmp\sql_instance_list.txt"
-$first = $lines[0]
-$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
-$lines = Get-Content "C:\tmp\sql_instance_list.txt"
-$first = $lines[0]
-$lines | where { $_ -ne $first } | Out-File "C:\tmp\sql_instance_list.txt"
-$s = Get-Content "C:\tmp\sql_instance_list.txt"
-$s.Substring(0, $s.LastIndexOf(':')) | Out-File "C:\tmp\sql_instance_list.txt"
-$s = Get-Content "C:\tmp\sql_instance_list.txt"
-$s.Split(' ')[-1] | Out-File -FilePath "C:\tmp\sql_instance_settings.txt" -Encoding ascii -NoNewline
-
-# Creating Azure Data Studio settings for SQL Managed Instance connection
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
-$s = Get-Content "C:\tmp\sql_instance_settings.txt"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'arc_sql_mi',$s | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings_template.json"
-(Get-Content -Path "C:\tmp\settings_template.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings_template.json"
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
+(Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
+Copy-Item -Path $settingsFile -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
 
 # Cleaning garbage
-Remove-Item "C:\tmp\sql_instance_settings.txt" -Force
+Write-Host "Cleaning garbage"
 Remove-Item "C:\tmp\sql_instance_list.txt" -Force
-Remove-Item "C:\tmp\merge.txt" -Force
 
 # Downloading demo database
 $podname = "$env:MSSQL_MI_NAME" + "-0"
@@ -230,7 +191,8 @@ azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-
 azdata arc sql mi list
 
 # Creating MSSQL Instance connectivity details
-Start-Process powershell -ArgumentList "C:\tmp\sql_connectivity.ps1" -WindowStyle Hidden -Wait
+# Start-Process powershell -Verb runAs "C:\tmp\sql_connectivity.ps1"
+Start-Process powershell -ArgumentList '-noprofile -file C:\tmp\sql_connectivity.ps1' -verb RunAs
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
