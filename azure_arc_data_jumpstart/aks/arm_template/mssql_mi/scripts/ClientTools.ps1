@@ -107,9 +107,6 @@ $sql_connectivity = @'
 Start-Transcript "C:\tmp\sql_connectivity.log"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
-Start-Transcript "C:\tmp\sql_connectivity.log"
-New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-
 # Retreving SQL Managed Instance IP
 azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $lines = Get-Content "C:\tmp\sql_instance_list.txt"
