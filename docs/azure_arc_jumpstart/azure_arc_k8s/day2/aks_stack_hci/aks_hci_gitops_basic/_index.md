@@ -54,7 +54,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * Create Azure service principal (SP)
 
-    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command.
+    To be able to complete the scenario and its related automation, an Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below PowerShell command.
 
     ```powershell
     Connect-AzAccount
