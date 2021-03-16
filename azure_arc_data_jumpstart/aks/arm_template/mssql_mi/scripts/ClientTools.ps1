@@ -177,16 +177,16 @@ $string = Get-Content $file
 $string.Substring(0, $string.IndexOf(',')) | Set-Content $file
 $sql = Get-Content $file
 
-(Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
-(Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
-(Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
-(Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
+# (Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
+# (Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
+# (Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
+# (Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
 
-# Cleaning garbage
-Write-Host ""
-Write-Host "Cleaning garbage"
-Write-Host ""
-Remove-Item "C:\tmp\sql_instance_list.txt" -Force
+# # Cleaning garbage
+# Write-Host ""
+# Write-Host "Cleaning garbage"
+# Write-Host ""
+# Remove-Item "C:\tmp\sql_instance_list.txt" -Force
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
