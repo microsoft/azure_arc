@@ -13,7 +13,13 @@ Invoke-WebRequest https://aka.ms/enable-monitoring-powershell-script -OutFile en
 
 Write-Output "Onboarding the Azure Arc enabled Kubernetes cluster to Azure Monitor for containers"
 az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
-microk8s config > config
+
+if(!(Test-Path -path "$env:userprofile/.kube"))  
+{ 
+    New-Item -ItemType directory -Path "$env:userprofile/.kube"
+} 
+
+microk8s config >  "$env:userprofile/.kube/config"
 $env:azureArcClusterResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:arcClusterName --resource-type "Microsoft.Kubernetes/connectedClusters" --query id -o tsv)
 $env:kubeContext = kubectl config current-context
 
