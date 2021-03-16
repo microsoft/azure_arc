@@ -160,32 +160,33 @@ Write-Host "Waiting for all pods to be completely ready for work"
 
 $podname = "$env:MSSQL_MI_NAME" + "-0"
 Start-Sleep -Seconds 220
+Write-Host "Ready to go!"
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
 Start-Sleep -Seconds 5
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
 
-# Creating Azure Data Studio settings for SQL Managed Instance connection
-# Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
-# New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-# Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-# $settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-# azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-# $file = "C:\tmp\sql_instance_list.txt"
-# (Get-Content $file | Select-Object -Skip 2) | Set-Content $file
-# $string = Get-Content $file
-# $string.Substring(0, $string.IndexOf(',')) | Set-Content $file
-# $sql = Get-Content $file
+Write-Host ""
+Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
+$file = "C:\tmp\sql_instance_list.txt"
+(Get-Content $file | Select-Object -Skip 2) | Set-Content $file
+$string = Get-Content $file
+$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
+$sql = Get-Content $file
 
-# (Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
-# (Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
-# (Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
-# (Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
 
-# # Cleaning garbage
-# Write-Host ""
-# Write-Host "Cleaning garbage"
-# Write-Host ""
-# Remove-Item "C:\tmp\sql_instance_list.txt" -Force
+# Cleaning garbage
+Write-Host ""
+Write-Host "Cleaning garbage"
+Write-Host ""
+Remove-Item "C:\tmp\sql_instance_list.txt" -Force
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
