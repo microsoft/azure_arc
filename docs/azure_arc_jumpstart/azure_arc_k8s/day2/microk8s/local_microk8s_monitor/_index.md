@@ -69,6 +69,17 @@ In this guide, you will hook the microK8s cluster to Azure Monitor by deploying 
 
 * Edit the environment variables in either of the scripts to match your environment parameters, run it using the ```. ./microk8s_monitor_onboarding.sh``` (Bash) or ```./microk8s_monitor_onboarding.ps1``` (PowerShell) command.
 
+```shell
+# <--- Change the following environment variables according to your Azure service principal name --->
+echo "Exporting environment variables"
+export subscriptionId='<Your Azure subscription ID>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
+export tenantId='<Your Azure tenant ID>'
+export resourceGroup='<Azure resource group name>'
+export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
+```
+
     The script will:
 
   * Login to your Azure subscription using the SPN credentials
@@ -88,12 +99,12 @@ In this guide, you will hook the microK8s cluster to Azure Monitor by deploying 
 
 * Click the "Connected Clusters" tab and see the Azure Arc connected cluster was added. Now that your cluster is being monitored, navigate trough the different tabs and sections and watch the monitoring telemetry for the cluster nodes and pods.  
 
-    ![Agent install on the cluster](./5.png)
+    ![Agent install on the cluster](./05.png)
 
-    ![New Azure Monitor telemetry](./6.png)
+    ![New Azure Monitor telemetry](./06.png)
 
-    ![New Azure Monitor telemetry](./7.png)
+    ![New Azure Monitor telemetry](./07.png)
 
-    ![New Azure Monitor telemetry](./8.png)
+    ![New Azure Monitor telemetry](./08.png)
 
-    ![New Azure Monitor telemetry](./9.png)
+    ![New Azure Monitor telemetry](./09.png)
