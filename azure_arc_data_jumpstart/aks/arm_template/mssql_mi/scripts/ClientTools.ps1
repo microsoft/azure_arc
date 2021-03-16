@@ -47,7 +47,7 @@ workflow ClientTools_01
         {
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140'
             #Run commands in parallel.
-            Parallel 
+            Parallel
                 {
                     InlineScript {
                         param (
@@ -62,17 +62,17 @@ workflow ClientTools_01
                                 iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
                             }
                         }
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-                            Write-Host "Chocolatey Apps Specified"  
-                            
+                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){
+                            Write-Host "Chocolatey Apps Specified"
+
                             $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
-                        
+
                             foreach ($app in $appsToInstall)
                             {
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
-                        }                        
+                        }
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi"
@@ -95,8 +95,8 @@ workflow ClientTools_02
                 }
             }
         }
-        
-ClientTools_02 | Format-Table 
+
+ClientTools_02 | Format-Table
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
@@ -159,13 +159,11 @@ azdata arc sql mi list
 Write-Host "Waiting for all pods to be completely ready for work"
 $podname = "$env:MSSQL_MI_NAME" + "-0"
 
-Start-Sleep -Seconds 300
-Write-Host "Testing Done"
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
 Start-Sleep -Seconds 5
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
 
-# # Creating Azure Data Studio settings for SQL Managed Instance connectio
+# Creating Azure Data Studio settings for SQL Managed Instance connection
 # Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
 # New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 # Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
