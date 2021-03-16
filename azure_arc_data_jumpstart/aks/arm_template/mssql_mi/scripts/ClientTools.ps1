@@ -157,8 +157,9 @@ azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-
 azdata arc sql mi list
 
 Write-Host "Waiting for all pods to be completely ready for work"
-$podname = "$env:MSSQL_MI_NAME" + "-0"
 
+$podname = "$env:MSSQL_MI_NAME" + "-0"
+Start-Sleep -Seconds 220
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
 Start-Sleep -Seconds 5
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
