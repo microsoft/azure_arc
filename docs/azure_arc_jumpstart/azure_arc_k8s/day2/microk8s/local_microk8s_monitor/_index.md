@@ -80,14 +80,14 @@ export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 ```
 
-    The script will:
+The script will:
 
-  * Login to your Azure subscription using the SPN credentials
-  * Download the OMS script
-  * Retrieve the Azure Arc Connected Cluster Azure Resource ID as well as the cluster credentials (KUBECONFIG)
-  * Retrieve the Kube config using the `microk8s config` command and append the configuration to ~/.kube/config
-  * Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
-  * Delete the downloaded script
+* Login to your Azure subscription using the SPN credentials
+* Download the OMS script
+* Retrieve the Azure Arc Connected Cluster Azure Resource ID as well as the cluster credentials (KUBECONFIG)
+* Retrieve the Kube config using the `microk8s config` command and append the configuration to ~/.kube/config
+* Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
+* Delete the downloaded script
 
 * Once the script will complete it's run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers. At the end of it's run, the script generates URL for you to click on. This URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
 
