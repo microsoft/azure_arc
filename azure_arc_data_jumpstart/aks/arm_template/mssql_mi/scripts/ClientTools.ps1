@@ -157,27 +157,27 @@ azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-
 azdata arc sql mi list
 
 # Creating Azure Data Studio settings for SQL Managed Instance connectio
-#Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
-#New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-#Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-#$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-#azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-#$file = "C:\tmp\sql_instance_list.txt"
-#(Get-Content $file | Select-Object -Skip 2) | Set-Content $file
-#$string = Get-Content $file
-#$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
-#$sql = Get-Content $file
+Write-Output "Creating Azure Data Studio settings for SQL Managed Instance connection"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
+$file = "C:\tmp\sql_instance_list.txt"
+(Get-Content $file | Select-Object -Skip 2) | Set-Content $file
+$string = Get-Content $file
+$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
+$sql = Get-Content $file
 
-#(Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
-#(Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
-#(Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
-#(Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile -Raw) -replace 'false','true' | Set-Content -Path $settingsFile
 
 # Cleaning garbage
-#Write-Host ""
-#Write-Host "Cleaning garbage"
-#Write-Host ""
-#Remove-Item "C:\tmp\sql_instance_list.txt" -Force
+Write-Host ""
+Write-Host "Cleaning garbage"
+Write-Host ""
+Remove-Item "C:\tmp\sql_instance_list.txt" -Force
 
 Write-Host "Waiting for all pods to be completely ready for work"
 $podname = "$env:MSSQL_MI_NAME" + "-0"
@@ -194,7 +194,7 @@ Stop-Transcript
 
 # Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
-#Stop-Process -Name powershell -Force
+Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
 
 # Creating LogonScript Windows Scheduled Task
