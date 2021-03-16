@@ -82,18 +82,18 @@ In this guide, you will hook the microK8s cluster to Azure Monitor by deploying 
 
     > **Note: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
-    ![Installing the OMS agent on the cluster](./08.png)
+    ![Installing the OMS agent on the cluster](./03.png)
 
-    ![Installing the OMS agent on the cluster](./09.png)
+    ![Installing the OMS agent on the cluster](./04.png)
 
 * Click the "Connected Clusters" tab and see the Azure Arc connected cluster was added. Now that your cluster is being monitored, navigate trough the different tabs and sections and watch the monitoring telemetry for the cluster nodes and pods.  
 
-    ![Agent install on the cluster](./10.png)
+    ![Agent install on the cluster](./5.png)
 
-    ![New Azure Monitor telemetry](./11.png)
+    ![New Azure Monitor telemetry](./6.png)
 
-    ![New Azure Monitor telemetry](./12.png)
+    ![New Azure Monitor telemetry](./7.png)
 
-    ![New Azure Monitor telemetry](./13.png)
+    ![New Azure Monitor telemetry](./8.png)
 
-    ![New Azure Monitor telemetry](./14.png)
+    ![New Azure Monitor telemetry](./9.png)
