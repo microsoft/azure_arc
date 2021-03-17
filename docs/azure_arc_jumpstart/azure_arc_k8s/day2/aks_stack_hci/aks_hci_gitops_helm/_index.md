@@ -24,7 +24,7 @@ By doing so, you will be able to make real-time changes to the application and s
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* Fork/Clone the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
+* Fork the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
