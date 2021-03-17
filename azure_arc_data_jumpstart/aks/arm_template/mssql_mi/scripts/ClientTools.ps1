@@ -156,10 +156,11 @@ azdata arc sql mi create --name $env:MSSQL_MI_NAME --storage-class-data managed-
 
 azdata arc sql mi list
 
-Write-Host "Waiting for all pods to be completely ready for work"
+# Restoring demo database and configuring Azure Data Studio
+Write-Host "Waiting for 5min for all pods to be completely ready for work"
 
 $podname = "$env:MSSQL_MI_NAME" + "-0"
-Start-Sleep -Seconds 220
+Start-Sleep -Seconds 300
 Write-Host "Ready to go!"
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
 Start-Sleep -Seconds 5
