@@ -159,7 +159,7 @@ azdata arc sql mi list
 Write-Host "Waiting for all pods to be completely ready for work"
 
 $podname = "$env:MSSQL_MI_NAME" + "-0"
-Start-Sleep -Seconds 220
+Start-Sleep -Seconds 180
 Write-Host "Ready to go!"
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
 Start-Sleep -Seconds 5
@@ -181,12 +181,6 @@ $sql = Get-Content $file
 (Get-Content -Path $settingsFile) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'false','true' | Set-Content -Path $settingsFile
-
-# # Cleaning garbage
-# Write-Host ""
-# Write-Host "Cleaning garbage"
-# Write-Host ""
-# Remove-Item "C:\tmp\sql_instance_list.txt" -Force
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$false
 
