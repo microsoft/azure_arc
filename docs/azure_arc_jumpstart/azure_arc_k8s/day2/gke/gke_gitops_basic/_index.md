@@ -22,7 +22,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* Clone the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
+* Fork the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
