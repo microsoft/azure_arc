@@ -40,14 +40,13 @@ az login --service-principal --username $appId --password $password --tenant $te
 kubectl create namespace hello-arc
 
 # Add the official stable repo
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo add nginx-stable https://helm.nginx.com/stable
+helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
-helm install nginx stable/nginx-ingress \
+helm install nginx nginx-stable/nginx-ingress \
     --namespace hello-arc \
-    --set controller.replicaCount=2 \
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+    --set controller.replicaCount=2
 
 az k8s-configuration create \
 --name cluster-config \
