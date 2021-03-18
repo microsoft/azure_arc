@@ -89,8 +89,8 @@ The script will:
 * Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
 * Delete the downloaded script
 
-* Once the script will complete it's run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers. 
-At the end of it's run, the script will generate a URL for you to click on, this URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
+* Once the script will complete its run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers. 
+At the end of its run, the script will generate a URL for you to click on, this URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
 
     > **Note: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
