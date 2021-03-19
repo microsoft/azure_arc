@@ -185,7 +185,9 @@ There are many ways for you to emphasize a specific text in your scenario README
 
 ## Naming convention and branding
 
-The Jumpstart scenarios include many tech terms, brand names, and various naming conventions. For example, how a company name, a product, or a feature are written down is important. The project maintainers are keeping the naming convention list which can be found [here](https://github.com/microsoft/azure_arc/tree/main/docs/scenario_guidelines/naming.md).
+The Jumpstart scenarios include many tech terms, brand names, and various naming conventions. For example, how a company name, a product, or a feature are written down is important. 
+
+The project maintainers are keeping the naming convention list which can be found [here](https://github.com/microsoft/azure_arc/tree/main/docs/scenario_guidelines/naming.md).
 
 ## Examples
 
