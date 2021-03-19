@@ -2,7 +2,7 @@
 type: docs
 title: "Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster"
 linkTitle: "Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster"
-weight: 1
+weight: 2
 description: >
 ---
 
@@ -90,11 +90,11 @@ The script will:
 * Once the script will complete its run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers.
 At the end of its run, the script will generate a URL for you to click on, this URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
 
-    > **Note: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
+  > **Note: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
-    ![Installing the OMS agent on the cluster](./03.png)
+  ![Installing the OMS agent on the cluster](./03.png)
 
-    ![Installing the OMS agent on the cluster](./04.png)
+  ![Installing the OMS agent on the cluster](./04.png)
 
 * Click the "Connected Clusters" tab and see the Azure Arc connected cluster was added. Now that your cluster is being monitored, navigate trough the different tabs and sections and watch the monitoring telemetry for the cluster nodes and pods.  
 
