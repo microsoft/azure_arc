@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster"
-linkTitle: "Integrate Azure Monitor for Containers with AKS as an Azure Arc Connected Cluster"
+title: "Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster"
+linkTitle: "Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster"
 weight: 2
 description: >
 ---
@@ -70,14 +70,12 @@ In this guide, you will hook the microK8s cluster to Azure Monitor by deploying 
 * Edit the environment variables in either of the scripts to match your environment parameters, run it using the ```. ./microk8s_monitor_onboarding.sh``` (Bash) or ```./microk8s_monitor_onboarding.ps1``` (PowerShell) command.
 
 ```shell
-# <--- Change the following environment variables according to your Azure service principal name --->
-echo "Exporting environment variables"
-export subscriptionId='<Your Azure subscription ID>'
-export appId='<Your Azure service principal name>'
-export password='<Your Azure service principal password>'
-export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure resource group name>'
-export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
+export subscriptionId='e73c1dbe-XXXX-XXXX-XXXX-c813757b1786'
+export appId='051b9a58-XXXX-XXXX-XXXX-0e7ae1bca3fb'
+export password='051b9a58-XXXX-XXXX-XXXX-0e7ae1bca3fb'
+export tenantId='051b9a58-XXXX-XXXX-XXXX-0e7ae1bca3fb'
+export resourceGroup='Arc-MicroK8s-Demo'
+export arcClusterName='Arc-MicroK8s-Demo'
 ```
 
 The script will:
@@ -89,7 +87,7 @@ The script will:
 * Execute the script which will create Azure Log Analytics workspace, deploy the OMS agent on the Kubernetes cluster and tag the cluster
 * Delete the downloaded script
 
-* Once the script will complete its run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers. 
+* Once the script will complete its run, you will have an Azure Arc connected cluster integrated with Azure Monitor for Containers.
 At the end of its run, the script will generate a URL for you to click on, this URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
 
     > **Note: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
