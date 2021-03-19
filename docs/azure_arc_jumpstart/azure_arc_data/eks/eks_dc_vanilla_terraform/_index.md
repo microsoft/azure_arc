@@ -262,6 +262,8 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
 * Initially, since the data controller was deployed in "Directly Connected" mode, only after the logon script run is will be completed, a new Azure resource for the controller will be created as well.
 
+  > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
+
     ![Data Controller in a resource group](./33.png)
 
     ![Data Controller resource](./34.png)

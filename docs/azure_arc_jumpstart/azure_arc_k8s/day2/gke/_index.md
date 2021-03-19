@@ -2,6 +2,6 @@
 type: docs
 title: "GKE"
 linkTitle: "GKE"
-weight: 2
+weight: 3
 description: >-
 ---
