@@ -86,6 +86,12 @@ The only thing you need to do before executing the Terraform plan is to export t
     export TF_VAR_tenant_id=<Your Azure service principal Tenant ID>
     ```
 
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_subscription_id
+    ```
+
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
 
     ![terraform init](./01.png)

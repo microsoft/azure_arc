@@ -169,6 +169,12 @@ The only thing you need to do before executing the Terraform plan is to export t
   export TF_VAR_gke_cluster_node_machine_type='n1-standard-2'
   ```
 
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_gcp_project_id
+    ```
+
 * Run the ```terraform init``` command which will download the required terraform providers.
 
   ![terraform init](./18.png)

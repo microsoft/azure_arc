@@ -170,7 +170,13 @@ Before executing the Terraform plan, you must set the environment variables whic
   export TF_VAR_admin_password='Guest OS Admin Password'
   ```
 
-  > **Note: Do not set the TF_VAR_admin_user variable to "Administrator". GCP Windows images have the administrator account [disabled by default](https://cloud.google.com/compute/docs/images/os-details#windows_server). Therefore, you must use a different username for your TF_VAR_admin_user (e.g., "arcdemo")**
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_gcp_project_id
+    ```
+
+    > **Note: Do not set the TF_VAR_admin_user variable to "Administrator". GCP Windows images have the administrator account [disabled by default](https://cloud.google.com/compute/docs/images/os-details#windows_server). Therefore, you must use a different username for your TF_VAR_admin_user (e.g., "arcdemo")**
 
   ![Screenshot showing exporting environment variables in shell](./19.png)
 
