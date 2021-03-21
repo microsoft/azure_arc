@@ -143,6 +143,12 @@ Before executing the Terraform plan, you must set the environment variables whic
     export TF_VAR_admin_password='Guest OS Admin Password'
     ```
 
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_servicePrincipalAppId
+    ```
+
     > **Note: Use the Terraform plan [*variables.tf*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/vmware/winsrv/terraform/variables.tf) file for more details around VMware vSphere vars structure if needed**
 
     ![Screenshot of environment variables exporting in shell](./01.jpg)

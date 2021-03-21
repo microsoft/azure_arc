@@ -161,6 +161,12 @@ Before executing the Terraform plan, you must set the environment variables whic
 
     ![Export terraform variables](./07.png)
 
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_AWS_ACCESS_KEY_ID
+    ```
+
 * From the folder within your cloned repo where the Terraform binaries are, the below commands to download the needed TF providers and to run the plan.
 
     ```shell

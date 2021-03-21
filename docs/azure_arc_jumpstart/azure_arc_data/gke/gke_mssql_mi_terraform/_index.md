@@ -199,6 +199,12 @@ As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data C
   * *export TF_VAR_ARC_DC_RG*='Azure resource group where all future Azure Arc resources will be deployed'
   * *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
 
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_gcp_project_id
+    ```
+
 * Navigate to the folder that has Terraform binaries.
 
   ```shell
