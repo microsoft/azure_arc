@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Scenario Writeup Guidelines"
-linkTitle: "Scenario Writeup Guidelines"
+title: "Scenario Write-up Guidelines"
+linkTitle: "Scenario Write-up Guidelines"
 weight: 4
 ---
 
