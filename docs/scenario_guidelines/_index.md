@@ -5,7 +5,7 @@ linkTitle: "Scenario Write-up Guidelines"
 weight: 4
 ---
 
-# Jumpstart Scenario Writeup Guidelines
+# Jumpstart Scenario Write-up Guidelines
 
 Thank you for considering writing a Jumpstart scenario, we appreciate it, a lot!
 
