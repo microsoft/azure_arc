@@ -40,8 +40,6 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.14](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* [Create a free Alibaba Cloud account](https://www.alibabacloud.com/)
-
 * [Enable Azure subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes. Login with an identity with sufficient authorizations.
 
   ```shell
@@ -72,6 +70,8 @@ The following README will guide you on how to use the provided [Terraform](https
   ```
 
 ### Create a new Alibaba Cloud access key
+
+* [Sign in to Alibaba Cloud account](https://www.alibabacloud.com/)
 
 * Browse to <https://console.aliyun.com/> and login with your Alibaba Cloud account. Once logged in, create a new access key from your profile. After creating it, be sure to copy down the access and secret key.
 
