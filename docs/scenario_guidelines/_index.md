@@ -70,7 +70,7 @@ The Azure Arc Jumpstart website is using [HUGO](https://gohugo.io/) as its web f
 
 ## Description
 
-All Jumpstart scenarios start with an overview of what the outcome will be after you run the automation. This description should also mention the starting point for the automation, for example for day two scenarios you may need an already deployed server or Kubernetes cluster that is onboarded onto Azure Arc, you should also include pointers to scenarios that would allow you to get to that starting point.
+All Jumpstart scenarios start with an overview of what the outcome will be after you run the automation. This description should also mention the starting point for the automation, for example for "Unified Operations" (day-2) scenarios you may need an already deployed server or Kubernetes cluster that is onboarded onto Azure Arc, you should also include pointers to scenarios that would allow you to get to that starting point.
 
 ## Prerequisites
 
@@ -244,6 +244,6 @@ Incorporating an explanation on how you designed the automation(s) in your scena
 
 * Automation flow section should be accurate and comprehensive but also not too long. Bullet points explaining the flow are ok.
 
-* Automation flow sections follow specific language and format, there are multiple examples for Automation flow  in several scenarios. You can either [take a look at this example](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_dc_vanilla_arm_template/#automation-flow) or search for "Automation Flow" in the Jumpstart homepage.
+* Automation flow sections follow specific language and format, there are multiple examples for Automation flow in several scenarios. You can either [take a look at this example](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_dc_vanilla_arm_template/#automation-flow) or search for "Automation Flow" in the Jumpstart homepage.
 
     ![Screenshot of searching for Automation Flow](./40.png)
