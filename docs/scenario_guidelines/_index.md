@@ -39,25 +39,38 @@ Rather you are working on a new scenario or updating an existing one, a scenario
 
 * As always, we are here for you. In your scenario "Feature request" issue, tag one of the maintainers and we will answer any question you may have.
 
+## Folder Structure
+
+The Azure Arc Jumpstart repository follows a specific folder structure that you should get familiar with before creating a new scenario.
+
+* Automations, scripts, templates, json files, etc. should be placed under each Azure Arc pillar that corresponds to each scenario.
+* The guide for the scenario should be under docs and follow a similar structure.
+
+![Screenshot of folder structure](./03.png)
+
 ## Indexing
 
-The Azure Arc Jumpstart website is using [HUGO](https://gohugo.io/) as its web framework alongside [Docsy](https://www.docsy.dev/) as it theme of choice.
+The Azure Arc Jumpstart website is using [HUGO](https://gohugo.io/) as its web framework alongside [Docsy](https://www.docsy.dev/) as its theme of choice.
 
 * Scenarios must be created in its respected "docs" folder in the project GitHub repository and with the "_index.md_" filename for it to get published.
 
-    ![Screenshot of index file location](./03.png)
+    ![Screenshot of index file location](./04.png)
 
 * Both the "_title_" and the "_linkTitle_" must be the same.
 
-    ![Screenshot of matching link and linkTitle](./04.png)
+    ![Screenshot of matching link and linkTitle](./05.png)
 
-* The "_Weight_" felid number represents the location of the scenario comparing to other scenarios on the same page on the website.
-
-    ![Screenshot of weight numbering](./05.png)
+* The "_Weight_" field number represents the location of the scenario comparing to other scenarios on the same page on the website.
 
     ![Screenshot of weight numbering](./06.png)
 
+    ![Screenshot of weight numbering](./07.png)
+
 * As always, if you are not sure and you have questions about this section, we recommend looking at other published scenarios and/or reaching out to one of the maintainers.
+
+## Description
+
+All Jumpstart scenarios start with an overview of what the outcome will be after you run the automation. This description should also mention the starting point for the automation, for example for "Unified Operations" (day-2) scenarios you may need an already deployed server or Kubernetes cluster that is onboarded onto Azure Arc, you should also include pointers to scenarios that would allow you to get to that starting point.
 
 ## Prerequisites
 
@@ -75,11 +88,11 @@ All the scenarios and README files follow standard markdown and linting rules. A
 
 Before submitting a PR for a new/updated scenario, make sure to perform markdown linting to avoid errors and typos. If you are using VSCode, we recommend installing the [_markdownlint_ extension] as it provides an easy way of performing an efficient MD lint.
 
-![Screenshot of the markdownlint extension](./07.png)
+![Screenshot of the markdownlint extension](./08.png)
 
 Below you can find an example of common markdown lint issues that will be presented to you as you are writing your scenario and should be fixed. [Here](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint), you can find detailed explanations on the markdown rules highlighted by the extension and how to fix a violation of these rules.
 
-![Screenshot of the markdown lint errors](./08.png)
+![Screenshot of the markdown lint errors](./09.png)
 
 ## Screenshots
 
@@ -89,29 +102,33 @@ Quality, accurate and clean screenshots are critical when it comes to providing 
 
 * Screenshots should be saved in either a _png_ or _jpg_ format.
 
+* Images must include an accurate description.
+
 * As you are adding screenshots to your scenario, keep them in a serial order right order as this helps the PR reviewer.
 
-    ![Screenshot of a wrong screenshots order](./09.png)
+    ![Screenshot of a wrong screenshots order](./10.png)
 
-    ![Screenshot of a correct screenshots order](./10.png)
+    ![Screenshot of a correct screenshots order](./11.png)
 
 * Image files must be located alongside the scenario _index.md_ file.
 
-    ![Screenshot of a correct screenshots structure](./11.png)
+    ![Screenshot of a correct screenshots structure](./12.png)
 
 ### Boxes, arrows and step numbers
 
 * Either highlighting boxes and/or arrows should be created in a non-freeform fashion. Choose color and line width that make sense so it will be embedded nicely in the screenshot.
 
-    ![Screenshot of a wrong highlighting and arrow](./12.png)
+    ![Screenshot of a wrong highlighting and arrow](./13.png)
 
-    ![Screenshot of a correct highlighting and arrow](./13.png)
+    ![Screenshot of a correct highlighting and arrow](./14.png)
 
 * When creating step numbers, make sure these are positioned correctly and visible to the reader.
 
-    ![Screenshot of wrong step numbers positioning and color](./14.png)
+    ![Screenshot of wrong step numbers positioning and color](./15.png)
 
-    ![Screenshot of correct step numbers positioning and color](./15.png)
+    ![Screenshot of correct step numbers positioning and color](./16.png)
+
+* Be aware of sensitive information on your screenshots and be sure to blur it out: subscription ID, passwords, service principals, etc.
 
 ## Code blocks and commands
 
@@ -121,33 +138,33 @@ As you can see in the below examples, each block is represented differently, dep
 
 * shell + json
 
-    ![Screenshot of a shell+json code block format raw code](./16.png)
+    ![Screenshot of a shell+json code block format raw code](./17.png)
 
-    ![Screenshot of shell+json code block format in the website](./17.png)
+    ![Screenshot of shell+json code block format in the website](./18.png)
 
 * PowerShell
 
-    ![Screenshot of a shell+json code block format raw code](./18.png)
+    ![Screenshot of a shell+json code block format raw code](./19.png)
 
-    ![Screenshot of shell+json code block format in the website](./19.png)
+    ![Screenshot of shell+json code block format in the website](./20.png)
 
 ## Positioning and alignments
 
 ### Image positioning
 
-Images should be positionally aligned with it's respective bulletining or header. This helps with readability and creates a cleaner look. Below is an example of how such alignment looks like in the code and on the website.
+Images should be positionally aligned with its respective bulletining or header. This helps with readability and creates a cleaner look. Below is an example of how such alignment looks like in the code and on the website.
 
-![Screenshot of a correct image positioning in the website](./20.png)
+![Screenshot of a correct image positioning in the website](./21.png)
 
-![Screenshot of a correct image positioning in the code](./21.png)
+![Screenshot of a correct image positioning in the code](./22.png)
 
 ### Code block positioning
 
-Code blocks should be positionally aligned with it's respective bulletining or header. This helps with readability and creates a cleaner look. Below is an example of how such alignment looks like on the website.
+Code blocks should be positionally aligned with its respective bulletining or header. This helps with readability and creates a cleaner look. Below is an example of how such alignment looks like on the website.
 
-![Screenshot of a wrong code block positioning](./22.png)
+![Screenshot of a wrong code block positioning](./23.png)
 
-![Screenshot of a correct code block positioning](./23.png)
+![Screenshot of a correct code block positioning](./24.png)
 
 ## Credentials, secrets and passwords
 
@@ -155,9 +172,9 @@ No need to mention how important secrets and passwords are. As you are writing y
 
 Rather it's a credential that should be included or a secret/password as part of a terminal out, make sure these are mask from the reader.
 
-![Screenshot of unwanted credentials files](./24.png)
+![Screenshot of unwanted credentials files](./25.png)
 
-![Screenshot of masked secrets](./25.png)
+![Screenshot of masked secrets](./26.png)
 
 ## Notes, disclaimers and highlighted text
 
@@ -165,27 +182,27 @@ There are many ways for you to emphasize a specific text in your scenario README
 
 1. To create a note or a disclaimer, below you can find a couple of examples of the format we have been using and how the result would look like on the Jumpstart website.
 
-    ![Screenshot of Note format raw code](./26.png)
+    ![Screenshot of Note format raw code](./27.png)
 
-    ![Screenshot of Note format in the website](./27.png)
+    ![Screenshot of Note format in the website](./28.png)
 
-    ![Screenshot of Disclaimer format raw code](./28.png)
+    ![Screenshot of Disclaimer format raw code](./29.png)
 
-    ![Screenshot of Disclaimer format in the website](./29.png)
+    ![Screenshot of Disclaimer format in the website](./30.png)
 
 2. When you need to either bold or italic a text, use the below markdown characters.
 
-    ![Screenshot of bold text raw code](./30.png)
+    ![Screenshot of bold text raw code](./31.png)
 
-    ![Screenshot of bold text in the website](./31.png)
+    ![Screenshot of bold text in the website](./32.png)
 
-    ![Screenshot of italic text raw code](./32.png)
+    ![Screenshot of italic text raw code](./33.png)
 
-    ![Screenshot of italic text in the website](./33.png)
+    ![Screenshot of italic text in the website](./34.png)
 
 ## Naming convention and branding
 
-The Jumpstart scenarios include many tech terms, brand names, and various naming conventions. For example, how a company name, a product, or a feature are written down is important. 
+The Jumpstart scenarios include many tech terms, brand names, and various naming conventions. For example, how a company name, a product, or a feature are written down is important.
 
 The project maintainers are keeping the naming convention list which can be found [here](https://github.com/microsoft/azure_arc/tree/main/docs/scenario_guidelines/naming.md).
 
@@ -201,7 +218,7 @@ Rather if it's in an example code block, a command, or a screenshot, wherever it
 
 Before submitting your scenario PR, make sure to not include unwanted files such as logs, credentials, state files, scripts testing files, etc. If it's not part of the scenario, it shouldn't be included.
 
-![Screenshot of unwanted file trails](./34.png)
+![Screenshot of unwanted file trails](./35.png)
 
 ## Links
 
@@ -209,15 +226,15 @@ Every scenario includes URLs, either to an external or internal source.
 
 * When you want to point the reader to another Jumpstart scenario, make sure you are using the Jumpstart website URL for it, meaning _azurearcjumpstart.io/other-scenario_ and not the GitHub repository _index.md_ file. You want to provide an experience that does not force the user to go outside the website.
 
-    ![Screenshot of Jumpstart links in the website](./35.png)
+    ![Screenshot of Jumpstart links in the website](./36.png)
 
-    ![Screenshot of Jumpstart links in the code](./36.png)
+    ![Screenshot of Jumpstart links in the code](./37.png)
 
-* When pointing to a script or a various files, use the GitHub repository URL.
+* When pointing to a script or various files, use the GitHub repository URL.
 
-    ![Screenshot of script link in the website](./37.png)
+    ![Screenshot of script link in the website](./38.png)
 
-    ![Screenshot of script link in the code](./38.png)
+    ![Screenshot of script link in the code](./39.png)
 
 ## Automation flows explanation
 
@@ -227,6 +244,6 @@ Incorporating an explanation on how you designed the automation(s) in your scena
 
 * Automation flow section should be accurate and comprehensive but also not too long. Bullet points explaining the flow are ok.
 
-* There are multiple examples for Automation flow sections in several scenarios. You can either [take a look at this example](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_dc_vanilla_arm_template/#automation-flow) or search for "Automation Flow" in the Jumpstart homepage.
+* Automation flow sections follow specific language and format, there are multiple examples for Automation flow in several scenarios. You can either [take a look at this example](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_dc_vanilla_arm_template/#automation-flow) or search for "Automation Flow" in the Jumpstart homepage.
 
-    ![Screenshot of searching for Automation Flow](./39.png)
+    ![Screenshot of searching for Automation Flow](./40.png)
