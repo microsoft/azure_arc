@@ -81,7 +81,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
   ![Alibaba Cloud new access key](./03.png)
 
-* Navigate to product *Container Service - Kubernetes* and **Confirm Cloud Resource Access Authorization**
+* Navigate to product *Container Service - Kubernetes*, activate this service and if demanded **Confirm Cloud Resource Access Authorization**
 
   ![Cloud Resource Access Authorization](./04.png)
 
