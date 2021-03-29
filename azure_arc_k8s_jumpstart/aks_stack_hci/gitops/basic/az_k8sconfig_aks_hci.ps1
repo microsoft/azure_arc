@@ -22,17 +22,18 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Get-AksHciCredential -Name $ClusterName 
 
 # Create a namespace for your ingress resources
-
+kubectl create namespace hello-arc
 
 # Helm Install 
 
 choco install kubernetes-helm
 
 # Add the official stable repo
-helm repo add stable https://charts.helm.sh/stable
+helm repo add nginx-stable https://helm.nginx.com/stable
+helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
-helm install nginx stable/nginx-ingress `
+helm install nginx nginx-stable/nginx-ingress `
     --namespace hello-arc `
     --set controller.replicaCount=2 `
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
