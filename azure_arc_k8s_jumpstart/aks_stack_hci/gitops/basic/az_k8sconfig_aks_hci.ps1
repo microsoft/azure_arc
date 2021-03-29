@@ -22,7 +22,7 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Get-AksHciCredential -Name $ClusterName 
 
 # Create a namespace for your ingress resources
-
+kubectl create namespace hello-arc
 
 # Helm Install 
 
