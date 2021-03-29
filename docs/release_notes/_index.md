@@ -9,6 +9,34 @@ weight: 3
 
 Release notes will be released on the first week of each month and will cover the previous month.
 
+## March 2021
+
+### Jumpstart enhancements
+
+* In this milestone, we released our [Jumpstart Scenario Write-up Guidelines](https://azurearcjumpstart.io/scenario_guidelines/) document to help our community with scenarios contribution.
+
+* [Update the "Feature request" template to include new write-up guidelines #473](https://github.com/microsoft/azure_arc/issues/473)
+
+### Azure Arc enabled Kubernetes scenarios
+
+* [New Scenario: Deploy GitOps configurations and perform basic GitOps flow on AKS on Azure Stack HCI as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks_stack_hci/aks_hci_gitops_basic/)
+
+* [New Scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on AKS on Azure Stack HCI as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks_stack_hci/aks_hci_gitops_helm/)
+
+* [New Scenario: Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks_stack_hci/aks_hci_gitops_helm/)
+
+* [Bug fix: azure-arc-connectproxy-agent-deployment.yaml #429](https://github.com/microsoft/azure_arc/issues/429)
+
+* [Bug fix: GKE cluster Terraform plan - az_connect_gke.sh link #455](https://github.com/microsoft/azure_arc/issues/455)
+
+* [Bug fix: Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster - Fork vs Clone #459](https://github.com/microsoft/azure_arc/issues/459)
+
+* [Bug fix: Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster - Helm Endpoint #460](https://github.com/microsoft/azure_arc/issues/460)
+
+### Azure Arc enabled data services scenarios
+
+* [Bug fix: SQL MI AKS ARM Template #437](https://github.com/microsoft/azure_arc/issues/437)
+
 ## February 2021
 
 ### Azure Arc Jumpstart YouTube channel demos
