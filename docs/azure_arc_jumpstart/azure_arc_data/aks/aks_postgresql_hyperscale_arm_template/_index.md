@@ -6,7 +6,7 @@ weight: 3
 description: >
 ---
 
-## Deploy an Azure PostgreSQL Hyperscale on AKS using an ARM Template
+## Deploy Azure PostgreSQL Hyperscale on AKS using an ARM Template
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services with Azure PostgreSQL Hyperscale (Citus) deployed on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
@@ -168,7 +168,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters azuredeploy.parameters.json
     ```
 
-    > **Note: Deployment time of the Azure Resource (AKS + Windows VM) can take ~25-30min long**
+    > **Note: Deployment time of the Azure resources (AKS + Windows VM) can take ~25-30min long**
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
