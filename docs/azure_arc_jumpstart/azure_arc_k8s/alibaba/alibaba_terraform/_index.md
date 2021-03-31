@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Deploy CSK cluster and connect it to Azure Arc using Terraform
+## Deploy Alibaba Container Service for Kubernetes cluster and connect it to Azure Arc using Terraform
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Alibaba Cloud [Container Service for Kubernetes](https://www.alibabacloud.com/product/kubernetes) and connect it as an Azure Arc cluster resource.
 
@@ -18,19 +18,19 @@ The following README will guide you on how to use the provided [Terraform](https
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.21.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-* [Install or update Helm to version 3.5.3 and above](https://helm.sh/docs/intro/install/)
+* [Install or update Helm to version 3.5.3 and above](https://helm.sh/docs/intro/install/). Use the below command to check your current installed version.
 
   ```shell
   helm version
   ```
 
-* optional: [Install or update Aliyun CLI to version 3.0.73 and above](https://github.com/aliyun/aliyun-cli)
+* optional: [Install or update Aliyun CLI to lateversion 3.0.73 and above](https://github.com/aliyun/aliyun-cli). Use the below command to check your current installed version.
 
   > Ālǐyún or Aliyun is actually the chinese name for Alibaba Cloud
 
@@ -38,7 +38,11 @@ The following README will guide you on how to use the provided [Terraform](https
   aliyun --version
   ```
 
-* [Install Terraform >=0.14](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html). Use the below command to check your current installed version.
+
+  ```shell
+  terraform -v
+  ```
 
 * [Enable Azure subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes. Login with an identity with sufficient authorizations.
 
@@ -71,7 +75,9 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ### Create a new Alibaba Cloud access key
 
-* [Sign in to Alibaba Cloud account](https://www.alibabacloud.com/)
+* [Sign up to or have an Alibaba Cloud account](https://www.alibabacloud.com/) - domestic or international
+
+  > **Note: The screenshots and sample outputs shown here are based on a domestic account.**
 
 * Browse to <https://console.aliyun.com/> and login with your Alibaba Cloud account. Once logged in, create a new access key from your profile. After creating it, be sure to copy down the access and secret key.
 
@@ -121,56 +127,75 @@ The only thing you need to do before executing the Terraform plan is to export t
   $env:ALICLOUD_ACCESS_KEY="aBcDeFgHiJkLmNo"
   ```
 
-* From folder `azure_arc_k8s_jumpstart/csk/terraform` run the ```terraform init``` command which will download the required terraform providers.
+* From folder `azure_arc_k8s_jumpstart/alibaba/terraform` run the ```terraform init``` command which will download the required terraform providers.
 
-* Deploy CSK by running the ```terraform apply --auto-approve``` command. Wait for the plan to finish.
+  ![terraform init output](./05.png)
+
+* Deploy cluster by running the ```terraform apply --auto-approve``` command. Wait for the plan to finish.
+
+  ![terraform deploy output](./06.png)
+  ...
+  ![terraform deploy output](./07.png)
+
+  sample cluster in Alibaba Cloud Resource Management view:
+
+  ![Alibaba Cloud Resource Management](./08.png)
 
 * The plan will drop the created clusters configuration in users home directory `~/.kube/config` to be used with `kubectl` or `helm`. But to make it usable with `helm`, file permissions need to be reduced:
 
-```shell
-chmod go-r ~/.kube/config
-```
+   ```shell
+   chmod go-r ~/.kube/config
+   ```
 
 ## Connecting to Azure Arc
 
 * Now that you have running cluster, based on the environment variables set and Azure environment prepared above, you can connect the Alibaba Cloud cluster to Azure Arc:
 
-```shell
-az login
-az account set -s $AZURE_SUBSCRIPTION_ID
-az group create --location $AZURE_LOCATION --name $AZURE_RESOURCE_GROUP
-az connectedk8s connect --name $AZURE_CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION
-```
+   ```shell
+   az login
+   az account set -s $AZURE_SUBSCRIPTION_ID
+   az group create --location $AZURE_LOCATION --name $AZURE_RESOURCE_GROUP
+   ```
 
-sample output
+   output should look like this:
 
-![Connect Alibaba cluster to Azure Arc](./21.png)
+   ```json
+   {
+     "id": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/Azure-Arc-Aliyun-K8S",
+     "location": "southeastasia",
+     "managedBy": null,
+     "name": "Azure-Arc-Aliyun-K8S",
+     "properties": {
+       "provisioningState": "Succeeded"
+     },
+     "type": "Microsoft.Resources/resourceGroups"
+   }
+   ```
 
-cluster in Azure Portal
+   connect the cluster:
 
-![Connect Alibaba cluster to Azure Arc](./22.png)
+   ```shell
+   az connectedk8s connect --name $AZURE_CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION
+   ```
 
-## Deploying the sample application
+   sample output
 
-```shell
-az k8sconfiguration create \
-    --name cluster-config \
-    --cluster-name $AZURE_CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP \
-    --operator-instance-name cluster-config --operator-namespace cluster-config \
-    --repository-url https://github.com/Azure/arc-k8s-demo \
-    --scope cluster --cluster-type connectedClusters
-```
+   ![Connect Alibaba cluster to Azure Arc](./09.png)
 
-sample output
+   sample cluster in Azure Portal
 
-![Connect Alibaba cluster to Azure Arc](./23.png)
-
-GitOps deployment in Azure Portal
-
-![Connect Alibaba cluster to Azure Arc](./24.png)
+   ![Connect Alibaba cluster to Azure Arc](./10.png)
 
 ## Delete the deployment
 
-To delete the environment in Alibaba Cloud, use the *`terraform destroy --auto-approve`* command.
+To delete the environment in Azure, the use *`az group delete --resource-group $AZURE_RESOURCE_GROUP -y`* command.
 
-To delete the environment in Azure, the use *`az connectedk8s delete --name $AZURE_CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP`*.
+To delete the environment in Alibaba Cloud, use the *`terraform refresh`* and *`terraform destroy --auto-approve`* commands.
+
+output:
+
+```text
+Destroy complete! Resources: 8 destroyed.
+```
+
+> **Note: `terraform refresh` will update the local state to that `terraform destroy` also handles automatically generated resources like _Elastic IP Address_ and/or _NAT Gateway_.**
