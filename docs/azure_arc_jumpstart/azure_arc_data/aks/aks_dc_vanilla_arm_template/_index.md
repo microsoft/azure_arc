@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Deploy an Azure Arc Data Controller (Vanilla) on AKS using an ARM Template
+## Deploy Azure Arc Data Controller (Vanilla) on AKS using an ARM Template
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
