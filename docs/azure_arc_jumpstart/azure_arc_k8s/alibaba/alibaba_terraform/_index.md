@@ -30,7 +30,7 @@ The following README will guide you on how to use the provided [Terraform](https
   helm version
   ```
 
-* optional: [Install or update Aliyun CLI to lateversion 3.0.73 and above](https://github.com/aliyun/aliyun-cli). Use the below command to check your current installed version.
+* optional: [Install or update Aliyun CLI to latest version 3.0.73 and above](https://github.com/aliyun/aliyun-cli). Use the below command to check your current installed version.
 
   > Ālǐyún or Aliyun is actually the chinese name for Alibaba Cloud
 
