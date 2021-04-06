@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster, using [Terraform](https://www.terraform.io/).
 
-By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)) and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
 > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -162,7 +162,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
       * Create the *azdata* config file in user Windows profile
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       * Create Arc Data Controller config file (*control.json*) to setup the use of the Storage Class and Kubernetes LoadBalancer service
-      * Deploy the Arc Data Controller **"Directly Connected" mode** using the *TF_VAR* variables values
+      * Deploy the Arc Data Controller using the *TF_VAR* variables values
       * Unregister the logon script Windows schedule task so it will not run after first login
 
 ## Deployment
@@ -259,8 +259,6 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
   ![PowerShell login script run](./34.png)
 
   ![PowerShell login script run](./35.png)
-
-* Initially, since the data controller was deployed in "Directly Connected" mode, only after the logon script run is will be completed, a new Azure resource for the controller will be created as well.
 
   > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
 

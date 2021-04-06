@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on single-node Kubernetes cluster deployed with [Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) in az Azure Ubuntu VM, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)) and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
 > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -66,7 +66,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 * Main ARM template will deploy an Ubuntu VM. The ARM template will call the the Azure [Linux Custom Script Extension](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/custom-script-linux) to:
 
 * Deploy a single-node Kubernetes cluster using Kubeadm.
-* Deploy the Azure Arc Data Controller in **"Directly Connected" mode** on that cluster.
+* Deploy the Azure Arc Data Controller on that cluster.
 * Once Ubuntu VM deployment has finished, the main ARM template will call a secondary ARM template which is depended on a successful Ubuntu VM deployment.
 * Secondary ARM template will deploy a client Windows Server 2019 VM.
 * As part of the Windows Server 2019 VM deployment, there are 2 script executions; First PowerShell script [ClientTools.ps1](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/ClientTools.ps1) at deployment runtime using the ARM *CustomScriptExtension* module and the second PowerShell script *LogonScript.ps1* on user first logon to Windows.

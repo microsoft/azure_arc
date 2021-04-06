@@ -166,7 +166,7 @@ Read the below explanation to get familiar with the automation and deployment fl
       * Create the *azdata* config file in user Windows profile
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       * Create Arc Data Controller config file (*control.json*) to setup the use of the Storage Class and Kubernetes LoadBalancer service
-      * Deploy the Arc Data Controller **"Directly Connected" mode** using the *TF_VAR* variables values
+      * Deploy the Arc Data Controller using the *TF_VAR* variables values
       * Execute a secondary *Postgres_Connectivity* script which will configure the Postgres instance and download and install the sample Adventureworks database
       * Unregister the logon script Windows scheduler task so it will not run after first login
 
@@ -262,8 +262,6 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
   ![PowerShell login script run](./33.png)
 
   ![PowerShell login script run](./34.png)
-
-* Since the data controller was deployed in "Directly Connected" mode, after the logon script run is completed a new Azure resource for the controller will be created and visible in the Azure Portal.
 
   > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
 
