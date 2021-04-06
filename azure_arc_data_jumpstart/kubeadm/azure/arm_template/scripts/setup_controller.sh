@@ -369,7 +369,7 @@ fi
 azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.storage.data.className=local-storage'
 azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.storage.logs.className=local-storage'
 
-azdata arc dc create --name $ARC_DC_NAME --path azure-arc-custom --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode direct
+azdata arc dc create --name $ARC_DC_NAME --path azure-arc-custom --namespace $ARC_DC_NAME --location $ARC_DC_REGION --resource-group $ARC_DC_RG --subscription $ARC_DC_SUBSCRIPTION --connectivity-mode indirect
 
 echo "Azure Arc Data Controller cluster created."
 
