@@ -32,7 +32,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * (Optional) [Install or update Aliyun CLI to latest version 3.0.73 and above](https://github.com/aliyun/aliyun-cli). Use the below command to check your current installed version.
 
-  > Ālǐyún or Aliyun is actually the chinese name for Alibaba Cloud
+  > **Note: Ālǐyún or Aliyun is actually the chinese name for Alibaba Cloud**
 
   ```shell
   aliyun --version
@@ -140,6 +140,8 @@ The only thing you need to do before executing the Terraform plan is to export t
   ![terraform deploy output](./06.png)
   ![terraform deploy output](./07.png)
 
+  > **Note: The deprecation warnings are caused by the Terraform module used and can be ignored at this point.**
+
   Sample cluster in Alibaba Cloud Resource Management view:
 
   ![Alibaba Cloud Resource Management](./08.png)
@@ -187,9 +189,20 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 ## Delete the deployment
 
-To delete the environment in Azure, the use *`az group delete --resource-group $AZURE_RESOURCE_GROUP -y`* command.
+In Azure, the most straightforward way is to delete the resource group via the Azure Portal or through the CLI.
 
-To delete the environment in Alibaba Cloud, use the *`terraform refresh`* and *`terraform destroy --auto-approve`* commands.
+```shell
+az --resource-group $AZURE_RESOURCE_GROUP -y
+```
+
+![Delete resource group in Azure Portal](./11.png)
+
+To delete the environment in Alibaba Cloud, use Terraform.
+
+```shell
+terraform refresh
+terraform destroy --auto-approve
+```
 
 > **Note: `terraform refresh` will update the local state to that `terraform destroy` also handles automatically generated resources like _Elastic IP Address_ and/or _NAT Gateway_.**
 
@@ -198,5 +211,3 @@ output:
 ```text
 Destroy complete! Resources: 8 destroyed.
 ```
-
-> **Note: `terraform refresh` will update the local state to that `terraform destroy` also handles automatically generated resources like _Elastic IP Address_ and/or _NAT Gateway_.**
