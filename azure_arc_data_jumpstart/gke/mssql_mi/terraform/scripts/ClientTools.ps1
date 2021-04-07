@@ -29,10 +29,10 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 Write-Host "Downloading Azure Data Studio and azdata CLI"
 Write-Host "`n"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip" | Out-Null
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/mssql_mi/terraform/settings.json" -OutFile "C:\tmp\settings.json"
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\tmp\AZDataCLI.msi" | Out-Null
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\MSSQL_MI_Cleanup.ps1"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\MSSQL_MI_Deploy.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/mssql_mi/terraform/scripts/settings_template.json" -OutFile "C:\tmp\settings_template.json"
 
 # Creating PowerShell LogonScript
 $LogonScript = @'
@@ -76,14 +76,13 @@ $env:gcp_credentials_file_path="C:\tmp\$env:gcp_credentials_filename"
 gcloud auth activate-service-account --key-file $env:gcp_credentials_file_path
 gcloud container clusters get-credentials $env:gke_cluster_name --region $env:gcp_region  
 kubectl version
-kubectl apply -f 'C:\tmp\local_ssd_sc.yaml'
 
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 azdata --version
 
 azdata arc dc config init --source azure-arc-gke --path "C:\tmp\custom" --force
-azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=local-ssd"
-azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=local-ssd"
+azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.data.className=premium-rwo"
+azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "spec.storage.logs.className=premium-rwo"
 azdata arc dc config replace --path "C:\tmp\custom\control.json" --json-values "$.spec.services[*].serviceType=LoadBalancer"
 
 if(($env:DOCKER_REGISTRY -ne $NULL) -or ($env:DOCKER_REGISTRY -ne ""))
@@ -109,20 +108,16 @@ azdata arc sql mi create --name $env:MSSQL_MI_NAME
 azdata arc sql mi list
 
 # Restoring demo database and configuring Azure Data Studio
-Write-Host "Waiting for 5min for all pods to be completely ready for work"
-
 $podname = "$env:MSSQL_MI_NAME" + "-0"
-# Start-Sleep -Seconds 300
-Write-Host "Ready to go!"
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak
 Start-Sleep -Seconds 5
 kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'"
 
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+New-Item -Path "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json"
+$settingsFile = "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json"
 azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $file = "C:\tmp\sql_instance_list.txt"
 (Get-Content $file | Select-Object -Skip 2) | Set-Content $file
