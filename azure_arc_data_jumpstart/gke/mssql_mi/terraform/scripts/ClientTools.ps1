@@ -47,7 +47,6 @@ $SettingsDestination = "C:\Users\$env:windows_username\AppData\Roaming\azuredata
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Hidden
 Start-Sleep -s 5
 Stop-Process -Name "azuredatastudio" -Force
-Copy-Item -Path "C:\tmp\settings.json" -Destination $SettingsDestination -Recurse -Force -ErrorAction Continue
 
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
