@@ -148,10 +148,12 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   * *AZURE_TENANT_ID*="Azure tenant id"
   * *AZURE_CLIENT_ID=*"Azure SPN application client id"
   * *AZURE_CLIENT_SECRET*="Azure SPN application client secret"
-  * *AZURE_CONTROL_PLANE_MACHINE_TYPE*="Control Plane node Azure VM type .For example: Standard_D2_v3"
+  * *AZURE_CONTROL_PLANE_MACHINE_TYPE*="Control Plane node Azure VM type .For example: Standard_D2s_v3".
   * *AZURE_NODE_MACHINE_TYPE*="Worker node Azure VM type .For example: Standard_D4s_v3"
 
   ![Screenshot of user environment variables](./04.png)
+
+  > **Note: CAPI-based Kubernetes cluster deployment are using an auto-generated yaml that holds the deployment parameters as a Kubernetes manifest. The script in this scenario [generates the default scheme](https://github.com/kubernetes-sigs/cluster-api-provider-azure/blob/cfdac96526e388eb6374cad5eef581fb1767627f/templates/cluster-template-external-cloud-provider.yaml#L131) that has Premium storage type VMs as it's default. When editing both the _AZURE_CONTROL_PLANE_MACHINE_TYPE_ and the _AZURE_NODE_MACHINE_TYPE_, use Premium storage supported type VMs**
 
 * Execute the script using the below command. The script runtime can take ~10-20min, depends on the number of control plane and worker nodes you chose to deploy. In case you don't have the required Azure CLI extensions already installed or if they are requires an update, the script will either install it or perform an update.
 
