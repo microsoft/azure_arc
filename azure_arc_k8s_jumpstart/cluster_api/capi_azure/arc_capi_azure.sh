@@ -12,7 +12,7 @@ export AZURE_SUBSCRIPTION_ID="<Azure subscription id>"
 export AZURE_TENANT_ID="<Azure tenant id>"
 export AZURE_CLIENT_ID="<Azure SPN application client id>"
 export AZURE_CLIENT_SECRET="<Azure SPN application client secret>"
-export AZURE_CONTROL_PLANE_MACHINE_TYPE="<Control Plane node Azure VM type>" # For example: "Standard_D2_v3"
+export AZURE_CONTROL_PLANE_MACHINE_TYPE="<Control Plane node Azure VM type>" # For example: "Standard_D2s_v3"
 export AZURE_NODE_MACHINE_TYPE="<Worker node Azure VM type>" # For example: "Standard_D4s_v3"
 
 # Azure cloud settings - Do not change!
