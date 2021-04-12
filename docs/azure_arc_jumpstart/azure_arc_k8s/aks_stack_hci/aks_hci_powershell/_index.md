@@ -14,7 +14,7 @@ Azure Kubernetes Service on Azure Stack HCI is an implementation of AKS on-premi
 
   > **Note: Azure Kubernetes Service is now in preview on Azure Stack HCI and on Windows Server 2019 Datacenter.**
 
-This guide will not provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have a configured cluster.
+This guide will not provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have a configured cluster. The commands described in this guide should be ran on the management computer or in a host server in a cluster.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
   
 * Create Azure service principal (SP)
 
-    To be able to complete the scenario and its related automation, an Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account using PowerShell and run the below command. To do this, you will need to run the script from a PowerShell session that has access to your AKS on the Azure Stack HCI environment. 
+    To be able to complete the scenario and its related automation, an Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account using PowerShell and run the below command. To do this, you will need to run the script from a PowerShell session that has access to your AKS on the Azure Stack HCI environment.
 
     ```powershell
     Connect-AzAccount
@@ -39,7 +39,7 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
     $sp = New-AzADServicePrincipal -DisplayName "<Unique SP Name>" -Role 'Contributor'
     ```
 
-    This command will return a secure string as shown below:
+    This command will create a variable with a secure string as shown below:
 
     ```shell
     Secret                : System.Security.SecureString
@@ -57,6 +57,8 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
     $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($sp.Secret)
     $UnsecureSecret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     ```
+
+    Copy the Service Principal ApplicationId and Secret as you will need it for later on in the automation.
 
     > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 
@@ -83,7 +85,9 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
   Exit
   ```
 
-* Using a web browser navigate to https://aka.ms/AKS-HCI-Evaluate, complete the registration form, download and save AKS on Azure Stack HCI. Extract the contents of the zip file.
+* Using a web browser navigate to https://aka.ms/AKS-HCI-Evaluate and complete the registration form, download and save AKS on Azure Stack HCI.
+
+* Navigate to the path %systemdrive%\program files\windowspowershell\modules and delete any existing directories for AksHci, AksHci.Day2, Kva, MOC, and MSK8sDownloadAgent. Then extract the zip file in the same location (%systemdrive%\program files\windowspowershell\modules).
 
 * Open PowerShell as administrator, navigate to the folder where you extracted the software and run the following commands:
 
