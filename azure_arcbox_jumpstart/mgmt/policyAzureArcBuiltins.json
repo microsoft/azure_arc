@@ -1,0 +1,86 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "azureLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of your Azure resources"
+            }
+        },
+        "logAnalyticsWorkspace": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of your log analytics workspace"
+            }
+        }
+    },
+    "variables": {
+        "logAnalyticsResource": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]",
+        "policyDefinitionForLinuxDeployLogAnalytics": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
+        "policyDefinitionForWindowsDeployLogAnalytics": "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203",
+        "policyNameForLinuxDeployLogAnalytics": "policyLinuxDeployLogAnalytics",
+        "policyNameForWindowsDeployLogAnalytics": "policyWindowsDeployLogAnalytics",
+        "logAnalyticsContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "name": "[variables('policyNameForLinuxDeployLogAnalytics')]",
+            "apiVersion": "2019-09-01",
+            "location": "[parameters('azureLocation')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
+                "policyDefinitionId": "[variables('policyDefinitionForLinuxDeployLogAnalytics')]",
+                "parameters": {
+                    "logAnalytics": {
+                        "value": "[variables('logAnalyticsResource')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "name": "[guid(variables('policyNameForLinuxDeployLogAnalytics'), resourceGroup().id)]",
+            "dependsOn": [ "[variables('policyNameForLinuxDeployLogAnalytics')]" ],
+            "apiVersion": "2020-04-01-preview",
+            "properties": {
+                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForLinuxDeployLogAnalytics')),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "name": "[variables('policyNameForWindowsDeployLogAnalytics')]",
+            "apiVersion": "2019-09-01",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
+                "policyDefinitionId": "[variables('policyDefinitionForWindowsDeployLogAnalytics')]",
+                "parameters": {
+                    "logAnalytics": {
+                        "value": "[variables('logAnalyticsResource')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "name": "[guid(variables('policyNameForWindowsDeployLogAnalytics'), resourceGroup().id)]",
+            "dependsOn": [ "[variables('policyNameForWindowsDeployLogAnalytics')]" ],
+            "apiVersion": "2020-04-01-preview",
+            "properties": {
+                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForWindowsDeployLogAnalytics')),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        }
+    ]
+}
