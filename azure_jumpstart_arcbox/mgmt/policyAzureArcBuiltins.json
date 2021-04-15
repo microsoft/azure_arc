@@ -19,9 +19,12 @@
         "logAnalyticsResource": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]",
         "policyDefinitionForLinuxDeployLogAnalytics": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
         "policyDefinitionForWindowsDeployLogAnalytics": "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203",
+        "policyDefinitionForAddResourceTag": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
         "policyNameForLinuxDeployLogAnalytics": "policyLinuxDeployLogAnalytics",
         "policyNameForWindowsDeployLogAnalytics": "policyWindowsDeployLogAnalytics",
-        "logAnalyticsContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+        "policyNameForAddResourceTag": "policyAddResourceTag",
+        "logAnalyticsContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+        "tagContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '4a9ae827-6dc8-4573-8ac7-8239d42aa03f')]"
     },
     "resources": [
         {
@@ -79,6 +82,38 @@
             "properties": {
                 "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
                 "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForWindowsDeployLogAnalytics')),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "name": "[variables('policyNameForAddResourceTag')]",
+            "apiVersion": "2019-09-01",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
+                "policyDefinitionId": "[variables('policyDefinitionForAddResourceTag')]",
+                "parameters": {
+                    "tagName": {
+                        "value": "Project"
+                    },
+                    "tagValue": {
+                        "value": "jumpstart_arcbox"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "name": "[guid(variables('policyNameForAddResourceTag'), resourceGroup().id)]",
+            "dependsOn": [ "[variables('policyNameForAddResourceTag')]" ],
+            "apiVersion": "2020-04-01-preview",
+            "properties": {
+                "roleDefinitionId": "[variables('tagContributorRoleDefinition')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForAddResourceTag')),'2019-09-01', 'full').identity.principalId]",
                 "principalType": "ServicePrincipal"
             }
         }
