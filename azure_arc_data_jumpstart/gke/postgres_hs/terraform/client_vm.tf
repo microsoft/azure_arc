@@ -87,21 +87,6 @@ resource "google_compute_instance" "default" {
     }
   }
 
-  provisioner "file" {
-    source      = "scripts/local_ssd_sc.yaml"
-    destination = "C:/tmp/local_ssd_sc.yaml"
-
-    connection {
-      host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
-      https    = false
-      insecure = true
-      timeout  = "10m"
-      type     = "winrm"
-      user     = var.windows_username
-      password = var.windows_password
-    }
-  }
-
   provisioner "remote-exec" {
     inline = [
       "powershell.exe -File C://tmp/azure_arc.ps1"
