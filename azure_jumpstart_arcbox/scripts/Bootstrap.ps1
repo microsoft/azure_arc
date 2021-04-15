@@ -139,13 +139,13 @@ workflow ClientTools_01
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/arcbox/main/scripts/settings_template.json" -OutFile "C:\ArcBox\settings_template.json"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/scripts/settings_template.json" -OutFile "C:\ArcBox\settings_template.json"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\ArcBox\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/arcbox/main/scripts/ArcServersLogonScript.ps1" -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/arcbox/main/scripts/DataServicesLogonScript.ps1" -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/arcbox/main/scripts/installArcAgent.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/arcbox/main/scripts/installArcAgentSQL.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/arcbox/main/scripts/installArcAgent.sh" -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/scripts/ArcServersLogonScript.ps1" -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/scripts/DataServicesLogonScript.ps1" -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/scripts/installArcAgent.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/scripts/installArcAgentSQL.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/scripts/installArcAgent.sh" -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
                 }
         }
 
