@@ -192,7 +192,7 @@
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "172.16.1.0/24",
         "addressPrefix": "172.16.0.0/16",
-        "templateBaseUrl": "https://raw.githubusercontent.com/dkirby-ms/arcbox/main/"
+        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/"
     },
     "resources": [
         {

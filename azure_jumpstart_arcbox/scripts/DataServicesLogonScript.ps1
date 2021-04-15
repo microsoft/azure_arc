@@ -72,7 +72,7 @@ Workflow DatabaseDeploy
             # $podname = "$env:POSTGRES_NAME" + "c-0"
             # Start-Sleep -Seconds 300
             # Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-            # kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/dkirby-ms/arcbox/main/scripts/AdventureWorks.sql" 2>&1 $null
+            # kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/scripts/AdventureWorks.sql" 2>&1 $null
             # Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
             # kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres 2>&1 $null
             # Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
