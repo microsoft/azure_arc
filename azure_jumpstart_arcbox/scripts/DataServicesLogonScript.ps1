@@ -36,9 +36,9 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Deploying Azure Arc Data Controller
-Write-Host "Deploying Azure Arc Data Controller (opening another terminal window to monitor pod deployment)"
+Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
-start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; sleep 5; clear }}
+#start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; sleep 5; clear }}
 azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
 if(($env:dockerRegistry -ne $NULL) -or ($env:dockerRegistry -ne ""))
 {
@@ -156,7 +156,7 @@ az extension add --name "k8s-extension" -y
 
 # Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
-Stop-Process -Name powershell -Force
+#Stop-Process -Name powershell -Force
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
