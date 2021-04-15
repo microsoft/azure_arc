@@ -24,7 +24,7 @@
         "policyNameForWindowsDeployLogAnalytics": "policyWindowsDeployLogAnalytics",
         "policyNameForAddResourceTag": "policyAddResourceTag",
         "logAnalyticsContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-        "tagContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '4a9ae827-6dc8-4573-8ac7-8239d42aa03f')]"
+        "tagContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]"
     },
     "resources": [
         {
