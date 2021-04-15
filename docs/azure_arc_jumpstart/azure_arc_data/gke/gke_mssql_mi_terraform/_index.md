@@ -263,11 +263,11 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   ![PowerShell login script run](./34.png)
 
-  > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
+  <!-- > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
 
     ![Data Controller in a resource group](./36.png)
 
-    ![Data Controller resource](./37.png)
+    ![Data Controller resource](./37.png) -->
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Azure Data Studio will be opened automatically after the LoginScript is finished. In Azure Data Studio, you can connect to the SQL Managed Instance and see the Adventureworks sample database.
 

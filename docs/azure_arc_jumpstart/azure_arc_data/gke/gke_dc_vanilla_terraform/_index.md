@@ -260,11 +260,11 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   ![PowerShell login script run](./35.png)
 
-  > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
+  <!-- > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
 
     ![Data Controller in a resource group](./36.png)
 
-    ![Data Controller resource](./37.png)
+    ![Data Controller resource](./37.png) -->
 
 * Using PowerShell, login to the Data Controller and check it's health using the below commands.
 

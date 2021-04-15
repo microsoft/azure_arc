@@ -201,11 +201,11 @@ Now that both the AKS cluster and the Windows Server client VM are created, it i
 
     ![PowerShell logon script run](./09.jpg)
 
-  > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
+  <!-- > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
   
     ![Data Controller in a resource group](./10.jpg)
 
-    ![Data Controller resource](./11.jpg)
+    ![Data Controller resource](./11.jpg) -->
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. At the end of the logon script run, Azure Data Studio will automatically be open and connected to the Azure SQL MI with the sample DB.
 
