@@ -101,7 +101,7 @@ DatabaseDeploy | Format-Table
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for database connections"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "C:\ArcBox\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+Copy-Item -Path "C:\ArcBox\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 $settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 azdata arc sql mi list | Tee-Object "C:\ArcBox\sql_instance_list.txt"
 azdata arc postgres endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\ArcBox\postgres_instance_endpoint.txt"
