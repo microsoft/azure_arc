@@ -76,7 +76,7 @@
         "resourceTags": {
             "type": "object",
             "defaultValue": {
-                "Project": "jumpstart_azure_arc_k8s"
+                "Project": "jumpstart_arcbox"
             }
         },
         "spnClientId": {
