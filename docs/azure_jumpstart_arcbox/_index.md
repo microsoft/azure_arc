@@ -59,7 +59,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   * Deploy and configure Azure Arc enabled data services on the AKS cluster including a data controller, a SQL MI instance, and a PostgreSQL Hyperscale cluster. After deployment, Azure Data Studio opens automatically with connection entries for each database instance. Data services deployed by the script are:
     * Data controller
     * SQL MI instance
-    * Postgres instance
+    * PostgreSQL Hyperscale cluster
 
 ## Deployment Option 1: Azure Portal
 
