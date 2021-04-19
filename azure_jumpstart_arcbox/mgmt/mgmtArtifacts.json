@@ -1,0 +1,117 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for your log analytics workspace"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure Region to deploy the Log Analytics Workspace"
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "pergb2018",
+      "metadata": {
+        "description": "SKU, leave default pergb2018"
+      }
+    }
+  },
+  "variables": {
+    "Updates": {
+      "name": "[concat('Updates', '(', parameters('workspaceName'), ')')]",
+      "galleryName": "Updates"
+    },
+    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/",
+    "policyTemplate": "[uri(variables('templateBaseUrl'), 'mgmt/policyAzureArcBuiltins.json')]",
+    "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2020-03-01-preview",
+      "name": "[parameters('workspaceName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('sku')]"
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-11-01-preview",
+      "location": "[parameters('location')]",
+      "name": "[variables('Updates').name]",
+      "type": "Microsoft.OperationsManagement/solutions",
+      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('Updates').name)]",
+      "dependsOn": [
+        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+      ],
+      "properties": {
+        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+      },
+      "plan": {
+        "name": "[variables('Updates').name]",
+        "publisher": "Microsoft",
+        "promotionCode": "",
+        "product": "[concat('OMSGallery/', variables('Updates').galleryName)]"
+      }
+    },
+    {
+      "type": "Microsoft.Automation/automationAccounts",
+      "apiVersion": "2020-01-13-preview",
+      "name": "[variables('automationAccountName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[parameters('workspaceName')]"
+      ],
+      "properties": {
+        "sku": {
+          "name": "Basic"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
+      "apiVersion": "2020-03-01-preview",
+      "name": "[concat(parameters('workspaceName'), '/' , 'Automation')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[parameters('workspaceName')]",
+        "[variables('automationAccountName')]"
+      ],
+      "properties": {
+        "resourceId": "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "policyDeployment",
+      "dependsOn": [
+        "[concat(parameters('workspaceName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('policyTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "azureLocation": {
+            "value": "[parameters('location')]"
+          },
+          "logAnalyticsWorkspace": {
+            "value": "[parameters('workspaceName')]"
+          }
+        }
+      }
+    }
+  ]
+}
