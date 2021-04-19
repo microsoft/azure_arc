@@ -63,7 +63,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Deployment Option 1: Azure Portal
 
-* Click the [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Farcbox%2Fazure_jumpstart_arcbox%2Fazuredeploy.json) button and enter values for the the ARM template parameters.
+* Click the [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_jumpstart_arcbox%2Fazuredeploy.json){target="_blank"} button and enter values for the the ARM template parameters.
 
   ![Screenshot showing Azure Portal deployment of ArcBox](./portaldeploy.png)
 
@@ -226,3 +226,4 @@ az group delete -n <name of your resource group>
 
 * Sample databases are not deployed into the MSSQL or PostgreSQL instances at this time.
 * Azure Arc enabled SQL Server assessment report not always visible in Azure Portal
+* MMA Agent on ArcBox-Ubuntu server not deploying properly via policy.
