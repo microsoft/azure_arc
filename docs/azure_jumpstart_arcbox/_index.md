@@ -61,7 +61,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     * SQL MI instance
     * Postgres instance
 
-## Supported Azure Regions
+## ArcBox Azure Region Compatibility
 
 ArcBox must be deployed to one of the following regions. Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.
 
