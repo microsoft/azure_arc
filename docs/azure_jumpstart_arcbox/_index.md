@@ -59,7 +59,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   * Deploy and configure Azure Arc enabled data services on the AKS cluster including a data controller, a SQL MI instance, and a PostgreSQL Hyperscale cluster. After deployment, Azure Data Studio opens automatically with connection entries for each database instance. Data services deployed by the script are:
     * Data controller
     * SQL MI instance
-    * PostgreSQL Hyperscale cluster
+    * Postgres instance
 
 ## Deployment Option 1: Azure Portal
 
@@ -158,7 +158,42 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Using ArcBox
 
-ArcBox is a sandbox that can be used for a large variety of use cases, such as a sandbox environment for testing and training or kickstarter for proof of concept projects. Ultimately, you are free to do whatever you wish with ArcBox. Some suggested next steps for you to try in your ArcBox are:
+After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure Portal, CLI or similar) or from inside the ArcBox-Client virtual machine. When remoted into the client VM, here are some things to try:
+
+* Open Hyper-V and access the Azure Arc enabled servers
+  * Username: Arcdemo
+  * Password: ArcDemo123!!
+
+  ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
+
+* Use the included [kubectx](https://github.com/ahmetb/kubectx) tool to switch Kubernetes contexts between the Rancher and AKS clusters.
+
+  ```shell
+  kubectx
+  kubectx ArcBox-Data
+  kubectl get nodes
+  kubectl get pods -n arcdatactrl
+  kubectx arcboxk3s
+  kubectl get nodes
+  ```
+
+  ![Screenshot showing usage of kubectx](./kubectx.png)
+
+* Login to the Azure Arc data controller with [Azdata CLI](https://docs.microsoft.com/en-us/sql/azdata/reference/reference-azdata-arc?view=sql-server-ver15) and explore its functionality.
+  * Azdata username: arcdemo
+  * Azdata password: ArcPassword123!!
+  * Namespace: arcdatactrl
+  
+  ```shell
+  azdata login --username arcdemo --namespace arcdatactrl
+  azdata arc dc status show
+  azdata arc sql endpoint list
+  azdata arc postgres endpoint list
+  ```
+
+  ![Screenshot ](./azdatausage.png)
+
+ArcBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or kickstarter for proof of concept projects. Ultimately, you are free to do whatever you wish with ArcBox. Some suggested next steps for you to try in your ArcBox are:
 
 * Login to the Azure Arc data controller using azdata and explore the functionality provided by the data controller
 * Deploy sample databases to the PostgreSQL Hyperscale instance or to the SQL Managed Instance
