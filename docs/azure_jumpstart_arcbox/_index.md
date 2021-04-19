@@ -61,6 +61,19 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     * SQL MI instance
     * Postgres instance
 
+## ArcBox Azure Region Compatibility
+
+ArcBox must be deployed to one of the following regions. Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.
+
+* East US
+* East US 2
+* West US 2
+* North Europe
+* West Europe
+* UK South
+* Southeast Asia
+* Australia East
+
 ## Deployment Option 1: Azure Portal
 
 * Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_jumpstart_arcbox%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
