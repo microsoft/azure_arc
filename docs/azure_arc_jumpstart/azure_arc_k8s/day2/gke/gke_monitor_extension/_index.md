@@ -61,9 +61,9 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
 
 ## Create Azure monitor extensions instance
 
-To create a new extension Instance, use `k8s-extension create`, passing in values for the mandatory parameters. The below example creates an instance of Azure Monitor extension on your Arc enabled Kubernetes cluster. An auotmation script file is provided part of jumpstart.
+To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Azure Monitor extension on your Azure Arc enabled Kubernetes cluster
 
-* In order to keep your local environment clean and untouched, we will use [Google Cloud Shell](https://cloud.google.com/shell) to run the [*gke_monitor_onboarding*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/gke_monitor/azure_monitor_k8s_extension.sh) shell script against the GKE connected cluster.
+* In order to keep your local environment clean and untouched, we will use [Google Cloud Shell](https://cloud.google.com/shell) to run the [*gke_monitor_onboarding*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/gke_monitor_extension/azure_monitor_k8s_extension.sh) shell script against the GKE connected cluster.
 
 * Before integrating the cluster with Azure Monitor for Containers, click on the "Insights (preview)" blade for the connected Arc cluster to show how the cluster is not currently being monitored.
 
@@ -79,15 +79,15 @@ To create a new extension Instance, use `k8s-extension create`, passing in value
 
     ![Screenshot showing connection to GKE cluster in GCP console](./04.png)
 
-    ![Screenshot showing uploading the script file to cloud shell](./07.png)
+    ![Screenshot showing uploading the script file to cloud shell](./05.png)
 
     The script will:
 
   * Login to your Azure subscription using the SPN credentials
-  * Add or Update the connectedk8s and k8s-extension
+  * Add or Update your local _connectedk8s_ and _k8s-extension_ Azure CLI extensions
   * Create monitor k8s extension instance
 
-* Now if you can see that the monitoring is enabled once you visit Container Insights section of Azure Arc enabled kubernetes cluster in Azure.
+* You can see that the monitoring is enabled once you visit the Container Insights section of the Azure Arc enabled Kubernetes cluster resource in Azure.
 
     > **Note: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
@@ -103,4 +103,4 @@ The following command only deletes the extension instance, but doesn't delete th
 az k8s-extension delete --name azuremonitor-containers --cluster-type connectedClusters --cluster-name <cluster-name> --resource-group <resource-group>
 ```
 
- ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource Insights](./02.png)
+ ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource Insights](./07.png)
