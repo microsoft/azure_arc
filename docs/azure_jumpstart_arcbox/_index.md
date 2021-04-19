@@ -191,8 +191,12 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
   azdata arc postgres endpoint list
   ```
 
-  ![Screenshot ](./azdatausage.png)
+  ![Screenshot showing Azdata CLI usage](./azdatausage.png)
 
+* Open Azure Data Studio and explore the SQL MI and PostgreSQL Hyperscale instances.
+
+  ![Screenshot showing Azure Data Studio usage](./azdatastudio.png)
+  
 ArcBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or kickstarter for proof of concept projects. Ultimately, you are free to do whatever you wish with ArcBox. Some suggested next steps for you to try in your ArcBox are:
 
 * Login to the Azure Arc data controller using azdata and explore the functionality provided by the data controller
