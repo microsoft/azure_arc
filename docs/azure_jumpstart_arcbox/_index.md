@@ -166,7 +166,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
 
-* Use the included [kubectx](https://github.com/ahmetb/kubectx) tool to switch Kubernetes contexts between the Rancher and AKS clusters.
+* Use the included [kubectx](https://github.com/ahmetb/kubectx) tool to switch Kubernetes contexts between the Rancher K3s and AKS clusters.
 
   ```shell
   kubectx
