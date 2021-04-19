@@ -2,9 +2,9 @@
 
 ## Jumpstart ArcBox - Overview
 
-![ArcBox architecture diagram](./arch.png)
-
 Jumpstart ArcBox is a project that provides an easy to deploy sandbox for all things Azure Arc. ArcBox is designed to be completely self-contained within a single Azure subscription and resource group, which will make it easy for a user to get hands-on with all available Azure Arc technology with nothing more than an available Azure subscription.
+
+![ArcBox architecture diagram](./arch.png)
 
 ### Use cases
 
@@ -221,7 +221,7 @@ ArcBox is a sandbox that can be used for a large variety of use cases, such as a
 * Incorporate your own tooling and automation into the existing automation framework
 * Build a certificate/secret/key management strategy with your Azure Arc resources
 
-Do you have an interesting use case to share? Submit an issue on GitHub with your idea and we will consider it for future releases! 
+Do you have an interesting use case to share? Submit an issue on GitHub with your idea and we will consider it for future releases!
 
 ## Clean up the deployment
 
