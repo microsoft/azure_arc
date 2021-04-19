@@ -28,7 +28,7 @@
       "name": "[concat('Updates', '(', parameters('workspaceName'), ')')]",
       "galleryName": "Updates"
     },
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox/azure_jumpstart_arcbox/",
+    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/",
     "policyTemplate": "[uri(variables('templateBaseUrl'), 'mgmt/policyAzureArcBuiltins.json')]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]"
   },
