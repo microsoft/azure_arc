@@ -161,7 +161,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure Portal, CLI or similar) or from inside the ArcBox-Client virtual machine. When remoted into the client VM, here are some things to try:
 
 * Open Hyper-V and access the Azure Arc enabled servers
-  * Username: Arcdemo
+  * Username: arcdemo
   * Password: ArcDemo123!!
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
