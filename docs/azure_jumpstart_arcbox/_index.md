@@ -225,3 +225,4 @@ az group delete -n <name of your resource group>
 ## Known issues
 
 * Sample databases are not deployed into the MSSQL or PostgreSQL instances at this time.
+* Azure Arc enabled SQL Server assessment report not always visible in Azure Portal
