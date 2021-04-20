@@ -99,7 +99,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
   ![Enable Compute Engine API](./05.png)
 
-  ![Add credentials](./06.png)
+  ![Add credentials](https://user-images.githubusercontent.com/20439825/115454113-b2f53680-a220-11eb-9c1f-0ab185deebee.png)
 
   ![Add credentials](./07.png)
 
@@ -107,19 +107,21 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
   ![Add credentials](./09.png)
 
-  ![Add credentials](./10.png)
+  ![Add credentials](https://user-images.githubusercontent.com/20439825/115454772-70802980-a221-11eb-865c-0e00d0cea423.png)
 
-  ![Create private key](./11.png)
+  ![Create private key](https://user-images.githubusercontent.com/20439825/115455006-b0dfa780-a221-11eb-9014-cae04a7b8899.png)
 
+  ![Create private key](https://user-images.githubusercontent.com/20439825/115455223-f8feca00-a221-11eb-905d-e82a97468850.png)
+  
   ![Create private key](./12.png)
 
   ![Create private key](./13.png)
 
   ![Create private key](./14.png)
 
-  ![account.json](./15.png)
+  ![account.json](https://user-images.githubusercontent.com/20439825/115455505-54c95300-a222-11eb-98af-f5b73db7e8b0.png)
 
-  ![account.json](./16.png)
+  ![account.json](https://user-images.githubusercontent.com/20439825/115455820-bbe70780-a222-11eb-8454-c97c3277e025.png)
 
 * Enable the Kubernetes Engine API for the project
 
