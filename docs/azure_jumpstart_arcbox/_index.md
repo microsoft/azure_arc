@@ -12,6 +12,7 @@ Jumpstart ArcBox is a project that provides an easy to deploy sandbox for all th
 * Accelerator for Proof-of-concepts or pilots
 * Training tool for Azure Arc skills development
 * Demo environment for customer presentations or events
+* Rapid integration testing platform
 
 ## Azure Arc capabilities available in ArcBox
 
@@ -217,7 +218,7 @@ ArcBox is a sandbox that can be used for a large variety of use cases, such as a
 * Use the included kubectx to switch contexts between the two Kubernetes clusters
 * Deploy GitOps configurations with Azure Arc enabled Kubernetes
 * Build policy initiatives that apply to your Azure Arc enabled resources
-* Write custom policies that apply to your Azure Arc enabled resources
+* Write and test custom policies that apply to your Azure Arc enabled resources
 * Incorporate your own tooling and automation into the existing automation framework
 * Build a certificate/secret/key management strategy with your Azure Arc resources
 
