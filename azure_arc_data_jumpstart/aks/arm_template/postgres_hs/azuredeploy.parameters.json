@@ -63,13 +63,22 @@
             "value": "arcpg"
         },       
         "POSTGRES_WORKER_NODE_COUNT": {
-            "value": "<PostgreSQL Hyperscale server group number of workers>"
+            "value": 2,
+            "metadata": {
+                "description": "PostgreSQL Hyperscale server group number of workers (minimum of 2)"
+            }
         },
         "POSTGRES_DATASIZE": {
-            "value": "<PostgreSQL Hyperscale size of data volumes in MB>"
+            "value": 1024,
+            "metadata": {
+                "description": "PostgreSQL Hyperscale size of data volumes in MB"
+            }
         },
         "POSTGRES_SERVICE_TYPE": {
-            "value": "<Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort>"
+            "value": "LoadBalancer",
+            "metadata": {
+                "description": "Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort"
+            }
         }
     }
 }
