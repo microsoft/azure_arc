@@ -197,13 +197,13 @@ As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data C
     > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
 
     ```powershell
-    Set-Item -Path env:TF_VAR_gcp_project_id
+    $env:TF_VAR_gcp_project_id='azure-arc-demo-xxxxxx'
     ```
 
 * Navigate to the folder that has Terraform binaries.
 
   ```shell
-  cd azure_arc_data_jumpstart/gke/dc_vanilla/terraform
+  cd azure_arc_data_jumpstart/gke/dc_vanilla/terraform/
   ```
 
 * Run the ```terraform init``` command which is used to initialize a working directory containing Terraform configuration files and load the required Terraform providers.
