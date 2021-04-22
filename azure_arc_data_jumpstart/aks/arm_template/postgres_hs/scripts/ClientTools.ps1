@@ -51,7 +51,7 @@ param (
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,postgresql'
             #Run commands in parallel.
             Parallel 
                 {
@@ -152,10 +152,7 @@ Remove-Item "C:\tmp\out.txt" -Force
 Write-Host "Waiting for 5min for all pods to be completely ready for work"
 
 $podname = "$env:POSTGRES_NAME" + "c-0"
-Start-Sleep -Seconds 300
-Write-Host "Ready to go!"
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
-kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql
 
 Stop-Transcript
