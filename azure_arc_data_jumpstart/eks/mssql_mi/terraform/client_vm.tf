@@ -20,6 +20,7 @@ resource "local_file" "azure_arc" {
     DOCKER_REPOSITORY     = var.DOCKER_REPOSITORY
     DOCKER_TAG            = var.DOCKER_TAG
     AZDATA_URL            = var.AZDATA_URL
+    MSSQL_MI_NAME         = var.MSSQL_MI_NAME
     }
   )
   filename = "scripts/azure_arc.ps1"
