@@ -270,9 +270,11 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
     ![PowerShell logon script run](./32.png)
 
+  <!-- > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
+
     ![Data Controller in a resource group](./33.png)
 
-    ![Data Controller resource](./34.png)
+    ![Data Controller resource](./34.png) -->
 
 * Using PowerShell, login to the Data Controller and check it's health using the below commands.
 
@@ -293,13 +295,13 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
 * To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *MSSQL_MI_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is ~2-3min long**.
 
-  ![MSSQL_MI_Cleanup PowerShell script run](./38.png)
+  ![MSSQL_MI_Cleanup PowerShell script run](./37.png)
 
 ## Re-Deploy Azure Arc Data Controller and SQL MI
 
 * In case you deleted the Azure Arc Data Controller from the EKS cluster, you can re-deploy it by running the *MSSQL_MI_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long**.
 
-  ![Re-Deploy Azure Arc Data Controller PowerShell script](./39.png)
+  ![Re-Deploy Azure Arc Data Controller PowerShell script](./38.png)
 
 ## Delete the deployment
 
@@ -309,4 +311,4 @@ To completely delete the environment, follow the below steps:
 
 * Run the ```terraform destroy --auto-approve``` which will delete all of the AWS resources as well as the Azure resource group. **The *terraform destroy* run time is approximately ~5-10min long**.
 
-  ![terraform destroy](./40.png)
+  ![terraform destroy](./39.png)
