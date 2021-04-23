@@ -152,6 +152,8 @@ Remove-Item "C:\tmp\out.txt" -Force
 Write-Host "Waiting for 5min for all pods to be completely ready for work"
 
 $podname = "$env:POSTGRES_NAME" + "c-0"
+Start-Sleep -Seconds 300
+Write-Host "Ready to go!"
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/AdventureWorks.sql"
 kubectl exec $podname -n $env:ARC_DC_NAME -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql
 
