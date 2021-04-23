@@ -12,7 +12,7 @@ kubectl delete ns $env:ARC_DC_NAME
 # Restoring Azure Data Studio settings
 Write-Host "Restoring Azure Data Studio settings"
 Stop-Process -Name azuredatastudio
-$settingsFile = "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json"
+$settingsFile = "C:\Users\$env:USERNAME\AppData\Roaming\azuredatastudio\User\settings.json"
 Remove-Item $settingsFile -Force
 Remove-Item "C:\tmp\sql_instance_list.txt"
 
