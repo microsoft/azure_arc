@@ -2,6 +2,31 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "ArcBox-Vnet",
+            "metadata": {
+                "description": "Name of the virtual Network"
+            }
+        },
+        "vnetAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.1.0.0/16",
+            "metadata": {
+                "description": "Address prefix"
+            }
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.1.0.0/24",
+            "metadata": {
+                "description": "Subnet Prefix"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "Subnet"
+        },
         "azureLocation": {
             "type": "string",
             "metadata": {
@@ -28,7 +53,7 @@
             "defaultValue": "ArcBox-Data"
         },
         "kubernetesVersion": {
-            "defaultValue": "1.18.14",
+            "defaultValue": "1.18.17",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes"
@@ -88,14 +113,79 @@
             },
             "minValue": 0,
             "maxValue": 1023
+        },
+        "networkPlugin": {
+            "type": "string",
+            "defaultValue": "azure",
+            "metadata": {
+                "description": "Network plugin used for building Kubernetes network."
+            }
+        },
+        "serviceCidr": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "A CIDR notation IP range from which to assign service cluster IPs."
+            }
+        },
+        "dnsServiceIP": {
+            "type": "string",
+            "defaultValue": "10.0.0.10",
+            "metadata": {
+                "description": "Containers DNS server IP address."
+            }
+        },
+        "dockerBridgeCidr": {
+            "type": "string",
+            "defaultValue": "172.17.0.1/16",
+            "metadata": {
+                "description": "A CIDR notation IP for Docker bridge."
+            }
         }
     },
+    "variables": {
+        "builtInRole": {
+            "Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+            "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]"
+        },
+        "vnetSubnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks/subnets',parameters('vnetName'),parameters('subnetName'))]"
+    },
     "resources": [
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('vnetName')]",
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vnetAddressPrefix')]"
+                    ]
+                }
+            },
+            "resources": [
+                {
+                    "apiVersion": "2020-05-01",
+                    "type": "subnets",
+                    "location": "[parameters('azureLocation')]",
+                    "name": "[parameters('subnetName')]",
+                    "dependsOn": [
+                        "[parameters('vnetName')]"
+                    ],
+                    "properties": {
+                        "addressPrefix": "[parameters('subnetPrefix')]"
+                    }
+                }
+            ]
+        },
         {
             "apiVersion": "2020-03-01",
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[parameters('azureLocation')]",
             "name": "[parameters('aksClusterName')]",
+            "dependsOn": [
+                "[parameters('subnetName')]"
+            ],
             "tags": "[parameters('resourceTags')]",
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
@@ -108,7 +198,8 @@
                         "count": "[parameters('agentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('osType')]",
-                        "storageProfile": "ManagedDisks"
+                        "storageProfile": "ManagedDisks",
+                        "vnetSubnetID": "[variables('vnetSubnetID')]"
                     }
                 ],
                 "linuxProfile": {
@@ -124,6 +215,12 @@
                 "servicePrincipalProfile": {
                     "clientId": "[parameters('spnClientId')]",
                     "Secret": "[parameters('spnClientSecret')]"
+                },
+                "networkProfile": {
+                    "networkPlugin": "[parameters('networkPlugin')]",
+                    "serviceCidr": "[parameters('serviceCidr')]",
+                    "dnsServiceIP": "[parameters('dnsServiceIP')]",
+                    "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]"
                 }
             }
         }
