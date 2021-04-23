@@ -1,5 +1,7 @@
 Start-Transcript -Path C:\ArcBox\DataServicesLogonScript.log
 
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
@@ -38,7 +40,7 @@ $Shortcut.Save()
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
-#start PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; sleep 5; clear }}
+#Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; Start-Sleep 5; Clear-Host }}
 azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
 if(($env:dockerRegistry -ne $NULL) -or ($env:dockerRegistry -ne ""))
 {

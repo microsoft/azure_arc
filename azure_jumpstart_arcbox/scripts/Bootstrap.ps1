@@ -86,14 +86,6 @@ function Disable-ieESC {
 }
 Disable-ieESC
 
-# Disable PowerShell QuickEdit
-# Set-Location HKCU:\Console
-# New-Item ‘.%SystemRoot%_System32_WindowsPowerShell_v1.0_Powershell.exe’
-# Set-Location ‘.%SystemRoot%_System32_WindowsPowerShell_v1.0_Powershell.exe’
-# New-ItemProperty . QuickEdit –Type DWORD –Value 0x00000000
-# New-ItemProperty . InsertMode –Type DWORD –Value 0x00000000
-# Pop-Location
-
 # Extending C:\ partition to the maximum size
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
@@ -109,7 +101,7 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,postgresql'
             #Run commands in parallel.
             Parallel 
                 {
@@ -142,7 +134,7 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/settingsTemplate.json" -OutFile "C:\ArcBox\settingsTemplate.json"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\ArcBox\AZDataCLI.msi"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/ArcServersLogonScript.ps1" -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/DataServicesLogonScript.ps1" -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_cni/azure_jumpstart_arcbox/scripts/DataServicesLogonScript.ps1" -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/installArcAgent.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/installArcAgentSQL.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/installArcAgent.sh" -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
