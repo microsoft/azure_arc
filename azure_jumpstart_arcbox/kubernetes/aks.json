@@ -173,7 +173,9 @@
                         "[parameters('vnetName')]"
                     ],
                     "properties": {
-                        "addressPrefix": "[parameters('subnetPrefix')]"
+                        "addressPrefix": "[parameters('subnetPrefix')]",
+                        "privateEndpointNetworkPolicies": "Enabled",
+                        "privateLinkServiceNetworkPolicies": "Enabled"
                     }
                 }
             ]
