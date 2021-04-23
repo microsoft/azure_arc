@@ -35,8 +35,8 @@ Write-Host "`n"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\tmp\azuredatastudio.zip" | Out-Null
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/ekssqlmi/azure_arc_data_jumpstart/eks/mssql_mi/terraform/settings.json" -OutFile "C:\tmp\settings.json"
 Invoke-WebRequest "$env:AZDATA_URL" -OutFile "C:\tmp\AZDataCLI.msi" | Out-Null
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/ekssqlmi/azure_arc_data_jumpstart/eks/mssql_mi/terraform/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\MSSQL_MI_Cleanup.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/ekssqlmi/azure_arc_data_jumpstart/eks/mssql_mi/terraform/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\MSSQL_MI_Deploy.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/eks/mssql_mi/terraform/scripts/MSSQL_MI_Cleanup.ps1" -OutFile "C:\tmp\MSSQL_MI_Cleanup.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/eks/mssql_mi/terraform/scripts/MSSQL_MI_Deploy.ps1" -OutFile "C:\tmp\MSSQL_MI_Deploy.ps1"
 
 Write-Host "Deleting AWS Desktop shortcuts"
 Write-Host "`n"
