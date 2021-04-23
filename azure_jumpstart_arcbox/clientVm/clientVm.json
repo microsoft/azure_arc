@@ -190,8 +190,6 @@
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
-        "subnetAddressPrefix": "10.1.0.0/24",
-        "addressPrefix": "10.1.0.0/16",
         "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/"
     },
     "resources": [
@@ -243,29 +241,6 @@
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2020-05-01",
-            "name": "[parameters('virtualNetworkName')]",
-            "location": "[parameters('location')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[variables('addressPrefix')]"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[parameters('subnetName')]",
-                        "properties": {
-                            "addressPrefix": "[variables('subnetAddressPrefix')]",
-                            "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }
                 ]
