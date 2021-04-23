@@ -25,7 +25,7 @@
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "Subnet"
+            "defaultValue": "ArcBox-Subnet"
         },
         "azureLocation": {
             "type": "string",
