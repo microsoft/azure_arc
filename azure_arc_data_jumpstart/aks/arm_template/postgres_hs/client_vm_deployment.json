@@ -254,19 +254,6 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
                         }
-                    },
-                    {
-                        "name": "allow_PostgreSQL_5432",
-                        "properties": {
-                            "priority": 1002,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "5432"
-                        }
                     }                                                                                                                                     
                 ]
             }
