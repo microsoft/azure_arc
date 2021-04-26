@@ -4,7 +4,7 @@
     "parameters": {
         "vnetName": {
             "type": "string",
-            "defaultValue": "ArcBox-Vnet",
+            "defaultValue": "ArcBox-VNet",
             "metadata": {
                 "description": "Name of the virtual Network"
             }
