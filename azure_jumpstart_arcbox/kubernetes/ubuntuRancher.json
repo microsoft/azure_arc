@@ -54,9 +54,9 @@
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "ArcBox-VNET",
+            "defaultValue": "ArcBox-VNet",
             "metadata": {
-                "description": "Name of the VNET"
+                "description": "Name of the VNet"
             }
         },
         "subnetName": {
