@@ -77,6 +77,8 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
 
 ## Prerequisites
 
+* Ensure you have sufficient vCPU cores available in your Azure subscription. ArcBox requires 44 cores.
+
 * [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
@@ -166,7 +168,7 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
 
   ![Screenshot showing az deployment group create](./deployedresources.png)
 
-* Open a remote desktop connection into _ArcBox-Client_. Upon logging in, multiple automated scripts will open and start running. These scripts will take 10-20 minutes to finish and once completed, Azure Data Studio will start. At this point, the deployment is complete.
+* Open a remote desktop connection into _ArcBox-Client_. Upon logging in, multiple automated scripts will open and start running. These scripts will take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
 
   ![Screenshot showing ArcBox-Client](./clientscript.png)
 
@@ -215,10 +217,17 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
 ### Included tools
 
-| Tool  | Location |
-| ----- | -------- |
-| Item1 | Location |
-| Item2 | Location |
+| Tool                                                 | Location      |
+| ---------------------------------------------------- | ------------- |
+| Azure Data Studio with Arc and PostgreSQL extensions | ArcBox-Client |
+| kubectl, kubectx, helm                               | ArcBox-Client |
+| PostgreSQL tools                                     | ArcBox-Client |
+| Chocolatey                                           | ArcBox-Client |
+| Visual Studio Code                                   | ArcBox-Client |
+| Putty                                                | ArcBox-Client |
+| 7zip                                                 | ArcBox-Client |
+| Terraform                                            | ArcBox-Client |
+| Git                                                  | ArcBox-Client |
 
 ### Next steps
   
