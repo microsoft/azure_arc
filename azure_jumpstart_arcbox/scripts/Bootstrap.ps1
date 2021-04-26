@@ -86,14 +86,6 @@ function Disable-ieESC {
 }
 Disable-ieESC
 
-# Disable PowerShell QuickEdit
-# Set-Location HKCU:\Console
-# New-Item ‘.%SystemRoot%_System32_WindowsPowerShell_v1.0_Powershell.exe’
-# Set-Location ‘.%SystemRoot%_System32_WindowsPowerShell_v1.0_Powershell.exe’
-# New-ItemProperty . QuickEdit –Type DWORD –Value 0x00000000
-# New-ItemProperty . InsertMode –Type DWORD –Value 0x00000000
-# Pop-Location
-
 # Extending C:\ partition to the maximum size
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
@@ -109,7 +101,7 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,postgresql'
             #Run commands in parallel.
             Parallel 
                 {
