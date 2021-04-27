@@ -20,17 +20,18 @@ The following README will guide you on how to connect an Windows machine to Azur
 
 * Create Azure service principal (SP)
 
-    To connect a server to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To connect a server to Azure Arc, an Azure service principal assigned with the "Azure Connected Machine Onboarding" role is required. The Azure Connected Machine Onboarding role is available for at-scale onboarding, and is only able to read or create new Arc enabled servers in Azure. It cannot be used to delete servers already registered or manage extensions. As a best practice, we recommend only assigning this role to the Azure Active Directory (Azure AD) service principal used to onboard machines at scale.
+    To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Azure Connected Machine Onboarding"
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
+    az ad sp create-for-rbac -n "http://AzureArcServers" --role "Azure Connected Machine Onboarding"
     ```
 
     Output should look like this:
