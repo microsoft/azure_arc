@@ -2,9 +2,9 @@
 
 ## Overview
 
-Modern organizations ussually manage diverse and complex IT infrastructures that frequently is distributed accross on-premises, edge and multi-cloud.
+Modern organizations ussually manage diverse and complex IT infrastructures that frequently are distributed accross on-premises, edge and multi-cloud.
 
-In these kind of environments it is very important to have a consistent approach to operations and select the proper tools that allow you to have greater visibility and work at scale. Many enterprises have chosen vendor or technology specific tools which leads to silos, causes a ruptured management experience and an inconsistent approach to operations. When we add to the mix the speed and the innovation that cloud native technologies and practices bring to the table, the challenge becomes even greater. The absence of single view and consistent tooling complicates the management for customer and partners alike.
+In these kind of environments it is very important to have a consistent approach to operations and select the proper tools that allow you to have greater visibility and work at scale. Many enterprises have chosen vendor or technology specific tools which leads to silos, causes a ruptured management experience and an inconsistent approach to operations. When we add to the mix the speed and the innovation that cloud native technologies and practices bring to the table, the challenge becomes even greater. The absence of single view and consistent tooling complicates the management for customers and partners alike.
 
 This guide provides an overview of how managed service providers or any multi-tenant organization can leverage Azure Arc in a scalable way to manage hybrid and multicloud environments, with visibility across all managed tenants by using Azure Lighthouse.
 
@@ -12,7 +12,7 @@ This guide provides an overview of how managed service providers or any multi-te
 
 [Azure Lighthouse](https://docs.microsoft.com/en-us/azure/lighthouse/overview) is an Azure service that enables cross and multi-tenant management providing greater visibility and scale into operations. Azure Lighthouse uses an Azure Resource Provider that brings the Azure Delegated Resource Management capability by logically projecting resources from one tenant onto another and unlocking cross-tenant management without the need to do context switching.
 
-This service is very valuable service for service providers as they can realize efficiencies in their offerings using Azure’s operations and management tools for multiple customers, however it is as valuable to customers that may have multiple Azure AD tenants (e.g. multiple subsidiaries or geographies in separate tenants).
+This service is very valuable for service providers as they can realize efficiencies in their offerings using Azure’s operations and management tools for multiple customers, however it is as useful to customers that may have multiple Azure AD tenants (e.g. multiple subsidiaries or geographies in separate tenants).
 
 To get started with Azure Lighthouse you can onboard a managed tenant using the Azure Delegated resource management. The onboarding process can be done in two different ways:
 
@@ -43,13 +43,11 @@ With Azure Arc you can even take it a step further as now Azure Policies can be 
 
 ![Azure Policy and Azure Arc](./04.png)
 
-To work with Azure Arc and Azure Policies check out this Jumpstart scenarios:
+Your Azure Arc enabled resources should be registered on a managed tenant so you can centrally managed compliance from the Azure Lighthouse powered tenant. To work with Azure Arc and Azure Policies check out this Jumpstart scenarios:
 
 - [Deploy Monitoring Agent Extension to Azure Arc Linux and Windows servers using Azure Policy](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/)
 - [Apply GitOps configurations on AKS as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks/aks_policy/#apply-gitops-configurations-on-aks-as-an-azure-arc-connected-cluster-using-azure-policy-for-kubernetes)
 - [Apply GitOps configurations on GKE as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_policy/#apply-gitops-configurations-on-gke-as-an-azure-arc-connected-cluster-using-azure-policy-for-kubernetes)
-
-Your Azure Arc enabled resources should be registered on a managed tenant so you can centrally managed compliance from the Azure Lighthouse powered tenant.
 
 ### Inventory Management
 
