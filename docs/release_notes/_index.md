@@ -9,6 +9,44 @@ weight: 3
 
 Release notes will be released on the first week of each month and will cover the previous month.
 
+## April 2021
+
+### Azure Arc enabled Kubernetes scenarios
+
+* [New Scenario: Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extension](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/)
+
+* [New Scenario: Deploy Alibaba Cloud Container Service for Kubernetes cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/alibaba/alibaba_terraform/)
+
+* [Bug fix: GKE cluster Terraform plan - az_connect_gke.sh link #455](https://github.com/microsoft/azure_arc/issues/455)
+
+* [Bug fix: Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster - Fork vs Clone #459](https://github.com/microsoft/azure_arc/issues/459)
+
+* [Bug fix: Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster - Helm Endpoint #460](https://github.com/microsoft/azure_arc/issues/460)
+
+* [Bug fix: Create cluster with arc_capi_azure.sh hangs when vm SKU of control plane and node are not the same #480](https://github.com/microsoft/azure_arc/issues/480)
+
+* [Bug fix: EKS cluster Terraform plan #521](https://github.com/microsoft/azure_arc/issues/521)
+
+### Azure Arc enabled data services scenarios
+
+* [New Scenario: Deploy Azure SQL Managed Instance on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_arm_template_ado/)
+
+* [New Scenario: Deploy Azure PostgreSQL Hyperscale on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_hyperscale_arm_template_ado/)
+
+* [New Scenario: Deploy a SQL Managed Instance on EKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_mssql_mi/)
+
+* [Bug fix: SECURITY Vulnerability : PostgreSQL port 5432 opened to * #396](https://github.com/microsoft/azure_arc/issues/396)
+
+* [Bug fix: GKE default storage class #493](https://github.com/microsoft/azure_arc/issues/493)
+
+* [Bug fix: Data Client VM ARM template has inbound ports open for MSSQL and PostGres #497](https://github.com/microsoft/azure_arc/issues/497)
+
+* [Bug fix: wrong uri #511](https://github.com/microsoft/azure_arc/issues/511)
+
+* [Bug fix: remove quotes in POSTGRES_DATASIZE and POSTGRES_WORKER_NODE_COUNT #512](https://github.com/microsoft/azure_arc/issues/512)
+
+* [Feature request: Adding psql to client vm #519](https://github.com/microsoft/azure_arc/issues/519)
+
 ## March 2021
 
 ### Jumpstart enhancements
