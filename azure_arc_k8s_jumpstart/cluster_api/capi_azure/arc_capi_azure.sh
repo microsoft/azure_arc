@@ -3,7 +3,7 @@ export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 
 # Set deployment environment variables
-export KUBERNETES_VERSION="<Kubernetes version>" # For example: "1.18.10"
+export KUBERNETES_VERSION="<Kubernetes version>" # For example: "1.18.17"
 export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
 export WORKER_MACHINE_COUNT="<Workers node count>"
 export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
@@ -22,7 +22,7 @@ export AZURE_CLIENT_ID_B64="$(echo -n "$AZURE_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$AZURE_CLIENT_SECRET" | base64 | tr -d '\n')"
 
 # Transforming the kind cluster to a Cluster API management cluster
-echo "Transforming the kind Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
+echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
 clusterctl init --infrastructure azure
 echo "Making sure cluster is ready..."
 echo ""
