@@ -24,7 +24,7 @@ The following README will guide you on how to use the provided [Terraform](https
   az --version
   ```
 
-* [Create a free Google Cloud account](https://cloud.google.com/free)
+* [Create a Google Cloud account](https://cloud.google.com/free)
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
