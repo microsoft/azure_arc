@@ -22,7 +22,7 @@ export AZURE_CLIENT_ID_B64="$(echo -n "$AZURE_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$AZURE_CLIENT_SECRET" | base64 | tr -d '\n')"
 
 # Transforming the kind cluster to a Cluster API management cluster
-echo "Transforming the kind Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
+echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
 clusterctl init --infrastructure azure
 echo "Making sure cluster is ready..."
 echo ""
