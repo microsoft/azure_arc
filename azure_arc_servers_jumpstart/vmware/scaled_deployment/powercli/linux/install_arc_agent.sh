@@ -4,7 +4,7 @@
 source /tmp/arctemp/vars.sh
 
 # Download the installation package
-wget https://aka.ms/azcmagent -O /tmp/arctemp/install_linux_azcmagent.sh
+curl -L https://aka.ms/azcmagent -o /tmp/arctemp/install_linux_azcmagent.sh -create-dirs
 
 # Install the hybrid agent
 bash /tmp/arctemp/install_linux_azcmagent.sh
