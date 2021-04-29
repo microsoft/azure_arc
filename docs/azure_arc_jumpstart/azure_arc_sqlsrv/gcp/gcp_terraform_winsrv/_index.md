@@ -28,7 +28,15 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
   az --version
   ```
 
-* [Create a free Google Cloud account](https://cloud.google.com/free) if you don't have one already.
+* Google Cloud account with billing enabled - [Create a free trial account](https://cloud.google.com/free). To create Windows Server virtual machines, you must upgraded your account to enable billing. Click Billing from the menu and then select Upgrade in the lower right.
+
+    ![Screenshot showing how to enable billing on GCP account](./45.png)
+
+    ![Screenshot showing how to enable billing on GCP account](./46.png)
+
+    ![Screenshot showing how to enable billing on GCP account](./47.png)
+
+    ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
