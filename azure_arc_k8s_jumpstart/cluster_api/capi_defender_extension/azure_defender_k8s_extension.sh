@@ -28,7 +28,7 @@ echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO 
 sudo tee /etc/apt/sources.list.d/azure-cli.list
 sudo apt-get install azure-cli
 
-echo "Clear cached helm AzureArc Helm Charts"
+echo "Clear cached helm Azure Arc Helm Charts"
 rm -rf ~/.azure/AzureArcCharts
 
 echo "Checking if you have up-to-date Azure Arc AZ CLI 'connectedk8s' extension..."
