@@ -25,8 +25,8 @@ ForEach ($VMName in $VMs) {
     Destination = "/tmp/arctemp/"
     VM = $VM
     LocalToGuest = $true
-    GuestUser = $env:OSAdmin # OSAdmin defined in vars.ps1
-    GuestPassword = $env:OSAdminPassword # OSAdminPassword defined in vars.ps1
+    GuestUser = "$env:OSAdmin" # OSAdmin defined in vars.ps1
+    GuestPassword = "$env:OSAdminPassword" # OSAdminPassword defined in vars.ps1
     Verbose = $false
   }
 
