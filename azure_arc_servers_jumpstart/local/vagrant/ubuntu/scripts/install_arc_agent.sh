@@ -30,4 +30,5 @@ azcmagent connect \
   --resource-group "${resourceGroup}" \
   --tenant-id "${tenantId}" \
   --location "${location}" \
-  --subscription-id "${subscriptionId}"
+  --subscription-id "${subscriptionId}" \
+  --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
