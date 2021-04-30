@@ -152,7 +152,7 @@ If you want to demo/control the actual registration process, do the following:
 * Run the following command
 
     ```shell
-    azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-Servers-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id
+    azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-Servers-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
     ```
 
     ![Screenshot showing azcmagent connect being run](./16.png)

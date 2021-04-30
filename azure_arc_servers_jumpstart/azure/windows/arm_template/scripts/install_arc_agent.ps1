@@ -47,7 +47,8 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
  --tenant-id $env:tenantId `
  --location $env:location `
  --subscription-id $env:subscriptionId `
- --tags "Project=jumpstart_azure_arc_servers"
+ --tags "Project=jumpstart_azure_arc_servers" `
+ --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
 Stop-Process -Name powershell -Force
