@@ -21,4 +21,5 @@ if($exitCode -ne 0) {
   --location $env:location `
   --subscription-id $env:subscription_id `
   --cloud "AzureCloud" `
-  --tags "Project=jumpstart_azure_arc_servers"
+  --tags "Project=jumpstart_azure_arc_servers" `
+  --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
