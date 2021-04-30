@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "AKS Engine Kubernetes Cluster with Azure CLI"
-linkTitle: "AKS Engine Kubernetes Cluster with Azure CLI"
+title: "AKS Engine Kubernetes cluster in Azure with Azure CLI"
+linkTitle: "AKS Engine Kubernetes cluster in Azure with Azure CLI"
 weight: 1
 description: >
 ---
