@@ -157,7 +157,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   az group create --name Arc-kind-Demo -l EastUS -o table
   ```
 
-  > **Note: Azure Arc enabled Kubernetes is currently supported in *East US* and *West Europe***
+  > Note: See this [table](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc) for Azure Arc enabled Kubernetes region availability.
 
   ![Create Azure resource group](./03.png)
 
