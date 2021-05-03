@@ -19,46 +19,15 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: postgresql-11s.arcdata.microsoft.com
+  name: postgresqls.arcdata.microsoft.com
 spec:
   group: arcdata.microsoft.com
   version: v1alpha1
   names:
-    kind: postgresql-11
-    plural: postgresql-11s
-    categories: ["postgresqls"]
+    kind: postgresql
+    plural: postgresqls
     shortNames:
-    - pg11
-  subresources:
-    status: {}
-  additionalPrinterColumns:
-  - name: State
-    type: string
-    JSONPath: ".status.state"
-  - name: Ready-Pods
-    type: string
-    JSONPath: ".status.readyPods"
-  - name: External-Endpoint
-    type: string
-    JSONPath: ".status.externalEndpoint"
-  - name: Age
-    type: date
-    JSONPath: ".metadata.creationTimestamp"
-  scope: Namespaced
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: postgresql-12s.arcdata.microsoft.com
-spec:
-  group: arcdata.microsoft.com
-  version: v1alpha1
-  names:
-    kind: postgresql-12
-    plural: postgresql-12s
-    categories: ["postgresqls"]
-    shortNames:
-    - pg12
+    - postgres
   subresources:
     status: {}
   additionalPrinterColumns:
@@ -104,3 +73,4 @@ spec:
     type: date
     JSONPath: ".metadata.creationTimestamp"
   scope: Namespaced
+---
