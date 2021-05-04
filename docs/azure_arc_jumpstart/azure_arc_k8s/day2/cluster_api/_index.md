@@ -2,6 +2,6 @@
 type: docs
 title: "Cluster API"
 linkTitle: "Cluster API"
-weight: 6
+weight: 3
 description: >-
 ---

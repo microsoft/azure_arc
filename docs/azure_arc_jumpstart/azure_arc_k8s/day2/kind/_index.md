@@ -2,6 +2,6 @@
 type: docs
 title: "Kind"
 linkTitle: "Kind"
-weight: 4
+weight: 5
 description: >-
 ---
