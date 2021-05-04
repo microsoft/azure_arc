@@ -36,10 +36,10 @@ clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --kubernetes-version v$KUBERNETES_VERSION \
   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
-  --infrastructure=$CAPI_PROVIDER \
   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-wget -O audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Secret
