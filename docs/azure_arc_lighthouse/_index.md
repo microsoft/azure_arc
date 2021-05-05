@@ -117,11 +117,11 @@ Contoso can use configuration as code and uniformly govern and deploy containeri
 
 ![Azure Arc GitOps](./11.png)
 
-Azure Arc enabled data services allows Contoso to run Azure data services like Azure SQL Managed Instance and Azure Database for PostreSQL Hyperscale on any Kubernetes cluster with unified management and familiar tools. With Azure Arc and Azure Lighthouse, Contoso is empowered to create cloud native management operations with no location boundaries.
+Azure Arc enabled data services to allow Contoso to run Azure data services like Azure SQL Managed Instance and Azure Database for PostgreSQL Hyperscale on any Kubernetes cluster with unified management and familiar tools. With Azure Arc and Azure Lighthouse, Contoso is empowered to create cloud-native management operations with no location boundaries.
 
 All of these data and application deployments can be done across organizations by using Azure Lighthouse delegated management features.
 
-To work with Azure Arc enabled data services and Azure Arc enabled Kubernetes check out this Jumpstart scenarios:
+To work with Azure Arc enabled data services and Azure Arc enabled Kubernetes check out these Jumpstart scenarios:
 
 - [Deploy GitOps configurations and perform basic GitOps flow on AKS on Azure Stack HCI as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks_stack_hci/aks_hci_gitops_basic/)
 - [Deploy GitOps configurations and perform Helm-based GitOps flow on AKS on Azure Stack HCI as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks_stack_hci/aks_hci_gitops_helm/)
