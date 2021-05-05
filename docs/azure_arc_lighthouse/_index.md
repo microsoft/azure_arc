@@ -35,15 +35,15 @@ In our scenario, now Arc Contoso can use Azure Arc to not only understand and or
 
 ### Governance and Compliance
 
-Azure Policy provides the mechanism to enforce corporate standards and to assess compliance at-scale. Through it, you can implement governance for consistency of deployments, compliance, control costs and improve your security posture; with its compliance dashboard you will get an aggregated view of the overall state of the Azure environment as well as remediation capabilities. If your resources are distributed across different tenants, Azure Lighthouse will provide the full picture of your compliance status.
+Azure Policy provides the mechanism to enforce corporate standards and to assess compliance at scale. Through it, you can implement governance for consistency of deployments, compliance, control costs, and improve your security posture; with its compliance dashboard, you will get an aggregated view of the overall state of the Azure environment as well as remediation capabilities. If your resources are distributed across different tenants, Azure Lighthouse will provide the full picture of your compliance status.
 
 ![Azure Policy and Azure Lighthouse](./03.png)
 
-With Azure Arc you can even take it a step further as now Azure Policies can be assigned to Azure Arc enabled servers and Kubernetes, this way you can apply the same set of policies accross hybrid and multicloud resources to entirely manage governance and guarantee corporate compliance.
+With Azure Arc you can even take it a step further as now Azure Policies can be assigned to Azure Arc enabled servers and Kubernetes, this way you can apply the same set of policies across hybrid and multi-cloud resources to entirely manage governance and guarantee corporate compliance.
 
 ![Azure Policy and Azure Arc](./04.png)
 
-Your Azure Arc enabled resources should be registered on a managed tenant so you can centrally managed compliance from the Azure Lighthouse powered tenant. To work with Azure Arc and Azure Policies check out this Jumpstart scenarios:
+Your Azure Arc enabled resources should be registered on a managed tenant so you can centrally manage compliance from the Azure Lighthouse-powered tenant. To work with Azure Arc and Azure Policies check out these Jumpstart scenarios:
 
 - [Deploy Monitoring Agent Extension to Azure Arc Linux and Windows servers using Azure Policy](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/)
 - [Apply GitOps configurations on AKS as an Azure Arc Connected Cluster using Azure Policy for Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks/aks_policy/#apply-gitops-configurations-on-aks-as-an-azure-arc-connected-cluster-using-azure-policy-for-kubernetes)
