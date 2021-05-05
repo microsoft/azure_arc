@@ -5,18 +5,18 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
+# Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
 
-Write-Host "Checking kubernetes nodes"
-Write-Host "`n"
-kubectl get nodes
-azdata --version
+# Write-Host "Checking kubernetes nodes"
+# Write-Host "`n"
+# kubectl get nodes
+# azdata --version
 
-Write-Host "Enabling Container Insights for AKS"
-Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
-$env:resourceGroup=(Get-AzResource -Name ArcBox-Client).ResourceGroupName
-$env:workspaceId=(Get-AzResource -Name $env:workspaceName).ResourceId
-Get-AzAksCluster -ResourceGroupName $env:resourceGroup -Name ArcBox-Data | Enable-AzAksAddon -Name Monitoring -WorkspaceResourceId $env:workspaceId
+# Write-Host "Enabling Container Insights for AKS"
+# Set-Item Env:\SuppressAzurePowerShellBreakingChangeWarnings "true"
+# $env:resourceGroup=(Get-AzResource -Name ArcBox-Client).ResourceGroupName
+# $env:workspaceId=(Get-AzResource -Name $env:workspaceName).ResourceId
+# Get-AzAksCluster -ResourceGroupName $env:resourceGroup -Name ArcBox-Data | Enable-AzAksAddon -Name Monitoring -WorkspaceResourceId $env:workspaceId
 
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
@@ -38,25 +38,25 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Deploying Azure Arc Data Controller
-Write-Host "Deploying Azure Arc Data Controller"
-Write-Host "`n"
-#Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; Start-Sleep 5; Clear-Host }}
-azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
-if(($env:dockerRegistry -ne $NULL) -or ($env:dockerRegistry -ne ""))
-{
-    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.registry=$env:dockerRegistry"
-}
-if(($env:dockerRepository -ne $NULL) -or ($env:dockerRepository -ne ""))
-{
-    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.repository=$env:dockerRepository"
-}
-if(($env:dockerTag -ne $NULL) -or ($env:dockerTag -ne ""))
-{
-    azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.imageTag=$env:dockerTag"
-}
+# Write-Host "Deploying Azure Arc Data Controller"
+# Write-Host "`n"
+# #Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; Start-Sleep 5; Clear-Host }}
+# azdata arc dc config init --source azure-arc-aks-premium-storage --path ./custom
+# if(($env:dockerRegistry -ne $NULL) -or ($env:dockerRegistry -ne ""))
+# {
+#     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.registry=$env:dockerRegistry"
+# }
+# if(($env:dockerRepository -ne $NULL) -or ($env:dockerRepository -ne ""))
+# {
+#     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.repository=$env:dockerRepository"
+# }
+# if(($env:dockerTag -ne $NULL) -or ($env:dockerTag -ne ""))
+# {
+#     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.imageTag=$env:dockerTag"
+# }
 
-azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
-Start-Sleep -s 30
+# azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
+# Start-Sleep -s 30
 
 Write-Host "Deploying SQL MI and Postgres data services"
 Write-Host "`n"
@@ -96,7 +96,7 @@ Workflow DatabaseDeploy
     }
 }
 
-DatabaseDeploy | Format-Table
+# DatabaseDeploy | Format-Table
 
 # Creating Azure Data Studio settings for database connections
 Write-Host ""
