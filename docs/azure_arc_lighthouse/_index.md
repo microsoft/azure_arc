@@ -99,13 +99,13 @@ To work with Azure Arc extension management check out these Jumpstart scenarios:
 
 ### Access Management
 
-Another important topic in unified operations is being able to keep track what the different teams are doing and provide insights into the operations that are perfomed on resources or subscriptions.
+Another important topic in unified operations is being able to keep track of what the different teams are doing and provide insights into the operations that are performed on resources or subscriptions.
 
-With Azure Lighthouse the managed tenant can view Azure Activity log data to see all of the actions taken, this gives full visibility into operations that are performed through the Azure delegated resource management. Azure Lighthouse also uses supports Azure RBAC so you can give access to your resources following the principle of least priviledge so that users only have the permissions needed to complete their job.
+With Azure Lighthouse the managed tenant can view Azure Activity log data to see all of the actions taken, this gives full visibility into operations that are performed through the Azure delegated resource management. Azure Lighthouse also uses supports Azure RBAC so you can give access to your resources following the principle of least privilege so that users only have the permissions needed to complete their job.
 
 ![Azure Lighthouse RBAC](./09.png)
 
-If you are centralizing operations in Azure and this includes on-premises and multicloud resources with Azure Arc, you will want to also control access to these services. Access to Azure Arc enabled resources is controlled by standard Azure RBAC, so from Access Control (IAM) in the Azure portal you can verify who has access to your resources and any actions taken from Azure will also be reflected on the Activity log.
+If you are centralizing operations in Azure and this includes on-premises and multi-cloud resources with Azure Arc, you will want to also control access to these services. Access to Azure Arc enabled resources is controlled by standard Azure RBAC, so from Access Control (IAM) in the Azure portal you can verify who has access to your resources and any actions taken from Azure will also be reflected on the Activity log.
 
 ![Azure Arc RBAC](./10.png)
 
