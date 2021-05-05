@@ -51,7 +51,7 @@ Your Azure Arc enabled resources should be registered on a managed tenant so you
 
 ### Inventory Management
 
-By using Azure Arc your on-premises and multicloud resources become part of Azure Resource Manager and therefore you can use tools such as Azure Reources Graph as a way to explore your inventory at scale.  Your Azure Resource Graph queries can now include Azure Arc enabled resources with filtering, using tags or tracking changes.
+By using Azure Arc, your on-premises and multi-cloud resources become part of Azure Resource Manager and therefore you can use tools such as Azure Resource Graph as a way to explore your inventory at scale.  Your Azure Resource Graph queries can now include Azure Arc enabled resources with filtering, using tags, or tracking changes.
 
 For multitenant organizations, this service also supports Azure Lighthouse to allow you to query resources in a managed tenant.
 
