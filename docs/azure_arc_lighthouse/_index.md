@@ -63,11 +63,11 @@ To explore this use case, use this Jumpstart scenario to work with tagged Azure 
 
 ### Monitoring and Alerting
 
-Azure Lighthouse allows Contoso to also get monitoring and security alerts across all of the tenant’s subscriptions, run multitenant queries using KQL and set up dashboards that provides valuable insights on the managed environments. There is no need to store logs from different entities into a shared log analytics workspace, Microsoft, Fabrikam and Fourth Coffee can  keep their logs on a dedicated workspace in their subscription, while Contoso gets delegated access to them and get insights from all tenants.
+Azure Lighthouse allows Contoso to also get monitoring and security alerts across all of the tenant’s subscriptions, run multitenant queries using Kusto query language (KQL), and set up dashboards that provide valuable insights on the managed environments. There is no need to store logs from different entities into a shared log analytics workspace, Microsoft, Fabrikam and Fourth Coffee can keep their logs on a dedicated workspace in their subscription, while Contoso gets delegated access to them and get insights from all tenants.
 
 ![Azure Monitor multitenant](./06.png)
 
-By enabling a resource in Azure Arc it gives you the ability to perform configuration management and monitoring tasks on those services as if they were first class citizens in Azure. You will be able to monitor your connected machine guest operating system performance or your Kubernetes clusters at the scope of the resource with VM and container Insights.
+By enabling a resource in Azure Arc it gives you the ability to perform configuration management and monitoring tasks on those services as if they were first-class citizens in Azure. You will be able to monitor your connected machine guest operating system performance or your Kubernetes clusters at the scope of the resource with VM and container Insights.
 
 ![Azure Monitor with Azure Arc](./07.png)
 
