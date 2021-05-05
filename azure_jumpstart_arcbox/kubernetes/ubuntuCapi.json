@@ -110,7 +110,7 @@
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
-        "subnetAddressPrefix": "172.16.1.0/24",
+        "subnetAddressPrefix": "172.16.10.0/24",
         "addressPrefix": "172.16.0.0/16"
     },
     "resources": [
