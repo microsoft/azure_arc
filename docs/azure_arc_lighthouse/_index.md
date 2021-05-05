@@ -80,13 +80,13 @@ Use these Jumpstart scenarios to integrate Azure Monitor and Azure Arc in your m
 
 ### Hybrid Services Onboarding at Scale
 
-In the Contoso scenario, you will centrally manage at scale infrastructure and services that are distributed, for the operations you will usually use services such as zure Monitoring, Azure Automation, Azure Security Center or Azure Sentinel. To work with these services you will need to deploy an agent on your Arc enabled resources and there are several ways you can do that:
+In the Contoso scenario, you will centrally manage at scale infrastructure and services that are distributed, for the operations you will usually use services such as Azure Monitoring, Azure Automation, Azure Security Center, or Azure Sentinel. To work with these services you will need to deploy an agent on your Arc enabled resources and there are several ways you can do that:
 
-- Using a configuration management tool of your choise
+- Using a configuration management tool of your choice
 - Using Azure Policy and its remediation tasks
 - Azure Arc’s extension management capabilities
 
-The extension management feature for [Azure Arc enabled servers](https://docs.microsoft.com/en-us/azure/azure-arc/servers/manage-vm-extensions) and [Azure Arc enabled Kubernetes](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/extensions) provides the same post-deployment configuration and automation tasks that you have for Azure VMs or Azure Kubernetes Service. With this feature you can deploy small pieces of software to your Arc enabled resources in an automated fashion, this can be the onboarding on Azure Monitor, Azure Defender, DSC or even the deployment of a custom script on your VMs.
+The extension management feature for [Azure Arc enabled servers](https://docs.microsoft.com/en-us/azure/azure-arc/servers/manage-vm-extensions) and [Azure Arc enabled Kubernetes](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/extensions) provides the same post-deployment configuration and automation tasks that you have for Azure VMs or Azure Kubernetes Service. With this feature, you can deploy small pieces of software to your Arc enabled resources in an automated fashion, onboarding to Azure Monitor, Azure Defender, DSC, or even deploy a custom script on your VMs.
 
 ![Azure Arc extension management](./08.png)
 
