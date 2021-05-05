@@ -9,6 +9,13 @@
         "description": "Name of the VNet"
       }
     },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "ArcBox-Subnet",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network"
+      }
+    },
     "workspaceName": {
       "type": "string",
       "metadata": {
