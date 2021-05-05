@@ -61,7 +61,7 @@
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "ArcBox-Subnet",
+            "defaultValue": "ArcBox-Rancher-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
