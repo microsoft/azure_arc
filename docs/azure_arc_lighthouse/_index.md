@@ -2,11 +2,11 @@
 
 ## Overview
 
-Modern organizations ussually manage diverse and complex IT infrastructures that frequently are distributed accross on-premises, edge and multi-cloud.
+Modern organizations usually manage diverse and complex IT infrastructures that frequently are distributed across on-premises, edge, and multi-cloud.
 
-In these kind of environments it is very important to have a consistent approach to operations and select the proper tools that allow you to have greater visibility and work at scale. Many enterprises have chosen vendor or technology specific tools which leads to silos, causes a ruptured management experience and an inconsistent approach to operations. When we add to the mix the speed and the innovation that cloud native technologies and practices bring to the table, the challenge becomes even greater. The absence of single view and consistent tooling complicates the management for customers and partners alike.
+In these kinds of environments, it is very important to have a consistent approach to operations and select the proper tools that allow you to have greater visibility and work at scale. Many enterprises have chosen vendor or technology-specific tools which leads to silos, causes a ruptured management experience, and an inconsistent approach to operations. When we add to the mix the speed and the innovation that cloud-native technologies and practices bring to the table, the challenge becomes even greater. The absence of a single view and consistent tooling complicates the management for customers and partners alike.
 
-This guide provides an overview of how managed service providers or any multi-tenant organization can leverage Azure Arc in a scalable way to manage hybrid and multicloud environments, with visibility across all managed tenants by using Azure Lighthouse.
+This guide provides an overview of how managed service providers or any multi-tenant organization can leverage Azure Arc in a scalable way to manage hybrid and multi-cloud environments, with visibility across all managed tenants by using Azure Lighthouse.
 
 ### Management across tenants
 
