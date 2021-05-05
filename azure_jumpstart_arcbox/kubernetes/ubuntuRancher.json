@@ -61,7 +61,7 @@
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "ArcBox-Rancher-Subnet",
+            "defaultValue": "ArcBox-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
@@ -109,9 +109,7 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "osDiskType": "Premium_LRS",
-        "subnetAddressPrefix": "172.16.1.0/24",
-        "addressPrefix": "172.16.0.0/16"
+        "osDiskType": "Premium_LRS"
     },
     "resources": [
         {
@@ -240,29 +238,6 @@
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "32323"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-04-01",
-            "name": "[parameters('virtualNetworkName')]",
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[variables('addressPrefix')]"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[parameters('subnetName')]",
-                        "properties": {
-                            "addressPrefix": "[variables('subnetAddressPrefix')]",
-                            "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }
                 ]
