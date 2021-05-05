@@ -19,19 +19,19 @@ To get started with Azure Lighthouse you can onboard a managed tenant using the 
 - [Using an ARM template](https://docs.microsoft.com/en-us/azure/lighthouse/how-to/onboard-customer#create-an-azure-resource-manager-template)
 - [Publishing a Managed Service offer to the Azure Marketplace](https://docs.microsoft.com/en-us/azure/lighthouse/how-to/publish-managed-services-offers)
 
-After you finish the onboarding process you will have a central management tenant, in this scenario Contoso, that will aggregate the information from multiple customers: Microsoft, Fabrikam and Fourth Coffee.
+After you finish the onboarding process you will have a central management tenant, in this scenario Contoso, that will aggregate the information from multiple customers: Microsoft, Fabrikam, and Fourth Coffee.
 
 ![Azure Lighthouse Diagram](./01.png)
 
 ### Extend Azure management across your environments
 
-Once you have centralized all operations in Azure using Lighthouse and Azure's Operations and Management tools, you can strech those services to run across on-premises, other clouds, or the edge.
+Once you have centralized all operations in Azure using Lighthouse and Azure's Operations and Management tools, you can stretch these services to run across on-premises, other clouds, or the edge.
 
-With Azure Arc your on-premises and other clouds deployments become an Azure Resource Manager entity and as such, servers, Kubernetes clusters or data services  can be treated as first-class citizens of Azure.  As any other ARM resource, they can be organized into resource groups and subscriptions, use tags, policies, assign RBAC and you can even leverage Azure Arc to onboard other services such as Azure Monitoring, Azure Security Center, Azure Sentinel or Azure Automation.
+With Azure Arc, your on-premises and other cloud deployments become an Azure Resource Manager entity and as such, servers, Kubernetes clusters, or data services can be treated as first-class citizens of Azure.  As with any other ARM resource, they can be organized into resource groups and subscriptions, use tags, policies, assign RBAC, and can even leverage Azure Arc to onboard other services such as Azure Monitoring, Azure Security Center, Azure Sentinel, or Azure Automation.
 
 ![Azure Lighthouse and Azure Arc Diagram](./02.png)
 
-In our scenario, now Arc Contoso can use Azure Arc to not only understand and organize the breadth of operations, but also extend and grow services and offerings provided in Azure into every corner of the digital state. Using Azure hybrid management services with Azure Arc allows Contoso to adopt cloud-native practices everywhere and Lighthouse will provide the multitenancy required to have a single view into operations. Now we can explore key cross-tenant management experiences that are enabled by Azure Arc and Azure Lighthouse.
+In our scenario, now Arc Contoso can use Azure Arc to not only understand and organize the breadth of operations but also extend and grow services and offerings provided in Azure into every corner of the digital state. Using Azure hybrid management services with Azure Arc allows Contoso to adopt cloud-native practices everywhere and Lighthouse will provide the multitenancy required to have a single view into operations. Now we can explore key cross-tenant management experiences that are enabled by Azure Arc and Azure Lighthouse.
 
 ### Governance and Compliance
 
