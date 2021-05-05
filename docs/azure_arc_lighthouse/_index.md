@@ -90,7 +90,7 @@ The extension management feature for [Azure Arc enabled servers](https://docs.mi
 
 ![Azure Arc extension management](./08.png)
 
-To work with Azure Arc extension management check out this Jumpstart scenarios:
+To work with Azure Arc extension management check out these Jumpstart scenarios:
 
 - [Deploy Monitoring Agent Extension on Azure Arc Linux and Windows servers using Extension Management](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_mma_arm/#deploy-monitoring-agent-extension-on-azure-arc-linux-and-windows-servers-using-extension-management)
 - [Deploy Custom Script Extension on Azure Arc Linux and Windows servers using Extension Management](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_customscript_arm/#deploy-custom-script-extension-on-azure-arc-linux-and-windows-servers-using-extension-management)
