@@ -12,7 +12,7 @@ This guide provides an overview of how managed service providers or any multi-te
 
 [Azure Lighthouse](https://docs.microsoft.com/en-us/azure/lighthouse/overview) is an Azure service that enables cross and multi-tenant management providing greater visibility and scale into operations. Azure Lighthouse uses an Azure Resource Provider that brings the Azure Delegated Resource Management capability by logically projecting resources from one tenant onto another and unlocking cross-tenant management without the need to do context switching.
 
-This service is very valuable for service providers as they can realize efficiencies in their offerings using Azure’s operations and management tools for multiple customers, however it is as useful to customers that may have multiple Azure AD tenants (e.g. multiple subsidiaries or geographies in separate tenants).
+This service is very valuable for service providers as they can realize efficiencies in their offerings using Azure’s operations and management tools for multiple customers, however, it is as useful to customers that may have multiple Azure AD tenants (e.g. multiple subsidiaries or geographies in separate tenants).
 
 To get started with Azure Lighthouse you can onboard a managed tenant using the Azure Delegated resource management. The onboarding process can be done in two different ways:
 
