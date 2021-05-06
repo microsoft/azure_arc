@@ -48,17 +48,17 @@ export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$azureLocation # Name of the Azure datacenter location.
 export CAPI_WORKLOAD_CLUSTER_NAME="arcbox-capi-data" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 export AZURE_SUBSCRIPTION_ID=$subscriptionId
-export AZURE_TENANT_ID=$spnTenantId
-export AZURE_CLIENT_ID=$spnClientId
-export AZURE_CLIENT_SECRET=$spnClientSecret
+export AZURE_TENANT_ID=$SPN_TENANT_ID
+export AZURE_CLIENT_ID=$SPN_CLIENT_ID
+export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
 export AZURE_NODE_MACHINE_TYPE="Standard_D4s_v3"
 
 # Azure cloud settings - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
-export AZURE_TENANT_ID_B64="$(echo -n "$spnTenantId" | base64 | tr -d '\n')"
-export AZURE_CLIENT_ID_B64="$(echo -n "$spnClientId" | base64 | tr -d '\n')"
-export AZURE_CLIENT_SECRET_B64="$(echo -n "$spnClientSecret" | base64 | tr -d '\n')"
+export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
 
 # Installing snap
 sudo apt install snapd
@@ -72,15 +72,10 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kubectl --classic
 
 # Installing kind and deploying initial cluster
-sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
 sudo chmod +x ./kind
 sudo mv ./kind /usr/local/bin
 sudo kind create cluster
-sudo cp ${HOME}/.kube/config /home/${adminUsername}/.kube/config
-sudo cp ${HOME}/.kube/config /home/${adminUsername}/.kube/config.staging
-chown -R $adminUsername /home/${adminUsername}/.kube/
-chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 sudo cp .kube/config /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
