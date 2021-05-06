@@ -25,9 +25,6 @@ sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 
-chmod +x vars.sh 
-. ./vars.sh
-
 # Set CAPI deployment environment variables
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
@@ -48,6 +45,9 @@ export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '
 export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
+
+chmod +x vars.sh 
+. ./vars.sh
 
 # Installing Azure CLI & Azure Arc Extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
