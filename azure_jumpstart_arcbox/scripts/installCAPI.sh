@@ -41,9 +41,9 @@ sudo snap install kubectl --classic
 
 # Installing kind and deploying initial cluster
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
-sudo -u $adminUsername chmod +x ./kind
-sudo -u $adminUsername mv ./kind /usr/local/bin
-sudo -u $adminUsername kind create cluster
+sudo chmod +x ./kind
+sudo mv ./kind /usr/local/bin
+sudo kind create cluster
 
 sudo cp .kube/config /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
@@ -56,15 +56,14 @@ sudo mv ./clusterctl /usr/local/bin/clusterctl
 clusterctl version
 
 # Installing Helm 3
-sudo -u $adminUsername snap install helm --classic
-helm version
+sudo snap install helm --classic
 
 # Installing Azure CLI & Azure Arc Extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-sudo -u $adminUsername az extension add --name "connectedk8s"
-sudo -u $adminUsername az extension add --name "k8s-configuration"
-sudo -u $adminUsername az extension add --name "k8s-extension"
+sudo az extension add --name "connectedk8s"
+sudo az extension add --name "k8s-configuration"
+sudo az extension add --name "k8s-extension"
 
 az -v
 
