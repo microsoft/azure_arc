@@ -130,3 +130,10 @@ To work with Azure Arc enabled data services and Azure Arc enabled Kubernetes ch
 -[Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/kind/local_kind_gitops_helm/)
 - [Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/microk8s/local_microk8s_gitops_helm/)
 - [Azure Arc enabled data services](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/)
+
+### Summary
+
+Simplifying your cloud management and operations experience using consistent tools for governannce, application deployment and cloud management at scale is essential when working with distributed, hybrid or multi-cloud assets even more so for multi-tenant organizations.
+
+Using Azure Arc and Azure Lighthouse as central pieces of your operations to extend Azure tooling and services to all your assets, enables organizations to have consistent management and governance to accelerate innovation and agility with cloud-native practices anywhere.
+
