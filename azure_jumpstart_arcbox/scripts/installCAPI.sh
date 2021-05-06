@@ -85,9 +85,10 @@ sudo snap install kubectl --classic
 publicIp=$(curl icanhazip.com)
 
 # Installing Rancher K3s single node cluster using k3sup
+sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -sLS https://get.k3sup.dev | sh
-sudo cp k3sup /usr/local/bin/k3sup
+# sudo cp k3sup /usr/local/bin/k3sup
 sudo k3sup install --local --context arcboxcapimgmt --ip $publicIp --k3s-extra-args '--no-deploy traefik'
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo cp kubeconfig /home/${adminUsername}/.kube/config
@@ -95,6 +96,9 @@ sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
 chown -R $adminUsername /home/${adminUsername}/.kube/
 chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
+export KUBECONFIG=/var/lib/waagent/custom-script/download/0/kubeconfig
+kubectl config set-context arcboxcapimgmt
+kubectl get node -o wide
 
 # Installing clusterctl
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.16/clusterctl-linux-amd64 -o clusterctl
