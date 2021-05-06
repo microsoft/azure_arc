@@ -15,15 +15,18 @@ echo $SPN_CLIENT_ID:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $SPN_CLIENT_SECRET:$3 | awk '{print substr($1,2); }' >> vars.sh
 echo $SPN_TENANT_ID:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $azureLocation:$6 | awk '{print substr($1,2); }' >> vars.sh
+echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
 sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
 sed -i '5s/^/export SPN_TENANT_ID=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
-sed -i '7s/^/export azureLocation=/' vars.sh
+sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
+
+chmod +x vars.sh 
+. ./vars.sh
 
 # Set CAPI deployment environment variables
 export CAPI_PROVIDER="azure" # Do not change!
@@ -31,7 +34,7 @@ export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export KUBERNETES_VERSION="1.18.17"
 export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
-export AZURE_LOCATION=$azureLocation # Name of the Azure datacenter location.
+export AZURE_LOCATION=$location # Name of the Azure datacenter location.
 export CAPI_WORKLOAD_CLUSTER_NAME="arcbox-capi-data" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 export AZURE_SUBSCRIPTION_ID=$subscriptionId
 export AZURE_TENANT_ID=$SPN_TENANT_ID
@@ -45,9 +48,6 @@ export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '
 export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
-
-chmod +x vars.sh 
-. ./vars.sh
 
 # Installing Azure CLI & Azure Arc Extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
