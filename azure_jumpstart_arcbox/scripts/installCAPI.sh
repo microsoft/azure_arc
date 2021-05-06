@@ -4,27 +4,50 @@ exec 2>&1
 
 sudo apt-get update
 
+sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
+sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
+
+# Injecting environment variables
+echo '#!/bin/bash' >> vars.sh
+echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
+echo $spnClientId:$2 | awk '{print substr($1,2); }' >> vars.sh
+echo $spnClientSecret:$3 | awk '{print substr($1,2); }' >> vars.sh
+echo $spnTenantId:$4 | awk '{print substr($1,2); }' >> vars.sh
+echo $azureLocation:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $vmName:$6 | awk '{print substr($1,2); }' >> vars.sh
+echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
+sed -i '2s/^/export adminUsername=/' vars.sh
+sed -i '3s/^/export spnClientId=/' vars.sh
+sed -i '4s/^/export spnClientSecret=/' vars.sh
+sed -i '5s/^/export spnTenantId=/' vars.sh
+sed -i '6s/^/export azureLocation=/' vars.sh
+sed -i '7s/^/export vmName=/' vars.sh
+sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
+
+chmod +x vars.sh 
+. ./vars.sh
+
 # Installing snap
 sudo apt install snapd
 
 # Installing Docker
 sudo snap install docker
 sudo groupadd docker
-sudo usermod -aG docker $USER
+sudo usermod -aG docker $adminUsername
 
 # Installing kubectl
 sudo snap install kubectl --classic
-kubectl version --client
 
 # Installing kind and deploying initial cluster
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
-sudo chmod +x ./kind
-sudo mv ./kind /usr/local/bin
-sudo kind create cluster
+sudo -u $adminUsername chmod +x ./kind
+sudo -u $adminUsername mv ./kind /usr/local/bin
+sudo -u $adminUsername kind create cluster
 
-sudo cp .kube/config /home/${USER}/.kube/config.staging
-sudo chown -R $USER /home/${USER}/.kube/
-sudo chown -R staginguser /home/${USER}/.kube/config.staging
+sudo cp .kube/config /home/${adminUsername}/.kube/config.staging
+sudo chown -R $adminUsername /home/${adminUsername}/.kube/
+sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 # Installing clusterctl
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.16/clusterctl-linux-amd64 -o clusterctl
@@ -33,45 +56,23 @@ sudo mv ./clusterctl /usr/local/bin/clusterctl
 clusterctl version
 
 # Installing Helm 3
-sudo snap install helm --classic
+sudo -u $adminUsername snap install helm --classic
 helm version
 
 # Installing Azure CLI & Azure Arc Extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-az extension add --name "connectedk8s"
-az extension add --name "k8s-configuration"
-az extension add --name "k8s-extension"
+sudo -u $adminUsername az extension add --name "connectedk8s"
+sudo -u $adminUsername az extension add --name "k8s-configuration"
+sudo -u $adminUsername az extension add --name "k8s-extension"
 
 az -v
 
-# Injecting environment variables
-echo '#!/bin/bash' >> vars.sh
-echo $spnClientId:$1 | awk '{print substr($1,2); }' >> vars.sh
-echo $spnClientSecret:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $spnTenantId:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $azureLocation:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $stagingStorageAccountName:$6 | awk '{print substr($1,2); }' >> vars.sh
-sed -i '2s/^/export spnClientId=/' vars.sh
-sed -i '3s/^/export spnClientSecret=/' vars.sh
-sed -i '4s/^/export spnTenantId=/' vars.sh
-sed -i '5s/^/export azureLocation=/' vars.sh
-sed -i '6s/^/export vmName=/' vars.sh
-sed -i '7s/^/export stagingStorageAccountName=/' vars.sh
-
-chmod +x vars.sh 
-. ./vars.sh
-
 echo "Log in to Azure"
-az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
-export subscriptionId=$(az account show --query id --output tsv)
-export resourceGroup=$(az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
+sudo -u $adminUsername az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
+export subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
+export resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
 echo ""
-
-sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
-sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
-sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
@@ -106,7 +107,7 @@ echo "Transforming the Kubernetes cluster to a management cluster with the Clust
 clusterctl init --infrastructure azure
 echo "Making sure cluster is ready..."
 echo ""
-kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
 echo ""
 
 # Deploy CAPI Workload cluster
@@ -120,7 +121,7 @@ clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
 
 curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
-cat <<EOF | kubectl apply -f -
+cat <<EOF | sudo kubectl apply -f -
 apiVersion: v1
 kind: Secret
 metadata:
@@ -156,48 +157,45 @@ sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sudo kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 echo ""
 
-until kubectl get cluster --all-namespaces | grep -q "Provisioned"; do echo "Waiting for Kubernetes control plane to be in Provisioned phase..." && sleep 20 ; done
+until sudo kubectl get cluster --all-namespaces | grep -q "Provisioned"; do echo "Waiting for Kubernetes control plane to be in Provisioned phase..." && sleep 20 ; done
 echo ""
-kubectl get cluster --all-namespaces
+sudo kubectl get cluster --all-namespaces
 echo ""
 
-until kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do echo "Waiting for control plane to initialize. This may take a few minutes..." && sleep 20 ; done
+until sudo kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do echo "Waiting for control plane to initialize. This may take a few minutes..." && sleep 20 ; done
 echo ""
-kubectl get kubeadmcontrolplane --all-namespaces
+sudo kubectl get kubeadmcontrolplane --all-namespaces
 clusterctl get kubeconfig $CAPI_WORKLOAD_CLUSTER_NAME > $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
 echo ""
-kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/master/templates/addons/calico.yaml
+sudo kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/master/templates/addons/calico.yaml
 echo ""
 
 CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
 export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-until [[ $(kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
+until [[ $(sudo kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
 echo ""
-kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
+sudo kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
 echo ""
-kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
+sudo kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
 echo ""
 
 echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
+sudo -u $adminUsername az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
 
 echo "Create Azure Monitor for containers Kubernetes extension instance"
-az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
 echo "Create Azure Defender Kubernetes extension instance"
-az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+sudo -u $adminUsername az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 # Copying workload CAPI kubeconfig file to staging storage account
-az extension add --upgrade -n storage-preview
-
-# stagingStorageAccountName=arcinbox ## to remove
-
-storageAccountRG=$(az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
+sudo -u $adminUsername az extension add --upgrade -n storage-preview
+storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
 storageContainerName="staging-capi"
-localPath="/home/$USER/.kube/config"
-storageAccountKey=$(az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
-az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
-az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
+localPath="/home/$adminUsername/.kube/config"
+storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
+sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
+sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
