@@ -4,28 +4,200 @@ exec 2>&1
 
 sudo apt-get update
 
-sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
-sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
-sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
+# Installing snap
+sudo apt install snapd
+
+# Installing Docker
+sudo snap install docker
+sudo groupadd docker
+sudo usermod -aG docker $USER
+
+# Installing kubectl
+sudo snap install kubectl --classic
+kubectl version --client
+
+# Installing kind and deploying initial cluster
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
+sudo chmod +x ./kind
+sudo mv ./kind /usr/local/bin
+sudo kind create cluster
+
+sudo cp .kube/config /home/${USER}/.kube/config.staging
+sudo chown -R $USER /home/${USER}/.kube/
+sudo chown -R staginguser /home/${USER}/.kube/config.staging
+
+# Installing clusterctl
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.16/clusterctl-linux-amd64 -o clusterctl
+sudo chmod +x ./clusterctl
+sudo mv ./clusterctl /usr/local/bin/clusterctl
+clusterctl version
+
+# Installing Helm 3
+sudo snap install helm --classic
+helm version
+
+# Installing Azure CLI & Azure Arc Extensions
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+az extension add --name "connectedk8s"
+az extension add --name "k8s-configuration"
+az extension add --name "k8s-extension"
+
+az -v
 
 # Injecting environment variables
 echo '#!/bin/bash' >> vars.sh
-echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_CLIENT_ID:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_CLIENT_SECRET:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_TENANT_ID:$4 | awk '{print substr($1,2); }' >> vars.sh
+echo $spnClientId:$1 | awk '{print substr($1,2); }' >> vars.sh
+echo $spnClientSecret:$2 | awk '{print substr($1,2); }' >> vars.sh
+echo $spnTenantId:$3 | awk '{print substr($1,2); }' >> vars.sh
+echo $azureLocation:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
-echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
-sed -i '2s/^/export adminUsername=/' vars.sh
-sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
-sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
-sed -i '5s/^/export SPN_TENANT_ID=/' vars.sh
+echo $stagingStorageAccountName:$6 | awk '{print substr($1,2); }' >> vars.sh
+sed -i '2s/^/export spnClientId=/' vars.sh
+sed -i '3s/^/export spnClientSecret=/' vars.sh
+sed -i '4s/^/export spnTenantId=/' vars.sh
+sed -i '5s/^/export azureLocation=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
-sed -i '7s/^/export location=/' vars.sh
-sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
+sed -i '7s/^/export stagingStorageAccountName=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
 
-publicIp=$(curl icanhazip.com)
+echo "Log in to Azure"
+az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
+export subscriptionId=$(az account show --query id --output tsv)
+export resourceGroup=$(az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
+echo ""
+
+sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
+sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
+
+export CAPI_PROVIDER="azure" # Do not change!
+export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
+
+# Set deployment environment variables
+export KUBERNETES_VERSION="1.18.17"
+export CONTROL_PLANE_MACHINE_COUNT="1"
+export WORKER_MACHINE_COUNT="3"
+export AZURE_LOCATION=$location # Name of the Azure datacenter location.
+export CAPI_WORKLOAD_CLUSTER_NAME="arcbox-capi-data" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+export AZURE_SUBSCRIPTION_ID=$subscriptionId
+export AZURE_TENANT_ID=$spnTenantId
+export AZURE_CLIENT_ID=$spnClientId
+export AZURE_CLIENT_SECRET=$spnClientSecret
+export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
+export AZURE_NODE_MACHINE_TYPE="Standard_D4s_v3"
+
+# Azure cloud settings - Do not change!
+export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
+export AZURE_TENANT_ID_B64="$(echo -n "$spnTenantId" | base64 | tr -d '\n')"
+export AZURE_CLIENT_ID_B64="$(echo -n "$spnClientId" | base64 | tr -d '\n')"
+export AZURE_CLIENT_SECRET_B64="$(echo -n "$spnClientSecret" | base64 | tr -d '\n')"
+
+echo "Making sure kind cluster is ready..."
+echo ""
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
+sudo kubectl get nodes
+echo ""
+
+# Transforming the kind cluster to a Cluster API management cluster
+echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
+clusterctl init --infrastructure azure
+echo "Making sure cluster is ready..."
+echo ""
+kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
+echo ""
+
+# Deploy CAPI Workload cluster
+echo "Deploying Kubernetes workload cluster"
+echo ""
+clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
+  --kubernetes-version v$KUBERNETES_VERSION \
+  --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
+  --worker-machine-count=$WORKER_MACHINE_COUNT \
+  > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
+curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: audit
+type: Opaque
+data:
+  audit.yaml: $(cat "audit.yaml" | base64 -w0)
+  username: $(echo -n "jumpstart" | base64 -w0)
+EOF
+
+line=$(expr $(grep -n -B 1 "extraArgs" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 5)
+sed -i -e "$line"' i\          readOnly: true' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          name: audit-policy' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          mountPath: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        - hostPath: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          name: kubeaudit' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          mountPath: /var/log/kube-apiserver' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        - hostPath: /var/log/kube-apiserver' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+line=$(expr $(grep -n -B 1 "extraArgs" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 2)
+sed -i -e "$line"' i\          audit-policy-file: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          audit-log-path: /var/log/kube-apiserver/audit.log' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          audit-log-maxsize: "100"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          audit-log-maxbackup: "10"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          audit-log-maxage: "30"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+line=$(expr $(grep -n -A 3 files: $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "control-plane" | cut -f1 -d-) + 5)
+sed -i -e "$line"' i\      permissions: "0644"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\      path: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\      owner: root:root' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          name: audit' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          key: audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        secret:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
+sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
+kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+echo ""
+
+until kubectl get cluster --all-namespaces | grep -q "Provisioned"; do echo "Waiting for Kubernetes control plane to be in Provisioned phase..." && sleep 20 ; done
+echo ""
+kubectl get cluster --all-namespaces
+echo ""
+
+until kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do echo "Waiting for control plane to initialize. This may take a few minutes..." && sleep 20 ; done
+echo ""
+kubectl get kubeadmcontrolplane --all-namespaces
+clusterctl get kubeconfig $CAPI_WORKLOAD_CLUSTER_NAME > $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
+echo ""
+kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/master/templates/addons/calico.yaml
+echo ""
+
+CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
+export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
+until [[ $(kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
+echo ""
+kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
+echo ""
+kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
+echo ""
+
+echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
+
+echo "Create Azure Monitor for containers Kubernetes extension instance"
+az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+
+echo "Create Azure Defender Kubernetes extension instance"
+az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+
+# Copying workload CAPI kubeconfig file to staging storage account
+az extension add --upgrade -n storage-preview
+
+# stagingStorageAccountName=arcinbox ## to remove
+
+storageAccountRG=$(az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
+storageContainerName="staging-capi"
+localPath="/home/$USER/.kube/config"
+storageAccountKey=$(az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
+az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
+az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
