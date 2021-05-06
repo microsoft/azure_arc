@@ -1,5 +1,5 @@
 #!/bin/bash
-exec >logfile
+exec >installK3s.log
 exec 2>&1
 
 sudo apt-get update
