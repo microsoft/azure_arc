@@ -35,13 +35,8 @@ echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
 resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
-echo ""
-
-sudo -u $adminUsername az extension add --name connectedk8s
-sudo -u $adminUsername az extension add --name k8s-configuration
-sudo -u $adminUsername az extension add --name k8s-extension
-
 az -v
+echo ""
 
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
@@ -77,10 +72,15 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kubectl --classic
 
 # Installing kind and deploying initial cluster
+sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
 sudo chmod +x ./kind
 sudo mv ./kind /usr/local/bin
 sudo kind create cluster
+sudo cp ${HOME}/.kube/config /home/${adminUsername}/.kube/config
+sudo cp ${HOME}/.kube/config /home/${adminUsername}/.kube/config.staging
+chown -R $adminUsername /home/${adminUsername}/.kube/
+chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 sudo cp .kube/config /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
@@ -180,6 +180,10 @@ sudo kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig label node -l
 echo ""
 sudo kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
 echo ""
+
+sudo -u $adminUsername az extension add --name connectedk8s 
+sudo -u $adminUsername az extension add --name k8s-configuration
+sudo -u $adminUsername az extension add --name k8s-extension
 
 echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 sudo -u $adminUsername az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
