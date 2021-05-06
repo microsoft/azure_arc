@@ -28,7 +28,7 @@ sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 chmod +x vars.sh 
 . ./vars.sh
 
-# Installing Azure CLI & Azure Arc Extensions
+# Installing Azure CLI
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 echo "Log in to Azure"
@@ -121,7 +121,7 @@ echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
 echo ""
 
-# Deploy CAPI Workload cluster
+# Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
 clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
@@ -130,6 +130,7 @@ clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
+# Building Azure Defender plumbing for Cluster API
 curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
 cat <<EOF | sudo kubectl apply -f -
@@ -168,6 +169,7 @@ sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
+# Deploying CAPI Workload cluster
 sudo kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 echo ""
 
@@ -193,13 +195,15 @@ echo ""
 sudo kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
 echo ""
 
-export KUBECONFIG=/var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
+export KUBECONFIG=/var/lib/waagent/custom-script/download/0/config.$CAPI_WORKLOAD_CLUSTER_NAME
 sudo cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 sudo cp ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
+# Installing Azure Arc extensions
 sudo -u $adminUsername az extension add --name connectedk8s 
 sudo -u $adminUsername az extension add --name k8s-configuration
 sudo -u $adminUsername az extension add --name k8s-extension
+az -v
 
 echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 sudo -u $adminUsername az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
