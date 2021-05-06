@@ -28,6 +28,43 @@ sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 chmod +x vars.sh 
 . ./vars.sh
 
+# Installing Azure CLI & Azure Arc Extensions
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+echo "Log in to Azure"
+sudo -u $adminUsername az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
+subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
+resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
+echo ""
+
+sudo -u $adminUsername az extension add --name connectedk8s
+sudo -u $adminUsername az extension add --name k8s-configuration
+sudo -u $adminUsername az extension add --name k8s-extension
+
+az -v
+
+export CAPI_PROVIDER="azure" # Do not change!
+export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
+
+# Set deployment environment variables
+export KUBERNETES_VERSION="1.18.17"
+export CONTROL_PLANE_MACHINE_COUNT="1"
+export WORKER_MACHINE_COUNT="3"
+export AZURE_LOCATION=$azureLocation # Name of the Azure datacenter location.
+export CAPI_WORKLOAD_CLUSTER_NAME="arcbox-capi-data" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+export AZURE_SUBSCRIPTION_ID=$subscriptionId
+export AZURE_TENANT_ID=$spnTenantId
+export AZURE_CLIENT_ID=$spnClientId
+export AZURE_CLIENT_SECRET=$spnClientSecret
+export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
+export AZURE_NODE_MACHINE_TYPE="Standard_D4s_v3"
+
+# Azure cloud settings - Do not change!
+export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
+export AZURE_TENANT_ID_B64="$(echo -n "$spnTenantId" | base64 | tr -d '\n')"
+export AZURE_CLIENT_ID_B64="$(echo -n "$spnClientId" | base64 | tr -d '\n')"
+export AZURE_CLIENT_SECRET_B64="$(echo -n "$spnClientSecret" | base64 | tr -d '\n')"
+
 # Installing snap
 sudo apt install snapd
 
@@ -57,43 +94,6 @@ clusterctl version
 
 # Installing Helm 3
 sudo snap install helm --classic
-
-# Installing Azure CLI & Azure Arc Extensions
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
-sudo -u $adminUsername az extension add --name connectedk8s
-sudo -u $adminUsername az extension add --name k8s-configuration
-sudo -u $adminUsername az extension add --name k8s-extension
-
-az -v
-
-echo "Log in to Azure"
-sudo -u $adminUsername az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
-export subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
-export resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
-echo ""
-
-export CAPI_PROVIDER="azure" # Do not change!
-export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-
-# Set deployment environment variables
-export KUBERNETES_VERSION="1.18.17"
-export CONTROL_PLANE_MACHINE_COUNT="1"
-export WORKER_MACHINE_COUNT="3"
-export AZURE_LOCATION=$location # Name of the Azure datacenter location.
-export CAPI_WORKLOAD_CLUSTER_NAME="arcbox-capi-data" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
-export AZURE_SUBSCRIPTION_ID=$subscriptionId
-export AZURE_TENANT_ID=$spnTenantId
-export AZURE_CLIENT_ID=$spnClientId
-export AZURE_CLIENT_SECRET=$spnClientSecret
-export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
-export AZURE_NODE_MACHINE_TYPE="Standard_D4s_v3"
-
-# Azure cloud settings - Do not change!
-export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
-export AZURE_TENANT_ID_B64="$(echo -n "$spnTenantId" | base64 | tr -d '\n')"
-export AZURE_CLIENT_ID_B64="$(echo -n "$spnClientId" | base64 | tr -d '\n')"
-export AZURE_CLIENT_SECRET_B64="$(echo -n "$spnClientSecret" | base64 | tr -d '\n')"
 
 echo "Making sure kind cluster is ready..."
 echo ""
