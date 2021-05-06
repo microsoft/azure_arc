@@ -68,7 +68,7 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "ArcBox-CAPI-NSG",
+            "defaultValue": "ArcBox-CAPI-MGMT-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
