@@ -46,8 +46,6 @@ export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
 
-export KUBECONFIG=/tmp/config
-
 chmod +x vars.sh 
 . ./vars.sh
 
@@ -72,17 +70,29 @@ sudo usermod -aG docker $adminUsername
 # Installing kubectl
 sudo snap install kubectl --classic
 
-# Installing kind and deploying initial cluster
-sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
-sudo chmod +x ./kind
-sudo mv ./kind /usr/local/bin
-kind create cluster --kubeconfig /tmp/config
+# # Installing kind and deploying initial cluster
+# sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
+# curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
+# sudo chmod +x ./kind
+# sudo mv ./kind /usr/local/bin
+# kind create cluster --kubeconfig /tmp/config
 
-sudo cp /tmp/config /home/${adminUsername}/.kube/config
-sudo cp /tmp/config /home/${adminUsername}/.kube/config.staging
-sudo chown -R $adminUsername /home/${adminUsername}/.kube/
-sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
+# sudo cp /tmp/config /home/${adminUsername}/.kube/config
+# sudo cp /tmp/config /home/${adminUsername}/.kube/config.staging
+# sudo chown -R $adminUsername /home/${adminUsername}/.kube/
+# sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
+
+# Installing Rancher K3s single node cluster using k3sup
+sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
+curl -sLS https://get.k3sup.dev | sh
+sudo cp k3sup /usr/local/bin/k3sup
+sudo k3sup install --local --context arcboxk3s --ip $publicIp --k3s-extra-args '--no-deploy traefik'
+sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+sudo cp kubeconfig /home/${adminUsername}/.kube/config
+sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
+chown -R $adminUsername /home/${adminUsername}/.kube/
+chown -R staginguser /home/${adminUsername}/.kube/config.staging
+
 
 # Installing clusterctl
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.16/clusterctl-linux-amd64 -o clusterctl
