@@ -75,12 +75,14 @@ sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
 sudo chmod +x ./kind
 sudo mv ./kind /usr/local/bin
-sudo kind create cluster
+kind create cluster --kubeconfig /tmp/config
 
-sudo cp .kube/config /home/${adminUsername}/.kube/config
-sudo cp .kube/config /home/${adminUsername}/.kube/config.staging
+sudo cp /tmp/config /home/${adminUsername}/.kube/config
+sudo cp /tmp/config /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
+
+export KUBECONFIG=/tmp/config
 
 # Installing clusterctl
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.16/clusterctl-linux-amd64 -o clusterctl
