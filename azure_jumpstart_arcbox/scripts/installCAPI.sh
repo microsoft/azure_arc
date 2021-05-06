@@ -46,6 +46,8 @@ export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
 
+export KUBECONFIG=/tmp/config
+
 chmod +x vars.sh 
 . ./vars.sh
 
@@ -81,8 +83,6 @@ sudo cp /tmp/config /home/${adminUsername}/.kube/config
 sudo cp /tmp/config /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
-
-export KUBECONFIG=/tmp/config
 
 # Installing clusterctl
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.16/clusterctl-linux-amd64 -o clusterctl
