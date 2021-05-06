@@ -25,23 +25,9 @@ sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 
-chmod +x vars.sh 
-. ./vars.sh
-
-# Installing Azure CLI & Azure Arc Extensions
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
-echo "Log in to Azure"
-sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
-subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
-resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
-az -v
-echo ""
-
+# Set CAPI deployment environment variables
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-
-# Set deployment environment variables
 export KUBERNETES_VERSION="1.18.17"
 export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
@@ -60,6 +46,19 @@ export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
 
+chmod +x vars.sh 
+. ./vars.sh
+
+# Installing Azure CLI & Azure Arc Extensions
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+echo "Log in to Azure"
+sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
+subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
+resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
+az -v
+echo ""
+
 # Installing snap
 sudo apt install snapd
 
@@ -72,11 +71,13 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kubectl --classic
 
 # Installing kind and deploying initial cluster
+sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
 sudo chmod +x ./kind
 sudo mv ./kind /usr/local/bin
 sudo kind create cluster
 
+sudo cp .kube/config /home/${adminUsername}/.kube/config
 sudo cp .kube/config /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
