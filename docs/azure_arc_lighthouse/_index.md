@@ -133,7 +133,6 @@ To work with Azure Arc enabled data services and Azure Arc enabled Kubernetes ch
 
 ### Summary
 
-Simplifying your cloud management and operations experience using consistent tools for governannce, application deployment and cloud management at scale is essential when working with distributed, hybrid or multi-cloud assets even more so for multi-tenant organizations.
+Simplifying your cloud management and operations experience using consistent tools for governance, application deployment, and cloud management at scale is essential when working with distributed, hybrid or multi-cloud assets even more so for multi-tenant organizations.
 
 Using Azure Arc and Azure Lighthouse as central pieces of your operations to extend Azure tooling and services to all your assets, enables organizations to have consistent management and governance to accelerate innovation and agility with cloud-native practices anywhere.
-
