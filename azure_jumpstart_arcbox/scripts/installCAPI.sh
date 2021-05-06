@@ -11,18 +11,18 @@ sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 # Injecting environment variables
 echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
-echo $spnClientId:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $spnClientSecret:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $spnTenantId:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $azureLocation:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $vmName:$6 | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_CLIENT_ID:$2 | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_CLIENT_SECRET:$3 | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_TENANT_ID:$4 | awk '{print substr($1,2); }' >> vars.sh
+echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
+echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
-sed -i '3s/^/export spnClientId=/' vars.sh
-sed -i '4s/^/export spnClientSecret=/' vars.sh
-sed -i '5s/^/export spnTenantId=/' vars.sh
-sed -i '6s/^/export azureLocation=/' vars.sh
-sed -i '7s/^/export vmName=/' vars.sh
+sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
+sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
+sed -i '5s/^/export SPN_TENANT_ID=/' vars.sh
+sed -i '6s/^/export vmName=/' vars.sh
+sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 
 chmod +x vars.sh 
@@ -32,7 +32,7 @@ chmod +x vars.sh
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 echo "Log in to Azure"
-sudo -u $adminUsername az login --service-principal --username $spnClientId --password $spnClientSecret --tenant $spnTenantId
+sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
 resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
 echo ""
