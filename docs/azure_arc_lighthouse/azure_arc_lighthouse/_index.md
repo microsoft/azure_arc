@@ -1,4 +1,12 @@
-# Unified Operations at Scale with Azure Arc and Azure Lighthouse
+---
+type: docs
+title: "Unified Operations at Scale with Azure Arc and Azure Lighthouse"
+linkTitle: "Unified Operations at Scale with Azure Arc and Azure Lighthouse"
+weight: 1
+description: >
+---
+
+## Unified Operations at Scale with Azure Arc and Azure Lighthouse
 
 ## Overview
 
