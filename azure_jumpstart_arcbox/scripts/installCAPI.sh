@@ -198,7 +198,7 @@ echo ""
 # CAPI workload cluster kubeconfig housekeeping
 sudo cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 sudo cp ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
-export KUBECONFIG=~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
+export KUBECONFIG=/var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
 
 # Installing Azure Arc extensions
 sudo -u $adminUsername az extension add --name connectedk8s 
