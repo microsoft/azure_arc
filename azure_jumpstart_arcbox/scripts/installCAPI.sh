@@ -1,5 +1,5 @@
 #!/bin/bash
-exec >logfile
+exec >installCAPI.log
 exec 2>&1
 
 sudo apt-get update
@@ -24,27 +24,6 @@ sed -i '5s/^/export SPN_TENANT_ID=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
-
-# Set CAPI deployment environment variables
-export CAPI_PROVIDER="azure" # Do not change!
-export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.18.17"
-export CONTROL_PLANE_MACHINE_COUNT="1"
-export WORKER_MACHINE_COUNT="3"
-export AZURE_LOCATION=$location # Name of the Azure datacenter location.
-export CAPI_WORKLOAD_CLUSTER_NAME="arcbox-capi-data" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
-export AZURE_SUBSCRIPTION_ID=$subscriptionId
-export AZURE_TENANT_ID=$SPN_TENANT_ID
-export AZURE_CLIENT_ID=$SPN_CLIENT_ID
-export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
-export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
-export AZURE_NODE_MACHINE_TYPE="Standard_D4s_v3"
-
-# Azure cloud settings - Do not change!
-export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
-export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -81,6 +60,27 @@ sudo snap install kubectl --classic
 # sudo cp /tmp/config /home/${adminUsername}/.kube/config.staging
 # sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 # sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
+
+# Set CAPI deployment environment variables
+export CAPI_PROVIDER="azure" # Do not change!
+export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
+export KUBERNETES_VERSION="1.18.17"
+export CONTROL_PLANE_MACHINE_COUNT="1"
+export WORKER_MACHINE_COUNT="3"
+export AZURE_LOCATION=$location # Name of the Azure datacenter location.
+export CAPI_WORKLOAD_CLUSTER_NAME="arcbox-capi-data" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+export AZURE_SUBSCRIPTION_ID=$subscriptionId
+export AZURE_TENANT_ID=$SPN_TENANT_ID
+export AZURE_CLIENT_ID=$SPN_CLIENT_ID
+export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
+export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
+export AZURE_NODE_MACHINE_TYPE="Standard_D4s_v3"
+
+# Azure cloud settings - Do not change!
+export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
+export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
 
 # Installing Rancher K3s single node cluster using k3sup
 sudo mkdir ~/.kube
