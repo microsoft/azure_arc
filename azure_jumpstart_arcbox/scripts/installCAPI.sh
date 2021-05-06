@@ -203,10 +203,9 @@ export KUBECONFIG=~/.kube/config.arcbox-capi-data
 kubectl get node -o wide
 
 # Installing Azure Arc extensions
-sudo -u $adminUsername az config set extension.use_dynamic_install=yes_without_prompt
-sudo -u $adminUsername az extension add --name connectedk8s
-sudo -u $adminUsername az extension add --name k8s-configuration
-sudo -u $adminUsername az extension add --name k8s-extension
+sudo -u $adminUsername az extension add --name connectedk8s --yes
+sudo -u $adminUsername az extension add --name k8s-configuration --yes
+sudo -u $adminUsername az extension add --name k8s-extension --yes
 az -v
 
 echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
