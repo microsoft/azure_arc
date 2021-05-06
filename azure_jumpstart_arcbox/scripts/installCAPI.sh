@@ -82,11 +82,13 @@ sudo snap install kubectl --classic
 # sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 # sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
+publicIp=$(curl icanhazip.com)
+
 # Installing Rancher K3s single node cluster using k3sup
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -sLS https://get.k3sup.dev | sh
 sudo cp k3sup /usr/local/bin/k3sup
-sudo k3sup install --local --context arcboxk3s --ip $publicIp --k3s-extra-args '--no-deploy traefik'
+sudo k3sup install --local --context arcboxcapimgmt --ip $publicIp --k3s-extra-args '--no-deploy traefik'
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo cp kubeconfig /home/${adminUsername}/.kube/config
 sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
@@ -201,6 +203,8 @@ sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cl
 
 echo "Create Azure Defender Kubernetes extension instance"
 sudo -u $adminUsername az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+
+sudo service sshd restart
 
 # Copying workload CAPI kubeconfig file to staging storage account
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
