@@ -5,7 +5,6 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-# Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
 
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
@@ -27,13 +26,13 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Adding Azure Arc CLI extensions
-Write-Output "Adding Azure Arc CLI extensions"
+Write-Host "Adding Azure Arc CLI extensions"
 az extension add --name "connectedk8s" -y
 az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
-Write-Output "Downloading CAPI Kubernetes cluster kubeconfig file"
+Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
 $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arcbox-capi-data"
 $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
@@ -55,7 +54,7 @@ azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=fast'
 
 azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
-Start-Sleep -s 30
+# Start-Sleep -Seconds 30
 
 # Write-Host "Deploying SQL MI and Postgres data services"
 # Write-Host "`n"
@@ -130,16 +129,15 @@ Start-Sleep -s 30
 # Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force
 
 # Downloading Rancher K3s kubeconfig file
-Write-Output "Downloading Rancher K3s kubeconfig file"
+Write-Host "Downloading Rancher K3s kubeconfig file"
 $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config-k3s"
-kubectl config rename-context arcboxk3s arcbox-k3s
 
 # Merging kubeconfig files from CAPI and Rancher K3s
-Write-Output "Merging kubeconfig files from AKS and Rancher K3s"
+Write-Host "Merging kubeconfig files from AKS and Rancher K3s"
 Copy-Item -Path "C:\Users\$env:USERNAME\.kube\config" -Destination "C:\Users\$env:USERNAME\.kube\config.backup"
 $env:KUBECONFIG="C:\Users\$env:USERNAME\.kube\config;C:\Users\$env:USERNAME\.kube\config-k3s"
 kubectl config view  --raw > C:\users\$env:USERNAME\.kube\config_tmp
@@ -148,19 +146,20 @@ Remove-Item C:\users\$env:USERNAME\.kube\config
 Remove-Item C:\users\$env:USERNAME\.kube\config-k3s
 Move-Item C:\users\$env:USERNAME\.kube\config_tmp C:\users\$env:USERNAME\.kube\config
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
-kubectx arcbox-k3s
+kubectx "arcbox-k3s"
 
-# Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-# az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
+Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox'
+Start-Sleep -Seconds 10
 
-# Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-# az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
+az k8s-extension create --name "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
-# Write-Host "Create Azure Defender Kubernetes extension instance"
-# az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+Write-Host "Create Azure Defender Kubernetes extension instance"
+az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
-# Write-Host ""
-# az -v
+Write-Host ""
+az -v
 
 # Starting Azure Data Studio
 #Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
