@@ -203,59 +203,6 @@ export KUBECONFIG=~/.kube/config.arcbox-capi-data
 # echo "Create Azure Defender Kubernetes extension instance"
 # az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
-# Creating azure-managed-disk persistent volume claim
-cat <<EOF | sudo -u $adminUsername kubectl apply -f -
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: fast
-provisioner: kubernetes.io/azure-disk
-parameters:
-  storageaccounttype: Premium_LRS
-  kind: managed
-EOF
-
-# Creating azure-managed-disk persistent volume claim
-cat <<EOF | sudo -u $adminUsername kubectl apply -f -
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: azure-managed-disk
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: managed-premium
-  resources:
-    requests:
-      storage: 20Gi
-EOF
-
-# cat <<EOF | sudo kubectl apply -f -
-# apiVersion: storage.k8s.io/v1
-# kind: StorageClass
-# metadata:
-#   name: fast
-# provisioner: kubernetes.io/azure-disk
-# parameters:
-#   storageaccounttype: Premium_LRS
-#   kind: managed
-# EOF
-
-# # Creating azure-managed-disk persistent volume claim
-# cat <<EOF | sudo kubectl apply -f -
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: azure-managed-disk
-# spec:
-#   accessModes:
-#   - ReadWriteOnce
-#   storageClassName: managed-premium
-#   resources:
-#     requests:
-#       storage: 20Gi
-# EOF
-
 sudo service sshd restart
 
 # Copying workload CAPI kubeconfig file to staging storage account

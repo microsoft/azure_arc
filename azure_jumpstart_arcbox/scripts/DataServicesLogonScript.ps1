@@ -40,11 +40,11 @@ $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
 kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-capi"
 
-kubectl get sc
-kubectl get pvc
-
-kubectl apply -f "C:\tmp\capiStorageClass.yaml"
-kubectl apply -f "C:\tmp\capiPersistentVolumeClaim.yaml"
+# Creating Storage Class and Persistent Volume Claim with azure-managed-disk for the CAPI cluster
+Write-Host ""
+Write-Host "Creating Storage Class and Persistent Volume Claim with azure-managed-disk for the CAPI cluster"
+kubectl apply -f "C:\ArcBox\capiStorageClass.yaml"
+kubectl apply -f "C:\ArcBox\capiPersistentVolumeClaim.yaml"
 
 kubectl get sc
 kubectl get pvc
