@@ -49,9 +49,6 @@ sudo usermod -aG docker $adminUsername
 # Installing kubectl
 sudo snap install kubectl --classic
 
-# Installing kubectx
-sudo apt install kubectx
-
 # Set CAPI deployment environment variables
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
@@ -233,31 +230,31 @@ spec:
       storage: 20Gi
 EOF
 
-cat <<EOF | sudo kubectl apply -f -
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: fast
-provisioner: kubernetes.io/azure-disk
-parameters:
-  storageaccounttype: Premium_LRS
-  kind: managed
-EOF
+# cat <<EOF | sudo kubectl apply -f -
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: fast
+# provisioner: kubernetes.io/azure-disk
+# parameters:
+#   storageaccounttype: Premium_LRS
+#   kind: managed
+# EOF
 
-# Creating azure-managed-disk persistent volume claim
-cat <<EOF | sudo kubectl apply -f -
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: azure-managed-disk
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: managed-premium
-  resources:
-    requests:
-      storage: 20Gi
-EOF
+# # Creating azure-managed-disk persistent volume claim
+# cat <<EOF | sudo kubectl apply -f -
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: azure-managed-disk
+# spec:
+#   accessModes:
+#   - ReadWriteOnce
+#   storageClassName: managed-premium
+#   resources:
+#     requests:
+#       storage: 20Gi
+# EOF
 
 sudo service sshd restart
 
