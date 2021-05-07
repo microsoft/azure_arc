@@ -201,19 +201,19 @@ sudo cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.ku
 export KUBECONFIG=~/.kube/config.arcbox-capi-data
 
 # Installing Azure Arc extensions
-sudo -u $adminUsername az extension add --name connectedk8s --yes
-sudo -u $adminUsername az extension add --name k8s-configuration --yes
-sudo -u $adminUsername az extension add --name k8s-extension --yes
+az extension add --name connectedk8s --yes
+az extension add --name k8s-configuration --yes
+az extension add --name k8s-extension --yes
 az -v
 
 echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-sudo -u $adminUsername az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
+az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
 
 echo "Create Azure Monitor for containers Kubernetes extension instance"
-sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
 echo "Create Azure Defender Kubernetes extension instance"
-sudo -u $adminUsername az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 sudo service sshd restart
 
