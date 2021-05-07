@@ -128,15 +128,15 @@ Invoke-Expression $command
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
-New-VM -Name ArcBox-Win -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win\Virtual Hard Disks\ArcBox-Win.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
-Set-VMProcessor -VMName "ArcBox-Win" -Count 2
+New-VM -Name ArcBox-Win -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\Virtual Hard Disks\ArcBox-Win.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+Set-VMProcessor -VMName ArcBox-Win -Count 2
 
-New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-SQL\Virtual Hard Disks\ArcBox-SQL.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
-Set-VMProcessor -VMName "ArcBox-SQL" -Count 2
+New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\Virtual Hard Disks\ArcBox-SQL.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
-New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Ubuntu\Virtual Hard Disks\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
-Set-VMFirmware -VMName "ArcBox-Ubuntu" -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
-Set-VMProcessor -VMName "ArcBox-Ubuntu" -Count 2
+New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\Virtual Hard Disks\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+Set-VMFirmware -VMName ArcBox-Ubuntu -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
+Set-VMProcessor -VMName ArcBox-Ubuntu -Count 2
 
 # We always want the VMs to start with the host and shut down cleanly with the host
 Write-Output "Set VM auto start/stop"
