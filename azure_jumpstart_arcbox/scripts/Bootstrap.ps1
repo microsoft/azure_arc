@@ -15,9 +15,6 @@ param (
     [string]$arcDcName,
     [string]$azureLocation,
     [string]$mssqlmiName,
-    [string]$dockerRegistry,
-    [string]$dockerRepository,
-    [string]$dockerTag,
     [string]$POSTGRES_NAME,   
     [string]$POSTGRES_WORKER_NODE_COUNT,
     [string]$POSTGRES_DATASIZE,
@@ -46,9 +43,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('mssqlmiName', $mssqlmiName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('dockerRegistry', $dockerRegistry,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('dockerRepository', $dockerRepository,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('dockerTag', $dockerTag,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('POSTGRES_NAME', $POSTGRES_NAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('POSTGRES_WORKER_NODE_COUNT', $POSTGRES_WORKER_NODE_COUNT,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('POSTGRES_DATASIZE', $POSTGRES_DATASIZE,[System.EnvironmentVariableTarget]::Machine)
