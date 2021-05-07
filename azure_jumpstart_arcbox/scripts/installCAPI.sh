@@ -95,13 +95,13 @@ clusterctl version
 # Installing Helm 3
 sudo snap install helm --classic
 
-echo "Making sure kind cluster is ready..."
+echo "Making sure Rancher K3s cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
 sudo kubectl get nodes
 echo ""
 
-# Transforming the kind cluster to a Cluster API management cluster
+# Transforming the Rancher K3s cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
 clusterctl init --infrastructure azure
 echo "Making sure cluster is ready..."
@@ -204,7 +204,7 @@ export KUBECONFIG=~/.kube/config.arcbox-capi-data
 # az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 # Creating azure-managed-disk persistent volume claim
-sudo -u $adminUsername cat <<EOF | sudo kubectl apply -f -
+cat <<EOF | sudo -u $adminUsername kubectl apply -f -
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -216,7 +216,7 @@ parameters:
 EOF
 
 # Creating azure-managed-disk persistent volume claim
-sudo -u $adminUsername cat <<EOF | sudo kubectl apply -f -
+cat <<EOF | sudo -u $adminUsername kubectl apply -f -
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

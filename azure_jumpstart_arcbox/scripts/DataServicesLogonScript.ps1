@@ -38,7 +38,16 @@ $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
-kubectl config rename-context arcbox-capi-data-admin@arcbox-capi-data arcbox-capi
+kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-capi"
+
+kubectl get sc
+kubectl get pvc
+
+kubectl apply -f "C:\tmp\capiStorageClass.yaml"
+kubectl apply -f "C:\tmp\capiPersistentVolumeClaim.yaml"
+
+kubectl get sc
+kubectl get pvc
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -48,7 +57,7 @@ azdata --version
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
-Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; Start-Sleep 5; Clear-Host }}
+Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Start-Sleep 5; Clear-Host }}
 azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=fast'
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=fast'
