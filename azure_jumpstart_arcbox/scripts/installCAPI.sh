@@ -49,17 +49,8 @@ sudo usermod -aG docker $adminUsername
 # Installing kubectl
 sudo snap install kubectl --classic
 
-# # Installing kind and deploying initial cluster
-# sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-# curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.10.0/kind-linux-amd64
-# sudo chmod +x ./kind
-# sudo mv ./kind /usr/local/bin
-# kind create cluster --kubeconfig /tmp/config
-
-# sudo cp /tmp/config /home/${adminUsername}/.kube/config
-# sudo cp /tmp/config /home/${adminUsername}/.kube/config.staging
-# sudo chown -R $adminUsername /home/${adminUsername}/.kube/
-# sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
+# Installing kubectx
+sudo apt install kubectx
 
 # Set CAPI deployment environment variables
 export CAPI_PROVIDER="azure" # Do not change!
@@ -196,24 +187,77 @@ sudo kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
 echo ""
 
 # CAPI workload cluster kubeconfig housekeeping
-sudo cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
-sudo cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
+cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
+cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 export KUBECONFIG=~/.kube/config.arcbox-capi-data
 
-# Installing Azure Arc extensions
-az extension add --name connectedk8s --yes
-az extension add --name k8s-configuration --yes
-az extension add --name k8s-extension --yes
-az -v
+# # Installing Azure Arc extensions
+# az extension add --name connectedk8s --yes
+# az extension add --name k8s-configuration --yes
+# az extension add --name k8s-extension --yes
+# az -v
 
-echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
+# echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
 
-echo "Create Azure Monitor for containers Kubernetes extension instance"
-az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+# echo "Create Azure Monitor for containers Kubernetes extension instance"
+# az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
-echo "Create Azure Defender Kubernetes extension instance"
-az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+# echo "Create Azure Defender Kubernetes extension instance"
+# az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+
+# Creating azure-managed-disk persistent volume claim
+sudo -u $adminUsername cat <<EOF | sudo kubectl apply -f -
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: kubernetes.io/azure-disk
+parameters:
+  storageaccounttype: Premium_LRS
+  kind: managed
+EOF
+
+# Creating azure-managed-disk persistent volume claim
+sudo -u $adminUsername cat <<EOF | sudo kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 20Gi
+EOF
+
+cat <<EOF | sudo kubectl apply -f -
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: kubernetes.io/azure-disk
+parameters:
+  storageaccounttype: Premium_LRS
+  kind: managed
+EOF
+
+# Creating azure-managed-disk persistent volume claim
+cat <<EOF | sudo kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: azure-managed-disk
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 20Gi
+EOF
 
 sudo service sshd restart
 
