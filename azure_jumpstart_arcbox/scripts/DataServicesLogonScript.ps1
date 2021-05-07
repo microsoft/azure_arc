@@ -57,19 +57,6 @@ kubectx
 # Write-Host "`n"
 # Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; Start-Sleep 5; Clear-Host }}
 azdata arc dc config init --source azure-arc-kubeadm --path ./custom
-# if(($env:dockerRegistry -ne $NULL) -or ($env:dockerRegistry -ne ""))
-# {
-#     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.registry=$env:dockerRegistry"
-# }
-# if(($env:dockerRepository -ne $NULL) -or ($env:dockerRepository -ne ""))
-# {
-#     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.repository=$env:dockerRepository"
-# }
-# if(($env:dockerTag -ne $NULL) -or ($env:dockerTag -ne ""))
-# {
-#     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.imageTag=$env:dockerTag"
-# }
-
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=fast'
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=fast'
 
