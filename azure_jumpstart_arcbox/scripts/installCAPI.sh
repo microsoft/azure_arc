@@ -265,7 +265,7 @@ sudo service sshd restart
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
 storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
 storageContainerName="staging-capi"
-localPath="/home/$adminUsername/.kube/config"
+localPath="/home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
 sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
