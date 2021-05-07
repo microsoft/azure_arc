@@ -55,7 +55,7 @@ kubectx
 # Deploying Azure Arc Data Controller
 # Write-Host "Deploying Azure Arc Data Controller"
 # Write-Host "`n"
-Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; Start-Sleep 5; Clear-Host }}
+# Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:ARC_DC_NAME; Start-Sleep 5; Clear-Host }}
 azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 # if(($env:dockerRegistry -ne $NULL) -or ($env:dockerRegistry -ne ""))
 # {
@@ -70,8 +70,8 @@ azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 #     azdata arc dc config replace --path ./custom/control.json --json-values "spec.docker.imageTag=$env:dockerTag"
 # }
 
-azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.storage.data.className=fast'
-azdata arc dc config replace --path azure-arc-custom/control.json --json-values '$.spec.storage.logs.className=fast'
+azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=fast'
+azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=fast'
 
 # azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
 # Start-Sleep -s 30
