@@ -2,9 +2,9 @@ Start-Transcript -Path C:\ArcBox\DataServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-# $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-# $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientID , $azurePassword)
-# Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
 az login --service-principal --username $env:spnClientID --password $env:spnClientSecret --tenant $env:spnTenantId
 
@@ -180,9 +180,9 @@ Move-Item C:\users\$env:USERNAME\.kube\config_tmp C:\users\$env:USERNAME\.kube\c
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 kubectx "arcbox-capi"
 
-# Starting Azure Data Studio
-#Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
-#Stop-Process -Name powershell -Force
+Starting Azure Data Studio
+Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
+Stop-Process -Name powershell -Force
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
