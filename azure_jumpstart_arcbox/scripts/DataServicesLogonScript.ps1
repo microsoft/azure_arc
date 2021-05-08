@@ -86,7 +86,7 @@ azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.
 azdata arc dc config replace --path ./custom/control.json --json-values "$.spec.services[*].serviceType=LoadBalancer"
 azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
 
-Write-Host "Deploying SQL MI and Postgres data services"
+Write-Host "Deploying SQL MI and PostgreSQL Hyperscale data services"
 Write-Host "`n"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 
@@ -104,7 +104,7 @@ Workflow DatabaseDeploy
             Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
             kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks.sql" 2>&1 $null
             Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "AdventureWorks2019";' postgres 2>&1 $null
             Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
             kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql 2>&1 $null
         }
@@ -140,6 +140,8 @@ $postgresfile = "C:\ArcBox\postgres_instance_endpoint.txt"
 (Get-Content $sqlfile | Select-Object -Skip 2) | Set-Content $sqlfile
 $sqlstring = Get-Content $sqlfile
 $sqlstring.Substring(0, $sqlstring.IndexOf(',')) | Set-Content $sqlfile
+$sqlstring = Get-Content $sqlfile
+$sqlstring.Split(' ')[$($sqlstring.Split(' ').Count-1)] | Set-Content $sqlfile
 $sql = Get-Content $sqlfile
 
 (Get-Content $postgresfile | Select-Object -Index 8) | Set-Content $postgresfile
@@ -154,31 +156,30 @@ $pg = Get-Content $postgresfile
 (Get-Content -Path $settingsFile) -replace 'arc_postgres',$pg | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
 
+# # Downloading Rancher K3s kubeconfig file
+# Write-Host "Downloading Rancher K3s kubeconfig file"
+# $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
+# $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
+# $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
+# $sourceFile = $sourceFile + $sas
+# azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config-k3s"
+
+# # Merging kubeconfig files from CAPI and Rancher K3s
+# Write-Host "Merging kubeconfig files from CAPI and Rancher K3s clusters"
+# Copy-Item -Path "C:\Users\$env:USERNAME\.kube\config" -Destination "C:\Users\$env:USERNAME\.kube\config.backup"
+# $env:KUBECONFIG="C:\Users\$env:USERNAME\.kube\config;C:\Users\$env:USERNAME\.kube\config-k3s"
+# kubectl config view  --raw > C:\users\$env:USERNAME\.kube\config_tmp
+# kubectl config get-clusters --kubeconfig=C:\users\$env:USERNAME\.kube\config_tmp
+# Remove-Item C:\users\$env:USERNAME\.kube\config
+# Remove-Item C:\users\$env:USERNAME\.kube\config-k3s
+# Move-Item C:\users\$env:USERNAME\.kube\config_tmp C:\users\$env:USERNAME\.kube\config
+# $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
+
 # Cleaning garbage
-Remove-Item "C:\ArcBox\sql_instance_list.txt" -Force
-Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force
+# Remove-Item "C:\ArcBox\sql_instance_list.txt" -Force
+# Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force
 
-# Downloading Rancher K3s kubeconfig file
-Write-Host "Downloading Rancher K3s kubeconfig file"
-$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
-$context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
-$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-$sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config-k3s"
-
-# Merging kubeconfig files from CAPI and Rancher K3s
-Write-Host "Merging kubeconfig files from AKS and Rancher K3s"
-Copy-Item -Path "C:\Users\$env:USERNAME\.kube\config" -Destination "C:\Users\$env:USERNAME\.kube\config.backup"
-$env:KUBECONFIG="C:\Users\$env:USERNAME\.kube\config;C:\Users\$env:USERNAME\.kube\config-k3s"
-kubectl config view  --raw > C:\users\$env:USERNAME\.kube\config_tmp
-kubectl config get-clusters --kubeconfig=C:\users\$env:USERNAME\.kube\config_tmp
-Remove-Item C:\users\$env:USERNAME\.kube\config
-Remove-Item C:\users\$env:USERNAME\.kube\config-k3s
-Move-Item C:\users\$env:USERNAME\.kube\config_tmp C:\users\$env:USERNAME\.kube\config
-$env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
-kubectx "arcbox-capi"
-
-Starting Azure Data Studio
+#Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
 Stop-Process -Name powershell -Force
 
