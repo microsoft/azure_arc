@@ -44,15 +44,18 @@ kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-
 Write-Host ""
 Write-Host "Creating Storage Class and Persistent Volume Claim with azure-managed-disk for the CAPI cluster"
 kubectl apply -f "C:\ArcBox\capiStorageClass.yaml"
-# kubectl apply -f "C:\ArcBox\capiPersistentVolumeClaim.yaml"
 
-kubectl get sc
-kubectl get pvc
+kubectl label node --all failure-domain.beta.kubernetes.io/zone-
+kubectl label node --all  topology.kubernetes.io/zone-
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 azdata --version
+
+# Deploy an NGINX ingress controller
+helm repo add stable https://charts.helm.sh/stable
+helm install nginx stable/nginx-ingress --namespace $env:arcDcName --set controller.replicaCount=3
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
@@ -61,6 +64,7 @@ Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Star
 azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=fast'
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=fast'
+azdata arc dc config replace --path ./custom/control.json --json-values "$.spec.services[*].serviceType=LoadBalancer"
 
 azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
 # Start-Sleep -Seconds 30

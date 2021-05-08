@@ -62,7 +62,7 @@ export AZURE_TENANT_ID=$SPN_TENANT_ID
 export AZURE_CLIENT_ID=$SPN_CLIENT_ID
 export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
-export AZURE_NODE_MACHINE_TYPE="Standard_D4s_v3"
+export AZURE_NODE_MACHINE_TYPE="Standard_D8s_v3"
 
 # Azure cloud settings - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
@@ -187,21 +187,6 @@ echo ""
 cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 export KUBECONFIG=~/.kube/config.arcbox-capi-data
-
-# # Installing Azure Arc extensions
-# az extension add --name connectedk8s --yes
-# az extension add --name k8s-configuration --yes
-# az extension add --name k8s-extension --yes
-# az -v
-
-# echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-# az connectedk8s connect --name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig --tags 'Project=jumpstart_arcbox'
-
-# echo "Create Azure Monitor for containers Kubernetes extension instance"
-# az k8s-extension create -n "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
-
-# echo "Create Azure Defender Kubernetes extension instance"
-# az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 sudo service sshd restart
 
