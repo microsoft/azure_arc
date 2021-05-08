@@ -70,19 +70,19 @@ Start-Sleep -Seconds 10
 
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+az k8s-extension create --name "azuremonitor-containers" --cluster-name "ArcBox-CAPI-Data" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
 Write-Host "Create Azure Defender Kubernetes extension instance"
 Write-Host "`n"
-az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Start-Sleep 5; Clear-Host }}
 azdata arc dc config init --source azure-arc-kubeadm --path ./custom
-azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=fast'
-azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=fast'
+azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=managed-premium'
+azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=managed-premium'
 azdata arc dc config replace --path ./custom/control.json --json-values "$.spec.services[*].serviceType=LoadBalancer"
 
 azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
@@ -103,12 +103,12 @@ Workflow DatabaseDeploy
             # Downloading demo database and restoring onto Postgres
             $podname = "$env:POSTGRES_NAME" + "c-0"
             #Start-Sleep -Seconds 300
-            #Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-            #kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks.sql" 2>&1 $null
-            #Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-            #kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres 2>&1 $null
-            #Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-            #kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql 2>&1 $null
+            # Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
+            # kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks.sql" 2>&1 $null
+            # Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
+            # kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres 2>&1 $null
+            # Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
+            # kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql 2>&1 $null
         }
         InlineScript {
             # Deploying Azure Arc SQL Managed Instance
