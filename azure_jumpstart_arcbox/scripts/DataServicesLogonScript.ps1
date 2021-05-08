@@ -84,9 +84,7 @@ azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=managed-premium'
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=managed-premium'
 azdata arc dc config replace --path ./custom/control.json --json-values "$.spec.services[*].serviceType=LoadBalancer"
-
 azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
-# Start-Sleep -Seconds 30
 
 Write-Host "Deploying SQL MI and Postgres data services"
 Write-Host "`n"
@@ -103,12 +101,12 @@ Workflow DatabaseDeploy
             # Downloading demo database and restoring onto Postgres
             $podname = "$env:POSTGRES_NAME" + "c-0"
             #Start-Sleep -Seconds 300
-            # Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-            # kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks.sql" 2>&1 $null
-            # Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-            # kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres 2>&1 $null
-            # Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-            # kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql 2>&1 $null
+            Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
+            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks.sql" 2>&1 $null
+            Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
+            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks";' postgres 2>&1 $null
+            Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
+            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql 2>&1 $null
         }
         InlineScript {
             # Deploying Azure Arc SQL Managed Instance
@@ -118,17 +116,17 @@ Workflow DatabaseDeploy
             # Downloading demo database and restoring onto SQL MI
             $podname = "$env:mssqlMiName" + "-0"
             #Start-Sleep -Seconds 300
-            #Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
-            #kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 $null
-            #Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-            #kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+            Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 $null
+            Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
         }
     }
 }
 
 DatabaseDeploy | Format-Table
 
-Creating Azure Data Studio settings for database connections
+#Creating Azure Data Studio settings for database connections
 Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for database connections"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
