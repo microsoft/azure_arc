@@ -102,11 +102,11 @@ Workflow DatabaseDeploy
             $podname = "$env:POSTGRES_NAME" + "c-0"
             #Start-Sleep -Seconds 300
             Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks2019.sql" 2> /dev/null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks2019.sql" 2>&1 $null
             Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks2019";' postgres 2> /dev/null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 $null
             Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks2019 -f /tmp/AdventureWorks.sql 2> /dev/null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks2019 -f /tmp/AdventureWorks.sql 2>&1 $null
         }
         InlineScript {
             # Deploying Azure Arc SQL Managed Instance
@@ -117,9 +117,9 @@ Workflow DatabaseDeploy
             $podname = "$env:mssqlMiName" + "-0"
             #Start-Sleep -Seconds 300
             Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
-            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2> /dev/null
+            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 $null
             Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2> /dev/null
+            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
         }
     }
 }
@@ -179,10 +179,6 @@ $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 Remove-Item "C:\ArcBox\sql_instance_list.txt" -Force
 Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force
 
-# Starting Azure Data Studio
-Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
-Stop-Process -Name powershell -Force
-
 # Changing to Jumpstart ArcBox wallpaper
 $imgPath="C:\ArcBox\wallpaper.png"
 $code = @' 
@@ -202,6 +198,10 @@ namespace Win32{
 
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
+
+# Starting Azure Data Studio
+Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
+Stop-Process -Name powershell -Force
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
