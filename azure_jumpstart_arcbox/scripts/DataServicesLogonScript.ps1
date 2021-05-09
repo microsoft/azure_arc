@@ -100,9 +100,8 @@ Workflow DatabaseDeploy
             azdata arc postgres endpoint list --name $env:POSTGRES_NAME
             # Downloading demo database and restoring onto Postgres
             $podname = "$env:POSTGRES_NAME" + "c-0"
-            #Start-Sleep -Seconds 300
             Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks2019.sql" 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/AdventureWorks2019.sql" 2>&1 $null
             Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
             kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 $null
             Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
@@ -115,7 +114,6 @@ Workflow DatabaseDeploy
             azdata arc sql mi list
             # Downloading demo database and restoring onto SQL MI
             $podname = "$env:mssqlMiName" + "-0"
-            #Start-Sleep -Seconds 300
             Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
             kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 $null
             Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
