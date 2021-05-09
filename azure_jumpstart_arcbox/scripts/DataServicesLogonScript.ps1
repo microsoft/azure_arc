@@ -102,11 +102,11 @@ Workflow DatabaseDeploy
             $podname = "$env:POSTGRES_NAME" + "c-0"
             #Start-Sleep -Seconds 300
             Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks.sql" 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks2019.sql" 2> /dev/null
             Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "AdventureWorks2019";' postgres 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks2019";' postgres 2> /dev/null
             Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks -f /tmp/AdventureWorks.sql 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks2019 -f /tmp/AdventureWorks.sql 2> /dev/null
         }
         InlineScript {
             # Deploying Azure Arc SQL Managed Instance
@@ -117,9 +117,9 @@ Workflow DatabaseDeploy
             $podname = "$env:mssqlMiName" + "-0"
             #Start-Sleep -Seconds 300
             Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
-            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2> /dev/null
             Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2> /dev/null
         }
     }
 }
@@ -156,28 +156,28 @@ $pg = Get-Content $postgresfile
 (Get-Content -Path $settingsFile) -replace 'arc_postgres',$pg | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
 
-# # Downloading Rancher K3s kubeconfig file
-# Write-Host "Downloading Rancher K3s kubeconfig file"
-# $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
-# $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
-# $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-# $sourceFile = $sourceFile + $sas
-# azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config-k3s"
+# Downloading Rancher K3s kubeconfig file
+Write-Host "Downloading Rancher K3s kubeconfig file"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
+$context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
+$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config-k3s"
 
-# # Merging kubeconfig files from CAPI and Rancher K3s
-# Write-Host "Merging kubeconfig files from CAPI and Rancher K3s clusters"
-# Copy-Item -Path "C:\Users\$env:USERNAME\.kube\config" -Destination "C:\Users\$env:USERNAME\.kube\config.backup"
-# $env:KUBECONFIG="C:\Users\$env:USERNAME\.kube\config;C:\Users\$env:USERNAME\.kube\config-k3s"
-# kubectl config view  --raw > C:\users\$env:USERNAME\.kube\config_tmp
-# kubectl config get-clusters --kubeconfig=C:\users\$env:USERNAME\.kube\config_tmp
-# Remove-Item C:\users\$env:USERNAME\.kube\config
-# Remove-Item C:\users\$env:USERNAME\.kube\config-k3s
-# Move-Item C:\users\$env:USERNAME\.kube\config_tmp C:\users\$env:USERNAME\.kube\config
-# $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
+# Merging kubeconfig files from CAPI and Rancher K3s
+Write-Host "Merging kubeconfig files from CAPI and Rancher K3s clusters"
+Copy-Item -Path "C:\Users\$env:USERNAME\.kube\config" -Destination "C:\Users\$env:USERNAME\.kube\config.backup"
+$env:KUBECONFIG="C:\Users\$env:USERNAME\.kube\config;C:\Users\$env:USERNAME\.kube\config-k3s"
+kubectl config view  --raw > C:\users\$env:USERNAME\.kube\config_tmp
+kubectl config get-clusters --kubeconfig=C:\users\$env:USERNAME\.kube\config_tmp
+Remove-Item C:\users\$env:USERNAME\.kube\config
+Remove-Item C:\users\$env:USERNAME\.kube\config-k3s
+Move-Item C:\users\$env:USERNAME\.kube\config_tmp C:\users\$env:USERNAME\.kube\config
+$env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 
 # Cleaning garbage
-# Remove-Item "C:\ArcBox\sql_instance_list.txt" -Force
-# Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force
+Remove-Item "C:\ArcBox\sql_instance_list.txt" -Force
+Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force
 
 # Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
