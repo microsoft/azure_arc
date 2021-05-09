@@ -45,9 +45,9 @@ $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
 kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-capi"
 
-# Creating Storage Class for the CAPI cluster
+# Creating Storage Class with azure-managed-disk for the CAPI cluster
 Write-Host "`n"
-Write-Host "Creating Storage Class and Persistent Volume Claim with azure-managed-disk for the CAPI cluster"
+Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
 kubectl apply -f "C:\ArcBox\capiStorageClass.yaml"
 
 kubectl label node --all failure-domain.beta.kubernetes.io/zone-
@@ -179,9 +179,29 @@ $pg = Get-Content $postgresfile
 # Remove-Item "C:\ArcBox\sql_instance_list.txt" -Force
 # Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force
 
-#Starting Azure Data Studio
+# Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
 Stop-Process -Name powershell -Force
+
+# Changing to Jumpstart ArcBox wallpaper
+$imgPath="C:\ArcBox\wallpaper.png"
+$code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
+    
+     public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+         
+         public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+         }
+    }
+ } 
+'@
+
+add-type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
