@@ -156,7 +156,7 @@ $pg = Get-Content $postgresfile
 
 # Downloading Rancher K3s kubeconfig file
 Write-Host "Downloading Rancher K3s kubeconfig file"
-$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
@@ -166,7 +166,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERN
 Write-Host "Merging kubeconfig files from CAPI and Rancher K3s clusters"
 Copy-Item -Path "C:\Users\$env:USERNAME\.kube\config" -Destination "C:\Users\$env:USERNAME\.kube\config.backup"
 $env:KUBECONFIG="C:\Users\$env:USERNAME\.kube\config;C:\Users\$env:USERNAME\.kube\config-k3s"
-kubectl config view  --raw > C:\users\$env:USERNAME\.kube\config_tmp
+kubectl config view --raw > C:\users\$env:USERNAME\.kube\config_tmp
 kubectl config get-clusters --kubeconfig=C:\users\$env:USERNAME\.kube\config_tmp
 Remove-Item C:\users\$env:USERNAME\.kube\config
 Remove-Item C:\users\$env:USERNAME\.kube\config-k3s
