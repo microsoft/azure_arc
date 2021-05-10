@@ -202,5 +202,5 @@ Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 # Starting Azure Data Studio
-Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
-Stop-Process -Name powershell -Force
+#Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
+#Stop-Process -Name powershell -Force
