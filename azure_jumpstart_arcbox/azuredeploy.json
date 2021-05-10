@@ -32,19 +32,6 @@
         "description": "Azure AD tenant id for your service principal"
       }
     },
-    "aksDnsPrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "DNS prefix used for your AKS cluster"
-      }
-    },
-    "aksClusterName": {
-      "type": "string",
-      "defaultValue": "ArcBox-Data",
-      "metadata": {
-        "description": "Name for the AKS cluster"
-      }
-    },
     "windowsAdminUsername": {
       "type": "string",
       "metadata": {
@@ -66,7 +53,6 @@
   },
   "variables": {
     "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/",
-    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/aks.json')]",
     "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuRancher.json')]",
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm/clientVm.json')]",
@@ -166,9 +152,6 @@
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
-          },
-          "aksClusterName": {
-            "value": "[parameters('aksClusterName')]"
           },
           "myIpAddress": {
             "value": "[parameters('myIpAddress')]"
