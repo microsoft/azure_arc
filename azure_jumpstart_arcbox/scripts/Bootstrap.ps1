@@ -5,7 +5,6 @@ param (
     [string]$spnTenantId,
     [string]$spnAuthority,
     [string]$subscriptionId,
-    [string]$clusterName,
     [string]$resourceGroup,
     [string]$azdataUsername,
     [string]$azdataPassword,
@@ -32,7 +31,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $azdataUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $azdataPassword,[System.EnvironmentVariableTarget]::Machine)
@@ -123,7 +121,7 @@ workflow ClientTools_01
                                 & choco install $app /y -Force| Write-Output
                             }
                             #Write-Host "Installing postgresql command line tools"
-                            #choco install postgresql --disable-components server,pgAdmin,stackbuilder -y -Force | Write-Output
+                            #choco install postgresql --install-arguments="'--disable-components server,pgAdmin,stackbuilder'" -y -Force | Write-Output
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
