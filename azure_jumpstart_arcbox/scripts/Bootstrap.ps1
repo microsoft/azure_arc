@@ -95,7 +95,7 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,postgresql'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm'
             #Run commands in parallel.
             Parallel 
                 {
@@ -122,6 +122,8 @@ workflow ClientTools_01
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
+                            Write-Host "Installing postgresql command line tools"
+                            choco install postgresql --disable-components server,pgAdmin,stackbuilder -y -Force | Write-Output
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
