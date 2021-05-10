@@ -51,7 +51,7 @@ Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
 kubectl apply -f "C:\ArcBox\capiStorageClass.yaml"
 
 kubectl label node --all failure-domain.beta.kubernetes.io/zone-
-kubectl label node --all  topology.kubernetes.io/zone-
+kubectl label node --all topology.kubernetes.io/zone-
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
