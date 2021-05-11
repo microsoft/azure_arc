@@ -58,10 +58,6 @@ Write-Host "`n"
 kubectl get nodes
 azdata --version
 
-# Deploy an NGINX ingress controller
-# helm repo add stable https://charts.helm.sh/stable
-# helm install nginx stable/nginx-ingress --namespace $env:arcDcName --set controller.replicaCount=3
-
 # Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
@@ -79,7 +75,7 @@ az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
-Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Start-Sleep  -Seconds 5; Clear-Host }}
+Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Start-Sleep -Seconds 5; Clear-Host }}
 azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=managed-premium'
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=managed-premium'
@@ -101,7 +97,7 @@ Workflow DatabaseDeploy
             # Downloading demo database and restoring onto Postgres
             $podname = "$env:POSTGRES_NAME" + "c-0"
             Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/AdventureWorks2019.sql" 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/capi_integration/azure_jumpstart_arcbox/scripts/AdventureWorks2019.sql" 2>&1 $null
             Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
             kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 $null
             Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
@@ -200,7 +196,3 @@ add-type $code
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
-
-# Starting Azure Data Studio
-#Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
-#Stop-Process -Name powershell -Force

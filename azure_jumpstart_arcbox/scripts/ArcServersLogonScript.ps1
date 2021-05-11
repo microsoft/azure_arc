@@ -74,7 +74,7 @@ Function Set-VMNetworkConfiguration {
         $job=[WMI]$setip.job 
 
         while ($job.JobState -eq 3 -or $job.JobState -eq 4) {
-            Start-Sleep 1
+            Start-Sleep -Seconds 1
             $job=[WMI]$setip.job
         }
 
@@ -120,11 +120,9 @@ Write-Output "Enable Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
 # Downloading and extracting the 3 VMs
-Write-Output "Downloading and extracting the 3 VMs. This can take some time, hold tight..."
+Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 $sourceFolder = 'https://jumpstartarcbox.blob.core.windows.net/vms'
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*? $vmDir --recursive
-# $command = "7z x '$tempDir' -o'$vmDir'"
-# Invoke-Expression $command
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
@@ -153,7 +151,7 @@ Start-VM -Name ArcBox-Win
 Start-VM -Name ArcBox-SQL
 Start-VM -Name ArcBox-Ubuntu
 
-Start-Sleep -s 20
+Start-Sleep -Seconds 20
 $username = "Administrator"
 $password = "ArcDemo123!!"
 $secstr = New-Object -TypeName System.Security.SecureString
@@ -162,7 +160,7 @@ $cred = new-object -typename System.Management.Automation.PSCredential -argument
 Invoke-Command -VMName ArcBox-Win -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
 Invoke-Command -VMName ArcBox-SQL -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
 
-Start-Sleep -s 5
+Start-Sleep -Seconds 5
 
 # Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc enabled servers
 Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc enabled servers"
@@ -215,9 +213,6 @@ Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
-# Starting Hyper-V Manager
-Start-Process -FilePath "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -WindowStyle Maximized
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
