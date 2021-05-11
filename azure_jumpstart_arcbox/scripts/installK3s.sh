@@ -1,5 +1,5 @@
 #!/bin/bash
-exec >logfile
+exec >installK3s.log
 exec 2>&1
 
 sudo apt-get update
@@ -33,8 +33,8 @@ publicIp=$(curl icanhazip.com)
 # Installing Rancher K3s single master cluster using k3sup
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -sLS https://get.k3sup.dev | sh
-sudo cp k3sup /usr/local/bin/k3sup
-sudo k3sup install --local --context arcboxk3s --ip $publicIp --k3s-extra-args '--no-deploy traefik'
+# sudo cp k3sup /usr/local/bin/k3sup
+sudo k3sup install --local --context arcbox-k3s --ip $publicIp --k3s-extra-args '--no-deploy traefik'
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo cp kubeconfig /home/${adminUsername}/.kube/config
 sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
@@ -64,7 +64,7 @@ sudo service sshd restart
 # Copying Rancher K3s kubeconfig file to staging storage account
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
 storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
-storageContainerName="staging"
+storageContainerName="staging-k3s"
 localPath="/home/$adminUsername/.kube/config"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey

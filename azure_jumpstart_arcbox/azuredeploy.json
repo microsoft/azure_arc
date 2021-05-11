@@ -32,19 +32,6 @@
         "description": "Azure AD tenant id for your service principal"
       }
     },
-    "aksDnsPrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "DNS prefix used for your AKS cluster"
-      }
-    },
-    "aksClusterName": {
-      "type": "string",
-      "defaultValue": "ArcBox-Data",
-      "metadata": {
-        "description": "Name for the AKS cluster"
-      }
-    },
     "windowsAdminUsername": {
       "type": "string",
       "metadata": {
@@ -66,8 +53,8 @@
   },
   "variables": {
     "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/",
-    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/aks.json')]",
     "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuRancher.json')]",
+    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'mgmt/mgmtArtifacts.json')]",
     "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmt/mgmtStagingStorage.json')]"
@@ -76,19 +63,20 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "aksDeployment",
+      "name": "ubuntuCAPIDeployment",
+      "dependsOn": [ "stagingStorageAccountDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('aksTemplateUrl')]",
+          "uri": "[variables('capiTemplateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "aksDnsPrefix": {
-            "value": "[parameters('aksDnsPrefix')]"
-          },
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "myIpAddress": {
+            "value": "[parameters('myIpAddress')]"
           },
           "spnClientId": {
             "value": "[parameters('spnClientId')]"
@@ -96,16 +84,11 @@
           "spnClientSecret": {
             "value": "[parameters('spnClientSecret')]"
           },
-          "azureLocation": {
-            "value": "[resourceGroup().location]"
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
           },
-          "aksClusterName": {
-            "value": "[parameters('aksClusterName')]"
-          },       
-          "resourceTags": {
-            "value": {
-              "Project": "jumpstart_arcbox"
-            }
+          "stagingStorageAccountName": {
+            "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           }
         }
       }
@@ -169,9 +152,6 @@
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
-          },
-          "aksClusterName": {
-            "value": "[parameters('aksClusterName')]"
           },
           "myIpAddress": {
             "value": "[parameters('myIpAddress')]"

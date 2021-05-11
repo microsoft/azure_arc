@@ -5,7 +5,6 @@ param (
     [string]$spnTenantId,
     [string]$spnAuthority,
     [string]$subscriptionId,
-    [string]$clusterName,
     [string]$resourceGroup,
     [string]$azdataUsername,
     [string]$azdataPassword,
@@ -15,9 +14,6 @@ param (
     [string]$arcDcName,
     [string]$azureLocation,
     [string]$mssqlmiName,
-    [string]$dockerRegistry,
-    [string]$dockerRepository,
-    [string]$dockerTag,
     [string]$POSTGRES_NAME,   
     [string]$POSTGRES_WORKER_NODE_COUNT,
     [string]$POSTGRES_DATASIZE,
@@ -35,7 +31,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $azdataUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $azdataPassword,[System.EnvironmentVariableTarget]::Machine)
@@ -46,9 +41,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('mssqlmiName', $mssqlmiName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('dockerRegistry', $dockerRegistry,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('dockerRepository', $dockerRepository,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('dockerTag', $dockerTag,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('POSTGRES_NAME', $POSTGRES_NAME,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('POSTGRES_WORKER_NODE_COUNT', $POSTGRES_WORKER_NODE_COUNT,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('POSTGRES_DATASIZE', $POSTGRES_DATASIZE,[System.EnvironmentVariableTarget]::Machine)
@@ -101,7 +93,7 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,postgresql'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm'
             #Run commands in parallel.
             Parallel 
                 {
@@ -128,6 +120,8 @@ workflow ClientTools_01
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
+                            #Write-Host "Installing postgresql command line tools"
+                            #choco install postgresql --install-arguments="'--disable-components server,pgAdmin,stackbuilder'" -y -Force | Write-Output
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
@@ -138,6 +132,8 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/installArcAgent.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/installArcAgentSQL.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/installArcAgent.sh" -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/capiStorageClass.yaml" -OutFile "C:\ArcBox\capiStorageClass.yaml"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/wallpaper.png" -OutFile "C:\ArcBox\wallpaper.png"
                 }
         }
 
