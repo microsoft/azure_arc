@@ -105,7 +105,7 @@ Workflow DatabaseDeploy
             Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
             kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 $null
             Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks2019 -f /tmp/AdventureWorks.sql 2>&1 $null
+            kubectl exec $podname -n $env:arcDcName -c postgres -- sudo -u postgres psql -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 $null
         }
         InlineScript {
             # Deploying Azure Arc SQL Managed Instance
