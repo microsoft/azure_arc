@@ -59,8 +59,8 @@ kubectl get nodes
 azdata --version
 
 # Deploy an NGINX ingress controller
-helm repo add stable https://charts.helm.sh/stable
-helm install nginx stable/nginx-ingress --namespace $env:arcDcName --set controller.replicaCount=3
+# helm repo add stable https://charts.helm.sh/stable
+# helm install nginx stable/nginx-ingress --namespace $env:arcDcName --set controller.replicaCount=3
 
 # Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
