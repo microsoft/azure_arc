@@ -121,20 +121,20 @@ Set-VMHost -EnableEnhancedSessionMode $true
 
 # Downloading and extracting the 3 VMs
 Write-Output "Downloading and extracting the 3 VMs. This can take some time, hold tight..."
-$sourceFolder = 'https://jumpstartarcbox.blob.core.windows.net/vhds'
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*? $tempDir --recursive
-$command = "7z x '$tempDir' -o'$vmDir'"
-Invoke-Expression $command
+$sourceFolder = 'https://jumpstartarcbox.blob.core.windows.net/vms'
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*? $vmDir --recursive
+# $command = "7z x '$tempDir' -o'$vmDir'"
+# Invoke-Expression $command
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
-New-VM -Name ArcBox-Win -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\Virtual Hard Disks\ArcBox-Win.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-Win -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win -Count 2
 
-New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\Virtual Hard Disks\ArcBox-SQL.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-SQL.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
-New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\Virtual Hard Disks\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMFirmware -VMName ArcBox-Ubuntu -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
 Set-VMProcessor -VMName ArcBox-Ubuntu -Count 2
 
