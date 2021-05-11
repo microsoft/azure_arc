@@ -168,9 +168,9 @@ Copy-Item -Path "C:\Users\$env:USERNAME\.kube\config" -Destination "C:\Users\$en
 $env:KUBECONFIG="C:\Users\$env:USERNAME\.kube\config;C:\Users\$env:USERNAME\.kube\config-k3s"
 kubectl config view --raw > C:\users\$env:USERNAME\.kube\config_tmp
 kubectl config get-clusters --kubeconfig=C:\users\$env:USERNAME\.kube\config_tmp
-Remove-Item C:\users\$env:USERNAME\.kube\config
-Remove-Item C:\users\$env:USERNAME\.kube\config-k3s
-Move-Item C:\users\$env:USERNAME\.kube\config_tmp C:\users\$env:USERNAME\.kube\config
+Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config"
+Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config-k3s"
+Move-Item -Path "C:\Users\$env:USERNAME\.kube\config_tmp" -Destination "C:\users\$env:USERNAME\.kube\config"
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 
 # Cleaning garbage
