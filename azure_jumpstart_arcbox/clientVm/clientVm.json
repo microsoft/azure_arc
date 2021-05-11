@@ -266,7 +266,7 @@
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]"
                         },
-                        "diskSizeGB": 512
+                        "diskSizeGB": 1024
                     },
                     "imageReference": {
                         "publisher": "MicrosoftWindowsServer",
