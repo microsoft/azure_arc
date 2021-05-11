@@ -7,17 +7,6 @@ param (
 Start-Transcript -Path C:\Temp\installArcAgentSQL.log
 $ErrorActionPreference = 'SilentlyContinue'
 
-# choco install azure-cli -y ## this should be part of the vhd image
-# Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-# if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
-#     Write-Warning -Message ('Az module not installed. Having both the AzureRM and ' +
-#       'Az modules installed at the same time is not supported.')
-# } else {
-#     Install-Module -Name Az -AllowClobber -Force
-# }
-# New-Item -path alias:az -value 'C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd'
-# Install-Module -Name Az.ConnectedMachine -AllowClobber -Force
-
 # These settings will be replaced by the portal when the script is generated
 $subId = $subscriptionId
 $resourceGroup = $myResourceGroup
