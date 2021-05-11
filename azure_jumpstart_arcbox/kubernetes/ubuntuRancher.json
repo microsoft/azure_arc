@@ -109,9 +109,7 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "osDiskType": "Premium_LRS",
-        "subnetAddressPrefix": "172.16.1.0/24",
-        "addressPrefix": "172.16.0.0/16"
+        "osDiskType": "Premium_LRS"
     },
     "resources": [
         {
@@ -121,7 +119,6 @@
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
             ],
             "properties": {
@@ -240,29 +237,6 @@
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "32323"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-04-01",
-            "name": "[parameters('virtualNetworkName')]",
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[variables('addressPrefix')]"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[parameters('subnetName')]",
-                        "properties": {
-                            "addressPrefix": "[variables('subnetAddressPrefix')]",
-                            "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
                         }
                     }
                 ]
