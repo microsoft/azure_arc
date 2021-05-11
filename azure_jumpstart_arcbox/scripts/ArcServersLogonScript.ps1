@@ -217,7 +217,7 @@ Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
 # Starting Hyper-V Manager
-Start-Process -FilePath "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -WindowStyle Maximized
+# Start-Process -FilePath "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -WindowStyle Maximized
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
