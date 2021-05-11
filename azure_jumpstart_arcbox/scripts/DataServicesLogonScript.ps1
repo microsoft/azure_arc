@@ -152,7 +152,7 @@ $pg = Get-Content $postgresfile
 
 # Downloading Rancher K3s kubeconfig file
 Write-Host "Downloading Rancher K3s kubeconfig file"
-$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging/config"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
