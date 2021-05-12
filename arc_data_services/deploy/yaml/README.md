@@ -1,10 +1,18 @@
 # Azure Arc enabled data services - Sample yaml files
 
-## [Security Context Constraint for OpenShift deployments](./arc-data-scc.yaml)
-
 This folder contains deployment related scripts for Azure Arc enabled data services. These scripts can be applied using kubectl command-line tool. If you are performing any operations on the services using the [Azure Data CLI](https://docs.microsoft.com/en-us/sql/azdata/install/deploy-install-azdata?toc=%2Fazure%2Fazure-arc%2Fdata%2Ftoc.json&bc=%2Fazure%2Fazure-arc%2Fdata%2Fbreadcrumb%2Ftoc.json&view=sql-server-ver15) tool then ensure that you have the latest version always.
 
-## Deployment yaml files
+## Security Context Constraint for OpenShift deployments
+
+The deployment of Azure Arc enabled data services on OpenShift cluster requires configuration of custom Security Context Constraint. The following yaml files should be used to create & configure the custom Security Context Constraint object. The yaml files should be applied in the order specified below. The files can be applied using the OC or kubectl CLI.
+
+1. [Create custom Security Context Constraint](./arc-data-scc.yaml)
+This yaml file creates the OpenShift custom Security Context Constraint (SCC) object for Azure Arc enabled data services. Creation of the SCC requires cluster level edit permission.
+
+1. [Configure namespace for the custom Security Context Constraint](./arc-data-scc-role-rolebinding.yaml)
+This yaml file creates the Kubernetes role and rolebinding necessary in the namespace where you are creating the Azure ARc enabled data service resources. Creation of the role and rolebinding requires namespace level edit permissions.
+
+## Deployment yaml files for kube-native operations
 
 The following yaml files can be used to create Azure Arc enabled data services using kubectl CLI. The yaml files can be applied in the order specified below and modifying the parameters based on your Kubernetes environment.
 
