@@ -75,7 +75,7 @@ az k8s-extension create --name "azure-defender" --cluster-name "ArcBox-CAPI-Data
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
-Start-Process PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Start-Sleep -Seconds 5; Clear-Host }}
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Start-Sleep -Seconds 5; Clear-Host }}
 azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=managed-premium'
 azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=managed-premium'
@@ -192,6 +192,9 @@ namespace Win32{
 
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
+
+# Kill the open PowerShell monitoring kubectl get pods
+Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
