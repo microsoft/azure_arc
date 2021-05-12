@@ -34,7 +34,7 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
-resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
+resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$stagingStorageAccountName']".[resourceGroup] --resource-type "Microsoft.Storage/storageAccounts" -o tsv)
 az -v
 echo ""
 
