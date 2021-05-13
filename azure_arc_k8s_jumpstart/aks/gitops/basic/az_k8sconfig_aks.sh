@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
 
@@ -19,7 +19,7 @@ az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --
 kubectl create namespace hello-arc
 
 # Add the official stable repo
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo add stable https://charts.helm.sh/stable
 
 # Use Helm to deploy an NGINX ingress controller
 helm install nginx stable/nginx-ingress \
@@ -28,7 +28,7 @@ helm install nginx stable/nginx-ingress \
     --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
     --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
 
-az k8sconfiguration create \
+az k8s-configuration create \
 --name cluster-config \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name cluster-config --operator-namespace cluster-config \

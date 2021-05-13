@@ -4,13 +4,13 @@ data:
   username: <your base64 encoded user name. 'sa' is not allowed>
 kind: Secret
 metadata:
-  name: example-login-secret
+  name: sql1-login-secret
 type: Opaque
 ---
 apiVersion: sql.arcdata.microsoft.com/v1alpha1
 kind: sqlmanagedinstance
 metadata:
-  name: example
+  name: sql1
 spec:
   limits:
     memory: 4Gi
@@ -21,13 +21,7 @@ spec:
   service:
     type: LoadBalancer
   storage:
-    backups:
-      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
-      size: 5Gi
     data:
-      className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
-      size: 5Gi
-    datalogs:
       className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
       size: 5Gi
     logs:

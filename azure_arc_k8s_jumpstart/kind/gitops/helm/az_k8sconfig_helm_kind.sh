@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
 
@@ -16,11 +16,11 @@ az login --service-principal --username $appId --password $password --tenant $te
 
 # Create Namespace-level GitOps-Config for deploying the "Hello Arc" application
 echo "Create Namespace-level GitOps-Config for deploying the 'Hello Arc' application"
-az k8sconfiguration create \
+az k8s-configuration create \
 --name hello-arc \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name hello-arc --operator-namespace prod \
---enable-helm-operator --helm-operator-version='0.6.0' \
+--enable-helm-operator \
 --helm-operator-params='--set helm.versions=v3' \
 --repository-url $appClonedRepo \
 --scope namespace --cluster-type connectedClusters \

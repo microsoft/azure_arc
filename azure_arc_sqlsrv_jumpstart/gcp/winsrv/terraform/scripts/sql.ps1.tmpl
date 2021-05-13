@@ -19,7 +19,7 @@ if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
-Write-Host "Installing SQL Server Express and PowerShell Module"
+Write-Host "Installing SQL Server and PowerShell Module"
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 If(-not(Get-InstalledModule SQLServer -ErrorAction silentlycontinue)){
     Install-Module SQLServer -Confirm:$False -Force
@@ -79,7 +79,7 @@ $resourceGroup = "${resourceGroup}"
 $WorkspaceName = "log-analytics-" + (Get-Random -Maximum 99999)
 $Location = "${location}"
 
-# Get the Resource Group
+# Get the resource group
 Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
 
 # Create the workspace
@@ -105,7 +105,7 @@ New-AzResourceGroupDeployment -Name MMA `
   -TemplateFile C:\tmp\mma.json
 
 Write-Host "Configuring SQL Azure Assessment"
-Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/master/azure_arc_sqlsrv_jumpstart/gcp/winsrv/terraform/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
+Invoke-WebRequest "https://github.com/microsoft/azure_arc/raw/main/azure_arc_sqlsrv_jumpstart/gcp/winsrv/terraform/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip"
 Expand-Archive "C:\tmp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
 $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\'Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
 Import-Module $env:ProgramFiles\'Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll'

@@ -2,13 +2,13 @@
 
 sudo apt-get update
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
 # Installing Helm 3
@@ -20,7 +20,7 @@ echo "Installing Azure CLI & Azure Arc Extensions"
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 sudo az extension add --name connectedk8s
-sudo az extension add --name k8sconfiguration
+sudo az extension add --name k8s-configuration
 
 echo "Log in to Azure using service principal"
 sudo az login --service-principal --username $appId --password $password --tenant $tenantId

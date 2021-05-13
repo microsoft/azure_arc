@@ -4,23 +4,23 @@ variable "location" {
 }
 
 variable "resourceGroup" {
-  description = "Azure Resource Group"
+  description = "Azure resource group"
   type        = string
   default     = "Arc-VMware-SQL-Demo"
 }
 
 variable "subId" {
-  description = "Azure Subscription ID"
+  description = "Azure subscription ID"
   type        = string
 }
 
 variable "servicePrincipalAppId" {
-  description = "Azure Service Principal App ID"
+  description = "Azure service principal App ID"
   type        = string
 }
 
 variable "servicePrincipalSecret" {
-  description = "Azure Service Principal App Password"
+  description = "Azure service principal App Password"
   type        = string
 }
 

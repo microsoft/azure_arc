@@ -1,0 +1,60 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmName": {
+        "type": "string"
+      },
+      "location": {
+        "type": "string"
+      },
+      "keyvaultCertPath": {
+        "type": "string"
+      }
+    },
+    "resources": [
+      {
+        "name": "[concat(parameters('vmName'),'/CustomScript')]",
+        "type": "Microsoft.HybridCompute/machines/extensions",
+        "location": "[parameters('location')]",
+        "apiVersion": "2019-08-02-preview",
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "autoUpgradeMinorVersion": true,
+          "settings": {},
+          "protectedSettings": {
+            "commandToExecute": "./keyvault-install-nginx.sh",
+            "fileUris": [
+              "https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/keyvault-install-nginx.sh"
+            ]
+          }
+        }
+      },
+      {
+        "type": "Microsoft.HybridCompute/machines/extensions",
+        "name": "[concat(parameters('vmName'),'/KeyVaultForLinux')]",
+        "apiVersion": "2020-08-02",
+        "location": "[parameters('location')]",
+        "properties": {
+            "publisher": "Microsoft.Azure.KeyVault",
+            "type": "KeyVaultForLinux",
+            "typeHandlerVersion": "1.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+                "secretsManagementSettings": {
+                  "pollingIntervalInS": "3600",
+                  "certificateStoreLocation": "/etc/ssl/certs",
+                  "observedCertificates": [
+                    "[parameters('keyvaultCertPath')]"
+                  ]
+                },
+                "authenticationSettings": {
+                  "msiEndpoint": "http://localhost:40342/metadata/identity"
+                }
+            }
+         }
+      }
+    ]
+  }
+  

@@ -36,7 +36,7 @@ This yaml file creates the PostgreSQL Hyperscale resource(s).The administrator u
 
 ### Creating base64 encoded strings
 
-The values of the username and password in secrets should be base64 encoded using UTF8 encoded string. On Windows, the following Powershell snippet can be used to obtain the base64 encoded value:
+The values of the username and password in secrets should be base64 encoded using UTF8 encoded string. On Windows, the following PowerShell snippet can be used to obtain the base64 encoded value:
 
 ```powershell
 $PASSWORD = 'this is my password'
@@ -50,7 +50,7 @@ On Linux, the following bash shell command can be used to obtain the base64 enco
 echo -n this is my password|base64
 ```
 
-The base64 encoded values can be decoded using similar steps. On Windows, the following Powershell snippet can be used to decode the base64 encoded string:
+The base64 encoded values can be decoded using similar steps. On Windows, the following PowerShell snippet can be used to decode the base64 encoded string:
 
 ```powershell
 $ENCODED_PASSWORD = 'dGhpcyBpcyBteSBwYXNzd29yZA=='
