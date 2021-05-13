@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
 
@@ -30,7 +30,7 @@ sudo apt-get update
 sudo apt-get install azure-cli
 
 az extension add --name connectedk8s
-az extension add --name k8sconfiguration
+az extension add --name k8s-configuration
 
 # Login to Azure
 echo "Log in to Azure with Service Principal"
@@ -40,16 +40,15 @@ az login --service-principal --username $appId --password $password --tenant $te
 kubectl create namespace hello-arc
 
 # Add the official stable repo
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo add nginx-stable https://helm.nginx.com/stable
+helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
-helm install nginx stable/nginx-ingress \
+helm install nginx nginx-stable/nginx-ingress \
     --namespace hello-arc \
-    --set controller.replicaCount=2 \
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux \
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+    --set controller.replicaCount=2
 
-az k8sconfiguration create \
+az k8s-configuration create \
 --name cluster-config \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name cluster-config --operator-namespace cluster-config \

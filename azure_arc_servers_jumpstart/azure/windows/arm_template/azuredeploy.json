@@ -65,7 +65,7 @@
         "resourceGroup": {
             "type": "string",
             "metadata": {
-                "description": "Azure Resource Group"
+                "description": "Azure resource group"
             }
         },
         "subscriptionId": {
@@ -264,7 +264,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_servers_jumpstart/azure/windows/arm_template/scripts/install_arc_agent.ps1"
+                "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/windows/arm_template/scripts/install_arc_agent.ps1"
               ],
               "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File install_arc_agent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'),  ' -subscriptionId ', parameters('subscriptionId'), ' -location ', parameters('location'), ' -adminUsername ', parameters('adminUsername'))]" 
             }            

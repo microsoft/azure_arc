@@ -41,22 +41,28 @@
                 "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
             }
         },
-        "servicePrincipalClientId": {
-            "type": "string",
+        "SPN_CLIENT_ID": {
             "metadata": {
-                "description": "Unique SPN app ID"
-            }
+                "description": "Client ID (used by cloudprovider)"
+            },
+            "type": "securestring"
         },
-        "servicePrincipalClientSecret": {
-            "type": "string",
+        "SPN_CLIENT_SECRET": {
             "metadata": {
-                "description": "Unique SPN password"
-            }
+                "description": "The Service Principal Client Secret"
+            },
+            "type": "securestring"
         },
-        "tenantId": {
+        "SPN_TENANT_ID": {
             "type": "string",
             "metadata": {
                 "description": "Unique SPN tenant ID"
+            }
+        },        
+        "SPN_AUTHORITY": {
+            "type": "string",
+            "metadata": {
+                "description": "The Service Principal authority"
             }
         },        
         "AZDATA_USERNAME": {
@@ -107,7 +113,7 @@
         "ARC_DC_RG": {
             "type": "string",
             "metadata": {
-                "description": "Arc Data Controller Resource Group"
+                "description": "Arc Data Controller resource group"
             }
         },
         "ARC_DC_REGION": {
@@ -444,8 +450,8 @@
             "typeHandlerVersion": "2.1",
             "autoUpgradeMinorVersion": true,
             "protectedSettings": {
-                        "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'), ' ', parameters('DOCKER_REGISTRY'), ' ', parameters('DOCKER_REPOSITORY'), ' ', parameters('DOCKER_TAG'))]",
-            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh"]
+                        "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'), ' ', parameters('DOCKER_REGISTRY'), ' ', parameters('DOCKER_REPOSITORY'), ' ', parameters('DOCKER_TAG'),' ', parameters('SPN_CLIENT_ID'),' ', parameters('SPN_CLIENT_SECRET'),' ', parameters('SPN_TENANT_ID'),' ', parameters('SPN_AUTHORITY'))]",
+            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh"]
             }
           }
         },
@@ -459,7 +465,7 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-            "uri":"https://raw.githubusercontent.com/microsoft/azure_arc/master/azure_arc_data_jumpstart/kubeadm/azure/arm_template/client_vm_deployment.json",
+            "uri":"https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/client_vm_deployment.json",
             "contentVersion":"1.0.0.0"
             },
             "parameters": {
@@ -468,9 +474,10 @@
             "adminUsername":{"value": "[parameters('adminUsername')]"},
             "adminPassword":{"value": "[parameters('adminPassword')]"},
             "vmSize":{"value": "[parameters('vmSize')]"},
-            "servicePrincipalClientId":{"value": "[parameters('servicePrincipalClientId')]"},
-            "servicePrincipalClientSecret":{"value": "[parameters('servicePrincipalClientSecret')]"},
-            "tenantId":{"value": "[parameters('tenantId')]"},
+            "SPN_CLIENT_ID":{"value": "[parameters('SPN_CLIENT_ID')]"},
+            "SPN_CLIENT_SECRET":{"value": "[parameters('SPN_CLIENT_SECRET')]"},
+            "SPN_TENANT_ID":{"value": "[parameters('SPN_TENANT_ID')]"},
+            "SPN_AUTHORITY":{"value": "[parameters('SPN_AUTHORITY')]"},
             "ARC_DC_RG":{"value": "[parameters('ARC_DC_RG')]"},
             "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
             "AZDATA_PASSWORD":{"value": "[parameters('AZDATA_PASSWORD')]"},

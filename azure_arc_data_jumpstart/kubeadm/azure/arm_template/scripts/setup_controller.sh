@@ -15,6 +15,10 @@ echo $ACCEPT_EULA:${10} | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_REGISTRY:${11} | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_REPOSITORY:${12} | awk '{print substr($1,2); }' >> vars.sh
 echo $DOCKER_TAG:${13} | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_CLIENT_ID:${14} | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_CLIENT_SECRET:${15} | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_TENANT_ID:${16} | awk '{print substr($1,2); }' >> vars.sh
+echo $SPN_AUTHORITY:${17} | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars.sh
@@ -28,6 +32,10 @@ sed -i '11s/^/export ACCEPT_EULA=/' vars.sh
 sed -i '12s/^/export DOCKER_REGISTRY=/' vars.sh
 sed -i '13s/^/export DOCKER_REPOSITORY=/' vars.sh
 sed -i '14s/^/export DOCKER_TAG=/' vars.sh
+sed -i '15s/^/export SPN_CLIENT_ID=/' vars.sh
+sed -i '16s/^/export SPN_CLIENT_SECRET=/' vars.sh
+sed -i '17s/^/export SPN_TENANT_ID=/' vars.sh
+sed -i '18s/^/export SPN_AUTHORITY=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -47,6 +55,10 @@ echo $ACCEPT_EULA >> vars_profile.sh
 echo $DOCKER_REGISTRY >> vars_profile.sh
 echo $DOCKER_REPOSITORY >> vars_profile.sh
 echo $DOCKER_TAG >> vars_profile.sh
+echo $SPN_CLIENT_ID >> vars_profile.sh
+echo $SPN_CLIENT_SECRET >> vars_profile.sh
+echo $SPN_TENANT_ID >> vars_profile.sh
+echo $SPN_AUTHORITY >> vars_profile.sh
 sed -i '2s/^/export adminUsername=/' vars_profile.sh
 sed -i '3s/^/export AZDATA_USERNAME=/' vars_profile.sh
 sed -i '4s/^/export AZDATA_PASSWORD=/' vars_profile.sh
@@ -60,6 +72,10 @@ sed -i '11s/^/export ACCEPT_EULA=yes/' vars_profile.sh
 sed -i '12s/^/export DOCKER_REGISTRY=/' vars_profile.sh
 sed -i '13s/^/export DOCKER_REPOSITORY=/' vars_profile.sh
 sed -i '14s/^/export DOCKER_TAG=/' vars_profile.sh
+sed -i '15s/^/export SPN_CLIENT_ID=yes/' vars_profile.sh
+sed -i '16s/^/export SPN_CLIENT_SECRET=/' vars_profile.sh
+sed -i '17s/^/export SPN_TENANT_ID=/' vars_profile.sh
+sed -i '18s/^/export SPN_AUTHORITY=/' vars_profile.sh
 
 cat vars_profile.sh >> /etc/profile
 

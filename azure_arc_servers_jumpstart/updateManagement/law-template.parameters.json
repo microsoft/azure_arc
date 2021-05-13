@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName": {
+            "value": "<Name for Log Analytics workspace>" // Name for your Log Analytics workspace
+        },
+        "sku": {
+            "value": "pergb2018" // SKU, leave default
+        },
+        "automationAccountName": {
+            "value": "<Name for Automation Account>" // Name for your Automation account
+        },
+        "arcVmName": {
+            "value": "<Name of your Azure Arc enabled server>" // Name of your Azure Arc enabled server
+        },
+        "arcVmResourceGroup": {
+            "value": "<resource group for your Azure Arc enabled server>" // the resource group of the Azure Arc enabled server
+        }
+    }
+}

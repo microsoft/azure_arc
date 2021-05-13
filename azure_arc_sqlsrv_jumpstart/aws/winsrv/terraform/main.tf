@@ -98,17 +98,17 @@ data "aws_ami" "Windows_2019" {
 
 locals {
   vars = {
-    admin_user     = "${var.admin_user}"
-    admin_password = "${var.admin_password}"
+    admin_user     = var.admin_user
+    admin_password = var.admin_password
   }
 }
 
 data "template_file" "user_data" {
   template = "${file("scripts/user_data.tpl")}"
   vars = {
-    admin_user     = "${var.admin_user}"
-    admin_password = "${var.admin_password}"
-    hostname       = "${var.hostname}"
+    admin_user     = var.admin_user
+    admin_password = var.admin_password
+    hostname = var.hostname
   }
 }
 

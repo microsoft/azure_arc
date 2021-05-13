@@ -14,14 +14,26 @@
         "sshRSAPublicKey": {
             "value": "ssh-rsa THISISTOPSECRETSTUFF1234XXXXXXXXXXXXXtEbhbVqD bilbo@MacBook-Pro.localdomain"
         },
-        "servicePrincipalClientId": {
+        "SPN_CLIENT_ID": {
             "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
         },
-        "servicePrincipalClientSecret": {
+        "SPN_CLIENT_SECRET": {
             "value": "33333333-XXXX-YTYT-9c21-7777777777"
         },
+        "SPN_TENANT_ID": {
+            "value": "33333333-XXXX-41af-1111-7777777777"
+        },
+        "ARC_DC_SUBSCRIPTION": {
+            "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
+        },
+        "ARC_DC_REGION": {
+            "value": "eastus"
+        },        
+        "SPN_AUTHORITY": {
+            "value": "https://login.microsoftonline.com"
+        },        
         "kubernetesVersion": {
-            "value": "1.18.6"
+            "value": "1.18.14"
         },
         "adminUsername": {
             "value": "arcdemo"
@@ -31,9 +43,6 @@
         },
         "vmSize": {
             "value": "Standard_D4s_v3"
-        },
-        "tenantId": {
-            "value": "33333333-XXXX-41af-1111-7777777777"
         },
         "resourceGroup": {
             "value": "Arc-Data-Vanilla-Demo"
@@ -49,12 +58,6 @@
         },
         "ARC_DC_NAME": {
             "value": "arcdatactrl"
-        },
-        "ARC_DC_SUBSCRIPTION": {
-            "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
-        },
-        "ARC_DC_REGION": {
-            "value": "eastus"
-        }                
+        }
     }
 }

@@ -1,12 +1,12 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 
 # Login to Azure using the service principal name
@@ -16,8 +16,8 @@ az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --
 
 # Deleting GitOps Configurations from Azure Arc Kubernetes cluster
 echo "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
-az k8sconfiguration delete --name hello-arc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
-az k8sconfiguration delete --name nginx-ingress --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
+az k8s-configuration delete --name hello-arc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
+az k8s-configuration delete --name nginx-ingress --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
 
 # Cleaning Kubernetes cluster
 echo "Cleaning Kubernetes cluster. You can safely ignore non-exist resources"
