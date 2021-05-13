@@ -1,13 +1,13 @@
 #!/bin/sh
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
-export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
-export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
+export servicePrincipalAppId='<Your Azure service principal name>'
+export servicePrincipalSecret='<Your Azure service principal password>'
+export servicePrincipalTenantId='<Your Azure tenant ID>'
+export resourceGroup='<Azure resource group name>'
+export arcClusterName='<The name of Azure Arc enabled Kubernetes cluster>'
 export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
 
 # Installing Helm 3
@@ -29,20 +29,21 @@ sudo tee /etc/apt/sources.list.d/azure-cli.list
 sudo apt-get update
 sudo apt-get install azure-cli
 
-az extension add --name connectedk8s
-az extension add --name k8sconfiguration
+az extension remove --name k8s-configuration
+rm -rf ~/.azure/AzureArcCharts
+az extension add --name k8s-configuration
 
 # Login to Azure
 echo "Log in to Azure with Service Principal"
-az login --service-principal --username $appId --password $password --tenant $tenantId
+az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
 
 # Create Cluster-level GitOps-Config for deploying nginx-ingress
 echo "Create Cluster-level GitOps-Config for deploying nginx-ingress"
-az k8sconfiguration create \
+az k8s-configuration create \
 --name nginx-ingress \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name cluster-mgmt --operator-namespace cluster-mgmt \
---enable-helm-operator --helm-operator-version='0.6.0' \
+--enable-helm-operator \
 --helm-operator-params='--set helm.versions=v3' \
 --repository-url $appClonedRepo \
 --scope cluster --cluster-type connectedClusters \
@@ -50,11 +51,11 @@ az k8sconfiguration create \
 
 # Create Namespace-level GitOps-Config for deploying the "Hello Arc" application
 echo "Create Namespace-level GitOps-Config for deploying the 'Hello Arc' application"
-az k8sconfiguration create \
+az k8s-configuration create \
 --name hello-arc \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name hello-arc --operator-namespace prod \
---enable-helm-operator --helm-operator-version='0.6.0' \
+--enable-helm-operator \
 --helm-operator-params='--set helm.versions=v3' \
 --repository-url $appClonedRepo \
 --scope namespace --cluster-type connectedClusters \

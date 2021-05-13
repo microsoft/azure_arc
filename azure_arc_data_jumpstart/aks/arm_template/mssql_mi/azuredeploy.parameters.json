@@ -14,14 +14,26 @@
         "sshRSAPublicKey": {
             "value": "<Your ssh public key>"
         },
-        "servicePrincipalClientId": {
-            "value": "<Your Azure Service Principal name>"
+        "SPN_CLIENT_ID": {
+            "value": "<Your Azure service principal name>"
         },
-        "servicePrincipalClientSecret": {
-            "value": "<Your Azure Service Principal password>"
+        "SPN_CLIENT_SECRET": {
+            "value": "<Your Azure service principal password>"
         },
+        "SPN_TENANT_ID": {
+            "value": "<Azure tenant ID>"
+        },
+        "ARC_DC_SUBSCRIPTION": {
+            "value": "<Azure Arc Data Controller Azure subscription ID>"
+        },
+        "ARC_DC_REGION": {
+            "value": "eastus"
+        },          
+        "SPN_AUTHORITY": {
+            "value": "https://login.microsoftonline.com"
+        },        
         "kubernetesVersion": {
-            "value": "<Kubernetes Version, e.g. 1.18.6>"
+            "value": "<Kubernetes Version, e.g. 1.18.14>"
         },
         "adminUsername": {
             "value": "<Client Windows VM admin username>"
@@ -32,11 +44,8 @@
         "vmSize": {
             "value": "<Client Windows VM size>"
         },
-        "tenantId": {
-            "value": "<Azure tenant ID>"
-        },
         "resourceGroup": {
-            "value": "<Azure Resource Group where all resource to be deployed>"
+            "value": "<Azure resource group where all resource to be deployed>"
         },
         "AZDATA_USERNAME": {
             "value": "<Azure Arc Data Controller admin username>"
@@ -49,12 +58,6 @@
         },
         "ARC_DC_NAME": {
             "value": "<Azure Arc Data Controller name (will be used for k8s Arc namespace as well)>"
-        },
-        "ARC_DC_SUBSCRIPTION": {
-            "value": "<Azure Arc Data Controller Azure subscription ID>"
-        },
-        "ARC_DC_REGION": {
-            "value": "eastus"
         },
         "MSSQL_MI_NAME": {
             "value": "<SQL Managed Instance name to be deployed on the Kubernetes cluster>"

@@ -2,14 +2,14 @@
 
 sudo apt-get update
 
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export subscriptionId='<Your Azure Subscription ID>'
-export appId='<Your Azure Service Principal name>'
-export password='<Your Azure Service Principal password>'
+export subscriptionId='<Your Azure subscription ID>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure Resource Group Name>'
+export resourceGroup='<Azure resource group name>'
 export location='<Azure Region>'
 
 # Download the installation package
@@ -25,4 +25,5 @@ azcmagent connect \
   --resource-group "${resourceGroup}" \
   --tenant-id "${tenantId}" \
   --location "${location}" \
-  --subscription-id "${subscriptionId}"
+  --subscription-id "${subscriptionId}" \
+  --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"

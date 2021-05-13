@@ -1,0 +1,21 @@
+---
+
+    - name: Download the installation package
+      win_get_url:
+        url: https://aka.ms/AzureConnectedMachineAgent
+        dest: C:\AzureConnectedMachineAgent.msi
+  
+    - name: Install the hybrid agent
+      win_package:
+        path: C:\AzureConnectedMachineAgent.msi
+    
+    - name: Set proxy if required
+      win_environment:
+        state: present
+        name: https_proxy
+        value: '{{ proxy }}'
+        level: machine
+      when: proxy is defined
+    
+    - name:  Run connect command
+      win_shell: '$status=(azcmagent.exe show | findstr -i Disconnected); If ($Status -ne $null) { & $env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe connect --service-principal-id "{{ service_principal_id }}"  --service-principal-secret "{{ service_principal_secret }}" --resource-group "{{ resource_group }}" --tenant-id "{{ tenant_id }}" --location "{{ azure_region }}" --subscription-id "{{ subscription_id }}" --tags Project=jumpstart_azure_arc_servers  --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a" }'

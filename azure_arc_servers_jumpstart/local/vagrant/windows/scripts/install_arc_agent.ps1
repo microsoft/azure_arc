@@ -1,7 +1,7 @@
 # Injecting environment variables
 Invoke-Expression "C:\runtime\vars.ps1"
 
-# Creating new Azure Arc Resource Group
+# Creating new Azure Arc resource group
 az login --service-principal --username $env:appId --password $env:password --tenant $env:tenantId
 az group create --location $env:location --name $env:resourceGroup --subscription $env:subscriptionId 
 
@@ -24,4 +24,6 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
  --resource-group $env:resourceGroup `
  --tenant-id $env:tenantId `
  --location $env:location `
- --subscription-id $env:subscriptionId
+ --subscription-id $env:subscriptionId `
+ --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+

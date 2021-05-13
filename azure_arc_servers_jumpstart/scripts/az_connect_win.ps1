@@ -1,10 +1,10 @@
-# <--- Change the following environment variables according to your Azure Service Principal name --->
+# <--- Change the following environment variables according to your Azure service principal name --->
 
-$env:subscriptionId='<Your Azure Subscription ID>'
-$env:appId='<Your Azure Service Principal name>'
-$env:password='<Your Azure Service Principal password>'
+$env:subscriptionId='<Your Azure subscription ID>'
+$env:appId='<Your Azure service principal name>'
+$env:password='<Your Azure service principal password>'
 $env:tenantId='<Your Azure tenant ID>'
-$env:resourceGroup='<Azure Resource Group Name>'
+$env:resourceGroup='<Azure resource group name>'
 $env:location='<Azure Region>'
 
 # Download the package
@@ -21,4 +21,5 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
  --resource-group $env:resourceGroup `
  --tenant-id $env:tenantId `
  --location $env:location `
- --subscription-id $env:subscriptionId
+ --subscription-id $env:subscriptionId `
+ --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
