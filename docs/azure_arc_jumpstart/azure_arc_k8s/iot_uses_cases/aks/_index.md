@@ -163,7 +163,7 @@ az iot hub device-identity connection-string show --device-id "EdgeDeviceSim" --
 
   ![Screenshot showing how to access Cloud Shell in Visual Studio Code](./07.png)
 
-* Next, log into the deployment VM using your SSH credentials and edit the _/etc/aziot/config.toml_ and replace the connection string using the one we obtained in the previous step.
+* Next, log into the deployment VM using your SSH credentials and edit the _/etc/aziot/config.toml_ by replacing the connection string using the one we obtained in the previous step.
 
 ```shell
 # Manual provisioning with connection string
