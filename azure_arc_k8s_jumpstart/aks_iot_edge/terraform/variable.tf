@@ -1,16 +1,16 @@
 #Commons
 variable "location" {
-  description = "(Required) Location of the Key Vault to be created"
+  description = "(Required) Location of the all services to be created"
   default="westeurope"
 }
 
 variable "resource_group_name" {
-  description = "(Required) Resource group name of the Key Vault to be created"
+  description = "(Required) Resource group name of the all services to be created"
   default= "K8sEdgeJumpStart"
 }
 
 variable "tags" {
-  description = "(Required) Tags to be applied to the Key Vault to be created"
+  description = "(Required) Tags to be applied to the all services to be created"
   default = { Project = "jumpstart_azure_arc_k8s" }
 }
 
@@ -31,7 +31,7 @@ variable "replication-type-sta" {
 }
 
 variable "http-traffic-only-sta" {
-  description = "(Required) Location of the Key Vault to be created"
+  description = "(Required) HTTP traffic only enabled on Storage Account"
   default=true
 }
 
@@ -158,7 +158,7 @@ variable "route_tables_ids" {
 #Kubernetes
 
 variable "name" {
-  description = "(Required) Name of the Key Vault"
+  description = "(Required) Name of the Kuberentes cluster"
   default="K8sEdgeVault"
 }
 

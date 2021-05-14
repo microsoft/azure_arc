@@ -166,6 +166,13 @@ az iot hub device-identity connection-string show --device-id "EdgeDeviceSim" --
 * Modify the file _/etc/aziot/config.toml_ in the VM that we have deployed using your SSH credentials.
 Once inside the VM, we will modify the /etc/aziot/config.toml file including the following lines at the end of the file with the value of the connection string that we have obtained in the previous step: 
 
+```shell
+# Manual provisioning with connection string
+[provisioning]
+source = "manual"
+connection_string = "<ADD DEVICE CONNECTION STRING HERE>"
+ ```
+
 * In order to synchronize the configuration of the device that we have paired we must execute the following command:
 
 ```shell
