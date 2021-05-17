@@ -212,7 +212,7 @@ provisioning:
 * Once the script run has finished, the AKS cluster will be projected as a new Azure Arc enabled Kubernetes resource. We will proceed to connect to our AKS cluster and in a couple of minutes you should see the workload modules defined in the edge deployment running as pods along with edgeagent and iotedged. 
 We can use the following commands to check it: 
 
-![Screenshot environment variables section](./17.png)
+![Screenshot environment variables section](./16.png)
 
 ```shell
 kubectl get pods -n iotedge
