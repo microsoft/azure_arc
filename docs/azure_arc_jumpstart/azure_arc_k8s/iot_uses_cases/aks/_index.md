@@ -74,17 +74,6 @@ The following README will guide you on how to use the provided [Terraform](https
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
-
-## Architecture diagram 
-
-Azure Arc provides mechanisms for cluster operators to configure the foundational components of a cluster, and apply and enforce cluster policies. Azure IoT Edge allows application operators to remotely deploy and manage the workloads at scale with convenient cloud ingestion and bi-directional communication primitives.
-
-
-The architecture defined for this scenario is shown below: 
-
-![Screenshot architecture diagram](./16.png)
-
-
 ## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
