@@ -29,6 +29,8 @@ We know you are busy and sometimes all you need is just a good, short, solid rec
 
 All the demos in the [Azure Arc Jumpstart YouTube channel](https://aka.ms/AzureArcJumpstartDemos) are "bite-size" versions of the Azure Arc Jumpstart written scenarios we have on our website so make sure to check those as well.
 
+<p align="center"><img src="/img/jumpstart_demos_logo.png" alt="jumpstart-demos-logo" width="250"></p>
+
 Oh, and one last thing before you go. Please consider subscribing to the channel so you will know when we have a new awesome demo for you!
 
 Enjoy!
