@@ -24,9 +24,11 @@
         },
         "windowsAdminPassword": {
             "type": "securestring",
+            "minLength": 12,
+            "maxLength": 123,
             "defaultValue": "ArcPassword123!!",
             "metadata": {
-                "description": "Windows password for the Virtual Machine"
+                "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
             }
         },
         "windowsOSVersion": {
@@ -84,7 +86,7 @@
             }
         },
         "spnClientSecret": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Client secret of the service principal"
             }
@@ -104,7 +106,7 @@
             "defaultValue": "arcdemo"
         },
         "azdataPassword": {
-            "type": "string",
+            "type": "securestring",
             "defaultValue": "ArcPassword123!!"
         },
         "acceptEula": {
@@ -116,7 +118,7 @@
             "defaultValue": "registryUser"
         },
         "registryPassword": {
-            "type": "string",
+            "type": "securestring",
             "defaultValue": "registrySecret"
         },
         "arcDcName": {
@@ -166,7 +168,7 @@
             "metadata": {
                 "description": "Name for the environment Azure Log Analytics workspace"
             }
-        }        
+        }
 
     },
     "variables": {
