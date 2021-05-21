@@ -89,6 +89,8 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
 * Edit the environment variables in the script to match your environment parameters followed by running the ```. ./capi_osm_extension.sh``` command.
 
+    ![Screenshot parameter examples](./03.png)
+
  > **Note: The extra dot is due to the shell script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
    The script will:
@@ -106,17 +108,17 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
 You can now see that Open Service Mesh & Azure Monitor extensions are enabled once you visit the extension tab section of the Azure Arc enabled Kubernetes cluster resource in Azure.
 
-![Screenshot extension deployment security tab](./03.png)
+![Screenshot extension deployment security tab](./04.png)
 
 * You can also verify the deployment by running the kubectl command to ge look at the deployed artifacts in the arc-osm-system namespace below:
 
-![Screenshot extension deployment on cluster](./04.png)
+![Screenshot extension deployment on cluster](./05.png)
 
 After 15 minutes or so you can verify the integration and moniotring insights coming from OSM to Azure Monitor by following the below steps in Azure portal.
 
 Verify the namespaces are showing up in the insights section of the Arc enabled Kuberentes resource in Azure portal.
 
-![Show the namespaces in the Container Insights](./05.png)
+![Show the namespaces in the Container Insights](./06.png)
 
 To verify if monitoring working correctly or not, you can query the logs by running in the logs section to pull the data from the InsightsMetrics schema.
 
@@ -124,13 +126,13 @@ Sample query,
 
   > InsightsMetrics | where Name contains "envoy" | extend t=parse_json(Tags) | where t.app == "bookstore"
 
-![Show the log analytics query ](./06.png)
+![Show the log analytics query ](./07.png)
 
 You also navigate to the "Reports" tabs in the insights section and you can see OSM dashbarod report got added.
 
 > **Disclaimer: This feature is under preview and in order to view the OSM report template you have to access the portal with a query string "?feature.includePreviewTemplates=true" or directly accessing the portal using this [link](https://aka.ms/azmon/osmux).**
 
-![Show the report templates for OSM in the Container insights](./07.png)
+![Show the report templates for OSM in the Container insights](./08.png)
 
 ### Delete extension instances
 
