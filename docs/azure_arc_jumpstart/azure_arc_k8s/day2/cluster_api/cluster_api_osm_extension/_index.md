@@ -124,13 +124,13 @@ Sample query,
 
   > InsightsMetrics | where Name contains "envoy" | extend t=parse_json(Tags) | where t.app == "bookstore"
 
-![Show the log analytics query ](./07.png)
+![Show the log analytics query ](./06.png)
 
 You also navigate to the "Reports" tabs in the insights section and you can see OSM dashbarod report got added.
 
 > **Disclaimer: This feature is under preview and in order to view the OSM report template you have to access the portal with a query string "?feature.includePreviewTemplates=true" or directly accessing the portal using this [link](https://aka.ms/azmon/osmux).**
 
-![Show the report templates for OSM in the Container insights](./06.png)
+![Show the report templates for OSM in the Container insights](./07.png)
 
 ### Delete extension instances
 
