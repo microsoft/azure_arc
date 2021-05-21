@@ -13,7 +13,7 @@ export k8sMonitorExtensionName='<azuremonitor extenion name>'
 
 export osmCliDownloadUrl="https://github.com/openservicemesh/osm/releases/download/v0.8.4/osm-v0.8.4-linux-amd64.tar.gz"
 export osmCliPkg="osm-v0.8.4-linux-amd64.tar.gz"
-export osmVersion=0.8.3
+export osmVersion=0.8.4
 
 export bookStoreNameSpace="bookstore"
 export bookbuyerNameSpace="bookbuyer"
