@@ -2,17 +2,27 @@
 
 # <--- Change the following environment variables according to your Azure service principal name --->
 
-export subscriptionId='<Your Azure subscription ID>'
-export appId='<Your Azure service principal name>'
-export password='<Your Azure service principal password>'
-export tenantId='<Your Azure tenant ID>'
-export resourceGroup='<Azure resource group name>'
-export arcClusterName='<Azure Arc Cluster Name>'
-export k8sOSMExtensionName='<OSM extension name>'
-export k8sMonitorExtensionName='<azuremonitor extenion name>'
+# export subscriptionId='<Your Azure subscription ID>'
+# export appId='<Your Azure service principal name>'
+# export password='<Your Azure service principal password>'
+# export tenantId='<Your Azure tenant ID>'
+# export resourceGroup='<Azure resource group name>'
+# export arcClusterName='<Azure Arc Cluster Name>'
+# export k8sOSMExtensionName='<OSM extension name>'
+# export k8sMonitorExtensionName='<azuremonitor extenion name>'
+
+export subscriptionId='ebb856bd-cdcb-4e79-92bd-02911c47395f'
+export appId='9df28080-4024-4114-8320-4b6b2bbbbd3d'
+export password='2TXSUqXpC121s4m0Hd4qJD7h5_TuWl_t4y'
+export tenantId='72f988bf-86f1-41af-91ab-2d7cd011db47'
+export resourceGroup='arc-capi-azure'
+export arcClusterName='arc-capi-azure'
+export k8sOSMExtensionName='osm'
+export k8sMonitorExtensionName='azuremonitor-containers'
 
 export osmCliDownloadUrl="https://github.com/openservicemesh/osm/releases/download/v0.8.4/osm-v0.8.4-linux-amd64.tar.gz"
 export osmCliPkg="osm-v0.8.4-linux-amd64.tar.gz"
+export osmVersion=0.8.3
 
 export bookStoreNameSpace="bookstore"
 export bookbuyerNameSpace="bookbuyer"
@@ -114,13 +124,3 @@ kubectl get ns
 
 echo "Deployments, pods and services got created"
 kubectl get all --all-namespaces
-
-# port forward UI apps
-# bookThiefPod="$(kubectl get pods --selector app=bookthief -n "$bookthiefNameSpace" --no-headers | grep 'Running' | awk 'NR==1{print $1}')"
-# kubectl port-forward "$bookThiefPod" -n "$bookthiefNameSpace" "$bookThiefLocalPort":14001
-
-# bookBuyerPod="$(kubectl get pods --selector app=bookthief -n "$bookbuyerNameSpace" --no-headers | grep 'Running' | awk 'NR==1{print $1}')"
-# kubectl port-forward "$bookBuyerPod" -n "$bookbuyerNameSpace" "$bookBuyerLocalPort":14001
-
-# bookStorePod="$(kubectl get pods --selector app=bookthief -n "$bookStoreNameSpace" --no-headers | grep 'Running' | awk 'NR==1{print $1}')"
-# kubectl port-forward "$bookStorePod" -n "$bookStoreNameSpace" "$bookStoreLocalPort":14001
