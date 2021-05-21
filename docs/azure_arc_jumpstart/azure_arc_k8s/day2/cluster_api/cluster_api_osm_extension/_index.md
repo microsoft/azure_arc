@@ -130,6 +130,8 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
     InsightsMetrics | where Name contains "envoy" | extend t=parse_json(Tags) | where t.app == "bookstore"
     ```
 
+    ![Screenshot showing the InsightsMetrics logs](./07.png)
+
   * You can also navigate to the "Reports" tabs in the Insights section and see the OSM dashboard report got added.
 
     > **Disclaimer: This feature is under preview and in order to view the OSM report template you have to access the portal with a query string _"?feature.includePreviewTemplates=true"_ or directly accessing the Azure portal using the following [link](https://aka.ms/azmon/osmux).**
