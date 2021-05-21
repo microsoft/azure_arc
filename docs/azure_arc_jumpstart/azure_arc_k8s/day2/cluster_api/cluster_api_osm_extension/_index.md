@@ -124,7 +124,6 @@ You can now see that Open Service Mesh & Azure Monitor for containers extensions
   
 ```shell
 InsightsMetrics | where Name contains "envoy" | extend t=parse_json(Tags) | where t.app == "bookstore"
-![Show the log analytics query ](./07.png)
 
 You can also navigate to the "Reports" tabs in the Insights section and see the OSM dashboard report got added.
 
