@@ -133,8 +133,7 @@ You can also navigate to the "Reports" tabs in the Insights section and see the 
 
 ### Delete extension instances
 
-The following command only deletes the extension instances, but doesn't delete the Log Analytics workspace. You can also delete the extensions from the Azure Portal under the extensions section of Azure Arc enabled Kubernetes cluster resource.
+The following command only deletes the extension instances but doesn't delete the Log Analytics workspace. 
 
 ```bash
 az k8s-extension delete --cluster-type connectedClusters --cluster-name <name of the cluster> --resource-group <name of the resource group> --name <name of the extension> -y
-```
