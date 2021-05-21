@@ -2,23 +2,14 @@
 
 # <--- Change the following environment variables according to your Azure service principal name --->
 
-# export subscriptionId='<Your Azure subscription ID>'
-# export appId='<Your Azure service principal name>'
-# export password='<Your Azure service principal password>'
-# export tenantId='<Your Azure tenant ID>'
-# export resourceGroup='<Azure resource group name>'
-# export arcClusterName='<Azure Arc Cluster Name>'
-# export k8sOSMExtensionName='<OSM extension name>'
-# export k8sMonitorExtensionName='<azuremonitor extenion name>'
-
-export subscriptionId='ebb856bd-cdcb-4e79-92bd-02911c47395f'
-export appId='9df28080-4024-4114-8320-4b6b2bbbbd3d'
-export password='2TXSUqXpC121s4m0Hd4qJD7h5_TuWl_t4y'
-export tenantId='72f988bf-86f1-41af-91ab-2d7cd011db47'
-export resourceGroup='arc-capi-azure'
-export arcClusterName='arc-capi-azure'
-export k8sOSMExtensionName='osm'
-export k8sMonitorExtensionName='azuremonitor-containers'
+export subscriptionId='<Your Azure subscription ID>'
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
+export tenantId='<Your Azure tenant ID>'
+export resourceGroup='<Azure resource group name>'
+export arcClusterName='<Azure Arc Cluster Name>'
+export k8sOSMExtensionName='<OSM extension name>'
+export k8sMonitorExtensionName='<azuremonitor extenion name>'
 
 export osmCliDownloadUrl="https://github.com/openservicemesh/osm/releases/download/v0.8.4/osm-v0.8.4-linux-amd64.tar.gz"
 export osmCliPkg="osm-v0.8.4-linux-amd64.tar.gz"
@@ -90,7 +81,7 @@ tar -xvf $osmCliPkg
 echo "Copy the OSM binary to local bin folder"
 sudo cp ./linux-amd64/osm /usr/local/bin/osm
 
-#display current osm version
+echo "Display current osm version"
 osm version
 
 echo "Create the Bookstore Application Namespaces"
@@ -109,7 +100,25 @@ echo "Enable metrics for pods belonging to app namespaces"
 osm metrics enable --namespace "$bookStoreNameSpace,$bookbuyerNameSpace,$bookthiefNameSpace,$bookwarehouseNameSpace"
 
 echo "update the namespaces to be monitored first in the yaml file below"
-kubectl apply -f container-azm-ms-osmconfig.yaml
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: ConfigMap
+data:
+  schema-version:
+    #string.used by agent to parse OSM config. supported versions are {v1}. Configs with other schema versions will be rejected by the agent.
+    v1
+  config-version:
+    #string.used by OSM addon team to keep track of this config file's version in their source control/repository (max allowed 10 chars, other chars will be truncated)
+    ver1
+  osm-metric-collection-configuration: |-
+    # OSM metric collection settings
+    [osm_metric_collection_configuration.settings]
+        # Namespaces to monitor
+         monitor_namespaces = ["bookstore", "bookbuyer","bookthief", "bookwarehouse"]
+metadata:
+  name: container-azm-ms-osmconfig
+  namespace: kube-system
+EOF
 
 echo "Create the Kubernetes resources for the bookstore demo applications"
 kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookbuyer.yaml
