@@ -69,11 +69,11 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 * User will set the current kubectl context to the connected Azure Arc enabled Kubernetes cluster.
 
-* User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Open Service Mesh extension and Azure monitor enxtenion on the Azure Arc connected cluster.
+* User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Open Service Mesh extension and Azure monitor extension on the Azure Arc connected cluster.
 
-* The script will also deploy sample app (bookstore) to Azure Arc enabled Kuberentes cluster and onboard the app namesapces with OSM to monitor.
+* The script will also deploy the sample app (bookstore) to Azure Arc enabled Kubernetes cluster and onboard the app namespaces with OSM to monitor.
 
-* User is veryfing the cluster and make sure OSM extension enabled.
+* User is verifying the cluster and make sure OSM extension enabled.
 
 * User check the monitoring insights to confirm OSM start capturing the logs and metrics from the custom app sending it over to Azure Monitor.
 
