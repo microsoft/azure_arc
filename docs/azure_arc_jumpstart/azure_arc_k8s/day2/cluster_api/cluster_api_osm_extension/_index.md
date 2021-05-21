@@ -106,17 +106,17 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 * Update the namespaces to be monitored by modifying the configmap provided by the OSM
 * Deploy the apps to the namespaces
 
-You can now see that Open Service Mesh & Azure Monitor extensions are enabled once you visit the extension tab section of the Azure Arc enabled Kubernetes cluster resource in Azure.
+You can now see that Open Service Mesh & Azure Monitor for containers extensions are now enabled in the extension tab section of the Azure Arc enabled Kubernetes cluster resource in Azure.
 
 ![Screenshot extension deployment security tab](./04.png)
 
-* You can also verify the deployment by running the kubectl command to ge look at the deployed artifacts in the arc-osm-system namespace below:
+* You can also verify the deployment by running the below _kubectl_ commands and see the deployed artifacts in the _arc-osm-system_ namespace.
 
 ![Screenshot extension deployment on cluster](./05.png)
 
-After 15 minutes or so you can verify the integration and moniotring insights coming from OSM to Azure Monitor by following the below steps in Azure portal.
+* It can take ~15 minutes before you will be able to verify the integration and monitoring insights coming from OSM to Azure Monitor by following the below steps in the Azure portal.
 
-Verify the namespaces are showing up in the insights section of the Arc enabled Kuberentes resource in Azure portal.
+  * Verify the namespaces are showing up in the insights section of the Arc enabled Kubernetes resource in Azure portal.
 
 ![Show the namespaces in the Container Insights](./06.png)
 
