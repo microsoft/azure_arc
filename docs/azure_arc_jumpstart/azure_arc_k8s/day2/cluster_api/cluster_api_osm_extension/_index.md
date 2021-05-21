@@ -81,7 +81,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Open Service Mesh extension on your Azure Arc enabled Kubernetes cluster.
 
-* Before integrating the cluster with Open Service Mesh, make sure that the kubectl context is pointing to your Azure Arc enabled Kubernetes cluster. You can refer the documentation [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) to find the options to change the kube context to different Kubernetes clusters. Also notice that, there is no any extensions enabled yet in your Arc enabled Kuberentes cluster.
+* Before integrating the cluster with Open Service Mesh, make sure that the kubectl context is pointing to your Azure Arc enabled Kubernetes cluster. You can refer to the documentation [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) to find the options to change the kubecontext to different Kubernetes clusters. Also notice that there are no any extensions enabled yet in your Arc enabled Kubernetes cluster.
 
     ![Screenshot showing current kubectl context pointing to CAPI cluster](./01.png)
 
