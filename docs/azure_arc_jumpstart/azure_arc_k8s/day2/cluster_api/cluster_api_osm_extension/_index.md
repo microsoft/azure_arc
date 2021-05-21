@@ -120,12 +120,10 @@ You can now see that Open Service Mesh & Azure Monitor for containers extensions
 
 ![Show the namespaces in the Container Insights](./06.png)
 
-To verify if monitoring working correctly or not, you can query the logs by running in the logs section to pull the data from the InsightsMetrics schema.
-
-Sample query,
-
-  > InsightsMetrics | where Name contains "envoy" | extend t=parse_json(Tags) | where t.app == "bookstore"
-
+  * Verify if monitoring working correctly by query the logs for pulling the data from the InsightsMetrics schema.
+  
+```shell
+InsightsMetrics | where Name contains "envoy" | extend t=parse_json(Tags) | where t.app == "bookstore"
 ![Show the log analytics query ](./07.png)
 
 You also navigate to the "Reports" tabs in the insights section and you can see OSM dashbarod report got added.
