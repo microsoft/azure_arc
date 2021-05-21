@@ -79,9 +79,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Create Open Service Mesh and Azure Monitor extension instances with sample app
 
-To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Open Service Mesh extension on your Azure Arc enabled Kubernetes cluster.
+To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Open Service Mesh extension on your Azure Arc enabled Kubernetes cluster. In the screenshot below, notice how currently there are no extensions installed yet in your Arc enabled Kubernetes cluster.
 
-* Before integrating the cluster with Open Service Mesh, make sure that the kubectl context is pointing to your Azure Arc enabled Kubernetes cluster. You can refer to the documentation [here](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) to find the options to change the kubecontext to different Kubernetes clusters. Also notice that there are no any extensions enabled yet in your Arc enabled Kubernetes cluster.
+> **Note: Before installing the Open Service Mesh extension, make sure that the kubectl context is pointing to your Azure Arc enabled Kubernetes cluster. To do that, you can refer to the [official Kubernetes documentation] (https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) to find the options to change the kubecontext to different Kubernetes clusters.**
 
     ![Screenshot showing current kubectl context pointing to CAPI cluster](./01.png)
 
