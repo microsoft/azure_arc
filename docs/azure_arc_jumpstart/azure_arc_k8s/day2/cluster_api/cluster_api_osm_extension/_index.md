@@ -91,7 +91,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
   ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource extensions](./02.png)
 
-* Edit the environment variables in the [_capi_osm_extension.sh_](https://github.com/main/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_osm_extension/capi_osm_extension.sh) shell script to match your environment parameters followed by running the ```. ./capi_osm_extension.sh``` command.
+* Edit the environment variables in the [_capi_osm_extension.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_osm_extension/capi_osm_extension.sh) shell script to match your environment parameters followed by running the ```. ./capi_osm_extension.sh``` command.
 
   ![Screenshot parameter examples](./03.png)
 
