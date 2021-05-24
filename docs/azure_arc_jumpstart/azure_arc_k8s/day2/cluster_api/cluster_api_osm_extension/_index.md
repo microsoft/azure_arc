@@ -1,9 +1,9 @@
 ---
-#type: docs
-#title: "Integrate Open Service Mesh (OSM) with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"
-#linkTitle: "Integrate Open Service Mesh with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"
-#weight: 2
-# description: >
+type: docs
+title: "Integrate Open Service Mesh (OSM) with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"
+linkTitle: "Integrate Open Service Mesh with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"
+weight: 2
+description: >
 ---
 
 ## Integrate Open Service Mesh (OSM) with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions
