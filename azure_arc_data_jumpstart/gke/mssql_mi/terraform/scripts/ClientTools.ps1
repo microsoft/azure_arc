@@ -120,8 +120,10 @@ $settingsFile = "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\
 azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
 $file = "C:\tmp\sql_instance_list.txt"
 (Get-Content $file | Select-Object -Skip 2) | Set-Content $file
-$string = Get-Content $file
-$string.Substring(0, $string.IndexOf(',')) | Set-Content $file
+$sqlstring = Get-Content $file
+$sqlstring.Substring(0, $sqlstring.IndexOf(',')) | Set-Content $file
+$sqlstring = Get-Content $file
+$sqlstring.Split(' ')[$($sqlstring.Split(' ').Count-1)] | Set-Content $file
 $sql = Get-Content $file
 
 (Get-Content -Path $settingsFile) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
