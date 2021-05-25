@@ -35,7 +35,7 @@ Enjoy!
 
 ## Jumpstart ArcBox
 
-Have you ever wanted to have a complete Azure Arc lab with just one click? We've got you covered with ArcBox!
+Have you ever wanted to have a complete Azure Arc environment with just one click? We've got you covered with ArcBox!
 
 [ArcBox](../azure_jumpstart_arcbox/index.md) is a dedicated sandbox environment for exploring all things Azure Arc, and the best part is that the only prerequisite is an Azure subscription. With a one-click deployment, you get a full Azure Arc lab packed with technology including Azure Arc enabled Servers, Kubernetes, Data Services and much more. Check out ArcBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
 
