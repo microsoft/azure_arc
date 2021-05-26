@@ -163,7 +163,7 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* Edit the [azuredeploy.parameters.json](../../azure_jumpstart_arcbox/azuredeploy.parameters.json) ARM template parameters file and supply some values for your environment.
+* Edit the [azuredeploy.parameters.json](https://github.com/microsoft/azure_arc/blob/main/azure_jumpstart_arcbox/azuredeploy.parameters.json) ARM template parameters file and supply some values for your environment.
 
   * *sshRSAPublicKey* - Your SSH public key
   * *spnClientId* - Your Azure service principal id
@@ -176,7 +176,7 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
 
     ![Screenshot showing example parameters](./parameters.png)
 
-* Now you will deploy the ARM template. Navigate to the local cloned [deployment folder](../../azure_jumpstart_arcbox) and run the below command:
+* Now you will deploy the ARM template. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox) and run the below command:
 
   ```shell
   az group create --name <Name of the Azure resource group> --location <Azure Region>
