@@ -24,14 +24,11 @@ Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connect
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 $settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-azdata arc sql mi list | Tee-Object "C:\tmp\sql_instance_list.txt"
-$file = "C:\tmp\sql_instance_list.txt"
-(Get-Content $file | Select-Object -Skip 2) | Set-Content $file
-$sqlstring = Get-Content $file
-$sqlstring.Substring(0, $sqlstring.IndexOf(',')) | Set-Content $file
-$sqlstring = Get-Content $file
-$sqlstring.Split(' ')[$($sqlstring.Split(' ').Count-1)] | Set-Content $file
-$sql = Get-Content $file
+kubectl describe svc $env:MSSQL_MI_NAME-external-svc -n $env:ARC_DC_NAME | Select-String "LoadBalancer Ingress" | Tee-Object "C:\tmp\sql_instance_list.txt" | Out-Null
+$sqlfile = "C:\tmp\sql_instance_list.txt"
+$sqlstring = Get-Content $sqlfile
+$sqlstring.split(" ") | Tee-Object "C:\tmp\sql_instance_list.txt" | Out-Null
+(Get-Content $sqlfile | Select-Object -Skip 7) | Set-Content $sqlfile
 
 (Get-Content -Path $settingsFile) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
