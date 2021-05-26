@@ -29,8 +29,9 @@ $sqlfile = "C:\tmp\sql_instance_list.txt"
 $sqlstring = Get-Content $sqlfile
 $sqlstring.split(" ") | Tee-Object "C:\tmp\sql_instance_list.txt" | Out-Null
 (Get-Content $sqlfile | Select-Object -Skip 7) | Set-Content $sqlfile
+$sqlstring = Get-Content $sqlfile
 
-(Get-Content -Path $settingsFile) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'false','true' | Set-Content -Path $settingsFile
