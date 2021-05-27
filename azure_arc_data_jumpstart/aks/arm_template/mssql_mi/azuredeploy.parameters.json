@@ -54,7 +54,7 @@
             "value": "<Azure Arc Data Controller admin password>"
         },
         "ACCEPT_EULA": {
-            "value": "yes"           
+            "value": "yes"
         },
         "ARC_DC_NAME": {
             "value": "<Azure Arc Data Controller name (will be used for k8s Arc namespace as well)>"
