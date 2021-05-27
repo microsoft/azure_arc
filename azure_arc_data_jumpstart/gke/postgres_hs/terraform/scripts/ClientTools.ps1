@@ -57,19 +57,22 @@ Copy-Item -Path "C:\Windows\System32\drivers\etc\hosts" -Destination "C:\tmp\hos
 $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
-# Creating Azure Data Studio settings for PostgreSQL connection
-azdata arc postgres endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\tmp\postgres_instance_endpoint.txt"
-Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\tmp\settings_backup.json" -Recurse -Force -ErrorAction Continue
-Get-Content "C:\tmp\postgres_instance_endpoint.txt" | Where-Object {$_ -match '@'} | Set-Content "C:\tmp\out.txt"
-$s = Get-Content "C:\tmp\out.txt" 
-$s.Split('@')[-1] | Out-File "C:\tmp\out.txt"
-$s = Get-Content "C:\tmp\out.txt"
-$s.Substring(0, $s.IndexOf(':')) | Out-File -FilePath "C:\tmp\merge.txt" -Encoding ascii -NoNewline
-$s = (Get-Content "C:\tmp\merge.txt").Trim()
-(Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'arc_postgres',$s | Set-Content -Path "C:\tmp\settings.json"
-(Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path "C:\tmp\settings.json"
-(Get-Content -Path "C:\tmp\settings.json" -Raw) -replace 'false','true' | Set-Content -Path "C:\tmp\settings.json"
-Copy-Item -Path "C:\tmp\settings.json" -Destination "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json" -Recurse -Force -ErrorAction Continue
+## Creating Azure Data Studio settings for PostgreSQL connection
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
+$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+kubectl describe svc $env:POSTGRES_NAME-external-svc -n $env:ARC_DC_NAME | Select-String "LoadBalancer Ingress" | Tee-Object "C:\tmp\postgres_instance_endpoint.txt" | Out-Null
+$pgfile = "C:\tmp\postgres_instance_endpoint.txt"
+$pgstring = Get-Content $pgfile
+$pgstring.split(" ") | Tee-Object "C:\tmp\postgres_instance_endpoint.txt" | Out-Null
+(Get-Content $pgfile | Select-Object -Skip 7) | Set-Content $pgfile
+(Get-Content $pgfile) | ? {$_.trim() -ne "" } | Set-Content $pgfile
+$pgstring = Get-Content $pgfile
+
+(Get-Content -Path $settingsFile) -replace 'arc_postgres',$pgstring | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile) -replace 'false','true' | Set-Content -Path $settingsFile
 
 # Cleaning garbage
 Remove-Item "C:\tmp\postgres_instance_endpoint.txt" -Force
