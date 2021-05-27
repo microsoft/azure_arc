@@ -58,10 +58,10 @@ $s = Get-Content "C:\tmp\merge.txt"
 Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value $s -Encoding ascii
 
 ## Creating Azure Data Studio settings for PostgreSQL connection
-New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+New-Item -Path "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json"
 Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\tmp\settings_template_backup.json" -Recurse -Force -ErrorAction Continue
-$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+$settingsFile = "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json"
 kubectl describe svc $env:POSTGRES_NAME-external-svc -n $env:ARC_DC_NAME | Select-String "LoadBalancer Ingress" | Tee-Object "C:\tmp\postgres_instance_endpoint.txt" | Out-Null
 $pgfile = "C:\tmp\postgres_instance_endpoint.txt"
 $pgstring = Get-Content $pgfile
