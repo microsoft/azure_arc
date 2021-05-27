@@ -114,9 +114,9 @@ kubectl exec $podname -n $env:ARC_DC_NAME -c arc-sqlmi -- /opt/mssql-tools/bin/s
 
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+New-Item -Path "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "C:\tmp\settings_template.json" -Destination "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json"
+$settingsFile = "C:\Users\$env:windows_username\AppData\Roaming\azuredatastudio\User\settings.json"
 kubectl describe svc $env:MSSQL_MI_NAME-external-svc -n $env:ARC_DC_NAME | Select-String "LoadBalancer Ingress" | Tee-Object "C:\tmp\sql_instance_list.txt" | Out-Null
 $sqlfile = "C:\tmp\sql_instance_list.txt"
 $sqlstring = Get-Content $sqlfile
