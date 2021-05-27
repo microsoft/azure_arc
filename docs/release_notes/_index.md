@@ -2,21 +2,21 @@
 type: docs
 title: "Jumpstart Release Notes"
 linkTitle: "Jumpstart Release Notes"
-weight: 4
+weight: 3
 ---
 
 # Azure Arc Jumpstart release notes
 
-| Category                                                                                            | New scenarios for this release | Existing scenarios | Total scenarios |
+**Release notes will be released on the first week of each month and will cover the previous month.**
+
+<!-- | Category                                                                                            | New scenarios for this release | Existing scenarios | Total scenarios |
 | --------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------ | --------------- |
 | [Azure Arc enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/)    | 0                              | 25                 | 25              |
 | [Azure Arc enabled SQL Server](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/)  | 0                              | 4                  | 4               |
 | [Azure Arc enabled Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/)     | 3                              | 29                 | 32              |
 | [Azure Arc enabled data services](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/) | 2                              | 11                 | 13              |
 | [Azure Arc with Azure Lighthouse](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/) | 1                              | 0                  | 1               |
-|                                                                                                     |                                |                    | 75              |
-
-Release notes will be released on the first week of each month and will cover the previous month.
+|                                                                                                     |                                |                    | 75              | -->
 
 ## May 2021
 
@@ -49,6 +49,10 @@ Release notes will be released on the first week of each month and will cover th
 * [Bug fix: adding psql to client vm #519](https://github.com/microsoft/azure_arc/issues/519)
 
 * [Bug fix: Arc DataService on GCP-GKE - no successful deployment - free account is not enough #520](https://github.com/microsoft/azure_arc/issues/520)
+
+* [Bug fix: SQL MI Server alias for connection contains wrong value #561](https://github.com/microsoft/azure_arc/issues/561)
+
+* [Jumpstart enhancement: fetching data services IP's based on kubectl #566](https://github.com/microsoft/azure_arc/issues/566)
 
 ### Azure Arc Jumpstart YouTube channel demos
 
