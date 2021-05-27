@@ -33,7 +33,7 @@
             "value": "https://login.microsoftonline.com"
         },
         "kubernetesVersion": {
-            "value": "1.18.14"
+            "value": "1.18.17"
         },
         "adminUsername": {
             "value": "arcdemo"
