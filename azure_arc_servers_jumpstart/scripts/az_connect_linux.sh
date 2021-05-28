@@ -19,7 +19,7 @@ wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
 bash ~/install_linux_azcmagent.sh
 
 # Run connect command
-azcmagent connect \
+sudo azcmagent connect \
   --service-principal-id "${appId}" \
   --service-principal-secret "${password}" \
   --resource-group "${resourceGroup}" \
