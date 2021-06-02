@@ -24,7 +24,7 @@
         }
     },
     "variables": {
-        "storageAccountName": "[concat('arcbox', uniquestring(resourceGroup().id))]"
+        "storageAccountName": "[concat('arcdata', uniquestring(resourceGroup().id))]"
     },
     "resources": [
         {
