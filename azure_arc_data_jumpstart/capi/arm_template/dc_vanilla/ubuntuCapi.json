@@ -61,7 +61,7 @@
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "CAPI-Demo-Subnet",
+            "defaultValue": "Arc-Data-CAPI-Demo-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
@@ -109,6 +109,8 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "subnetAddressPrefix": "172.16.1.0/24",
+        "addressPrefix": "172.16.0.0/16",
         "osDiskType": "Premium_LRS"
     },
     "resources": [
@@ -164,6 +166,29 @@
                 ]
             }
         },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-04-01",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetAddressPrefix')]",
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    }
+                ]
+            }
+        },        
         {
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
