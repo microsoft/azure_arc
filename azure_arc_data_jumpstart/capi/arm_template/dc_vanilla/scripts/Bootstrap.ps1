@@ -11,7 +11,7 @@ param (
     [string]$acceptEula,
     [string]$arcDcName,
     [string]$azureLocation,
-    [string]$stagingStorageAccountName,
+    [string]$stagingStorageAccountName
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
