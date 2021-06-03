@@ -1,0 +1,144 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "customLocationName": {
+            "type": "string"
+        },
+        "dcName": {
+            "type": "string"
+        },
+        "targetLocation": {
+            "type": "string"
+        },
+        "imageTag": {
+            "type": "string"
+        },
+        "registry": {
+            "type": "string"
+        },
+        "repository": {
+            "type": "string"
+        },
+        "imagePullPolicy": {
+            "type": "string"
+        },
+         "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroup": {
+            "type": "string"
+        },
+        "AZDATA_USERNAME": {
+            "type": "string"
+        },
+        "AZDATA_PASSWORD": {
+            "type": "string"
+        },
+        "spnClientID": {
+            "type": "string"
+        },
+        "spnTenantId": {
+            "type": "string"
+        },
+        "spnClientSecret": {
+            "type": "string"
+        },
+        "serviceType": {
+            "type": "string"
+        },
+        "storageClass": {
+            "type": "string"
+        }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [{
+        "name": "[parameters('dcName')]",
+        "type": "Microsoft.AzureArcData/dataControllers",
+        "apiVersion": "2021-03-02-preview",
+         "extendedLocation": {
+             "name": "[concat('/subscriptions/', parameters('subscriptionId'), '/resourceGroups/', parameters('resourceGroup'), '/providers/microsoft.extendedlocation/customlocations/', parameters('customLocationName'))]",
+        "type": "CustomLocation"
+    },
+    "location": "[parameters('targetLocation')]",
+    "properties": {
+        "basicLoginInformation": {
+        "username": "[parameters('AZDATA_USERNAME')]",
+        "password": "[parameters('AZDATA_PASSWORD')]"
+        },
+        "uploadServicePrincipal": {
+        "clientId": "[parameters('spnClientID')]",
+        "tenantId": "[parameters('spnTenantId')]",
+        "clientSecret": "[parameters('spnClientSecret')]",
+        "authority": "https://login.microsoftonline.com"
+        },
+        "k8sRaw": {
+        "apiVersion": "arcdata.microsoft.com/v1alpha1",
+        "kind": "datacontroller",
+        "spec": {
+            "credentials": {
+            "controllerAdmin": "controller-login-secret",
+            "dockerRegistry": "arc-private-registry",
+            "domainServiceAccount": "domain-service-account-secret",
+            "serviceAccount": "sa-bootstrapper"
+            },
+            "docker": {
+            "imagePullPolicy": "[parameters('imagePullPolicy')]",
+            "imageTag": "[parameters('imageTag')]",
+            "registry": "[parameters('registry')]",
+            "repository": "[parameters('repository')]"
+            },
+            "security": {
+            "allowDumps": true,
+            "allowNodeMetricsCollection": true,
+            "allowPodMetricsCollection": true,
+            "allowRunAsRoot": false
+            },
+            "services": [
+            {
+                "name": "controller",
+                "port": 30080,
+                "serviceType": "[parameters('serviceType')]"
+            },
+            {
+                "name": "serviceProxy",
+                "port": 30777,
+                "serviceType": "[parameters('serviceType')]"
+            }
+            ],
+            "settings": {
+            "ElasticSearch": {
+                "vm.max_map_count": "-1"
+            },
+            "azure": {
+                "connectionMode": "direct",
+                "location": "[parameters('targetLocation')]",
+                "resourceGroup": "[parameters('resourceGroup')]",
+                "subscription": "[parameters('subscriptionId')]"
+            },
+            "controller": {
+                "displayName": "[parameters('dcName')]",
+                "enableBilling": "True",
+                "logs.rotation.days": "7",
+                "logs.rotation.size": "5000"
+            }
+            },
+            "storage": {
+            "data": {
+                "accessMode": "ReadWriteOnce",
+                "className": "[parameters('storageClass')]",
+                "size": "15Gi"
+            },
+            "logs": {
+                "accessMode": "ReadWriteOnce",
+                "className": "[parameters('storageClass')]",
+                "size": "10Gi"
+            }
+            }
+        }
+        }
+    }
+    }],
+    "outputs": {}
+}

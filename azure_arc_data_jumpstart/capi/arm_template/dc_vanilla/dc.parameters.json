@@ -1,0 +1,55 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "customLocationName": {
+            "value": "arc-testing-cl"
+        },
+        "dcName": {
+            "value": "twright-arc-testing-dc" 
+        },
+        "imagePullPolicy": {
+            "value": "Always" 
+        },
+        "registry": {
+            "value": "mcr.microsoft.com"
+        },
+        "repository": {
+            "value": "arcdata"
+        },
+        "imageTag": {
+            "value": "public-preview-apr-2021"
+        },
+        "subscriptionId": {
+            "value": "182c901c-129a-4f5d-86e4-cc6b294590b3"
+        },
+        "resourceGroup": {
+            "value": "twright-arc-testing"
+        },
+        "targetLocation": {
+            "value": "eastus"
+        },
+        "AZDATA_USERNAME": {
+            "value": "arcadmin"
+        },
+        "AZDATA_PASSWORD": {
+            "value": "Seattle800"
+        },
+        "spnClientID": {
+            "value": "cd564d29-f62b-4afb-872b-3a4b85299c45" 
+        },
+        "spnTenantId": { 
+            "value": "72f988bf-86f1-41af-91ab-2d7cde11db46" 
+        },
+        "spnClientSecret": { 
+            "value": "fgVYH9kkQ_S5Bj~Z4Twkqgxqifckul-Qes" 
+        },
+        "serviceType": {
+            "value": "LoadBalancer"
+        },
+        "storageClass": {
+            "value": "managed-premium"
+        }
+
+    }
+}
