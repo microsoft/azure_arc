@@ -62,16 +62,24 @@ azdata --version
 # Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
-az connectedk8s connect --name "Arc-Data-CAPI" --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+az connectedk8s connect --name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 Start-Sleep -Seconds 10
 
-# Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-# Write-Host "`n"
-# az k8s-extension create --name "azuremonitor-containers" --cluster-name "Arc-Data-CAPI" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+$connectedClusterId = az connectedk8s show --name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --query id -o tsv
+az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
-# Write-Host "Create Azure Defender Kubernetes extension instance"
-# Write-Host "`n"
-# az k8s-extension create --name "azure-defender" --cluster-name "Arc-Data-CAPI" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+
+Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
+Write-Host "`n"
+az k8s-extension create --name "azuremonitor-containers" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+
+Write-Host "Create Azure Defender Kubernetes extension instance"
+Write-Host "`n"
+az k8s-extension create --name "azure-defender" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+
+
 
 # Deploying Azure Arc Data Controller
 # Write-Host "Deploying Azure Arc Data Controller"
@@ -134,8 +142,8 @@ Start-Sleep -Seconds 10
 #  } 
 # '@
 
-add-type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
+# add-type $code 
+# [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
