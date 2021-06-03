@@ -10,7 +10,7 @@
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "Arc-Data-CAPI-SC",
+            "defaultValue": "Arc-Data-SC",
             "metadata": {
                 "description": "The name of you Virtual Machine"
             }
@@ -68,7 +68,7 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "Arc-Data-CAPI-SC-NSG",
+            "defaultValue": "Arc-Data-SC-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
@@ -113,49 +113,9 @@
             "type": "string",
             "defaultValue": "yes"
         },
-        "registryUsername": {
-            "type": "string",
-            "defaultValue": "registryUser"
-        },
-        "registryPassword": {
-            "type": "securestring",
-            "defaultValue": "registrySecret"
-        },
         "arcDcName": {
             "type": "string",
             "defaultValue": "arcdatactrl"
-        },
-        "mssqlmiName": {
-            "type": "string",
-            "defaultValue": "arcsqlmidemo"
-        },
-        "postgresName": {
-            "type": "string",
-            "defaultValue": "arcpg",
-            "metadata": {
-                "description": "Name of PostgreSQL server group"
-            }
-        },
-        "postgresWorkerNodeCount": {
-            "type": "int",
-            "defaultValue": 3,
-            "metadata": {
-                "description": "Number of PostgreSQL Hyperscale worker nodes"
-            }
-        },
-        "postgresDatasize": {
-            "type": "int",
-            "defaultValue": 1024,
-            "metadata": {
-                "description": "Size of data volumes in MB"
-            }
-        },
-        "postgresServiceType": {
-            "type": "string",
-            "defaultValue": "LoadBalancer",
-            "metadata": {
-                "description": "Choose how PostgreSQL service is accessed through Kubernetes networking interface"
-            }
         },
         "stagingStorageAccountName": {
             "type": "string",
