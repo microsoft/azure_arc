@@ -53,6 +53,8 @@ kubectl apply -f "C:\Temp\capiStorageClass.yaml"
 
 kubectl label node --all failure-domain.beta.kubernetes.io/zone-
 kubectl label node --all topology.kubernetes.io/zone-
+kubectl label node --all failure-domain.beta.kubernetes.io/zone= --overwrite
+kubectl label node --all topology.kubernetes.io/zone= --overwrite
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -66,18 +68,36 @@ az connectedk8s connect --name "Arc-Data-CAPI-K8s" --resource-group $env:resourc
 Start-Sleep -Seconds 10
 
 az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
-# $connectedClusterId = az connectedk8s show --name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --query id -o tsv
-# $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --query id -o tsv
-# Start-Sleep -Seconds 20
-# az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
-# Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-# Write-Host "`n"
-# az k8s-extension create --name "azuremonitor-containers" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+Do {
+    Write-Host "Waiting for bootstrapper pod"
+    Start-Sleep -Seconds 1
+    $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($podStatus -eq "Nope")
 
-# Write-Host "Create Azure Defender Kubernetes extension instance"
-# Write-Host "`n"
-# az k8s-extension create --name "azure-defender" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+$connectedClusterId = az connectedk8s show --name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --query id -o tsv
+Start-Sleep -Seconds 20
+az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+
+Workflow ExtensionDeploy
+{
+    Parallel {
+        InlineScript {
+            # Deploying Azure Monitor for containers Kubernetes extension instance
+            Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
+            Write-Host "`n"
+            az k8s-extension create --name "azuremonitor-containers" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+        }
+        InlineScript {
+            # Deploying Azure Defender Kubernetes extension instance
+            Write-Host "Create Azure Defender Kubernetes extension instance"
+            Write-Host "`n"
+            az k8s-extension create --name "azure-defender" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+        }
+    }
+}
+
 
 
 
