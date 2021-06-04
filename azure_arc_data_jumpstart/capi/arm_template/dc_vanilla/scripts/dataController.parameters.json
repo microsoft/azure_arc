@@ -6,7 +6,7 @@
             "value": "resourceGroup-stage"
         },
         "namespace": {
-            "value": "arc-data"
+            "value": "arc"
         },
         "connectionMode": {
             "value": "direct"
@@ -15,7 +15,7 @@
             "value": "jumpstart-dc"
         },
         "azdataUsername": {
-            "value": "arcdemo"
+            "value": "azdataUsername-stage"
         },
         "azdataPassword": {
             "value": "azdataPassword-stage"
