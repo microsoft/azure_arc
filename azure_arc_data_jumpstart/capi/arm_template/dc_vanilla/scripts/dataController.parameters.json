@@ -6,7 +6,7 @@
             "value": "resourceGroup-stage"
         },
         "namespace": {
-            "value": "arc-data"
+            "value": "arc"
         },
         "connectionMode": {
             "value": "direct"
