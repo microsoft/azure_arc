@@ -80,23 +80,15 @@ $extensionId = az k8s-extension show --name arc-data-services --cluster-type con
 Start-Sleep -Seconds 20
 az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
-Workflow ExtensionsDeploy
-{
-    Parallel {
-        InlineScript {
-            # Deploying Azure Monitor for containers Kubernetes extension instance
-            Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-            Write-Host "`n"
-            az k8s-extension create --name "azuremonitor-containers" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
-        }
-        InlineScript {
-            # Deploying Azure Defender Kubernetes extension instance
-            Write-Host "Create Azure Defender Kubernetes extension instance"
-            Write-Host "`n"
-            az k8s-extension create --name "azure-defender" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
-        }
-    }
-}
+# Deploying Azure Monitor for containers Kubernetes extension instance
+Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
+Write-Host "`n"
+az k8s-extension create --name "azuremonitor-containers" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+
+# Deploying Azure Defender Kubernetes extension instance
+Write-Host "Create Azure Defender Kubernetes extension instance"
+Write-Host "`n"
+az k8s-extension create --name "azure-defender" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
@@ -127,11 +119,6 @@ Do {
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc data controller is ready!"
-# azdata arc dc config init --source azure-arc-kubeadm --path ./custom
-# azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=managed-premium'
-# azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=managed-premium'
-# azdata arc dc config replace --path ./custom/control.json --json-values "$.spec.services[*].serviceType=LoadBalancer"
-# azdata arc dc create --namespace $env:arcDcName --name $env:arcDcName --subscription $env:subscriptionId --resource-group $env:resourceGroup --location $env:azureLocation --connectivity-mode indirect --path ./custom
 
 # #Creating Azure Data Studio settings for database connections
 # Write-Host "`n"
@@ -188,7 +175,7 @@ Write-Host "Azure Arc data controller is ready!"
 # [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-# Stop-Process -Id $kubectlMonShell.Id
+Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
