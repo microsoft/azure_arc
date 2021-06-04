@@ -79,7 +79,6 @@ $connectedClusterId = az connectedk8s show --name 'Arc-Data-CAPI-K8s' --resource
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
 az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
-Stop-Process -Id $kubectlMonShell.Id
 
 Workflow ExtensionsDeploy
 {
@@ -120,9 +119,14 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc-data; Start-Sleep -Seconds 5; Clear-Host }}
 az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\dataController.json" --parameters "C:\Temp\dataController.parameters.json"
 
+Do {
+    Write-Host "Waiting for data controller, hold tight..."
+    Start-Sleep -Seconds 20
+    $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($dcStatus -eq "Nope")
+Write-Host "Azure Arc data controller is ready!"
 # azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 # azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=managed-premium'
 # azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=managed-premium'
@@ -184,7 +188,7 @@ az deployment group create --resource-group $env:resourceGroup --template-file "
 # [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
+# Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
