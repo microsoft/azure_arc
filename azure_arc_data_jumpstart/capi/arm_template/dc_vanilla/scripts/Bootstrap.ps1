@@ -11,7 +11,8 @@ param (
     [string]$acceptEula,
     [string]$arcDcName,
     [string]$azureLocation,
-    [string]$stagingStorageAccountName
+    [string]$stagingStorageAccountName,
+    [string]$workspaceName
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -28,6 +29,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
 Write-Output "Create deployment path"
@@ -94,6 +96,8 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/DataServicesLogonScript.ps1" -OutFile "C:\Temp\DataServicesLogonScript.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/capiStorageClass.yaml" -OutFile "C:\Temp\capiStorageClass.yaml"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/dataController.json" -OutFile "C:\Temp\dataController.json"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"
                     # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
