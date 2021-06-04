@@ -3,10 +3,10 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientID , $azurePassword)
+$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
-az login --service-principal --username $env:spnClientID --password $env:spnClientSecret --tenant $env:spnTenantId
+az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
@@ -109,7 +109,7 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage',$customLocationId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage',$env:spnClientID | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage',$env:spnClientId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage',$env:spnTenantId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage',$env:spnClientSecret | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId | Set-Content -Path $dataControllerParams
@@ -117,9 +117,11 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 
 
 # Deploying Azure Arc Data Controller
-# Write-Host "Deploying Azure Arc Data Controller"
-# Write-Host "`n"
-# $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Start-Sleep -Seconds 5; Clear-Host }}
+Write-Host "Deploying Azure Arc Data Controller"
+Write-Host "`n"
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; Start-Sleep -Seconds 5; Clear-Host }}
+az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\dataController.json" --parameters "C:\Temp\dataController.parameters.json"
+
 # azdata arc dc config init --source azure-arc-kubeadm --path ./custom
 # azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.data.className=managed-premium'
 # azdata arc dc config replace --path ./custom/control.json --json-values '$.spec.storage.logs.className=managed-premium'

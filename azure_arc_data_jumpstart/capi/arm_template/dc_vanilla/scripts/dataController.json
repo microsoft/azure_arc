@@ -33,7 +33,7 @@
         "subscriptionId": {
             "type": "String"
         },
-        "spnClientID": {
+        "spnClientId": {
             "type": "String"
         },
         "spnTenantId": {
@@ -110,7 +110,7 @@
                     "password": "[parameters('azdataPassword')]"
                 },
                 "uploadServicePrincipal": {
-                    "clientId": "[parameters('spnClientID')]",
+                    "clientId": "[parameters('spnClientId')]",
                     "tenantId": "[parameters('spnTenantId')]",
                     "authority": "[parameters('spnAuthority')]",
                     "clientSecret": "[parameters('spnClientSecret')]"
