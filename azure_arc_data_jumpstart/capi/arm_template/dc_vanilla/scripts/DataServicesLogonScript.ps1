@@ -67,12 +67,12 @@ Write-Host "`n"
 az connectedk8s connect --name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 Start-Sleep -Seconds 10
 
-az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc-data --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
 Do {
-    Write-Host "Waiting for bootstrapper pod"
+    Write-Host "Waiting for bootstrapper pod, hold tight..."
     Start-Sleep -Seconds 20
-    $podStatus = $(if(kubectl get pods -n arc-data | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($podStatus -eq "Nope")
 
 $connectedClusterId = az connectedk8s show --name 'Arc-Data-CAPI-K8s' --resource-group $env:resourceGroup --query id -o tsv
