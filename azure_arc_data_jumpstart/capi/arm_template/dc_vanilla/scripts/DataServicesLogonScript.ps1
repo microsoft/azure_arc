@@ -114,8 +114,8 @@ Write-Host "`n"
 az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\dataController.json" --parameters "C:\Temp\dataController.parameters.json"
 
 Do {
-    Write-Host "Waiting for data controller, hold tight..."
-    Start-Sleep -Seconds 20
+    Write-Host "Waiting for data controller, hold tight, this might take few minutes..."
+    Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc data controller is ready!"
@@ -154,25 +154,25 @@ Write-Host "Azure Arc data controller is ready!"
 # Remove-Item "C:\Temp\sql_instance_list.txt" -Force
 # Remove-Item "C:\Temp\postgres_instance_endpoint.txt" -Force
 
-# # Changing to Client VM wallpaper
-# $imgPath="C:\Temp\wallpaper.png"
-# $code = @' 
-# using System.Runtime.InteropServices; 
-# namespace Win32{ 
+# Changing to Client VM wallpaper
+$imgPath="C:\Temp\wallpaper.png"
+$code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
     
-#      public class Wallpaper{ 
-#         [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-#          static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+     public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
          
-#          public static void SetWallpaper(string thePath){ 
-#             SystemParametersInfo(20,0,thePath,3); 
-#          }
-#     }
-#  } 
-# '@
+         public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+         }
+    }
+ } 
+'@
 
-# add-type $code 
-# [Win32.Wallpaper]::SetWallpaper($imgPath)
+add-type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id

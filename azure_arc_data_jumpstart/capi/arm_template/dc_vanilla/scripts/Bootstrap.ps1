@@ -20,7 +20,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
+# [System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $azdataUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $azdataPassword,[System.EnvironmentVariableTarget]::Machine)
@@ -98,7 +98,7 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/capiStorageClass.yaml" -OutFile "C:\Temp\capiStorageClass.yaml"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/dataController.json" -OutFile "C:\Temp\dataController.json"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"
-                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
