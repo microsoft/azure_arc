@@ -97,6 +97,8 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/capiStorageClass.yaml" -OutFile "C:\Temp\capiStorageClass.yaml"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/dataController.json" -OutFile "C:\Temp\dataController.json"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/sql.json" -OutFile "C:\Temp\sql.json"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/sql.parameters.json" -OutFile "C:\Temp\sql.parameters.json"                    
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/capi/arm_template/dc_vanilla/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
