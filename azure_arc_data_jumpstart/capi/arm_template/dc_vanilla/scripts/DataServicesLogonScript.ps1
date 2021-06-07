@@ -185,7 +185,7 @@ $sqlstring = Get-Content $sqlfile
 (Get-Content -Path $settingsFile) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'false','true' | Set-Content -Path $settingsFile
 
-Cleaning garbage
+# Cleaning garbage
 Remove-Item "C:\Temp\sql_instance_list.txt" -Force
 
 # Changing to Client VM wallpaper
@@ -208,16 +208,14 @@ namespace Win32{
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-# Replacing Internel Explorer Taskbar shortcut with Microsoft Edge
-# syspin "C:\Program Files\Internet Explorer\iexplore.exe" c:5387
-syspin "C:\Program Files\Internet Explorer\iexplore.exe" c:"Unpin from taskbar"
-syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
-
 # Starting Azure Data Studio
 Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
+
+# Pining Microsoft Edge to taskbar
+syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
