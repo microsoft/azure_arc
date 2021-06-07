@@ -142,9 +142,6 @@ namespace Win32{
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
-# Starting Azure Data Studio
-Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
-
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
 
