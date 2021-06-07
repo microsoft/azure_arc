@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroup": {
+            "value": "resourceGroup-stage"
+        },        
+        "customLocation": {
+            "value": "customLocation-stage"
+        },
+        "subscriptionId": {
+            "value": "subscriptionId-stage"
+        },
+        "azdataUsername": {
+            "value": "azdataUsername-stage"
+        },
+        "azdataPassword": {
+            "value": "azdataPassword-stage"
+        },        
+    }
+}

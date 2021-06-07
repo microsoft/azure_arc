@@ -27,6 +27,10 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
+# Replacing Internel Explorer Taskbar shortcut with Microsoft Edge
+syspin "PROGRAMFILES\Internet Explorer\iexplore.exe" 5387
+syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
+
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
 az extension add --name "connectedk8s" -y
