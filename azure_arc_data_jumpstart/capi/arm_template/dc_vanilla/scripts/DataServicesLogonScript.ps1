@@ -171,7 +171,7 @@ kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S loca
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "C:\Temp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 $settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 kubectl describe svc jumpstart-sql-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
 $sqlfile = "C:\Temp\sql_instance_list.txt"
@@ -209,7 +209,8 @@ add-type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Replacing Internel Explorer Taskbar shortcut with Microsoft Edge
-syspin "c:\Program Files\internet explorer\iexplore.exe" c:5387
+# syspin "C:\Program Files\Internet Explorer\iexplore.exe" c:5387
+syspin "C:\Program Files\Internet Explorer\iexplore.exe" c:"Unpin from taskbar"
 syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
 
 # Starting Azure Data Studio
