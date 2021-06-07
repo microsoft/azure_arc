@@ -160,43 +160,33 @@ Do {
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 
-# #Creating Azure Data Studio settings for database connections
-# Write-Host "`n"
-# Write-Host "Creating Azure Data Studio settings for database connections"
-# New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-# Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-# $settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-# azdata arc sql mi list | Tee-Object "C:\Temp\sql_instance_list.txt"
-# azdata arc postgres endpoint list --name $env:POSTGRES_NAME | Tee-Object "C:\Temp\postgres_instance_endpoint.txt"
-# $sqlfile = "C:\Temp\sql_instance_list.txt"
-# $postgresfile = "C:\Temp\postgres_instance_endpoint.txt"
+# Downloading demo database and restoring onto SQL MI
+$podname = "jumpstart-sql" + "-0"
+Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
 
-# (Get-Content $sqlfile | Select-Object -Skip 2) | Set-Content $sqlfile
-# $sqlstring = Get-Content $sqlfile
-# $sqlstring.Substring(0, $sqlstring.IndexOf(',')) | Set-Content $sqlfile
-# $sqlstring = Get-Content $sqlfile
-# $sqlstring.Split(' ')[$($sqlstring.Split(' ').Count-1)] | Set-Content $sqlfile
-# $sql = Get-Content $sqlfile
+# Creating Azure Data Studio settings for SQL Managed Instance connection
+Write-Host ""
+Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
+New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "C:\Temp\settings_template.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+kubectl describe svc jumpstart-sql-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
+$sqlfile = "C:\Temp\sql_instance_list.txt"
+$sqlstring = Get-Content $sqlfile
+$sqlstring.split(" ") | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
+(Get-Content $sqlfile | Select-Object -Skip 7) | Set-Content $sqlfile
+$sqlstring = Get-Content $sqlfile
 
-# (Get-Content $postgresfile | Select-Object -Index 8) | Set-Content $postgresfile
-# $pgstring = Get-Content $postgresfile
-# $pgstring.Substring($pgstring.IndexOf('@')+1, $pgstring.LastIndexOf(':')-$pgstring.IndexOf('@')-1) | Set-Content $postgresfile
-# $pg = Get-Content $postgresfile
+(Get-Content -Path $settingsFile) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsFile) -replace 'false','true' | Set-Content -Path $settingsFile
 
-# (Get-Content -Path $settingsFile) -replace 'arc_sql_mi',$sql | Set-Content -Path $settingsFile
-# (Get-Content -Path $settingsFile) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
-# (Get-Content -Path $settingsFile) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
-# (Get-Content -Path $settingsFile) -replace 'false','true' | Set-Content -Path $settingsFile
-# (Get-Content -Path $settingsFile) -replace 'arc_postgres',$pg | Set-Content -Path $settingsFile
-# (Get-Content -Path $settingsFile) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
-
-# Cleaning garbage
-# Remove-Item "C:\Temp\sql_instance_list.txt" -Force
-# Remove-Item "C:\Temp\postgres_instance_endpoint.txt" -Force
-
-# Replacing Internel Explorer Taskbar shortcut with Microsoft Edge
-syspin "PROGRAMFILES\Internet Explorer\iexplore.exe" 5387
-syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
+Cleaning garbage
+Remove-Item "C:\Temp\sql_instance_list.txt" -Force
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
@@ -217,6 +207,13 @@ namespace Win32{
 
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
+
+# Replacing Internel Explorer Taskbar shortcut with Microsoft Edge
+syspin "c:\Program Files\internet explorer\iexplore.exe" c:5387
+syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
+
+# Starting Azure Data Studio
+Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -WindowStyle Maximized
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
