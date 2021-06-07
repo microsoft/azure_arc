@@ -137,7 +137,6 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
         "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/"
-        https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_vanilla/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/Bootstrap.ps1
     },
     "resources": [
         {
