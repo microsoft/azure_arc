@@ -18,6 +18,9 @@
         "customLocation": {
             "type": "String"
         },
+        "subscriptionId": {
+            "type": "String"
+        },        
         "azdataUsername": {
             "type": "String"
         },
@@ -33,34 +36,43 @@
             "defaultValue": "LoadBalancer"
         },
         "vCoresMax": {
-            "type": "Int"
+            "type": "Int",
+            "defaultValue": 4
         },
         "memoryMax": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "8"
         },
         "dataStorageSize": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "5"
         },
         "dataStorageClassName": {
             "type": "String"
         },
         "logsStorageSize": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "5"
         },
         "logsStorageClassName": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "managed-premium"
         },
         "dataLogsStorageSize": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "5"
         },
         "dataLogsStorageClassName": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "managed-premium"
         },
         "backupsStorageSize": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "5"
         },
         "backupsStorageClassName": {
-            "type": "String"
+            "type": "String",
+            "defaultValue": "managed-premium"
         },
         "replicas": {
             "type": "Int"
@@ -143,9 +155,9 @@
                         },
                         "settings": {
                             "azure": {
-                                "subscription": "[parameters(subscriptionId)]",
-                                "resourceGroup": "[parameters(resourceGroup)]",
-                                "location": "[parameters('location')]"
+                                "location": "[parameters('location')]",
+                                "resourceGroup": "[parameters('resourceGroup')]",
+                                "subscription": "[parameters('subscriptionId')]"
                             }
                         }
                     },

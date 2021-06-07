@@ -27,10 +27,6 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-# Replacing Internel Explorer Taskbar shortcut with Microsoft Edge
-syspin "PROGRAMFILES\Internet Explorer\iexplore.exe" 5387
-syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
-
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
 az extension add --name "connectedk8s" -y
@@ -94,6 +90,10 @@ Write-Host "Create Azure Defender Kubernetes extension instance"
 Write-Host "`n"
 az k8s-extension create --name "azure-defender" --cluster-name "Arc-Data-CAPI-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
+# Deploying Azure Arc Data Controller
+Write-Host "Deploying Azure Arc Data Controller"
+Write-Host "`n"
+
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
@@ -111,10 +111,6 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
 
-
-# Deploying Azure Arc Data Controller
-Write-Host "Deploying Azure Arc Data Controller"
-Write-Host "`n"
 az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\dataController.json" --parameters "C:\Temp\dataController.parameters.json"
 
 Do {
@@ -123,6 +119,46 @@ Do {
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc data controller is ready!"
+
+# Deploying Azure Arc SQL Managed Instance
+Write-Host "Deploying Azure Arc SQL Managed Instance"
+Write-Host "`n"
+
+$dataControllerId = $(az resource show --resource-group $env:resourceGroup --name "jumpstart-dc" --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+$vCoresMax = 4
+$memoryMax = "8"
+$StorageClassName = "managed-premium"
+$dataStorageSize = "5"
+$logsStorageSize = "5"
+$dataLogsStorageSize = "5"
+$backupsStorageSize = "5"
+$replicas = 1 # Value can be either 1 or 3
+
+$SQLParams = "C:\Temp\sql.parameters.json"
+
+(Get-Content -Path $SQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'customLocation-stage',$customLocationId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'vCoresMaxStage',$vCoresMax | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'memoryMax-stage',$memoryMax | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataSize-stage',$dataStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'logsSize-stage',$logsStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataLogseSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
+
+az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\sql.json" --parameters "C:\Temp\sql.parameters.json"
+
+Do {
+    Write-Host "Waiting for SQL Managed Instance, hold tight, this might take few minutes..."
+    Start-Sleep -Seconds 45
+    $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($dcStatus -eq "Nope")
+Write-Host "Azure Arc SQL Managed Instance is ready!"
 
 # #Creating Azure Data Studio settings for database connections
 # Write-Host "`n"
@@ -157,6 +193,10 @@ Write-Host "Azure Arc data controller is ready!"
 # Cleaning garbage
 # Remove-Item "C:\Temp\sql_instance_list.txt" -Force
 # Remove-Item "C:\Temp\postgres_instance_endpoint.txt" -Force
+
+# Replacing Internel Explorer Taskbar shortcut with Microsoft Edge
+syspin "PROGRAMFILES\Internet Explorer\iexplore.exe" 5387
+syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
