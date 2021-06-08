@@ -129,6 +129,3 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
-
-# Pinning Microsoft Edge to taskbar
-syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386 | Out-Null
