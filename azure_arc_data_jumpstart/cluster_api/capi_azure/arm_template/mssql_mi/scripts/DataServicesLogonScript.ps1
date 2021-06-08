@@ -223,6 +223,6 @@ Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 # Pinning Microsoft Edge to taskbar
-syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386 | Out-Null
+# syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386 | Out-Null
 
 Stop-Process -Name powershell -Force
