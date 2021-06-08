@@ -109,7 +109,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *myIpAddress* - Your local IP address. This is used to allow remote RDP and SSH connections to the sidecar Windows VM and K3s Rancher VM.
   * *logAnalyticsWorkspaceName* - Unique name for the deployment log analytics workspace
 
-* To deploy the ARM template, navigate to the local cloned [deployment folder](.) and run the below command:
+* To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla) and run the below command:
 
     ```shell
     az group create --name <Name of the Azure resource group> --location <Azure Region>
