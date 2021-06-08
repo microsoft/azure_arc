@@ -115,7 +115,7 @@ az deployment group create --resource-group $env:resourceGroup --template-file "
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take few minutes..."
+    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
@@ -157,7 +157,7 @@ az deployment group create --resource-group $env:resourceGroup --template-file "
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take few minutes..."
+    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")

@@ -115,7 +115,7 @@ az deployment group create --resource-group $env:resourceGroup --template-file "
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take few minutes..."
+    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
@@ -144,9 +144,6 @@ add-type $code
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
-
-# Pinning Microsoft Edge to taskbar
-syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
