@@ -219,7 +219,7 @@ Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
 Stop-Process -Id $kubectlMonShell.Id
 
 # Pinning Microsoft Edge to taskbar
-syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386
+# syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386 | Out-Null
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
