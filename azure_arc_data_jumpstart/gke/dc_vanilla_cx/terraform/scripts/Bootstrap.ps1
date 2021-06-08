@@ -56,8 +56,8 @@ workflow ClientTools_01
         Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
         Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/terraform/scripts/DC_Cleanup.ps1" -OutFile "C:\Temp\DC_Cleanup.ps1"
         Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/terraform/scripts/DC_Deploy.ps1" -OutFile "C:\Temp\DC_Deploy.ps1"
-        Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/arm_template/dc_vanilla_cx/terraform/scripts/dataController.json" -OutFile "C:\Temp\dataController.json"
-        Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/arm_template/dc_vanilla_cx/terraform/scripts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"     
+        Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/terraform/scripts/dataController.json" -OutFile "C:\Temp\dataController.json"
+        Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/terraform/scripts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"     
         Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_sqlmi/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
     }
 }
