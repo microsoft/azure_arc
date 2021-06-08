@@ -1,0 +1,174 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources"
+            }
+        },        
+        "resourceGroup": {
+            "type": "string"
+        },
+        "dataControllerId": {
+            "type": "String"
+        },
+        "customLocation": {
+            "type": "String"
+        },
+        "subscriptionId": {
+            "type": "String"
+        },        
+        "azdataUsername": {
+            "type": "String"
+        },
+        "azdataPassword": {
+            "type": "SecureString"
+        },
+        "namespace": {
+            "type": "String",
+            "defaultValue": "arc"
+        },
+        "serviceType": {
+            "type": "String",
+            "defaultValue": "LoadBalancer"
+        },
+        "vCoresMax": {
+            "type": "Int",
+            "defaultValue": 4
+        },
+        "memoryMax": {
+            "type": "String",
+            "defaultValue": "8"
+        },
+        "dataStorageSize": {
+            "type": "String",
+            "defaultValue": "5"
+        },
+        "dataStorageClassName": {
+            "type": "String"
+        },
+        "logsStorageSize": {
+            "type": "String",
+            "defaultValue": "5"
+        },
+        "logsStorageClassName": {
+            "type": "String",
+            "defaultValue": "managed-premium"
+        },
+        "dataLogsStorageSize": {
+            "type": "String",
+            "defaultValue": "5"
+        },
+        "dataLogsStorageClassName": {
+            "type": "String",
+            "defaultValue": "managed-premium"
+        },
+        "backupsStorageSize": {
+            "type": "String",
+            "defaultValue": "5"
+        },
+        "backupsStorageClassName": {
+            "type": "String",
+            "defaultValue": "managed-premium"
+        },
+        "replicas": {
+            "type": "Int"
+        },
+        "resourceTags": {
+            "type": "Object"
+        }
+    },
+    "variables": {},
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.AzureArcData/sqlManagedInstances",
+            "apiVersion": "2021-06-01-preview",
+            "name": "jumpstart-sql",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocation')]"
+            },
+            "tags": "[parameters('resourceTags')]",
+            "properties": {
+                "admin": "[parameters('azdataUsername')]",
+                "basicLoginInformation": {
+                    "username": "[parameters('azdataUsername')]",
+                    "password": "[parameters('azdataPassword')]"
+                },
+                "k8sRaw": {
+                    "spec": {
+                        "dev": false,
+                        "services": {
+                            "primary": {
+                                "type": "[parameters('serviceType')]"
+                            }
+                        },
+                        "replicas": "[parameters('replicas')]",
+                        "scheduling": {
+                            "default": {
+                                "resources": {
+                                    "requests": {
+                                        "vcores": "[parameters('vCoresMax')]",
+                                        "memory": "[parameters('memoryMax')]"
+                                    }
+                                }
+                            }
+                        },
+                        "storage": {
+                            "data": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('dataStorageClassName')]",
+                                        "size": "[parameters('dataStorageSize')]"
+                                    }
+                                ]
+                            },
+                            "logs": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('logsStorageClassName')]",
+                                        "size": "[parameters('logsStorageSize')]"
+                                    }
+                                ]
+                            },
+                            "datalogs": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('dataLogsStorageClassName')]",
+                                        "size": "[parameters('dataLogsStorageSize')]"
+                                    }
+                                ]
+                            },
+                            "backups": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('backupsStorageClassName')]",
+                                        "size": "[parameters('backupsStorageSize')]"
+                                    }
+                                ]
+                            }
+                        },
+                        "settings": {
+                            "azure": {
+                                "location": "[parameters('location')]",
+                                "resourceGroup": "[parameters('resourceGroup')]",
+                                "subscription": "[parameters('subscriptionId')]"
+                            }
+                        }
+                    },
+                    "metadata": {
+                        "namespace": "[parameters('namespace')]"
+                    },
+                    "status": {}
+                },
+                "dataControllerId": "[parameters('dataControllerId')]"
+            }
+        }
+    ],
+    "outputs": {}
+}
