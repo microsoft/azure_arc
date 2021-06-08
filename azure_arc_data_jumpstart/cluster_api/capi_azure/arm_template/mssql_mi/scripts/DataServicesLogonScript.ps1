@@ -218,11 +218,11 @@ Start-Process -FilePath "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
 
-# Pinning Microsoft Edge to taskbar
-# syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386 | Out-Null
-
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
+
+# Pinning Microsoft Edge to taskbar
+syspin "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" c:5386 | Out-Null
 
 Stop-Process -Name powershell -Force
