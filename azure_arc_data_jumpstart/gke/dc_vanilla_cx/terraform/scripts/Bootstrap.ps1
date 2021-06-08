@@ -21,10 +21,6 @@ function Disable-ieESC {
 }
 Disable-ieESC
 
-# Extending C:\ partition to the maximum size
-Write-Host "Extending C:\ partition to the maximum size"
-Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
-
 # Installing tools
 workflow ClientTools_01 
 {
@@ -42,7 +38,7 @@ workflow ClientTools_01
             }
         
             if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false){   
-                Write-Host "Chocolatey Apps Specified"  
+                Write-Output "Chocolatey Apps Specified"  
                 
                 $appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
         
@@ -54,10 +50,10 @@ workflow ClientTools_01
             }
         }
         # Downloading Azure Data Studio and azdata CLI
-        Write-Host "Downloading Azure Data Studio and azdata CLI"
-        Write-Host "`n"
-        Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip" | Out-Null
-        Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi" | Out-Null
+        Write-Output "Downloading Azure Data Studio and azdata CLI"
+        Write-Output "`n"
+        Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
+        Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
         Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/terraform/scripts/DC_Cleanup.ps1" -OutFile "C:\Temp\DC_Cleanup.ps1"
         Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/terraform/scripts/DC_Deploy.ps1" -OutFile "C:\Temp\DC_Deploy.ps1"
         Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla_cx/arm_template/dc_vanilla_cx/terraform/scripts/dataController.json" -OutFile "C:\Temp\dataController.json"
@@ -79,6 +75,8 @@ workflow ClientTools_02
         }
     }
 }
+
+ClientTools_02 | Format-Table 
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
