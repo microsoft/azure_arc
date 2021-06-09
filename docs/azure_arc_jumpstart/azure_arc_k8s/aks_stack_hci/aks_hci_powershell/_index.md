@@ -82,7 +82,7 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
   Exit
   ```
   
-* After this is done, close all PowerShell windows and verify the installation by tunning the following:
+* Once completed, close all PowerShell windows and verify the installation by tunning the following:
 
   ```powershell
   Get-Command -Module AksHci
