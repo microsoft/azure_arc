@@ -58,11 +58,25 @@
         "metadata": {
           "description": "The version of Kubernetes."
       }
-    },  
+    },
+    "aksClusterName": {
+      "type": "string",
+      "defaultValue":"Arc-App-Service-AKS",
+        "metadata": {
+          "description": "The name of the Managed Cluster resource."
+      }
+    },
     "dnsPrefix": {
       "type": "string",
       "metadata": {
         "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+      }
+    },
+    "linuxAdminUsername": {
+      "type": "string",
+      "defaultValue": "arcdemo",
+      "metadata": {
+        "description": "User name for the Linux Virtual Machines."
       }
     }
   },
@@ -98,7 +112,13 @@
           },
           "dnsPrefix": {
             "value": "[parameters('dnsPrefix')]"
-          }         
+          },
+          "aksClusterName": {
+            "value": "[parameters('aksClusterName')]"
+          },
+          "linuxAdminUsername": {
+            "value": "[parameters('linuxAdminUsername')]"
+          }          
         }
       }
     },

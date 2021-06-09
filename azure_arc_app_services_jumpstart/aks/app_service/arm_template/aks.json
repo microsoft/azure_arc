@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.1",
+    "contentVersion": "1.0.0.0",
     "parameters": {
         "myIpAddress": {
             "type": "string",
@@ -55,6 +55,7 @@
         },
         "linuxAdminUsername": {
             "type": "string",
+            "defaultValue": "arcdemo",
             "metadata": {
                 "description": "User name for the Linux Virtual Machines."
             }
