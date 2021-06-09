@@ -27,6 +27,18 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
+# Register Azure providers
+az provider register --namespace Microsoft.Kubernetes
+az provider register --namespace Microsoft.KubernetesConfiguration
+az provider register --namespace Microsoft.ExtendedLocation
+Do {
+    Write-Host "Waiting for providers to register, hold tight..."
+    Start-Sleep -Seconds 20
+    $extendedProvider = $(if(az provider show -n Microsoft.ExtendedLocation | Select-String 'Registered' -Quiet){"Ready!"}Else{"Nope"})
+    $kubeProvider = $(if(az provider show -n Microsoft.Kubernetes | Select-String 'Registered' -Quiet){"Ready!"}Else{"Nope"})
+    $kubeconfigProvider = $(if(az provider show -n Microsoft.KubernetesConfiguration | Select-String 'Registered' -Quiet){"Ready!"}Else{"Nope"})
+} while ($extendedProvider -eq "Nope" -or $kubeProvider -eq "Nope" -or $kubeconfigProvider -eq "Nope")
+
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
 az extension add --name "connectedk8s" -y
