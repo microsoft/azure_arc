@@ -118,6 +118,9 @@
           },
           "linuxAdminUsername": {
             "value": "[parameters('linuxAdminUsername')]"
+          },
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
           }          
         }
       }
