@@ -5,7 +5,7 @@ $appId ='<Your Azure service principal name>'
 $password ='<Your Azure service principal password>'
 $tenant ='<Your Azure tenant ID>'
 $resourceGroup ='<Azure resource group name>'
-$ClusterName ='<The name of your AKS cluster running on Azure Stack HCI>'
+$clusterName ='<The name of your AKS cluster running on Azure Stack HCI>'
 $appClonedRepo ='<The URL for the "Hello Arc" cloned GitHub repository>'
 $subscriptionId ='<Your subscription ID>'
 
@@ -19,30 +19,28 @@ az account set --subscription $subscriptionId
 az config set extension.use_dynamic_install=yes_without_prompt
 
 #Get AKS on Azure Stack HCI cluster credentials
-Get-AksHciCredential -Name $ClusterName 
+Get-AksHciCredential -Name $ClusterName -Confirm:$false
 
 # Create a namespace for your ingress resources
-kubectl create namespace hello-arc
+kubectl create ns cluster-mgmt
 
 # Helm Install 
 
 choco install kubernetes-helm
 
 # Add the official stable repo
-helm repo add nginx-stable https://helm.nginx.com/stable
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 
 # Use Helm to deploy an NGINX ingress controller
-helm install nginx nginx-stable/nginx-ingress `
-    --namespace hello-arc `
-    --set controller.replicaCount=2 `
-    --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux `
-    --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux
+helm install nginx ingress-nginx/ingress-nginx -n cluster-mgmt
 
-az k8sconfiguration create `
---name cluster-config `
+az k8s-configuration create `
+--name hello-arc `
 --cluster-name $clusterName --resource-group $resourceGroup `
---operator-instance-name cluster-config --operator-namespace cluster-config `
+--operator-instance-name hello-arc --operator-namespace prod `
+--enable-helm-operator `
+--helm-operator-params='--set helm.versions=v3' `
 --repository-url $appClonedRepo `
---scope cluster --cluster-type connectedClusters `
---operator-params="--git-poll-interval 3s --git-readonly" 
+--scope namespace --cluster-type connectedClusters `
+--operator-params="--git-poll-interval 3s --git-readonly --git-path=releases/prod"
