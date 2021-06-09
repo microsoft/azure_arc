@@ -22,7 +22,7 @@ function Disable-ieESC {
 Disable-ieESC
 
 # Installing tools
-$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140"
+$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140,kubernetes-helm,vscode,putty.install,microsoft-edge,azcopy10"
 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
     try{
