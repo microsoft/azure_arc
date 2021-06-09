@@ -1,16 +1,16 @@
 ---
 type: docs
-title: "Data Controller ARM Template"
-linkTitle: "Data Controller ARM Template"
-weight: 1
+title: "SQL Managed Instance ARM Template"
+linkTitle: "SQL Managed Instance ARM Template"
+weight: 2
 description: >
 ---
 
-## Deploy a vanilla Azure Arc Data Controller in directly connected mode on Cluster API Kubernetes cluster with Azure provider using an ARM Template
+## Deploy Azure Arc enabled SQL Managed Instance in directly connected mode on Cluster API Kubernetes cluster with Azure provider using an ARM Template
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
+The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) and [SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-arc/data/managed-instance-overview) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
 
-By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure sidecar VM, installed & pre-configured with all the required tools needed to work with Azure Arc enabled data services.
+By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an Azure Arc Data Controller, SQL Managed Instance (with a sample database), and a Microsoft Windows Server 2019 (Datacenter) Azure sidecar VM, installed & pre-configured with all the required tools needed to work with Azure Arc enabled data services.
 
 > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -85,20 +85,20 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 * User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
-* Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/azuredeploy.json) will initiate four linked ARM templates:
+* Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/azuredeploy.json) will initiate four linked ARM templates:
 
-  * [_ubuntuCapi_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/ubuntuCapi.json) - Deploys an Ubuntu Linux VM which will have Rancher K3s installed and transformed into a Cluster API management cluster via the Azure CAPZ provider.
-  * [_clientVm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/clientVm.json) - Deploys the sidecar Windows VM. This is where all user interactions with the environment are made from.
-  * [_mgmtStagingStorage_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/mgmtStagingStorage.json) - Used for staging files in automation scripts.
-  * [_logAnalytics_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/logAnalytics.json) - Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs upload.
+  * [_ubuntuCapi_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/ubuntuCapi.json) - Deploys an Ubuntu Linux VM which will have Rancher K3s installed and transformed into a Cluster API management cluster via the Azure CAPZ provider.
+  * [_clientVm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/clientVm.json) - Deploys the sidecar Windows VM. This is where all user interactions with the environment are made from.
+  * [_mgmtStagingStorage_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/mgmtStagingStorage.json) - Used for staging files in automation scripts.
+  * [_logAnalytics_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/logAnalytics.json) - Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs upload.
 
-* User remotes into sidecar Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/DataServicesLogonScript.ps1) PowerShell script that deploy and configure Azure Arc enabled data services on the CAPI workload cluster including the data controller.
+* User remotes into sidecar Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/scripts/DataServicesLogonScript.ps1) PowerShell script that deploy and configure Azure Arc enabled data services on the CAPI workload cluster including the data controller and SQL Managed Instance.
 
 ## Deployment
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template that will initiate the entire automation for this scenario.
 
-* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/azuredeploy.parameters.json) file located in your local cloned repository folder.
+* The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/azuredeploy.parameters.json) file located in your local cloned repository folder.
 
   * *sshRSAPublicKey* - Your SSH public key
   * *spnClientId* - Your Azure service principal id
@@ -109,14 +109,14 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *myIpAddress* - Your local IP address. This is used to allow remote RDP and SSH connections to the sidecar Windows VM and K3s Rancher VM.
   * *logAnalyticsWorkspaceName* - Unique name for the deployment log analytics workspace
 
-* To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla) and run the below command:
+* To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi) and run the below command:
 
     ```shell
     az group create --name <Name of the Azure resource group> --location <Azure Region>
     az deployment group create \
     --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
-    --template-uri https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/azuredeploy.json \
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
@@ -125,11 +125,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```shell
-    az group create --name Arc-Data-CAPI --location "East US"
+    az group create --name Arc-Data-CAPI-SQLMI --location "East US"
     az deployment group create \
-    --resource-group Arc-Data-CAPI \
+    --resource-group Arc-Data-CAPI-SQLMI \
     --name arcdatademo \
-    --template-uri https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/azuredeploy.json \
     --parameters azuredeploy.parameters.json
     ```
 
@@ -149,9 +149,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Sidecar VM public IP](./04.png)
 
-* At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
+* At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/scripts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
-* Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure Arc Data Controller will be deployed on the cluster and be ready to use.
+* Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and the SQL Managed Instance will be deployed on the cluster and be ready to use.
 
 ![PowerShell logon script run](./05.png)
 
@@ -177,13 +177,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ![PowerShell logon script run](./16.png)
 
-* Since this scenario is deploying the Azure Arc Data Controller, you will also notice addtional newly deployed Azure resources in the resources group (at this point you should have **47 verious Azure resources" deployed). The important ones to notice are:
+* Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice addtional newly deployed Azure resources in the resources group (at this point you should have **54 verious Azure resources" deployed). The important ones to notice are:
 
   * Azure Arc enabled Kubernetes cluster - Azure Arc enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
   * Custom location - provides a way for tenant administrators to use their Azure Arc enabled Kubernetes clusters as target locations for deploying Azure services instances.
 
   * Azure Arc Data Controller - The data contoller that is now deployed on the Kubernetes cluster.
+
+  * Azure Arc enabled SQL Managed Instance - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
 ![Addtional Azure resources in the resource group](./17.png)
 
@@ -192,6 +194,12 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
   ![Azure Data Studio shortcut](./18.png)
+
+* Addtionaly, the SQL Managed Instance connection will be configured as well as the sample [_AdventureWorks_](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will restored automaticly for you.
+
+  ![Azure Data Studio connection](./19.png)
+
+  ![Configured SQL Managed Instance connection](./20.png)
 
 ## Cluster extensions
 
@@ -205,12 +213,12 @@ In this scenario, three Azure Arc enabled Kubernetes cluster extensions were dep
 
 * In order to view these cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc enabled Kubernetes resource](./19.png)
+  ![Azure Arc enabled Kubernetes resource](./21.png)
 
-  ![Azure Arc enabled Kubernetes clustExtensions settings](./20.png)
+  ![Azure Arc enabled Kubernetes clustExtensions settings](./22.png)
 
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Delete Azure resource group](./21.png)
+    ![Delete Azure resource group](./23.png)
