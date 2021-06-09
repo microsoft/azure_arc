@@ -99,7 +99,7 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_sqlmi/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/scripts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_sqlmi/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/scripts/sql.json" -OutFile "C:\Temp\sql.json"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_sqlmi/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/mssql_mi/scripts/sql.parameters.json" -OutFile "C:\Temp\sql.parameters.json"                    
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/blob/capi_data_sqlmi/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_sqlmi/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
