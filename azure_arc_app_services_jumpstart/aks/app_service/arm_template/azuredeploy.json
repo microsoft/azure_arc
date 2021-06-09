@@ -57,7 +57,13 @@
       "defaultValue": "1.19.11",
         "metadata": {
           "description": "The version of Kubernetes."
+    },
+    "dnsPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
       }
+    }  
     }
   },
   "variables": {
@@ -89,7 +95,7 @@
           },          
           "kubernetesVersion": {
             "value": "[parameters('kubernetesVersion')]"
-          }          
+          }
         }
       }
     },
