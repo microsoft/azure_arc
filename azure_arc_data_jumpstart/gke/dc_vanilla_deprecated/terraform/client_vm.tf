@@ -44,13 +44,13 @@ resource "google_compute_instance" "default" {
 
   provisioner "file" {
     source      = var.gcp_credentials_filename
-    destination = "C:/Temp/${var.gcp_credentials_filename}"
+    destination = "C:/tmp/${var.gcp_credentials_filename}"
 
     connection {
       host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
       https    = false
       insecure = true
-      timeout  = "20m"
+      timeout  = "10m"
       type     = "winrm"
       user     = var.windows_username
       password = var.windows_password
@@ -59,13 +59,13 @@ resource "google_compute_instance" "default" {
 
   provisioner "file" {
     source      = "scripts/azure_arc.ps1"
-    destination = "C:/Temp/azure_arc.ps1"
+    destination = "C:/tmp/azure_arc.ps1"
 
     connection {
       host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
       https    = false
       insecure = true
-      timeout  = "20m"
+      timeout  = "10m"
       type     = "winrm"
       user     = var.windows_username
       password = var.windows_password
@@ -73,29 +73,14 @@ resource "google_compute_instance" "default" {
   }
 
   provisioner "file" {
-    source      = "scripts/Bootstrap.ps1"
-    destination = "C:/Temp/Bootstrap.ps1"
+    source      = "scripts/ClientTools.ps1"
+    destination = "C:/tmp/ClientTools.ps1"
 
     connection {
       host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
       https    = false
       insecure = true
-      timeout  = "20m"
-      type     = "winrm"
-      user     = var.windows_username
-      password = var.windows_password
-    }
-  }
-
-  provisioner "file" {
-    source      = "scripts/DataServicesLogonScript.ps1"
-    destination = "C:/Temp/DataServicesLogonScript.ps1"
-
-    connection {
-      host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
-      https    = false
-      insecure = true
-      timeout  = "20m"
+      timeout  = "10m"
       type     = "winrm"
       user     = var.windows_username
       password = var.windows_password
@@ -104,13 +89,13 @@ resource "google_compute_instance" "default" {
 
   provisioner "file" {
     source      = "scripts/local_ssd_sc.yaml"
-    destination = "C:/Temp/local_ssd_sc.yaml"
+    destination = "C:/tmp/local_ssd_sc.yaml"
 
     connection {
       host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
       https    = false
       insecure = true
-      timeout  = "20m"
+      timeout  = "10m"
       type     = "winrm"
       user     = var.windows_username
       password = var.windows_password
@@ -119,14 +104,14 @@ resource "google_compute_instance" "default" {
 
   provisioner "remote-exec" {
     inline = [
-      "powershell.exe -File C://Temp/azure_arc.ps1"
+      "powershell.exe -File C://tmp/azure_arc.ps1"
     ]
 
     connection {
       host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
       https    = false
       insecure = true
-      timeout  = "20m"
+      timeout  = "5m"
       type     = "winrm"
       user     = var.windows_username
       password = var.windows_password
@@ -135,14 +120,14 @@ resource "google_compute_instance" "default" {
 
   provisioner "remote-exec" {
     inline = [
-      "powershell.exe -File C://Temp/Bootstrap.ps1"
+      "powershell.exe -File C://tmp/ClientTools.ps1"
     ]
 
     connection {
       host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
       https    = false
       insecure = true
-      timeout  = "20m"
+      timeout  = "5m"
       type     = "winrm"
       user     = var.windows_username
       password = var.windows_password
@@ -164,24 +149,23 @@ resource "local_file" "password_reset" {
 
 resource "local_file" "azure_arc" {
   content = templatefile("scripts/azure_arc.ps1.tmpl", {
-    adminUsername          = var.windows_username
-    gcpCredentialsFilename = var.gcp_credentials_filename
-    gkeClusterName         = var.gke_cluster_name
-    gcpRegion              = var.gcp_region
-    spnClientId            = var.SPN_CLIENT_ID
-    spnClientSecret        = var.SPN_CLIENT_SECRET
-    spnTenantId            = var.SPN_TENANT_ID
-    spnAuthority           = var.SPN_AUTHORITY
-    AZDATA_USERNAME        = var.AZDATA_USERNAME
-    AZDATA_PASSWORD        = var.AZDATA_PASSWORD
-    ACCEPT_EULA            = var.ACCEPT_EULA
-    arcDcName              = var.ARC_DC_NAME
-    subscriptionId         = var.ARC_DC_SUBSCRIPTION
-    resourceGroup          = var.ARC_DC_RG
-    azureLocation          = var.ARC_DC_REGION
-    DOCKER_REGISTRY        = var.DOCKER_REGISTRY
-    DOCKER_REPOSITORY      = var.DOCKER_REPOSITORY
-    DOCKER_TAG             = var.DOCKER_TAG
+    gcp_credentials_filename = var.gcp_credentials_filename
+    gke_cluster_name         = var.gke_cluster_name
+    gcp_region               = var.gcp_region
+    SPN_CLIENT_ID            = var.SPN_CLIENT_ID
+    SPN_CLIENT_SECRET        = var.SPN_CLIENT_SECRET
+    SPN_TENANT_ID            = var.SPN_TENANT_ID
+    SPN_AUTHORITY            = var.SPN_AUTHORITY
+    AZDATA_USERNAME          = var.AZDATA_USERNAME
+    AZDATA_PASSWORD          = var.AZDATA_PASSWORD
+    ACCEPT_EULA              = var.ACCEPT_EULA
+    ARC_DC_NAME              = var.ARC_DC_NAME
+    ARC_DC_SUBSCRIPTION      = var.ARC_DC_SUBSCRIPTION
+    ARC_DC_RG                = var.ARC_DC_RG
+    ARC_DC_REGION            = var.ARC_DC_REGION
+    DOCKER_REGISTRY          = var.DOCKER_REGISTRY
+    DOCKER_REPOSITORY        = var.DOCKER_REPOSITORY
+    DOCKER_TAG               = var.DOCKER_TAG
     }
   )
   filename = "scripts/azure_arc.ps1"

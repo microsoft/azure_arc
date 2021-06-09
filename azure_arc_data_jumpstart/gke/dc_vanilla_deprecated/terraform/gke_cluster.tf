@@ -9,14 +9,14 @@ resource "google_container_cluster" "arcdemo" {
   remove_default_node_pool = true
   initial_node_count       = 1
 
-  # master_auth {
-  #   username = var.admin_username
-  #   password = var.admin_password
+  master_auth {
+    username = var.admin_username
+    password = var.admin_password
 
-  #   client_certificate_config {
-  #     issue_client_certificate = true
-  #   }
-  # }
+    client_certificate_config {
+      issue_client_certificate = false
+    }
+  }
 }
 
 resource "google_container_node_pool" "primary_preemptible_nodes" {
