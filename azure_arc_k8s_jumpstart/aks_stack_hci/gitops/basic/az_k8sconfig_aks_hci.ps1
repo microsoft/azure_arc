@@ -5,7 +5,7 @@ $appId ='<Your Azure service principal name>'
 $password ='<Your Azure service principal password>'
 $tenant ='<Your Azure tenant ID>'
 $resourceGroup ='<Azure resource group name>'
-$ClusterName ='<The name of your AKS cluster running on Azure Stack HCI>'
+$clusterName ='<The name of your AKS cluster running on Azure Stack HCI>'
 $appClonedRepo ='<The URL for the "Hello Arc" cloned GitHub repository>'
 $subscriptionId ='<Your subscription ID>'
 
@@ -37,7 +37,7 @@ helm install nginx ingress-nginx/ingress-nginx -n cluster-mgmt
 
 az k8s-configuration create `
 --name hello-arc `
---cluster-name $ClusterName --resource-group $resourceGroup `
+--cluster-name $clusterName --resource-group $resourceGroup `
 --operator-instance-name hello-arc --operator-namespace prod `
 --enable-helm-operator `
 --helm-operator-params='--set helm.versions=v3' `
