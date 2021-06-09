@@ -9,7 +9,7 @@ $k8sNodeIpPoolStart= 'first IP for the kubernetes nodes IP pool.'
 $k8sNodeIpPoolEnd= 'last IP for the kubernetes nodes IP pool.'
 $ipAddressPrefix= 'Network range in CIDR' 
 $gateway= 'IP address for your networks gateway'
-$dnsServers**: static IP address that will be assigned to your DNS server.
+$dnsServers= 'static IP address that will be assigned to your DNS server.'
 $imageDir = 'Provide a path to the directory where AKS on Azure Stack HCI will store its VHD images'
 $cloudConfigLocation = 'Provide a path to the directory where the cloud agent will store its configuration'
 $clusterName = 'Provide a name for your AKS cluster'
