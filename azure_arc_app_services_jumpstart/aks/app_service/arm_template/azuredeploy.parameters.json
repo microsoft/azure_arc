@@ -30,7 +30,7 @@
             "value": "<Kubernetes Version, e.g. 1.19.11>"
         },
         "dnsPrefix": {
-            "value": "<AKS unique DNS prefix>"
+            "value": "<Optional DNS prefix to use with hosted Kubernetes API server FQDN>"
         }
     }
 }
