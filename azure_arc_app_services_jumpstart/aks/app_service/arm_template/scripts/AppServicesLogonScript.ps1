@@ -72,7 +72,6 @@ az k8s-extension create `
    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
    --configuration-settings "appsNamespace=$namespace" `
    --configuration-settings "clusterName=$env:clusterName" `
-   --configuration-settings "loadBalancerIp=$publicIp" `
    --configuration-settings "keda.enabled=true" `
    --configuration-settings "buildService.storageClassName=default" `
    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
