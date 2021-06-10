@@ -10,7 +10,7 @@ module "managed-k8s" {
   worker_instance_types = ["ecs.g6.large"]
   new_sls_project = true
 
-  kube_config_path = "~/.kube/config"
+  kube_config_path = "~/.kube/config_alicloudArc"
 
   cluster_addons = [
    {
