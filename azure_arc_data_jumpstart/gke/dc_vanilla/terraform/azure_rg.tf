@@ -4,4 +4,5 @@ resource "azurerm_resource_group" "arc-data-demo" {
   tags = {
     project = "jumpstart_azure_arc_data"
   }
+  depends_on = [google_compute_network.default]
 }
