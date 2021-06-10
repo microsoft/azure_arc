@@ -12,7 +12,7 @@ $dataLogsStorageSize = "5"
 $backupsStorageSize = "5"
 $replicas = 1 # Value can be either 1 or 3
 
-$SQLParams = "C:\Temp\sql.parameters.json"
+$SQLParams = "C:\Temp\sqlmi.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $SQLParams
@@ -29,7 +29,7 @@ $SQLParams = "C:\Temp\sql.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\sql.json" --parameters "C:\Temp\sql.parameters.json"
+az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\sqlmi.json" --parameters "C:\Temp\sqlmi.parameters.json"
 Write-Host "`n"
 
 Do {
