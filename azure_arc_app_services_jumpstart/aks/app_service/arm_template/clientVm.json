@@ -196,20 +196,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "443"
                         }
-                    },
-                    {
-                        "name": "allow_SQL_1433",
-                        "properties": {
-                            "priority": 1004,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "1433"
-                        }
-                    }                                         
+                    }                              
                 ]
             }
         },
