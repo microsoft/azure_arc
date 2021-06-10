@@ -146,7 +146,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
   ![Alibaba Cloud Resource Management](./08.png)
 
-* The plan will create the _kubeconfig_ file in the home directory `~/.kube/config_alicloudArc`. You can either use this directly or merge it into your kubeconfig to be used with `kubectl` or `helm`.
+* The plan will create the _kubeconfig_ file in the home directory `~/.kube/config_alicloudArc`. You can either use this directly or merge it into your _kubeconfig_ to be used with `kubectl` or `helm`.
 
    ```shell
    cp ~/.kube/config ~/.kube/config_old
