@@ -8,7 +8,7 @@
                 "description": "Your public IP address, used to ssh to the AKS nodes (if needed)"
             }
         },
-        "aksClusterName": {
+        "clusterName": {
             "type": "string",
             "defaultValue":"Arc-App-Service-AKS",
             "metadata": {
@@ -114,7 +114,7 @@
             "apiVersion": "2020-03-01",
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[parameters('location')]",
-            "name": "[parameters('aksClusterName')]",
+            "name": "[parameters('clusterName')]",
             "tags": "[parameters('resourceTags')]",
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
@@ -150,7 +150,7 @@
     "outputs": {
         "controlPlaneFQDN": {
             "type": "string",
-            "value": "[reference(parameters('aksClusterName')).fqdn]"
+            "value": "[reference(parameters('clusterName')).fqdn]"
         }
     }
 }
