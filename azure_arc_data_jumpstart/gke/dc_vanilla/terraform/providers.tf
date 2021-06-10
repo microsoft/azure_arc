@@ -5,9 +5,9 @@
 terraform {
   required_version = "~> 1.0"
   required_providers {
-    google  = "~> 3.21"
-    local   = "~> 1.4"
-    azurerm = "~> 2.0.0"
+    google  = "~> 3.71.0"
+    local   = "~> 2.1"
+    azurerm = "~> 2.62.1"
   }
 }
 

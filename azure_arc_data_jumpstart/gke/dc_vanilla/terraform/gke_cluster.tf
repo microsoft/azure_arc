@@ -17,6 +17,7 @@ resource "google_container_cluster" "arcdemo" {
   #     issue_client_certificate = true
   #   }
   # }
+  depends_on = [azurerm_resource_group.arc-data-demo]
 }
 
 resource "google_container_node_pool" "primary_preemptible_nodes" {
