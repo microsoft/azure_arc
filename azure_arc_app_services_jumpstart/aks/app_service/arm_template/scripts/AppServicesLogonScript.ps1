@@ -40,6 +40,12 @@ Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 
+# Creating Azure Public IP resource to be used by the Azure Arc app service
+Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
+Write-Host "`n"
+az network public-ip create --resource-group $env:resourceGrou --name "Arc-AppSvc-PIP" --sku STANDARD
+$staticIp = $(az network public-ip show --resource-group $env:resourceGrou --name "Arc-AppSvc-PIP" --output tsv --query ipAddress)
+
 # Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
@@ -48,43 +54,32 @@ Start-Sleep -Seconds 10
 $namespace="appservices"
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n $namespace; Start-Sleep -Seconds 5; Clear-Host }}
 
+$extensionName = arc-app-services
 $kubeEnvironmentName="$env:clusterName-appsvc"
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceIdBase64 = $([Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$workspaceId'")))
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
-$workspaceKeyBase64 = $([Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$workspaceKey'")))
+$workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
+$workspaceKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
-[String]$logAnalyticsWorkspaceIdEnc = $workspaceIdBase64
-"logAnalyticsWorkspaceIdEnc = {0}" -f $logAnalyticsWorkspaceIdEnc
-$logAnalyticsWorkspaceIdEnc
+$extensionId = az k8s-extension create -g $env:resourceGroup --name $extensionName --query id -o tsv `
+    --cluster-type connectedClusters -c $env:clusterName `
+    --extension-type 'Microsoft.Web.Appservice' --release-train stable --auto-upgrade-minor-version true `
+    --scope cluster --release-namespace "$namespace" `
+    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default"  `
+    --configuration-settings "appsNamespace=$namespace"  `
+    --configuration-settings "clusterName=$kubeEnvironmentName"  `
+    --configuration-settings "loadBalancerIp=$staticIp"  `
+    --configuration-settings "keda.enabled=true"  `
+    --configuration-settings "buildService.storageClassName=default"  `
+    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
+    --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
+    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
+    --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${workspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${workspaceKeyEnc}"
 
-[String]$logAnalyticsWorkspaceKeyEnc = $workspaceKeyBase64
-"logAnalyticsWorkspaceKeyEnc = {0}" -f $logAnalyticsWorkspaceKeyEnc
-$logAnalyticsWorkspaceKeyEnc
+az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
 
 
-az k8s-extension create `
-   --resource-group $env:resourceGroup `
-   --name arc-app-services `
-   --cluster-type connectedClusters `
-   --cluster-name $env:clusterName `
-   --extension-type 'Microsoft.Web.Appservice' `
-   --release-train stable `
-   --auto-upgrade-minor-version true `
-   --scope cluster `
-   --release-namespace $namespace `
-   --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
-   --configuration-settings "appsNamespace=$namespace" `
-   --configuration-settings "clusterName=$env:clusterName" `
-   --configuration-settings "loadBalancerIp=$publicIp" `
-   --configuration-settings "keda.enabled=true" `
-   --configuration-settings "buildService.storageClassName=default" `
-   --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
-   --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
-   --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" 
-   # --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
-   # --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=$logAnalyticsWorkspaceIdEnc" `
-   # --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=$logAnalyticsWorkspaceKeyEnc"
+
 
 
 # Do {
@@ -132,4 +127,4 @@ Stop-Process -Id $kubectlMonShell.Id
 Unregister-ScheduledTask -TaskName "AppServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
-Stop-Process -Name powershell -Force
+# Stop-Process -Name powershell -Force
