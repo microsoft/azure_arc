@@ -118,12 +118,12 @@ Do {
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
-if ( $env:deploySQLMI )
+if ( $env:deploySQLMI -eq $true )
 {
     & "C:\Temp\DeploySQLMI.ps1"
 }
 
-if ( $env:deployPostgreSQL )
+if ( $env:deployPostgreSQL -eq $true )
 {
     # & "C:\Temp\DeployPostgreSQL.ps1"
 }
