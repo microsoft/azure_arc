@@ -10,9 +10,9 @@ az login --service-principal --username $env:spnClientId --password $env:spnClie
 
 # Registering Azure Arc providers
 Write-Host "Registering Azure Arc providers"
-az provider register --namespace Microsoft.Kubernetes
-az provider register --namespace Microsoft.KubernetesConfiguration
-az provider register --namespace Microsoft.ExtendedLocation
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
@@ -30,7 +30,7 @@ Write-Host "`n"
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
+Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:$clusterName -Force
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -39,10 +39,10 @@ kubectl get nodes
 # Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
-az connectedk8s connect --name "Arc-AppSvc-AKS" --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_app_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+az connectedk8s connect --name $env:$clusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_app_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservice; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name 'Arc-AppSvc-AKS' --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $env:$clusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 az extension remove --name appservice-kube
 az extension add --yes --name appservice --source "https://aka.ms/appsvc/appservice_kube-latest-py2.py3-none-any.whl"
 
@@ -52,15 +52,15 @@ az extension add --yes --name appservice --source "https://aka.ms/appsvc/appserv
 #     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
 #     } while ($podStatus -eq "Nope")
 
-$connectedClusterId = az connectedk8s show --name 'Arc-AppSvc-AKS' --resource-group $env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name appservice --cluster-type connectedClusters --cluster-name 'Arc-AppSvc-AKS' --resource-group $env:resourceGroup --query id -o tsv
+$connectedClusterId = az connectedk8s show --name $env:$clusterName --resource-group $env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name appservice --cluster-type connectedClusters --cluster-name $env:$clusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
 az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
 # # Deploying Azure Defender Kubernetes extension instance
 # Write-Host "Create Azure Defender Kubernetes extension instance"
 # Write-Host "`n"
-# az k8s-extension create --name "azure-defender" --cluster-name "Arc-AppSvc-AKS" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+# az k8s-extension create --name "azure-defender" --cluster-name $env:$clusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 
 

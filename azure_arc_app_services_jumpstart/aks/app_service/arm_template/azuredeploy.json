@@ -59,7 +59,7 @@
           "description": "The version of Kubernetes."
       }
     },
-    "aksClusterName": {
+    "clusterName": {
       "type": "string",
       "defaultValue":"Arc-App-Service-AKS",
         "metadata": {
@@ -113,8 +113,8 @@
           "dnsPrefix": {
             "value": "[parameters('dnsPrefix')]"
           },
-          "aksClusterName": {
-            "value": "[parameters('aksClusterName')]"
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
           },
           "linuxAdminUsername": {
             "value": "[parameters('linuxAdminUsername')]"
@@ -129,7 +129,6 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      // "dependsOn": ["aksDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
