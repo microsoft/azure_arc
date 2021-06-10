@@ -14,6 +14,8 @@ $env:arcDcName="${arcDcName}"
 $env:subscriptionId="${subscriptionId}"
 $env:resourceGroup="${resourceGroup}"
 $env:azureLocation="${azureLocation}"
+$env:deploySQLMI="${deploySQLMI}"
+$env:deployPostgreSQL="${deployPostgreSQL}"
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $env:adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('gcpCredentialsFilename', $env:gcpCredentialsFilename,[System.EnvironmentVariableTarget]::Machine)
@@ -30,3 +32,5 @@ $env:azureLocation="${azureLocation}"
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $env:subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $env:resourceGroup,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureLocation', $env:azureLocation,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deploySQLMI', $env:deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $env:deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
