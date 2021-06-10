@@ -102,6 +102,13 @@
             "metadata": {
                 "description": "Name for the environment Azure Log Analytics workspace"
             }
+        },
+        "clusterName": {
+            "type": "string",
+            "defaultValue":"Arc-App-Service-AKS",
+            "metadata": {
+                "description": "The name of the Kubernetes cluster resource.."
+            }
         }
     },
     "variables": {
@@ -269,7 +276,7 @@
                     "fileUris": [
                         "[uri(variables('templateBaseUrl'), 'scripts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName')) ]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -clusterName ', parameters('clusterName'))]"
                 }
             }
         }
