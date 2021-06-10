@@ -78,36 +78,19 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/DataServicesLogonScript.ps1" -OutFile "C:\Temp\DataServicesLogonScript.ps1"
-                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/capiStorageClass.yaml" -OutFile "C:\Temp\capiStorageClass.yaml"
-                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/dataController.json" -OutFile "C:\Temp\dataController.json"
-                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"                 
-                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/scripts/AppServicesLogonScript.ps1" -OutFile "C:\Temp\AppServicesLogonScript.ps1"              
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
 ClientTools_01 | Format-Table
 
-# workflow ClientTools_02
-#         {
-#             #Run commands in parallel.
-#             Parallel
-#             {
-#                 InlineScript {
-#                     Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-#                     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
-#                 }
-#             }
-#         }
-        
-# ClientTools_02 | Format-Table 
-
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
-# Creating scheduled task for DataServicesLogonScript.ps1
-# $Trigger = New-ScheduledTaskTrigger -AtLogOn
-# $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\DataServicesLogonScript.ps1'
-# Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+Creating scheduled task for AppServicesLogonScript.ps1
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\AppServicesLogonScript.ps1'
+Register-ScheduledTask -TaskName "AppServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
