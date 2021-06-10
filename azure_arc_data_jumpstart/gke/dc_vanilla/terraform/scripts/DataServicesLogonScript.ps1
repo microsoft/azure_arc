@@ -28,18 +28,10 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Register Azure providers
-az provider register --namespace Microsoft.Kubernetes
-az provider register --namespace Microsoft.KubernetesConfiguration
-az provider register --namespace Microsoft.ExtendedLocation
-az provider register --namespace Microsoft.AzureArcData
-Do {
-    Write-Host "Waiting for providers to register, hold tight..."
-    Start-Sleep -Seconds 20
-    $extendedProvider = $(if(az provider show -n Microsoft.ExtendedLocation | Select-String 'Registered' -Quiet){"Ready!"}Else{"Nope"})
-    $kubeProvider = $(if(az provider show -n Microsoft.Kubernetes | Select-String 'Registered' -Quiet){"Ready!"}Else{"Nope"})
-    $kubeconfigProvider = $(if(az provider show -n Microsoft.KubernetesConfiguration | Select-String 'Registered' -Quiet){"Ready!"}Else{"Nope"})
-    $arcDataProvider = $(if(az provider show -n Microsoft.AzureArcData | Select-String 'Registered' -Quiet){"Ready!"}Else{"Nope"})
-} while ($extendedProvider -eq "Nope" -or $kubeProvider -eq "Nope" -or $kubeconfigProvider -eq "Nope" -or $arcDataProvider -eq "Nope")
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.AzureArcData --wait
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
