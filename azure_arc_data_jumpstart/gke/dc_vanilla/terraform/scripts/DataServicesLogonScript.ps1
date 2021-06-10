@@ -118,12 +118,15 @@ Do {
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
-# start Powershell {for (0 -lt 1) {kubectl get pod -n $env:arcDcName; sleep 5; clear }}
+if ( $env:deploySQLMI )
+{
+    & "C:\Temp\DeploySQLMI.ps1"
+}
 
-# azdata arc dc config init --source azure-arc-gke --path "C:\Temp\custom" --force
-# azdata arc dc config replace --path "C:\Temp\custom\control.json" --json-values "spec.storage.data.className=local-ssd"
-# azdata arc dc config replace --path "C:\Temp\custom\control.json" --json-values "spec.storage.logs.className=local-ssd"
-# azdata arc dc config replace --path "C:\Temp\custom\control.json" --json-values "$.spec.services[*].serviceType=LoadBalancer"
+if ( $env:deployPostgreSQL )
+{
+    # & "C:\Temp\DeployPostgreSQL.ps1"
+}
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"

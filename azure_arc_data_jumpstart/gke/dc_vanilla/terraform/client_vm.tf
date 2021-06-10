@@ -179,9 +179,8 @@ resource "local_file" "azure_arc" {
     subscriptionId         = var.ARC_DC_SUBSCRIPTION
     resourceGroup          = var.ARC_DC_RG
     azureLocation          = var.ARC_DC_REGION
-    DOCKER_REGISTRY        = var.DOCKER_REGISTRY
-    DOCKER_REPOSITORY      = var.DOCKER_REPOSITORY
-    DOCKER_TAG             = var.DOCKER_TAG
+    deploySQLMI            = var.deploy_SQLMI
+    deployPostgreSQL       = var.deploy_PostgreSQL
     }
   )
   filename = "scripts/azure_arc.ps1"
