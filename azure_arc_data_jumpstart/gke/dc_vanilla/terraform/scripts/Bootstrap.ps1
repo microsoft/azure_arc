@@ -49,8 +49,8 @@ Write-Output "Downloading Azure Data Studio and azdata CLI"
 Write-Output "`n"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla/terraform/scripts/dataController.json" -OutFile "C:\Temp\dataController.json"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla/terraform/scripts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"     
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla/terraform/arm_templates/dataController.json" -OutFile "C:\Temp\dataController.json"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/azure_arc_data_jumpstart/gke/dc_vanilla/terraform/arm_templates/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"     
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/gke_connectedmode/img/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
 Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
