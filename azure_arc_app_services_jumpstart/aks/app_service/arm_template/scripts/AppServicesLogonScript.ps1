@@ -7,15 +7,18 @@ $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId 
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
+Write-Host "`n"
 
 # Registering Azure Arc providers
-Write-Host "Registering Azure Arc providers"
+Write-Host "Registering Azure Arc providers, hold tight..."
+Write-Host "`n"
 az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
+Write-Host "`n"
 az extension add --name "connectedk8s" -y
 az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
