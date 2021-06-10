@@ -120,7 +120,7 @@ add-type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-Stop-Process -Id $kubectlMonShell.Id
+# Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "AppServicesLogonScript" -Confirm:$false
