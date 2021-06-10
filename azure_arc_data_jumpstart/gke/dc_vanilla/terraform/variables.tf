@@ -72,24 +72,6 @@ variable "ACCEPT_EULA" {
   default     = "yes"
 }
 
-variable "DOCKER_REGISTRY" {
-  description = "Azure Arc Data Container Registry"
-  type        = string
-  default     = "mcr.microsoft.com"
-}
-
-variable "DOCKER_REPOSITORY" {
-  description = "Azure Arc Data Container Registry Repository"
-  type        = string
-  default     = "arcdata"
-}
-
-variable "DOCKER_TAG" {
-  description = "Azure Arc Data Container Tag"
-  type        = string
-  default     = "latest"
-}
-
 variable "ARC_DC_NAME" {
   description = "Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for k8s namespace as well)."
   type        = string
@@ -128,4 +110,14 @@ variable "SPN_TENANT_ID" {
 variable "SPN_AUTHORITY" {
   description = "The Service Principal authority"
   type        = string
+}
+
+variable "deploy_SQLMI" {
+  description = "The Service Principal authority"
+  type        = bool
+}
+
+variable "deploy_PostgreSQL" {
+  description = "The Service Principal authority"
+  type        = bool
 }
