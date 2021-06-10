@@ -48,35 +48,35 @@ Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservice; Start-Sleep -Seconds 5; Clear-Host }}
 
 $namespace="appservices"
-# $kubeEnvironmentName="$env:clusterName-appsvc"
-# $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-# $workspaceIdBase64 = $([Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$workspaceId'")))
-# $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
-# $workspaceKeyBase64 = $([Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$workspaceKey'")))
+$kubeEnvironmentName="$env:clusterName-appsvc"
+$workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceIdBase64 = $([Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$workspaceId'")))
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
+$workspaceKeyBase64 = $([Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$workspaceKey'")))
 
 # $logAnalyticsKeyEnc=$(echo -n "${workspaceKeyBase64}")
 
 az network public-ip create --resource-group $env:resourceGroup --name "Arc-AppSvc-PIP" --sku STANDARD
 $publicIp=$(az network public-ip show --resource-group $env:resourceGroup --name "Arc-AppSvc-PIP" --output tsv --query ipAddress)
 
-az k8s-extension create `
-   --resource-group $env:resourceGroup `
-   --name arc-app-services `
-   --cluster-type connectedClusters `
-   --cluster-name $env:clusterName `
-   --extension-type 'Microsoft.Web.Appservice' `
-   --release-train stable `
-   --auto-upgrade-minor-version true `
-   --scope cluster `
-   --release-namespace $namespace `
-   --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
-   --configuration-settings "appsNamespace=$namespace" `
-   --configuration-settings "clusterName=$env:clusterName" `
-   --configuration-settings "keda.enabled=true" `
-   --configuration-settings "buildService.storageClassName=default" `
-   --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
-   --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
-   --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup"
+# az k8s-extension create `
+#    --resource-group $env:resourceGroup `
+#    --name arc-app-services `
+#    --cluster-type connectedClusters `
+#    --cluster-name $env:clusterName `
+#    --extension-type 'Microsoft.Web.Appservice' `
+#    --release-train stable `
+#    --auto-upgrade-minor-version true `
+#    --scope cluster `
+#    --release-namespace $namespace `
+#    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
+#    --configuration-settings "appsNamespace=$namespace" `
+#    --configuration-settings "clusterName=$env:clusterName" `
+#    --configuration-settings "keda.enabled=true" `
+#    --configuration-settings "buildService.storageClassName=default" `
+#    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
+#    --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
+#    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup"
 
 # az k8s-extension create `
 #    --resource-group $env:resourceGroup `
@@ -101,7 +101,7 @@ az k8s-extension create `
 #    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=$workspaceIdBase64" `
 #    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=$logAnalyticsKeyEnc"
 
-
+printf 
 
 # Do {
 #     Write-Host "Waiting for bootstrapper pod, hold tight..."
