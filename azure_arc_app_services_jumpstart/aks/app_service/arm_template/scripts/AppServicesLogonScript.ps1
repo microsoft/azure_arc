@@ -54,54 +54,38 @@ $workspaceIdBase64 = $([Convert]::ToBase64String([System.Text.Encoding]::Unicode
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 $workspaceKeyBase64 = $([Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("$workspaceKey'")))
 
-# $logAnalyticsKeyEnc=$(echo -n "${workspaceKeyBase64}")
+[String]$logAnalyticsWorkspaceIdEnc = $workspaceIdBase64
+"logAnalyticsWorkspaceIdEnc = {0}" -f $logAnalyticsWorkspaceIdEnc
+$logAnalyticsWorkspaceIdEnc
 
-az network public-ip create --resource-group $env:resourceGroup --name "Arc-AppSvc-PIP" --sku STANDARD
-$publicIp=$(az network public-ip show --resource-group $env:resourceGroup --name "Arc-AppSvc-PIP" --output tsv --query ipAddress)
+[String]$logAnalyticsWorkspaceKeyEnc = $workspaceKeyBase64
+"logAnalyticsWorkspaceKeyEnc = {0}" -f $logAnalyticsWorkspaceKeyEnc
+$logAnalyticsWorkspaceKeyEnc
 
-# az k8s-extension create `
-#    --resource-group $env:resourceGroup `
-#    --name arc-app-services `
-#    --cluster-type connectedClusters `
-#    --cluster-name $env:clusterName `
-#    --extension-type 'Microsoft.Web.Appservice' `
-#    --release-train stable `
-#    --auto-upgrade-minor-version true `
-#    --scope cluster `
-#    --release-namespace $namespace `
-#    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
-#    --configuration-settings "appsNamespace=$namespace" `
-#    --configuration-settings "clusterName=$env:clusterName" `
-#    --configuration-settings "keda.enabled=true" `
-#    --configuration-settings "buildService.storageClassName=default" `
-#    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
-#    --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
-#    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup"
 
-# az k8s-extension create `
-#    --resource-group $env:resourceGroup `
-#    --name arc-app-services `
-#    --cluster-type connectedClusters `
-#    --cluster-name $env:clusterName `
-#    --extension-type 'Microsoft.Web.Appservice' `
-#    --release-train stable `
-#    --auto-upgrade-minor-version true `
-#    --scope cluster `
-#    --release-namespace $namespace `
-#    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
-#    --configuration-settings "appsNamespace=$namespace" `
-#    --configuration-settings "clusterName=$env:clusterName" `
-#    --configuration-settings "loadBalancerIp=$publicIp" `
-#    --configuration-settings "keda.enabled=true" `
-#    --configuration-settings "buildService.storageClassName=default" `
-#    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
-#    --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
-#    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
-#    --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
-#    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=$workspaceIdBase64" `
-#    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=$logAnalyticsKeyEnc"
+az k8s-extension create `
+   --resource-group $env:resourceGroup `
+   --name arc-app-services `
+   --cluster-type connectedClusters `
+   --cluster-name $env:clusterName `
+   --extension-type 'Microsoft.Web.Appservice' `
+   --release-train stable `
+   --auto-upgrade-minor-version true `
+   --scope cluster `
+   --release-namespace $namespace `
+   --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
+   --configuration-settings "appsNamespace=$namespace" `
+   --configuration-settings "clusterName=$env:clusterName" `
+   --configuration-settings "loadBalancerIp=$publicIp" `
+   --configuration-settings "keda.enabled=true" `
+   --configuration-settings "buildService.storageClassName=default" `
+   --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
+   --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
+   --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
+   --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
+   --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=$logAnalyticsWorkspaceIdEnc" `
+   --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=$logAnalyticsWorkspaceKeyEnc"
 
-printf 
 
 # Do {
 #     Write-Host "Waiting for bootstrapper pod, hold tight..."
@@ -109,12 +93,12 @@ printf
 #     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
 #     } while ($podStatus -eq "Nope")
 
-$connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name appservice --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
-Start-Sleep -Seconds 20
-az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservice --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+# $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
+# $extensionId = az k8s-extension show --name appservice --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
+# Start-Sleep -Seconds 20
+# az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservice --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
-$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
+# $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 
 
 
