@@ -170,7 +170,46 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
                         }
-                    }
+                    },
+                    {
+                        "name": "allow_HTTP_80",
+                        "properties": {
+                            "priority": 1002,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "allow_HTTPS_443",
+                        "properties": {
+                            "priority": 1003,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "443"
+                        }
+                    },
+                    {
+                        "name": "allow_SQL_1433",
+                        "properties": {
+                            "priority": 1003,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "1433"
+                        }
+                    }                                         
                 ]
             }
         },
@@ -206,7 +245,10 @@
                         "properties": {
                             "addressPrefix": "[variables('subnetAddressPrefix')]",
                             "privateEndpointNetworkPolicies": "Enabled",
-                            "privateLinkServiceNetworkPolicies": "Enabled"
+                            "privateLinkServiceNetworkPolicies": "Enabled",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+                            }
                         }
                     }
                 ]
