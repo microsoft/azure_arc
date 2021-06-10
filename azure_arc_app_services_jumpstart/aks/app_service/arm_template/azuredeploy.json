@@ -63,7 +63,7 @@
       "type": "string",
       "defaultValue":"Arc-App-Service-AKS",
         "metadata": {
-          "description": "The name of the Managed Cluster resource."
+          "description": "The name of the Kubernetes cluster resource.."
       }
     },
     "dnsPrefix": {
@@ -156,6 +156,9 @@
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
           }          
         }
       }
