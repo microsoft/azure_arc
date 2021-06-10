@@ -200,7 +200,7 @@
                     {
                         "name": "allow_SQL_1433",
                         "properties": {
-                            "priority": 1003,
+                            "priority": 1004,
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
