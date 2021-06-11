@@ -9,6 +9,29 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 Write-Host "`n"
 
+
+
+
+
+
+# Attaching network secuirty group to the deployment virtual network subnet
+Write-Host "Attaching network secuirty group to the deployment virtual network subnet"
+$aksResourceGroupMC = "MC_${env:resourceGroup}_${env:clusterName}_${env:azureLocation}"
+$aksVnetMC = az network vnet list --resource-group $aksResourceGroupMC --query "[0].name" --output tsv
+$nsgName = az network nsg list --resource-group $aksResourceGroupMC --query "[0].name" --output tsv
+$subnetId = az network vnet subnet list --resource-group $aksResourceGroupMC --vnet-name $aksVnetMC --query "[0].id" --output tsv
+az network nsg create -g $aksResourceGroupMC -n $nsgName --output none
+az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-HTTP --destination-port-ranges 80 --priority 100 --output none
+az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-HTTPS --destination-port-ranges 443 --priority 101 --output none
+az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-SQL --destination-port-ranges 1433 --priority 102 --output none
+az network vnet subnet update --nsg $nsgName --ids $subnetId --output none
+
+# Creating Azure Public IP resource to be used by the Azure Arc app service
+Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
+Write-Host "`n"
+az network public-ip create --resource-group $aksResourceGroupMC --name "Arc-AppSvc-PIP" --sku STANDARD
+$staticIp = $(az network public-ip show --resource-group $aksResourceGroupMC --name "Arc-AppSvc-PIP" --output tsv --query ipAddress)
+
 # Registering Azure Arc providers
 Write-Host "Registering Azure Arc providers, hold tight..."
 Write-Host "`n"
@@ -50,11 +73,7 @@ Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 
-# Creating Azure Public IP resource to be used by the Azure Arc app service
-Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
-Write-Host "`n"
-az network public-ip create --resource-group $env:resourceGroup --name "Arc-AppSvc-PIP" --sku STANDARD
-$staticIp = $(az network public-ip show --resource-group $env:resourceGroup --name "Arc-AppSvc-PIP" --output tsv --query ipAddress)
+
 
 # Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
@@ -64,7 +83,7 @@ Start-Sleep -Seconds 10
 $namespace="appservices"
 
 $extensionName = "arc-app-services"
-$kubeEnvironmentName="$env:clusterName"
+$kubeEnvironmentName=$env:clusterName
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 $workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
