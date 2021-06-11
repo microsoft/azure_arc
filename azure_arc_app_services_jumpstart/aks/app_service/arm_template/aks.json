@@ -197,6 +197,9 @@
             "name": "ClusterSubnetRoleAssignmentDeployment",
             "apiVersion": "2019-10-01",
             "resourceGroup": "[parameters('resourceGroup')]",
+            "dependsOn": [
+                "[concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName'))]"
+            ],            
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -222,9 +225,6 @@
             "name": "[parameters('clusterName')]",
             "apiVersion": "2020-07-01",
             "location": "[parameters('location')]",
-            "dependsOn": [
-                "ClusterSubnetRoleAssignmentDeployment"
-            ],
             "identity": {
                 "type": "SystemAssigned"
             },
