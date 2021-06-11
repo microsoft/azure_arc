@@ -59,12 +59,6 @@
                 "description": "The size of the Virtual Machine."
             }
         },
-        "existingServicePrincipalObjectId": {
-            "type": "string",
-            "metadata": {
-                "description": "Oject ID against which the Network Contributor roles will be assigned on the subnet"
-            }
-        },
         "linuxAdminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
