@@ -217,7 +217,7 @@
             "apiVersion": "2017-05-01",
             "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, 'akstovnet'))]",
             "properties": {
-                "roleDefinitionId": "[variables('networkContributorRole')]",
+                "roleDefinitionId": "4d97b98b-1d4f-4787-a291-c67834d212e7",
                 "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters/', parameters('clusterName')), '2020-06-01', 'Full').identity.principalId]",
                 "scope": "[variables('subnetRef')]"
             }
