@@ -12,7 +12,7 @@
             "type": "string",
             "defaultValue": "Arc-AppSvc-SC",
             "metadata": {
-                "description": "The name of you Virtual Machine"
+                "description": "The name for the sidecar virtual machine"
             }
         },
         "windowsAdminUsername": {
