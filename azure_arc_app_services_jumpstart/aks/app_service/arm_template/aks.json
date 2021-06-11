@@ -53,7 +53,7 @@
             }
         },
         "agentVMSize": {
-            "defaultValue": "Standard_D2s_v3",
+            "defaultValue": "Standard_DS2_v2",
             "type": "string",
             "metadata": {
                 "description": "The size of the Virtual Machine."
