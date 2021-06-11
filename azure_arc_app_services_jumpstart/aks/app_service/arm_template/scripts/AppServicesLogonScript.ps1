@@ -16,6 +16,10 @@ az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 
+az provider show --namespace Microsoft.Kubernetes -o table
+az provider show --namespace Microsoft.KubernetesConfiguration -o table
+az provider show --namespace Microsoft.ExtendedLocation -o table
+
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
 Write-Host "`n"
@@ -84,6 +88,18 @@ Do {
    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
    } while ($logProcessorStatus -eq "Nope")
 
+Do {
+   Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
+   Start-Sleep -Seconds 45
+   $buildService = $(if(kubectl get pods -n appservices | Select-String "k8se-build-service" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+   } while ($buildService -eq "Nope")
+
+Do {
+   Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
+   Start-Sleep -Seconds 45
+   $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
+   } while ($logProcessorStatus -eq "Nope")
+
 $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
@@ -91,12 +107,7 @@ Start-Sleep -Seconds 20
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservice --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
 Write-Host "Custom Location ID is $($CustomLocationId)"
 
-
-# $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
-
-
-
-
+az appservice kube create -g $env:resourceGroup -n $kubeEnvironmentName --custom-location $CustomLocationId --static-ip "$staticIp" --output none -l $env:azureLocation
 
 
 # Changing to Client VM wallpaper
