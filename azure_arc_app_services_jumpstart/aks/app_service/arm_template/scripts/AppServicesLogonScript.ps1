@@ -107,7 +107,7 @@ Start-Sleep -Seconds 20
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservice --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
 Write-Host "Custom Location ID is $($CustomLocationId)"
 
-az appservice kube create -g $env:resourceGroup -n $kubeEnvironmentName --custom-location $CustomLocationId --static-ip "$staticIp" --output none -l $env:azureLocation
+az appservice kube create -g $env:resourceGroup -n $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --output none -l $env:azureLocation
 
 
 # Changing to Client VM wallpaper
