@@ -66,7 +66,7 @@ sudo -u $adminUsername az extension add --upgrade -n storage-preview
 
 # Localizing to Staging Storage Account
 storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
-storageContainerName="staging-capi"
+storageContainerName="staging"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 
 # Set Kubeconfig - export from microk8s
