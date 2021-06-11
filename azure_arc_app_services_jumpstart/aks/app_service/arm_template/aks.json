@@ -152,7 +152,11 @@
             "tags": {},
             "identity": {
                 "type": "SystemAssigned"
-            }
+            },
+            "servicePrincipalProfile": {
+                "clientId": "[parameters('spnClientId')]",
+                "Secret": "[parameters('spnClientSecret')]"
+            }            
             }
         }
     ],
