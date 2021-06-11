@@ -148,6 +148,7 @@
         },
         "virtualNetworkName": {
             "type": "string",
+            "defaultValue": "Arc-AppSvc-VNet",
             "metadata": {
               "description": "Name of an existing VNET that will contain this AKS deployment."
             }
@@ -161,6 +162,7 @@
         },
         "subnetName": {
             "type": "string",
+            "defaultValue": "Arc-AppSvc-Subnet",
             "metadata": {
                 "description": "Subnet name that will contain the App Service Environment"
             }
