@@ -123,6 +123,7 @@
                 "agentPoolProfiles": [
                     {
                         "name": "agentpool",
+                        "mode": "System",
                         "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
                         "count": "[parameters('agentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
