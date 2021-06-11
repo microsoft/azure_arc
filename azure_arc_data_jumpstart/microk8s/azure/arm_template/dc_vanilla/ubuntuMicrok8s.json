@@ -10,7 +10,7 @@
     },
     "vmName": {
       "type": "string",
-      "defaultValue": "Arc-Data-CAPI-K8s",
+      "defaultValue": "Arc-Data-Microk8s-K8s",
       "metadata": {
         "description": "The name of you Virtual Machine."
       }
@@ -45,28 +45,28 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_D4s_v3",
+      "defaultValue": "Standard_D8s_v3",
       "metadata": {
         "description": "The size of the VM"
       }
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "Arc-Data-CAPI-VNet",
+      "defaultValue": "Arc-Data-Microk8s-VNet",
       "metadata": {
         "description": "Name of the VNet"
       }
     },
     "subnetName": {
       "type": "string",
-      "defaultValue": "Arc-Data-CAPI-Subnet",
+      "defaultValue": "Arc-Data-Microk8s-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
     "networkSecurityGroupName": {
       "type": "string",
-      "defaultValue": "Arc-Data-CAPI-K8s-NSG",
+      "defaultValue": "Arc-Data-Microk8s-K8s-NSG",
       "metadata": {
         "description": "Name of the Network Security Group"
       }
@@ -99,6 +99,13 @@
       "type": "string",
       "metadata": {
         "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
+      }
+    },
+    "templateBaseUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/mdrakiburrahman/azure_arc/microk8s-data/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/",
+      "metadata": {
+        "description": "Base URL for ARM template"
       }
     }
   },
@@ -255,7 +262,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(variables('vmName'),'/installscript_CAPI')]",
+      "name": "[concat(variables('vmName'),'/installscript_Microk8s')]",
       "apiVersion": "2019-07-01",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
@@ -268,9 +275,9 @@
         "autoUpgradeMinorVersion": true,
         "settings": {},
         "protectedSettings": {
-          "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
+          "commandToExecute": "[concat('bash install_microk8s.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
           "fileUris": [
-            "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/installCAPI.sh"
+            "[uri(parameters('templateBaseUrl'), 'scripts/install_microk8s.sh')]"
           ]
         }
       }
