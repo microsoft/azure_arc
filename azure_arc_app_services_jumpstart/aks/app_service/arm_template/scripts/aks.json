@@ -217,7 +217,7 @@
                             "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
-                                "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('vmName')), '2017-03-30', 'Full').identity.principalId]",
+                                "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('vmName')), '2019-03-01', 'Full').identity.principalId]",
                                 "scope": "[variables('vnetSubnetId')]"
                             }
                         }
