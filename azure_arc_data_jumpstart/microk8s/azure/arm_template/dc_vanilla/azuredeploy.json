@@ -54,8 +54,8 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/",
-    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuCapi.json')]",
+    "templateBaseUrl": "https://raw.githubusercontent.com/mdrakiburrahman/azure_arc/microk8s-data/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/",
+    "microk8sTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuMicrok8s.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmtStagingStorage.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"
@@ -63,13 +63,14 @@
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys a single node Ubuntu VM with Microk8s installed",
       "apiVersion": "2019-10-01",
-      "name": "ubuntuCAPIDeployment",
+      "name": "ubuntuMicrok8sDeployment",
       "dependsOn": ["stagingStorageAccountDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('capiTemplateUrl')]",
+          "uri": "[variables('microk8sTemplateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -90,12 +91,16 @@
           },
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
           }
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys the sidecar Windows VM",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
       "dependsOn": ["stagingStorageAccountDeployment"],
