@@ -2,6 +2,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "myIpAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Your public IP address, used to ssh to the AKS nodes (if needed)"
+            }
+        },        
         "clusterName": {
             "type": "string",
             "metadata": {
@@ -52,11 +58,30 @@
                 "description": "Oject ID against which the Network Contributor roles will be assigned on the subnet"
             }
         },
+        "linuxAdminUsername": {
+            "type": "string",
+            "defaultValue": "arcdemo",
+            "metadata": {
+                "description": "User name for the Linux Virtual Machines."
+            }
+        },
+        "sshRSAPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+            }
+        },        
         "spnClientId": {
             "type": "string",
             "metadata": {
                 "description": "Client ID (used by cloudprovider)"
             }
+        },
+        "spnClientSecret": {
+            "metadata": {
+                "description": "The Service Principal Client Secret."
+            },
+            "type": "securestring"
         },
         "osType": {
             "defaultValue": "Linux",
@@ -235,6 +260,16 @@
                     "serviceCidr": "[parameters('serviceCidr')]",
                     "dnsServiceIP": "[parameters('dnsServiceIP')]",
                     "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]"
+                },
+                "linuxProfile": {
+                    "adminUsername": "[parameters('linuxAdminUsername')]",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('sshRSAPublicKey')]"
+                            }
+                        ]
+                    }
                 }
             }
         }
