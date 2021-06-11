@@ -98,12 +98,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "spnClientId": {
-            "value": "[parameters('spnClientId')]"
-          },
-          "spnClientSecret": {
-            "value": "[parameters('spnClientSecret')]"
-          },
           "myIpAddress": {
             "value": "[parameters('myIpAddress')]"
           },          
