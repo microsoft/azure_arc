@@ -128,7 +128,8 @@
                         "count": "[parameters('agentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('osType')]",
-                        "storageProfile": "ManagedDisks"
+                        "storageProfile": "ManagedDisks",
+                        "type": "VirtualMachineScaleSets"
                     }
                 ],
                 "linuxProfile": {
