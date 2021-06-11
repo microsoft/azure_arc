@@ -15,10 +15,16 @@ Write-Host "`n"
 az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.Web --wait
 
 az provider show --namespace Microsoft.Kubernetes -o table
+Write-Host "`n"
 az provider show --namespace Microsoft.KubernetesConfiguration -o table
+Write-Host "`n"
 az provider show --namespace Microsoft.ExtendedLocation -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.Web -o table
+Write-Host "`n"
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
@@ -58,7 +64,7 @@ Start-Sleep -Seconds 10
 $namespace="appservices"
 
 $extensionName = "arc-app-services"
-$kubeEnvironmentName="$env:clusterName-appsvc"
+$kubeEnvironmentName="$env:clusterName"
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 $workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
@@ -100,13 +106,11 @@ Do {
    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
    } while ($logProcessorStatus -eq "Nope")
 
+Write-Host "Deploying App Service Kubernetes Environment"
+Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
-Start-Sleep -Seconds 20
-
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservice --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
-Write-Host "Custom Location ID is $($CustomLocationId)"
-
 az appservice kube create -g $env:resourceGroup -n $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --output none -l $env:azureLocation
 
 
