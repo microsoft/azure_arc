@@ -143,6 +143,9 @@
                 },
             "identity": {
                 "type": "SystemAssigned"
+            },
+            "servicePrincipalProfile": {
+                "clientId": "msi"
             }
             }
         }
