@@ -152,7 +152,6 @@
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
       ],
       "properties": {
