@@ -206,7 +206,7 @@
                         {
                             "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",
                             "apiVersion": "2020-04-01-preview",
-                            "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
+                            "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, parameters('clusterName'), 'Network Contributor'))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
                                 "principalId": "[reference(concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName')), '2020-04-01', 'Full').identity.principalId]",
