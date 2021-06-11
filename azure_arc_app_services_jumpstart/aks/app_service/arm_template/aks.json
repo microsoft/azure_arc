@@ -157,14 +157,14 @@
             "type": "string",
             "defaultValue": "Arc-AppSvc-SC",
             "metadata": {
-                "description": "The name for the sidecar virtual machine"
+                "description": "The name for the sidecar virtual machine."
             }
         },
         "subnetName": {
             "type": "string",
             "defaultValue": "Arc-AppSvc-Subnet",
             "metadata": {
-                "description": "Subnet name that will contain the App Service Environment"
+                "description": "Subnet name that will contain the App Service Environment."
             }
         },
         "serviceCidr": {
@@ -183,7 +183,7 @@
         },
         "dockerBridgeCidr": {
             "type": "string",
-            "defaultValue": "172.17.0.1/16",
+            "defaultValue": "172.16.0.0/16",
             "metadata": {
                 "description": "A CIDR notation IP for Docker bridge."
             }
@@ -196,8 +196,7 @@
         "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "Network Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')]"
         },
-        "vnetSubnetId": "[resourceId(parameters('resourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]",
-        "vmName": "[resourceId(parameters('vmName'),'Microsoft.Compute/virtualMachines',parameters('vmName'))]"
+        "vnetSubnetId": "[resourceId(parameters('resourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]"
     },
     "resources": [
             {
@@ -253,7 +252,7 @@
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('osType')]",
                         "storageProfile": "ManagedDisks",
-                        "vnetSubnetID": "[variables('vnetSubnetID')]",
+                        "vnetSubnetID": "[variables('vnetSubnetId')]",
                         "maxPods": "[parameters('maxPods')]",
                         "mode" : "System"
                     }
