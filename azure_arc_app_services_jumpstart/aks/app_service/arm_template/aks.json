@@ -157,10 +157,11 @@
               "description": "Name of an existing VNET that will contain this AKS deployment."
             }
         },
-        "existingVirtualNetworkResourceGroup": {
+        "vmName": {
             "type": "string",
+            "defaultValue": "Arc-AppSvc-SC",
             "metadata": {
-              "description": "Name of the existing VNET resource group"
+                "description": "The name for the sidecar virtual machine"
             }
         },
         "subnetName": {
@@ -198,7 +199,8 @@
         "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "Network Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')]"
         },
-        "vnetSubnetId": "[resourceId(parameters('resourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]"
+        "vnetSubnetId": "[resourceId(parameters('resourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]",
+        "vmName": "[resourceId(parameters('vmName'),'Microsoft.Compute/virtualMachines',parameters('vmName'))]"
     },
     "resources": [
             {
@@ -218,7 +220,7 @@
                             "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
-                                "principalId": "[parameters('existingServicePrincipalObjectId')]",
+                                "principalId": "[reference(concat('Microsoft.Compute/virtualMachines/', variables('vmName')), '2017-03-30', 'Full').identity.principalId]",
                                 "scope": "[variables('vnetSubnetId')]"
                             }
                         }
