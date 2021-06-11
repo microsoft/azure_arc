@@ -107,6 +107,13 @@
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_app_services"
             }
+        },
+        "identity": {
+        "type": "string",
+        "defaultValue": "SystemAssigned",
+        "metadata": {
+            "description": "Type of cluster managed identity"
+        }
         }
     },
     "resources": [
