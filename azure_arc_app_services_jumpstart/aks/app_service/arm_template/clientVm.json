@@ -116,8 +116,8 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "subnetAddressPrefix": "172.16.1.0/24",
-        "addressPrefix": "172.16.0.0/16",
+        "subnetAddressPrefix": "10.240.0.0/16",
+        "addressPrefix": "10.240.0.0/16",
         "osDiskType": "Premium_LRS",
         "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/"
     },
