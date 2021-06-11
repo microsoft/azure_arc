@@ -141,6 +141,7 @@
                 "Reader",
                 "Network Contributor"
             ],
+            "defaultValue": "Network Contributor",
             "metadata": {
                 "description": "Built-in role to assign"
             }
