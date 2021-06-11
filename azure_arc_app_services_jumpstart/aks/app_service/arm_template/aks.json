@@ -209,13 +209,73 @@
                             "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
-                                "principalId": "[reference(concat('Microsoft.Network/virtualNetworks/subnets', variables('vnetSubnetId')), '2019-03-01', 'Full').identity.principalId]",
+                                "principalId": "[reference(concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName')), '2020-04-01', 'Full').identity.principalId]",
                                 "scope": "[variables('vnetSubnetId')]"
                             }
                         }
                     ]
                 }
             }
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "name": "[parameters('clusterName')]",
+            "apiVersion": "2020-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "ClusterSubnetRoleAssignmentDeployment"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "enableRBAC": "[parameters('enableRBAC')]",
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "addonProfiles": {
+                    "httpApplicationRouting": {
+                        "enabled": "[parameters('enableHttpApplicationRouting')]"
+                    }
+                },
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                        "count": "[parameters('agentCount')]",
+                        "vmSize": "[parameters('agentVMSize')]",
+                        "osType": "[parameters('osType')]",
+                        "storageProfile": "ManagedDisks",
+                        "vnetSubnetID": "[variables('vnetSubnetId')]",
+                        "maxPods": "[parameters('maxPods')]",
+                        "mode" : "System"
+                    }
+                ],
+                "servicePrincipalProfile": {
+                    "clientId": "[parameters('spnClientId')]"
+                },
+                "networkProfile": {
+                    "networkPlugin": "[parameters('networkPlugin')]",
+                    "serviceCidr": "[parameters('serviceCidr')]",
+                    "dnsServiceIP": "[parameters('dnsServiceIP')]",
+                    "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]"
+                },
+                "linuxProfile": {
+                    "adminUsername": "[parameters('linuxAdminUsername')]",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('sshRSAPublicKey')]"
+                            }
+                        ]
+                    }
+                }
+            }
         }
-    ]
+    ],
+    "outputs": {
+        "controlPlaneFQDN": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('clusterName'))).fqdn]"
+        }
+    }
 }
