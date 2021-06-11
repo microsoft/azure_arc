@@ -68,8 +68,6 @@ Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 
-
-
 # Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
