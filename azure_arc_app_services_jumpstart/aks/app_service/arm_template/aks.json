@@ -153,13 +153,6 @@
               "description": "Name of an existing VNET that will contain this AKS deployment."
             }
         },
-        "vmName": {
-            "type": "string",
-            "defaultValue": "Arc-AppSvc-SC",
-            "metadata": {
-                "description": "The name for the sidecar virtual machine."
-            }
-        },
         "subnetName": {
             "type": "string",
             "defaultValue": "Arc-AppSvc-Subnet",
@@ -231,7 +224,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "ClusterSubnetRoleAssignmentDeployment",
-                "[reference(concat('Microsoft.Network/virtualNetworks/subnets', variables('vnetSubnetId')))]"
+                "Microsoft.Network/virtualNetworks/Arc-AppSvc-VNet"
             ],
             "identity": {
                 "type": "SystemAssigned"
