@@ -145,7 +145,8 @@
                 "type": "SystemAssigned"
             },
             "servicePrincipalProfile": {
-                "clientId": "msi"
+                "clientId": "[parameters('spnClientId')]",
+                "Secret": "[parameters('spnClientSecret')]"
             }
             }
         }
