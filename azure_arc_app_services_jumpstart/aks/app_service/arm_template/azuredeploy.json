@@ -78,6 +78,13 @@
       "metadata": {
         "description": "User name for the Linux Virtual Machines."
       }
+    },
+    "identity": {
+      "type": "string",
+      "defaultValue": "SystemAssigned",
+      "metadata": {
+        "description": "Type of cluster managed identity"
+      }
     }
   },
   "variables": {
@@ -121,7 +128,10 @@
           },
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
-          }          
+          },
+          "identity": {
+            "value": "[parameters('identity')]"
+          }
         }
       }
     },
