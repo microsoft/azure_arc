@@ -60,6 +60,12 @@ Disable-ieESC
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
+# Downloading Github artifacts for DataServicesLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "scripts/DataServicesLogonScript.ps1") -OutFile "C:\Temp\DataServicesLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "scripts/dataController.json") -OutFile "C:\Temp\dataController.json"
+Invoke-WebRequest ($templateBaseUrl + "scripts/dataController.parameters.json") -OutFile "C:\Temp\dataController.parameters.json"                 
+Invoke-WebRequest ($templateBaseUrl + "scripts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
+
 # Installing tools
 workflow ClientTools_01
         {
@@ -94,10 +100,6 @@ workflow ClientTools_01
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
-                    Invoke-WebRequest ($templateBaseUrl + "scripts/DataServicesLogonScript.ps1") -OutFile "C:\Temp\DataServicesLogonScript.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "scripts/dataController.json") -OutFile "C:\Temp\dataController.json"
-                    Invoke-WebRequest ($templateBaseUrl + "scripts/dataController.parameters.json") -OutFile "C:\Temp\dataController.parameters.json"                 
-                    Invoke-WebRequest ($templateBaseUrl + "scripts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
