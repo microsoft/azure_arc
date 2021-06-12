@@ -166,7 +166,7 @@
                             "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
-                                "principalId": "[reference(resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName')), '2019-02-01', 'Full').identity.principalId]",
+                                "principalId": "[reference(resourceId('Microsoft.Network/virtualNetworks/subnets', variables('subnetRef')), '2019-03-01', 'Full').identity.principalId]",
                                 "scope": "[variables('subnetRef')]"
                             }
                         }
