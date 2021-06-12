@@ -207,7 +207,7 @@
                             "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, parameters('clusterName'), 'Network Contributor'))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
-                                "principalId": "[reference(concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName')), '2020-04-01', 'Full').identity.principalId]",
+                                "principalId": "[reference(concat('Microsoft.Network/virtualNetworks/subnets', variables('vnetSubnetId')), '2019-03-01', 'Full').identity.principalId]",
                                 "scope": "[variables('vnetSubnetId')]"
                             }
                         }
@@ -222,7 +222,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "ClusterSubnetRoleAssignmentDeployment"
-            ],            
+            ],
             "identity": {
                 "type": "SystemAssigned"
             },
