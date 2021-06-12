@@ -145,6 +145,13 @@
                 "description": "Built-in role to assign"
             }
         },
+        "existingServicePrincipalObjectId": {
+            "type": "string",
+            "defaultValue": "[reference(concat('Microsoft.Network/virtualNetworks/subnets', variables('vnetSubnetId')), '2019-03-01', 'Full').identity.principalId]",
+            "metadata": {
+                "description": "Oject ID against which the Network Contributor roles will be assigned on the subnet"
+            }
+        },        
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "Arc-AppSvc-VNet",
@@ -204,10 +211,10 @@
                         {
                             "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",
                             "apiVersion": "2020-04-01-preview",
-                            "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, parameters('clusterName'), 'Network Contributor'))]",
+                            "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
-                                "principalId": "[reference(concat('Microsoft.Network/virtualNetworks/subnets', variables('vnetSubnetId')), '2019-03-01', 'Full').identity.principalId]",
+                                "principalId": "[parameters('existingServicePrincipalObjectId')]",
                                 "scope": "[variables('vnetSubnetId')]"
                             }
                         }
