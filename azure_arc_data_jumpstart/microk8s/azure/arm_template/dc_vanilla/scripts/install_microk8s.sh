@@ -70,10 +70,11 @@ storageContainerName="staging"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 
 # Set Kubeconfig - export from microk8s
-sudo chown -R $adminUsername /home/${adminUsername}/.kube/
-kubeconfigPath="/home/${adminUsername}/.kube/config"
-sudo microk8s config view > $kubeconfigPath
+kubeconfigPath="/home/${adminUsername}/.kube"
+mkdir -p $kubeconfigPath
+sudo chown -R $adminUsername $kubeconfigPath
+sudo microk8s config view > "$kubeconfigPath/config"
 
 # Create container, and copy kubeconfig file to staging storage account
 sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
-sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $kubeconfigPath
+sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source "$kubeconfigPath/config"
