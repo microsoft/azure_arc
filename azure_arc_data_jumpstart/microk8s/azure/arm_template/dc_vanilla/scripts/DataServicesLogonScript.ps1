@@ -53,10 +53,29 @@ azdata --version
 # Onboarding the Microk8s cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
-az connectedk8s connect --name "Arc-Data-Microk8s-K8s" --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+
+# Create Kubernetes - Azure Arc Cluster
+az connectedk8s connect --name "Arc-Data-Microk8s-K8s" `
+                        --resource-group $env:resourceGroup `
+                        --location $env:azureLocation `
+                        --tags 'Project=jumpstart_azure_arc_data' `
+                        --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+
 Start-Sleep -Seconds 10
+
+# Monitor pods across namespaces
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name 'Arc-Data-Microk8s-K8s' --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+
+
+az k8s-extension create --name arc-data-services `
+                        --extension-type microsoft.arcdataservices `
+                        --cluster-type connectedClusters `
+                        --cluster-name 'Arc-Data-Microk8s-K8s' `
+                        --resource-group $env:resourceGroup `
+                        --auto-upgrade false `
+                        --scope cluster `
+                        --release-namespace arc `
+                        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
@@ -65,9 +84,20 @@ Do {
     } while ($podStatus -eq "Nope")
 
 $connectedClusterId = az connectedk8s show --name 'Arc-Data-Microk8s-K8s' --resource-group $env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name 'Arc-Data-Microk8s-K8s' --resource-group $env:resourceGroup --query id -o tsv
+
+$extensionId = az k8s-extension show --name arc-data-services `
+                                     --cluster-type connectedClusters `
+                                     --cluster-name 'Arc-Data-Microk8s-K8s' `
+                                     --resource-group $env:resourceGroup `
+                                     --query id -o tsv
+
 Start-Sleep -Seconds 20
-az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+
+az customlocation create --name 'jumpstart-cl' `
+                         --resource-group $env:resourceGroup `
+                         --namespace arc `
+                         --host-resource-id $connectedClusterId `
+                         --cluster-extension-ids $extensionId
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
