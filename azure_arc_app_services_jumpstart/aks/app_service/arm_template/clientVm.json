@@ -14,13 +14,6 @@
             "metadata": {
                 "description": "The name for the sidecar virtual machine"
             }
-        },
-        "resourceGroup": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().name]",
-            "metadata": {
-                "description": "Location for all resources"
-            }
         },        
         "windowsAdminUsername": {
             "type": "string",
