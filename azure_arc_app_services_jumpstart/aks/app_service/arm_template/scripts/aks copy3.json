@@ -20,7 +20,7 @@
             "metadata": {
                 "description": "Location for all resources"
             }
-        },
+        },        
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
@@ -190,11 +190,39 @@
         "vnetSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]"
     },
     "resources": [
+            {
+            "type": "Microsoft.Resources/deployments",
+            "name": "ClusterSubnetRoleAssignmentDeployment",
+            "apiVersion": "2019-10-01",
+            "resourceGroup": "[parameters('resourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",
+                            "apiVersion": "2020-04-01-preview",
+                            "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
+                            "properties": {
+                                "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
+                                "principalId": "[reference(concat('Microsoft.Network/virtualNetworks/subnets', variables('vnetSubnetId')), '2019-03-01', 'Full').identity.principalId]",
+                                "scope": "[variables('vnetSubnetId')]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
         {
             "type": "Microsoft.ContainerService/managedClusters",
             "name": "[parameters('clusterName')]",
             "apiVersion": "2020-07-01",
             "location": "[parameters('location')]",
+            "dependsOn": [
+                "ClusterSubnetRoleAssignmentDeployment"
+            ],
             "identity": {
                 "type": "SystemAssigned"
             },
