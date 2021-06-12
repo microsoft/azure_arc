@@ -15,6 +15,13 @@
                 "description": "The name for the sidecar virtual machine"
             }
         },
+        "resourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Location for all resources"
+            }
+        },        
         "windowsAdminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
@@ -109,6 +116,18 @@
             "metadata": {
                 "description": "The name of the Kubernetes cluster resource.."
             }
+        },
+        "builtInRoleType": {
+            "type": "string",
+            "allowedValues": [
+                "Owner",
+                "Contributor",
+                "Reader"
+            ],
+            "defaultValue": "Contributor",
+            "metadata": {
+                "description": "Built-in role to assign"
+            }
         }
     },
     "variables": {
@@ -119,9 +138,42 @@
         "subnetAddressPrefix": "10.240.0.0/16",
         "addressPrefix": "10.240.0.0/16",
         "osDiskType": "Premium_LRS",
-        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/"
+        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/",
+        "builtInRole":{
+            "Owner":"[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+            "Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+            "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]"
+        }
     },
     "resources": [
+            {
+            "type": "Microsoft.Resources/deployments",
+            "name": "ClusterSubnetRoleAssignmentDeployment",
+            "apiVersion": "2019-10-01",
+            "resourceGroup": "[parameters('resourceGroup')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",
+                            "apiVersion": "2020-04-01-preview",
+                            "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
+                            "properties": {
+                                "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
+                                "principalId": "[reference(concat('Microsoft.Network/virtualNetworks/subnets', variables('subnetRef')), '2019-03-01', 'Full').identity.principalId]",
+                                "scope": "[variables('subnetRef')]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-10-01",
