@@ -138,10 +138,9 @@
             "allowedValues": [
                 "Owner",
                 "Contributor",
-                "Reader",
-                "Network Contributor"
+                "Reader"
             ],
-            "defaultValue": "Network Contributor",
+            "defaultValue": "Contributor",
             "metadata": {
                 "description": "Built-in role to assign"
             }
@@ -186,8 +185,7 @@
         "builtInRole":{
         "Owner":"[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
         "Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-        "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
-        "Network Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')]"
+        "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]"
         },
         "vnetSubnetId": "[resourceId(parameters('resourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]"
     },
@@ -197,9 +195,6 @@
             "name": "ClusterSubnetRoleAssignmentDeployment",
             "apiVersion": "2019-10-01",
             "resourceGroup": "[parameters('resourceGroup')]",
-            "dependsOn": [
-                "[concat('Microsoft.ContainerService/managedClusters/', parameters('clusterName'))]"
-            ],            
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -225,6 +220,9 @@
             "name": "[parameters('clusterName')]",
             "apiVersion": "2020-07-01",
             "location": "[parameters('location')]",
+            "dependsOn": [
+                "ClusterSubnetRoleAssignmentDeployment"
+            ],            
             "identity": {
                 "type": "SystemAssigned"
             },
