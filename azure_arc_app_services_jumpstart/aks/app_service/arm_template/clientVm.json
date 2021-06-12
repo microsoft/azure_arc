@@ -152,7 +152,7 @@
             "apiVersion": "2019-10-01",
             "resourceGroup": "[parameters('resourceGroup')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+                "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -166,7 +166,7 @@
                             "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
-                                "principalId": "[reference(resourceId('Microsoft.Network/virtualNetworks/subnets', variables('subnetRef')), '2019-03-01', 'Full').identity.principalId]",
+                                "principalId": "[reference(resourceId('Microsoft.Compute/virtualMachines', variables('vmName')), '2019-03-01', 'Full').identity.principalId]",
                                 "scope": "[variables('subnetRef')]"
                             }
                         }
