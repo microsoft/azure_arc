@@ -207,7 +207,7 @@
                             "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
                             "properties": {
                                 "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
-                                "principalId": "[reference(resourceId(parameters('resourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName')),'2019-04-01','Full').properties.principalId]",
+                                "principalId": "[reference(concat(parameters('resourceGroup'), 'Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName')),'2019-04-01','Full').properties.principalId]",
                                 "scope": "[variables('vnetSubnetId')]"
                             }
                         }
