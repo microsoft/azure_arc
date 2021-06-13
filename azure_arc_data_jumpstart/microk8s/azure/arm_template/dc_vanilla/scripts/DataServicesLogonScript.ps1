@@ -54,6 +54,9 @@ azdata --version
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 
+# Monitor pods across namespaces
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
+
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name "Arc-Data-Microk8s-K8s" `
                         --resource-group $env:resourceGroup `
@@ -62,10 +65,6 @@ az connectedk8s connect --name "Arc-Data-Microk8s-K8s" `
                         --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 
 Start-Sleep -Seconds 10
-
-# Monitor pods across namespaces
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
-
 
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
