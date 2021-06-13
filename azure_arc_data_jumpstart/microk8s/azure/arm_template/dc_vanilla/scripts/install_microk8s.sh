@@ -56,7 +56,14 @@ sudo snap alias microk8s.kubectl kubectl
 
 # Enable microk8s features
 sudo microk8s status --wait-ready
-sudo microk8s enable storage dns ingress helm3 dashboard
+
+# Set to Azure DNS: https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-name-resolution-for-vms-and-role-instances#considerations
+microk8s enable dns:168.63.129.16
+
+sleep 5
+
+# Enable other add-ons
+sudo microk8s enable storage ingress helm3 dashboard
 
 echo "###########################################################################"
 echo "Networking enablement..." 
