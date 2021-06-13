@@ -51,29 +51,25 @@ sudo apt install snapd
 # Installing microk8s from specific snap channel
 sudo snap install microk8s --classic --channel=1.18/stable
 
+#use docker, kubectl from microk8s
+sudo snap alias microk8s.docker docker
+sudo snap alias microk8s.kubectl kubectl
+
 # Enable microk8s features
 sudo microk8s status --wait-ready
-sudo microk8s enable rbac storage dns helm3 dashboard
+sudo microk8s enable storage dns ingress helm3 dashboard
 
 echo "###########################################################################"
-echo "Installing other add ons to Kubernetes..." 
+echo "Misc..." 
 echo "###########################################################################"
 
-# Enable other add-ons
-# --------------------
-sleep 15
+sleep 10
 
-# Add rbac
-echo "Adding RBAC..." 
-sudo microk8s kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
+#avoid dns crashlooping
+sudo ufw allow in on cbr0 && sudo ufw allow out on cbr0
 
-# Add certificates
-echo "Adding certs..." 
-sudo apt-get install gnupg ca-certificates curl wget software-properties-common apt-transport-https lsb-release -y
-curl -sL https://packages.microsoft.com/keys/microsoft.asc |
-gpg --dearmor |
-sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
-sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/18.04/prod.list)"
+#make sure iptables allow outbound traffic
+sudo iptables -P FORWARD ACCEPT
 
 echo "###########################################################################"
 echo "Upload kubeconfig to Storage..." 
