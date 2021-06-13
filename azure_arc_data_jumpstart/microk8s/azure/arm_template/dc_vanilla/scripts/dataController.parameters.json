@@ -65,19 +65,19 @@
       "value": "arcdata"
     },
     "dataStorageClass": {
-      "value": "local-storage"
+      "value": "microk8s-hostpath"
     },
     "dataStorageSize": {
       "value": "15Gi"
     },
     "logsStorageClass": {
-      "value": "local-storage"
+      "value": "microk8s-hostpath"
     },
     "logsStorageSize": {
       "value": "10Gi"
     },
     "serviceType": {
-      "value": "LoadBalancer"
+      "value": "NodePort"
     },
     "controllerPort": {
       "value": 30080
