@@ -49,7 +49,7 @@ sudo apt-get update
 sudo apt install snapd
 
 # Installing microk8s from specific snap channel
-sudo snap install microk8s --classic --channel=1.18/stable
+sudo snap install microk8s --classic --channel=1.21/stable
 
 #use docker, kubectl from microk8s
 sudo snap alias microk8s.docker docker
