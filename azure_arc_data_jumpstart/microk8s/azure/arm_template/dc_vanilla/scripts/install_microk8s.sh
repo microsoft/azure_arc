@@ -40,7 +40,7 @@ az -v
 echo ""
 
 echo "###########################################################################"
-echo "Installing packages..." 
+echo "Installing snap and microk8s..." 
 echo "###########################################################################"
 # Sync packages
 sudo apt-get update
@@ -48,18 +48,39 @@ sudo apt-get update
 # Installing snap
 sudo apt install snapd
 
-# Installing kubectl
-sudo snap install kubectl --classic
-
-# Installing microk8s
-sudo snap install microk8s --classic --channel=1.20/stable
+# Installing microk8s from specific snap channel
+sudo snap install microk8s --classic --channel=1.18/stable
 
 # Enable microk8s features
 sudo microk8s status --wait-ready
-sudo microk8s enable storage dns helm3 dashboard
+sudo microk8s enable storage dns helm3 dashboard rbac
+
+echo "###########################################################################"
+echo "Installing other add ons to Kubernetes..." 
+echo "###########################################################################"
 
 # Enable other add-ons
-sudo microk8s enable cilium helm host-access multus
+echo "Adding taint..." 
+master_node=`sudo microk8s kubectl get nodes --no-headers=true --output=custom-columns=NAME:.metadata.name`
+
+# Add taint: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+sudo microk8s kubectl taint nodes ${master_node} node-role.kubernetes.io/master:NoSchedule-
+
+# Add flannel
+echo "Adding flannel..." 
+sudo microk8s kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+# Add rbac
+echo "Adding RBAC..." 
+sudo microk8s kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
+
+# Add certificates
+echo "Adding certs..." 
+sudo apt-get install gnupg ca-certificates curl wget software-properties-common apt-transport-https lsb-release -y
+curl -sL https://packages.microsoft.com/keys/microsoft.asc |
+gpg --dearmor |
+sudo tee /etc/apt/trusted.gpg.d/microsoft.asc.gpg > /dev/null
+sudo add-apt-repository "$(wget -qO- https://packages.microsoft.com/config/ubuntu/18.04/prod.list)"
 
 echo "###########################################################################"
 echo "Upload kubeconfig to Storage..." 
