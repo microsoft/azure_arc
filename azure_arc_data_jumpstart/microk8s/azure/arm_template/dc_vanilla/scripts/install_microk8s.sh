@@ -53,7 +53,7 @@ sudo snap install microk8s --classic --channel=1.18/stable
 
 # Enable microk8s features
 sudo microk8s status --wait-ready
-sudo microk8s enable storage dns helm3 dashboard rbac
+sudo microk8s enable rbac storage dns helm3 dashboard
 
 echo "###########################################################################"
 echo "Installing other add ons to Kubernetes..." 
