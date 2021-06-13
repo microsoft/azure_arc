@@ -77,10 +77,10 @@ sleep 10
 # From here: https://github.com/ubuntu/microk8s/issues/140
 # --------------------------------------------------------
 # Avoid dns crashlooping
-sudo ufw allow in on cbr0 && sudo ufw allow out on cbr0
+# sudo ufw allow in on cbr0 && sudo ufw allow out on cbr0
 
 #make sure iptables allow outbound traffic
-sudo iptables -P FORWARD ACCEPT
+# sudo iptables -P FORWARD ACCEPT
 
 echo "###########################################################################"
 echo "Upload kubeconfig to Storage..." 
