@@ -65,13 +65,13 @@
       "value": "arcdata"
     },
     "dataStorageClass": {
-      "value": "microk8s-hostpath"
+      "value": "local-storage"
     },
     "dataStorageSize": {
       "value": "15Gi"
     },
     "logsStorageClass": {
-      "value": "microk8s-hostpath"
+      "value": "local-storage"
     },
     "logsStorageSize": {
       "value": "10Gi"

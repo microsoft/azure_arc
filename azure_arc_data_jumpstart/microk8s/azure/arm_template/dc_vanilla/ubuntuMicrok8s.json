@@ -272,9 +272,9 @@
         "autoUpgradeMinorVersion": true,
         "settings": {},
         "protectedSettings": {
-          "commandToExecute": "[concat('bash install_microk8s.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
+          "commandToExecute": "[concat('bash install_kubeadm.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
           "fileUris": [
-            "[uri(parameters('templateBaseUrl'), 'scripts/install_microk8s.sh')]"
+            "[uri(parameters('templateBaseUrl'), 'scripts/install_kubeadm.sh')]"
           ]
         }
       }
