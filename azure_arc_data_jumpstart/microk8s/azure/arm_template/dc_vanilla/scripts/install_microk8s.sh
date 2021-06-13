@@ -52,7 +52,6 @@ sudo apt install snapd
 sudo snap install microk8s --classic --channel=1.21/stable
 
 #use docker, kubectl from microk8s
-sudo snap alias microk8s.docker docker
 sudo snap alias microk8s.kubectl kubectl
 
 # Enable microk8s features
@@ -60,7 +59,7 @@ sudo microk8s status --wait-ready
 sudo microk8s enable storage dns ingress helm3 dashboard
 
 echo "###########################################################################"
-echo "Misc..." 
+echo "Networking enablement..." 
 echo "###########################################################################"
 
 sleep 10
