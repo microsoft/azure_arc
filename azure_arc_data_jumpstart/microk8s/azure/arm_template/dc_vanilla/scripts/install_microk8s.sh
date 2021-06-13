@@ -58,7 +58,8 @@ sudo snap alias microk8s.kubectl kubectl
 sudo microk8s status --wait-ready
 
 # Set to Azure DNS: https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-name-resolution-for-vms-and-role-instances#considerations
-microk8s enable dns:168.63.129.16
+#microk8s enable dns:168.63.129.16
+microk8s enable dns
 
 sleep 5
 
