@@ -52,7 +52,7 @@ sudo apt install snapd
 sudo snap install kubectl --classic
 
 # Installing microk8s
-sudo snap install microk8s --classic --channel=1.19/stable
+sudo snap install microk8s --classic --channel=1.18/stable
 
 # Enable microk8s features
 sudo microk8s status --wait-ready
