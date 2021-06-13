@@ -49,9 +49,9 @@ sudo apt-get update
 sudo apt install snapd
 
 # Installing microk8s from specific snap channel
-sudo snap install microk8s --classic --channel=1.21/stable
+sudo snap install microk8s --classic --channel=1.18/stable
 
-#use docker, kubectl from microk8s
+# Use kubectl from microk8s
 sudo snap alias microk8s.kubectl kubectl
 
 # Enable microk8s features
@@ -64,7 +64,9 @@ echo "##########################################################################
 
 sleep 10
 
-#avoid dns crashlooping
+# From here: https://github.com/ubuntu/microk8s/issues/140
+# --------------------------------------------------------
+# Avoid dns crashlooping
 sudo ufw allow in on cbr0 && sudo ufw allow out on cbr0
 
 #make sure iptables allow outbound traffic
