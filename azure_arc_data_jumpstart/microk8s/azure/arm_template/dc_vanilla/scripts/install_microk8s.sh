@@ -63,10 +63,6 @@ echo "##########################################################################
 # --------------------
 sleep 15
 
-# Add flannel
-echo "Adding flannel..." 
-sudo microk8s kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-
 # Add rbac
 echo "Adding RBAC..." 
 sudo microk8s kubectl apply -f https://raw.githubusercontent.com/microsoft/sql-server-samples/master/samples/features/azure-arc/deployment/kubeadm/ubuntu/rbac.yaml
