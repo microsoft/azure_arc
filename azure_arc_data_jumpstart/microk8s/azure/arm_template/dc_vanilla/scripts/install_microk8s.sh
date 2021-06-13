@@ -60,12 +60,7 @@ echo "Installing other add ons to Kubernetes..."
 echo "###########################################################################"
 
 # Enable other add-ons
-echo "Adding taint..." 
-master_node=`sudo microk8s kubectl get nodes --no-headers=true --output=custom-columns=NAME:.metadata.name`
-
-# Add taint: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-sudo microk8s kubectl taint nodes ${master_node} node-role.kubernetes.io/master:NoSchedule-
-
+# --------------------
 # Add flannel
 echo "Adding flannel..." 
 sudo microk8s kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
