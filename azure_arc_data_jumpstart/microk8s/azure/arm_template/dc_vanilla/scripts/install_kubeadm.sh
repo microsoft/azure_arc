@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Export all logs to file
-exec >install_microk8s.log
+exec >install_kubeadm.log
 exec 2>&1
 
 # Injecting environment variables - export to file
@@ -67,7 +67,7 @@ storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagin
 storageContainerName="staging"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 
-# Set Kubeconfig - export from microk8s
+# Set Kubeconfig path
 kubeconfigPath="$HOME/.kube"
 sudo chown -R $adminUsername $kubeconfigPath
 
