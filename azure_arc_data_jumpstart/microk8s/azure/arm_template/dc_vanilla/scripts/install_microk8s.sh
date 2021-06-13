@@ -56,7 +56,7 @@ sudo snap install microk8s --classic --channel=1.19/stable
 
 # Enable microk8s features
 sudo microk8s status --wait-ready
-sudo microk8s enable dns storage
+sudo microk8s enable storage
 
 echo "###########################################################################"
 echo "Upload kubeconfig to Storage..." 
