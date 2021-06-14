@@ -115,9 +115,11 @@ variable "SPN_AUTHORITY" {
 variable "deploy_SQLMI" {
   description = "The Service Principal authority"
   type        = bool
+  default     = false
 }
 
 variable "deploy_PostgreSQL" {
   description = "The Service Principal authority"
   type        = bool
+  default     = false
 }
