@@ -42,8 +42,6 @@ echo ""
 echo "###########################################################################"
 echo "Installing snap and microk8s..." 
 echo "###########################################################################"
-# Disable Ubuntu firewall
-sudo ufw disable
 
 # Sync packages
 sudo apt-get update
@@ -55,39 +53,27 @@ sudo apt install snapd
 sudo snap install microk8s --classic --channel=1.18/stable
 
 # Use kubectl from microk8s
-# sudo snap alias microk8s.kubectl kubectl
+sudo snap alias microk8s.kubectl kubectl
 
 # Enable microk8s features
 sudo microk8s status --wait-ready
-
-########################################
-#                  MVP
-########################################
-# Set DNS to Azure forwarder
-sudo microk8s enable dns:168.63.129.16
-
-########################################
-# Set to Azure DNS: https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-name-resolution-for-vms-and-role-instances#considerations
-# sudo microk8s enable dns:168.63.129.16
-
-# sleep 5
-
-# Enable other add-ons
-# sudo microk8s enable storage ingress helm3 dashboard
+sudo microk8s enable dns storage dashboard
 
 echo "###########################################################################"
 echo "Networking enablement..." 
 echo "###########################################################################"
 
-# sleep 10
+sleep 10
 
-# From here: https://github.com/ubuntu/microk8s/issues/140
-# --------------------------------------------------------
-# Avoid dns crashlooping
-# sudo ufw allow in on cbr0 && sudo ufw allow out on cbr0
+# Disable internal firewall
+sudo ufw disable
 
-#make sure iptables allow outbound traffic
-# sudo iptables -P FORWARD ACCEPT
+# See: https://stackoverflow.com/questions/66759153/how-to-access-hosts-in-my-network-from-microk8s-deployment-pods
+sudo echo "--resolv-conf=/run/systemd/resolve/resolv.conf" >> /var/snap/microk8s/current/args/kubelet
+sudo service snap.microk8s.daemon-kubelet restart
+
+# Update Core DNS ConfigMap to leverage Azure DNS forwarder
+# TBD
 
 echo "###########################################################################"
 echo "Upload kubeconfig to Storage..." 
