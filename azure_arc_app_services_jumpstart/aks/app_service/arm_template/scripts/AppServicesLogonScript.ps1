@@ -10,9 +10,12 @@ az login --service-principal --username $env:spnClientId --password $env:spnClie
 Write-Host "`n"
 
 
+# Deploying AKS cluster
+Write-Host "Deploying AKS cluster"
+Write-Host "`n"
 az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
-az aks get-credentials --resource-group $env:resourceGroup --name $aksClusterName --admin
-$aksResourceGroupMC = $(az aks show -g $env:resourceGroup -n $env:clusterName -o tsv --query nodeResourceGroup)
+az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
+$aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
 
 
 
