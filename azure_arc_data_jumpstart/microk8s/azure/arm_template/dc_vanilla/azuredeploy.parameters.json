@@ -3,28 +3,31 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "sshRSAPublicKey": {
-      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArND8Vl6lztgwIocjN9nqEuvjSks1itf3bgGn2P29b8GnspbDe5oVuGq7g/KdMr9i9lbdfaIq0wkrlAc7u8w7eivcPWxSjk+PvSBJzMGa+vf/OtzeUXuDV19Fb4Y7cKIF8mEpFjo89m2UvtTUgQGcHLuoqwrbjSMoSYqrcs+elqMOWjD9Do4BQsPkBapY3OukYAZeaBpbMPDqd4iR46CwiRl4Nb2r4jz2Z3iG1eiSpXVYZsY0h1EzN4i9Nt/bVuJY41/VTAM1FyqPaaTxG4uH6+zCThrLiXxCMdqkPKXQpcZGuAgNC7D21j2HTWQIQGs4sfKYTGggNDOCE7U3DLBISw==\n"
+      "value": "<your RSA public key>"
     },
     "spnClientId": {
-      "value": "6ec88954-30af-4c4a-a17c-5604d770fe3b"
+      "value": "<your service principal client id>"
     },
     "spnClientSecret": {
-      "value": "zegW3FajIR_oP~NyQhx9fwNm96P~0JyHRO"
+      "value": "<your service principal secret>"
     },
     "spnTenantId": {
-      "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+      "value": "<your spn tenant id>"
     },
     "windowsAdminUsername": {
-      "value": "boor"
+      "value": "arcdemo"
     },
     "windowsAdminPassword": {
-      "value": "acntorPRESTO!"
+      "value": "ArcPassword123!!"
     },
     "myIpAddress": {
-      "value": "99.238.41.0/24"
+      "value": "<your IP address>"
     },
     "logAnalyticsWorkspaceName": {
-      "value": "aiamicrok8slaws"
+      "value": "<your unique Log Analytics workspace name>"
+    },
+    "templateBaseUrl": {
+      "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/"
     }
   }
 }
