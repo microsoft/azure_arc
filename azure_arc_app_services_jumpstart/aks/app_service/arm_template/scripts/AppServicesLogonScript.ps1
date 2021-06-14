@@ -17,7 +17,9 @@ az aks create --resource-group $env:resourceGroup --name $env:clusterName --loca
 az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
 $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
 
-
+Write-Host "Checking kubernetes nodes"
+Write-Host "`n"
+kubectl get nodes
 
 # Attaching network secuirty group to the deployment virtual network subnet
 # Write-Host "Attaching network secuirty group to the deployment virtual network subnet"
@@ -66,17 +68,13 @@ az extension add --yes --source "https://aka.ms/appsvc/appservice_kube-latest-py
 Write-Host "`n"
 az -v
 
-# Getting AKS credentials
-Write-Host "Getting AKS credentials"
-Write-Host "`n"
-$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Admin -Force
-
-Write-Host "Checking kubernetes nodes"
-Write-Host "`n"
-kubectl get nodes
+# # Getting AKS credentials
+# Write-Host "Getting AKS credentials"
+# Write-Host "`n"
+# $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
+# Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Admin -Force
 
 # Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
