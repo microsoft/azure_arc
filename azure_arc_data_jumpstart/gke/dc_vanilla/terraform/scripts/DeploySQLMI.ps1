@@ -5,7 +5,7 @@ Write-Host "`n"
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name "jumpstart-dc" --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $vCoresMax = 4
 $memoryMax = "8"
-$StorageClassName = "managed-premium"
+$StorageClassName = "local-ssd"
 $dataStorageSize = "5"
 $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
