@@ -63,6 +63,7 @@ echo "##########################################################################
 echo "Networking enablement..." 
 echo "###########################################################################"
 
+# Wait until Microk8s features are done enabling
 sleep 10
 
 # Disable internal ubuntu firewall
