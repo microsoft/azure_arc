@@ -58,7 +58,7 @@ resource "google_compute_instance" "default" {
   }
 
   provisioner "file" {
-    source      = "scripts/azure_arc.ps1"
+    source      = "artifacts/azure_arc.ps1"
     destination = "C:/Temp/azure_arc.ps1"
 
     connection {
@@ -73,7 +73,7 @@ resource "google_compute_instance" "default" {
   }
 
   provisioner "file" {
-    source      = "scripts/Bootstrap.ps1"
+    source      = "artifacts/Bootstrap.ps1"
     destination = "C:/Temp/Bootstrap.ps1"
 
     connection {
@@ -88,7 +88,7 @@ resource "google_compute_instance" "default" {
   }
 
   provisioner "file" {
-    source      = "scripts/DataServicesLogonScript.ps1"
+    source      = "artifacts/DataServicesLogonScript.ps1"
     destination = "C:/Temp/DataServicesLogonScript.ps1"
 
     connection {
@@ -103,7 +103,7 @@ resource "google_compute_instance" "default" {
   }
 
   provisioner "file" {
-    source      = "scripts/local_ssd_sc.yaml"
+    source      = "artifacts/local_ssd_sc.yaml"
     destination = "C:/Temp/local_ssd_sc.yaml"
 
     connection {
@@ -154,16 +154,16 @@ resource "google_compute_instance" "default" {
 }
 
 resource "local_file" "password_reset" {
-  content = templatefile("scripts/password_reset.ps1.tmpl", {
+  content = templatefile("artifacts/password_reset.ps1.tmpl", {
     windows_username = var.windows_username
     windows_password = var.windows_password
     }
   )
-  filename = "scripts/password_reset.ps1"
+  filename = "artifacts/password_reset.ps1"
 }
 
 resource "local_file" "azure_arc" {
-  content = templatefile("scripts/azure_arc.ps1.tmpl", {
+  content = templatefile("artifacts/azure_arc.ps1.tmpl", {
     adminUsername          = var.windows_username
     gcpCredentialsFilename = var.gcp_credentials_filename
     gkeClusterName         = var.gke_cluster_name
@@ -183,7 +183,7 @@ resource "local_file" "azure_arc" {
     deployPostgreSQL       = var.deploy_PostgreSQL
     }
   )
-  filename = "scripts/azure_arc.ps1"
+  filename = "artifacts/azure_arc.ps1"
 }
 
 // A variable for extracting the external ip of the instance
