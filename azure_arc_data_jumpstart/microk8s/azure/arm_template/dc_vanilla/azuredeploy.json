@@ -98,7 +98,7 @@
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
           "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
+            "value": "[parameters('templateBaseUrl')]"
           }
         }
       }
@@ -141,7 +141,7 @@
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
           "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
+            "value": "[parameters('templateBaseUrl')]"
           }
         }
       }
