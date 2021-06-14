@@ -65,14 +65,67 @@
         "metadata": {
           "description": "The name of the Kubernetes cluster resource.."
       }
+    },
+    "dnsPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+      }
+    },
+    "linuxAdminUsername": {
+      "type": "string",
+      "defaultValue": "arcdemo",
+      "metadata": {
+        "description": "User name for the Linux Virtual Machines."
+      }
     }
   },
   "variables": {
     "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
+    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"
   },
   "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "aksDeployment",
+      "dependsOn": [ "clientVmDeployment" ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('aksTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "myIpAddress": {
+            "value": "[parameters('myIpAddress')]"
+          },          
+          "kubernetesVersion": {
+            "value": "[parameters('kubernetesVersion')]"
+          },
+          "dnsPrefix": {
+            "value": "[parameters('dnsPrefix')]"
+          },
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
+          },
+          "linuxAdminUsername": {
+            "value": "[parameters('linuxAdminUsername')]"
+          },
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
+          }
+        }
+      }
+    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",

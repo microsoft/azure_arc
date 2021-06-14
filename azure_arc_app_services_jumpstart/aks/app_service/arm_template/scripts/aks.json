@@ -132,14 +132,7 @@
             "metadata": {
                 "description": "Boolean flag to turn on and off of RBAC"
             }
-        },
-        "adminGroups": {
-            "defaultValue": "cd69f6c3-fd24-4f8a-a8c2-27c9c2b1dd4c",
-            "type": "string",
-            "metadata": {
-                "description": "Boolean flag to turn on and off of RBAC"
-            }
-        },        
+        },       
         "builtInRoleType": {
             "type": "string",
             "allowedValues": [
@@ -241,8 +234,7 @@
                     }
                 },
                 "aadProfile": {
-                "managed": true,
-                "adminGroupObjectIDs": "[parameters('adminGroups')]"
+                "managed": true
                 },                
                 "agentPoolProfiles": [
                     {

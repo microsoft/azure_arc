@@ -2,24 +2,31 @@ Start-Transcript -Path C:\Temp\AppServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
+# $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 Write-Host "`n"
 
+
+az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
+az aks get-credentials --resource-group $env:resourceGroup --name $aksClusterName --admin
+$aksResourceGroupMC = $(az aks show -g $env:resourceGroup -n $env:clusterName -o tsv --query nodeResourceGroup)
+
+
+
 # Attaching network secuirty group to the deployment virtual network subnet
-Write-Host "Attaching network secuirty group to the deployment virtual network subnet"
-$aksResourceGroupMC = "MC_${env:resourceGroup}_${env:clusterName}_${env:azureLocation}"
-$aksVnetMC = az network vnet list --resource-group $aksResourceGroupMC --query "[0].name" --output tsv
-$nsgName = az network nsg list --resource-group $aksResourceGroupMC --query "[0].name" --output tsv
-$subnetId = az network vnet subnet list --resource-group $aksResourceGroupMC --vnet-name $aksVnetMC --query "[0].id" --output tsv
-az network nsg create -g $aksResourceGroupMC -n $nsgName --output none
-az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-HTTP --destination-port-ranges 80 --priority 100 --output none
-az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-HTTPS --destination-port-ranges 443 --priority 101 --output none
-az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-SQL --destination-port-ranges 1433 --priority 102 --output none
-az network vnet subnet update --nsg $nsgName --ids $subnetId --output none
+# Write-Host "Attaching network secuirty group to the deployment virtual network subnet"
+# $aksResourceGroupMC = "MC_${env:resourceGroup}_${env:clusterName}_${env:azureLocation}"
+# $aksVnetMC = az network vnet list --resource-group $aksResourceGroupMC --query "[0].name" --output tsv
+# $nsgName = az network nsg list --resource-group $aksResourceGroupMC --query "[0].name" --output tsv
+# $subnetId = az network vnet subnet list --resource-group $aksResourceGroupMC --vnet-name $aksVnetMC --query "[0].id" --output tsv
+# az network nsg create -g $aksResourceGroupMC -n $nsgName --output none
+# az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-HTTP --destination-port-ranges 80 --priority 100 --output none
+# az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-HTTPS --destination-port-ranges 443 --priority 101 --output none
+# az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-SQL --destination-port-ranges 1433 --priority 102 --output none
+# az network vnet subnet update --nsg $nsgName --ids $subnetId --output none
 
 # Creating Azure Public IP resource to be used by the Azure Arc app service
 Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
@@ -62,7 +69,7 @@ Write-Host "`n"
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Force
+Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Admin -Force
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
