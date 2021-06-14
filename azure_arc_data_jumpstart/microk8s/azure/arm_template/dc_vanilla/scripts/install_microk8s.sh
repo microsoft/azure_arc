@@ -52,13 +52,13 @@ sudo apt install snapd
 sudo snap install microk8s --classic --channel=1.18/stable
 
 # Use kubectl from microk8s
-sudo snap alias microk8s.kubectl kubectl
+# sudo snap alias microk8s.kubectl kubectl
 
 # Enable microk8s features
 sudo microk8s status --wait-ready
 
 # Local mode
-# microk8s enable dashboard dns storage ingress helm3
+sudo microk8s enable dns
 
 # Set to Azure DNS: https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-name-resolution-for-vms-and-role-instances#considerations
 # microk8s enable dns:168.63.129.16
@@ -72,7 +72,7 @@ echo "##########################################################################
 echo "Networking enablement..." 
 echo "###########################################################################"
 
-sleep 10
+# sleep 10
 
 # From here: https://github.com/ubuntu/microk8s/issues/140
 # --------------------------------------------------------
