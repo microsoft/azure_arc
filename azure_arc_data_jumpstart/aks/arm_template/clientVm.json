@@ -143,7 +143,7 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "subnetAddressPrefix": "172.16.0.0/16",
+        "subnetAddressPrefix": "172.16.1.0/24",
         "addressPrefix": "172.16.0.0/16",
         "osDiskType": "Premium_LRS",
         "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/"
@@ -238,7 +238,7 @@
                     }
                 ]
             }
-        },        
+        },       
         {
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
