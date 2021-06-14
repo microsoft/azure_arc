@@ -68,13 +68,13 @@
             "value": "local-ssd"
         },
         "dataStorageSize": {
-            "value": "15Gi"
+            "value": "5Gi"
         },
         "logsStorageClass": {
             "value": "local-ssd"
         },
         "logsStorageSize": {
-            "value": "10Gi"
+            "value": "5Gi"
         },
         "serviceType": {
             "value": "LoadBalancer"
