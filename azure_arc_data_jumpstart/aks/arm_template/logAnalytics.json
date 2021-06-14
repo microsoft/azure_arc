@@ -25,7 +25,7 @@
     "tags": {
       "type": "object",
       "defaultValue": {
-        "Project": "jumpstart_azure_arc_data"
+        "Project": "jumpstart_azure_arc_data_services"
       }
     } 
   },
