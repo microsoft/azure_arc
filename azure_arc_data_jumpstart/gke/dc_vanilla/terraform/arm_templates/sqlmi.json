@@ -56,7 +56,7 @@
         },
         "logsStorageClassName": {
             "type": "String",
-            "defaultValue": "managed-premium"
+            "defaultValue": "local-ssd"
         },
         "dataLogsStorageSize": {
             "type": "String",
@@ -64,7 +64,7 @@
         },
         "dataLogsStorageClassName": {
             "type": "String",
-            "defaultValue": "managed-premium"
+            "defaultValue": "local-ssd"
         },
         "backupsStorageSize": {
             "type": "String",
@@ -72,7 +72,7 @@
         },
         "backupsStorageClassName": {
             "type": "String",
-            "defaultValue": "managed-premium"
+            "defaultValue": "local-ssd"
         },
         "replicas": {
             "type": "Int"
