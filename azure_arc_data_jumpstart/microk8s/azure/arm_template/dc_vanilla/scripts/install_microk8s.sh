@@ -42,6 +42,9 @@ echo ""
 echo "###########################################################################"
 echo "Installing snap and microk8s..." 
 echo "###########################################################################"
+# Disable Ubuntu firewall
+sudo ufw disable
+
 # Sync packages
 sudo apt-get update
 
@@ -57,11 +60,15 @@ sudo snap install microk8s --classic --channel=1.18/stable
 # Enable microk8s features
 sudo microk8s status --wait-ready
 
-# Local mode
-sudo microk8s enable dns
+########################################
+#                  MVP
+########################################
+# Set DNS to Azure forwarder
+sudo microk8s enable dns:168.63.129.16
 
+########################################
 # Set to Azure DNS: https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-name-resolution-for-vms-and-role-instances#considerations
-# microk8s enable dns:168.63.129.16
+# sudo microk8s enable dns:168.63.129.16
 
 # sleep 5
 
