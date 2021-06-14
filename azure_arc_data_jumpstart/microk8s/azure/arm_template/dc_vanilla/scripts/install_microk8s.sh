@@ -70,7 +70,8 @@ sleep 10
 sudo ufw disable
 
 # See: https://stackoverflow.com/questions/66759153/how-to-access-hosts-in-my-network-from-microk8s-deployment-pods
-sudo echo "--resolv-conf=/run/systemd/resolve/resolv.conf" >> /var/snap/microk8s/current/args/kubelet
+
+sudo bash -c 'echo "--resolv-conf=/run/systemd/resolve/resolv.conf" >> /var/snap/microk8s/current/args/kubelet'
 sudo service snap.microk8s.daemon-kubelet restart
 
 # Update Core DNS ConfigMap to leverage Azure's DNS rather than Google's
