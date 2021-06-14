@@ -66,11 +66,7 @@ echo "##########################################################################
 # Wait until Microk8s features are done enabling
 sleep 10
 
-# Disable internal ubuntu firewall
-sudo ufw disable
-
 # See: https://stackoverflow.com/questions/66759153/how-to-access-hosts-in-my-network-from-microk8s-deployment-pods
-
 sudo bash -c 'echo "--resolv-conf=/run/systemd/resolve/resolv.conf" >> /var/snap/microk8s/current/args/kubelet'
 sudo service snap.microk8s.daemon-kubelet restart
 
