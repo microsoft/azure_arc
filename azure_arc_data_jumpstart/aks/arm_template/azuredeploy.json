@@ -93,9 +93,6 @@
           },
           "spnClientSecret": {
             "value": "[parameters('spnClientSecret')]"
-          },
-          "spnTenantId": {
-            "value": "[parameters('spnTenantId')]"
           }
         }
       }
