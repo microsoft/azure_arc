@@ -54,14 +54,12 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "Arc-Data-Microk8s-VNet",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
     "subnetName": {
       "type": "string",
-      "defaultValue": "Arc-Data-Microk8s-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }

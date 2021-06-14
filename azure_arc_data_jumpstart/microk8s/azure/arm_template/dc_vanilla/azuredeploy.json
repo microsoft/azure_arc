@@ -63,15 +63,45 @@
     "microk8sTemplateUrl": "[uri(parameters('templateBaseUrl'), 'ubuntuMicrok8s.json')]",
     "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
     "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
-    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]"
+    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
+    // Virtual Network configuration
+    "virtualNetworkName": "Arc-Data-Microk8s-VNet",
+    "subnetName": "Arc-Data-Microk8s-Subnet",
+    "subnetAddressPrefix": "172.16.1.0/24",
+    "addressPrefix": "172.16.0.0/16"
   },
   "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "comments": "Deploys a VNET and Subnet for Sidecar and K8s VM",
+      "apiVersion": "2019-04-01",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": ["[variables('addressPrefix')]"]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetAddressPrefix')]",
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          }
+        ]
+      }
+    },
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys a single node Ubuntu VM with Microk8s installed",
       "apiVersion": "2019-10-01",
       "name": "ubuntuMicrok8sDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment"],
+      "dependsOn": [
+        "stagingStorageAccountDeployment",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -99,6 +129,12 @@
           },
           "templateBaseUrl": {
             "value": "[parameters('templateBaseUrl')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
           }
         }
       }
@@ -108,7 +144,10 @@
       "comments": "Deploys the sidecar Windows VM",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment"],
+      "dependsOn": [
+        "stagingStorageAccountDeployment",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -142,13 +181,19 @@
           },
           "templateBaseUrl": {
             "value": "[parameters('templateBaseUrl')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
           }
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "comments": "Used for staging kubectl config and staging scripts",
+      "comments": "Storage Account used for staging kubectl config and staging scripts",
       "apiVersion": "2019-10-01",
       "name": "stagingStorageAccountDeployment",
       "properties": {
