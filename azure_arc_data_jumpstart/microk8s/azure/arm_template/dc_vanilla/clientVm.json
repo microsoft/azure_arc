@@ -131,7 +131,6 @@
     },
     "templateBaseUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/mdrakiburrahman/azure_arc/microk8s-data/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/",
       "metadata": {
         "description": "Base URL for ARM template"
       }

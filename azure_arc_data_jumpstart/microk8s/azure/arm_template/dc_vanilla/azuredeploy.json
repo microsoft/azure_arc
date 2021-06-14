@@ -51,14 +51,19 @@
       "metadata": {
         "description": "Name for your log analytics workspace"
       }
+    },
+    "templateBaseUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Base URL for ARM template"
+      }
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/mdrakiburrahman/azure_arc/microk8s-data/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/",
-    "microk8sTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuMicrok8s.json')]",
-    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmtStagingStorage.json')]",
-    "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"
+    "microk8sTemplateUrl": "[uri(parameters('templateBaseUrl'), 'ubuntuMicrok8s.json')]",
+    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
+    "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
+    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]"
   },
   "resources": [
     {

@@ -62,10 +62,11 @@ az connectedk8s connect --name "Arc-Data-Microk8s-K8s" `
                         --resource-group $env:resourceGroup `
                         --location $env:azureLocation `
                         --tags 'Project=jumpstart_azure_arc_data' `
-                        --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+                        --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815' # This is the Custom Locations Enterprise Application ObjectID from AAD
 
 Start-Sleep -Seconds 10
 
+# Create Azure Arc enabled Data Services extension
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
@@ -92,6 +93,7 @@ $extensionId = az k8s-extension show --name arc-data-services `
 
 Start-Sleep -Seconds 20
 
+# Create Custom Location
 az customlocation create --name 'jumpstart-cl' `
                          --resource-group $env:resourceGroup `
                          --namespace arc `
@@ -101,12 +103,20 @@ az customlocation create --name 'jumpstart-cl' `
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name "Arc-Data-Microk8s-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+az k8s-extension create --name "azuremonitor-containers" `
+                        --cluster-name "Arc-Data-Microk8s-K8s" `
+                        --resource-group $env:resourceGroup `
+                        --cluster-type connectedClusters `
+                        --extension-type Microsoft.AzureMonitor.Containers
 
 # Deploying Azure Defender Kubernetes extension instance
 Write-Host "Create Azure Defender Kubernetes extension instance"
 Write-Host "`n"
-az k8s-extension create --name "azure-defender" --cluster-name "Arc-Data-Microk8s-K8s" --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+az k8s-extension create --name "azure-defender" `
+                        --cluster-name "Arc-Data-Microk8s-K8s" `
+                        --resource-group $env:resourceGroup `
+                        --cluster-type connectedClusters `
+                        --extension-type Microsoft.AzureDefender.Kubernetes
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
@@ -129,7 +139,9 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\dataController.json" --parameters "C:\Temp\dataController.parameters.json"
+az deployment group create --resource-group $env:resourceGroup `
+                           --template-file "C:\Temp\dataController.json" `
+                           --parameters "C:\Temp\dataController.parameters.json"
 Write-Host "`n"
 
 Do {
