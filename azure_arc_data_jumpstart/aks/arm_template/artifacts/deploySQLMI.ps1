@@ -1,14 +1,14 @@
 Start-Transcript -Path C:\Temp\deploySQL.log
 
 # Deployment environment variables
-$deploymentNamespace = "arc"
+# $deploymentNamespace = "arc"
 $controllerName = "Jumpstart-DC"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
-$deploymentNamespace = "dataservices"
+# $deploymentNamespace = "dataservices"
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $vCoresMax = 4
 $memoryMax = "8"
@@ -42,7 +42,7 @@ Write-Host "`n"
 Do {
     Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
-    $dcStatus = $(if(kubectl get sqlmanagedinstances -n $deploymentNamespace | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
@@ -60,7 +60,7 @@ Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connect
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 $settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-kubectl describe svc jumpstart-sql-external-svc -n $deploymentNamespace | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
+kubectl describe svc jumpstart-sql-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
 $sqlfile = "C:\Temp\sql_instance_list.txt"
 $sqlstring = Get-Content $sqlfile
 $sqlstring.split(" ") | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
