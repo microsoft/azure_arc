@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) deployed on a single-node [Microk8s](https://microk8s.io/) Kubernetes cluster.
 
-By the end of this guide, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure sidecar VM, installed & pre-configured with all the required tools needed to work with Azure Arc enabled data services.
+By the end of this guide, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) Azure sidecar VM, installed & pre-configured with all the required tools needed to work with Azure Arc enabled data services:
 
 ![Deployed Architecture](./01.png)
 
@@ -75,7 +75,7 @@ By the end of this guide, you will have a Microk8s Kubernetes cluster deployed w
 
 ## Architecture (In a nutshell)
 
-From the Microk8s docs:
+From the [Microk8s Github repo](https://github.com/ubuntu/microk8s):
 
 _"Microk8s is a single-package, fully conformant, lightweight Kubernetes that works on 42 flavours of Linux. Perfect for Developer workstations, IoT, Edge & CI/CD. MicroK8s tracks upstream and releases beta, RC and final bits the same day as upstream K8s."_
 
@@ -89,7 +89,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
-- Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/azuredeploy.json) will initiate four linked ARM templates:
+- Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/azuredeploy.json) will initiate **five** linked ARM templates:
 
   - [_VNET_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/VNET.json) - Deploys a Virtual Network with a single subnet - used by our VMs.
   - [_ubuntuMicrok8s_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla/ubuntuMicrok8s.json) - Deploys an Ubuntu Linux VM which will have Microk8s installed from the Snap Store.
@@ -112,8 +112,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - `windowsAdminUsername` - Sidecar Windows VM Administrator name.
   - `windowsAdminPassword` - Sidecar Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - `myIpAddress` - Your local IP address/CIDR range. This is used to allow remote RDP and SSH connections to the sidecar Windows VM and Microk8s VM.
-  - `logAnalyticsWorkspaceName` - Unique name for the deployment log analytics workspace.
-  - `templateBaseUrl` - Github URL to the deployment template - filled in by default - you can point this to your forked repo.
+  - `logAnalyticsWorkspaceName` - Unique name for log analytics workspace deployment.
+  - `templateBaseUrl` - Github URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc), but you can point this to your forked repo as well.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/dc_vanilla) and run the below command:
 
@@ -161,15 +161,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![PowerShell logon script run](./06.gif)
 
-  Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and the Azure Arc Data Controller will have been deployed on the cluster and be ready to use:
+  Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and the Azure Arc Data Controller will have been deployed on the cluster and be ready for use:
 
   ![Wallpaper Change](./07.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **16** various Azure resources deployed). The important ones to notice are:
 
-  - **Azure Arc enabled Kubernetes cluster** - Azure Arc enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
+  - **Azure Arc enabled Kubernetes cluster** - Azure Arc enabled data services deployed in directly connected mode is using this resource to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
-  - **Custom location** - provides a way for tenant administrators to use their Azure Arc enabled Kubernetes clusters as target locations for deploying Azure services instances.
+  - **Custom location** - provides a way for tenant administrators to use their Azure Arc enabled Kubernetes clusters as a target location for deploying Azure services.
 
   - **Azure Arc Data Controller** - The data controller that is now deployed on the Kubernetes cluster.
 
@@ -183,7 +183,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Cluster extensions
 
-In this scenario, three Azure Arc enabled Kubernetes cluster extensions were deployed:
+In this scenario, **three** Azure Arc enabled Kubernetes cluster extensions were deployed:
 
 - `microsoft.azuredefender.kubernetes` - The Azure Defender cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Defender with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_defender_extension/#create-azure-defender-extensions-instance) scenario.
 
@@ -191,7 +191,7 @@ In this scenario, three Azure Arc enabled Kubernetes cluster extensions were dep
 
 - `arc-data-services` - The Azure Arc enabled data services cluster extension that was used throughout this scenario in order to deploy the data services infrastructure.
 
-- In order to view these cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
+  In order to view these cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
 
   ![Azure Arc enabled Kubernetes resource](./10.png)
 
@@ -200,6 +200,6 @@ In this scenario, three Azure Arc enabled Kubernetes cluster extensions were dep
 
 ## Cleanup
 
-- If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
+- If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
   ![Delete Azure resource group](./12.png)
