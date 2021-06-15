@@ -63,7 +63,7 @@
       "type": "string",
       "defaultValue":"Arc-App-Service-AKS",
         "metadata": {
-          "description": "The name of the Kubernetes cluster resource.."
+          "description": "The name of the Kubernetes cluster resource."
       }
     }
   },

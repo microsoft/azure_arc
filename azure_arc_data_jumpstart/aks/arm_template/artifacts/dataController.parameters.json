@@ -12,7 +12,7 @@
             "value": "direct"
         },
         "controllerName": {
-            "value": "Jumpstart-DC"
+            "value": "controllerName-stage"
         },
         "azdataUsername": {
             "value": "azdataUsername-stage"
@@ -46,7 +46,7 @@
         },
         "resourceTags": {
             "value": {
-                "Project": "jumpstart_azure_arc_data"
+                "Project": "jumpstart_azure_arc_data_services"
             }
         },
         "dockerRegistryCredential": {

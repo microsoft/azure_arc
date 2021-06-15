@@ -87,7 +87,7 @@
         {
             "type": "Microsoft.AzureArcData/sqlManagedInstances",
             "apiVersion": "2021-06-01-preview",
-            "name": "jumpstart-sql",
+            "name": "Jumpstart-SQL",
             "location": "[parameters('location')]",
             "extendedLocation": {
                 "type": "CustomLocation",

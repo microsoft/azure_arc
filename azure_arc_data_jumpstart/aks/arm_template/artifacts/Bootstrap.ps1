@@ -95,7 +95,7 @@ workflow ClientTools_01
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
-                    # Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/settingsTemplate.json" -OutFile "C:\Temp\settingsTemplate.json"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/settingsTemplate.json" -OutFile "C:\Temp\settingsTemplate.json"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/DataServicesLogonScript.ps1" -OutFile "C:\Temp\DataServicesLogonScript.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/deploySQLMI.ps1" -OutFile "C:\Temp\deploySQLMI.ps1"
