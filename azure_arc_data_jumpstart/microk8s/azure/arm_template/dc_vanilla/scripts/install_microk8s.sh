@@ -40,7 +40,7 @@ az -v
 echo ""
 
 echo "###########################################################################"
-echo "Installing snap and microk8s..." 
+echo "Installing snap and Microk8s..." 
 echo "###########################################################################"
 
 # Sync packages
@@ -60,7 +60,7 @@ sudo microk8s status --wait-ready
 sudo microk8s enable dns storage dashboard
 
 echo "###########################################################################"
-echo "Networking enablement..." 
+echo "Microk8s specific configurations..." 
 echo "###########################################################################"
 
 # Wait until Microk8s features are done enabling
@@ -74,6 +74,13 @@ sudo service snap.microk8s.daemon-kubelet restart
 sudo kubectl get configmap -n kube-system coredns -o yaml > coredns.yaml
 sudo sed -i 's/forward . 8.8.8.8 8.8.4.4/forward . 168.63.129.16/' coredns.yaml
 sudo kubectl apply -f coredns.yaml
+
+# Enable --allow-privileged for Arc Extensions deployments
+# See: https://github.com/ubuntu/microk8s/issues/749
+sudo bash -c 'echo "--allow-privileged" >> /var/snap/microk8s/current/args/kube-apiserver'
+sudo microk8s stop
+sleep 5
+sudo microk8s start
 
 echo "###########################################################################"
 echo "Upload kubeconfig to Storage..." 
