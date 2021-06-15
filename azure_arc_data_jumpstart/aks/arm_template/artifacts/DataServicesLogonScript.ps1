@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 # Deployment environment variables
 $connectedClusterName = "Arc-Data-AKS"
 # $deploymentNamespace = "arc"
-$customlocationName = "Jumpstart-CL"
+# $customlocationName = "Jumpstart-CL"
 $controllerName = "Jumpstart-DC"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
@@ -84,13 +84,13 @@ Do {
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name $customlocationName --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+az customlocation create --name Jumpstart-CL --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
-$customLocationId = $(az customlocation show --name $customlocationName --resource-group $env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name Jumpstart-CL --resource-group $env:resourceGroup --query id -o tsv)
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 
