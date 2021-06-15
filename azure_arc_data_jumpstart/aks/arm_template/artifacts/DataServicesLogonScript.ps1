@@ -2,7 +2,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $connectedClusterName = "Arc-Data-AKS"
-$deploymentNamespace = "dataservices"
+$deploymentNamespace = "arc"
 $customlocationName = "Jumpstart-CL"
 $controllerName = "Jumpstart-DC"
 
