@@ -59,6 +59,13 @@
         "description": "The version of Kubernetes."
       }
     },
+    "clusterName": {
+      "type": "string",
+      "defaultValue":"Arc-Data-Service-AKS",
+        "metadata": {
+          "description": "The name of the Kubernetes cluster resource."
+      }
+    },
     "dnsPrefix": {
       "type": "string",
       "metadata": {
@@ -147,6 +154,9 @@
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
           },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
