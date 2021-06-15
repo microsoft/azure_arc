@@ -6,7 +6,7 @@
             "value": "resourceGroup-stage"
         },
         "namespace": {
-            "value": "dataservices"
+            "value": "arc"
         },
         "connectionMode": {
             "value": "direct"
