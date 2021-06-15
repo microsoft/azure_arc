@@ -2,9 +2,9 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $connectedClusterName = "Arc-Data-AKS"
-$deploymentNamespace = "arc"
+# $deploymentNamespace = "arc"
 # $customlocationName = "jumpstart-cl"
-$controllerName = "Jumpstart-DC"
+# $controllerName = "Jumpstart-DC"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -73,7 +73,7 @@ Write-Host "`n"
 az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace $deploymentNamespace --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
@@ -100,7 +100,7 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage',$customLocationId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'controllerName-stage',$controllerName | Set-Content -Path $dataControllerParams
+# (Get-Content -Path $dataControllerParams) -replace 'controllerName-stage',$controllerName | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage',$env:spnClientId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage',$env:spnTenantId | Set-Content -Path $dataControllerParams
