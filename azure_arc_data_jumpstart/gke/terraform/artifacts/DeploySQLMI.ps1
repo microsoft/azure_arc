@@ -1,4 +1,5 @@
 # Deploying Azure Arc SQL Managed Instance
+Start-Transcript -Path C:\Temp\DeploySQLMI.log
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
