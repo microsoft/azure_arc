@@ -2,7 +2,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $connectedClusterName = "Arc-Data-AKS"
-$deploymentNamespace = "arc"
+# $deploymentNamespace = "arc"
 $customlocationName = "Jumpstart-CL"
 $controllerName = "Jumpstart-DC"
 
@@ -72,19 +72,19 @@ Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 Start-Sleep -Seconds 10
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n $deploymentNamespace; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace $deploymentNamespace --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
+az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
     Start-Sleep -Seconds 20
-    $podStatus = $(if(kubectl get pods -n $deploymentNamespace | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($podStatus -eq "Nope")
 
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name $customlocationName --resource-group $env:resourceGroup --namespace $deploymentNamespace --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+az customlocation create --name $customlocationName --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
@@ -114,7 +114,7 @@ Write-Host "`n"
 Do {
     Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
-    $dcStatus = $(if(kubectl get datacontroller -n $deploymentNamespace | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
