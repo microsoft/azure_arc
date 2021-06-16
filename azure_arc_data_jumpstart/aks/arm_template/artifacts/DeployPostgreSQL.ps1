@@ -15,7 +15,7 @@ $StorageClassName = "managed-premium"
 $dataStorageSize = "5Gi"
 $logsStorageSize = "5Gi"
 $backupsStorageSize = "5Gi"
-$numWorkers = 3
+$numWorkers = 1
 
 $PSQLParams = "C:\Temp\postgreSQL.parameters.json"
 
