@@ -53,16 +53,6 @@ $pgsqlstring.split(" ") | Tee-Object "C:\Temp\postgres_instance_endpoint.txt" | 
 (Get-Content $pgsqlfile | Select-Object -Skip 7) | Set-Content $pgsqlfile
 $pgsqlstring = Get-Content $pgsqlfile
 
-Write-Host ""
-Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-$settingsTemplate = "C:\Temp\settingsTemplate.json"
-kubectl describe svc jumpstart-sql-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
-$sqlfile = "C:\Temp\sql_instance_list.txt"
-$sqlstring = Get-Content $sqlfile
-$sqlstring.split(" ") | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
-(Get-Content $sqlfile | Select-Object -Skip 7) | Set-Content $sqlfile
-$sqlstring = Get-Content $sqlfile
-
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres',$pgsqlstring | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 
