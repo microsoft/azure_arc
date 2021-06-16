@@ -1,14 +1,12 @@
 Start-Transcript -Path C:\Temp\deploySQL.log
 
 # Deployment environment variables
-# $deploymentNamespace = "arc"
 $controllerName = "Jumpstart-DC"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
-# $deploymentNamespace = "dataservices"
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $vCoresMax = 4
 $memoryMax = "8"
@@ -74,5 +72,3 @@ if ( $env:deployPostgreSQL -eq $false )
 
 # Cleaning garbage
 Remove-Item "C:\Temp\sql_instance_list.txt" -Force
-
-Stop-Transcript

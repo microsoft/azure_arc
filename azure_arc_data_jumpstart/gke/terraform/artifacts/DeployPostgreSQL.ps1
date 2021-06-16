@@ -1,14 +1,12 @@
 Start-Transcript -Path C:\Temp\deployPostgreSQL.log
 
 # Deployment environment variables
-# $deploymentNamespace = "arc"
 $controllerName = "Jumpstart-DC"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
 Write-Host "`n"
 
-# $deploymentNamespace = "dataservices"
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $memoryRequest = "0.25Gi"
 $StorageClassName = "local-ssd"
@@ -51,8 +49,9 @@ $settingsTemplate = "C:\Temp\settingsTemplate.json"
 kubectl describe svc jumpstartps-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
 $pgsqlfile = "C:\Temp\postgres_instance_endpoint.txt"
 $pgsqlstring = Get-Content $pgsqlfile
-$pgsqlstring.split(" ") | Tee-Object "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
+$pgsqlstring.split(" ") | Out-File "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
 (Get-Content $pgsqlfile | Select-Object -Skip 7) | Set-Content $pgsqlfile
+(Get-Content $pgsqlfile ) | Where-Object {$_.trim() -ne "" } | Set-Content $pgsqlfile
 $pgsqlstring = Get-Content $pgsqlfile
 
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres',$pgsqlstring | Set-Content -Path $settingsTemplate
@@ -66,5 +65,3 @@ if ( $env:deploySQLMI -eq $false )
 
 # Cleaning garbage
 Remove-Item "C:\Temp\postgres_instance_endpoint.txt" -Force
-
-Stop-Transcript
