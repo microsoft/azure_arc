@@ -3,7 +3,8 @@ Start-Transcript -Path C:\Temp\DeploySQLMI.log
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
-$dataControllerId = $(az resource show --resource-group $env:resourceGroup --name "jumpstart-dc" --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+$controllerName = "Jumpstart-DC"
+$dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $vCoresMax = 4
 $memoryMax = "8"
 $StorageClassName = "local-ssd"
