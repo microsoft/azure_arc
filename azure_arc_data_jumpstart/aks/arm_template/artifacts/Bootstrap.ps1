@@ -98,7 +98,7 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/settingsTemplate.json" -OutFile "C:\Temp\settingsTemplate.json"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/DataServicesLogonScript.ps1" -OutFile "C:\Temp\DataServicesLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/deploySQLMI.ps1" -OutFile "C:\Temp\deploySQLMI.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/DeploySQLMI.ps1" -OutFile "C:\Temp\DeploySQLMI.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/DeployPostgreSQL.ps1" -OutFile "C:\Temp\DeployPostgreSQL.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/dataController.json" -OutFile "C:\Temp\dataController.json"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/artifacts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"
