@@ -123,10 +123,10 @@ if ( $env:deploySQLMI -eq $true )
     & "C:\Temp\DeploySQLMI.ps1"
 }
 
-# if ( $env:deployPostgreSQL -eq $true )
-# {
-#     & "C:\Temp\DeployPostgreSQL.ps1"
-# }
+if ( $env:deployPostgreSQL -eq $true )
+{
+    & "C:\Temp\DeployPostgreSQL.ps1"
+}
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
