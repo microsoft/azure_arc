@@ -50,9 +50,7 @@ Write-Host "`n"
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-$settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+$settingsTemplate = "C:\Temp\settingsTemplate.json"
 kubectl describe svc jumpstart-sql-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
 $sqlfile = "C:\Temp\sql_instance_list.txt"
 $sqlstring = Get-Content $sqlfile
@@ -60,10 +58,19 @@ $sqlstring.split(" ") | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
 (Get-Content $sqlfile | Select-Object -Skip 7) | Set-Content $sqlfile
 $sqlstring = Get-Content $sqlfile
 
-(Get-Content -Path $settingsFile) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsFile
-(Get-Content -Path $settingsFile) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
-(Get-Content -Path $settingsFile) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
-(Get-Content -Path $settingsFile) -replace 'false','true' | Set-Content -Path $settingsFile
+(Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
+
+if ( $env:deployPostgreSQL -eq $false )
+{
+    $string = Get-Content $settingsTemplate
+    $string[25] = $string[25] -replace ",",""
+    $string | Set-Content $settingsTemplate
+    $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
+    (Get-Content -Path $string) | Set-Content -Path $settingsTemplate
+}
 
 # Cleaning garbage
 Remove-Item "C:\Temp\sql_instance_list.txt" -Force

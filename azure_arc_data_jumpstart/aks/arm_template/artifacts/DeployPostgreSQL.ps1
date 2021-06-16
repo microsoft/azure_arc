@@ -44,4 +44,27 @@ Do {
 Write-Host "Azure Arc PostgreSQL Hyperscale is ready!"
 Write-Host "`n"
 
+# Creating Azure Data Studio settings for PostgreSQL connection
+Write-Host ""
+Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
+$settingsTemplate = "C:\Temp\settingsTemplate.json"
+kubectl describe svc jumpstartps-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
+$pgsqlfile = "C:\Temp\postgres_instance_endpoint.txt"
+$pgsqlstring = Get-Content $pgsqlfile
+$pgsqlstring.split(" ") | Tee-Object "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
+(Get-Content $pgsqlfile | Select-Object -Skip 7) | Set-Content $pgsqlfile
+$pgsqlstring = Get-Content $pgsqlfile
+
+(Get-Content -Path $settingsTemplate) -replace 'arc_postgres',$pgsqlstring | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
+
+if ( $env:deploySQLMI -eq $false )
+{
+     $string = Get-Content -Path $settingsTemplate | Select-Object -First 9 -Last 23
+     $string | Set-Content -Path $settingsTemplate
+}
+
+# Cleaning garbage
+Remove-Item "C:\Temp\postgres_instance_endpoint.txt" -Force
+
 Stop-Transcript
