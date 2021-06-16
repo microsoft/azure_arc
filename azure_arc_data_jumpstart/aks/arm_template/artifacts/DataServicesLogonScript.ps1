@@ -123,10 +123,10 @@ if ( $env:deploySQLMI -eq $true )
     & "C:\Temp\DeploySQLMI.ps1"
 }
 
-# if ( $env:deployPostgreSQL -eq $true )
-# {
-#     & "C:\Temp\DeployPostgreSQL.ps1"
-# }
+if ( $env:deployPostgreSQL -eq $true )
+{
+    & "C:\Temp\DeployPostgreSQL.ps1"
+}
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
