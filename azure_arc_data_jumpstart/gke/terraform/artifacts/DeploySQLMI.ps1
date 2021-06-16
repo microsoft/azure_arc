@@ -52,6 +52,16 @@ kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S loca
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
+$settingsTemplate = "C:\Temp\settingsTemplate.json"
+if ( $env:deployPostgreSQL -eq $false)
+{
+    $string = Get-Content -Path $settingsTemplate
+    $string[25] = $string[25] -replace ",",""
+    $string | Set-Content -Path $settingsTemplate
+    $string = Get-Content -Path $settingsTemplate | Select-Object -First 25 -Last 4
+    $string | Set-Content -Path $settingsTemplate
+}
+
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 $settingsFile = "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
@@ -66,6 +76,8 @@ $sqlstring = Get-Content $sqlfile
 (Get-Content -Path $settingsFile) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsFile
 (Get-Content -Path $settingsFile) -replace 'false','true' | Set-Content -Path $settingsFile
+
+
 
 # Cleaning garbage
 Remove-Item "C:\Temp\sql_instance_list.txt" -Force
