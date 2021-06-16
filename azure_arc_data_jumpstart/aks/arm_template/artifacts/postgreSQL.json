@@ -8,10 +8,10 @@
             "metadata": {
                 "description": "Location for all resources"
             }
-        },        
+        },
         "resourceGroup": {
             "type": "string"
-        },
+        },        
         "dataControllerId": {
             "type": "String"
         },
@@ -20,74 +20,60 @@
         },
         "subscriptionId": {
             "type": "String"
-        },        
-        "azdataUsername": {
+        },
+        "admin": {
             "type": "String"
         },
         "azdataPassword": {
             "type": "SecureString"
         },
         "namespace": {
-            "type": "String",
-            "defaultValue": "arc"
+            "type": "String"
         },
         "serviceType": {
-            "type": "String",
-            "defaultValue": "LoadBalancer"
+            "type": "String"
         },
-        "vCoresMax": {
-            "type": "Int",
-            "defaultValue": 4
+        "memoryRequest": {
+            "type": "String"
         },
-        "memoryMax": {
-            "type": "String",
-            "defaultValue": "8"
+        "postgresEngineVersion": {
+            "type": "Int"
         },
         "dataStorageSize": {
-            "type": "String",
-            "defaultValue": "5"
+            "type": "String"
         },
         "dataStorageClassName": {
             "type": "String"
         },
         "logsStorageSize": {
-            "type": "String",
-            "defaultValue": "5"
+            "type": "String"
         },
-        "logsStorageClassName": {
-            "type": "String",
-            "defaultValue": "managed-premium"
-        },
-        "dataLogsStorageSize": {
-            "type": "String",
-            "defaultValue": "5"
-        },
-        "dataLogsStorageClassName": {
-            "type": "String",
-            "defaultValue": "managed-premium"
+        "logStorageClassName": {
+            "type": "String"
         },
         "backupsStorageSize": {
-            "type": "String",
-            "defaultValue": "5"
+            "type": "String"
         },
         "backupsStorageClassName": {
-            "type": "String",
-            "defaultValue": "managed-premium"
-        },
-        "replicas": {
-            "type": "Int"
+            "type": "String"
         },
         "resourceTags": {
             "type": "Object"
+        },
+        "numWorkers": {
+            "type": "Int"
+        },
+        "extensions": {
+            "type": "Array"
         }
     },
     "variables": {},
     "functions": [],
     "resources": [
         {
-            "type": "Microsoft.AzureArcData/sqlManagedInstances",
+            "type": "Microsoft.AzureArcData/postgresInstances",
             "apiVersion": "2021-06-01-preview",
-            "name": "Jumpstart-SQL",
+            "name": "jumpstartps",
             "location": "[parameters('location')]",
             "extendedLocation": {
                 "type": "CustomLocation",
@@ -95,28 +81,34 @@
             },
             "tags": "[parameters('resourceTags')]",
             "properties": {
-                "admin": "[parameters('azdataUsername')]",
+                "admin": "[parameters('admin')]",
                 "basicLoginInformation": {
-                    "username": "[parameters('azdataUsername')]",
+                    "username": "[parameters('admin')]",
                     "password": "[parameters('azdataPassword')]"
                 },
                 "k8sRaw": {
+                    "kind": "postgresql",
                     "spec": {
-                        "dev": false,
-                        "services": {
-                            "primary": {
-                                "type": "[parameters('serviceType')]"
-                            }
+                        "engine": {
+                            "version": "[parameters('postgresEngineVersion')]",
+                            "extensions": "[parameters('extensions')]"
                         },
-                        "replicas": "[parameters('replicas')]",
+                        "scale": {
+                            "workers": "[parameters('numWorkers')]"
+                        },
                         "scheduling": {
                             "default": {
                                 "resources": {
                                     "requests": {
-                                        "vcores": "[parameters('vCoresMax')]",
-                                        "memory": "[parameters('memoryMax')]"
-                                    }
+                                        "memory": "[parameters('memoryRequest')]"
+                                    },
+                                    "limits": {}
                                 }
+                            }
+                        },
+                        "services": {
+                            "primary": {
+                                "type": "[parameters('serviceType')]"
                             }
                         },
                         "storage": {
@@ -131,16 +123,8 @@
                             "logs": {
                                 "volumes": [
                                     {
-                                        "className": "[parameters('logsStorageClassName')]",
+                                        "className": "[parameters('logStorageClassName')]",
                                         "size": "[parameters('logsStorageSize')]"
-                                    }
-                                ]
-                            },
-                            "datalogs": {
-                                "volumes": [
-                                    {
-                                        "className": "[parameters('dataLogsStorageClassName')]",
-                                        "size": "[parameters('dataLogsStorageSize')]"
                                     }
                                 ]
                             },
@@ -155,9 +139,9 @@
                         },
                         "settings": {
                             "azure": {
-                                "location": "[parameters('location')]",
+                                "subscription": "[parameters('subscriptionId')]",
                                 "resourceGroup": "[parameters('resourceGroup')]",
-                                "subscription": "[parameters('subscriptionId')]"
+                                "location": "[parameters('location')]"
                             }
                         }
                     },
