@@ -1,14 +1,12 @@
 Start-Transcript -Path C:\Temp\deployPostgreSQL.log
 
 # Deployment environment variables
-# $deploymentNamespace = "arc"
 $controllerName = "Jumpstart-DC"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
 Write-Host "`n"
 
-# $deploymentNamespace = "dataservices"
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $memoryRequest = "0.25Gi"
 $StorageClassName = "managed-premium"
@@ -55,6 +53,16 @@ $pgsqlstring.split(" ") | Tee-Object "C:\Temp\postgres_instance_endpoint.txt" | 
 (Get-Content $pgsqlfile | Select-Object -Skip 7) | Set-Content $pgsqlfile
 $pgsqlstring = Get-Content $pgsqlfile
 
+Write-Host ""
+Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
+$settingsTemplate = "C:\Temp\settingsTemplate.json"
+kubectl describe svc jumpstart-sql-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
+$sqlfile = "C:\Temp\sql_instance_list.txt"
+$sqlstring = Get-Content $sqlfile
+$sqlstring.split(" ") | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
+(Get-Content $sqlfile | Select-Object -Skip 7) | Set-Content $sqlfile
+$sqlstring = Get-Content $sqlfile
+
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres',$pgsqlstring | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 
@@ -66,5 +74,3 @@ if ( $env:deploySQLMI -eq $false )
 
 # Cleaning garbage
 Remove-Item "C:\Temp\postgres_instance_endpoint.txt" -Force
-
-Stop-Transcript
