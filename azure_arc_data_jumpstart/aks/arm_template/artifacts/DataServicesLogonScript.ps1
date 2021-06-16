@@ -128,6 +128,13 @@ if ( $env:deployPostgreSQL -eq $true )
     & "C:\Temp\DeployPostgreSQL.ps1"
 }
 
+# Applying Azure Data Studio settings template file
+if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
+    Write-Host "Copying Azure Data Studio settings template file"
+    New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+    Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+}
+
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
 $code = @' 
@@ -154,7 +161,5 @@ Stop-Process -Id $kubectlMonShell.Id
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
-
-# Stop-Process -Name powershell -Force
 
 Stop-Transcript
