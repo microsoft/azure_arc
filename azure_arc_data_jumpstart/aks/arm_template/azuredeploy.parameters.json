@@ -21,16 +21,22 @@
             "value": "ArcPassword123!!"
         },
         "myIpAddress": {
-            "value": "<your IP address>"
+            "value": "<your local public IP address>"
         },
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
-        },        
+        },
         "deploySQLMI": {
             "value": "<SQL Managed Instance deployement (true/false)>"
         },
         "deployPostgreSQL": {
             "value": "<PostgreSQL Hyperscale deployement (true/false)>"
+        },
+        "kubernetesVersion": {
+            "value": "1.18.17"
+        },
+        "dnsPrefix": {
+            "value": "arcdata"
         }
     }
 }
