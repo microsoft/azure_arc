@@ -7,7 +7,6 @@ module "managed-k8s" {
   vswitch_cidrs = [
     "192.168.1.0/24",
   ]
-  worker_instance_types = ["ecs.g6.large"]
   new_sls_project = true
 
   kube_config_path = "~/.kube/config_alicloudArc"
