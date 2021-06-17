@@ -88,7 +88,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *myIpAddress* - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and AKS cluster.
   * *logAnalyticsWorkspaceName* - Unique name for the deployment log analytics workspace
   * *deploySQLMI* - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure SQL Managed Instance scenario, we will set it to _**true**_.
-  * *deployPostgreSQL* - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure SQL Managed Instance scenario only scenario, we leave it set to _**false**_.
+  * *deployPostgreSQL* - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
   * *kubernetesVersion* - AKS version
   * *dnsPrefix* - AKS unique DNS prefix
 
@@ -132,7 +132,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
-* Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure Arc Data Controller will be deployed on the cluster and be ready to use.
+* Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and SQL Managed Instance will be deployed on the cluster and be ready to use.
 
 ![PowerShell logon script run](./04.png)
 
@@ -168,23 +168,23 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ![PowerShell logon script run](./20.png)
 
-* Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice addtional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
+* Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
 
   * Azure Arc enabled Kubernetes cluster - Azure Arc enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
   * Custom location - provides a way for tenant administrators to use their Azure Arc enabled Kubernetes clusters as target locations for deploying Azure services instances.
 
-  * Azure Arc Data Controller - The data contoller that is now deployed on the Kubernetes cluster.
+  * Azure Arc Data Controller - The data controller that is now deployed on the Kubernetes cluster.
 
   * Azure Arc enabled SQL Managed Instance - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
-![Addtional Azure resources in the resource group](./21.png)
+![additional Azure resources in the resource group](./21.png)
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
   ![Azure Data Studio connection](./22.png)
 
-* Addtionaly, the SQL Managed Instance connection will be configured automaticly for you.
+* additionally, the SQL Managed Instance connection will be configured automatically for you.
 
   ![Azure Data Studio connection](./23.png)
 
@@ -192,7 +192,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Cluster extensions
 
-In this scenario, the Azure Arc enabled data services cluster extension was deployed and used troughout this scenario in order to deploy the data services infrastructure.
+In this scenario, the Azure Arc enabled data services cluster extension was deployed and used throughout this scenario in order to deploy the data services infrastructure.
 
 * In order to view cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
 

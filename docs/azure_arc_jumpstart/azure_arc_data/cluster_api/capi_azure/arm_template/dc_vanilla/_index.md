@@ -177,15 +177,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ![PowerShell logon script run](./16.png)
 
-* Since this scenario is deploying the Azure Arc Data Controller, you will also notice addtional newly deployed Azure resources in the resources group (at this point you should have **47 various Azure resources" deployed). The important ones to notice are:
+* Since this scenario is deploying the Azure Arc Data Controller, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **47 various Azure resources" deployed). The important ones to notice are:
 
   * Azure Arc enabled Kubernetes cluster - Azure Arc enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
   * Custom location - provides a way for tenant administrators to use their Azure Arc enabled Kubernetes clusters as target locations for deploying Azure services instances.
 
-  * Azure Arc Data Controller - The data contoller that is now deployed on the Kubernetes cluster.
+  * Azure Arc Data Controller - The data controller that is now deployed on the Kubernetes cluster.
 
-![Addtional Azure resources in the resource group](./17.png)
+![additional Azure resources in the resource group](./17.png)
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
@@ -199,7 +199,7 @@ In this scenario, three Azure Arc enabled Kubernetes cluster extensions were dep
 
 * _azuremonitor-containers_ - The Azure monitor for containers cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/) scenario.
 
-* _arc-data-services_ - The Azure Arc enabled data services cluster extension that was used troughout this scenario in order to deploy the data services infrastructure.
+* _arc-data-services_ - The Azure Arc enabled data services cluster extension that was used throughout this scenario in order to deploy the data services infrastructure.
 
 * In order to view these cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
 
