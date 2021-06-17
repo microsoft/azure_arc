@@ -88,7 +88,7 @@
     }    
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/",
+    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",    
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"

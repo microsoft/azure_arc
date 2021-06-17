@@ -153,7 +153,7 @@
         "subnetAddressPrefix": "172.16.1.0/24",
         "addressPrefix": "172.16.0.0/16",
         "osDiskType": "Premium_LRS",
-        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_data_connected/azure_arc_data_jumpstart/aks/arm_template/"
+        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/"
     },
     "resources": [
         {

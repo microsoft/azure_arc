@@ -187,8 +187,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ![Addtional Azure resources in the resource group](./17.png)
 
-**Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
-
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
   ![Azure Data Studio shortcut](./18.png)
@@ -207,7 +205,7 @@ In this scenario, three Azure Arc enabled Kubernetes cluster extensions were dep
 
   ![Azure Arc enabled Kubernetes resource](./19.png)
 
-  ![Azure Arc enabled Kubernetes clustExtensions settings](./20.png)
+  ![Azure Arc enabled Kubernetes cluster extensions settings](./20.png)
 
 ## Cleanup
 
