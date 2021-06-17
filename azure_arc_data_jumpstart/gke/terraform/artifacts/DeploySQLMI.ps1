@@ -67,7 +67,7 @@ if ( $env:deployPostgreSQL -eq $false )
     $string[25] = $string[25] -replace ",",""
     $string | Set-Content $settingsTemplate
     $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
-    (Get-Content -Path $string) | Set-Content -Path $settingsTemplate
+    $string | Set-Content -Path $settingsTemplate
 }
 
 # Cleaning garbage
