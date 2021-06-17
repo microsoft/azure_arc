@@ -27,10 +27,10 @@
             "value": "<your unique Log Analytics workspace name>"
         },
         "deploySQLMI": {
-            "value": "<SQL Managed Instance deployement (true/false)>"
+            "value": "<SQL Managed Instance deployment (true/false)>"
         },
         "deployPostgreSQL": {
-            "value": "<PostgreSQL Hyperscale deployement (true/false)>"
+            "value": "<PostgreSQL Hyperscale deployment (true/false)>"
         },
         "kubernetesVersion": {
             "value": "1.18.17"
