@@ -8,6 +8,7 @@ Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
 Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $memoryRequest = "0.25Gi"
 $StorageClassName = "local-ssd"
 $dataStorageSize = "5Gi"
