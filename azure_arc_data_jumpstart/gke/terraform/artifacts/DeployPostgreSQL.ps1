@@ -61,7 +61,7 @@ $pgsqlfile = "C:\Temp\postgres_instance_endpoint.txt"
 $pgsqlstring = Get-Content $pgsqlfile
 $pgsqlstring.split(" ") | Out-File "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
 (Get-Content $pgsqlfile | Select-Object -Skip 7) | Set-Content $pgsqlfile
-(Get-Content $pgsqlfile ) | Where-Object {$_.trim() -ne "" } | Set-Content $pgsqlfile
+(Get-Content $pgsqlfile | Where-Object {$_.trim() -ne "" }) | Set-Content $pgsqlfile
 $pgsqlstring = Get-Content $pgsqlfile
 
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres',$pgsqlstring | Set-Content -Path $settingsTemplate
