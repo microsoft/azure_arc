@@ -146,7 +146,13 @@
             "metadata": {
                 "description": "Private Azure Arc Data Container Image Tag"
             }
-        },                              
+        },      
+        "MSSQL_MI_NAME": {
+            "type": "string",
+            "metadata": {
+                "description": "MSSQL instance name to be deployed on the Kubernetes cluster"
+            }
+        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "Arc-Data-Client-VNET",
@@ -171,7 +177,7 @@
         "resourceTags": {
             "type": "object",
             "defaultValue": {
-                "Project": "jumpstart_azure_arc_data"
+                "Project": "jumpstart_azure_arc_data_services"
             }
         }        
     },
@@ -234,20 +240,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
                         }
-                    },
-                    {
-                        "name": "allow_SQL_1433",
-                        "properties": {
-                            "priority": 1002,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "1443"
-                        }
-                    }                                                                                                                                  
+                    }                                                                                                                                     
                 ]
             }
         },
@@ -294,7 +287,7 @@
             "apiVersion": "2019-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
-            "tags": "[parameters('resourceTags')]",            
+            "tags": "[parameters('resourceTags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -350,9 +343,9 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/dc_vanilla/scripts/ClientTools.ps1"
+                "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/scripts/ClientTools.ps1"
               ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -SPN_CLIENT_ID ', parameters('SPN_CLIENT_ID'), ' -SPN_CLIENT_SECRET ', parameters('SPN_CLIENT_SECRET'), ' -SPN_AUTHORITY ', parameters ('SPN_AUTHORITY'), ' -adminUsername ', parameters('adminUsername'), ' -SPN_TENANT_ID ', parameters('SPN_TENANT_ID'), ' -resourceGroup ', parameters('resourceGroup'), ' -clusterName ', parameters('clusterName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -REGISTRY_USERNAME ', parameters('REGISTRY_USERNAME'), ' -REGISTRY_PASSWORD ', parameters('REGISTRY_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -DOCKER_REGISTRY ', parameters('DOCKER_REGISTRY'), ' -DOCKER_REPOSITORY ', parameters('DOCKER_REPOSITORY'), ' -DOCKER_TAG ', parameters('DOCKER_TAG'))]" 
+              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -SPN_CLIENT_ID ', parameters('SPN_CLIENT_ID'), ' -SPN_CLIENT_SECRET ', parameters('SPN_CLIENT_SECRET'), ' -adminUsername ', parameters('adminUsername'), ' -SPN_TENANT_ID ', parameters('SPN_TENANT_ID'), ' -SPN_AUTHORITY ', parameters('SPN_AUTHORITY'), ' -resourceGroup ', parameters('resourceGroup'), ' -clusterName ', parameters('clusterName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -REGISTRY_USERNAME ', parameters('REGISTRY_USERNAME'), ' -REGISTRY_PASSWORD ', parameters('REGISTRY_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -DOCKER_REGISTRY ', parameters('DOCKER_REGISTRY'), ' -DOCKER_REPOSITORY ', parameters('DOCKER_REPOSITORY'), ' -DOCKER_TAG ', parameters('DOCKER_TAG'), ' -MSSQL_MI_NAME ', parameters('MSSQL_MI_NAME'))]"
             }            
           }
         }                        
