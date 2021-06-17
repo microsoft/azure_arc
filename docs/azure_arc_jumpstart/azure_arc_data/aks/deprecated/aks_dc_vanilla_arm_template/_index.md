@@ -1,10 +1,10 @@
----
+<!-- ---
 type: docs
 title: "Data Controller ARM Template"
 linkTitle: "Data Controller ARM Template"
 weight: 1
 description: >
----
+--- -->
 
 ## Deploy Azure Arc Data Controller (Vanilla) on AKS using an ARM Template
 
