@@ -120,9 +120,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **8 various Azure resources** deployed.
 
-    ![ARM template deployment completed](./01.jpg)
+    ![ARM template deployment completed](./01.png)
 
-    ![New Azure resource group with all resources](./02.jpg)
+    ![New Azure resource group with all resources](./02.png)
 
 ## Windows Login & Post Deployment
 
