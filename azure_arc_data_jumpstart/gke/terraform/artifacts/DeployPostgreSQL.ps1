@@ -53,7 +53,7 @@ Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
 kubectl exec $podname -n arc -c postgres -- sudo -u postgres psql -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
 
 # Creating Azure Data Studio settings for PostgreSQL connection
-Write-Host ""
+Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
 $settingsTemplate = "C:\Temp\settingsTemplate.json"
 kubectl describe svc jumpstartps-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
