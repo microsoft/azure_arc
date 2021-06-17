@@ -1,0 +1,281 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "myIpAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Your public IP address, used to ssh to the AKS nodes (if needed)"
+            }
+        },        
+        "clusterName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Managed Cluster resource."
+            }
+        },
+        "resourceGroup": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().name]",
+            "metadata": {
+                "description": "Location for all resources"
+            }
+        },        
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "The Azure location of the AKS resource."
+            }
+        },
+        "dnsPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+            }
+        },
+        "osDiskSizeGB": {
+            "defaultValue": 0,
+            "minValue": 0,
+            "maxValue": 1023,
+            "type": "int",
+            "metadata": {
+                "description": "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
+            }
+        },
+        "agentCount": {
+            "defaultValue": 3,
+            "minValue": 1,
+            "maxValue": 50,
+            "type": "int",
+            "metadata": {
+                "description": "The number of agent nodes for the cluster. Production workloads have a recommended minimum of 3."
+            }
+        },
+        "agentVMSize": {
+            "defaultValue": "Standard_DS2_v2",
+            "type": "string",
+            "metadata": {
+                "description": "The size of the Virtual Machine."
+            }
+        },
+        "linuxAdminUsername": {
+            "type": "string",
+            "defaultValue": "arcdemo",
+            "metadata": {
+                "description": "User name for the Linux Virtual Machines."
+            }
+        },
+        "sshRSAPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+            }
+        },        
+        "spnClientId": {
+            "type": "string",
+            "metadata": {
+                "description": "Client ID (used by cloudprovider)"
+            }
+        },
+        "spnClientSecret": {
+            "metadata": {
+                "description": "The Service Principal Client Secret."
+            },
+            "type": "securestring"
+        },
+        "osType": {
+            "defaultValue": "Linux",
+            "allowedValues": [
+                "Linux"
+            ],
+            "type": "string",
+            "metadata": {
+                "description": "The type of operating system."
+            }
+        },
+        "kubernetesVersion": {
+            "defaultValue": "1.19.11",
+            "type": "string",
+            "metadata": {
+                "description": "The version of Kubernetes."
+            }
+        },
+        "enableHttpApplicationRouting": {
+            "defaultValue": false,
+            "type": "bool",
+            "metadata": {
+                "description": "boolean flag to turn on and off of http application routing"
+            }
+        },
+        "networkPlugin": {
+            "allowedValues": [
+                "azure",
+                "kubenet"
+            ],
+            "defaultValue": "azure",
+            "type": "string",
+            "metadata": {
+                "description": "Network plugin used for building Kubernetes network."
+            }
+        },
+        "maxPods": {
+            "defaultValue": 30,
+            "type": "int",
+            "metadata": {
+                "description": "Maximum number of pods that can run on a node."
+            }
+        },
+        "enableRBAC": {
+            "defaultValue": true,
+            "type": "bool",
+            "metadata": {
+                "description": "Boolean flag to turn on and off of RBAC"
+            }
+        },
+        "builtInRoleType": {
+            "type": "string",
+            "allowedValues": [
+                "Owner",
+                "Contributor",
+                "Reader",
+                "Network Contributor"
+            ],
+            "defaultValue": "Network Contributor",
+            "metadata": {
+                "description": "Built-in role to assign"
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "Arc-AppSvc-VNet",
+            "metadata": {
+              "description": "Name of an existing VNET that will contain this AKS deployment."
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "Arc-AppSvc-Subnet",
+            "metadata": {
+                "description": "Subnet name that will contain the App Service Environment."
+            }
+        },
+        "serviceCidr": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "A CIDR notation IP range from which to assign service cluster IPs."
+            }
+        },
+        "dnsServiceIP": {
+            "type": "string",
+            "defaultValue": "10.0.0.10",
+            "metadata": {
+                "description": "Containers DNS server IP address."
+            }
+        },
+        "dockerBridgeCidr": {
+            "type": "string",
+            "defaultValue": "172.16.0.0/16",
+            "metadata": {
+                "description": "A CIDR notation IP for Docker bridge."
+            }
+        }
+    },
+    "variables": {
+        "builtInRole":{
+        "Owner":"[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+        "Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+        "Network Contributor": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4d97b98b-1d4f-4787-a291-c67834d212e7')]"
+        },
+        "vnetSubnetId": "[resourceId(parameters('resourceGroup'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),parameters('subnetName'))]"
+    },
+    "resources": [
+            {
+            "type": "Microsoft.Resources/deployments",
+            "name": "ClusterSubnetRoleAssignmentDeployment",
+            "apiVersion": "2019-10-01",
+            "resourceGroup": "[parameters('resourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",
+                            "apiVersion": "2020-04-01-preview",
+                            "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, deployment().name))]",
+                            "properties": {
+                                "roleDefinitionId": "[variables('builtInRole')[parameters('builtInRoleType')]]",
+                                "principalId": "[reference(concat('Microsoft.Network/virtualNetworks/subnets', variables('vnetSubnetId')), '2019-03-01', 'Full').identity.principalId]",
+                                "scope": "[variables('vnetSubnetId')]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ContainerService/managedClusters",
+            "name": "[parameters('clusterName')]",
+            "apiVersion": "2020-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "ClusterSubnetRoleAssignmentDeployment"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "kubernetesVersion": "[parameters('kubernetesVersion')]",
+                "enableRBAC": "[parameters('enableRBAC')]",
+                "dnsPrefix": "[parameters('dnsPrefix')]",
+                "addonProfiles": {
+                    "httpApplicationRouting": {
+                        "enabled": "[parameters('enableHttpApplicationRouting')]"
+                    }
+                },
+                "agentPoolProfiles": [
+                    {
+                        "name": "agentpool",
+                        "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
+                        "count": "[parameters('agentCount')]",
+                        "vmSize": "[parameters('agentVMSize')]",
+                        "osType": "[parameters('osType')]",
+                        "storageProfile": "ManagedDisks",
+                        "vnetSubnetID": "[variables('vnetSubnetId')]",
+                        "maxPods": "[parameters('maxPods')]",
+                        "mode" : "System"
+                    }
+                ],
+                "servicePrincipalProfile": {
+                    "clientId": "[parameters('spnClientId')]"
+                },
+                "networkProfile": {
+                    "networkPlugin": "[parameters('networkPlugin')]",
+                    "serviceCidr": "[parameters('serviceCidr')]",
+                    "dnsServiceIP": "[parameters('dnsServiceIP')]",
+                    "dockerBridgeCidr": "[parameters('dockerBridgeCidr')]"
+                },
+                "linuxProfile": {
+                    "adminUsername": "[parameters('linuxAdminUsername')]",
+                    "ssh": {
+                        "publicKeys": [
+                            {
+                                "keyData": "[parameters('sshRSAPublicKey')]"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "controlPlaneFQDN": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.ContainerService/managedClusters', parameters('clusterName'))).fqdn]"
+        }
+    }
+}
