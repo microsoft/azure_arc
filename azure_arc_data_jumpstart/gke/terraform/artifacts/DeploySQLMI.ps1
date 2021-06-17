@@ -8,6 +8,7 @@ Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $vCoresMax = 4
 $memoryMax = "8"
 $StorageClassName = "local-ssd"
@@ -44,6 +45,13 @@ Do {
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
+
+# Downloading demo database and restoring onto SQL MI
+$podname = "jumpstart-sql-0"
+Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+kubectl exec $podname -n $env:arcDcName -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
 
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Write-Host ""
