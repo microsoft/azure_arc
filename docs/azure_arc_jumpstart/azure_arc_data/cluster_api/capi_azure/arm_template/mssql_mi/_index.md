@@ -135,7 +135,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: The deployment time for this scenario can take ~15-20min**
 
-* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 verious Azure resources" deployed.
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 verious Azure resources** deployed.
 
     ![ARM template deployment completed](./01.png)
 
@@ -177,7 +177,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ![PowerShell logon script run](./16.png)
 
-* Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice addtional newly deployed Azure resources in the resources group (at this point you should have **54 verious Azure resources" deployed). The important ones to notice are:
+* Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice addtional newly deployed Azure resources in the resources group (at this point you should have **54 verious Azure resources deployed**. The important ones to notice are:
 
   * Azure Arc enabled Kubernetes cluster - Azure Arc enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
@@ -188,8 +188,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * Azure Arc enabled SQL Managed Instance - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
 ![Addtional Azure resources in the resource group](./17.png)
-
-**Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 

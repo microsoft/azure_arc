@@ -120,9 +120,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **8 verious Azure resources" deployed.
 
-    ![ARM template deployment completed](./01.jpg)
+    ![ARM template deployment completed](./01.png)
 
-    ![New Azure resource group with all resources](./02.jpg)
+    ![New Azure resource group with all resources](./02.png)
 
 ## Windows Login & Post Deployment
 
@@ -168,7 +168,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ![PowerShell logon script run](./20.png)
 
-* Since this scenario is deploying the Azure Arc Data Controller, you will also notice addtional newly deployed Azure resources in the resources group (at this point you should have **11 verious Azure resources" deployed). The important ones to notice are:
+* Since this scenario is deploying the Azure Arc Data Controller, you will also notice addtional newly deployed Azure resources in the resources group (at this point you should have **11 verious Azure resources deployed**. The important ones to notice are:
 
   * Azure Arc enabled Kubernetes cluster - Azure Arc enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
@@ -184,7 +184,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Cluster extensions
 
-In this scenario, the Azure Arc enabled data services cluster extension was deployed and was used troughout this scenario in order to deploy the data services infrastructure.
+In this scenario, the Azure Arc enabled data services cluster extension was deployed and used troughout this scenario in order to deploy the data services infrastructure.
 
 * In order to view cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
 
