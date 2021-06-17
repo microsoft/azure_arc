@@ -1,5 +1,5 @@
 module "managed-k8s" {
-  source            = "terraform-alicloud-modules/managed-kubernetes/alicloud"
+  source            = "./module"
 
   k8s_name_prefix = "azure-arc-poc"
   new_vpc         = true
