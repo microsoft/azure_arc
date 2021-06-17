@@ -8,9 +8,9 @@ description: >
 
 ## Deploy an Azure Arc Data Controller (Vanilla) on GKE using Terraform
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster, using [Terraform](https://www.terraform.io/).
+The following scanario will guide you on how to deploy a "Ready to Go" environment so you can deploy Azure Arc Data Services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster using [Terraform](https://www.terraform.io/).
 
-By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM installed and pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
 > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -20,8 +20,11 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 * Download credentials file
 * Clone the Azure Arc Jumpstart repository
 * Edit *TF_VAR* variables values
+* Export *TFVAR* values
 * *terraform init*
 * *terraform apply*
+* User remotes into sidecar Windows VM, which automatically kicks off the [DataServicesLogonScript](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/terraform/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploys and configures Azure Arc enabled data services on the GKE cluster.
+* *kubectl delete namespace arc*
 * *terraform destroy*
 
 ## Prerequisites
@@ -32,7 +35,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.20.0 or higher](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -48,7 +51,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
     ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
-* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Install Terraform 1.0 or higher](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 * Create Azure service principal (SP)
 
@@ -78,18 +81,6 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
   ```
 
   > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
-
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
-
-  ```shell
-  az provider register --namespace Microsoft.AzureArcData
-  ```
-
-  You can monitor the registration process with the following commands:
-
-  ```shell
-  az provider show -n Microsoft.AzureArcData -o table
-  ```
 
 * Create a new GCP Project, IAM Role & Service Account. In order to deploy resources in GCP, we will create a new GCP Project as well as a service account to allow Terraform to authenticate against GCP APIs and run the plan to deploy resources.
 
@@ -137,47 +128,46 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 ## Automation Flow
 
-For you to get familiar with the automation and deployment flow, below is an explanation.
+Read the below explanation to get familiar with the automation and deployment flow.
 
-* User is editing and exporting Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables values are being used throughout the deployment.
+* User edits and exports Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables are being used throughout the deployment.
 
-* User deploys the Terraform plan which will deploy the GKE cluster and the GCP compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services you will be able to deploy such as Azure SQL Managed Instance and PostgreSQL Hyperscale.
+* User deploys the Terraform plan which will deploy the GKE cluster and the GCP compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and any database services you deploy on top of the data controller.
 
 * In addition, the plan will copy the *local_ssd_sc.yaml* file which will be used to create a Kubernetes Storage Class backed by SSD disks that will be used by Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
 
   > **Note: Depending on the GCP region, make sure you do not have any [SSD quota limit in the region](https://cloud.google.com/compute/quotas), otherwise, the Azure Arc Data Controller kubernetes resources will fail to deploy.**
 
-* As part of the Windows Server 2019 VM deployment, there are 4 scripts executions:
+* As part of the Windows Server 2019 VM deployment, there are 4 script executions:
 
   1. *azure_arc.ps1* script will be created automatically as part of the Terraform plan runtime and is responsible on injecting the *TF_VAR* variables values on to the Windows instance which will then be used in both the *ClientTools* and the *LogonScript* scripts.
 
   2. *password_reset.ps1* script will be created automatically as part of the Terraform plan runtime and is responsible on creating the Windows username & password.
 
-  3. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
-      * Create the *ClientTools.log* file  
-      * Install the required tools – az cli, az cli Powershell module, kubernetes-cli, Visual C++ Redistributable (Chocolaty packages)
+  3. *Bootstrap.ps1* script will run at the Terraform plan runtime Runtime and will:
+      * Create the *Bootstrap.log* file  
+      * Install the required tools – az cli, az cli Powershell module, kubernetes-cli, Visual C++ Redistributable, helm, vscode, etc. (Chocolaty packages)
       * Download Azure Data Studio & Azure Data CLI
-      * Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
-      * Disable Windows Server Manager
-      * Create the logon script
-      * Create the Windows schedule task to run the logon script at first login
+      * Disable Windows Server Manager, remove Internet Explorer, disable Windows Firewall
+      * Download the DataServicesLogonScript.ps1 PowerShell script
+      * Create the Windows schedule task to run the DataServicesLogonScript at first login
 
-  4. *LogonScript.ps1* script will run on user first logon to Windows and will:
-      * Create the *LogonScript.log* file
+  4. *DataServicesLogonScript.ps1* script will run on user first logon to Windows and will:
+      * Create the *DataServicesLogonScript.log* file
       * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       * Create the Azure Data Studio desktop shortcut
       * Apply the *local_ssd_sc.yaml* file on the GKE cluster
-      * Create the *azdata* config file in user Windows profile
+      * Use Azure CLI to connect the GKE cluster to Azure as an Azure Arc enabled Kubernetes cluster
+      * Create a custom location for use with the Azure Arc enabled Kubernetes cluster
+      * Deploy an ARM template that will deploy the Azure Arc data controller on the GKE cluster
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
-      * Create Arc Data Controller config file (*control.json*) to setup the use of the Storage Class and Kubernetes LoadBalancer service
-      * Deploy the Arc Data Controller using the *TF_VAR* variables values
       * Unregister the logon script Windows schedule task so it will not run after first login
 
 ## Deployment
 
-As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data Controller on that cluster and a Windows Server 2019 Client GCP compute instance.
+As mentioned, the Terraform plan and automation scripts will deploy a GKE cluster, the Azure Arc Data Controller on that cluster and a Windows Server 2019 Client GCP compute instance.
 
-* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/dc_vanilla/terraform/example/TF_VAR_example.sh)
+* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it into your shell after you finish editing these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/terraform/example/TF_VAR_datacontroller_only_example.sh)
 
   ![Terraform vars export](./19.png)
 
@@ -201,8 +191,10 @@ As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data C
   * *export TF_VAR_ARC_DC_SUBSCRIPTION*='Azure Arc Data Controller Azure subscription ID'
   * *export TF_VAR_ARC_DC_RG*='Azure resource group where all future Azure Arc resources will be deployed'
   * *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+  * *export TF_VAR_deploy_SQLMI='Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller only scenario we leave it set to false'
+  * *export TF_VAR_deploy_PostgreSQL='Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller only scenario we leave it set to false'
 
-    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables see example below**
 
     ```powershell
     $env:TF_VAR_gcp_project_id='azure-arc-demo-xxxxxx'
@@ -211,7 +203,7 @@ As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data C
 * Navigate to the folder that has Terraform binaries.
 
   ```shell
-  cd azure_arc_data_jumpstart/gke/dc_vanilla/terraform/
+  cd azure_arc_data_jumpstart/gke/terraform/
   ```
 
 * Run the ```terraform init``` command which is used to initialize a working directory containing Terraform configuration files and load the required Terraform providers.
@@ -250,11 +242,11 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   ![GCP Client VM RDP](./29.png)
 
-* At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
+* At first login, as mentioned in the "Automation Flow" section, the DataServicesLogonScript.ps1 will get executed. This script was created as part of the automated deployment process.
 
-    Let the script to run it's course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the GKE cluster. **The logon script run time is approximately 10min long**.
+    Let the script run its course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the GKE cluster. **The logon script run time is approximately 10min long**.
 
-    Once the script will finish it's run, the logon script PowerShell session will be close and the Azure Arc Data Controller will be deployed on the GKE cluster and be ready to use.
+    Once the script finishes, the logon script PowerShell session will be close and the Azure Arc Data Controller will be deployed on the GKE cluster and be ready to use.
 
   ![PowerShell login script run](./30.png)
 
@@ -266,22 +258,13 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   ![PowerShell login script run](./34.png)
 
+* When the scripts are complete, all PowerShell windows will close.
+
   ![PowerShell login script run](./35.png)
 
-  <!-- > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes) and features are subject to change. As such, the release being used in this scenario does not support the projection of Azure Arc data services resources in the Azure portal**.
+* From Azure Portal, navigate to the resource group and confirm that the Azure Arc enabled Kubernetes cluster, the Azure Arc data controller resource and the Custom Location resource are present.
 
-    ![Data Controller in a resource group](./36.png)
-
-    ![Data Controller resource](./37.png) -->
-
-* Using PowerShell, login to the Data Controller and check it's health using the below commands.
-
-    ```powershell
-    azdata login --namespace $env:ARC_DC_NAME
-    azdata arc dc status show
-    ```
-
-  ![azdata login](./38.png)
+  ![Azure Portal showing data controller resource](./38.png)
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
@@ -289,20 +272,22 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   ![Azure Data Studio extension](./40.png)
 
-## Cleanup
-
-* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is ~2-3min long**.
-
-  ![DC_Cleanup PowerShell script run](./41.png)
-  
-## Re-Deploy Azure Arc Data Controller
-
-In case you deleted the Azure Arc Data Controller from the GKE cluster, you can re-deploy it by running the *DC_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long**.
-
-  ![Re-Deploy Azure Arc Data Controller PowerShell script](./42.png)
-
 ## Delete the deployment
 
-To completely delete the environment, follow the below steps run the ```terraform destroy --auto-approve``` command which will delete all of the GCP resources as well as the Azure resource group. **The *terraform destroy* run time is approximately ~5-6min long**.
+To completely delete the environment, follow the below steps.
+
+* Delete the data services resources by using kubectl. Run the below command from a PowerShell window on the client VM.
+
+  ```shell
+  kubectl delete namespace arc
+  ```
+
+  ![Delete database resources](./47.png)
+
+* Use terraform to delete all of the GCP resources as well as the Azure resource group. **The *terraform destroy* run time is approximately ~5-6min long**.
+
+  ```shell
+  terraform destroy --auto-approve
+  ```
 
   ![terraform destroy](./43.png)
