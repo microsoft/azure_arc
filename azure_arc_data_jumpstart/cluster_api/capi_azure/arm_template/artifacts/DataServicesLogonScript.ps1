@@ -1,9 +1,12 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
-# Deployment environment variables
-$connectedClusterName = "Arc-Data-AKS"
+$connectedClusterName = "Arc-Data-CAPI"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
@@ -54,23 +57,37 @@ az extension add --name "customlocation" -y
 Write-Host "`n"
 az -v
 
-# Getting AKS cluster credentials
-Write-Host "Getting AKS cluster credentials"
+# Downloading CAPI Kubernetes cluster kubeconfig file
+Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arc-data-capi"
+$context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
+$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
+kubectl config rename-context "arc-data-capi-admin@arc-data-capi" "arc-data-capi"
+
+# Creating Storage Class with azure-managed-disk for the CAPI cluster
 Write-Host "`n"
-az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
+Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
+kubectl apply -f "C:\Temp\capiStorageClass.yaml"
+
+kubectl label node --all failure-domain.beta.kubernetes.io/zone-
+kubectl label node --all topology.kubernetes.io/zone-
+kubectl label node --all failure-domain.beta.kubernetes.io/zone= --overwrite
+kubectl label node --all topology.kubernetes.io/zone= --overwrite
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
-Write-Host "`n"
+azdata --version
 
-# Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
+# Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name "arc-data-services" --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
@@ -79,9 +96,19 @@ Do {
     } while ($podStatus -eq "Nope")
 
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name "arc-data-services" --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name "jumpstart-cl" --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+
+# Deploying Azure Monitor for containers Kubernetes extension instance
+Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
+Write-Host "`n"
+az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+
+# Deploying Azure Defender Kubernetes extension instance
+Write-Host "Create Azure Defender Kubernetes extension instance"
+Write-Host "`n"
+az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
@@ -158,5 +185,7 @@ Stop-Process -Id $kubectlMonShell.Id
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
+
+Stop-Process -Name powershell -Force
 
 Stop-Transcript

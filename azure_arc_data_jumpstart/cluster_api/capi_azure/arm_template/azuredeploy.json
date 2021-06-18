@@ -19,13 +19,13 @@
     "myIpAddress": {
       "type": "string",
       "metadata": {
-        "description": "IP address allowed SSH and RDP access to resources. Usually this is your home or office public IP address."
+        "description": "IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address."
       }
     },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
-        "description": "RSA public key used for securing SSH access to resources."
+        "description": "RSA public key used for securing SSH access to ArcBox resources."
       }
     },
     "spnClientId": {
@@ -52,26 +52,6 @@
         "description": "Name for your log analytics workspace"
       }
     },
-    "kubernetesVersion": {
-      "defaultValue": "1.18.17",
-      "type": "string",
-      "metadata": {
-        "description": "The version of Kubernetes."
-      }
-    },
-    "clusterName": {
-      "type": "string",
-      "defaultValue":"Arc-Data-AKS",
-        "metadata": {
-          "description": "The name of the Kubernetes cluster resource."
-      }
-    },
-    "dnsPrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
-      }
-    },
     "deploySQLMI": {
         "type": "bool",
         "defaultValue": false,
@@ -85,28 +65,33 @@
         "metadata": {
             "description": "PostgreSQL Hyperscale deployment"
         }
-    }    
+    }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/",
-    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
+    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_connected/azure_arc_data_jumpstart/cluster_api/arm_template/",
+    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",    
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmtStagingStorage.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"
   },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "name": "aksDeployment",
+      "name": "ubuntuCAPIDeployment",
+      "dependsOn": [ "stagingStorageAccountDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('aksTemplateUrl')]",
+          "uri": "[variables('capiTemplateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "myIpAddress": {
+            "value": "[parameters('myIpAddress')]"
           },
           "spnClientId": {
             "value": "[parameters('spnClientId')]"
@@ -114,12 +99,12 @@
           "spnClientSecret": {
             "value": "[parameters('spnClientSecret')]"
           },
-          "kubernetesVersion": {
-            "value": "[parameters('kubernetesVersion')]"
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
           },
-          "dnsPrefix": {
-            "value": "[parameters('dnsPrefix')]"
-          }                    
+          "stagingStorageAccountName": {
+            "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
+          }
         }
       }
     },
@@ -127,6 +112,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
+      "dependsOn": [ "stagingStorageAccountDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -151,19 +137,31 @@
           },
           "myIpAddress": {
             "value": "[parameters('myIpAddress')]"
+          },         
+          "stagingStorageAccountName": {
+            "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },
-          "clusterName": {
-            "value": "[parameters('clusterName')]"
           },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
           },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
-          }
+          }          
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "stagingStorageAccountDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('mgmtStagingStorageUrl')]",
+          "contentVersion": "1.0.0.0"
         }
       }
     },
