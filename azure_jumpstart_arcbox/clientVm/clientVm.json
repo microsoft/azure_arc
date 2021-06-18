@@ -177,7 +177,7 @@
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
-        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/"
+        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_connectedmode/azure_jumpstart_arcbox/"
     },
     "resources": [
         {
