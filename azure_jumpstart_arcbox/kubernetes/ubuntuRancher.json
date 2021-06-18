@@ -327,7 +327,7 @@
                 },
                 "protectedSettings": {
                     "commandToExecute": "[concat('bash installK3s.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
-                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/scripts/installK3s.sh" ]
+                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/installK3s.sh" ]
                 }
             }
         }
