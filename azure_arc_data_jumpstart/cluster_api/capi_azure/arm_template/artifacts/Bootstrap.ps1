@@ -107,7 +107,7 @@ workflow ClientTools_01
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_connected/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/SQLMI.parameters.json" -OutFile "C:\Temp\SQLMI.parameters.json"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_connected/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/postgreSQL.json" -OutFile "C:\Temp\postgreSQL.json"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_connected/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/postgreSQL.parameters.json" -OutFile "C:\Temp\postgreSQL.parameters.json"                       
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_connected/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/dc_vanilla/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/capi_data_connected/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
