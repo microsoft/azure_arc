@@ -201,8 +201,8 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
   kubectx
   kubectx arcbox-capi
   kubectl get nodes
-  kubectl get pods -n arcdatactrl
-  kubectx arcboxk3s
+  kubectl get pods -n arc
+  kubectx arcbox-k3s
   kubectl get nodes
   ```
 
@@ -214,7 +214,8 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
   * Namespace: arcdatactrl
   
   ```shell
-  azdata login --username arcdemo --namespace arcdatactrl
+  kubectx arcbox-capi
+  azdata login --username arcdemo --namespace arc
   azdata arc dc status show
   azdata arc sql endpoint list
   azdata arc postgres endpoint list
@@ -267,7 +268,3 @@ az group delete -n <name of your resource group>
 ## Known issues
 
 * Azure Arc enabled SQL Server assessment report not always visible in Azure Portal
-* Currently, Azure Arc enabled data services are deployed in **indirectly connected** mode.
-* The [_custom-location_](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/custom-locations) feature required for Azure Arc enabled data services directly connected mode currently cannot be installed using a service principal and will present an "Insufficient privileges" error as part of the data services logon script runtime that can be safely ignored for now.
-
-    ![Screenshot showing custom location "Insufficient privileges" error](./customlocationerror.png)
