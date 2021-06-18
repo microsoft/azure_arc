@@ -54,7 +54,7 @@
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "Arc-Data-CAPI-VNet",
+            "defaultValue": "Arc-Data-Client-VNet",
             "metadata": {
                 "description": "Name of the VNET"
             }
