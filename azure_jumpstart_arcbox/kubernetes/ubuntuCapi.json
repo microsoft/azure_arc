@@ -249,7 +249,7 @@
                 },
                 "protectedSettings": {
                     "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
-                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_connectedmode/azure_jumpstart_arcbox/artifacts/installCAPI.sh" ]
+                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/installCAPI.sh" ]
                 }
             }
         }
