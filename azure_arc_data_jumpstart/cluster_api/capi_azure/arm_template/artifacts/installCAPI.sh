@@ -87,7 +87,7 @@ kubectl config set-context arcdatacapimgmt
 kubectl get node -o wide
 
 # Installing clusterctl
-curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.19/clusterctl-linux-amd64 -o clusterctl
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.18/clusterctl-linux-amd64 -o clusterctl
 sudo chmod +x ./clusterctl
 sudo mv ./clusterctl /usr/local/bin/clusterctl
 clusterctl version
