@@ -10,7 +10,7 @@
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "Arc-Data-CAPI",
+            "defaultValue": "Arc-Data-CAPI-MGMT",
             "metadata": {
                 "description": "The name of you Virtual Machine."
             }
@@ -68,7 +68,7 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "Arc-Data-CAPI-NSG",
+            "defaultValue": "Arc-Data-CAPI-MGMT-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
