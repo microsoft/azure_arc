@@ -112,10 +112,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ 
-        "stagingStorageAccountDeployment",
-        "ubuntuCAPIDeployment" 
-        ],
+      "dependsOn": [ "stagingStorageAccountDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
