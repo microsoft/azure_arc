@@ -59,7 +59,7 @@ az -v
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
-$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arc-data-capi"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arc-data-capi-k8s"
 $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
