@@ -1,0 +1,69 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroup": {
+            "value": "resourceGroup-stage"
+        },        
+        "dataControllerId": {
+            "value": "dataControllerId-stage"
+        },
+        "customLocation": {
+            "value": "customLocation-stage"
+        },
+        "subscriptionId": {
+            "value": "subscriptionId-stage"
+        },
+        "admin": {
+            "value": "postgres"
+        },
+        "azdataPassword": {
+            "value": "azdataPassword-stage"
+        },
+        "namespace": {
+            "value": "arc"
+        },
+        "serviceType": {
+            "value": "LoadBalancer"
+        },
+        "memoryRequest": {
+            "value": "memoryRequest-stage"
+        },
+        "postgresEngineVersion": {
+            "value": 12
+        },
+        "dataStorageSize": {
+            "value": "dataSize-stage"
+        },
+        "dataStorageClassName": {
+            "value": "dataStorageClassName-stage"
+        },
+        "logsStorageSize": {
+            "value": "logsSize-stage"
+        },
+        "logStorageClassName": {
+            "value": "logsStorageClassName-stage"
+        },
+        "backupsStorageSize": {
+            "value": "backupsSize-stage"
+        },
+        "backupsStorageClassName": {
+            "value": "backupStorageClassName-stage"
+        },
+        "resourceTags": {
+            "value": {
+                "Project": "jumpstart_azure_arc_data_services"
+            }
+        },
+        "numWorkers": {
+            "value": numWorkersStage
+        },
+        "extensions": {
+            "value": [
+                {
+                    "name": "citus"
+                }
+            ]
+        }
+    }
+}
