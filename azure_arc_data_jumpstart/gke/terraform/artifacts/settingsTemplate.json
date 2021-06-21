@@ -21,7 +21,7 @@
             },
             "groupId": "C777F06B-202E-4480-B475-FA416154D458",
             "providerName": "MSSQL",
-            "savePassword": false,
+            "savePassword": true,
             "id": "ac333479-a04b-436b-88ab-3b314a201295"
         },
         {
@@ -41,7 +41,7 @@
             },
             "groupId": "C777F06B-202E-4480-B475-FA416154D458",
             "providerName": "PGSQL",
-            "savePassword": false,
+            "savePassword": true,
             "id": "4b0e89a5-0376-492d-aa14-791667f51253"
         }
     ],
