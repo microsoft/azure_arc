@@ -1,0 +1,53 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroup": {
+            "value": "resourceGroup-stage"
+        },
+        "dataControllerId": {
+            "value": "dataControllerId-stage"
+        },
+        "customLocation": {
+            "value": "customLocation-stage"
+        },
+        "subscriptionId": {
+            "value": "subscriptionId-stage"
+        },
+        "azdataUsername": {
+            "value": "azdataUsername-stage"
+        },
+        "azdataPassword": {
+            "value": "azdataPassword-stage"
+        },
+        "vCoresMax": {
+            "value": vCoresMaxStage
+        },
+        "memoryMax": {
+            "value": "memoryMax-stage"
+        },
+        "dataStorageSize": {
+            "value": "dataSize-stage"
+        },
+        "dataStorageClassName": {
+            "value": "dataStorageClassName-stage"
+        },
+        "logsStorageSize": {
+            "value": "logsSize-stage"
+        },
+        "dataLogsStorageSize": {
+            "value": "dataLogseSize-stage"
+        },
+        "backupsStorageSize": {
+            "value": "backupsSize-stage"
+        },
+        "replicas": {
+            "value": replicasStage
+        },
+        "resourceTags": {
+            "value": {
+                "Project": "jumpstart_azure_arc_data_services"
+            }
+        }
+    }
+}

@@ -81,7 +81,7 @@
     },
     "deployPostgreSQL": {
         "type": "bool",
-        "defaultValue": true,
+        "defaultValue": false,
         "metadata": {
             "description": "PostgreSQL Hyperscale deployment"
         }
