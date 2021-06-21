@@ -1,0 +1,158 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources"
+            }
+        },
+        "resourceGroup": {
+            "type": "string"
+        },        
+        "dataControllerId": {
+            "type": "String"
+        },
+        "customLocation": {
+            "type": "String"
+        },
+        "subscriptionId": {
+            "type": "String"
+        },
+        "admin": {
+            "type": "String"
+        },
+        "azdataPassword": {
+            "type": "SecureString"
+        },
+        "namespace": {
+            "type": "String"
+        },
+        "serviceType": {
+            "type": "String"
+        },
+        "memoryRequest": {
+            "type": "String"
+        },
+        "postgresEngineVersion": {
+            "type": "Int"
+        },
+        "dataStorageSize": {
+            "type": "String"
+        },
+        "dataStorageClassName": {
+            "type": "String"
+        },
+        "logsStorageSize": {
+            "type": "String"
+        },
+        "logStorageClassName": {
+            "type": "String"
+        },
+        "backupsStorageSize": {
+            "type": "String"
+        },
+        "backupsStorageClassName": {
+            "type": "String"
+        },
+        "resourceTags": {
+            "type": "Object"
+        },
+        "numWorkers": {
+            "type": "Int"
+        },
+        "extensions": {
+            "type": "Array"
+        }
+    },
+    "variables": {},
+    "functions": [],
+    "resources": [
+        {
+            "type": "Microsoft.AzureArcData/postgresInstances",
+            "apiVersion": "2021-06-01-preview",
+            "name": "arcboxps",
+            "location": "[parameters('location')]",
+            "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocation')]"
+            },
+            "tags": "[parameters('resourceTags')]",
+            "properties": {
+                "admin": "[parameters('admin')]",
+                "basicLoginInformation": {
+                    "username": "[parameters('admin')]",
+                    "password": "[parameters('azdataPassword')]"
+                },
+                "k8sRaw": {
+                    "kind": "postgresql",
+                    "spec": {
+                        "engine": {
+                            "version": "[parameters('postgresEngineVersion')]",
+                            "extensions": "[parameters('extensions')]"
+                        },
+                        "scale": {
+                            "workers": "[parameters('numWorkers')]"
+                        },
+                        "scheduling": {
+                            "default": {
+                                "resources": {
+                                    "requests": {
+                                        "memory": "[parameters('memoryRequest')]"
+                                    },
+                                    "limits": {}
+                                }
+                            }
+                        },
+                        "services": {
+                            "primary": {
+                                "type": "[parameters('serviceType')]"
+                            }
+                        },
+                        "storage": {
+                            "data": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('dataStorageClassName')]",
+                                        "size": "[parameters('dataStorageSize')]"
+                                    }
+                                ]
+                            },
+                            "logs": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('logStorageClassName')]",
+                                        "size": "[parameters('logsStorageSize')]"
+                                    }
+                                ]
+                            },
+                            "backups": {
+                                "volumes": [
+                                    {
+                                        "className": "[parameters('backupsStorageClassName')]",
+                                        "size": "[parameters('backupsStorageSize')]"
+                                    }
+                                ]
+                            }
+                        },
+                        "settings": {
+                            "azure": {
+                                "subscription": "[parameters('subscriptionId')]",
+                                "resourceGroup": "[parameters('resourceGroup')]",
+                                "location": "[parameters('location')]"
+                            }
+                        }
+                    },
+                    "metadata": {
+                        "namespace": "[parameters('namespace')]"
+                    },
+                    "status": {}
+                },
+                "dataControllerId": "[parameters('dataControllerId')]"
+            }
+        }
+    ],
+    "outputs": {}
+}
