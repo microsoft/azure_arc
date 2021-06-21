@@ -2,9 +2,6 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $connectedClusterName = "Arc-Data-AKS"
-# $deploymentNamespace = "arc"
-# $customlocationName = "jumpstart-cl"
-# $controllerName = "Jumpstart-DC"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
