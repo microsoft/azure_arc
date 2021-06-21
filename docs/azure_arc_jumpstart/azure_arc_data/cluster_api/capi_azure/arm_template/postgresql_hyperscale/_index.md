@@ -2,7 +2,7 @@
 type: docs
 title: "PostgreSQL Hyperscale ARM Template"
 linkTitle: "PostgreSQL Hyperscale ARM Template"
-weight: 2
+weight: 3
 description: >
 ---
 
