@@ -43,6 +43,18 @@ Oh, and one last thing before you go. Please consider subscribing to the channel
 
 Enjoy!
 
+## Jumpstart Lighting
+
+Jumpstart Lightning is the show where you get a chance to share with our team and the world your Azure Arc, Jumpstart contribution and Hybrid cloud awesome stories. Who knows?! You might find yourself on our YouTube channel!
+
+<p align="center"><img src="/img/jumpstart_lightning_logo.png" alt="jumpstart-lightning-logo" width="250"></p>
+
+* Are you an awesome Azure Arc customer or a Microsoft partner that has an awesome story you would like to talk about?!
+* Ever contributed to the Jumpstart project and want to share it with the world?!
+* Do you have a unique Azure Arc demo and content to show-off?!
+
+What are you waiting for?! [Fill the submission form](https://forms.office.com/r/cyg2DduG1W) and if it’s snazzy enough, you will be hearing from us soon.
+
 ## Azure Arc Overview
 
 For customers who want to simplify complex and distributed environments across on-premises, edge and multi-cloud, [Azure Arc](https://azure.microsoft.com/services/azure-arc/) enables deployment of Azure services anywhere and extends Azure management to any infrastructure.
@@ -51,7 +63,7 @@ For customers who want to simplify complex and distributed environments across o
 
 * **Manage Kubernetes Apps at scale** - Deploy and manage Kubernetes applications across environments using DevOps techniques. Ensure that applications are deployed and configured from source control consistently.
 
-* **Run data services anywhere** - Get automated patching, upgrades, security and scale on-demand across on-premises, edge and multi-cloud environments for your data estate.
+* **Run Azure services anywhere** - Get automated patching, upgrades, security and scale on-demand across on-premises, edge and multi-cloud environments for your data estate.
 
 ## Azure Arc Story Time
 
