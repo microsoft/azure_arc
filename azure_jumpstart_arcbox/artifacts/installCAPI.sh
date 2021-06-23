@@ -52,7 +52,7 @@ sudo snap install kubectl --classic
 # Set CAPI deployment environment variables
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.18.17"
+export KUBERNETES_VERSION="1.19.11"
 export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
@@ -87,7 +87,7 @@ kubectl config set-context arcboxcapimgmt
 kubectl get node -o wide
 
 # Installing clusterctl
-curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.16/clusterctl-linux-amd64 -o clusterctl
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.18/clusterctl-linux-amd64 -o clusterctl
 sudo chmod +x ./clusterctl
 sudo mv ./clusterctl /usr/local/bin/clusterctl
 clusterctl version
