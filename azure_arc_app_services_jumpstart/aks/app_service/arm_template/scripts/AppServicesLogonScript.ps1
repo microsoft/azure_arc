@@ -13,7 +13,7 @@ Write-Host "`n"
 # Deploying AKS cluster
 Write-Host "Deploying AKS cluster"
 Write-Host "`n"
-az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --kubernetes-version 1.20.7 --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
+az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --kubernetes-version 1.19.11 --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
 az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
 $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
 
