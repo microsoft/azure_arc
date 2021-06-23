@@ -13,7 +13,7 @@ Write-Host "`n"
 # Deploying AKS cluster
 Write-Host "Deploying AKS cluster"
 Write-Host "`n"
-az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
+az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --kubernetes-version 1.20.7 --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
 az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
 $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
 
@@ -130,9 +130,8 @@ Write-Host "Deploying App Service Kubernetes Environment"
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
-$customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservice --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
-az appservice kube create -g $env:resourceGroup -n $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --output none -l $env:azureLocation
-
+$customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
+az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --location "Central US EUAP" --output none 
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
