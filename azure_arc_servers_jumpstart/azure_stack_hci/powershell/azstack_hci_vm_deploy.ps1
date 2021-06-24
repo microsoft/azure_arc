@@ -11,7 +11,7 @@ $DHCPEnabled = 'Select $true if DHCP is enabled on your environment, $false if n
 
 $ServerClusterEnabled = 'Select $true if you have a server cluster created, $false if the not'
     
-    #If $ServerClusterEnabled = $true, please provide the path to the cluster storage in the format "<Disk Letter>:\Folder"
+    #If $ServerClusterEnabled = $true,  please provide the path to the cluster storage in the format "<Disk Letter>:\Folder"
     #If $ServerClusterEnabled = $false, please provide the path to a folder where the VM will be created in the format "<Disk Letter>:\Folder"
     $vmdir =  "<Disk Letter>:\Folder"
 
