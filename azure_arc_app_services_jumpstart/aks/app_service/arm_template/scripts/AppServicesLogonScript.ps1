@@ -2,6 +2,11 @@ Start-Transcript -Path C:\Temp\AppServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
+Remove-ItemProperty -Path "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.htm\UserChoice"
+Remove-ItemProperty -Path "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.html\UserChoice"
+Remove-ItemProperty -Path "HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice"
+Remove-ItemProperty -Path "HKCU\SOFTWARE\Microsoft\Windows\Shell\Associations\UrlAssociations\https\UserChoice"
+
 # $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 # $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
 # Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
@@ -20,18 +25,6 @@ $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
-
-# Attaching network secuirty group to the deployment virtual network subnet
-# Write-Host "Attaching network secuirty group to the deployment virtual network subnet"
-# $aksResourceGroupMC = "MC_${env:resourceGroup}_${env:clusterName}_${env:azureLocation}"
-# $aksVnetMC = az network vnet list --resource-group $aksResourceGroupMC --query "[0].name" --output tsv
-# $nsgName = az network nsg list --resource-group $aksResourceGroupMC --query "[0].name" --output tsv
-# $subnetId = az network vnet subnet list --resource-group $aksResourceGroupMC --vnet-name $aksVnetMC --query "[0].id" --output tsv
-# az network nsg create -g $aksResourceGroupMC -n $nsgName --output none
-# az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-HTTP --destination-port-ranges 80 --priority 100 --output none
-# az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-HTTPS --destination-port-ranges 443 --priority 101 --output none
-# az network nsg rule create -g $aksResourceGroupMC --nsg-name $nsgName -n Inbound-SQL --destination-port-ranges 1433 --priority 102 --output none
-# az network vnet subnet update --nsg $nsgName --ids $subnetId --output none
 
 # Creating Azure Public IP resource to be used by the Azure Arc app service
 Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
@@ -142,6 +135,7 @@ Do {
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 az appservice plan create -g $env:resourceGroup -n Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
 az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name mcr.microsoft.com/appsvc/node:12-lts
+az webapp browse --name jumpstart-app --resource-group $env:resourceGroup
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
