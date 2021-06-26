@@ -133,6 +133,16 @@ $extensionId = az k8s-extension show --name $extensionName --cluster-type connec
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
 az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --location $env:azureLocation --output none 
 
+Do {
+   Write-Host "Waiting for kube environment to become available. Hold tight, this might take a few minutes..."
+   Start-Sleep -Seconds 1
+   $kubeEnvironmentNameStatus = $(if(az appservice kube show --resource-group $env:resourceGroup --name $kubeEnvironmentName | Select-String '"provisioningState": "Succeeded"' -Quiet){"Ready!"}Else{"Nope"})
+   } while ($kubeEnvironmentNameStatus -eq "Nope")
+
+$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
+az appservice plan create -g $env:resourceGroup -n Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
+az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name mcr.microsoft.com/appsvc/node:12-lts
+
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
 $code = @' 
