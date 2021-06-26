@@ -10,7 +10,7 @@
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-Client",
+            "defaultValue": "Arc-App-Client",
             "metadata": {
                 "description": "The name for the sidecar virtual machine"
             }
@@ -54,21 +54,21 @@
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-VNet",
+            "defaultValue": "Arc-App-VNet",
             "metadata": {
                 "description": "Name of the VNET"
             }
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-Subnet",
+            "defaultValue": "Arc-App-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-Client-NSG",
+            "defaultValue": "Arc-App-Client-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
