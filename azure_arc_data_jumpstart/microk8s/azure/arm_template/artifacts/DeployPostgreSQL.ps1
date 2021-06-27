@@ -7,6 +7,7 @@ $controllerName = "Jumpstart-DC"
 Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
 Write-Host "`n"
 
+$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $ServiceType = "NodePort"
 $memoryRequest = "0.25Gi"
@@ -23,7 +24,7 @@ $PSQLParams = "C:\Temp\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'customLocation-stage',$customLocationId | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $PSQLParams
-(Get-Content -Path $SQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $SQLParams
+(Get-Content -Path $PSQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'memoryRequest-stage',$memoryRequest | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'logsStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
@@ -58,22 +59,18 @@ kubectl exec $podname -n arc -c postgres -- sudo -u postgres psql -d adventurewo
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
 $settingsTemplate = "C:\Temp\settingsTemplate.json"
-kubectl describe svc jumpstartps-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
-$pgsqlfile = "C:\Temp\postgres_instance_endpoint.txt"
-$pgsqlstring = Get-Content $pgsqlfile
-$pgsqlstring.split(" ") | Out-File "C:\Temp\postgres_instance_endpoint.txt" | Out-Null
-(Get-Content $pgsqlfile | Select-Object -Skip 7) | Set-Content $pgsqlfile
-(Get-Content $pgsqlfile | Where-Object {$_.trim() -ne "" }) | Set-Content $pgsqlfile
-$pgsqlstring = Get-Content $pgsqlfile
 
-(Get-Content -Path $settingsTemplate) -replace 'arc_postgres',$pgsqlstring | Set-Content -Path $settingsTemplate
+# Retrieving PostgreSQL connection endpoint
+$pgsqlstring = kubectl get postgresql  jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
+
+# Replace placeholder values in settingsTemplate.json
+(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_port',$pgsqlstring.split(":")[1] | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 
+# If SQL MI isn't being deployed, clean up settings file
 if ( $env:deploySQLMI -eq $false )
 {
-     $string = Get-Content -Path $settingsTemplate | Select-Object -First 9 -Last 23
+     $string = Get-Content -Path $settingsTemplate | Select-Object -First 9 -Last 24
      $string | Set-Content -Path $settingsTemplate
 }
-
-# Cleaning garbage
-Remove-Item "C:\Temp\postgres_instance_endpoint.txt" -Force
