@@ -35,6 +35,12 @@
       "metadata": {
         "description": "SKU, leave default pergb2018"
       }
+    },
+    "templateBaseUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+      }
     }
   },
   "variables": {
@@ -42,8 +48,7 @@
       "name": "[concat('Updates', '(', parameters('workspaceName'), ')')]",
       "galleryName": "Updates"
     },
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/",
-    "policyTemplate": "[uri(variables('templateBaseUrl'), 'mgmt/policyAzureArcBuiltins.json')]",
+    "policyTemplate": "[uri(parameters('templateBaseUrl'), 'mgmt/policyAzureArcBuiltins.json')]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",

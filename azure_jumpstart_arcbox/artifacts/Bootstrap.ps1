@@ -19,7 +19,8 @@ param (
     [string]$POSTGRES_DATASIZE,
     [string]$POSTGRES_SERVICE_TYPE,
     [string]$stagingStorageAccountName,
-    [string]$workspaceName
+    [string]$workspaceName,
+    [string]$templateBaseUrl
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -47,6 +48,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('POSTGRES_SERVICE_TYPE', $POSTGRES_SERVICE_TYPE,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
 Write-Output "Create ArcBox path"
@@ -125,23 +127,23 @@ workflow ClientTools_01
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/settingsTemplate.json" -OutFile "C:\ArcBox\settingsTemplate.json"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\ArcBox\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/ArcServersLogonScript.ps1" -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/DataServicesLogonScript.ps1" -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/installArcAgent.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/installArcAgentSQL.ps1" -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/installArcAgent.sh" -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml" -OutFile "C:\ArcBox\capiStorageClass.yaml"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/DeployPostgreSQL.ps1" -OutFile "C:\ArcBox\DeployPostgreSQL.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/DeploySQLMI.ps1" -OutFile "C:\ArcBox\DeploySQLMI.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/dataController.json" -OutFile "C:\ArcBox\dataController.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/dataController.parameters.json" -OutFile "C:\ArcBox\dataController.parameters.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/postgreSQL.json" -OutFile "C:\ArcBox\postgreSQL.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/postgreSQL.parameters.json" -OutFile "C:\ArcBox\postgreSQL.parameters.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/sqlmi.json" -OutFile "C:\ArcBox\sqlmi.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/sqlmi.parameters.json" -OutFile "C:\ArcBox\sqlmi.parameters.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/wallpaper.png" -OutFile "C:\ArcBox\wallpaper.png"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\ArcBox\settingsTemplate.json"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/installArcAgent.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/installArcAgentSQL.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/installArcAgent.sh") -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/capiStorageClass.yaml") -OutFile "C:\ArcBox\capiStorageClass.yaml"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\ArcBox\DeployPostgreSQL.ps1"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\ArcBox\DeploySQLMI.ps1"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.json") -OutFile "C:\ArcBox\dataController.json"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "C:\ArcBox\dataController.parameters.json"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\ArcBox\postgreSQL.json"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\ArcBox\postgreSQL.parameters.json"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.json") -OutFile "C:\ArcBox\sqlmi.json"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile "C:\ArcBox\sqlmi.parameters.json"
+                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
                 }
         }
 
