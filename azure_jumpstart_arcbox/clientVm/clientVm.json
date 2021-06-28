@@ -321,7 +321,6 @@
         }
     ],
 
-
     "outputs": {
         "adminUsername": {
             "type": "string",
