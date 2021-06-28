@@ -25,7 +25,6 @@ $extensionId = az k8s-extension create -g $env:resourceGroup --name $extensionNa
     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$aksResourceGroupMC" `
     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${workspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${workspaceKeyEnc}"
 
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
 az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
 
 Start-Transcript -Path C:\Temp\deployWebApp.log
