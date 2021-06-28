@@ -109,6 +109,13 @@
             "metadata": {
                 "description": "The name of the Kubernetes cluster resource.."
             }
+        },
+        "deployWebApp": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Azure Web App deployment"
+            }
         }
     },
     "variables": {
@@ -276,7 +283,7 @@
                     "fileUris": [
                         "[uri(variables('templateBaseUrl'), 'scripts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -clusterName ', parameters('clusterName'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployWebApp ', parameters('deployWebApp'), ' -clusterName ', parameters('clusterName'))]"
                 }
             }
         }

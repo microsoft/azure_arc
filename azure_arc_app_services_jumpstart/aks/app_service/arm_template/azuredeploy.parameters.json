@@ -31,6 +31,9 @@
         },
         "dnsPrefix": {
             "value": "arcappsvc"
+        },
+        "deployWebApp": {
+            "value": false
         }
     }
 }
