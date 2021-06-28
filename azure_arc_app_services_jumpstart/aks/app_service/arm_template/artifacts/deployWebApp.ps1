@@ -48,6 +48,7 @@ Do {
    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
    } while ($logProcessorStatus -eq "Nope")
 
+Write-Host "`n"
 Write-Host "Deploying App Service Kubernetes Environment"
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
@@ -61,6 +62,11 @@ Do {
    $kubeEnvironmentNameStatus = $(if(az appservice kube show --resource-group $env:resourceGroup --name $kubeEnvironmentName | Select-String '"provisioningState": "Succeeded"' -Quiet){"Ready!"}Else{"Nope"})
    } while ($kubeEnvironmentNameStatus -eq "Nope")
 
+Write-Host "Creating App Service plan. Hold tight, this might take a few minutes..."
+Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 az appservice plan create -g $env:resourceGroup -n Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
+
+Write-Host "Deploy Azure sample Web App plan"
+Write-Host "`n"
 az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name mcr.microsoft.com/appsvc/node:12-lts

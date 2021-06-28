@@ -5,25 +5,16 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 Write-Host "`n"
 
-# # Getting AKS credentials
-# Write-Host "Getting AKS credentials"
-# Write-Host "`n"
-# $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-# $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
-# Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-# Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Admin -Force
-# $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
-
-Write-Host "Checking kubernetes nodes"
-Write-Host "`n"
-kubectl get nodes
-
 # Deploying AKS cluster
 Write-Host "Deploying AKS cluster"
 Write-Host "`n"
 az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --kubernetes-version $env:kubernetesVersion --dns-name-prefix $env:dnsPrefix --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
 az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
 $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
+
+Write-Host "Checking kubernetes nodes"
+Write-Host "`n"
+kubectl get nodes
 
 # Creating Azure Public IP resource to be used by the Azure Arc app service
 Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
@@ -71,66 +62,6 @@ if ( $env:deployWebApp -eq $true )
     & "C:\Temp\deployWebApp.ps1"
 }
 
-# $namespace="appservices"
-# $extensionName = "arc-app-services"
-# $kubeEnvironmentName=$env:clusterName
-# $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-# $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
-# $workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
-# $workspaceKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
-
-# $extensionId = az k8s-extension create -g $env:resourceGroup --name $extensionName --query id -o tsv `
-#     --cluster-type connectedClusters -c $env:clusterName `
-#     --extension-type 'Microsoft.Web.Appservice' --release-train stable --auto-upgrade-minor-version true `
-#     --scope cluster --release-namespace "$namespace" `
-#     --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default"  `
-#     --configuration-settings "appsNamespace=$namespace"  `
-#     --configuration-settings "clusterName=$kubeEnvironmentName"  `
-#     --configuration-settings "loadBalancerIp=$staticIp"  `
-#     --configuration-settings "keda.enabled=true"  `
-#     --configuration-settings "buildService.storageClassName=default"  `
-#     --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
-#     --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
-#     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$aksResourceGroupMC" `
-#     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${workspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${workspaceKeyEnc}"
-
-# $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
-# az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
-
-# Do {
-#    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-#    Start-Sleep -Seconds 45
-#    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
-#    } while ($logProcessorStatus -eq "Nope")
-
-# Do {
-#    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
-#    Start-Sleep -Seconds 45
-#    $buildService = $(if(kubectl get pods -n appservices | Select-String "k8se-build-service" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-#    } while ($buildService -eq "Nope")
-
-# Do {
-#    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-#    Start-Sleep -Seconds 45
-#    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
-#    } while ($logProcessorStatus -eq "Nope")
-
-# Write-Host "Deploying App Service Kubernetes Environment"
-# Write-Host "`n"
-# $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
-# $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
-# $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
-# az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --location $env:azureLocation --output none 
-
-# Do {
-#    Write-Host "Waiting for kube environment to become available. Hold tight, this might take a few minutes..."
-#    Start-Sleep -Seconds 1
-#    $kubeEnvironmentNameStatus = $(if(az appservice kube show --resource-group $env:resourceGroup --name $kubeEnvironmentName | Select-String '"provisioningState": "Succeeded"' -Quiet){"Ready!"}Else{"Nope"})
-#    } while ($kubeEnvironmentNameStatus -eq "Nope")
-
-# $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
-# az appservice plan create -g $env:resourceGroup -n Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
-# az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name mcr.microsoft.com/appsvc/node:12-lts
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
@@ -153,7 +84,7 @@ add-type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-# Stop-Process -Id $kubectlMonShell.Id
+Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "AppServicesLogonScript" -Confirm:$false
