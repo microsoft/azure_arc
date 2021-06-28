@@ -5,25 +5,25 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 Write-Host "`n"
 
-# Getting AKS credentials
-Write-Host "Getting AKS credentials"
-Write-Host "`n"
-$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Admin -Force
-$aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
+# # Getting AKS credentials
+# Write-Host "Getting AKS credentials"
+# Write-Host "`n"
+# $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
+# Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Admin -Force
+# $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 
-# # Deploying AKS cluster
-# Write-Host "Deploying AKS cluster"
-# Write-Host "`n"
-# az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --kubernetes-version 1.19.11 --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
-# az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
-# $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
+# Deploying AKS cluster
+Write-Host "Deploying AKS cluster"
+Write-Host "`n"
+az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --kubernetes-version $env:kubernetesVersion --dns-name-prefix $env:dnsPrefix --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
+az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
+$aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
 
 # Creating Azure Public IP resource to be used by the Azure Arc app service
 Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"

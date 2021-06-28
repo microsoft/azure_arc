@@ -110,6 +110,19 @@
                 "description": "The name of the Kubernetes cluster resource.."
             }
         },
+        "dnsPrefix": {
+        "type": "string",
+        "metadata": {
+            "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+            }
+        },
+        "kubernetesVersion": {
+        "type": "string",
+        "defaultValue": "1.19.11",
+        "metadata": {
+            "description": "The version of Kubernetes."
+            }
+        },
         "deployWebApp": {
             "type": "bool",
             "defaultValue": false,
@@ -281,9 +294,9 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "[uri(variables('templateBaseUrl'), 'scripts/Bootstrap.ps1')]"
+                        "[uri(variables('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployWebApp ', parameters('deployWebApp'), ' -clusterName ', parameters('clusterName'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployWebApp ', parameters('deployWebApp'), ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ',parameters('dnsPrefix'))]"
                 }
             }
         }

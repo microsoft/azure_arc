@@ -52,13 +52,6 @@
         "description": "Name for your log analytics workspace"
       }
     },
-    "kubernetesVersion": {
-      "type": "string",
-      "defaultValue": "1.19.11",
-        "metadata": {
-          "description": "The version of Kubernetes."
-      }
-    },
     "clusterName": {
       "type": "string",
       "defaultValue":"Arc-App-AKS",
@@ -72,6 +65,13 @@
         "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
       }
     },
+    "kubernetesVersion": {
+      "type": "string",
+      "defaultValue": "1.19.11",
+      "metadata": {
+        "description": "The version of Kubernetes."
+      }
+    },
     "deployWebApp": {
         "type": "bool",
         "defaultValue": false,
@@ -82,45 +82,14 @@
   },
   "variables": {
     "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/",
-    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"
   },
-  "resources": [
-  {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
-      "name": "aksDeployment",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('aksTemplateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "sshRSAPublicKey": {
-            "value": "[parameters('sshRSAPublicKey')]"
-          },
-          "spnClientId": {
-            "value": "[parameters('spnClientId')]"
-          },
-          "spnClientSecret": {
-            "value": "[parameters('spnClientSecret')]"
-          },
-          "kubernetesVersion": {
-            "value": "[parameters('kubernetesVersion')]"
-          },
-          "dnsPrefix": {
-            "value": "[parameters('dnsPrefix')]"
-          }                    
-        }
-      }
-    },    
+  "resources": [    
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "aksDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -152,6 +121,12 @@
           "clusterName": {
             "value": "[parameters('clusterName')]"
           },
+          "dnsPrefix": {
+            "value": "[parameters('dnsPrefix')]"
+          },
+          "kubernetesVersion": {
+            "value": "[parameters('kubernetesVersion')]"
+          },          
           "deployWebApp": {
             "value": "[parameters('deployWebApp')]"
           }

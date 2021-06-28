@@ -8,6 +8,8 @@ param (
     [string]$azureLocation,
     [string]$workspaceName,
     [string]$clusterName,
+    [string]$dnsPrefix,
+    [string]$kubernetesVersion,
     [string]$deployWebApp
 )
 
@@ -20,6 +22,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('dnsPrefix', $dnsPrefix,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('kubernetesVersion', $kubernetesVersion,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployWebApp', $deployWebApp,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
@@ -82,9 +86,9 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/scripts/AppServicesLogonScript.ps1" -OutFile "C:\Temp\AppServicesLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/scripts/deployWebApp.ps1" -OutFile "C:\Temp\deployWebApp.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/scripts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/artifacts/AppServicesLogonScript.ps1" -OutFile "C:\Temp\AppServicesLogonScript.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/artifacts/deployWebApp.ps1" -OutFile "C:\Temp\deployWebApp.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/artifacts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
