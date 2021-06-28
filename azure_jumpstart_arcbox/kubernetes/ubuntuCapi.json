@@ -102,6 +102,12 @@
             "metadata": {
                 "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
             }
+        },
+        "templateBaseUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+            }
         }
     },
     "variables": {
@@ -249,7 +255,7 @@
                 },
                 "protectedSettings": {
                     "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
-                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/installCAPI.sh" ]
+                    "fileUris": [ "[concat(parameters('templateBaseUrl'), 'artifacts/installK3s.sh')]" ]
                 }
             }
         }
