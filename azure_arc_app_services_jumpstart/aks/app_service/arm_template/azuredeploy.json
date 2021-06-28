@@ -120,7 +120,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "aksTemplateUrl" ],
+      "dependsOn": [ "aksDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
