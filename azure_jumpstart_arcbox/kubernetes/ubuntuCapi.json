@@ -255,7 +255,7 @@
                 },
                 "protectedSettings": {
                     "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
-                    "fileUris": [ "[concat(parameters('templateBaseUrl'), 'artifacts/installK3s.sh')]" ]
+                    "fileUris": [ "[concat(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]" ]
                 }
             }
         }
