@@ -2,21 +2,6 @@ Start-Transcript -Path C:\Temp\AppServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-# Uninstall Internet Explorer
-Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
-
-# Disabling IE Enhanced Security Configuration
-Write-Host "Disabling IE Enhanced Security Configuration"
-function Disable-ieESC {
-    $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
-    $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
-    Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0
-    Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
-    Stop-Process -Name Explorer
-    Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
-}
-Disable-ieESC
-
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 Write-Host "`n"
 
@@ -80,8 +65,8 @@ Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 az connectedk8s connect --name $env:clusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_app_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 Start-Sleep -Seconds 10
-$namespace="appservices"
 
+$namespace="appservices"
 $extensionName = "arc-app-services"
 $kubeEnvironmentName=$env:clusterName
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
