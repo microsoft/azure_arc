@@ -2,15 +2,9 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "myIpAddress": {
-            "type": "string",
-            "metadata": {
-                "description": "Your public IP address, used to ssh to the AKS nodes (if needed)"
-            }
-        },
         "clusterName": {
             "type": "string",
-            "defaultValue":"Arc-App-Service-AKS",
+            "defaultValue":"Arc-App-AKS",
             "metadata": {
                 "description": "The name of the Kubernetes cluster resource.."
             }
@@ -96,7 +90,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.19.11",
+            "defaultValue": "1.18.17",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes."
@@ -105,28 +99,11 @@
         "resourceTags": {
             "type": "object",
             "defaultValue": {
-                "Project": "jumpstart_azure_arc_app_services"
+                "Project": "jumpstart_azure_arc_data_services"
             }
-        },
-        "identity": {
-        "type": "string",
-        "defaultValue": "SystemAssigned",
-        "metadata": {
-            "description": "Type of cluster managed identity"
-        }
         }
     },
     "resources": [
-        {
-            "type": "Microsoft.Network/virtualNetworks/subnets/providers/roleAssignments",
-            "apiVersion": "2017-05-01",
-            "name": "[concat(parameters('virtualNetworkName'), '/', parameters('subnetName'), '/Microsoft.Authorization/', guid(resourceGroup().id, 'akstovnet'))]",
-            "properties": {
-                "roleDefinitionId": "4d97b98b-1d4f-4787-a291-c67834d212e7",
-                "principalId": "[reference(resourceId('Microsoft.ContainerService/managedClusters/', parameters('clusterName')), '2020-06-01', 'Full').identity.principalId]",
-                "scope": "[variables('subnetRef')]"
-            }
-        },
         {
             "apiVersion": "2020-03-01",
             "type": "Microsoft.ContainerService/managedClusters",
@@ -135,7 +112,7 @@
             "tags": "[parameters('resourceTags')]",
             "properties": {
                 "kubernetesVersion": "[parameters('kubernetesVersion')]",
-                "enableRBAC": "[parameters('enableRBAC')]",                
+                "enableRBAC": "[parameters('enableRBAC')]",
                 "dnsPrefix": "[parameters('dnsPrefix')]",
                 "agentPoolProfiles": [
                     {
@@ -159,10 +136,6 @@
                         ]
                     }
                 },
-            "tags": {},
-            "identity": {
-                "type": "SystemAssigned"
-            },
             "servicePrincipalProfile": {
                 "clientId": "[parameters('spnClientId')]",
                 "Secret": "[parameters('spnClientSecret')]"

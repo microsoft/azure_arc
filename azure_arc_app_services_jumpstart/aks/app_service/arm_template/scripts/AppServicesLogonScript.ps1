@@ -17,24 +17,28 @@ function Disable-ieESC {
 }
 Disable-ieESC
 
-# $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-# $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
-# Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 Write-Host "`n"
 
-
-# Deploying AKS cluster
-Write-Host "Deploying AKS cluster"
+# Getting AKS credentials
+Write-Host "Getting AKS credentials"
 Write-Host "`n"
-az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --kubernetes-version 1.19.11 --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
-az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
+$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
+Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Admin -Force
 $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
+
+# # Deploying AKS cluster
+# Write-Host "Deploying AKS cluster"
+# Write-Host "`n"
+# az aks create --resource-group $env:resourceGroup --name $env:clusterName --location $env:azureLocation --kubernetes-version 1.19.11 --enable-aad --enable-azure-rbac --generate-ssh-keys --tags "Project=jumpstart_azure_arc_app_services" --enable-addons monitoring
+# az aks get-credentials --resource-group $env:resourceGroup --name $env:clusterName --admin
+# $aksResourceGroupMC = $(az aks show --resource-group $env:resourceGroup --name $env:clusterName -o tsv --query nodeResourceGroup)
 
 # Creating Azure Public IP resource to be used by the Azure Arc app service
 Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
@@ -70,14 +74,6 @@ az extension add --yes --source "https://aka.ms/appsvc/appservice_kube-latest-py
 
 Write-Host "`n"
 az -v
-
-# # Getting AKS credentials
-# Write-Host "Getting AKS credentials"
-# Write-Host "`n"
-# $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-# $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
-# Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-# Import-AzAksCredential -ResourceGroupName $env:resourceGroup -Name $env:clusterName -Admin -Force
 
 # Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
