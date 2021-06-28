@@ -95,6 +95,10 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 # Installing tools
 workflow ClientTools_01
         {
+            param(
+                [Parameter (Mandatory = $true)]
+                [string]$templateBaseUrl
+            )
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm'
             #Run commands in parallel.
             Parallel 
@@ -147,7 +151,7 @@ workflow ClientTools_01
                 }
         }
 
-ClientTools_01 | Format-Table
+ClientTools_01 -templateBaseUrl $templateBaseUrl | Format-Table
 
 workflow ClientTools_02
         {
