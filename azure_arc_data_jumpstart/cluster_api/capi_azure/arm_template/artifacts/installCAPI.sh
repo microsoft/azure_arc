@@ -103,7 +103,7 @@ echo ""
 
 # Transforming the Rancher K3s cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure azure
+clusterctl init --infrastructure azure -b kubeadm:v0.3.19 -c kubeadm:v0.3.19 --core cluster-api:v0.3.19
 echo "Making sure cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
