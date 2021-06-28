@@ -42,6 +42,7 @@ Do {
 Write-Host "Azure Arc PostgreSQL Hyperscale is ready!"
 Write-Host "`n"
 
+Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
 $podname = "jumpstartpsc0-0"
