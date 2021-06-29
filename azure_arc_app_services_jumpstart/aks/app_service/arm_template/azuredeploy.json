@@ -72,7 +72,7 @@
         "description": "The version of Kubernetes."
       }
     },
-    "deployWebApp": {
+    "deployAppService": {
         "type": "bool",
         "defaultValue": false,
         "metadata": {
@@ -127,8 +127,8 @@
           "kubernetesVersion": {
             "value": "[parameters('kubernetesVersion')]"
           },          
-          "deployWebApp": {
-            "value": "[parameters('deployWebApp')]"
+          "deployAppService": {
+            "value": "[parameters('deployAppService')]"
           }
         }
       }

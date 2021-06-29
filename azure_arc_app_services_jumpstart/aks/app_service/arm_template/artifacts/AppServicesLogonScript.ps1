@@ -58,9 +58,9 @@ az connectedk8s connect --name $env:clusterName --resource-group $env:resourceGr
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
 
-if ( $env:deployWebApp -eq $true )
+if ( $env:deployAppService -eq $true )
 {
-    & "C:\Temp\deployWebApp.ps1"
+    & "C:\Temp\deployAppService.ps1"
 }
 
 

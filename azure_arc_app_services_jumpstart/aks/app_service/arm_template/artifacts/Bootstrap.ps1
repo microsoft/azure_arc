@@ -10,7 +10,7 @@ param (
     [string]$clusterName,
     [string]$dnsPrefix,
     [string]$kubernetesVersion,
-    [string]$deployWebApp
+    [string]$deployAppService
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -24,7 +24,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('dnsPrefix', $dnsPrefix,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('kubernetesVersion', $kubernetesVersion,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployWebApp', $deployWebApp,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployAppService', $deployAppService,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
 Write-Output "Create deployment path"
@@ -87,7 +87,7 @@ workflow ClientTools_01
                         }                        
                     }
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/artifacts/AppServicesLogonScript.ps1" -OutFile "C:\Temp\AppServicesLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/artifacts/deployWebApp.ps1" -OutFile "C:\Temp\deployWebApp.ps1"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/artifacts/deployAppService.ps1" -OutFile "C:\Temp\deployAppService.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/artifacts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }

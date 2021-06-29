@@ -1,5 +1,5 @@
 # Deploying Azure Arc SQL Managed Instance
-Write-Host "Deploying Azure Arc-enabled app services with a Web App environment"
+Write-Host "Deploying Azure App Service"
 Write-Host "`n"
 
 $namespace="appservices"
@@ -27,7 +27,7 @@ $extensionId = az k8s-extension create -g $env:resourceGroup --name $extensionNa
 
 az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
 
-Start-Transcript -Path C:\Temp\deployWebApp.log
+Start-Transcript -Path C:\Temp\deployAppService.log
 
 Do {
    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
@@ -66,6 +66,6 @@ Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 az appservice plan create -g $env:resourceGroup -n Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
 
-Write-Host "Deploy Azure sample Web App plan"
+Write-Host "Deploy a sample Azure App Service"
 Write-Host "`n"
 az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name mcr.microsoft.com/appsvc/node:12-lts

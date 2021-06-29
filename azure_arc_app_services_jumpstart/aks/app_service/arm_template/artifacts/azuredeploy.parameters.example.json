@@ -32,7 +32,7 @@
         "dnsPrefix": {
             "value": "arcappsvc"
         },
-        "deployWebApp": {
+        "deployAppService": {
             "value": true
         }
     }
