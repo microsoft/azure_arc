@@ -37,7 +37,7 @@ $nodepath = "\\" + $NodeName + '\' +  $leftPart + "$" + $rightpart
 
 # Download of Windows VM VHDX file 
 New-Item -Path $nodepath -Name "ArcJumpstart" -ItemType "directory"
-Write-Verbose "Downloading Windows Server .VHDX. This can take some time, hold tight..." -Verbose
+Write-Verbose "Downloading Windows Server VHDX file. Hold tight, this might take a few minutes..." -Verbose
 function downloadVHDx() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri "https://azhcicloudwitness1123.blob.core.windows.net/vhds/ArcVM-HCIJS-win.vhdx"  -OutFile $nodepath\ArcJumpstart\ArcVM-HCIJS-win.vhdx}
 downloadVHDx
 
