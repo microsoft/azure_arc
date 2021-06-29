@@ -1,11 +1,11 @@
-#Powershell script to deploy VM in Azure Stack HCI and Arc enable it
+# Powershell script to deploy VM in Azure Stack HCI and Arc enable it
 
 # Environment variables for the optional configurations
 $DHCPEnabled = 'Select $true if DHCP is enabled on your environment, $false if not'
 
-    #If $DHCPEnabled = $false, please fill the following variables. Otherwise atribbute the vale $null
+    #If $DHCPEnabled = $false, please fill the following variables. Otherwise, attribute the value $null
     $IPAddress = 'Provide the static IP to assign the to the VM'
-    $PrefixLenght = 'Provide the lenght of the subnet mask to assing to the VM'
+    $PrefixLenght = 'Provide the length of the subnet mask to assign to the VM'
     $DefaultGateway = 'Provide the default gateway to assign to the VM'
     $DNSServer = 'Provide the DNS Server to assign to the VM'
 
