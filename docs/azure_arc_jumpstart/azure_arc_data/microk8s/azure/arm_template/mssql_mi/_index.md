@@ -61,21 +61,9 @@ By the end of this guide, you will have a Microk8s Kubernetes cluster deployed w
 
   > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
-- Enable subscription for the _Microsoft.AzureArcData_ resource provider for Azure Arc enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
-
-  ```shell
-  az provider register --namespace Microsoft.AzureArcData
-  ```
-
-  You can monitor the registration process with the following commands:
-
-  ```shell
-  az provider show -n Microsoft.AzureArcData -o table
-  ```
-
 ## Architecture (In a nutshell)
 
-From the [Microk8s Github repo](https://github.com/ubuntu/microk8s):
+From the [Microk8s GitHub repo](https://github.com/ubuntu/microk8s):
 
 _"Microk8s is a single-package, fully conformant, lightweight Kubernetes that works on 42 flavors of Linux. Perfect for Developer workstations, IoT, Edge & CI/CD. MicroK8s tracks upstream and releases beta, RC and final bits the same day as upstream K8s."_
 
@@ -115,7 +103,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - `logAnalyticsWorkspaceName` - Unique name for log analytics workspace deployment.
   - `deploySQLMI` - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure SQL Managed Instance scenario, we will set it to _**true**_.
   - `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
-  - `templateBaseUrl` - Github URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
+  - `templateBaseUrl` - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/microk8s/azure/arm_template) and run the below command:
 
@@ -162,11 +150,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Let the script run it's course and **do not close** the PowerShell session, this will be done for you once completed.
 
-  ![PowerShell logon script run](./06.gif)
+  ![PowerShell logon script run](./01.gif)
 
   Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and the SQL Managed Instance will be deployed on the cluster and be ready to use:
 
-  ![Wallpaper Change](./07.png)
+  ![Wallpaper Change](./06.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **17 various Azure resources deployed**. The important ones to notice are:
 
@@ -178,15 +166,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - **Azure Arc enabled SQL Managed Instance** - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
-  ![Addtional Azure resources in the resource group](./08.png)
+  ![Addtional Azure resources in the resource group](./07.png)
 
 - Another tool automatically deployed is Azure Data Studio along with the _Azure Data CLI_, the _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Azure Data Studio shortcut](./09.png)
+  ![Azure Data Studio shortcut](./08.png)
 
 - Additionally, the SQL Managed Instance connection will be configured within Data Studio, as well as the sample [_AdventureWorks_](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will be restored automatically for you.
 
-  ![Configured SQL Managed Instance connection](./10.png)
+  ![Configured SQL Managed Instance connection](./09.png)
 
 ## Cluster extensions
 
@@ -200,13 +188,13 @@ In this scenario, **three** Azure Arc enabled Kubernetes cluster extensions were
 
   In order to view these cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc enabled Kubernetes resource](./11.png)
+  ![Azure Arc enabled Kubernetes resource](./10.png)
 
   And we see the installed extensions:
-  ![Azure Arc enabled Kubernetes Cluster Extensions settings](./12.png)
+  ![Azure Arc enabled Kubernetes Cluster Extensions settings](./11.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./13.png)
+  ![Delete Azure resource group](./12.png)
