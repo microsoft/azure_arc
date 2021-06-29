@@ -30,8 +30,6 @@ $rgroup = "Provide the Resource Group Name"
 $location = "Provide the Region"
 
 # Deployment
-
-
 $pos = $vmdir.IndexOf(":")
 $leftPart = $vmdir.Substring(0, $pos)
 $rightPart = $vmdir.Substring($pos+1)
