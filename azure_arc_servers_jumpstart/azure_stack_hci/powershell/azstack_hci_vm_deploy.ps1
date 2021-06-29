@@ -73,7 +73,7 @@ Invoke-Command -Session $s -ScriptBlock{
     Start-Sleep -Seconds 20
 }
 
-#Assign IP Address manually or DHCP
+#Assign IP address manually or DHCP
 if (!$DHCPEnabled){
     Invoke-Command -Session $s -ScriptBlock{
             
