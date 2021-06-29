@@ -30,7 +30,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "comments": "Deploys a VNET and Subnet for Sidecar and K8s VM",
+      "comments": "Deploys a VNET and Subnet for Client and K8s VM",
       "apiVersion": "2019-04-01",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
