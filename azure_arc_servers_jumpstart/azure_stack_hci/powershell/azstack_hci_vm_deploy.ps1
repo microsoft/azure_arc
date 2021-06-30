@@ -3,7 +3,7 @@
 # Environment variables for the optional configurations
 $DHCPEnabled = 'Select $true if DHCP is enabled on your environment, $false if not'
 
-    #If $DHCPEnabled = $false, please fill the following variables. Otherwise, attribute the value $null
+    # If $DHCPEnabled = $false, please fill the following variables. Otherwise, attribute the value $null
     $IPAddress = 'Provide the static IP to assign the to the VM'
     $PrefixLenght = 'Provide the length of the subnet mask to assign to the VM'
     $DefaultGateway = 'Provide the default gateway to assign to the VM'
@@ -11,15 +11,16 @@ $DHCPEnabled = 'Select $true if DHCP is enabled on your environment, $false if n
 
 $ServerClusterEnabled = 'Select $true if you have a server cluster created, $false if the not'
     
-    #If $ServerClusterEnabled = $true,  please provide the path to the cluster storage in the format "<Disk Letter>:\Folder"
-    #If $ServerClusterEnabled = $false, please provide the path to a folder where the VM will be created in the format "<Disk Letter>:\Folder"
+    # If $ServerClusterEnabled = $true,  please provide the path to the cluster storage in the format "<Disk Letter>:\Folder"
+    # If $ServerClusterEnabled = $false, please provide the path to a folder where the VM will be created in the format "<Disk Letter>:\Folder"
     $vmdir =  "<Disk Letter>:\Folder"
 
 # Environment variables for the VM creation
 $NodeName = 'Provide the name of the node where the VM will be created'
 $DomainName = 'Provide the name of the domain where the node is added'
 $VMName = 'Provide the name of the VM'
-$VSwitchName = 'Provide the name of the Virtual Switch'
+$VSwitchCreation = 'Select $true if an external VSwitch creation is needed, $false if already created'
+    $VSwitchName = 'Provide the name of the Virtual Switch'
 
 # Environment variables to onboard the VM to Azure Arc
 $subID = "Provide the subscriptionID"
@@ -38,12 +39,12 @@ $nodepath = "\\" + $NodeName + '\' +  $leftPart + "$" + $rightpart
 # Download of Windows VM VHDX file 
 New-Item -Path $nodepath -Name "ArcJumpstart" -ItemType "directory"
 Write-Verbose "Downloading Windows Server VHDX file. Hold tight, this might take a few minutes..." -Verbose
-function downloadVHDx() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri "https://azhcicloudwitness1123.blob.core.windows.net/vhds/ArcVM-HCIJS-win.vhdx"  -OutFile $nodepath\ArcJumpstart\ArcVM-HCIJS-win.vhdx}
+function downloadVHDx() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri "https://azhcicloudwitness1123.blob.core.windows.net/vhds2/ArcVM-HCIJS-win.vhdx"  -OutFile $nodepath\ArcJumpstart\ArcVM-HCIJS-win.vhdx}
 downloadVHDx
 
 # Enable CredSSP
 Set-Item WSMAN:\localhost\client\auth\credssp –value $true
-Enable-WSManCredSSP -Role Client -DelegateComputer "$NodeName.$DomainName"
+Enable-WSManCredSSP -Role Client -DelegateComputer "$NodeName.$DomainName" -Force
 
 # PS Remote Session to Host
 Write-Verbose "Insert credentials for node $NodeName ..." -Verbose
@@ -53,17 +54,23 @@ $s = New-PSSession -ComputerName "$NodeName.$DomainName" -Credential $CustomCred
 Write-Verbose "Starting Powershell Remote Session to $NodeName ..." -Verbose
 Invoke-Command -Session $s -ScriptBlock{
 
-    # Windows VM creation
+    if($VSwitchCreation){
 
+        # Create a new external Virtual Switch
+        New-VMSwitch -Name ExternalSwitch  -NetAdapterName $VSwitchName -AllowManagementOS $true
+    }
+
+    # Windows VM creation
     Write-Verbose "Creating VM $using:VMName in $using:NodeName ..." -Verbose
-    New-VM -Name $using:VMName -MemoryStartupBytes 2GB -BootDevice VHD -VHDPath "$using:vmdir\ArcJumpstart\ArcVM-HCIJS-win.vhdx" -Path "$using:vmdir\ArcJumpstart" -Generation 2 -Switch $using:VSwitchName
+    New-VM -Name $using:VMName -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$using:vmdir\ArcJumpstart\ArcVM-HCIJS-win.vhdx" -Path "$using:vmdir\ArcJumpstart" -Generation 2 -Switch $using:VSwitchName
     Set-VMProcessor -VMName $using:VMName -Count 2
 
     Write-Verbose "Set VM auto start/stop" -Verbose
     Set-VM  -Name $using:VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown
 
     if($using:ServerClusterEnabled){
-        #Add VM to cluster
+
+        # Add VM to cluster
         Write-Verbose "Adding VM $using:VMName in Server Cluster ..." -Verbose
         Add-ClusterVirtualMachineRole -VirtualMachine $using:VMName
     }
@@ -73,7 +80,7 @@ Invoke-Command -Session $s -ScriptBlock{
     Start-Sleep -Seconds 20
 }
 
-#Assign IP address manually or DHCP
+# Assign IP address manually or DHCP
 if (!$DHCPEnabled){
     Invoke-Command -Session $s -ScriptBlock{
             
@@ -84,17 +91,17 @@ if (!$DHCPEnabled){
             Write-Verbose "Assigning static IP to VM $using:VMName ..." -Verbose
             Invoke-Command -VMName $using:VMName -Credential $Credential -ArgumentList $using:IPAddress, $using:DefaultGateway, $using:PrefixLenght, $using:DNSServer -ScriptBlock{
             
-                Remove-NetIPAddress -InterfaceIndex (Get-NetAdapter).InterfaceIndex
-                Remove-NetRoute -InterfaceIndex (Get-NetAdapter).InterfaceIndex
-                New-NetIPAddress –IPAddress $args[0] -DefaultGateway $args[1] -PrefixLength $args[2] -InterfaceIndex (Get-NetAdapter).InterfaceIndex
-                Set-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter).InterfaceIndex -ServerAddresses $args[3]
+                Remove-NetIPAddress -InterfaceIndex (Get-NetAdapter).InterfaceIndex -Confirm:$false
+                Remove-NetRoute -InterfaceIndex (Get-NetAdapter).InterfaceIndex -Confirm:$false
+                New-NetIPAddress –IPAddress $args[0] -DefaultGateway $args[1] -PrefixLength $args[2] -InterfaceIndex (Get-NetAdapter).InterfaceIndex -Confirm:$false
+                Set-DnsClientServerAddress -InterfaceIndex (Get-NetAdapter).InterfaceIndex -ServerAddresses $args[3] -Confirm:$false
            }
     }
 }
 
 Start-Sleep -Seconds 20
 
-#Azure Arc Agent Installation
+# Azure Arc Agent Installation
 Write-Verbose "Installing Azure Arc agent in VM $VMName ..." -Verbose
 Invoke-Command -Session $s -ScriptBlock{
             
@@ -120,7 +127,6 @@ Invoke-Command -Session $s -ScriptBlock{
 
                 # Run connect command
                  & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" connect `
-                 --resource-name "Arc-AzsHCI-VM01" `
                  --service-principal-id $env:appId `
                  --service-principal-secret $env:password `
                  --resource-group $env:resourceGroup `
