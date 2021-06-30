@@ -66,6 +66,6 @@ Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 az appservice plan create -g $env:resourceGroup -n Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
 
-Write-Host "Deploy a sample Azure App Service"
+Write-Host "Deploy a sample Azure Arc Jumpstart web application"
 Write-Host "`n"
 az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name azurearcjumpstart.azurecr.io/hello-arc:latest
