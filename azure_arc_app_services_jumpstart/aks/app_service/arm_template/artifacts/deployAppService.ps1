@@ -68,4 +68,4 @@ az appservice plan create -g $env:resourceGroup -n Jumpstart --custom-location $
 
 Write-Host "Deploy a sample Azure App Service"
 Write-Host "`n"
-az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name mcr.microsoft.com/appsvc/node:12-lts
+az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name azurearcjumpstart.azurecr.io/hello-arc:latest
