@@ -10,7 +10,7 @@ $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-
 $workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $workspaceKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
-$extensionId = az k8s-extension create -g $env:resourceGroup --name $extensionName --query id -o tsv `
+$extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
     --cluster-type connectedClusters -c $env:clusterName `
     --extension-type 'Microsoft.Web.Appservice' --release-train stable --auto-upgrade-minor-version true `
     --scope cluster --release-namespace "$namespace" `
@@ -64,8 +64,9 @@ Do {
 Write-Host "Creating App Service plan. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
-az appservice plan create -g $env:resourceGroup -n Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
+az appservice plan create --resource-group $env:resourceGroup --name Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
 
 Write-Host "Deploy a sample Azure Arc Jumpstart web application"
 Write-Host "`n"
 az webapp create --plan Jumpstart --resource-group $env:resourceGroup --name jumpstart-app --custom-location $customLocationId --deployment-container-image-name azurearcjumpstart.azurecr.io/hello-arc:latest
+az webapp config appsettings set --resource-group $env:resourceGroup --name jumpstart-app --settings WEBSITES_PORT=8080
