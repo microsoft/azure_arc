@@ -1,7 +1,5 @@
 #!/bin/bash
 
-sudo apt-get update
-
 # <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
@@ -11,6 +9,20 @@ export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export location='<Azure Region>'
+
+# Determine Package Manager
+
+if INST="$( which apt-get )" > /dev/null 2>&1; then
+   sudo apt-get update
+elif INST="$( which yum )" > /dev/null 2>&1; then
+   sudo yum -y update
+elif INST="$( which zypper )" > /dev/null 2>&1; then
+   sudo zypper ref
+   sudo zypper update -y
+else
+   echo "No package manager found, check Azure Arc enabled servers supported OS" >&2
+   exit 1
+fi
 
 # Download the installation package
 wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh
