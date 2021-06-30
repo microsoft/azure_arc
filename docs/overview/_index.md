@@ -29,7 +29,7 @@ Have you ever wanted to have a complete Azure Arc environment with just one clic
 
 [ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) is a dedicated sandbox environment for exploring all things Azure Arc, and the best part is that the only prerequisite is an Azure subscription. With a one-click deployment, you get a full Azure Arc lab packed with technology including Azure Arc enabled Servers, Kubernetes, Data Services and much more. Check out ArcBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
 
-<p align="center"><img src="/img/arcbox_logo.png" alt="jumpstart-arcbox-logo" width="250"></p>
+<p align="center"><a href="https://azurearcjumpstart.io/azure_jumpstart_arcbox/" target="_blank"><img src="/img/arcbox_logo.png" alt="jumpstart-arcbox-logo" width="250"></a></p>
 
 ## Jumpstart YouTube Channel
 
@@ -37,7 +37,7 @@ We know you are busy and sometimes all you need is just a good, short, solid rec
 
 All the demos in the [Azure Arc Jumpstart YouTube channel](https://aka.ms/AzureArcJumpstartDemos) are "bite-size" versions of the Azure Arc Jumpstart written scenarios we have on our website so make sure to check those as well.
 
-<p align="center"><img src="/img/jumpstart_demos_logo.png" alt="jumpstart-demos-logo" width="250"></p>
+<p align="center"><a href="https://www.youtube.com/channel/UCoIJw-P_9Jp6Jo_0Ca9avcA" target="_blank"><img src="/img/jumpstart_demos_logo.png" alt="jumpstart-demos-logo" width="250"></a></p>
 
 Oh, and one last thing before you go. Please consider subscribing to the channel so you will know when we have a new awesome demo for you!
 
@@ -47,7 +47,7 @@ Enjoy!
 
 Jumpstart Lightning is the show where you get a chance to share with our team and the world your Azure Arc, Jumpstart contribution and Hybrid cloud awesome stories. Who knows?! You might find yourself on our YouTube channel!
 
-<p align="center"><img src="/img/jumpstart_lightning_logo.png" alt="jumpstart-lightning-logo" width="250"></p>
+<p align="center"><a href="https://www.youtube.com/playlist?list=PLZuSmETs0xIagjkwrufUkBbex7RPJV4n5" target="_blank"><img src="/img/jumpstart_lightning_logo.png" alt="jumpstart-lightning-logo" width="250"></a></p>
 
 * Are you an awesome Azure Arc customer or a Microsoft partner that has an awesome story you would like to talk about?!
 * Ever contributed to the Jumpstart project and want to share it with the world?!
