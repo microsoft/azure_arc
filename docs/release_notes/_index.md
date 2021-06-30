@@ -9,14 +9,66 @@ weight: 3
 
 **Release notes will be released on the first week of each month and will cover the previous month.**
 
-<!-- | Category                                                                                            | New scenarios for this release | Existing scenarios | Total scenarios |
-| --------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------ | --------------- |
-| [Azure Arc enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/)    | 0                              | 25                 | 25              |
-| [Azure Arc enabled SQL Server](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/)  | 0                              | 4                  | 4               |
-| [Azure Arc enabled Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/)     | 3                              | 29                 | 32              |
-| [Azure Arc enabled data services](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/) | 2                              | 11                 | 13              |
-| [Azure Arc with Azure Lighthouse](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/) | 1                              | 0                  | 1               |
-|                                                                                                     |                                |                    | 75              | -->
+## June 2021
+
+### General Jumpstart enhancements
+
+* In this milestone, we introduced our new hosting show ["Jumpstart Lightning"](https://aka.ms/JumpstartLightning-blog), show where you get a chance to share with our team and the world your Azure Arc, Jumpstart contribution and Hybrid cloud awesome stories.
+
+### Azure Arc enabled servers scenarios
+
+* [New Scenario: Deploying Windows Server virtual machine in Azure Stack HCI and connect it to Azure Arc using Powershell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure_stack_hci/azure_stack_hci_windows/)
+
+* [Bug fix: existing linux server onboarding fails #570](https://github.com/microsoft/azure_arc/issues/570)
+
+### Azure Arc enabled Kubernetes scenarios
+
+* [Bug fix: Deploy GitOps configurations and perform basic GitOps flow on AKS on Azure Stack HCI as an Azure Arc Connected Cluster #552](https://github.com/microsoft/azure_arc/issues/552)
+
+* [Bug fix: AKS on Azure Stack HCI PowerShell - Preview Note #583](https://github.com/microsoft/azure_arc/issues/583)
+
+* [Bug fix: existing kube config is overwritten instead of merged #586](https://github.com/microsoft/azure_arc/issues/586)
+
+* [Bug fix: Cluster API fails with no "cluster" resource available #617](https://github.com/microsoft/azure_arc/issues/617)
+
+### Azure Arc enabled data services scenarios
+
+* [New Scenario: Deploying vanilla Azure Arc enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/dc_vanilla/)
+
+* [New Scenario: Deploying SQLMI Azure Arc enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/mssql_mi/)
+
+* [New Scenario: Deploying PostgreSQL Hyperscale Azure Arc enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/postgresql_hyperscale/)
+
+* [New Scenario: Deploying vanilla Azure Arc enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/dc_vanilla/)
+
+* [New Scenario: Deploying SQLMI Azure Arc enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/mssql_mi/)
+
+* [New Scenario: Deploying PostgreSQL Hyperscale Azure Arc enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/postgresql_hyperscale/)
+
+* [Updated Scenario: Deploying vanilla Azure Arc enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_dc_vanilla_arm_template/)
+
+* [Updated Scenario: Deploying SQLMI Azure Arc enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)
+
+* [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_hyperscale_arm_template/)
+
+* [Updated Scenario: Deploying vanilla Azure Arc enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_dc_vanilla_terraform/)
+
+* [Updated Scenario: Deploying SQLMI Azure Arc enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_mssql_mi_terraform/)
+
+* [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_hs_terraform/)
+
+* [Bug fix: SQL MI Server alias for connection contains wrong value #561](https://github.com/microsoft/azure_arc/issues/561)
+
+### Jumpstart ArcBox
+
+* Azure Arc-enabled data services components of ArcBox have been updated to use [directly connected mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity#connectivity-modes).
+* Required resource providers are now enabled automatically as part of the automation scripts.
+* Per updated Azure Arc-enabled data services requirements, ArcBox region support is restricted to East US, Northern Europe, and Western Europe.
+* Incorporated streamlined modular automation approach for Azure Arc-enabled data services used by the primary Jumpstart data services scenarios.
+
+### Azure Arc Jumpstart YouTube channel demos
+
+[New Demo: Deploy SQL Managed Instance on GKE with Azure Arc enabled data services](https://youtu.be/1jjPmaTa3oc)
 
 ## May 2021
 
@@ -28,7 +80,7 @@ weight: 3
 
 * [Added new disclaimer security best practices](https://github.com/microsoft/azure_arc/pull/531)
 
-* All Terraform-based automations were updated to support v0.15
+* All Terraform-based automation's were updated to support v0.15
 
 ### Azure Arc enabled servers scenarios
 
