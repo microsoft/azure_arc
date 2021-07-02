@@ -22,6 +22,12 @@
         "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address."
       }
     },
+    "sshRSAPublicKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "RSA public key used for securing SSH access to Azure resources."
+      }
+    },    
     "spnClientId": {
       "type": "string",
       "metadata": {
@@ -113,6 +119,9 @@
           },
           "myIpAddress": {
             "value": "[parameters('myIpAddress')]"
+          },
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
