@@ -135,7 +135,7 @@
         "metadata": {
             "description": "Base URL for ARM template"
             }
-        }        
+        }
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
