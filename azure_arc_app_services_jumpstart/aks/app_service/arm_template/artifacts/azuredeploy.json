@@ -19,13 +19,7 @@
     "myIpAddress": {
       "type": "string",
       "metadata": {
-        "description": "IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address."
-      }
-    },
-    "sshRSAPublicKey": {
-      "type": "securestring",
-      "metadata": {
-        "description": "RSA public key used for securing SSH access to ArcBox resources."
+        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address."
       }
     },
     "spnClientId": {
