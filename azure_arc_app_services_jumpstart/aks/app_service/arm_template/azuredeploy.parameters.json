@@ -36,7 +36,7 @@
             "value": true
         },
         "templateBaseUrl": {
-            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/aks/app_service/arm_template/"
+            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/"
         }
     }
 }
