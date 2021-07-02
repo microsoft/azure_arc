@@ -144,8 +144,7 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "subnetAddressPrefix": "10.240.0.0/16",
         "addressPrefix": "10.240.0.0/16",
-        "osDiskType": "Premium_LRS",
-        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/"
+        "osDiskType": "Premium_LRS"
     },
     "resources": [
         {
@@ -300,7 +299,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "[uri(variables('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
+                        "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
                     "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ',parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl')) ]"
                 }
