@@ -27,7 +27,7 @@
       "metadata": {
         "description": "RSA public key used for securing SSH access to Azure resources."
       }
-    },    
+    },
     "spnClientId": {
       "type": "string",
       "metadata": {
