@@ -88,7 +88,7 @@
   },
   "variables": {
     "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
-    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]"
+    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]"
   },
   "resources": [
     {
