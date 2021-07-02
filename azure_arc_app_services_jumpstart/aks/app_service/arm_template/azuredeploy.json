@@ -120,9 +120,6 @@
           "myIpAddress": {
             "value": "[parameters('myIpAddress')]"
           },
-          "sshRSAPublicKey": {
-            "value": "[parameters('sshRSAPublicKey')]"
-          },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },

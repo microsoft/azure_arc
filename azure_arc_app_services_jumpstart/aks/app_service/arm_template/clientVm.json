@@ -8,12 +8,6 @@
                 "description": "Your public IP address, used to RDP to the client VM"
             }
         },
-        "sshRSAPublicKey": {
-        "type": "securestring",
-        "metadata": {
-            "description": "RSA public key used for securing SSH access to Azure resources."
-            }
-        },
         "vmName": {
             "type": "string",
             "defaultValue": "Arc-App-Client",
