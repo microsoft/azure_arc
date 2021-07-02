@@ -78,14 +78,19 @@
         "metadata": {
             "description": "Azure Web App deployment"
         }
-    }
+    },
+    "templateBaseUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Base URL for ARM template"
+      }
+    }    
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"
   },
-  "resources": [    
+  "resources": [
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
@@ -129,6 +134,9 @@
           },          
           "deployAppService": {
             "value": "[parameters('deployAppService')]"
+          },
+          "templateBaseUrl": {
+            "value": "[parameters('templateBaseUrl')]"
           }
         }
       }
