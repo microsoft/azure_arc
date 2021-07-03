@@ -56,6 +56,10 @@ Disable-ieESC
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
+# Downloading GitHub artifacts for AppServicesLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"  
+
 # Installing tools
 workflow ClientTools_01
         {
@@ -87,11 +91,7 @@ workflow ClientTools_01
                                 & choco install $app /y -Force| Write-Output
                             }
                         }                        
-                    }
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"
-                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
-                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"                    
+                    }             
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }

@@ -84,7 +84,7 @@
       "metadata": {
         "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
       }
-    }      
+    }
   },
   "variables": {
     "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
