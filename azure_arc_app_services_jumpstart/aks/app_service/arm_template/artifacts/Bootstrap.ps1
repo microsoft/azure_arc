@@ -88,8 +88,8 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
-                    Invoke-WebRequest ($env:templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"
+                    Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
+                    Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }

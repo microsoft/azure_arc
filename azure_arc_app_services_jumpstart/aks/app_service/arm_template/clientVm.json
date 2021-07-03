@@ -127,13 +127,13 @@
             "type": "bool",
             "defaultValue": false,
             "metadata": {
-                "description": "Azure Web App deployment"
+                "description": "Azure Web App deployment."
             }
         },
         "templateBaseUrl": {
         "type": "string",
         "metadata": {
-            "description": "Base URL for ARM template"
+            "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
             }
         }
     },
