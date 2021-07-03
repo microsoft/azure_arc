@@ -131,7 +131,7 @@
             "value": "[parameters('deployAppService')]"
           },
           "templateBaseUrl": {
-            "value": "[parameters('templateBaseUrl')]"
+            "value": "[variables('templateBaseUrl')]"
           }
         }
       }
