@@ -131,9 +131,9 @@
             }
         },
         "templateBaseUrl": {
-        "type": "string",
-        "metadata": {
-            "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+            "type": "string",
+            "metadata": {
+                "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
             }
         }
     },
