@@ -140,7 +140,6 @@ The only thing you need to do before executing the Terraform plan is to export t
   ![terraform deploy output](./06.png)
   ![terraform deploy output](./07.png)
 
-  > **Note: The deprecation warnings are caused by the Terraform module used and can be ignored at this point.**
 
   Sample cluster in Alibaba Cloud Resource Management view:
 
