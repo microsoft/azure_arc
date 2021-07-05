@@ -92,7 +92,7 @@ workflow ClientTools_01
                             }
                         }                        
                     }             
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
