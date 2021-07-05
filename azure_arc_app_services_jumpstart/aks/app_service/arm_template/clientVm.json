@@ -10,11 +10,11 @@
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-SC",
+            "defaultValue": "Arc-App-Client",
             "metadata": {
                 "description": "The name for the sidecar virtual machine"
             }
-        },        
+        },
         "windowsAdminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
@@ -54,21 +54,21 @@
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-VNet",
+            "defaultValue": "Arc-App-VNet",
             "metadata": {
                 "description": "Name of the VNET"
             }
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-Subnet",
+            "defaultValue": "Arc-App-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-SC-NSG",
+            "defaultValue": "Arc-App-Client-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
@@ -109,6 +109,32 @@
             "metadata": {
                 "description": "The name of the Kubernetes cluster resource.."
             }
+        },
+        "dnsPrefix": {
+        "type": "string",
+        "metadata": {
+            "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+            }
+        },
+        "kubernetesVersion": {
+        "type": "string",
+        "defaultValue": "1.19.11",
+        "metadata": {
+            "description": "The version of Kubernetes."
+            }
+        },
+        "deployAppService": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Azure Web App deployment."
+            }
+        },
+        "templateBaseUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+            }
         }
     },
     "variables": {
@@ -118,8 +144,7 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "subnetAddressPrefix": "10.240.0.0/16",
         "addressPrefix": "10.240.0.0/16",
-        "osDiskType": "Premium_LRS",
-        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/"
+        "osDiskType": "Premium_LRS"
     },
     "resources": [
         {
@@ -274,9 +299,9 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "[uri(variables('templateBaseUrl'), 'scripts/Bootstrap.ps1')]"
+                        "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -clusterName ', parameters('clusterName'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ',parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl')) ]"
                 }
             }
         }
