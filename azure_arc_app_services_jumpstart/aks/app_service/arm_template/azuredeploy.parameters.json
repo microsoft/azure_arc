@@ -21,16 +21,22 @@
             "value": "ArcPassword123!!"
         },
         "myIpAddress": {
-            "value": "<your IP address>"
+            "value": "<your local public IP address>"
         },
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
         },
         "kubernetesVersion": {
-            "value": "<Kubernetes Version, e.g. 1.19.11>"
+            "value": "1.19.11"
         },
         "dnsPrefix": {
-            "value": "<Optional DNS prefix to use with hosted Kubernetes API server FQDN>"
+            "value": "arcappsvc"
+        },
+        "deployAppService": {
+            "value": true
+        },
+        "templateBaseUrl": {
+            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/aks/app_service/arm_template/"
         }
     }
 }
