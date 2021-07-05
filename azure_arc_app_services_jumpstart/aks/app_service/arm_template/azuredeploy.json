@@ -19,13 +19,13 @@
     "myIpAddress": {
       "type": "string",
       "metadata": {
-        "description": "IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address."
+        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address."
       }
     },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
-        "description": "RSA public key used for securing SSH access to ArcBox resources."
+        "description": "RSA public key used for securing SSH access to Azure resources."
       }
     },
     "spnClientId": {
@@ -52,25 +52,43 @@
         "description": "Name for your log analytics workspace"
       }
     },
+    "clusterName": {
+      "type": "string",
+      "defaultValue":"Arc-App-AKS",
+        "metadata": {
+          "description": "The name of the Kubernetes cluster resource.."
+      }
+    },
+    "dnsPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+      }
+    },
     "kubernetesVersion": {
       "type": "string",
       "defaultValue": "1.19.11",
-        "metadata": {
-          "description": "The version of Kubernetes."
+      "metadata": {
+        "description": "The version of Kubernetes."
       }
     },
-    "clusterName": {
+    "deployAppService": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Azure Web App deployment"
+      }
+    },
+    "templateBaseUrl": {
       "type": "string",
-      "defaultValue":"Arc-App-Service-AKS",
-        "metadata": {
-          "description": "The name of the Kubernetes cluster resource."
+      "metadata": {
+        "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
       }
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/aks_app_service_app/azure_arc_app_services_jumpstart/aks/app_service/arm_template/",
-    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
-    "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"
+    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
+    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]"
   },
   "resources": [
     {
@@ -107,7 +125,19 @@
           },
           "clusterName": {
             "value": "[parameters('clusterName')]"
-          }          
+          },
+          "dnsPrefix": {
+            "value": "[parameters('dnsPrefix')]"
+          },
+          "kubernetesVersion": {
+            "value": "[parameters('kubernetesVersion')]"
+          },          
+          "deployAppService": {
+            "value": "[parameters('deployAppService')]"
+          },
+          "templateBaseUrl": {
+            "value": "[parameters('templateBaseUrl')]"
+          }
         }
       }
     },
