@@ -30,6 +30,7 @@ Write-Host "`n"
 kubectl get nodes
 
 # Creating Azure Public IP resource to be used by the Azure Arc app service
+Write-Host "`n"
 Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
 Write-Host "`n"
 az network public-ip create --resource-group $aksResourceGroupMC --name "Arc-AppSvc-PIP" --sku STANDARD
