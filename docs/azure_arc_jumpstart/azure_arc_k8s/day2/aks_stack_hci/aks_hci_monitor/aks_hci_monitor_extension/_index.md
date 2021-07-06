@@ -77,8 +77,6 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
     ![Screenshot showing environment variables in script](./04.png)
 
-    > **Note: The extra dot is due to the shell script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
-
     The script will:
 
   * Login to your Azure subscription using the SPN credentials
