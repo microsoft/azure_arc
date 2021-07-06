@@ -24,7 +24,7 @@
             "value": "88.88.88.88"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "Arc-Data-LA"
+            "value": "Arc-AppSvc-LA"
         },
         "kubernetesVersion": {
             "value": "1.19.11"
