@@ -22,8 +22,7 @@ az extension update --name "connectedk8s"
 
 # Checking if you have up-to-date Azure Arc AZ CLI 'k8s-extension' extension...
 
-az extension add --name "k8s-extension"
-az extension update --name "k8s-extension"
+az extension add --name "k8s-extension" --version "0.4.3" -y # Temporary pin
 
 # Login to Az CLI using the service principal
 az login --service-principal --username $appId --password $password --tenant $tenantId

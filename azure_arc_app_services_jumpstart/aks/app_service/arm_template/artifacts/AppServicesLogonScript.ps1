@@ -58,7 +58,7 @@ Write-Host "Adding Azure Arc CLI extensions"
 Write-Host "`n"
 az extension add --name "connectedk8s" -y
 az extension add --name "k8s-configuration" -y
-az extension add --name "k8s-extension" -y
+az extension add --name "k8s-extension" --version "0.4.3" -y # Temporary pin
 az extension add --name "customlocation" -y
 az extension add --yes --source "https://aka.ms/appsvc/appservice_kube-latest-py2.py3-none-any.whl"
 

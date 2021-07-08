@@ -37,7 +37,7 @@ az provider register --namespace Microsoft.AzureArcData --wait
 Write-Host "Adding Azure Arc CLI extensions"
 az extension add --name "connectedk8s" -y
 az extension add --name "k8s-configuration" -y
-az extension add --name "k8s-extension" -y
+az extension add --name "k8s-extension" --version "0.4.3" -y # Temporary pin
 az extension add --name "customlocation" -y
 Write-Host "`n"
 az -v
