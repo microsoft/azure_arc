@@ -109,7 +109,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```shell
-    az group create --name Arc-Data-Demo --location "East US"
+    az group create --name Arc-AppSvc-Demo --location "East US"
     az deployment group create \
     --resource-group Arc-AppSvc-Demo \
     --name arcappsvc \
