@@ -38,7 +38,7 @@ The following README will guide you on how to use the provided [Terraform](https
   aliyun --version
   ```
 
-* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html). Use the below command to check your current installed version.
+* [Install Terraform >=1.0](https://learn.hashicorp.com/terraform/getting-started/install.html). Use the below command to check your current installed version.
 
   ```shell
   terraform -v
