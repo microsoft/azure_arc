@@ -45,10 +45,14 @@ echo ""
 echo "Checking if you have up-to-date Azure Arc AZ CLI 'k8s-extension' extension..."
 az extension show --name "k8s-extension" &> extension_output
 if cat extension_output | grep -q "not installed"; then
-az extension add --name "k8s-extension"
+az extension add --name "k8s-extension" --version "0.4.3" -y # Temporary pin
 rm extension_output
 else
-az extension update --name "k8s-extension"
+# az extension update --name "k8s-extension" # Temporary removal of update logic due to above pin - added 2 lines above to fully remove, then update to pin
+##############################################################################
+az extension remove --name "k8s-extension" # Fully remove
+az extension add --name "k8s-extension" --version "0.4.3" -y # Temporary pin
+##############################################################################
 rm extension_output
 fi
 echo ""
