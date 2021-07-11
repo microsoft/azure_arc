@@ -92,15 +92,14 @@ workflow ClientTools_01
                                 & choco install $app /y -Force| Write-Output
                             }
                         }                        
-                    }             
+                    }
+                    choco install azure-cli --version 2.25.0 -y
+                    # Pin down az cli version to avoid current app services version compatibility issues
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
 ClientTools_01 | Format-Table
-
-choco install azure-cli --version 2.25.0 -y
-# Pin down az cli version to avoid current app services version compatibility issues
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
