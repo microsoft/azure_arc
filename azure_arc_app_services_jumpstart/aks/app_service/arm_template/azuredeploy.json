@@ -85,7 +85,7 @@
       "metadata": {
         "description": "Azure Function deployment"
       }
-    },    
+    },
     "templateBaseUrl": {
       "type": "string",
       "metadata": {
