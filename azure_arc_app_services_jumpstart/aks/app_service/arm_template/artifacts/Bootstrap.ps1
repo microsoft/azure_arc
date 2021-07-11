@@ -62,6 +62,10 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1" 
 
 # Installing tools
+
+Invoke-WebRequest -Uri https://github.com/Azure/azure-cli/releases/download/azure-cli-2.25.0/azure-cli-2.25.0.msi -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+# Pindown az cli version to avoid current Azure Arc-enabled app services version compatibility issues
+
 workflow ClientTools_01
         {
             $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp'
@@ -93,8 +97,6 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    choco install azure-cli --version 2.25.0 -y
-                    # Pin down az cli version to avoid current app services version compatibility issues
                     Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
