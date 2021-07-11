@@ -1,3 +1,5 @@
+Start-Transcript -Path C:\Temp\deployAppService.log
+
 # # Deploying Azure App Service
 # Write-Host "Deploying Azure App Service"
 # Write-Host "`n"
