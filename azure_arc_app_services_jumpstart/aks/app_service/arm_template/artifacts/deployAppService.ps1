@@ -1,4 +1,4 @@
-# Deploying Azure Arc SQL Managed Instance
+# Deploying Azure App Service
 Write-Host "Deploying Azure App Service"
 Write-Host "`n"
 
