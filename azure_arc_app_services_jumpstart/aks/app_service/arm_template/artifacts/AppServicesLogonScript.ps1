@@ -83,6 +83,10 @@ if ( $env:deployAppService -eq $true )
     & "C:\Temp\deployAppService.ps1"
 }
 
+if ( $env:Function -eq $true )
+{
+    & "C:\Temp\deployFunction.ps1"
+}
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
