@@ -21,6 +21,13 @@ Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
 az functionapp create --resource-group $env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
+
+# Do {
+#     Write-Host "Waiting for Function app to become available. Hold tight, this might take a few minutes..."
+#     Start-Sleep -Seconds 45
+#     $buildService = $(if(kubectl get pods -n appservices | Select-String $functionAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+#     } while ($buildService -eq "Nope")
+
 Start-Sleep -Seconds 90
 
 # Retrieving the Azure Storage connection string & Registering binding extensions
