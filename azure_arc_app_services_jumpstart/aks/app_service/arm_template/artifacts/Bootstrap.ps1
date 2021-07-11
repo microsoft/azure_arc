@@ -64,7 +64,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp'
+            $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp'
             #Run commands in parallel.
             Parallel 
                 {
@@ -98,6 +98,9 @@ workflow ClientTools_01
         }
 
 ClientTools_01 | Format-Table
+
+choco install azure-cli --version 2.25.0 -y
+# Pin down az cli version to avoid current app services version compatibility issues
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
