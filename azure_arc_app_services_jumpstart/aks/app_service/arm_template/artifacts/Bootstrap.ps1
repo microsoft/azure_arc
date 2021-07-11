@@ -11,6 +11,7 @@ param (
     [string]$dnsPrefix,
     [string]$kubernetesVersion,
     [string]$deployAppService,
+    [string]$deployFunction,
     [string]$templateBaseUrl
 )
 
@@ -26,6 +27,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('dnsPrefix', $dnsPrefix,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('kubernetesVersion', $kubernetesVersion,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAppService', $deployAppService,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployFunction', $deployFunction,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path

@@ -83,7 +83,7 @@ if ( $env:deployAppService -eq $true )
     & "C:\Temp\deployAppService.ps1"
 }
 
-if ( $env:Function -eq $true )
+if ( $env:deployFunction -eq $true )
 {
     & "C:\Temp\deployFunction.ps1"
 }
