@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sshRSAPublicKey": {
-            "value": "<your RSA public key>"
+            "value": "ssh-rsa THISISTOPSECRETSTUFF1234XXXXXXXXXXXXXtEbhbVqD bilbo@MacBook-Pro.localdomain"
         },
         "spnClientId": {
-            "value": "<your service principal client id>"
+            "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
         },
         "spnClientSecret": {
-            "value": "<your service principal secret>"
+            "value": "33333333-XXXX-YTYT-9c21-7777777777"
         },
         "spnTenantId": {
-            "value": "<your spn tenant id>"
+            "value": "33333333-XXXX-41af-1111-7777777777"
         },
         "windowsAdminUsername": {
             "value": "arcdemo"
@@ -21,10 +21,10 @@
             "value": "ArcPassword123!!"
         },
         "myIpAddress": {
-            "value": "<your local public IP address>"
+            "value": "88.88.88.88"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "<your unique Log Analytics workspace name>"
+            "value": "Arc-AppSvc-LA"
         },
         "kubernetesVersion": {
             "value": "1.19.11"
@@ -35,11 +35,8 @@
         "deployAppService": {
             "value": true
         },
-        "deployFunction": {
-            "value": true
-        },        
         "templateBaseUrl": {
-            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/aks/app_service/arm_template/"
+            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/aks/arm_template/"
         }
     }
 }

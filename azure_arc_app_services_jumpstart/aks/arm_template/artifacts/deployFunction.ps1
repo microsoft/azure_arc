@@ -1,4 +1,7 @@
+Start-Transcript -Path C:\Temp\deployFunction.log
+
 # Creting Azure Storage Account for Function queue usage
+Write-Host "`n"
 Write-Host "Creting Azure Storage Account for Function queue usage"
 Write-Host "`n"
 $storageAccountName = "jumpstartappservices" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
@@ -18,6 +21,7 @@ Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
 az functionapp create --resource-group $env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
+Start-Sleep -Seconds 90
 
 # Retrieving the Azure Storage connection string & Registering binding extensions
 Write-Host "Retrieving the Azure Storage connection string & Registering binding extensions"
