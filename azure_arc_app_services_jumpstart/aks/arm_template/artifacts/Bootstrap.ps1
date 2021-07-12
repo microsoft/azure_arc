@@ -11,6 +11,7 @@ param (
     [string]$dnsPrefix,
     [string]$kubernetesVersion,
     [string]$deployAppService,
+    [string]$deployFunction,
     [string]$templateBaseUrl
 )
 
@@ -26,6 +27,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('dnsPrefix', $dnsPrefix,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('kubernetesVersion', $kubernetesVersion,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAppService', $deployAppService,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployFunction', $deployFunction,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
@@ -68,7 +70,7 @@ Invoke-WebRequest -Uri https://github.com/Azure/azure-cli/releases/download/azur
 
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp'
+            $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp,microsoftazurestorageexplorer'
             #Run commands in parallel.
             Parallel 
                 {
