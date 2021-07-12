@@ -108,8 +108,6 @@ $extensionId = az k8s-extension create --resource-group $env:resourceGroup --nam
 
 az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
 
-Start-Transcript -Path C:\Temp\deployAppService.log
-
 Do {
    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
    Start-Sleep -Seconds 45
