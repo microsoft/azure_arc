@@ -59,7 +59,7 @@ By the end of this guide, you will have a Microk8s Kubernetes cluster deployed w
   }
   ```
 
-  > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+  > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
 ## Architecture (In a nutshell)
 
