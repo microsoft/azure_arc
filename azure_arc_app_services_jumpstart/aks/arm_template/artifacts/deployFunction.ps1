@@ -8,6 +8,7 @@ $storageAccountName = "jumpstartappservices" + -join ((48..57) + (97..122) | Get
 az storage account create --name $storageAccountName --location $env:azureLocation --resource-group $env:resourceGroup --sku Standard_LRS
 
 # Creating local Azure Function project
+Write-Host "`n"
 Write-Host "Creating local Azure Function project"
 Write-Host "`n"
 Push-Location C:\Temp
@@ -22,15 +23,26 @@ $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-gr
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
 az functionapp create --resource-group $env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
 
-# Do {
-#     Write-Host "Waiting for Function app to become available. Hold tight, this might take a few minutes..."
-#     Start-Sleep -Seconds 45
-#     $buildService = $(if(kubectl get pods -n appservices | Select-String $functionAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-#     } while ($buildService -eq "Nope")
+Do {
+    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
+    Start-Sleep -Seconds 45
+    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($logProcessorStatus -eq "Nope")
 
-Start-Sleep -Seconds 90
+Do {
+    Write-Host "Waiting for Function app to become available. Hold tight, this might take a few minutes..."
+    Start-Sleep -Seconds 1
+    $buildService = $(if(kubectl get pods -n appservices | Select-String $functionAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($buildService -eq "Nope")
+
+Do {
+   Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
+   Start-Sleep -Seconds 45
+   $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
+   } while ($logProcessorStatus -eq "Nope")
 
 # Retrieving the Azure Storage connection string & Registering binding extensions
+Write-Host "`n"
 Write-Host "Retrieving the Azure Storage connection string & Registering binding extensions"
 Write-Host "`n"
 func azure functionapp fetch-app-settings $functionAppName
@@ -57,7 +69,7 @@ $fileContent = Get-Content -Path $filePath
 $fileContent[28] = "{0}`r`n{1}" -f $toAdd, $fileContent[28]
 $fileContent | Set-Content $filePath
 
-#Push-Location C:\Temp\JumpstartFunctionProj
+Push-Location C:\Temp\JumpstartFunctionProj
 $string = Get-Content C:\Temp\JumpstartFunctionProj\local.settings.json | Select-Object -Index 3
 $string.Split(' ')[-1] | Out-File C:\Temp\funcStorage.txt
 $string = Get-Content C:\Temp\funcStorage.txt
@@ -65,17 +77,32 @@ $string = $string.TrimEnd(",") | Out-File C:\Temp\funcStorage.txt
 $string = Get-Content C:\Temp\funcStorage.txt
 $env:AZURE_STORAGE_CONNECTION_STRING = $string
 
-
-#az storage queue list --output tsv
-#[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($(az storage message get --queue-name outqueue -o tsv --query '[].{Message:content}')))
-
 # Publishing the Function to Azure
+Write-Host "`n"
 Write-Host "Publishing the Function to Azure"
 Write-Host "`n"
 func azure functionapp publish $functionAppName | Out-File C:\Temp\funcPublish.txt
+Start-Sleep -Seconds 60
 $funcUrl = Get-Content C:\Temp\funcPublish.txt | Select-String "https://" | Out-File C:\Temp\funcUrl.txt
 $funcUrl = Get-Content C:\Temp\funcPublish.txt | Select-Object -Last 2 | Out-File C:\Temp\funcUrl.txt
 $funcUrl = Get-Content C:\Temp\funcUrl.txt
 $funcUrl.TrimStart("     ") | Out-File C:\Temp\funcUrl.txt
 $funcUrl = Get-Content C:\Temp\funcUrl.txt
 $funcUrl.TrimStart("Invoke url: ") | Out-File C:\Temp\funcUrl.txt
+$funcUrl = Get-Content C:\Temp\funcUrl.txt
+(Get-Content C:\Temp\funcUrl.txt) | Where-Object {$_.trim() -ne "" } | Set-Content C:\Temp\funcUrl.txt
+$funcUrl = Get-Content C:\Temp\funcUrl.txt
+
+
+# Creating While loop to generate 10 Azure Function messages to storage queue
+Write-Host "`n"
+Write-Host "Creating While loop to generate 10 Azure Function messages to storage queue"
+Write-Host "`n"
+$i=1
+Do {
+    $messageString = "?name=Jumpstart"+$i
+    $invokeUri = $funcUrl + $messageString
+    Invoke-WebRequest -URI $invokeUri -UseBasicParsing
+    $i++
+    }
+While ($i -le 10)
