@@ -37,6 +37,7 @@ az network public-ip create --resource-group $aksResourceGroupMC --name "Arc-App
 $staticIp = $(az network public-ip show --resource-group $aksResourceGroupMC --name "Arc-AppSvc-PIP" --output tsv --query ipAddress)
 
 # Registering Azure Arc providers
+Write-Host "`n"
 Write-Host "Registering Azure Arc providers, hold tight..."
 Write-Host "`n"
 az provider register --namespace Microsoft.Kubernetes --wait
