@@ -1,10 +1,10 @@
-<!-- ---
+---
 type: docs
 title: "Azure Function ARM Template"
 linkTitle: "Azure Function ARM Template"
-weight: 1
+weight: 2
 description: >
---- -->
+---
 
 ## Deploy Azure Function application on AKS using an ARM Template
 
@@ -170,11 +170,23 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![PowerShell logon script run](./18.png)
 
+    ![PowerShell logon script run](./19.png)
+
+    ![PowerShell logon script run](./20.png)
+
+    ![PowerShell logon script run](./21.png)
+
+    ![PowerShell logon script run](./22.png)
+
+    ![PowerShell logon script run](./23.png)
+
+    ![PowerShell logon script run](./24.png)
+
   Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the app service plan and the Azure Function application deployed on the cluster will be ready.
 
-    ![Wallpaper change](./19.png)
+    ![Wallpaper change](./25.png)
 
-* Since this scenario is deploying both the app service plan and a sample Azure Function application, you will also notice additional, newly deployed Azure resources in the resources group (at this point you should have **13 various Azure resources deployed**. The important ones to notice are:
+* Since this scenario is deploying both the app service plan and a sample Azure Function application, you will also notice additional, newly deployed Azure resources in the resources group (at this point you should have **15 various Azure resources deployed**. The important ones to notice are:
 
   * **Azure Arc enabled Kubernetes cluster** - Azure Arc enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
@@ -186,22 +198,49 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   * [**Azure Function**](https://docs.microsoft.com/en-us/azure/azure-functions/functions-overview) - Azure Functions is a serverless solution that allows you to write less code, maintain less infrastructure, and save on costs.
 
+  * [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) - Application Insights, a feature of Azure Monitor, is an extensible Application Performance Management (APM) service for developers and DevOps professionals. Use it to monitor your live applications.
+
   * Azure Storage Account - The storage account deployed in this scenario is used for hosting the [queue storage](https://docs.microsoft.com/en-us/azure/storage/queues/storage-queues-introduction) where the Azure Function will be sending messages to that can be leveraged later in an application event-driven architecture.
 
-  ![Additional Azure resources in the resource group](./20.png)
+  ![Additional Azure resources in the resource group](./26.png)
 
 * In this scenario, **a sample Jumpstart Azure Function application** was deployed. To open the deployed Function application in your web browser, simply click the Azure Function resource and the created URL.
 
-  ![Azure Function resource in a resource group](./21.png)
+  ![Azure Function URL](./27.png)
 
-  ![Azure Function URL](./22.png)
-
-  ![Azure Function open in a web browser](./23.png)
+  ![Azure Function open in a web browser](./28.png)
 
 * To demonstrate the messaging queuing element and to show how messages are stored in the queue storage, the Azure Function deployment script also generates 10 sample messages. To view it, click on the newly created storage account and go to the "Queues" section where you will see the new queue and the stored messages.
 
+  ![Azure Storage Account](./29.png)
 
-* To generate your own messages using the Function application, use the Function invoke URL. As part of the deployment script, a _`funcUrl.txt`_ text file located in the Client VM under _C:\Temp_ folder the include invoke URL was created for you. Open the URL in your browser 
+  ![Azure storage queue](./30.png)
+
+  ![Azure Function messages in storage queue](./31.png)
+
+* Alternatively, you can view the same queue storage using the Azure Storage Explorer client application installed automatically in the Client VM or using the Azure Storage Explorer portal-based view.
+
+  ![Azure Storage Explorer client application storage queue](./32.png)
+
+  ![Azure Storage Explorer portal-based view](./33.png)
+
+  ![Azure Storage Explorer portal-based view storage queue](./34.png)
+
+* To generate your own messages using the Function application, use the Function invoke URL. As part of the deployment script, a _`funcUrl.txt`_ text file located in the Client VM under _C:\Temp_ folder that includes invoke URL was created for you. Copy the URL and open it in your web browser while adding the message text to it using the _`?name=<Something>`_ syntax, for example, _`?name=Bilbo`_.
+
+  ![funcUrl.txt file](./35.png)
+
+  ![Invoke URL](./36.png)
+
+  ![Invoke URL in web browser](./37.png)
+
+* Go back to the storage queue and see the new added message.
+
+  ![New message in storage queue](./38.png)
+
+* As part of the deployment, an Application Insights instance was also provisioned to provide you with relevant performance and application telemetry.
+
+  ![Application Insights instance](./39.png)
 
 ## Cluster extensions
 
@@ -209,12 +248,12 @@ In this scenario, the Azure Arc enabled app services cluster extension was deplo
 
 * In order to view cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc enabled Kubernetes resource](./24.png)
+  ![Azure Arc enabled Kubernetes resource](./40.png)
 
-  ![Azure Arc enabled Kubernetes cluster extensions settings](./25.png)
+  ![Azure Arc enabled Kubernetes cluster extensions settings](./41.png)
 
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./26.png)
+  ![Delete Azure resource group](./42.png)
