@@ -1,23 +1,23 @@
 Start-Transcript -Path C:\Temp\deployFunction.log
 
-# Creting Azure Storage Account for Function queue usage
+# Creting Azure Storage Account for Azure Function application queue usage
 Write-Host "`n"
-Write-Host "Creting Azure Storage Account for Function queue usage"
+Write-Host "Creting Azure Storage Account for Azure Function application queue usage"
 Write-Host "`n"
 $storageAccountName = "jumpstartappservices" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 az storage account create --name $storageAccountName --location $env:azureLocation --resource-group $env:resourceGroup --sku Standard_LRS
 
-# Creating local Azure Function project
+# Creating local Azure Function application project
 Write-Host "`n"
-Write-Host "Creating local Azure Function project"
+Write-Host "Creating local Azure Function application project"
 Write-Host "`n"
 Push-Location C:\Temp
 func init JumpstartFunctionProj --dotnet
 Push-Location C:\Temp\JumpstartFunctionProj
 func new --name HttpJumpstart --template "HTTP trigger" --authlevel "anonymous"
 
-# Creating the new function app in the Kubernetes environment 
-Write-Host "Creating the new function app in the Kubernetes environment"
+# Creating the new function application in the Kubernetes environment 
+Write-Host "Creating the new Azure Function application in the Kubernetes environment"
 Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
@@ -30,7 +30,7 @@ Do {
     } while ($logProcessorStatus -eq "Nope")
 
 Do {
-    Write-Host "Waiting for Function app to become available. Hold tight, this might take a few minutes..."
+    Write-Host "Waiting for Azure Function application to become available. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 1
     $buildService = $(if(kubectl get pods -n appservices | Select-String $functionAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
@@ -77,9 +77,9 @@ $string = $string.TrimEnd(",") | Out-File C:\Temp\funcStorage.txt
 $string = Get-Content C:\Temp\funcStorage.txt
 $env:AZURE_STORAGE_CONNECTION_STRING = $string
 
-# Publishing the Function to Azure
+# Publishing the Azure Function application to Azure
 Write-Host "`n"
-Write-Host "Publishing the Function to Azure"
+Write-Host "Publishing the Azure Function application to Azure"
 Write-Host "`n"
 func azure functionapp publish $functionAppName | Out-File C:\Temp\funcPublish.txt
 Start-Sleep -Seconds 60
@@ -94,9 +94,9 @@ $funcUrl = Get-Content C:\Temp\funcUrl.txt
 $funcUrl = Get-Content C:\Temp\funcUrl.txt
 
 
-# Creating While loop to generate 10 Azure Function messages to storage queue
+# Creating a While loop to generate 10 Azure Function application messages to storage queue
 Write-Host "`n"
-Write-Host "Creating While loop to generate 10 Azure Function messages to storage queue"
+Write-Host "Creating a While loop to generate 10 Azure Function application messages to storage queue"
 Write-Host "`n"
 $i=1
 Do {
