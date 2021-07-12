@@ -201,7 +201,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 * To demonstrate the messaging queuing element and to show how messages are stored in the queue storage, the Azure Function deployment script also generates 10 sample messages. To view it, click on the newly created storage account and go to the "Queues" section where you will see the new queue and the stored messages.
 
 
-* To generate your own messages using the Function application, 
+* To generate your own messages using the Function application, use the Function invoke URL. As part of the deployment script, a _`funcUrl.txt`_ text file located in the Client VM under _C:\Temp_ folder the include invoke URL was created for you. Open the URL in your browser 
 
 ## Cluster extensions
 

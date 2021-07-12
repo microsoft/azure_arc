@@ -79,8 +79,8 @@ az connectedk8s connect --name $env:clusterName `
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
 
-# Deploying Azure App Service
-Write-Host "Deploying Azure App Service"
+# Deploying Azure App environment
+Write-Host "Deploying Azure App Service Kubernetes environment"
 Write-Host "`n"
 
 $namespace="appservices"
