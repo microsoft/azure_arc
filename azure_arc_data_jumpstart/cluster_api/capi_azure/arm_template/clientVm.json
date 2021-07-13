@@ -150,7 +150,7 @@
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
-        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/capi_0.5.0/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/"
+        "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/"
     },
     "resources": [
         {
