@@ -17,7 +17,7 @@ rules:
 - apiGroups: ["rbac.authorization.k8s.io"]
   resources: ["roles", "rolebindings"]
   verbs: ["*"]
-- apiGroups: ["sql.arcdata.microsoft.com", "tasks.sql.arcdata.microsoft.com", "arcdata.microsoft.com"]
+- apiGroups: ["sql.arcdata.microsoft.com", "tasks.sql.arcdata.microsoft.com", "tasks.arcdata.microsoft.com", "arcdata.microsoft.com"]
   resources: ["*"]
   verbs: ["*"]
 ---
@@ -50,13 +50,22 @@ spec:
         app: bootstrapper
     spec:
       serviceAccountName: sa-bootstrapper
+      securityContext:
+        fsGroup: 65534
       nodeSelector:
         kubernetes.io/os: linux
       imagePullSecrets:
       - name: arc-private-registry
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:latest
+        image: arcdata.azurecr.io/arcdata-p-bugbash/arc-bootstrapper:15.0.2148.137_1 # mcr.microsoft.com/arcdata/arc-bootstrapper:latest
         imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
         securityContext:
           runAsUser: 21000
