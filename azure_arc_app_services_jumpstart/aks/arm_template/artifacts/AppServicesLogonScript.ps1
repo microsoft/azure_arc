@@ -62,6 +62,7 @@ az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
 az extension add --yes --source "https://aka.ms/appsvc/appservice_kube-latest-py2.py3-none-any.whl"
+az extension add --yes --source "https://aka.ms/logicapp-latest-py2.py3-none-any.whl"
 
 Write-Host "`n"
 az -v
@@ -148,6 +149,11 @@ if ( $env:deployAppService -eq $true )
 if ( $env:deployFunction -eq $true )
 {
     & "C:\Temp\deployFunction.ps1"
+}
+
+if ( $env:deployLogicApp -eq $true )
+{
+    & "C:\Temp\deployLogicApp.ps1"
 }
 
 # Changing to Client VM wallpaper
