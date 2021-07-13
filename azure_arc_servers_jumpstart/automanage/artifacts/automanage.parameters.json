@@ -6,7 +6,7 @@
             "value": "<Name of your Azure Automanage Account>"
         },
         "machineName": {
-            "value": "<Name of your Azure Arc enabled Server>"
+            "value": "<Name of your Azure Arc enabled server>"
         },
         "configurationProfileAssignment": {
             "value": "<environment of your Azure Arc enabled server Production or DevTest>"
