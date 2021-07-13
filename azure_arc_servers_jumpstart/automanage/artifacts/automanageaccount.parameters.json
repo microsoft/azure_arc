@@ -6,7 +6,7 @@
             "value": "<name of your Automanage Account identity>"
         },
         "location": {
-            "value": "<azure region>"
+            "value": "<Azure Region>"
         }
     }
 }
