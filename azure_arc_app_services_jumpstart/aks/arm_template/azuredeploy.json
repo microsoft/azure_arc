@@ -86,6 +86,13 @@
         "description": "Azure Function deployment"
       }
     },
+    "deployLogicApp": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Azure Function deployment"
+      }
+    },
     "templateBaseUrl": {
       "type": "string",
       "metadata": {
@@ -144,6 +151,9 @@
           },
           "deployFunction": {
             "value": "[parameters('deployFunction')]"
+          },
+          "deployLogicApp": {
+            "value": "[parameters('deployLogicApp')]"
           },
           "templateBaseUrl": {
             "value": "[parameters('templateBaseUrl')]"

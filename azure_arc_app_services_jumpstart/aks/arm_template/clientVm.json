@@ -137,6 +137,13 @@
                 "description": "Azure Function deployment"
             }
         },
+        "deployLogicApp": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Azure Function deployment"
+            }
+        },
         "templateBaseUrl": {
             "type": "string",
             "metadata": {
@@ -308,7 +315,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ',parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl')) ]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployLogicApp ', parameters('deployLogicApp'), ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ',parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl')) ]"
                 }
             }
         }
