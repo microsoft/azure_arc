@@ -58,7 +58,7 @@ spec:
       - name: arc-private-registry
       containers:
       - name: bootstrapper
-        image: arcdata.azurecr.io/arcdata-p-bugbash/arc-bootstrapper:15.0.2148.137_1 # mcr.microsoft.com/arcdata/arc-bootstrapper:latest
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:latest
         imagePullPolicy: Always
         resources:
           limits:
