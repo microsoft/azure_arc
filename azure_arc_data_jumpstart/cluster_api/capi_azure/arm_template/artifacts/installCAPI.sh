@@ -50,6 +50,7 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kubectl --classic
 
 # Set CAPI deployment environment variables
+export CLUSTERCTL_VERSION="0.4.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export KUBERNETES_VERSION="1.19.11"
@@ -64,11 +65,16 @@ export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
 export AZURE_NODE_MACHINE_TYPE="Standard_D8s_v3"
 
-# Azure cloud settings - Do not change!
+# Base64 encode the variables - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
 export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
+
+# Settings needed for AzureClusterIdentity used by the AzureCluster
+export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
+export CLUSTER_IDENTITY_NAME="cluster-identity"
+export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
 # Installing Rancher K3s single node cluster using k3sup
 sudo mkdir ~/.kube
@@ -87,7 +93,7 @@ kubectl config set-context arcdatacapimgmt
 kubectl get node -o wide
 
 # Installing clusterctl
-curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.19/clusterctl-linux-amd64 -o clusterctl
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
 sudo chmod +x ./clusterctl
 sudo mv ./clusterctl /usr/local/bin/clusterctl
 clusterctl version
@@ -101,9 +107,13 @@ sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >
 sudo kubectl get nodes
 echo ""
 
+# Create a secret to include the password of the Service Principal identity created in Azure
+# This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
+kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
+
 # Transforming the Rancher K3s cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure azure -b kubeadm:v0.3.19 -c kubeadm:v0.3.19 --core cluster-api:v0.3.19
+clusterctl init --infrastructure azure
 echo "Making sure cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
@@ -112,7 +122,7 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
-clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
+clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --kubernetes-version v$KUBERNETES_VERSION \
   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
