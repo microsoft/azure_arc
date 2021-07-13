@@ -66,6 +66,6 @@ metadata:
       arcdata.microsoft.com/role: "true"
 rules:
     - apiGroups: ["arcdata.microsoft.com"]
-      resources: ["postgresql-11s", "postgresql-12s"]
+      resources: ["postgresqls"]
       verbs: ["get", "list", "watch"]
 ---
