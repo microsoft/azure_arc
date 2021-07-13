@@ -50,7 +50,7 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kubectl --classic
 
 # Set CAPI deployment environment variables
-export CAPI_VERSION="0.5.0" # Do not change!
+export CLUSTERCTL_VERSION="0.4.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export KUBERNETES_VERSION="1.19.11"
@@ -93,7 +93,7 @@ kubectl config set-context arcdatacapimgmt
 kubectl get node -o wide
 
 # Installing clusterctl
-curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/${CAPI_VERSION}/clusterctl-linux-amd64 -o clusterctl
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
 sudo chmod +x ./clusterctl
 sudo mv ./clusterctl /usr/local/bin/clusterctl
 clusterctl version
