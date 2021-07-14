@@ -103,7 +103,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * _`machineName`_: Name of your Azure Arc enabled server as it is shown in the Azure Portal.
   * _`profile`_: refers to the environment of your Azure Arc enabled server as Azure Automanage has different profiles. Values can be "Production" or "DevTest".
 
- ![Screenshot environment variables](./04.png)
+  ![Screenshot environment variables](./04.png)
 
 * From the deployment folder run the below command:
 
@@ -111,7 +111,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     . ./arcAutomanage.sh
   ```
 
- ![Scripts output](./05.png)
+  ![Scripts output](./05.png)
 
   > **Note: For the script to work properly you must run this command from the deployment folder. The extra dot is due to the shell script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
