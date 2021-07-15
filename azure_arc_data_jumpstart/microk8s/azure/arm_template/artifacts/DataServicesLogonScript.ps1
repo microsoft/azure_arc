@@ -137,10 +137,6 @@ az k8s-extension create --name "azure-defender" `
                         --cluster-type connectedClusters `
                         --extension-type Microsoft.AzureDefender.Kubernetes
 
-# Sleep before DC!!
-Write-Host "Stop Now!!!!!" -Foregroundcolor "Red"
-Start-Sleep -Seconds 200
-
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
@@ -174,6 +170,20 @@ Do {
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
+
+########################################
+# Follow operator logs (temporary debug)
+########################################
+$oPMonShell = Start-Process -PassThru PowerShell {
+                    for (0 -lt 1) {
+                        # Controller Pod name
+                        $operatorname = $(kubectl get pods -n arc | grep control-).Split(" ")[0]
+                        kubectl logs $operatorname -n arc -c controller --follow
+                        Start-Sleep -Seconds 10
+                        Clear-Host
+                    }
+                }
+########################################
 
 # If flag set, deploy SQL MI
 if ( $env:deploySQLMI -eq $true )
