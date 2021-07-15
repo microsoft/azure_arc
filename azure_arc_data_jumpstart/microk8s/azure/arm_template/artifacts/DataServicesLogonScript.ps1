@@ -137,6 +137,10 @@ az k8s-extension create --name "azure-defender" `
                         --cluster-type connectedClusters `
                         --extension-type Microsoft.AzureDefender.Kubernetes
 
+# Sleep before DC!!
+Write-Host "Stop Now!!!!!" -Foregroundcolor "Red"
+Start-Sleep -Seconds 200
+
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
