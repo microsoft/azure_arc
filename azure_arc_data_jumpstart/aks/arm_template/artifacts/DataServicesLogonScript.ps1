@@ -113,25 +113,6 @@ az customlocation create --name 'jumpstart-cl' `
                          --namespace arc `
                          --host-resource-id $connectedClusterId ` --cluster-extension-ids $extensionId
 
-# Deploying Azure Monitor for containers Kubernetes extension instance
-Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-Write-Host "`n"
-
-az k8s-extension create --name "azuremonitor-containers" `
-                        --cluster-name $connectedClusterName `
-                        --resource-group $env:resourceGroup `
-                        --cluster-type connectedClusters `
-                        --extension-type Microsoft.AzureMonitor.Containers
-
-# Deploying Azure Defender Kubernetes extension instance
-Write-Host "Create Azure Defender Kubernetes extension instance"
-Write-Host "`n"
-az k8s-extension create --name "azure-defender" `
-                        --cluster-name $connectedClusterName `
-                        --resource-group $env:resourceGroup `
-                        --cluster-type connectedClusters `
-                        --extension-type Microsoft.AzureDefender.Kubernetes
-
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
