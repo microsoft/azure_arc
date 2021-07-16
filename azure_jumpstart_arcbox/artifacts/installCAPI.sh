@@ -65,11 +65,16 @@ export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v3"
 export AZURE_NODE_MACHINE_TYPE="Standard_D8s_v3"
 
-# Azure cloud settings - Do not change!
+# Base64 encode the variables - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$subscriptionId" | base64 | tr -d '\n')"
 export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
 export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
+
+# Settings needed for AzureClusterIdentity used by the AzureCluster
+export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
+export CLUSTER_IDENTITY_NAME="cluster-identity"
+export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
 # Installing Rancher K3s single node cluster using k3sup
 sudo mkdir ~/.kube
