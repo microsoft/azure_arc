@@ -84,6 +84,12 @@
         },
         "serviceProxyPort": {
             "value": 30777
+        },
+        "apiVersion": {
+            "value": "2021-07-01-preview"
+        },
+        "infrastructure": {
+            "value": "azure"
         }
     }
 }

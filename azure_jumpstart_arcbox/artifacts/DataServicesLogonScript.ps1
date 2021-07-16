@@ -2,10 +2,12 @@ Start-Transcript -Path C:\ArcBox\DataServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
+# Required for azcopy
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
+# Required for CLI commands
 az login --service-principal --username $env:spnClientID --password $env:spnClientSecret --tenant $env:spnTenantId
 
 # Install Azure Data Studio extensions
@@ -58,6 +60,8 @@ kubectl apply -f "C:\ArcBox\capiStorageClass.yaml"
 
 kubectl label node --all failure-domain.beta.kubernetes.io/zone-
 kubectl label node --all topology.kubernetes.io/zone-
+kubectl label node --all failure-domain.beta.kubernetes.io/zone= --overwrite
+kubectl label node --all topology.kubernetes.io/zone= --overwrite
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"

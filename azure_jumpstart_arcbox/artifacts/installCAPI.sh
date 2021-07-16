@@ -50,6 +50,7 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kubectl --classic
 
 # Set CAPI deployment environment variables
+export CLUSTERCTL_VERSION="0.4.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export KUBERNETES_VERSION="1.19.11"
@@ -87,7 +88,7 @@ kubectl config set-context arcboxcapimgmt
 kubectl get node -o wide
 
 # Installing clusterctl
-curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.19/clusterctl-linux-amd64 -o clusterctl
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
 sudo chmod +x ./clusterctl
 sudo mv ./clusterctl /usr/local/bin/clusterctl
 clusterctl version
@@ -101,9 +102,13 @@ sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >
 sudo kubectl get nodes
 echo ""
 
+# Create a secret to include the password of the Service Principal identity created in Azure
+# This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
+kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
+
 # Transforming the Rancher K3s cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure azure -b kubeadm:v0.3.19 -c kubeadm:v0.3.19 --core cluster-api:v0.3.19
+clusterctl init --infrastructure azure
 echo "Making sure cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
@@ -112,7 +117,7 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
-clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
+clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --kubernetes-version v$KUBERNETES_VERSION \
   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
