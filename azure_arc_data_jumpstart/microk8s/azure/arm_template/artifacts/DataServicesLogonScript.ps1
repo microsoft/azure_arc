@@ -5,6 +5,12 @@ $connectedClusterName = "Arc-Data-Microk8s-K8s"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
+# Required for azcopy
+$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
+
+# Required for CLI commands
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
 Write-Host "Installing Azure Data Studio Extensions"
