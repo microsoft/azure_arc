@@ -12,7 +12,7 @@
       "type": "string",
       "defaultValue": "Arc-Data-Client",
       "metadata": {
-        "description": "The name of you Virtual Machine"
+        "description": "The name of your Virtual Machine"
       }
     },
     "windowsAdminUsername": {
@@ -54,12 +54,14 @@
     },
     "virtualNetworkName": {
       "type": "string",
+      "defaultValue": "Arc-Data-Microk8s-VNet",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
     "subnetName": {
       "type": "string",
+      "defaultValue": "Arc-Data-Microk8s-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
