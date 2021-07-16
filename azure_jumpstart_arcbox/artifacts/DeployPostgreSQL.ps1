@@ -9,6 +9,7 @@ Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group $env:resourceGroup --query id -o tsv)
+$ServiceType = "LoadBalancer"
 $memoryRequest = "0.25Gi"
 $StorageClassName = "managed-premium"
 $dataStorageSize = "5Gi"
@@ -23,6 +24,7 @@ $PSQLParams = "C:\ArcBox\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'customLocation-stage',$customLocationId | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'memoryRequest-stage',$memoryRequest | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'logsStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
@@ -58,16 +60,12 @@ kubectl exec $podname -n arc -c postgres -- sudo -u postgres psql -d adventurewo
 Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
 $settingsTemplate = "C:\ArcBox\settingsTemplate.json"
-kubectl describe svc arcboxps-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\ArcBox\postgres_instance_endpoint.txt" | Out-Null
-$pgsqlfile = "C:\ArcBox\postgres_instance_endpoint.txt"
-$pgsqlstring = Get-Content $pgsqlfile
-$pgsqlstring.split(" ") | Out-File "C:\ArcBox\postgres_instance_endpoint.txt" | Out-Null
-(Get-Content $pgsqlfile | Select-Object -Skip 7) | Set-Content $pgsqlfile
-(Get-Content $pgsqlfile | Where-Object {$_.trim() -ne "" }) | Set-Content $pgsqlfile
-$pgsqlstring = Get-Content $pgsqlfile
+# Retrieving PostgreSQL connection endpoint
+$pgsqlstring = kubectl get postgresql arcboxps -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
-(Get-Content -Path $settingsTemplate) -replace 'arc_postgres',$pgsqlstring | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
+# Replace placeholder values in settingsTemplate.json
+(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_port',$pgsqlstring.split(":")[1] | Set-Content -Path $settingsTemplate
 
 # Cleaning garbage
 Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force
