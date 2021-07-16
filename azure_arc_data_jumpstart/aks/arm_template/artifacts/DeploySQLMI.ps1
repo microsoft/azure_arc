@@ -51,6 +51,8 @@ Do {
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
+Start-Sleep -Seconds 60
+
 # Downloading demo database and restoring onto SQL MI
 $podname = "jumpstart-sql" + "-0"
 Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
