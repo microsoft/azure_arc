@@ -174,20 +174,6 @@ Do {
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
-########################################
-# Follow operator logs (temporary debug)
-########################################
-$oPMonShell = Start-Process -PassThru PowerShell {
-                    for (0 -lt 1) {
-                        # Controller Pod name
-                        $operatorname = $(kubectl get pods -n arc | grep control-).Split(" ")[0]
-                        kubectl logs $operatorname -n arc -c controller --follow
-                        Start-Sleep -Seconds 10
-                        Clear-Host
-                    }
-                }
-########################################
-
 # If flag set, deploy SQL MI
 if ( $env:deploySQLMI -eq $true )
 {
