@@ -1,12 +1,9 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
+# Deployment environment variables
 $connectedClusterName = "Arc-Data-Microk8s-K8s"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
-
-$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
@@ -68,7 +65,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERN
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
-azdata --version
+Write-Host "`n"
 
 # Onboarding the Microk8s cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
