@@ -45,6 +45,7 @@ Do {
 Write-Host "Azure Arc PostgreSQL Hyperscale is ready!"
 Write-Host "`n"
 
+# Ensures postgres container is initiated and ready to accept restores
 Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
