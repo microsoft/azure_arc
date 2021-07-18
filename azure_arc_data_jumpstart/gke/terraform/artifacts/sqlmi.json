@@ -32,8 +32,7 @@
             "defaultValue": "arc"
         },
         "serviceType": {
-            "type": "String",
-            "defaultValue": "LoadBalancer"
+            "type": "String"
         },
         "vCoresMax": {
             "type": "Int",
@@ -55,30 +54,30 @@
             "defaultValue": "5"
         },
         "logsStorageClassName": {
-            "type": "String",
-            "defaultValue": "local-ssd"
+            "type": "String"
         },
         "dataLogsStorageSize": {
             "type": "String",
             "defaultValue": "5"
         },
         "dataLogsStorageClassName": {
-            "type": "String",
-            "defaultValue": "local-ssd"
+            "type": "String"
         },
         "backupsStorageSize": {
             "type": "String",
             "defaultValue": "5"
         },
         "backupsStorageClassName": {
-            "type": "String",
-            "defaultValue": "local-ssd"
+            "type": "String"
         },
         "replicas": {
             "type": "Int"
         },
         "resourceTags": {
             "type": "Object"
+        },
+        "apiVersion": {
+          "type": "String"
         }
     },
     "variables": {},
@@ -86,7 +85,7 @@
     "resources": [
         {
             "type": "Microsoft.AzureArcData/sqlManagedInstances",
-            "apiVersion": "2021-06-01-preview",
+            "apiVersion": "[parameters('apiVersion')]",
             "name": "jumpstart-sql",
             "location": "[parameters('location')]",
             "extendedLocation": {

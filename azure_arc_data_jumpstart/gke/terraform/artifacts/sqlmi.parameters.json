@@ -20,6 +20,9 @@
         "azdataPassword": {
             "value": "azdataPassword-stage"
         },
+        "serviceType": {
+            "value": "serviceType-stage"
+        },
         "vCoresMax": {
             "value": vCoresMaxStage
         },
@@ -31,6 +34,15 @@
         },
         "dataStorageClassName": {
             "value": "dataStorageClassName-stage"
+        },
+        "logsStorageClassName": {
+            "value": "logsStorageClassName-stage"
+        },
+        "dataLogsStorageClassName": {
+            "value": "dataLogsStorageClassName-stage"
+        },
+        "backupsStorageClassName": {
+            "value": "backupsStorageClassName-stage"
         },
         "logsStorageSize": {
             "value": "logsSize-stage"
@@ -46,8 +58,11 @@
         },
         "resourceTags": {
             "value": {
-                "Project": "jumpstart_azure_arc_data"
+                "Project": "jumpstart_azure_arc_data_services"
             }
+        },
+        "apiVersion": {
+            "value": "2021-07-01-preview"
         }
     }
 }

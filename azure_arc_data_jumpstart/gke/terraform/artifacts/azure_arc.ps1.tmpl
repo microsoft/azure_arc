@@ -16,6 +16,7 @@ $env:resourceGroup="${resourceGroup}"
 $env:azureLocation="${azureLocation}"
 $env:deploySQLMI="${deploySQLMI}"
 $env:deployPostgreSQL="${deployPostgreSQL}"
+$env:templateBaseUrl="${templateBaseUrl}"
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $env:adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('gcpCredentialsFilename', $env:gcpCredentialsFilename,[System.EnvironmentVariableTarget]::Machine)
