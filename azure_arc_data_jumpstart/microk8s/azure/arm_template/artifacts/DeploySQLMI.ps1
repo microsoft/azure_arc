@@ -1,7 +1,7 @@
 Start-Transcript -Path C:\Temp\deploySQL.log
 
 # Deployment environment variables
-$controllerName = "Jumpstart-DC"
+$controllerName = "jumpstart-dc"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "Deploying Azure Arc SQL Managed Instance"
