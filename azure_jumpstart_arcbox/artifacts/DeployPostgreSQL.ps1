@@ -68,6 +68,3 @@ $pgsqlstring = kubectl get postgresql arcboxps -n arc -o=jsonpath='{.status.prim
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres_port',$pgsqlstring.split(":")[1] | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
-
-# Cleaning garbage
-Remove-Item "C:\ArcBox\postgres_instance_endpoint.txt" -Force

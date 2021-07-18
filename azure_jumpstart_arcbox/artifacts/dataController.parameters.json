@@ -68,13 +68,13 @@
             "value": "managed-premium"
         },
         "dataStorageSize": {
-            "value": "5Gi"
+            "value": "15Gi"
         },
         "logsStorageClass": {
             "value": "managed-premium"
         },
         "logsStorageSize": {
-            "value": "5Gi"
+            "value": "10Gi"
         },
         "serviceType": {
             "value": "LoadBalancer"
@@ -89,7 +89,7 @@
             "value": "2021-07-01-preview"
         },
         "infrastructure": {
-            "value": "azure"
+            "value": "onpremises"
         }
     }
 }
