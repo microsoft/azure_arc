@@ -64,6 +64,9 @@
                     "name": "citus"
                 }
             ]
+        },
+        "apiVersion": {
+            "value": "2021-07-01-preview"
         }
     }
 }
