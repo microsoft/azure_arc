@@ -11,6 +11,7 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 az login --service-principal --username $env:spnClientID --password $env:spnClientSecret --tenant $env:spnTenantId
 
 # Install Azure Data Studio extensions
+Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
 $env:argument1="--install-extension"
@@ -20,6 +21,7 @@ $env:argument3="microsoft.azuredatastudio-postgresql"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument3
 
 # Create Azure Data Studio desktop shortcut
+Write-Host "`n"
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
@@ -89,11 +91,13 @@ Start-Sleep -Seconds 20
 az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
+Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
 # Deploying Azure Defender Kubernetes extension instance
+Write-Host "`n"
 Write-Host "Create Azure Defender Kubernetes extension instance"
 Write-Host "`n"
 az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes

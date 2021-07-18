@@ -67,6 +67,3 @@ $sqlstring = kubectl get sqlmanagedinstances arcbox-sql -n arc -o=jsonpath='{.st
 (Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
-
-# Cleaning garbage
-Remove-Item "C:\ArcBox\sql_instance_list.txt" -Force
