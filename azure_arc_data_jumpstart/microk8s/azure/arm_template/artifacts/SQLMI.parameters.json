@@ -60,6 +60,9 @@
             "value": {
                 "Project": "jumpstart_azure_arc_data_services"
             }
+        },
+        "apiVersion": {
+            "value": "2021-07-01-preview"
         }
     }
 }
