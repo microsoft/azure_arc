@@ -53,9 +53,9 @@ $podname = "jumpstartpsc0-0"
 Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
 kubectl exec $podname -n arc -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AdventureWorks2019.sql" 2>&1 | Out-Null
 Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-kubectl exec $podname -n arc -c postgres -- sudo -u postgres psql -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
+kubectl exec $podname -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
 Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-kubectl exec $podname -n arc -c postgres -- sudo -u postgres psql -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
+kubectl exec $podname -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
 
 # Creating Azure Data Studio settings for PostgreSQL connection
 Write-Host ""
