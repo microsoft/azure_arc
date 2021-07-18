@@ -134,8 +134,8 @@ Write-Host "`n"
 & "C:\ArcBox\DeploySQLMI.ps1"
 & "C:\ArcBox\DeployPostgreSQL.ps1"
 
-
-Write-Host "Copying Azure Data Studio settings template file"
+# Replacing Azure Data Studio settings template file
+Write-Host "Replacing Azure Data Studio settings template file"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "C:\ArcBox\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
