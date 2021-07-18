@@ -7,3 +7,4 @@ backup/
 .vagrant
 *.pem
 .terraform.lock.hcl
+account.json
