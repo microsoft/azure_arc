@@ -7,4 +7,4 @@ backup/
 .vagrant
 *.pem
 .terraform.lock.hcl
-account.json
+azure_arc_data_jumpstart/gke/terraform/account.json
