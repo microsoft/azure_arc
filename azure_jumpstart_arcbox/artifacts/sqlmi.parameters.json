@@ -20,6 +20,9 @@
         "azdataPassword": {
             "value": "azdataPassword-stage"
         },
+        "serviceType": {
+            "value": "serviceType-stage"
+        },        
         "vCoresMax": {
             "value": vCoresMaxStage
         },
@@ -48,6 +51,9 @@
             "value": {
                 "Project": "jumpstart_azure_arc_data"
             }
-        }
+        },
+        "apiVersion": {
+            "value": "2021-07-01-preview"
+        }        
     }
 }
