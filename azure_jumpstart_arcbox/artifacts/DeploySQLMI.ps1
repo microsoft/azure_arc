@@ -9,6 +9,7 @@ Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group $env:resourceGroup --query id -o tsv)
+$ServiceType = "LoadBalancer"
 $vCoresMax = 4
 $memoryMax = "8"
 $StorageClassName = "managed-premium"
@@ -26,6 +27,7 @@ $SQLParams = "C:\ArcBox\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresMaxStage',$vCoresMax | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'memoryMax-stage',$memoryMax | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
@@ -57,17 +59,11 @@ kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S loca
 Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
 $settingsTemplate = "C:\ArcBox\settingsTemplate.json"
-kubectl describe svc arcbox-sql-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\ArcBox\sql_instance_list.txt" | Out-Null
-$sqlfile = "C:\ArcBox\sql_instance_list.txt"
-$sqlstring = Get-Content $sqlfile
-$sqlstring.split(" ") | Tee-Object "C:\ArcBox\sql_instance_list.txt" | Out-Null
-(Get-Content $sqlfile | Select-Object -Skip 7) | Set-Content $sqlfile
-$sqlstring = Get-Content $sqlfile
+# Retrieving SQL MI connection endpoint
+$sqlstring = kubectl get sqlmanagedinstances arcbox-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
+# Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
-
-# Cleaning garbage
-Remove-Item "C:\ArcBox\sql_instance_list.txt" -Force
