@@ -1,0 +1,32 @@
+{
+  "managedApiConnections": {
+    "azurequeues": {
+      "api": {
+        "id": "<queueApiResourceId>"
+      },
+      "connection": {
+        "id": "<queueConnectionResourceId>"
+      },
+      "connectionRuntimeUrl": "<queueConnectionRuntimeUrl>",
+      "authentication": {
+        "type": "Raw",
+        "scheme": "Key",
+        "parameter": "@appsetting('azurequeues-connectionKey')"
+      }
+    },
+    "azureblob": {
+      "api": {
+        "id": "<blobApiResourceId>"
+      },
+      "connection": {
+        "id": "<blobConnectionResourceId>"
+      },
+      "connectionRuntimeUrl": "<blobConnectionRuntimeUrl>",
+      "authentication": {
+        "type": "Raw",
+        "scheme": "Key",
+        "parameter": "@appsetting('azureblob-connectionKey')"
+      }
+    }
+  }
+}
