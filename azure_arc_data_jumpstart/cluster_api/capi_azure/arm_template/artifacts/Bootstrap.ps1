@@ -14,7 +14,8 @@ param (
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
     [string]$deploySQLMI,
-    [string]$deployPostgreSQL
+    [string]$deployPostgreSQL,
+    [string]$templateBaseUrl
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -33,6 +34,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', $deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
 Write-Output "Create deployment path"
@@ -62,10 +64,23 @@ Disable-ieESC
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
+# Downloading GitHub artifacts for DataServicesLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\Temp\settingsTemplate.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "C:\Temp\DataServicesLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\Temp\DeploySQLMI.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\Temp\DeployPostgreSQL.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "C:\Temp\dataController.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "C:\Temp\dataController.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.json") -OutFile "C:\Temp\SQLMI.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.parameters.json") -OutFile "C:\Temp\SQLMI.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\Temp\postgreSQL.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\Temp\postgreSQL.parameters.json"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
+
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep'
             #Run commands in parallel.
             Parallel 
                 {
@@ -95,19 +110,7 @@ workflow ClientTools_01
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/settingsTemplate.json" -OutFile "C:\Temp\settingsTemplate.json"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/DataServicesLogonScript.ps1" -OutFile "C:\Temp\DataServicesLogonScript.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/DeploySQLMI.ps1" -OutFile "C:\Temp\DeploySQLMI.ps1"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/DeployPostgreSQL.ps1" -OutFile "C:\Temp\DeployPostgreSQL.ps1"                    
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/capiStorageClass.yaml" -OutFile "C:\Temp\capiStorageClass.yaml"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/dataController.json" -OutFile "C:\Temp\dataController.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/SQLMI.json" -OutFile "C:\Temp\SQLMI.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/SQLMI.parameters.json" -OutFile "C:\Temp\SQLMI.parameters.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/postgreSQL.json" -OutFile "C:\Temp\postgreSQL.json"
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/postgreSQL.parameters.json" -OutFile "C:\Temp\postgreSQL.parameters.json"                       
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
