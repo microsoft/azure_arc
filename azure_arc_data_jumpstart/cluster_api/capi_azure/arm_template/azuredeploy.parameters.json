@@ -31,6 +31,9 @@
         },
         "deployPostgreSQL": {
             "value": "<PostgreSQL Hyperscale deployment (true/false)>"
+        },
+        "templateBaseUrl": {
+            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template"
         }
     }
 }

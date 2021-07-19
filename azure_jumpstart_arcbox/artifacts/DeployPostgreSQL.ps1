@@ -3,7 +3,7 @@ Start-Transcript -Path C:\ArcBox\deployPostgreSQL.log
 # Deployment environment variables
 $controllerName = "arcbox-dc"
 
-# Deploying Azure Arc SQL Managed Instance
+# Deploying Azure Arc PostgreSQL Hyperscale
 Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
 Write-Host "`n"
 
@@ -49,7 +49,7 @@ Write-Host "`n"
 Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
-$podname = "arcboxpsc0-0"
+$podname = "jumpstartpsc0-0"
 Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
 kubectl exec $podname -n arc -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/AdventureWorks2019.sql" 2>&1 | Out-Null
 Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
@@ -62,7 +62,7 @@ Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
 $settingsTemplate = "C:\ArcBox\settingsTemplate.json"
 # Retrieving PostgreSQL connection endpoint
-$pgsqlstring = kubectl get postgresql arcboxps -n arc -o=jsonpath='{.status.primaryEndpoint}'
+$pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
 # Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
