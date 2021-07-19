@@ -1,8 +1,13 @@
 Start-Transcript -Path C:\Temp\deployLogicApp.log
 
-# Creting Azure Storage Account for Azure Function application queue usage
+# Downloading sample Logic App
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/CreateBlobFromQueueMessage/workflow.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample\CreateBlobFromQueueMessage\workflow.json" -Force)
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/connections.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample\connections.json" -Force)
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/host.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample/host.json" -Force)
+
+# Creating Azure Storage Account for Azure Logic App queue and blob storage
 Write-Host "`n"
-Write-Host "Creting Azure Storage Account for Azure Function application queue usage"
+Write-Host "Creting Azure Storage Account for Azure Logic App example"
 Write-Host "`n"
 $storageAccountName = "jumpstartappservices" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 az storage account create --name $storageAccountName --location $env:azureLocation --resource-group $env:resourceGroup --sku Standard_LRS
@@ -16,7 +21,7 @@ az storage account create --name $storageAccountName --location $env:azureLocati
 # Push-Location C:\Temp\JumpstartFunctionProj
 # func new --name HttpJumpstart --template "HTTP trigger" --authlevel "anonymous"
 
-# Creating the new function application in the Kubernetes environment 
+# Creating the new Logic App in the Kubernetes environment 
 Write-Host "Creating the new Azure Logic App application in the Kubernetes environment"
 Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
