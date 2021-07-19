@@ -75,17 +75,50 @@
   },
   "variables": {
     "capiTemplateUrl": "[uri(parameters('templateBaseUrl'), 'ubuntuCapi.json')]",
-    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",    
+    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
     "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
-    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]"
+    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
+    "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
+    // Virtual Network configuration
+    "virtualNetworkName": "Arc-Data-CAPI-VNet",
+    "subnetName": "Arc-Data-CAPI-Subnet",
+    "addressPrefix": "172.16.0.0/16",
+    "subnetAddressPrefix": "172.16.1.0/24"
   },
   "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys a VNET and Subnet for Client and K8s VM",
+      "apiVersion": "2019-10-01",
+      "name": "VNETDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('VNETUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "addressPrefix": {
+            "value": "[variables('addressPrefix')]"
+          },
+          "subnetAddressPrefix": {
+            "value": "[variables('subnetAddressPrefix')]"
+          }
+        }
+      }
+    },
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploy the CAPI environment",
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment" ],
+      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -113,6 +146,12 @@
           },
           "templateBaseUrl": {
             "value": "[parameters('templateBaseUrl')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
           }
         }
       }
@@ -122,7 +161,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment" ],
+      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -156,6 +195,12 @@
           },
           "templateBaseUrl": {
             "value": "[parameters('templateBaseUrl')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
           },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
