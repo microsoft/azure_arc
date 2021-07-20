@@ -1,9 +1,9 @@
 #!/bin/bash
-export CAPI_PROVIDER="azure" # Do not change!
-export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 
 # Set deployment environment variables
-export KUBERNETES_VERSION="<Kubernetes version>" # For example: "1.18.17"
+export CAPI_PROVIDER="azure" # Do not change!
+export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
+export KUBERNETES_VERSION="<Kubernetes version>" # For example: "1.21.3"
 export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
 export WORKER_MACHINE_COUNT="<Workers node count>"
 export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
@@ -15,15 +15,24 @@ export AZURE_CLIENT_SECRET="<Azure SPN application client secret>"
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="<Control Plane node Azure VM type>" # For example: "Standard_D2s_v3"
 export AZURE_NODE_MACHINE_TYPE="<Worker node Azure VM type>" # For example: "Standard_D4s_v3"
 
-# Azure cloud settings - Do not change!
+# Base64 encode the variables - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$AZURE_SUBSCRIPTION_ID" | base64 | tr -d '\n')"
-export AZURE_TENANT_ID_B64="$(echo -n "$AZURE_TENANT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_ID_B64="$(echo -n "$AZURE_CLIENT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_SECRET_B64="$(echo -n "$AZURE_CLIENT_SECRET" | base64 | tr -d '\n')"
+export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
+
+# Settings needed for AzureClusterIdentity used by the AzureCluster
+export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
+export CLUSTER_IDENTITY_NAME="cluster-identity"
+export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+
+# Create a secret to include the password of the Service Principal identity created in Azure
+# This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
+kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
 # Transforming the kind cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure azure -b kubeadm:v0.3.19 -c kubeadm:v0.3.19 --core cluster-api:v0.3.19
+clusterctl init --infrastructure azure
 echo "Making sure cluster is ready..."
 echo ""
 kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
@@ -32,7 +41,7 @@ echo ""
 # Deploy CAPI Workload cluster
 echo "Deploying Kubernetes workload cluster"
 echo ""
-clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
+clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --kubernetes-version v$KUBERNETES_VERSION \
   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
@@ -101,7 +110,7 @@ kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
 echo ""
 
 echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 echo ""
 
 rm -rf ~/.azure/AzureArcCharts
@@ -128,4 +137,4 @@ rm extension_output
 fi
 echo ""
 
-az connectedk8s connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
+az connectedk8s connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --custom-locations-oid "51dfe1e8-70c6-4de5-a08e-e18aff23d815" --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
