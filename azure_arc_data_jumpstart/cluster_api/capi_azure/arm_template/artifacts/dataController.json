@@ -95,7 +95,7 @@
         },
         "infrastructure": {
         "type": "String"
-        }        
+        }
     },
     "variables": {},
     "functions": [],
@@ -125,8 +125,8 @@
                     "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",
                     "primaryKey": "[parameters('logAnalyticsPrimaryKey')]"
                 },
+                "infrastructure": "[parameters('infrastructure')]",
                 "k8sRaw": {
-                    "infrastructure": "[parameters('infrastructure')]",
                     "apiVersion": "arcdata.microsoft.com/v1beta1",
                     "kind": "datacontroller",
                     "spec": {
