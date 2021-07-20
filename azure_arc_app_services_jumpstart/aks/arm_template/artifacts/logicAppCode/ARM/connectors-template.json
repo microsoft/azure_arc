@@ -23,7 +23,7 @@
             "type": "string"
         },
         "connections_azurequeue_name": {
-            "defaultValue": "azurequeues",
+            "defaultValue": "azurequeue",
             "type": "string"
         }
     },

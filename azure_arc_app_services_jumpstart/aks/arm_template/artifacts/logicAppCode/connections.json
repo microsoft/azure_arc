@@ -5,13 +5,16 @@
         "id": "/subscriptions/@appsetting('subscriptionId')/providers/Microsoft.Web/locations/@appsetting('location')/managedApis/azurequeues"
       },
       "connection": {
-        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroupId')/providers/Microsoft.Web/connections/azurequeues"
+        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroupName')/providers/Microsoft.Web/connections/azurequeues"
       },
       "connectionRuntimeUrl": "@appsetting('queueConnectionRuntimeUrl')",
       "authentication": {
-        "type": "Raw",
-        "scheme": "Key",
-        "parameter": "@appsetting('azurequeues-connectionKey')"
+        "type": "ActiveDirectoryOAuth",
+        "audience": "https://management.core.windows.net/",
+        "credentialType": "Secret",
+        "clientId": "@appsetting('spnClientId')",
+        "tenant": "@appsetting('spnTenantId')",
+        "secret": "@appsetting('spnClientSecret')"
       }
     },
     "azureblob": {
@@ -19,7 +22,7 @@
         "id": "/subscriptions/@appsetting('subscriptionId')/providers/Microsoft.Web/locations/@appsetting('location')/managedApis/azureblob"
       },
       "connection": {
-        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroupId')/providers/Microsoft.Web/connections/azureblob"
+        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroupName')/providers/Microsoft.Web/connections/azureblob"
       },
       "connectionRuntimeUrl": "@appsetting('blobConnectionRuntimeUrl')",
       "authentication": {
