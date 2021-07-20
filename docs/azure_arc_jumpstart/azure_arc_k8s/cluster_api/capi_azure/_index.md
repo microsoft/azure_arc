@@ -82,7 +82,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   On Linux:
 
   ```shell
-  curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+  curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
   chmod +x ./kind
   sudo mv ./kind /usr/local/bin/kind
   ```
@@ -114,7 +114,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   On Linux:
 
   ```shell
-  curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.19/clusterctl-linux-amd64 -o clusterctl
+  curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.4.0/clusterctl-linux-amd64 -o clusterctl
   chmod +x ./clusterctl
   sudo mv ./clusterctl /usr/local/bin/clusterctl
   clusterctl version
@@ -123,7 +123,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   On MacOS:
 
   ```shell
-  curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.3.19/clusterctl-darwin-amd64 -o clusterctl
+  curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v0.4.0/clusterctl-darwin-amd64 -o clusterctl
   chmod +x ./clusterctl
   sudo mv ./clusterctl /usr/local/bin/clusterctl
   clusterctl version
@@ -139,17 +139,17 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
 
 * Edit the environment variables to match your Azure subscription and SPN details created in the prerequisites section in this guide as well as the required workload cluster details.
 
-  * *KUBERNETES_VERSION*="Kubernetes version. For example: 1.19.11"
-  * *CONTROL_PLANE_MACHINE_COUNT*="Control Plane node count. For example: 1"
-  * *WORKER_MACHINE_COUNT*="Workers node count. For example: 2"
-  * *AZURE_LOCATION*="Azure region. For example: eastus"
-  * *CAPI_WORKLOAD_CLUSTER_NAME*="Workload cluster name. For example: arc-capi-azure". Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
-  * *AZURE_SUBSCRIPTION_ID*="Azure subscription id"
-  * *AZURE_TENANT_ID*="Azure tenant id"
-  * *AZURE_CLIENT_ID=*"Azure SPN application client id"
-  * *AZURE_CLIENT_SECRET*="Azure SPN application client secret"
-  * *AZURE_CONTROL_PLANE_MACHINE_TYPE*="Control Plane node Azure VM type .For example: Standard_D2s_v3".
-  * *AZURE_NODE_MACHINE_TYPE*="Worker node Azure VM type .For example: Standard_D4s_v3"
+  * _`KUBERNETES_VERSION`_="Kubernetes version. For example: 1.19.11"
+  * _`CONTROL_PLANE_MACHINE_COUNT`_="Control Plane node count. For example: 1"
+  * _`WORKER_MACHINE_COUNT`_="Workers node count. For example: 2"
+  * _`AZURE_LOCATION`_="Azure region. For example: eastus"
+  * _`CAPI_WORKLOAD_CLUSTER_NAME`_="Workload cluster name. For example: arc-capi-azure". Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+  * _`AZURE_SUBSCRIPTION_ID`_="Azure subscription id"
+  * _`SPN_TENANT_ID`_="Azure tenant id"
+  * _`SPN_CLIENT_ID`_="Azure SPN application client id"
+  * _`SPN_CLIENT_SECRET`_="Azure SPN application client secret"
+  * _`AZURE_CONTROL_PLANE_MACHINE_TYPE`_="Control Plane node Azure VM type .For example: Standard_D2s_v3".
+  * _`AZURE_NODE_MACHINE_TYPE`_="Worker node Azure VM type .For example: Standard_D4s_v3"
 
   ![Screenshot of user environment variables](./04.png)
 
@@ -169,37 +169,31 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
 
   ![Screenshot of workload cluster deployment script runtime](./07.png)
 
-  ![Screenshot of workload cluster deployment script runtime](./08.png)
-
-  ![Screenshot of workload cluster deployment script runtime](./09.png)
-
 * Upon completion, you will have a new Kubernetes cluster deployed on top of Azure virtual machines  that is already onboard as an Azure Arc enabled Kubernetes cluster.
 
   The script will generate the cluster definition *yaml* file which was used to deploy the workload cluster as will as the *kubeconfig* file. To test the cluster is up and running use the below command.
 
   ```shell
-  kubectl --kubeconfig=./<Name of your workload cluster>.kubeconfig get nodes
+  kubectl get nodes --kubeconfig=./<Name of your workload cluster>.kubeconfig
   ```
 
-  ![Screenshot of the workload cluster nodes](./10.png)
+  ![Screenshot of the workload cluster nodes](./08.png)
 
 * In the Azure portal, you can see how all the resources were deployed in a new resource group as well as the Azure Arc enabled Kubernetes cluster resource.
 
-  ![Screenshot of the deployment Azure virtual machines](./11.png)
+  ![Screenshot of the Azure resources](./09.png)
 
-  ![Screenshot of the Azure Arc enabled Kubernetes cluster in a resource group](./12.png)
-
-  ![Screenshot of the Azure Arc enabled Kubernetes cluster resource](./13.png)  
+  ![Screenshot of the Azure Arc-enabled Kubernetes cluster resource](./10.png)
 
 ## Cleanup
 
-* To delete only the workload cluster (and as a result, the Azure resources as well), run the below command. Deletion can take ~10min, depends on the number of control plane and worker nodes you have chosen to deploy.
+* To delete only the workload cluster (and as a result, the Azure resources as well), run the below command. Deletion can take ~10-15 minutes, depends on the number of control plane and worker nodes you deployed.
 
   ```shell
   kubectl delete cluster "<Name of your cluster>"
   ```
 
-  ![Screenshot of the workload cluster deletion](./14.png)
+  ![Screenshot of the workload cluster deletion](./11.png)
 
 * In addition, you can also delete the management cluster using the below command.
 
@@ -207,4 +201,4 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   kind delete cluster
   ```
 
-  ![Screenshot of the management cluster deletion](./15.png)
+  ![Screenshot of the management cluster deletion](./12.png)
