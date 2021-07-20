@@ -3,14 +3,28 @@ Start-Transcript -Path C:\Temp\deployLogicApp.log
 # Downloading sample Logic App
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/CreateBlobFromQueueMessage/workflow.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample\CreateBlobFromQueueMessage\workflow.json" -Force)
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/connections.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample\connections.json" -Force)
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/host.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample/host.json" -Force)
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/host.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample\host.json" -Force)
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/ARM/connectors-parameters.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample\ARM\connectors-parameters.json" -Force)
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/ARM/connectors-template.json") -OutFile (New-Item -Path "C:\Temp\logicAppSample\ARM\connectors-template.json" -Force)
 
 # Creating Azure Storage Account for Azure Logic App queue and blob storage
 Write-Host "`n"
-Write-Host "Creting Azure Storage Account for Azure Logic App example"
+Write-Host "Creating Azure Storage Account for Azure Logic App example"
 Write-Host "`n"
 $storageAccountName = "jumpstartappservices" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
-az storage account create --name $storageAccountName --location $env:azureLocation --resource-group $env:resourceGroup --sku Standard_LRS
+#az storage account create --name $storageAccountName --location $env:azureLocation --resource-group $env:resourceGroup --sku Standard_LRS
+
+# Replace values in connectors-parameters.json with appropriate values.
+Write-Host "`n"
+Write-Host "Updating connectors-parameters.json with appropriate values and deploying API connectors via ARM."
+Write-Host "`n"
+$connectorsParametersPath = "C:\Temp\logicAppSample\ARM\connectors-parameters.json"
+$spnObjectId = az ad sp show --id $env:spnClientID --query objectId -o tsv
+(Get-Content -Path $connectorsParametersPath) -replace '<azureLocation>',$env:azureLocation | Set-Content -Path $connectorsParametersPath
+(Get-Content -Path $connectorsParametersPath) -replace '<tenantId>',$env:spnTenantId | Set-Content -Path $connectorsParametersPath
+(Get-Content -Path $connectorsParametersPath) -replace '<objectId>',$spnObjectId | Set-Content -Path $connectorsParametersPath
+(Get-Content -Path $connectorsParametersPath) -replace '<storageAccountName>',$env:storageAccountName | Set-Content -Path $connectorsParametersPath
+az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\logicAppSample\ARM\connectors-template.json" --parameters "C:\Temp\logicAppSample\ARM\connectors-parameters.json"
 
 # # Creating local Azure Function application project
 # Write-Host "`n"
