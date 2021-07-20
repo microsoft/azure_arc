@@ -60,7 +60,7 @@
                         }
                     },
                     "method": "get",
-                    "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent('logicappdev555'))}/queues/@{encodeURIComponent('jumpstart-queue')}/message_trigger"
+                    "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(appsettings('storageAccountName')))}/queues/@{encodeURIComponent('jumpstart-queue')}/message_trigger"
                 },
                 "recurrence": {
                     "frequency": "Second",
