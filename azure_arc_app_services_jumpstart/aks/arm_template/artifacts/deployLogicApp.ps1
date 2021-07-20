@@ -67,7 +67,7 @@ az logicapp deployment source config-zip --name $logicAppName --resource-group $
 
 # Configuring Logic App settings
 Write-Host "Configuring Logic App settings.`n"
-az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "resourceGroupName=$env:resourceGroup"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "resourceGroup=$env:resourceGroup"
 az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "subscriptionId=$env:subscriptionId"
 az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "location=$env:azureLocation"
 az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "spnClientId=$env:spnClientId"
