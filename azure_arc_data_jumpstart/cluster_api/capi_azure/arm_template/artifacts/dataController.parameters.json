@@ -89,7 +89,7 @@
             "value": "2021-07-01-preview"
         },
         "infrastructure": {
-            "value": "onpremises"
+            "value": "azure"
         }
     }
 }
