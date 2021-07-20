@@ -5,7 +5,7 @@
         "id": "/subscriptions/@appsetting('subscriptionId')/providers/Microsoft.Web/locations/@appsetting('location')/managedApis/azurequeues"
       },
       "connection": {
-        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroupName')/providers/Microsoft.Web/connections/azurequeues"
+        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroup')/providers/Microsoft.Web/connections/azurequeues"
       },
       "connectionRuntimeUrl": "@appsetting('queueConnectionRuntimeUrl')",
       "authentication": {
@@ -22,7 +22,7 @@
         "id": "/subscriptions/@appsetting('subscriptionId')/providers/Microsoft.Web/locations/@appsetting('location')/managedApis/azureblob"
       },
       "connection": {
-        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroupName')/providers/Microsoft.Web/connections/azureblob"
+        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroup')/providers/Microsoft.Web/connections/azureblob"
       },
       "connectionRuntimeUrl": "@appsetting('blobConnectionRuntimeUrl')",
       "authentication": {

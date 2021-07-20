@@ -29,7 +29,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('kubernetesVersion', $kubernetesVersion,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAppService', $deployAppService,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployFunction', $deployFunction,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployFunction,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployLogicApp,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path

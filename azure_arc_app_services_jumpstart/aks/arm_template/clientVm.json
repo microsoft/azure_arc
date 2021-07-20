@@ -141,7 +141,7 @@
             "type": "bool",
             "defaultValue": false,
             "metadata": {
-                "description": "Azure Function deployment"
+                "description": "Azure Logic App deployment"
             }
         },
         "templateBaseUrl": {
