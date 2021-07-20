@@ -65,6 +65,9 @@
         },
         "extensions": {
             "type": "Array"
+        },
+        "apiVersion": {
+        "type": "String"
         }
     },
     "variables": {},
@@ -72,7 +75,7 @@
     "resources": [
         {
             "type": "Microsoft.AzureArcData/postgresInstances",
-            "apiVersion": "2021-06-01-preview",
+            "apiVersion": "[parameters('apiVersion')]",
             "name": "jumpstartps",
             "location": "[parameters('location')]",
             "extendedLocation": {
