@@ -1,5 +1,8 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
+# Deployment environment variables
+$connectedClusterName="Arc-Data-GKE-K8s"
+
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
@@ -27,14 +30,27 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-# Register Azure providers
+# Registering Azure Arc providers
+Write-Host "Registering Azure Arc providers, hold tight..."
+Write-Host "`n"
 az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 
+az provider show --namespace Microsoft.Kubernetes -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.KubernetesConfiguration -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.ExtendedLocation -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.AzureArcData -o table
+Write-Host "`n"
+
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
+Write-Host "`n"
+
 az extension add --name "connectedk8s" -y
 az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
@@ -54,16 +70,35 @@ kubectl apply -f 'C:\Temp\local_ssd_sc.yaml'
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
-azdata --version
+Write-Host "`n"
 
 # Onboarding the GKE cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
-$connectedClusterName="Arc-Data-GKE-K8s"
-az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+
+# Monitor pods across namespaces
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
+
+# Create Kubernetes - Azure Arc Cluster
+az connectedk8s connect --name $connectedClusterName `
+                        --resource-group $env:resourceGroup `
+                        --location $env:azureLocation `
+                        --tags 'Project=jumpstart_azure_arc_data_services' `
+                        --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+                        # This is the Custom Locations Enterprise Application ObjectID from AAD
+
 Start-Sleep -Seconds 10
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+
+# Create Azure Arc enabled Data Services extension
+az k8s-extension create --name arc-data-services `
+                        --extension-type microsoft.arcdataservices `
+                        --cluster-type connectedClusters `
+                        --cluster-name $connectedClusterName `
+                        --resource-group $env:resourceGroup `
+                        --auto-upgrade false `
+                        --scope cluster `
+                        --release-namespace arc `
+                        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
@@ -72,19 +107,38 @@ Do {
     } while ($podStatus -eq "Nope")
 
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
+
+$extensionId = az k8s-extension show --name arc-data-services `
+                                     --cluster-type connectedClusters `
+                                     --cluster-name $connectedClusterName `
+                                     --resource-group $env:resourceGroup `
+                                     --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+
+# Create Custom Location
+az customlocation create --name 'jumpstart-cl' `
+                         --resource-group $env:resourceGroup `
+                         --namespace arc `
+                         --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+
+az k8s-extension create --name "azuremonitor-containers" `
+                        --cluster-name $connectedClusterName `
+                        --resource-group $env:resourceGroup `
+                        --cluster-type connectedClusters `
+                        --extension-type Microsoft.AzureMonitor.Containers
 
 # Deploying Azure Defender Kubernetes extension instance
 Write-Host "Create Azure Defender Kubernetes extension instance"
 Write-Host "`n"
-az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+az k8s-extension create --name "azure-defender" `
+                        --cluster-name $connectedClusterName `
+                        --resource-group $env:resourceGroup `
+                        --cluster-type connectedClusters `
+                        --extension-type Microsoft.AzureDefender.Kubernetes
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
@@ -107,22 +161,26 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\dataController.json" --parameters "C:\Temp\dataController.parameters.json"
+az deployment group create --resource-group $env:resourceGroup `
+                           --template-file "C:\Temp\dataController.json" `
+                           --parameters "C:\Temp\dataController.parameters.json"
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take few minutes..."
+    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
+# If flag set, deploy SQL MI
 if ( $env:deploySQLMI -eq $true )
 {
     & "C:\Temp\DeploySQLMI.ps1"
 }
 
+# If flag set, deploy PostgreSQL
 if ( $env:deployPostgreSQL -eq $true )
 {
     & "C:\Temp\DeployPostgreSQL.ps1"
@@ -135,9 +193,33 @@ if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
     Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 }
 
+# Changing to Client VM wallpaper
+$imgPath="C:\Temp\wallpaper.png"
+$code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
+    
+     public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+         
+         public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+         }
+    }
+ } 
+'@
+
+add-type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
+
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
+
+# Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 Stop-Process -Name powershell -Force
+
+Stop-Transcript

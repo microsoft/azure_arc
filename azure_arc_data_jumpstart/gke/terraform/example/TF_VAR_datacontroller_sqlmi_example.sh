@@ -19,4 +19,5 @@ export TF_VAR_ARC_DC_SUBSCRIPTION='32323232-XXXXX-YYYYY-9e8f-88888888888'
 export TF_VAR_ARC_DC_RG='Arc-Data-GKE-Demo'
 export TF_VAR_ARC_DC_REGION='eastus'
 export TF_VAR_deploy_SQLMI=true
-export TF_VAR_deploy_deploy_PostgreSQL=false
+export TF_VAR_deploy_PostgreSQL=false
+export TF_VAR_templateBaseUrl='https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/'
