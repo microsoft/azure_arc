@@ -110,12 +110,6 @@ $extensionId = az k8s-extension create --resource-group $env:resourceGroup --nam
 az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
 
 Do {
-   Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-   Start-Sleep -Seconds 45
-   $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
-   } while ($logProcessorStatus -eq "Nope")
-
-Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
    Start-Sleep -Seconds 45
    $buildService = $(if(kubectl get pods -n appservices | Select-String "k8se-build-service" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
