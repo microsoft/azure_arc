@@ -111,13 +111,13 @@ az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "p
 
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
-   Start-Sleep -Seconds 45
+   Start-Sleep -Seconds 15
    $buildService = $(if(kubectl get pods -n appservices | Select-String "k8se-build-service" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
    } while ($buildService -eq "Nope")
 
 Do {
    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-   Start-Sleep -Seconds 45
+   Start-Sleep -Seconds 15
    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
    } while ($logProcessorStatus -eq "Nope")
 
@@ -131,7 +131,7 @@ az appservice kube create --resource-group $env:resourceGroup --name $kubeEnviro
 
 Do {
    Write-Host "Waiting for kube environment to become available. Hold tight, this might take a few minutes..."
-   Start-Sleep -Seconds 1
+   Start-Sleep -Seconds 15
    $kubeEnvironmentNameStatus = $(if(az appservice kube show --resource-group $env:resourceGroup --name $kubeEnvironmentName | Select-String '"provisioningState": "Succeeded"' -Quiet){"Ready!"}Else{"Nope"})
    } while ($kubeEnvironmentNameStatus -eq "Nope")
 
