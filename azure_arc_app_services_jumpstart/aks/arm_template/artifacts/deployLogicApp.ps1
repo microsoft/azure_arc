@@ -44,12 +44,6 @@ $logicAppName = "JumpstartLogicApp-" + -join ((48..57) + (97..122) | Get-Random 
 az logicapp create --resource-group $env:resourceGroup --name $logicAppName --custom-location $customLocationId --storage-account $storageAccountName
 
 Do {
-    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-    Start-Sleep -Seconds 45
-    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($logProcessorStatus -eq "Nope")
-
-Do {
     Write-Host "Waiting for Azure Logic App to become available. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
     $buildService = $(if(kubectl get pods -n appservices | Select-String $logicAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
