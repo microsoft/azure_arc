@@ -22,7 +22,7 @@ $spnObjectId = az ad sp show --id $env:spnClientID --query objectId -o tsv
 (Get-Content -Path $connectorsParametersPath) -replace '<azureLocation>',$env:azureLocation | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<tenantId>',$env:spnTenantId | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<objectId>',$spnObjectId | Set-Content -Path $connectorsParametersPath
-(Get-Content -Path $connectorsParametersPath) -replace '<storageAccountName>',$env:storageAccountName | Set-Content -Path $connectorsParametersPath
+(Get-Content -Path $connectorsParametersPath) -replace '<storageAccountName>',$storageAccountName | Set-Content -Path $connectorsParametersPath
 az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\logicAppCode\ARM\connectors-template.json" --parameters "C:\Temp\logicAppCode\ARM\connectors-parameters.json"
 $storageAccountKey = az storage account keys list --account-name $storageAccountName --query [0].value -o tsv
 $blobConnectionRuntimeUrl = az resource show --resource-group $env:resourceGroup -n azureblob --resource-type Microsoft.Web/connections --query properties.connectionRuntimeUrl -o tsv
@@ -51,15 +51,15 @@ Do {
 
 Do {
     Write-Host "Waiting for Azure Logic App to become available. Hold tight, this might take a few minutes..."
-    Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 45
     $buildService = $(if(kubectl get pods -n appservices | Select-String $logicAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
 
 Do {
-   Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-   Start-Sleep -Seconds 45
-   $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
-   } while ($logProcessorStatus -eq "Nope")
+    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
+    Start-Sleep -Seconds 45
+    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($logProcessorStatus -eq "Nope")
 
 # Deploy Logic App
 Write-Host "Deploying Logic App code.`n"
@@ -92,3 +92,5 @@ Do {
     $i++
     }
 While ($i -le 10)
+
+Write-Host "Finished deploying Logic App.`n"
