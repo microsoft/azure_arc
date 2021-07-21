@@ -10,8 +10,8 @@ Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $ServiceType = "LoadBalancer"
-$vCoresMax = 2
-$memoryMax = "4"
+$vCoresMax = 4
+$memoryMax = "8"
 $StorageClassName = "managed-premium"
 $dataStorageSize = "5"
 $logsStorageSize = "5"

@@ -108,18 +108,24 @@ variable "SPN_TENANT_ID" {
 }
 
 variable "SPN_AUTHORITY" {
-  description = "The Service Principal authority"
+  description = "The Service Principal authority - i.e. https://login.microsoftonline.com"
   type        = string
 }
 
 variable "deploy_SQLMI" {
-  description = "The Service Principal authority"
+  description = "Flag for deploying Arc enabled SQL MI"
   type        = bool
   default     = false
 }
 
 variable "deploy_PostgreSQL" {
-  description = "The Service Principal authority"
+  description = "Flag for deploying Postgres Server Group"
   type        = bool
   default     = false
+}
+
+variable "templateBaseUrl" {
+  description = "Git repo base URL for downloading artifacts for Client VM bootstrap script"
+  type        = string
+  default     = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/"
 }
