@@ -62,7 +62,8 @@ $Body = @{
 $json = $Body | ConvertTo-Json
 # Invoke the REST API and retrieve token
 $restUri = "https://management.azure.com/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.ApiManagement/service/$APIName/gateways/$APIName/generateToken?api-version=2021-01-01-preview"
-$token = Invoke-RestMethod -Uri $restUri -Body $json -Method Post -Headers $authHeader
+$tokenAPI =  Invoke-RestMethod -Uri $restUri -Body $json -Method Post -Headers $authHeader
+$token =  "GatewayKey " + $tokenAPI.value
 $endpoint="https://$APIName.management.azure-api.net/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.ApiManagement/service/$APIName?api-version=2021-01-01-preview"
 
 # Deploy API Management gateway extension
@@ -71,7 +72,7 @@ az k8s-extension create --cluster-type connectedClusters --cluster-name $env:clu
   --resource-group $env:resourceGroup --name apimgmt --extension-type Microsoft.ApiManagement.Gateway `
   --scope namespace --target-namespace apimgmt `
   --configuration-settings gateway.endpoint=$endpoint `
-  --configuration-protected-settings gateway.authKey=$token.value `
+  --configuration-protected-settings gateway.authKey=$token `
   --configuration-settings service.type='LoadBalancer' --release-train preview
 
   # Importing an API
