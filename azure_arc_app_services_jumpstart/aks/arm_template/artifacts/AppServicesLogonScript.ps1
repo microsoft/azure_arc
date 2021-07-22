@@ -150,6 +150,11 @@ if ( $env:deployFunction -eq $true )
     & "C:\Temp\deployFunction.ps1"
 }
 
+if ( $env:deployApiMgmt -eq $true )
+{
+    & "C:\Temp\deployApiMgmt.ps1"
+}
+
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
 $code = @' 

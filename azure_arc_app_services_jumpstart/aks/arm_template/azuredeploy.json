@@ -86,6 +86,13 @@
         "description": "Azure Function deployment"
       }
     },
+    "deployApiMgmt": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Azure Function deployment"
+      }
+    },
     "templateBaseUrl": {
       "type": "string",
       "metadata": {
@@ -145,8 +152,14 @@
           "deployFunction": {
             "value": "[parameters('deployFunction')]"
           },
+          "deployApiMgmt": {
+            "value": "[parameters('deployApiMgmt')]"
+          },
           "templateBaseUrl": {
             "value": "[parameters('templateBaseUrl')]"
+          },
+          "adminEmail": {
+            "value": "[parameters('adminEmail')]"
           }
         }
       }
