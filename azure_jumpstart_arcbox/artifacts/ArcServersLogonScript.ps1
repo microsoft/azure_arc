@@ -122,7 +122,8 @@ Set-VMHost -EnableEnhancedSessionMode $true
 # Downloading and extracting the 3 VMs
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 $sourceFolder = 'https://jumpstartarcbox.blob.core.windows.net/vms'
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*? $vmDir --recursive
+$sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rlptfx&se=2022-08-30T04:11:11Z&st=2021-07-22T20:11:11Z&spr=https&sig=HfLlCXODFjdANJj%2FIh4ZG%2FQ22x7IIMFp6yoxoiDQp7E%3D"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $vmDir --recursive
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
