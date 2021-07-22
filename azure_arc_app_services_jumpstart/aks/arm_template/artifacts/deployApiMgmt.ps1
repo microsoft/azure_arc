@@ -7,6 +7,11 @@ Write-Host "`n"
 az extension add --name k8s-extension
 az extension update --name k8s-extension
 
+# Login using SP
+$userPassword = ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force
+$pscredential = New-Object -TypeName System.Management.Automation.PSCredential($env:spnClientId, $userPassword)
+Connect-AzAccount -ServicePrincipal -Credential $pscredential -Tenant $env:spntenantId
+
 #Create an API Management Service
 function New-RandomName {
     ( -join ((48..57) + (65..90) + (97..122) | Get-Random -Count 4 | % {[char]$_}))
