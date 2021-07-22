@@ -85,8 +85,8 @@ Write-Host "Deploying Azure App Service Kubernetes environment"
 Write-Host "`n"
 
 $namespace="appservices"
-$extensionName = "arc-app-services" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
-$kubeEnvironmentName=$env:clusterName 
+$extensionName = "arc-app-services"
+$kubeEnvironmentName=$env:clusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 $workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
