@@ -98,6 +98,12 @@
       "metadata": {
         "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
       }
+    },
+    "adminEmail": {
+      "type": "string",
+      "metadata": {
+        "description": "Your Email address"
+      }
     }
   },
   "variables": {
