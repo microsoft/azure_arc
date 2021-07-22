@@ -1,6 +1,6 @@
 {
   "managedApiConnections": {
-    "azurequeues": {
+    "azurequeue": {
       "api": {
         "id": "/subscriptions/@appsetting('subscriptionId')/providers/Microsoft.Web/locations/@appsetting('location')/managedApis/azurequeues"
       },
