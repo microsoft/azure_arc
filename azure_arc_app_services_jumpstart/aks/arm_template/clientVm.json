@@ -195,6 +195,9 @@
             "apiVersion": "2019-02-01",
             "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('azureLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
             "properties": {
                 "securityRules": [
                     {
