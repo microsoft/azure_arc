@@ -55,6 +55,8 @@ az extension add --name "connectedk8s" -y
 az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
+az extension add --name "arcdata" -y
+
 Write-Host "`n"
 az -v
 
