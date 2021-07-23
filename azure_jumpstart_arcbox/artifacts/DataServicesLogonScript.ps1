@@ -43,6 +43,7 @@ az extension add --name "connectedk8s" -y
 az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
+az extension add --name "arcdata" -y
 Write-Host "`n"
 az -v
 
@@ -161,6 +162,7 @@ Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config"
 Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config-k3s"
 Move-Item -Path "C:\Users\$env:USERNAME\.kube\config_tmp" -Destination "C:\users\$env:USERNAME\.kube\config"
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
+kubectx
 
 # Changing to Jumpstart ArcBox wallpaper
 $imgPath="C:\ArcBox\wallpaper.png"
