@@ -99,7 +99,12 @@
             },
             "properties": {
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForLinuxDeployDependencyAgent')]"
+                "policyDefinitionId": "[variables('policyDefinitionForLinuxDeployDependencyAgent')]",
+                "parameters": {
+                    "logAnalytics": {
+                        "value": "[variables('logAnalyticsResource')]"
+                    }
+                }
             }
         },
         {
@@ -123,7 +128,12 @@
             "location": "[parameters('azureLocation')]",
             "properties": {
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForWindowsDeployDependencyAgent')]"
+                "policyDefinitionId": "[variables('policyDefinitionForWindowsDeployDependencyAgent')]",
+                "parameters": {
+                    "logAnalytics": {
+                        "value": "[variables('logAnalyticsResource')]"
+                    }
+                }
             }
         },
         {
