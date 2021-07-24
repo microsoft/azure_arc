@@ -22,7 +22,7 @@ function Disable-ieESC {
 Disable-ieESC
 
 # Installing tools
-$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140,kubernetes-helm,vscode,putty.install,microsoft-edge,azcopy10,grep"
+$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,aws-iam-authenticator,vcredist140,kubernetes-helm,vscode,putty.install,microsoft-edge,azcopy10,grep"
 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
     try{
@@ -81,5 +81,5 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-#Stopping log for Bootstrap.ps1
+# Stopping log for Bootstrap.ps1
 Stop-Transcript

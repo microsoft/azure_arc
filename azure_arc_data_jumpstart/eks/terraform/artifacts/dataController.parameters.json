@@ -65,13 +65,13 @@
             "value": "arcdata"
         },
         "dataStorageClass": {
-            "value": "local-ssd"
+            "value": "gp2"
         },
         "dataStorageSize": {
             "value": "5Gi"
         },
         "logsStorageClass": {
-            "value": "local-ssd"
+            "value": "gp2"
         },
         "logsStorageSize": {
             "value": "5Gi"
@@ -89,7 +89,7 @@
           "value": "2021-07-01-preview"
         },
         "infrastructure": {
-          "value": "gcp"
+          "value": "aws"
         }
     }
 }

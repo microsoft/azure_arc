@@ -65,6 +65,8 @@ Write-Host "Setting up the kubectl & azdata environment"
 Write-Host "`n"
 
 kubectl version
+
+# Leverages AWS IAM to get access to EKS Cluster - see https://aws.amazon.com/premiumsupport/knowledge-center/amazon-eks-cluster-access/
 kubectl apply -f "C:\Temp\configmap.yml"
 
 Write-Host "Checking kubernetes nodes"
