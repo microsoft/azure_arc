@@ -97,7 +97,7 @@ resource "aws_instance" "windows" {
 
   provisioner "file" {
     source      = "configmap.yml"
-    destination = "C:/tmp/configmap.yml"
+    destination = "C:/Temp/configmap.yml"
 
     connection {
       host     = self.public_ip
@@ -112,7 +112,7 @@ resource "aws_instance" "windows" {
 
   provisioner "file" {
     source      = "artifacts/azure_arc.ps1"
-    destination = "C:/tmp/azure_arc.ps1"
+    destination = "C:/Temp/azure_arc.ps1"
 
     connection {
       host     = self.public_ip
@@ -127,7 +127,7 @@ resource "aws_instance" "windows" {
 
   provisioner "file" {
     source      = "artifacts/Bootstrap.ps1"
-    destination = "C:/tmp/Bootstrap.ps1"
+    destination = "C:/Temp/Bootstrap.ps1"
 
     connection {
       host     = self.public_ip
@@ -142,7 +142,7 @@ resource "aws_instance" "windows" {
 
   provisioner "file" {
     source      = "artifacts/DataServicesLogonScript.ps1"
-    destination = "C:/tmp/DataServicesLogonScript.ps1"
+    destination = "C:/Temp/DataServicesLogonScript.ps1"
 
     connection {
       host     = self.public_ip
@@ -157,7 +157,7 @@ resource "aws_instance" "windows" {
 
   provisioner "remote-exec" {
     inline = [
-      "powershell.exe -File C://tmp/azure_arc.ps1"
+      "powershell.exe -File C://Temp/azure_arc.ps1"
     ]
 
     connection {
@@ -173,7 +173,7 @@ resource "aws_instance" "windows" {
 
   provisioner "remote-exec" {
     inline = [
-      "powershell.exe -File C://tmp/Bootstrap.ps1"
+      "powershell.exe -File C://Temp/Bootstrap.ps1"
     ]
 
     connection {

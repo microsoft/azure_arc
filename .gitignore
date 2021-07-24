@@ -13,3 +13,4 @@ azure_arc_data_jumpstart/gke/terraform/artifacts/password_reset.ps1
 azure_arc_data_jumpstart/eks/terraform/artifacts/azure_arc.ps1
 azure_arc_data_jumpstart/eks/terraform/artifacts/password_reset.ps1
 azure_arc_data_jumpstart/eks/terraform/config
+azure_arc_data_jumpstart/eks/terraform/configmap.yml
