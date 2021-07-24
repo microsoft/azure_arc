@@ -65,7 +65,7 @@ Write-Host "Setting up the kubectl & azdata environment"
 Write-Host "`n"
 
 kubectl version
-kubectl apply -f "C:\tmp\configmap.yml"
+kubectl apply -f "C:\Temp\configmap.yml"
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
