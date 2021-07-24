@@ -1,0 +1,30 @@
+# Injecting environment variables
+$env:spnClientId="${spnClientId}"
+$env:spnClientSecret="${spnClientSecret}"
+$env:spnTenantId="${spnTenantId}"
+$env:spnAuthority="${spnAuthority}"
+$env:AZDATA_USERNAME="${AZDATA_USERNAME}"
+$env:AZDATA_PASSWORD="${AZDATA_PASSWORD}"
+$env:ACCEPT_EULA="${ACCEPT_EULA}"
+$env:arcDcName="${arcDcName}"
+$env:subscriptionId="${subscriptionId}"
+$env:resourceGroup="${resourceGroup}"
+$env:azureLocation="${azureLocation}"
+$env:deploySQLMI="${deploySQLMI}"
+$env:deployPostgreSQL="${deployPostgreSQL}"
+$env:templateBaseUrl="${templateBaseUrl}"
+
+[System.Environment]::SetEnvironmentVariable('spnClientId', $env:spnClientId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientSecret', $env:spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnTenantId', $env:spnTenantId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnAuthority', $env:spnAuthority,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $env:AZDATA_USERNAME,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $env:AZDATA_PASSWORD,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $env:ACCEPT_EULA,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('arcDcName', $env:arcDcName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('subscriptionId', $env:subscriptionId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $env:resourceGroup,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('azureLocation', $env:azureLocation,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deploySQLMI', $env:deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $env:deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $env:templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
