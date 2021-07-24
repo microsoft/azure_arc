@@ -74,6 +74,9 @@ Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
 
+# Adding delay because EKS seems to throw a network error if we onboard immediately after applying IAM
+Start-Sleep -Seconds 30
+
 # Onboarding the EKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
