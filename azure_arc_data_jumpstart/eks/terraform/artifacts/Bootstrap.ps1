@@ -87,6 +87,9 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 # Perhaps this is because az extensions leverage the Python Kubernetes Client under-the-hood
 ####################################
 
+# Login as SP, since Extensions are User Scoped
+az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
+
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
 Write-Host "`n"
@@ -96,6 +99,12 @@ az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
 az extension add --name "arcdata" -y
+
+# Validate
+Write-Host "`n"
+Write-Host "Azure CLI extensions installed: "
+az extension list
+Write-Host "`n"
 
 ####################################
 
