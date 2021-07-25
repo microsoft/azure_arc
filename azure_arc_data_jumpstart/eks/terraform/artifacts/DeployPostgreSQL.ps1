@@ -34,7 +34,10 @@ $PSQLParams = "C:\Temp\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'numWorkersStage',$numWorkers | Set-Content -Path $PSQLParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\postgreSQL.json" --parameters "C:\Temp\postgreSQL.parameters.json"
+az deployment group create --resource-group $env:resourceGroup `
+                           --template-file "C:\Temp\postgreSQL.json" `
+                           --parameters "C:\Temp\postgreSQL.parameters.json" `
+                           --no-wait
 Write-Host "`n"
 
 Do {
