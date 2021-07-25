@@ -88,6 +88,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 * Register necessary Azure resource providers by running the following commands.
 
   ```shell
+  az provider register --namespace 'Microsoft.HybridCompute' --wait
+  az provider register --namespace 'Microsoft.GuestConfiguration' --wait
   az provider register --namespace Microsoft.Kubernetes --wait
   az provider register --namespace Microsoft.KubernetesConfiguration --wait
   az provider register --namespace Microsoft.ExtendedLocation --wait
