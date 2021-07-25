@@ -47,8 +47,15 @@ Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
 
+Write-Host "Azure CLI version: "
 Write-Host "`n"
 az -v
+Write-Host "`n"
+
+Write-Host "`n"
+Write-Host "Azure CLI extensions installed: "
+az extension list
+Write-Host "`n"
 
 # Settings up kubectl
 Write-Host "Setting up the kubectl environment"
