@@ -4,7 +4,9 @@ New-Item -Path $tempDir -ItemType directory -Force
 
 Start-Transcript -Path C:\Temp\Bootstrap.log
 
-$ErrorActionPreference = 'SilentlyContinue'
+# https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables?view=powershell-7.1#erroractionpreference
+# Show errors, but to continue nonetheless
+$ErrorActionPreference = 'Continue'
 
 # Uninstall Internet Explorer
 Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
@@ -87,8 +89,8 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 # Perhaps this is because az extensions leverage the Python Kubernetes Client under-the-hood
 ####################################
 
-# Login as SP, since Extensions are User Scoped
-az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
+# Configure alias to az cli for this execution
+New-Item -path alias:az -value 'C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd'
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
