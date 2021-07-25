@@ -66,7 +66,22 @@ $settingsTemplate = "C:\Temp\settingsTemplate.json"
 $pgsqlstring = kubectl get postgresql  jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
 # Replace placeholder values in settingsTemplate.json
-(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
+
+################################################
+# NOTE: Following is unique to EKS only
+# EKS doesn't provide Public IP's for their LB's - since they don't guarantee static
+# Therefore - for ADS to work - we need to:
+# 1. Set value in `host` with the ELB FQDN
+# 2. Set value in `hostAddr` with blank
+################################################
+
+# 1. Set value in `host` with the ELB FQDN
+(Get-Content -Path $settingsTemplate) -replace 'jumpstartps',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
+
+# 2. Set value in `hostAddr` with blank
+(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host', "" | Set-Content -Path $settingsTemplate
+
+################################################
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres_port',$pgsqlstring.split(":")[1] | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 
