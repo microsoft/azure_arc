@@ -47,23 +47,24 @@ Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
 
-# Adding Azure Arc CLI extensions
-Write-Host "Adding Azure Arc CLI extensions"
-Write-Host "`n"
-
-az extension add --name "connectedk8s" -y
-az extension add --name "k8s-configuration" -y
-az extension add --name "k8s-extension" -y
-az extension add --name "customlocation" -y
-az extension add --name "arcdata" -y
-
 Write-Host "`n"
 az -v
+
+# Settings up kubectl
+Write-Host "Setting up the kubectl environment"
+Write-Host "`n"
+
+kubectl version
+
+# Leverages AWS IAM to get access to EKS Cluster - see https://aws.amazon.com/premiumsupport/knowledge-center/amazon-eks-cluster-access/
+kubectl apply -f "C:\Temp\configmap.yml"
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
+
+Start-Sleep -Seconds 10
 
 # Onboarding the EKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
