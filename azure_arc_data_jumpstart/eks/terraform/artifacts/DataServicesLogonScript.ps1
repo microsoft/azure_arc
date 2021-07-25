@@ -60,22 +60,10 @@ az extension add --name "arcdata" -y
 Write-Host "`n"
 az -v
 
-# Settings up kubectl
-Write-Host "Setting up the kubectl & azdata environment"
-Write-Host "`n"
-
-kubectl version
-
-# Leverages AWS IAM to get access to EKS Cluster - see https://aws.amazon.com/premiumsupport/knowledge-center/amazon-eks-cluster-access/
-kubectl apply -f "C:\Temp\configmap.yml"
-
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
-
-# Adding delay because EKS seems to throw a network error if we onboard immediately after applying IAM
-Start-Sleep -Seconds 30
 
 # Onboarding the EKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
