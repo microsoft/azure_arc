@@ -164,7 +164,8 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 
 az deployment group create --resource-group $env:resourceGroup `
                            --template-file "C:\Temp\dataController.json" `
-                           --parameters "C:\Temp\dataController.parameters.json"
+                           --parameters "C:\Temp\dataController.parameters.json" `
+                           --no-wait
 Write-Host "`n"
 
 Do {

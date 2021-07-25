@@ -40,7 +40,10 @@ $SQLParams = "C:\Temp\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\SQLMI.json" --parameters "C:\Temp\SQLMI.parameters.json"
+az deployment group create --resource-group $env:resourceGroup `
+                           --template-file "C:\Temp\SQLMI.json" `
+                           --parameters "C:\Temp\SQLMI.parameters.json" `
+                           --no-wait
 Write-Host "`n"
 
 Do {
