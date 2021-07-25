@@ -81,21 +81,23 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-# Settings up kubectl
-Write-Host "Setting up the kubectl environment"
+####################################
+# Note - we pulled the az extension install out of DataServicesLogonScript.ps1 due to how IAM permissions propagate within the same Powershell session
+# We observed this error when executing the az extention within the same Powershell session: https://github.com/kubernetes-client/python/issues/1333
+# Perhaps this is because az extensions leverage the Python Kubernetes Client under-the-hood
+####################################
+
+# Adding Azure Arc CLI extensions
+Write-Host "Adding Azure Arc CLI extensions"
 Write-Host "`n"
 
-kubectl version
+az extension add --name "connectedk8s" -y
+az extension add --name "k8s-configuration" -y
+az extension add --name "k8s-extension" -y
+az extension add --name "customlocation" -y
+az extension add --name "arcdata" -y
 
-# Note - we pulled this out of DataServicesLogonScript.ps1 due to how IAM permissions propagate within the same Powershell session
-# We observed this error when executing within the same session: https://github.com/kubernetes-client/python/issues/1333
-# Leverages AWS IAM to get access to EKS Cluster - see https://aws.amazon.com/premiumsupport/knowledge-center/amazon-eks-cluster-access/
-kubectl apply -f "C:\Temp\configmap.yml"
-
-Write-Host "Checking kubernetes nodes"
-Write-Host "`n"
-kubectl get nodes
-Write-Host "`n"
+####################################
 
 # Stopping log for Bootstrap.ps1
 Stop-Transcript
