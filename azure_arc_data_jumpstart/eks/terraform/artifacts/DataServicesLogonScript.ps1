@@ -175,6 +175,19 @@ Do {
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
+# Need to ensure all Data Controller Pods are running before running SQL MI and Postgres deployment
+Do {
+    Write-Host "Ensuring all Data Controller Pods are up..."
+    # Gets list of Pods in arc namespaces (all DC related thus far) that are not in "Running" state
+	$podsPending = kubectl get pods -n arc --field-selector=status.phase!=Running -o jsonpath="{.items[*].metadata.name}"
+	# Sets status to "Ready!" only if all pods are "Running"
+    $podStatus = $(if($podsPending -eq $null){"Ready!"}Else{"Nope"})
+    Start-Sleep -Seconds 30
+    } while ($podStatus -eq "Nope")
+
+Write-Host "All data controller pods are ready to go!"
+Write-Host "`n"
+
 # If flag set, deploy SQL MI
 if ( $env:deploySQLMI -eq $true )
 {
