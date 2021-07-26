@@ -43,7 +43,7 @@ New-Item -Path $tempDir -ItemType directory -Force
 
 Start-Transcript "C:\Temp\Bootstrap.log"
 
-$ErrorActionPreference = 'SilentlyContinue'
+$ErrorActionPreference = 'Continue'
 
 # Uninstall Internet Explorer
 Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
@@ -126,9 +126,6 @@ workflow ClientTools_02
                 InlineScript {
                     Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
                     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
-                    $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."   
-                    Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-                    Update-SessionEnvironment
                 }
             }
         }
@@ -146,18 +143,18 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-# # Configure alias to az cli for this execution
-# New-Item -path alias:az -value 'C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd'
+# Configure alias to az cli for this execution
+New-Item -path alias:az -value 'C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd'
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
 Write-Host "`n"
 
-az.cmd extension add --name "connectedk8s" -y
-az.cmd extension add --name "k8s-configuration" -y
-az.cmd extension add --name "k8s-extension" -y
-az.cmd extension add --name "customlocation" -y
-az.cmd extension add --name "arcdata" -y
+az extension add --name "connectedk8s" -y
+az extension add --name "k8s-configuration" -y
+az extension add --name "k8s-extension" -y
+az extension add --name "customlocation" -y
+az extension add --name "arcdata" -y
 
 # Validate
 Write-Host "`n"
