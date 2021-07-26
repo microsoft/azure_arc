@@ -126,6 +126,9 @@ workflow ClientTools_02
                 InlineScript {
                     Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
                     Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
+                    $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."   
+                    Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+                    Update-SessionEnvironment
                 }
             }
         }
