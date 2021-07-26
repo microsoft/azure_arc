@@ -4,9 +4,7 @@ New-Item -Path $tempDir -ItemType directory -Force
 
 Start-Transcript -Path C:\Temp\Bootstrap.log
 
-# https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables?view=powershell-7.1#erroractionpreference
-# Show errors, but to continue nonetheless
-$ErrorActionPreference = 'Continue'
+$ErrorActionPreference = 'SilentlyContinue'
 
 # Uninstall Internet Explorer
 Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
@@ -82,33 +80,6 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
-
-####################################
-# Note - we pulled the az extension install out of DataServicesLogonScript.ps1 due to how IAM permissions propagate within the same Powershell session
-# We observed this error when executing the az extention within the same Powershell session: https://github.com/kubernetes-client/python/issues/1333
-# Perhaps this is because az extensions leverage the Python Kubernetes Client under-the-hood
-####################################
-
-# Configure alias to az cli for this execution
-New-Item -path alias:az -value 'C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd'
-
-# Adding Azure Arc CLI extensions
-Write-Host "Adding Azure Arc CLI extensions"
-Write-Host "`n"
-
-az extension add --name "connectedk8s" -y
-az extension add --name "k8s-configuration" -y
-az extension add --name "k8s-extension" -y
-az extension add --name "customlocation" -y
-az extension add --name "arcdata" -y
-
-# Validate
-Write-Host "`n"
-Write-Host "Azure CLI extensions installed: "
-az extension list
-Write-Host "`n"
-
-####################################
 
 # Stopping log for Bootstrap.ps1
 Stop-Transcript

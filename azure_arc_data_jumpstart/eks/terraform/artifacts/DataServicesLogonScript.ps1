@@ -47,6 +47,10 @@ Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
 
+# Adding Azure Arc CLI extensions
+Write-Host "Adding Azure Arc CLI extensions"
+az config set extension.use_dynamic_install=yes_without_prompt
+
 Write-Host "Azure CLI version: "
 Write-Host "`n"
 az -v
