@@ -135,6 +135,13 @@ ClientTools_02 | Format-Table
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
+# Adding Azure Arc CLI extensions
+az extension add --name "connectedk8s" -y
+az extension add --name "k8s-configuration" -y
+az extension add --name "k8s-extension" -y
+az extension add --name "customlocation" -y
+az extension add --name "arcdata" -y
+
 # Creating scheduled task for DataServicesLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\DataServicesLogonScript.ps1'
