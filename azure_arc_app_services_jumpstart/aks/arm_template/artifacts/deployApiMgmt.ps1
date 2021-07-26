@@ -22,7 +22,7 @@ $APIRandomName = New-RandomName
 $APIName = ( $Prefix + '-' + $APIRandomName).ToLower()
 
 
-Write-Host "Creating Azure API Management instance. Hold tight, this might take an hour or more..."
+Write-Host "Creating Azure API Management instance. Hold tight, this might take an hour..."
 New-AzApiManagement -Name $APIName -ResourceGroupName $env:resourceGroup -Location $env:azureLocation -Organization $APIName -AdminEmail $env:adminEmail
 
   Do {
