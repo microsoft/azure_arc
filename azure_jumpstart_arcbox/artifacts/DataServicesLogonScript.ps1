@@ -38,7 +38,7 @@ az provider register --namespace Microsoft.ExtendedLocation --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 
 # Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_promp
+az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
