@@ -7,9 +7,7 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
-# Temporary!!!!!!!
-az account set --subscription "Azure Data Demos"
-###################################################
+az account set --subscription $env:subscriptionId
 
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
