@@ -1,7 +1,7 @@
 export TF_VAR_aws_region='us-west-2'
 export TF_VAR_aws_availabilityzone='us-west-2a'
 export TF_VAR_key_name='aws_terraform_arc'
-export TF_VAR_key_pair_filename='aws_terraform_arc.pem'
+export TF_VAR_key_pair_filename='terraform.pem'
 export TF_VAR_AWS_ACCESS_KEY_ID='<your-aws-access-key-id>'
 export TF_VAR_AWS_SECRET_ACCESS_KEY='<your-aws-secret-access-key>'
 export TF_VAR_hostname='arc-data-client'
