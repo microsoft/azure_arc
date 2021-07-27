@@ -28,8 +28,12 @@ resource "aws_instance" "ansible" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo sudo yum install epel-release -y",
-      "sudo yum install python3 python3-pip -y",
+      "sudo yum install epel-release -y",
+      "sudo yum install nano python3 python3-pip -y",
+      "sudo python3 -m pip install --upgrade setuptools",
+      "sudo python3 -m pip install wheel setuptools_rust",
+      "sudo python3 -m pip install --upgrade pip",
+      "sudo curl https://sh.rustup.rs -sSf | sh -s -- -y",
       "sudo python3 -m pip install ansible botocore boto3 pywinrm",
       "sudo chmod 600 /home/centos/.ssh/id_rsa"
     ]
