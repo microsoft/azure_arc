@@ -157,28 +157,6 @@ if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
     Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-
-    $URLShortcutName = "Grafana (Metrics)"
-    $URLShortcut = "C:\Temp\shortcutTemplate.ps1"
-    Get-Content -Path $URLShortcut | Out-File "C:\Temp\GrafanaURLShortcut.ps1"
-    $GrafanaURLShortcut = "C:\Temp\GrafanaURLShortcut.ps1"
-    kubectl get services --namespace arc metricsui-svc-external --output jsonpath='{.status.loadBalancer.ingress[0].ip}' | Out-File C:\Temp\Grafana.txt
-    $service = Get-Content "C:\Temp\Grafana.txt"
-    $service = $service+":3000"
-    (Get-Content -Path $GrafanaURLShortcut) -replace 'stagingName',$URLShortcutName | Set-Content -Path $GrafanaURLShortcut
-    (Get-Content -Path $GrafanaURLShortcut) -replace 'stagingURL',$service | Set-Content -Path $GrafanaURLShortcut
-    & $GrafanaURLShortcut
-
-    $URLShortcutName = "Kibana (Logs)"
-    $URLShortcut = "C:\Temp\shortcutTemplate.ps1"
-    Get-Content -Path $URLShortcut | Out-File "C:\Temp\KibanaURLShortcut.ps1"
-    $KibanaURLShortcut = "C:\Temp\KibanaURLShortcut.ps1"
-    kubectl get services --namespace arc logsui-svc-external --output jsonpath='{.status.loadBalancer.ingress[0].ip}' | Out-File C:\Temp\Kibana.txt
-    $service = Get-Content "C:\Temp\Kibana.txt"
-    $service = $service+":5601"
-    (Get-Content -Path $KibanaURLShortcut) -replace 'stagingName',$URLShortcutName | Set-Content -Path $KibanaURLShortcut
-    (Get-Content -Path $KibanaURLShortcut) -replace 'stagingURL',$service | Set-Content -Path $KibanaURLShortcut
-    & $KibanaURLShortcut
 }
 
 # Changing to Client VM wallpaper
