@@ -152,7 +152,7 @@ if ( $env:deployPostgreSQL -eq $true )
     & "C:\Temp\DeployPostgreSQL.ps1"
 }
 
-# Applying Azure Data Studio settings template file and creating Grafana+Kibana URL desktop shortcuts
+# Applying Azure Data Studio settings template file
 if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
