@@ -58,9 +58,9 @@ Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
 kubectl exec $podname -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
 
 # Creating Azure Data Studio settings for PostgreSQL connection
-Write-Host "`n"
+Write-Host ""
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
-$settingsTemplate = "C:\ArcBox\settingsTemplate.json"
+$settingsTemplate = "C:\Temp\settingsTemplate.json"
 # Retrieving PostgreSQL connection endpoint
 $pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
@@ -68,13 +68,3 @@ $pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.p
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres_port',$pgsqlstring.split(":")[1] | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
-
-# If SQL MI isn't being deployed, clean up settings file
-if ( $env:deploySQLMI -eq $false )
-{
-     $string = Get-Content -Path $settingsTemplate | Select-Object -First 9 -Last 24
-     $string | Set-Content -Path $settingsTemplate
-}
-
-# Cleaning garbage
-Remove-Item "C:\Temp\postgres_instance_endpoint.txt" -Force
