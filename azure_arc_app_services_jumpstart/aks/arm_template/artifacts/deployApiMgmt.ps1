@@ -25,7 +25,6 @@ New-AzApiManagement -Name $APIName -ResourceGroupName $env:resourceGroup -Locati
     } while ($apiMgmtStatus -eq "Nope")
     
 # Create a Gateway instance
-
 $apimContext = New-AzApiManagementContext -ResourceGroupName $env:resourceGroup -ServiceName $APIName
 $location = New-AzApiManagementResourceLocationObject -Name "n1" -City "c1" -District "d1" -CountryOrRegion "r1"
 New-AzApiManagementGateway -Context $apimContext -GatewayId $APIName -Description "ArcAPIMgmt" -LocationData $location
@@ -72,5 +71,4 @@ az k8s-extension create --cluster-type connectedClusters --cluster-name $env:clu
 Write-Host "Importing an API in the Kubernetes environment"
 Write-Host "`n"
 Import-AzApiManagementApi -Context $apimContext -SpecificationFormat OpenApi -SpecificationUrl https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml -Path "petstore30"
-
 
