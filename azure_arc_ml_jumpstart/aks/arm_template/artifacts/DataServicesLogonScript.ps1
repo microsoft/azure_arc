@@ -80,21 +80,52 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Create Azure Machine Learning extension
-az k8s-extension create --name amlarc-compute `
-                        --extension-type Microsoft.AzureML.Kubernetes `
-								--cluster-type connectedClusters `
-                        --cluster-name $connectedClusterName `
-                        --resource-group $env:resourceGroup `
-                        --scope cluster `
-                        --configuration-settings allowInsecureConnections=true `
-                        --configuration-settings enableTraining=True enableInference=True privateEndpointNodeport=True
+############################################################################################################################
+# Create Azure Machine Learning extension (Ctrl + K + C/U to Block/Unblock)
+
+# Training only 
+# az k8s-extension create --name amlarc-compute `
+#                         --extension-type Microsoft.AzureML.Kubernetes `
+# 								  --cluster-type connectedClusters `
+#                         --cluster-name $connectedClusterName `
+#                         --resource-group $env:resourceGroup `
+#                         --scope cluster `
+#                         --configuration-settings enableTraining=True
+
+# Inferencing only
+# az k8s-extension create --name amlarc-compute `
+# 								--extension-type Microsoft.AzureML.Kubernetes `
+# 								--cluster-type connectedClusters `
+# 								--cluster-name $connectedClusterName `
+# 								--resource-group $env:resourceGroup `
+# 								--scope cluster `
+# 								--configuration-settings enableInference=True allowInsecureConnections=True
 
 # Print out extension status
-az k8s-extension show --name amlarc-compute `
-                      --cluster-type connectedClusters `
-                      --cluster-name $connectedClusterName `
-                      --resource-group $env:resourceGroup
+# Write-Host "Waiting for extension install, hold tight..."
+# Do 
+# {
+#     $response = az k8s-extension show --name amlarc-compute `
+# 											--cluster-type connectedClusters `
+# 											--cluster-name $connectedClusterName `
+# 											--resource-group $env:resourceGroup `
+# 											--output json | ConvertFrom-Json
+
+# 		Write-Host ("Status: ", $response.installState)
+
+# 		If ($response.installState -eq "Failed") {break}
+
+# 		Start-Sleep -Seconds 20
+
+# } while (($response.installState -ne "Installed") -and ($response.installState -ne "Failed"))
+
+# # Received error
+# If ($response.installState -eq "Failed"){
+# 	Write-Host "Installation failed:" -ForegroundColor Red
+# 	Write-Host $response.errorInfo
+# }
+
+############################################################################################################################
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
