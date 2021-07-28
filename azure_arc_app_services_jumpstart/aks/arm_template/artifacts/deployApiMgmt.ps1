@@ -1,12 +1,5 @@
 Start-Transcript -Path C:\Temp\deployApiMgmt.log
 
-# Make sure extensions are added
-Write-Host "`n"
-Write-Host "Make sure extensions are installed"
-Write-Host "`n"
-az extension add --name k8s-extension
-az extension update --name k8s-extension
-
 # Login using SP
 $userPassword = ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force
 $pscredential = New-Object -TypeName System.Management.Automation.PSCredential($env:spnClientId, $userPassword)
