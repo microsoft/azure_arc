@@ -198,7 +198,7 @@
           {
             "name": "allow_RDP_3389",
             "properties": {
-              "priority": 1001,
+              "priority": 102,
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
