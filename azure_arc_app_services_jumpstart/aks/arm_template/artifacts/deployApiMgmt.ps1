@@ -34,8 +34,7 @@ New-AzApiManagementGateway -Context $apimContext -GatewayId $APIName -Descriptio
 Set-AzApiManagementTenantAccess -Context $apimContext -Enabled $True
 Get-AzApiManagementTenantAccess -Context $apimContext
 
-# Connect to the API
-
+# Connecting to the API
 $azContext = Get-AzContext
 $azProfile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
 $profileClient = New-Object -TypeName Microsoft.Azure.Commands.ResourceManager.Common.RMProfileClient -ArgumentList ($azProfile)
@@ -71,4 +70,3 @@ az k8s-extension create --cluster-type connectedClusters --cluster-name $env:clu
 Write-Host "Importing an API in the Kubernetes environment"
 Write-Host "`n"
 Import-AzApiManagementApi -Context $apimContext -SpecificationFormat OpenApi -SpecificationUrl https://raw.githubusercontent.com/OAI/OpenAPI-Specification/master/examples/v3.0/petstore.yaml -Path "petstore30"
-
