@@ -159,29 +159,6 @@ Move-Item -Path "C:\Users\$env:USERNAME\.kube\config_tmp" -Destination "C:\users
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 kubectx
 
-# Creating Grafana+Kibana URL desktop shortcuts
-$URLShortcutName = "Grafana (Metrics)"
-$URLShortcut = "C:\ArcBox\shortcutTemplate.ps1"
-Get-Content -Path $URLShortcut | Out-File "C:\ArcBox\GrafanaURLShortcut.ps1"
-$GrafanaURLShortcut = "C:\ArcBox\GrafanaURLShortcut.ps1"
-kubectl get services --namespace arc metricsui-svc-external --output jsonpath='{.status.loadBalancer.ingress[0].ip}' | Out-File C:\ArcBox\Grafana.txt
-$service = Get-Content "C:\ArcBox\Grafana.txt"
-$service = $service+":3000"
-(Get-Content -Path $GrafanaURLShortcut) -replace 'stagingName',$URLShortcutName | Set-Content -Path $GrafanaURLShortcut
-(Get-Content -Path $GrafanaURLShortcut) -replace 'stagingURL',$service | Set-Content -Path $GrafanaURLShortcut
-& $GrafanaURLShortcut
-
-$URLShortcutName = "Kibana (Logs)"
-$URLShortcut = "C:\ArcBox\shortcutTemplate.ps1"
-Get-Content -Path $URLShortcut | Out-File "C:\ArcBox\KibanaURLShortcut.ps1"
-$KibanaURLShortcut = "C:\ArcBox\KibanaURLShortcut.ps1"
-kubectl get services --namespace arc logsui-svc-external --output jsonpath='{.status.loadBalancer.ingress[0].ip}' | Out-File C:\ArcBox\Kibana.txt
-$service = Get-Content "C:\ArcBox\Kibana.txt"
-$service = $service+":5601"
-(Get-Content -Path $KibanaURLShortcut) -replace 'stagingName',$URLShortcutName | Set-Content -Path $KibanaURLShortcut
-(Get-Content -Path $KibanaURLShortcut) -replace 'stagingURL',$service | Set-Content -Path $KibanaURLShortcut
-& $KibanaURLShortcut
-
 # Changing to Jumpstart ArcBox wallpaper
 $imgPath="C:\ArcBox\wallpaper.png"
 $code = @' 
