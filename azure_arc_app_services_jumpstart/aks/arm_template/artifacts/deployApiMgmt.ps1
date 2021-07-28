@@ -60,7 +60,7 @@ $token =  "GatewayKey " + $tokenAPI.value
 $endpoint="https://$APIName.management.azure-api.net/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.ApiManagement/service/$APIName?api-version=2021-01-01-preview"
 
 # Deploy API Management gateway extension
-Write-Host "Deployumg Azure API Management Gateway Extension"
+Write-Host "Deploying Azure API Management Gateway Extension"
 az k8s-extension create --cluster-type connectedClusters --cluster-name $env:clusterName `
   --resource-group $env:resourceGroup --name apimgmt --extension-type Microsoft.ApiManagement.Gateway `
   --scope namespace --target-namespace apimgmt `
