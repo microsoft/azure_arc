@@ -87,6 +87,7 @@ az k8s-extension create --name amlarc-compute `
                         --cluster-name $connectedClusterName `
                         --resource-group $env:resourceGroup `
                         --scope cluster `
+                        --configuration-settings allowInsecureConnections=true `
                         --configuration-settings enableTraining=True enableInference=True privateEndpointNodeport=True
 
 # Print out extension status
