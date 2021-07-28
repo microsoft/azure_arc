@@ -191,12 +191,7 @@
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyDefinitionForEnableAzureDefenderKubernetes')]",
                 "parameters": {
-                    "tagName": {
-                        "value": "Project"
-                    },
-                    "tagValue": {
-                        "value": "jumpstart_arcbox"
-                    }
+
                 }
             }
         },
