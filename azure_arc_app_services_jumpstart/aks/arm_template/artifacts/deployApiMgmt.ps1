@@ -25,16 +25,18 @@ New-AzApiManagement -Name $APIName -ResourceGroupName $env:resourceGroup -Locati
     } while ($apiMgmtStatus -eq "Nope")
     
 # Create a Gateway instance
+Write-Host "Creating Azure API Management Gateway"
 $apimContext = New-AzApiManagementContext -ResourceGroupName $env:resourceGroup -ServiceName $APIName
 $location = New-AzApiManagementResourceLocationObject -Name "n1" -City "c1" -District "d1" -CountryOrRegion "r1"
 New-AzApiManagementGateway -Context $apimContext -GatewayId $APIName -Description "ArcAPIMgmt" -LocationData $location
 
 #Enable Management REST API 
-
+Write-Host "Enabling REST API Management for Azure API Management"
 Set-AzApiManagementTenantAccess -Context $apimContext -Enabled $True
 Get-AzApiManagementTenantAccess -Context $apimContext
 
 # Connecting to the API
+Write-Host "Getting Azure API Management configuration"
 $azContext = Get-AzContext
 $azProfile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
 $profileClient = New-Object -TypeName Microsoft.Azure.Commands.ResourceManager.Common.RMProfileClient -ArgumentList ($azProfile)
@@ -58,7 +60,7 @@ $token =  "GatewayKey " + $tokenAPI.value
 $endpoint="https://$APIName.management.azure-api.net/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.ApiManagement/service/$APIName?api-version=2021-01-01-preview"
 
 # Deploy API Management gateway extension
-
+Write-Host "Deployumg Azure API Management Gateway Extension"
 az k8s-extension create --cluster-type connectedClusters --cluster-name $env:clusterName `
   --resource-group $env:resourceGroup --name apimgmt --extension-type Microsoft.ApiManagement.Gateway `
   --scope namespace --target-namespace apimgmt `

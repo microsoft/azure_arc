@@ -90,7 +90,7 @@
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "Azure Function deployment"
+        "description": "Azure API Management deployment"
       }
     },
     "templateBaseUrl": {
@@ -102,7 +102,7 @@
     "adminEmail": {
       "type": "string",
       "metadata": {
-        "description": "Your Email address"
+        "description": "Email address used on the Azure API Management deployment to receive all system notifications"
       }
     }
   },
