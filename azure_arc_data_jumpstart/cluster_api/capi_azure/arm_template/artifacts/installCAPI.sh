@@ -53,7 +53,7 @@ sudo snap install kubectl --classic
 export CLUSTERCTL_VERSION="0.4.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.19.11"
+export KUBERNETES_VERSION="1.20.3"
 export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
