@@ -2,13 +2,16 @@ Start-Transcript -Path C:\ArcBox\DataServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
+# Required for azcopy
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
+# Required for CLI commands
 az login --service-principal --username $env:spnClientID --password $env:spnClientSecret --tenant $env:spnTenantId
 
 # Install Azure Data Studio extensions
+Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
 $env:argument1="--install-extension"
@@ -18,6 +21,7 @@ $env:argument3="microsoft.azuredatastudio-postgresql"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument3
 
 # Create Azure Data Studio desktop shortcut
+Write-Host "`n"
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
@@ -33,12 +37,8 @@ az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 
-# Adding Azure Arc CLI extensions
-Write-Host "Adding Azure Arc CLI extensions"
-az extension add --name "connectedk8s" -y
-az extension add --name "k8s-configuration" -y
-az extension add --name "k8s-extension" -y
-az extension add --name "customlocation" -y
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
@@ -58,6 +58,8 @@ kubectl apply -f "C:\ArcBox\capiStorageClass.yaml"
 
 kubectl label node --all failure-domain.beta.kubernetes.io/zone-
 kubectl label node --all topology.kubernetes.io/zone-
+kubectl label node --all failure-domain.beta.kubernetes.io/zone= --overwrite
+kubectl label node --all topology.kubernetes.io/zone= --overwrite
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -85,11 +87,13 @@ Start-Sleep -Seconds 20
 az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
+Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
 # Deploying Azure Defender Kubernetes extension instance
+Write-Host "`n"
 Write-Host "Create Azure Defender Kubernetes extension instance"
 Write-Host "`n"
 az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
@@ -130,8 +134,8 @@ Write-Host "`n"
 & "C:\ArcBox\DeploySQLMI.ps1"
 & "C:\ArcBox\DeployPostgreSQL.ps1"
 
-
-Write-Host "Copying Azure Data Studio settings template file"
+# Replacing Azure Data Studio settings template file
+Write-Host "Replacing Azure Data Studio settings template file"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "C:\ArcBox\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
@@ -153,6 +157,7 @@ Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config"
 Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config-k3s"
 Move-Item -Path "C:\Users\$env:USERNAME\.kube\config_tmp" -Destination "C:\users\$env:USERNAME\.kube\config"
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
+kubectx
 
 # Changing to Jumpstart ArcBox wallpaper
 $imgPath="C:\ArcBox\wallpaper.png"

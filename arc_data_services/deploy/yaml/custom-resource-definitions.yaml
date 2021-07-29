@@ -1,86 +1,124 @@
-apiVersion: apiextensions.k8s.io/v1beta1
+---
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: datacontrollers.arcdata.microsoft.com
 spec:
   group: arcdata.microsoft.com
-  version: v1alpha1
-  subresources:
-    status: {}
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: ".status.state"
   names:
     kind: datacontroller
     plural: datacontrollers
-  additionalPrinterColumns:
-  - name: State
-    type: string
-    JSONPath: .status.state
   scope: Namespaced
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: postgresqls.arcdata.microsoft.com
 spec:
   group: arcdata.microsoft.com
-  version: v1alpha1
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: ".status.state"
+    - name: Ready-Pods
+      type: string
+      jsonPath: ".status.readyPods"
+    - name: Primary-Endpoint
+      type: string
+      jsonPath: ".status.primaryEndpoint"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
   names:
     kind: postgresql
     plural: postgresqls
     shortNames:
     - postgres
-  subresources:
-    status: {}
-  additionalPrinterColumns:
-  - name: State
-    type: string
-    JSONPath: ".status.state"
-  - name: Ready-Pods
-    type: string
-    JSONPath: ".status.readyPods"
-  - name: Primary-Endpoint
-    type: string
-    JSONPath: ".status.primaryEndpoint"
-  - name: Age
-    type: date
-    JSONPath: ".metadata.creationTimestamp"
   scope: Namespaced
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: sqlmanagedinstances.sql.arcdata.microsoft.com
 spec:
   group: sql.arcdata.microsoft.com
-  version: v1alpha1
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Status
+      type: string
+      jsonPath: ".status.state"
+    - name: Replicas
+      type: string
+      jsonPath: ".status.readyReplicas"
+    - name: Primary-Endpoint
+      type: string
+      jsonPath: ".status.primaryEndpoint"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
   names:
     kind: sqlmanagedinstance
     plural: sqlmanagedinstances
     shortNames:
     - sqlmi
-  subresources:
-    status: {}
-  additionalPrinterColumns:
-  - name: Status
-    type: string
-    JSONPath: ".status.state"
-  - name: Replicas
-    type: string
-    JSONPath: ".status.readyReplicas"
-  - name: Primary-Endpoint
-    type: string
-    JSONPath: ".status.primaryEndpoint"
-  - name: Age
-    type: date
-    JSONPath: ".metadata.creationTimestamp"
   scope: Namespaced
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   name: sqlmanagedinstancerestoretasks.tasks.sql.arcdata.microsoft.com
 spec:
   group: tasks.sql.arcdata.microsoft.com
-  version: v1alpha1
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - jsonPath: ".status.state"
+      name: Status
+      type: string
+    - jsonPath: ".metadata.creationTimestamp"
+      name: Age
+      type: date
   names:
     kind: SqlManagedInstanceRestoreTask
     singular: sqlmanagedinstancerestoretask
@@ -88,12 +126,101 @@ spec:
     shortNames:
     - sqlmirestoretask
   scope: Namespaced
-  subresources:
-    status: {}
-  additionalPrinterColumns:
-  - JSONPath: .status.state
-    name: Status
-    type: string
-  - JSONPath: .metadata.creationTimestamp
-    name: Age
-    type: date
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: exporttasks.tasks.arcdata.microsoft.com
+spec:
+  group: tasks.arcdata.microsoft.com
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - jsonPath: ".status.state"
+      name: Status
+      type: string
+    - jsonPath: ".metadata.creationTimestamp"
+      name: Age
+      type: date
+    - name: FilePath
+      type: string
+      jsonPath: ".status.filePath"
+  names:
+    kind: ExportTask
+    singular: exporttask
+    plural: exporttasks
+    shortNames:
+    - export
+  scope: Namespaced
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: monitors.arcdata.microsoft.com
+spec:
+  group: arcdata.microsoft.com
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Status
+      type: string
+      jsonPath: ".status.state"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
+  names:
+    kind: Monitor
+    plural: monitors
+  scope: Namespaced
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: dags.sql.arcdata.microsoft.com
+spec:
+  group: sql.arcdata.microsoft.com
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - jsonPath: ".status.state"
+      name: Status
+      type: string
+    - jsonPath: ".status.results"
+      name: Results
+      type: string
+    - jsonPath: ".metadata.creationTimestamp"
+      name: Age
+      type: date
+  conversion:
+    strategy: None
+  names:
+    kind: Dag
+    singular: dag
+    plural: dags
+    shortNames:
+    - dag
+  scope: Namespaced

@@ -1,13 +1,16 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
+# Deployment environment variables
 $connectedClusterName = "Arc-Data-Microk8s-K8s"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
+# Required for azcopy
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
+# Required for CLI commands
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
 Write-Host "Installing Azure Data Studio Extensions"
@@ -48,11 +51,7 @@ Write-Host "`n"
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
-Write-Host "`n"
-az extension add --name "connectedk8s" -y
-az extension add --name "k8s-configuration" -y
-az extension add --name "k8s-extension" -y
-az extension add --name "customlocation" -y
+az config set extension.use_dynamic_install=yes_without_prompt
 
 Write-Host "`n"
 az -v
@@ -68,7 +67,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERN
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
-azdata --version
+Write-Host "`n"
 
 # Onboarding the Microk8s cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
