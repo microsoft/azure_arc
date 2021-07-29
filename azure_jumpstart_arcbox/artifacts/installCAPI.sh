@@ -52,8 +52,9 @@ sudo snap install kubectl --classic
 # Set CAPI deployment environment variables
 export CLUSTERCTL_VERSION="0.4.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
+export CAPI_PROVIDER_VERSION="0.5.1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.19.11"
+export KUBERNETES_VERSION="1.19.13" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
@@ -113,7 +114,7 @@ kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-lit
 
 # Transforming the Rancher K3s cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure azure
+clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
 echo "Making sure cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null

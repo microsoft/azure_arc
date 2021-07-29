@@ -89,6 +89,13 @@ Function Set-VMNetworkConfiguration {
     }
 }
 
+# Required for CLI commands
+az login --service-principal --username $env:spnClientID --password $env:spnClientSecret --tenant $env:spnTenantId
+
+# Register Azure providers
+az provider register --namespace Microsoft.HybridCompute --wait
+az provider register --namespace Microsoft.GuestConfiguration --wait
+
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Output "Configure DHCP service"
 $dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
