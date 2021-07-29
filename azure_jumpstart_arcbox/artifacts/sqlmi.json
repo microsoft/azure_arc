@@ -105,7 +105,7 @@
                 },
                 "k8sRaw": {
                     "spec": {
-                        "dev": false,
+                        "dev": true,
                         "services": {
                             "primary": {
                                 "type": "[parameters('serviceType')]"
