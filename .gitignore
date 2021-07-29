@@ -7,3 +7,6 @@ backup/
 .vagrant
 *.pem
 .terraform.lock.hcl
+azure_arc_data_jumpstart/gke/terraform/account.json
+azure_arc_data_jumpstart/gke/terraform/artifacts/azure_arc.ps1
+azure_arc_data_jumpstart/gke/terraform/artifacts/password_reset.ps1

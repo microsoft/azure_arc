@@ -7,7 +7,7 @@ metadata:
   name: sql1-login-secret
 type: Opaque
 ---
-apiVersion: sql.arcdata.microsoft.com/v1alpha1
+apiVersion: sql.arcdata.microsoft.com/v1beta1
 kind: sqlmanagedinstance
 metadata:
   name: sql1
@@ -18,6 +18,9 @@ metadata:
     examplelabel1: examplelabelvalue1
     examplelabel2: examplelabelvalue2
 spec:
+  dev: true #options: [true, false]
+  licenseType: LicenseIncluded #options: [LicenseIncluded, BasePrice].  BasePrice is used for Azure Hybrid Benefits.
+  tier: GeneralPurpose #options: [GeneralPurpose, BusinessCritical]
   scheduling:
     default:
       resources:

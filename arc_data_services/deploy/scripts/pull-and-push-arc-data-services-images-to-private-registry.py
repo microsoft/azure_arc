@@ -36,7 +36,7 @@ else:
     SOURCE_DOCKER_PASSWORD = os.environ["SOURCE_DOCKER_PASSWORD"]
 
 if (os.getenv("SOURCE_DOCKER_TAG") is None):
-    SOURCE_DOCKER_TAG = input("Provide container image tag for the images at the source - press ENTER for using 'public-preview-sep-2020': ") or "public-preview-sep-2020"
+    SOURCE_DOCKER_TAG = input("Provide container image tag for the images at the source - press ENTER for using 'public-preview-jun-2021': ") or "public-preview-jun-2021"
 else:
     SOURCE_DOCKER_TAG = os.environ["SOURCE_DOCKER_TAG"]
 
@@ -68,7 +68,6 @@ else:
 images = [  'arc-bootstrapper',
             'arc-postgres-11',
             'arc-postgres-12',
-            'arc-control-watchdog',
             'arc-controller',
             'arc-sqlmi',
             'arc-monitor-collectd',
@@ -80,8 +79,11 @@ images = [  'arc-bootstrapper',
             'arc-monitor-telegraf',
             'arc-server-controller',
             'arc-service-proxy',
+            'arc-dns',
+            'arc-ha-operator',
             'arc-ha-supervisor',
-            'mssql-ha-operator']
+            'arc-security-support'
+            ]
 
 taggedimages = [image + ":" + SOURCE_DOCKER_TAG for image in images]
 

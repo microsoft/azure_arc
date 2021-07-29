@@ -89,6 +89,12 @@
         },
         "serviceProxyPort": {
             "type": "Int"
+        },
+        "apiVersion": {
+        "type": "String"
+        },
+        "infrastructure": {
+        "type": "String"
         }
     },
     "variables": {},
@@ -96,7 +102,7 @@
     "resources": [
         {
             "type": "Microsoft.AzureArcData/dataControllers",
-            "apiVersion": "2021-06-01-preview",
+            "apiVersion": "[parameters('apiVersion')]",
             "name": "[parameters('controllerName')]",
             "location": "[parameters('location')]",
             "extendedLocation": {
@@ -119,8 +125,9 @@
                     "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",
                     "primaryKey": "[parameters('logAnalyticsPrimaryKey')]"
                 },
+                "infrastructure": "[parameters('infrastructure')]",
                 "k8sRaw": {
-                    "apiVersion": "arcdata.microsoft.com/v1alpha1",
+                    "apiVersion": "arcdata.microsoft.com/v1beta1",
                     "kind": "datacontroller",
                     "spec": {
                         "credentials": {
@@ -129,6 +136,7 @@
                             "domainServiceAccount": "domain-service-account-secret",
                             "serviceAccount": "sa-mssql-controller"
                         },
+                        "infrastructure": "[parameters('infrastructure')]",
                         "docker": {
                             "imagePullPolicy": "[parameters('dockerImagePullPolicy')]",
                             "imageTag": "[parameters('dockerImageTag')]",

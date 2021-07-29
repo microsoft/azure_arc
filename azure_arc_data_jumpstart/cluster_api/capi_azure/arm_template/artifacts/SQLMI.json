@@ -79,6 +79,9 @@
         },
         "resourceTags": {
             "type": "Object"
+        },
+        "apiVersion": {
+        "type": "String"
         }
     },
     "variables": {},
@@ -86,7 +89,7 @@
     "resources": [
         {
             "type": "Microsoft.AzureArcData/sqlManagedInstances",
-            "apiVersion": "2021-06-01-preview",
+            "apiVersion": "[parameters('apiVersion')]",
             "name": "jumpstart-sql",
             "location": "[parameters('location')]",
             "extendedLocation": {

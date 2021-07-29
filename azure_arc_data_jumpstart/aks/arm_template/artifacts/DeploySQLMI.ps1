@@ -1,13 +1,15 @@
 Start-Transcript -Path C:\Temp\deploySQL.log
 
 # Deployment environment variables
-$controllerName = "Jumpstart-DC"
+$controllerName = "jumpstart-dc"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
+$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+$ServiceType = "LoadBalancer"
 $vCoresMax = 4
 $memoryMax = "8"
 $StorageClassName = "managed-premium"
@@ -25,9 +27,13 @@ $SQLParams = "C:\Temp\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresMaxStage',$vCoresMax | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'memoryMax-stage',$memoryMax | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataLogsStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'logsStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'backupsStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataSize-stage',$dataStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'logsSize-stage',$logsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogseSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
@@ -49,18 +55,17 @@ Write-Host "`n"
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
 $settingsTemplate = "C:\Temp\settingsTemplate.json"
-kubectl describe svc jumpstart-sql-external-svc -n arc | Select-String "LoadBalancer Ingress" | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
-$sqlfile = "C:\Temp\sql_instance_list.txt"
-$sqlstring = Get-Content $sqlfile
-$sqlstring.split(" ") | Tee-Object "C:\Temp\sql_instance_list.txt" | Out-Null
-(Get-Content $sqlfile | Select-Object -Skip 7) | Set-Content $sqlfile
-$sqlstring = Get-Content $sqlfile
 
+# Retrieving SQL MI connection endpoint
+$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
+
+# Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
 
+# If PostgreSQL isn't being deployed, clean up settings file
 if ( $env:deployPostgreSQL -eq $false )
 {
     $string = Get-Content $settingsTemplate
@@ -69,6 +74,3 @@ if ( $env:deployPostgreSQL -eq $false )
     $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
     $string | Set-Content -Path $settingsTemplate
 }
-
-# Cleaning garbage
-Remove-Item "C:\Temp\sql_instance_list.txt" -Force

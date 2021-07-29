@@ -1,7 +1,7 @@
 Start-Transcript -Path C:\Temp\deploySQL.log
 
 # Deployment environment variables
-$controllerName = "Jumpstart-DC"
+$controllerName = "jumpstart-dc"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "Deploying Azure Arc SQL Managed Instance"
@@ -10,8 +10,8 @@ Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $ServiceType = "NodePort"
-$vCoresMax = 2
-$memoryMax = "4"
+$vCoresMax = 4
+$memoryMax = "8"
 $StorageClassName = "microk8s-hostpath"
 $dataStorageSize = "5"
 $logsStorageSize = "5"
