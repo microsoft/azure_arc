@@ -99,7 +99,7 @@ Start-Sleep -Seconds 10
 # 								--cluster-name $connectedClusterName `
 # 								--resource-group $env:resourceGroup `
 # 								--scope cluster `
-# 								--configuration-settings enableInference=True allowInsecureConnections=True
+# 								--configuration-settings enableInference=True allowInsecureConnections=True inferenceLoadBalancerHA=False # This is since our K8s is 1 node
 
 # Print out extension status
 # Write-Host "Waiting for extension install, hold tight..."
