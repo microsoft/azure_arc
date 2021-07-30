@@ -1,6 +1,6 @@
 #This version of the script is for the "new" platform version in the July release
 
-# requires installation of Docker: https://docs.docker.com/install/ 
+# requires installation of Docker: https://docs.docker.com/install/
 
 from subprocess import check_output, CalledProcessError, STDOUT, Popen, PIPE
 import os
@@ -66,10 +66,8 @@ else:
     TARGET_DOCKER_TAG = os.environ["TARGET_DOCKER_TAG"]
 
 images = [  'arc-bootstrapper',
-            'arc-postgres-11',
-            'arc-postgres-12',
             'arc-controller',
-            'arc-sqlmi',
+            'arc-controller-db',
             'arc-monitor-collectd',
             'arc-monitor-elasticsearch',
             'arc-monitor-fluentbit',
@@ -77,13 +75,14 @@ images = [  'arc-bootstrapper',
             'arc-monitor-influxdb',
             'arc-monitor-kibana',
             'arc-monitor-telegraf',
-            'arc-server-controller',
             'arc-service-proxy',
-            'arc-dns',
+            'arc-security-support',
+            'arc-sqlmi',
             'arc-ha-operator',
             'arc-ha-supervisor',
-            'arc-security-support'
-            ]
+            'arc-postgres-11',
+            'arc-postgres-12'
+        ]
 
 taggedimages = [image + ":" + SOURCE_DOCKER_TAG for image in images]
 
