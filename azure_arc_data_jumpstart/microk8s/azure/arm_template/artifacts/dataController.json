@@ -87,9 +87,6 @@
     "controllerPort": {
       "type": "Int"
     },
-    "serviceProxyPort": {
-      "type": "Int"
-    },
     "apiVersion": {
       "type": "String"
     },
@@ -127,14 +124,14 @@
         },
         "infrastructure": "[parameters('infrastructure')]",
         "k8sRaw": {
-          "apiVersion": "arcdata.microsoft.com/v1beta1",
-          "kind": "datacontroller",
+          "apiVersion": "arcdata.microsoft.com/v1",
+          "kind": "DataController",
           "spec": {
             "credentials": {
               "controllerAdmin": "controller-login-secret",
               "dockerRegistry": "[parameters('dockerRegistryCredential')]",
               "domainServiceAccount": "domain-service-account-secret",
-              "serviceAccount": "sa-mssql-controller"
+              "serviceAccount": "sa-arc-controller"
             },
             "infrastructure": "[parameters('infrastructure')]",
             "docker": {
@@ -153,11 +150,6 @@
               {
                 "name": "controller",
                 "port": "[parameters('controllerPort')]",
-                "serviceType": "[parameters('serviceType')]"
-              },
-              {
-                "name": "serviceProxy",
-                "port": "[parameters('serviceProxyPort')]",
                 "serviceType": "[parameters('serviceType')]"
               }
             ],
@@ -195,7 +187,31 @@
             "namespace": "[parameters('namespace')]",
             "name": "datacontroller"
           },
-          "status": {}
+          "status": {
+            "observedGeneration":1,
+            "azure":{
+               "uploadStatus":{
+                  "metrics":{
+                     "status":{
+                        "message":"",
+                        "state":""
+                     }
+                  },
+                  "logs":{
+                     "status":{
+                        "message":"",
+                        "state":""
+                     }
+                  },
+                  "usage":{
+                     "status":{
+                        "message":"",
+                        "state":""
+                     }
+                  }
+               }
+            }
+          }
         }
       }
     }
