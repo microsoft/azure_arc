@@ -21,10 +21,10 @@
         "subscriptionId": {
             "type": "String"
         },        
-        "azdataUsername": {
+        "admin": {
             "type": "String"
         },
-        "azdataPassword": {
+        "password": {
             "type": "SecureString"
         },
         "namespace": {
@@ -34,13 +34,17 @@
         "serviceType": {
             "type": "String"
         },
-        "vCoresMax": {
-            "type": "Int",
-            "defaultValue": 4
+        "vCoresRequest": {
+            "type": "String"
+          },
+        "memoryRequest": {
+            "type": "String"
         },
-        "memoryMax": {
-            "type": "String",
-            "defaultValue": "8"
+        "vCoresLimit": {
+            "type": "String"
+        },
+        "memoryLimit": {
+            "type": "String"
         },
         "dataStorageSize": {
             "type": "String",
@@ -77,7 +81,13 @@
             "type": "Object"
         },
         "apiVersion": {
-          "type": "String"
+            "type": "String"
+        },
+        "pricingTier": {
+            "type": "String"
+        },
+        "licenseType": {
+            "type": "String"
         }
     },
     "variables": {},
@@ -93,12 +103,17 @@
                 "name": "[parameters('customLocation')]"
             },
             "tags": "[parameters('resourceTags')]",
+            "sku": {
+                "name": "vCore",
+                "tier": "[parameters('pricingTier')]"
+            },
             "properties": {
-                "admin": "[parameters('azdataUsername')]",
+                "admin": "[parameters('admin')]",
                 "basicLoginInformation": {
-                    "username": "[parameters('azdataUsername')]",
-                    "password": "[parameters('azdataPassword')]"
+                    "username": "[parameters('admin')]",
+                    "password": "[parameters('password')]"
                 },
+                "licenseType": "[parameters('licenseType')]",
                 "k8sRaw": {
                     "spec": {
                         "dev": true,
@@ -112,8 +127,12 @@
                             "default": {
                                 "resources": {
                                     "requests": {
-                                        "vcores": "[parameters('vCoresMax')]",
-                                        "memory": "[parameters('memoryMax')]"
+                                        "cpu": "[parameters('vCoresRequest')]",
+                                        "memory": "[parameters('memoryRequest')]"
+                                    },
+                                    "limits": {
+                                        "cpu": "[parameters('vCoresLimit')]",
+                                        "memory": "[parameters('memoryLimit')]"
                                     }
                                 }
                             }
