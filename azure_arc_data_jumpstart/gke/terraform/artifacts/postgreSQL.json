@@ -24,7 +24,7 @@
         "admin": {
             "type": "String"
         },
-        "azdataPassword": {
+        "password": {
             "type": "SecureString"
         },
         "namespace": {
@@ -33,7 +33,16 @@
         "serviceType": {
             "type": "String"
         },
-        "memoryRequest": {
+        "coordinatorCoresRequest": {
+            "type": "String"
+        },
+        "coordinatorCoresLimit": {
+            "type": "String"
+        },
+        "coordinatorMemoryRequest": {
+            "type": "String"
+        },
+        "coordinatorMemoryLimit": {
             "type": "String"
         },
         "postgresEngineVersion": {
@@ -87,7 +96,7 @@
                 "admin": "[parameters('admin')]",
                 "basicLoginInformation": {
                     "username": "[parameters('admin')]",
-                    "password": "[parameters('azdataPassword')]"
+                    "password": "[parameters('password')]"
                 },
                 "k8sRaw": {
                     "kind": "postgresql",
@@ -103,9 +112,28 @@
                             "default": {
                                 "resources": {
                                     "requests": {
-                                        "memory": "[parameters('memoryRequest')]"
-                                    },
-                                    "limits": {}
+                                        "memory": "0.25Gi"
+                                    }
+                                }
+                            },
+                            "roles": {
+                                "coordinator": {
+                                    "resources": {
+                                        "requests": {
+                                            "memory": "[parameters('coordinatorMemoryRequest')]",
+                                            "cpu": "[parameters('coordinatorCoresRequest')]"
+                                        },
+                                        "limits": {
+                                            "cpu": "[parameters('coordinatorCoresLimit')]",
+                                            "memory": "[parameters('coordinatorMemoryLimit')]"
+                                        }
+                                    }
+                                },
+                                "worker": {
+                                    "resources": {
+                                        "requests": {},
+                                        "limits": {}
+                                    }
                                 }
                             }
                         },
