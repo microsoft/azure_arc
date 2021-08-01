@@ -6,10 +6,10 @@ import os
 ws = Workspace.from_config()
 
 # choose a name for your Azure Arc-enabled Kubernetes compute
-amlarc_compute_name = os.environ.get("AML_COMPUTE_CLUSTER_NAME", "arc")
+amlarc_compute_name = os.environ.get("AML_COMPUTE_CLUSTER_NAME", "connectedClusterName-stage")
 
 # resource ID for your Azure Arc-enabled Kubernetes cluster
-resource_id = "/subscriptions/182c901a-129a-4f5d-86e4-cc6b294590a2/resourceGroups/raki-arc-aks-inf-rg/providers/Microsoft.Kubernetes/connectedClusters/Arc-Data-AKS"
+resource_id = "connectedClusterId-stage"
 
 if amlarc_compute_name in ws.compute_targets:
     amlarc_compute = ws.compute_targets[amlarc_compute_name]

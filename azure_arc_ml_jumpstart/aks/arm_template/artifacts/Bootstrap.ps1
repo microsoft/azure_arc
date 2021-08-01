@@ -39,7 +39,9 @@ New-Item -Path $tempDir -ItemType directory -Force
 
 Start-Transcript "C:\Temp\Bootstrap.log"
 
-$ErrorActionPreference = 'SilentlyContinue'
+# https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables?view=powershell-7.1#erroractionpreference
+# Show errors, but to continue nonetheless
+$ErrorActionPreference = 'Continue'
 
 # Uninstall Internet Explorer
 Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
@@ -62,15 +64,15 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 
 # Downloading GitHub artifacts for AzureMLLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AzureMLLogonScript.ps1") -OutFile "C:\Temp\AzureMLLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-train-cli.zip") -OutFile "C:\Temp\simple-train-cli.zip"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-inference-cli.zip") -OutFile "C:\Temp\simple-inference-cli.zip"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/1.Get_WS.py") -OutFile "C:\Temp\1.Get_WS.py"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/2.Attach_Arc.py") -OutFile "C:\Temp\2.Attach_Arc.py"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
 
-# Unzip inference and training
-
-
-
-
+# Unzip training and inference payloads
+Expand-Archive -LiteralPath "C:\Temp\simple-train-cli.zip" -DestinationPath "C:\Temp"
+Expand-Archive -LiteralPath "C:\Temp\simple-inference-cli.zip" -DestinationPath "C:\Temp"
 
 # Installing tools
 workflow ClientTools_01
@@ -104,29 +106,13 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
-                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
                 }
         }
 
 ClientTools_01 | Format-Table
 
-workflow ClientTools_02
-        {
-            #Run commands in parallel.
-            Parallel
-            {
-                InlineScript {
-                    Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
-                }
-            }
-        }
-        
-ClientTools_02 | Format-Table 
-
+# Alias for kubectl
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
-New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
 # Creating scheduled task for AzureMLLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn

@@ -1,8 +1,8 @@
 from azureml.core import Workspace
 
-subscription_id = '182c901a-129a-4f5d-86e4-cc6b294590a2'
-resource_group  = 'raki-arc-aks-inf-rg'
-workspace_name  = 'raki-arc-aks-inf-rg-ws'
+subscription_id = 'subscription_id-stage'
+resource_group  = 'resource_group-stage'
+workspace_name  = 'workspace_name-stage'
 
 try:
     ws = Workspace(subscription_id = subscription_id, resource_group = resource_group, workspace_name = workspace_name)
