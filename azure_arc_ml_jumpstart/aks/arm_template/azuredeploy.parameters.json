@@ -26,12 +26,6 @@
     "logAnalyticsWorkspaceName": {
       "value": "<your unique Log Analytics workspace name>"
     },
-    "deploySQLMI": {
-      "value": "<SQL Managed Instance deployment (true/false)>"
-    },
-    "deployPostgreSQL": {
-      "value": "<PostgreSQL Hyperscale deployment (true/false)>"
-    },
     "templateBaseUrl": {
       "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_ml_jumpstart/aks/arm_template/"
     },
