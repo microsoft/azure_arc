@@ -10,7 +10,7 @@ environment:
   docker:
     image: mcr.microsoft.com/azureml/intelmpi2018.3-ubuntu16.04:20210301.v1
 compute:
-  target: azureml:arc
+  target: azureml:connectedClusterName-stage
 inputs:
   mnist:
     data: azureml:mnist_opendataset:1

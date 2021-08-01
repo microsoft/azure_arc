@@ -77,7 +77,7 @@ Expand-Archive -LiteralPath "C:\Temp\simple-inference-cli.zip" -DestinationPath 
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,python --version=3.6.7'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,python'
             #Run commands in parallel.
             Parallel 
                 {
