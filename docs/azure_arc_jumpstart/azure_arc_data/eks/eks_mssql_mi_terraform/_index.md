@@ -12,7 +12,7 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an EKS cluster deployed with an Azure Arc Data Controller running a SQL Managed Instance, and a Microsoft Windows Server 2019 (Datacenter) AWS EC2 instance VM, installed and pre-configured with all the required tools needed to work with Azure Arc Data Services:
 
-![Deployed Architecture](./34.png)
+![Deployed Architecture](./40.png)
 
 > **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -249,17 +249,27 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
     Once the script will finish it's run, the logon script PowerShell session will be close and the Azure Arc Data Controller and SQL Managed Instance will be deployed on the EKS cluster and be ready to use.
 
-    ![PowerShell logon script run](./01.gif)
+    ![PowerShell login script run](./27.png)
 
-    ![Resource Group](./27.png)
+    ![PowerShell login script run](./28.png)
+
+    ![PowerShell login script run](./29.png)
+
+    ![PowerShell login script run](./30.png)
+
+    ![PowerShell login script run](./31.png)
+
+    ![PowerShell login script run](./32.png)
+
+    ![Resource Group](./33.png)
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Azure Data Studio is automatically opened after the deployment finishes.
 
 * From Azure Data Studio, click on the MSSQL_MI instance and view the sample AdventureWorks database.
 
-  ![Azure Data Studio shortcut](./28.png)
+  ![Azure Data Studio shortcut](./34.png)
 
-  ![Sample AdventureWorks database](./29.png)
+  ![Sample AdventureWorks database](./35.png)
 
 ## Delete the deployment
 
@@ -273,18 +283,18 @@ To completely delete the environment, follow the below steps.
   terraform destroy --auto-approve
   ```
 
-  ![terraform destroy](./30.png)
+  ![terraform destroy](./36.png)
 
   > **Note: Because the following resources were created by EKS that creates internal AWS dependencies that Terraform has no knowledge of from our plan, we need to delete the resources from AWS console as `terraform destroy` is cleaning up - this allows us to avoid dependency conflicts and ongoing billing from orphaned resources such as EKS Volumes.**
 
 * While the `destroy` command is running, delete any new Load Balancers created as EKS Services (`EC2 > Load Balancing > Load Balancers`) that are deployed in AWS from the Console:
 
-  ![Delete Load Balancers](./31.png)
+  ![Delete Load Balancers](./37.png)
 
 * While the `destroy` command is running, delete any new Elastic Block Stores created as EKS Persistent Volumes (`EC2 > Elastic Block Store > Volumes`) that are deployed in AWS from the Console:
 
-  ![Delete Elastic Block Stores](./32.png)
+  ![Delete Elastic Block Stores](./38.png)
 
 * While the `destroy` command is running, delete any new Security Groups created (`EC2 > Network & Security > Security Groups`) that are deployed in AWS from the Console
 
-  ![Delete Elastic Block Stores](./33.png)
+  ![Delete Elastic Block Stores](./39.png)
