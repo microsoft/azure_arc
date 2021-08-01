@@ -92,9 +92,11 @@ az ml -h
 python -m pip install --upgrade pip
 pip install azureml-core
 
-# Deploying AML workspace
+# Set AML workspace defaults
 $ws = $env:resourceGroup + "-amlws" # AML workspace name
 az configure --defaults workspace=$ws group=$env:resourceGroup
+
+# Create Azure ML workspace
 az ml workspace create -g $env:resourceGroup
 
 # Arc K8s extension enablement: Training and Inferencing
@@ -152,17 +154,178 @@ $Script = "C:\Temp\2.Attach_Arc.py"
 (Get-Content -Path $Script) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $Script
 (Get-Content -Path $Script) -replace 'connectedClusterId-stage',$connectedClusterId | Set-Content -Path $Script
 
-# Write Azure ML Workspace info
+# Set Azure ML default Workspace info
 python "C:\Temp\1.Get_WS.py"
 
 # Attach Arc Cluster to Azure ML Workspace
 python "C:\Temp\2.Attach_Arc.py"
 
+#################
+# Training Model
+#################
+Write-Host """
+ Training model:                                           
+            .....                                             .....             
+         .........                                           .........          
+        .........                 (((((((((##                 .........         
+       .....                      (((((((####                      .....        
+      ......                      #((########                      ......       
+     ....... .............        ###########        ............. .......      
+     ......................       ###########       ......................      
+    .................*.....       ###########       ....,*.................     
+    .........*******......       (((((((((((         ......*******.........     
+         ............          (((((((((((     (.         ............          
+                            .(((((((((((     (((((/                             
+                          ((((((((((((     #(((((((##                           
+                        ////(((((((*     ##############                         
+                      //////(((((.         ,#############.                      
+                   ,**///////((               #############/                    
+                    *////////&%%%%%%%%%%%%%%%%%%%##########                     
+                    ///////&&&%&%%%%%%%%%%%%%%%&%&&#######(                     
+                     ////&&&&&&&%%%%%%%%%%%%%&&&&&&&&%####                      
+                     .(&&&&&&&&&&&&&&%%%%%%&&&&&&&&&&&&&#.                      
+                                                                                
+"""
+# Replace staging values
+$JobFile = "C:\Temp\simple-train-cli\job.yml"
+(Get-Content -Path $JobFile) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $JobFile
 
-#### TODO #####
-# Training deployment Stuff
-# Inference deployment Stuff
-# Inference call stuff
+# Create MNIST Dataset and register against Workspace
+pip install azureml-opendatasets
+python "C:\Temp\3.Create_MNIST_Dataset.py"
+
+# Train model with AML CLI
+$Job = az ml job create -f $JobFile
+$RunId = ($Job | grep '\"name\":').Split('\"')[3]
+
+# Poll training status from ARM
+Write-Host "Training model, hold tight..."
+Do 
+{
+   $response = az ml job show --name $RunId --query "{Name:name,Jobstatus:status}" | ConvertFrom-Json
+   Write-Host ("Job Status: ", $response.Jobstatus)
+
+	If ($response.Jobstatus -eq "Canceled") {break}
+
+	Start-Sleep -Seconds 20
+
+} while (($response.Jobstatus -ne "Completed") -and ($response.Jobstatus -ne "Canceled"))
+
+# Flag for Training Status
+$TrainingStatus = "Unsuccessful"
+
+# Get Job status
+If ($response.Jobstatus -eq "Completed"){
+   Write-Host "Job completed." -ForegroundColor Green
+   # Download job artifacts, including pkl model
+   az ml job download -n $RunId --outputs --download-path "C:\Temp"
+   # Set flag for successful training
+   $TrainingStatus = "Successful"
+}
+elseif ($response.Jobstatus -eq "Canceled"){
+	Write-Host "Job was canceled." -ForegroundColor Yellow
+}
+else
+{
+    Write-Host "Something else went wrong."
+}
+
+#######################
+# Inference Deployment
+#######################
+Write-Host """
+ Deploying model to Kubernetes Cluster:                                           
+                                                                                                                                  
+                                    .,,,,                                       
+                                  ,,,,,,,,,                                     
+                                  ,,,,,,,,,                                     
+                                *//,,,,,,,*,,,,                                 
+                            ///////////////////,,,,,                            
+              ,,,,,,,  /////////////////////////////,,,,,,,,,,,                 
+             ,,,,,,,,,/////////////////////////////////,,,,,,,,,                
+              ,,,,,,,,///////////////////////////////,,,,,,,,,,,                
+                 ,,#######//////////////////////*,,,,#####(,                    
+                 ,,############/////*,,,,///,,,,*##########,                    
+                 ,,###############,,,,,,,,,,###############,                    
+                 ,,###############,,,,,,,,,################,                    
+                 ,,################*,,,,,,#################,                    
+                 ,,##################/,,###################,                    
+                 ,,##################/,,###################,                    
+              ,,,,,,,################/,,################,,,,,,,                 
+             ,,,,,,,,,###############/,,###############,,,,,,,,,                
+             .,,,,,,,,,,#############/,,###############,,,,,,,,,                
+                 ,,     ,,,,/########/,,###########       .,.                   
+                            .,,,,###/,,,*#####.                                 
+                                 ,,,,,,,,,,                                     
+                                  ,,,,,,,,,                                     
+                                   ,,,,,,,                                                                                                           
+"""
+# Replace staging values
+$JobFile = "C:\Temp\simple-inference-cli\endpoint.yml"
+(Get-Content -Path $JobFile) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $JobFile
+
+# Flag for Inference Status
+$InferenceStatus = "Unsuccessful"
+
+# Proceed with inference deployment only if training was successful
+If ($TrainingStatus -eq "Successful"){
+   Write-Host "Copying trained model pkl to deployment folder..." -ForegroundColor White
+   Copy-Item "C:\Temp\$RunId\outputs\*.pkl" -Destination "C:\Temp\simple-inference-cli\model"
+
+   # Deploy unique inference endpoint
+   $random = ((New-Guid).Guid).Split('-')[0]
+   $name = "sklearn-mnist-$random"
+
+   # Synchronous call (blocking) - 5-10 minutes
+   Write-Host "Creating model deployment on your K8s cluster, takes 5-10 minutes..." -ForegroundColor White
+   az ml endpoint create -n $name -f $JobFile
+
+   # Set flag
+   $InferenceStatus = "Successful"
+}
+else
+{
+    Write-Host "Training was not successful - Inference skipped."
+}
+
+#################
+# Inference Call
+#################
+
+$RequestFile = "C:\Temp\simple-inference-cli\sample-request.json"
+
+# Proceed with inference call only if inference deployment was successful
+If ($InferenceStatus -eq "Successful"){
+   # Method 1: One-line invoke model
+   Write-Host "Method 1: Calling deployed model using az ml endpoint" -ForegroundColor Yellow
+   az ml endpoint invoke -n $name -r $RequestFile
+
+   # Method 2: Call using PowerShell Invoke-RestMethod (for demonstration)
+   Write-Host "Method 2: Calling deployed model using PowerShell Direct REST API call" -ForegroundColor Yellow
+   # Get OAuth token
+   $token = $(az ml endpoint get-credentials --name $name `
+                                             --resource-group $env:resourceGroup `
+                                             --workspace-name $ws | ConvertFrom-Json).accessToken
+   # Get scoring URL
+   $scoring_uri = $(az ml endpoint show --name $name `
+                                        --resource-group $env:resourceGroup `
+                                        --workspace-name $ws | ConvertFrom-Json).scoring_uri
+
+   Write-Host "Model Scoring URL: $scoring_uri" -ForegroundColor White
+   
+   # Score using URL
+   $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
+   $headers.Add("Authorization", "Bearer $token")
+   $headers.Add("Content-Type", "application/json")
+   $body = Get-Content $RequestFile | Out-String
+
+   $response = Invoke-RestMethod $scoring_uri -Method 'POST' -Headers $headers -Body $body
+   $response | ConvertTo-Json
+}
+else
+{
+    Write-Host "Training and/or Inference was not successful - call skipped."
+}
 
 ###################################################################################################################
 
