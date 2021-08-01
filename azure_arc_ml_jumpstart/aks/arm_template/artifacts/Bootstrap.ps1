@@ -13,8 +13,6 @@ param (
     [string]$azureLocation,
     [string]$workspaceName,
     [string]$clusterName,
-    [string]$deploySQLMI,
-    [string]$deployPostgreSQL,
     [string]$templateBaseUrl
 )
 
@@ -31,8 +29,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deploySQLMI', $deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
@@ -64,23 +60,22 @@ Disable-ieESC
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
-# Downloading GitHub artifacts for DataServicesLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\Temp\settingsTemplate.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "C:\Temp\DataServicesLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\Temp\DeploySQLMI.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\Temp\DeployPostgreSQL.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "C:\Temp\dataController.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "C:\Temp\dataController.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.json") -OutFile "C:\Temp\SQLMI.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.parameters.json") -OutFile "C:\Temp\SQLMI.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\Temp\postgreSQL.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\Temp\postgreSQL.parameters.json"
+# Downloading GitHub artifacts for AzureMLLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AzureMLLogonScript.ps1") -OutFile "C:\Temp\AzureMLLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-train-cli.zip") -OutFile "C:\Temp\simple-train-cli.zip"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-inference-cli.zip") -OutFile "C:\Temp\simple-inference-cli.zip"
+
+# Unzip inference and training
+
+
+
+
 
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,python --version=3.6.7'
             #Run commands in parallel.
             Parallel 
                 {
@@ -133,10 +128,10 @@ ClientTools_02 | Format-Table
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating scheduled task for DataServicesLogonScript.ps1
+# Creating scheduled task for AzureMLLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\DataServicesLogonScript.ps1'
-Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\AzureMLLogonScript.ps1'
+Register-ScheduledTask -TaskName "AzureMLLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask

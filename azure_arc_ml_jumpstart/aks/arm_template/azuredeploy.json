@@ -72,20 +72,6 @@
         "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
       }
     },
-    "deploySQLMI": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "SQL Managed Instance deployment"
-      }
-    },
-    "deployPostgreSQL": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "PostgreSQL Hyperscale deployment"
-      }
-    },
     "templateBaseUrl": {
       "type": "string",
       "metadata": {
@@ -207,19 +193,13 @@
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
-          },
-          "deploySQLMI": {
-            "value": "[parameters('deploySQLMI')]"
-          },
-          "deployPostgreSQL": {
-            "value": "[parameters('deployPostgreSQL')]"
           }
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs upload",
+      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc logs upload",
       "apiVersion": "2019-10-01",
       "name": "logAnalyticsDeployment",
       "properties": {
