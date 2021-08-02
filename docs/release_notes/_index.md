@@ -9,9 +9,90 @@ weight: 3
 
 **Release notes will be released on the first week of each month and will cover the previous month.**
 
+## July 2021
+
+### Release highlights and general Jumpstart enhancements
+
+* First new scenarios for Azure Arc enabled app services
+
+* Major updates to support general availability of Azure Arc enabled data services with SQL Managed Instance
+
+* Critical bug fixes for Cluster API based scenarios
+
+* Jumpstart ArcBox enhancements
+
+### Azure Arc enabled servers scenarios
+
+* [New Scenario: Enable Azure Automanage on an Azure Arc enabled server using an ARM template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/)
+
+* [Updated Scenario: Enable Update Management on Azure Arc enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_updatemanagement/)
+
+* [Bug fix: az_connect_linux.sh will not work as it is on RHEL/CentOS #613](https://github.com/microsoft/azure_arc/issues/613)
+
+* [Bug fix: ARM Template fails deployment Update Management on Azure Arc enabled servers #631](https://github.com/microsoft/azure_arc/issues/631)
+
+### Azure Arc enabled Kubernetes scenarios
+
+* [New Scenario: Integrate Azure Monitor for Containers with AKS on Azure Stack HCI as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks_stack_hci/aks_hci_monitor/aks_hci_monitor_extension/)
+
+* [Bug fix: Cluster API fails with no "cluster" resource available #617](https://github.com/microsoft/azure_arc/issues/617)
+
+### Azure Arc enabled data services scenarios
+
+* [Updated Scenario: Deploying vanilla Azure Arc enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/dc_vanilla/)
+
+* [Updated Scenario: Deploying SQLMI Azure Arc enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/mssql_mi/)
+
+* [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/postgresql_hyperscale/)
+
+* [Updated Scenario: Deploying vanilla Azure Arc enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/dc_vanilla/)
+
+* [Updated Scenario: Deploying SQLMI Azure Arc enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/mssql_mi/)
+
+* [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/postgresql_hyperscale/)
+
+* [Updated Scenario: Deploying vanilla Azure Arc enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_dc_vanilla_arm_template/)
+
+* [Updated Scenario: Deploying SQLMI Azure Arc enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)
+
+* [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_hyperscale_arm_template/)
+
+* [Updated Scenario: Deploying vanilla Azure Arc enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_dc_vanilla_terraform/)
+
+* [Updated Scenario: Deploying SQLMI Azure Arc enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_mssql_mi_terraform/)
+
+* [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_hs_terraform/)
+
+* [Bug fix: Data Controller ARM Template - Failure when using a service principal scoped to a resource group #624](https://github.com/microsoft/azure_arc/issues/624)
+
+* [Bug fix: Azure Arc using Cluster API Azure provider > 0.5.0 #664](https://github.com/microsoft/azure_arc/issues/664)
+
+### Azure Arc enabled app services scenarios
+
+* [New Scenario: Deploy an App Service app using custom container on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_app_service_arm_template/)
+
+* [New Scenario: Deploy Azure Function application on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_azure_function_arm_template/)
+
+* [Bug fix: Error when checking initialize status of K8SE stamp with kubectl Unexpected output from kubectl.exe when getting pod statuses #621](https://github.com/microsoft/azure_arc/issues/621)
+
+### Jumpstart ArcBox
+
+* Improvements to Azure Policy experience. Updated policy names with (ArcBox) callout to easily identify policies created by ArcBox deployment. New policies to support onboarding Dependency Agents and Azure Defender for Kubernetes.
+* Add Change Tracking, Security, VMInsights solutions to deployment.
+* New troubleshooting section in documentation.
+* Add automatic provisioning for Microsoft.HybridCompute and _Microsoft.GuestConfiguration_ resource providers.
+* Various fixes to Cluster API and Data Services components.
+* Automation optimizations and cleanup.
+
+* [Bug fix: Jumpstart ArcBox - Subscription missing Azure ARC server resource providers pre-requisite #672](https://github.com/microsoft/azure_arc/issues/672)
+
+* [Bug fix: Kubernetes Arc Namespace not created - along with resources #674](https://github.com/microsoft/azure_arc/issues/674)
+
+* [Bug fix: failed to get file "infrastructure-components.yaml" #688](https://github.com/microsoft/azure_arc/issues/688)
+
 ## June 2021
 
-### General Jumpstart enhancements
+### Release highlights and general Jumpstart enhancements
 
 * In this milestone, we introduced our new hosting show ["Jumpstart Lightning"](https://aka.ms/JumpstartLightning-blog), show where you get a chance to share with our team and the world your Azure Arc, Jumpstart contribution and Hybrid cloud awesome stories.
 
@@ -22,6 +103,8 @@ weight: 3
 * [Bug fix: existing linux server onboarding fails #570](https://github.com/microsoft/azure_arc/issues/570)
 
 ### Azure Arc enabled Kubernetes scenarios
+
+* [Updated Scenario: Deploy Alibaba Cloud Container Service for Kubernetes cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/alibaba/alibaba_terraform/)
 
 * [Bug fix: Deploy GitOps configurations and perform basic GitOps flow on AKS on Azure Stack HCI as an Azure Arc Connected Cluster #552](https://github.com/microsoft/azure_arc/issues/552)
 
@@ -72,7 +155,7 @@ weight: 3
 
 ## May 2021
 
-### General Jumpstart enhancements
+### Release highlights and general Jumpstart enhancements
 
 * In this milestone, we released the ["Jumpstart ArcBox" solution](https://azurearcjumpstart.io/azure_jumpstart_arcbox/), a sandbox environment that allows users to explore all the major capabilities of Azure Arc.
 
@@ -112,7 +195,7 @@ weight: 3
 
 ## April 2021
 
-### Azure Arc enabled Kubernetes scenarios
+### Release highlights and general Jumpstart enhancements
 
 * [New Scenario: Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extension](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/)
 
@@ -150,7 +233,7 @@ weight: 3
 
 ## March 2021
 
-### General Jumpstart enhancements
+### Release highlights and general Jumpstart enhancements
 
 * In this milestone, we released our [Jumpstart Scenario Write-up Guidelines](https://azurearcjumpstart.io/scenario_guidelines/) document to help our community with scenarios contribution.
 
