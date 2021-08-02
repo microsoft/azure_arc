@@ -88,10 +88,6 @@ Write-Host """
 az extension add -n ml
 az ml -h
 
-# Installing Azure ML Python SDK
-python -m pip install --upgrade pip
-pip install azureml-core
-
 # Set AML workspace defaults
 $ws = $env:resourceGroup + "-amlws" # AML workspace name
 az configure --defaults workspace=$ws group=$env:resourceGroup
@@ -191,7 +187,6 @@ $JobFile = "C:\Temp\simple-train-cli\job.yml"
 (Get-Content -Path $JobFile) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $JobFile
 
 # Create MNIST Dataset and register against Workspace
-pip install azureml-opendatasets
 python "C:\Temp\3.Create_MNIST_Dataset.py"
 
 # Train model with AML CLI
