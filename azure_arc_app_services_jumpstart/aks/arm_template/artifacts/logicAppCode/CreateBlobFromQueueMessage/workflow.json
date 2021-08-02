@@ -34,7 +34,7 @@
                 "inputs": {
                     "host": {
                         "connection": {
-                            "referenceName": "azurequeues"
+                            "referenceName": "azurequeue"
                         }
                     },
                     "method": "delete",
@@ -56,7 +56,7 @@
                 "inputs": {
                     "host": {
                         "connection": {
-                            "referenceName": "azurequeues"
+                            "referenceName": "azurequeue"
                         }
                     },
                     "method": "get",
