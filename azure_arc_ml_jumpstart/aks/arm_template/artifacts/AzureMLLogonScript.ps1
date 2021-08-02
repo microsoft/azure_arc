@@ -409,4 +409,4 @@ Unregister-ScheduledTask -TaskName "AzureMLLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 # Stop-Process -Name powershell -Force
-Stop-Transcript
+# Stop-Transcript
