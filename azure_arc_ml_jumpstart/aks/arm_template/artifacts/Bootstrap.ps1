@@ -68,6 +68,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-train-cli.zip") -OutFile
 Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-inference-cli.zip") -OutFile "C:\Temp\simple-inference-cli.zip"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/1.Get_WS.py") -OutFile "C:\Temp\1.Get_WS.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/2.Attach_Arc.py") -OutFile "C:\Temp\2.Attach_Arc.py"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/3.Create_MNIST_Dataset.py") -OutFile "C:\Temp\3.Create_MNIST_Dataset.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
 
 # Unzip training and inference payloads
