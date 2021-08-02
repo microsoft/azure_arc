@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: sa-bootstrapper
+  name: sa-arc-bootstrapper
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -27,7 +27,7 @@ metadata:
   name: rb-bootstrapper
 subjects:
 - kind: ServiceAccount
-  name: sa-bootstrapper
+  name: sa-arc-bootstrapper
 roleRef:
   kind: Role
   name: role-bootstrapper
@@ -49,16 +49,16 @@ spec:
       labels:
         app: bootstrapper
     spec:
-      serviceAccountName: sa-bootstrapper
+      serviceAccountName: sa-arc-bootstrapper
       securityContext:
-        fsGroup: 65534
+        fsGroup: 1000700001
       nodeSelector:
         kubernetes.io/os: linux
       imagePullSecrets:
       - name: arc-private-registry
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:latest
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.0.0_2021-07-30
         imagePullPolicy: Always
         resources:
           limits:
@@ -68,4 +68,4 @@ spec:
             cpu: 100m
             memory: 100Mi
         securityContext:
-          runAsUser: 21000
+          runAsUser: 1000700001

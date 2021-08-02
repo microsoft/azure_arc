@@ -1,0 +1,47 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cr-arc-webhook-job
+rules:
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["mutatingwebhookconfigurations"]
+  resourceNames: ["arcdata.microsoft.com-{{namespace}}"]
+  verbs: ["delete"]
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["mutatingwebhookconfigurations"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+   name: crb-arc-webhook-job
+subjects:
+ - kind: ServiceAccount
+   name: sa-arc-webhook-job
+   namespace: {{namespace}}
+roleRef:
+   kind: ClusterRole
+   name: cr-arc-webhook-job
+   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: arc-webhook-job
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: arc-private-registry
+      containers:
+      - name: bootstrapper
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.0.0_2021-07-30
+        command: ["/opt/webhook/webhook-job.sh",  "{{namespace}}"]
+      restartPolicy: Never
+      serviceAccountName: sa-arc-webhook-job
+  backoffLimit: 4
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa-arc-webhook-job

@@ -8,6 +8,19 @@ spec:
   versions:
   - name: v1beta1
     served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: .status.state
+  - name: v1
+    served: true
     storage: true
     schema:
       openAPIV3Schema:
@@ -18,9 +31,11 @@ spec:
     additionalPrinterColumns:
     - name: State
       type: string
-      jsonPath: ".status.state"
+      jsonPath: .status.state
+  conversion:
+    strategy: None
   names:
-    kind: datacontroller
+    kind: DataController
     plural: datacontrollers
   scope: Namespaced
 ---
@@ -53,8 +68,10 @@ spec:
     - name: Age
       type: date
       jsonPath: ".metadata.creationTimestamp"
+  conversion:
+    strategy: None
   names:
-    kind: postgresql
+    kind: PostgreSql
     plural: postgresqls
     shortNames:
     - postgres
@@ -68,6 +85,28 @@ spec:
   group: sql.arcdata.microsoft.com
   versions:
   - name: v1beta1
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Status
+      type: string
+      jsonPath: ".status.state"
+    - name: Replicas
+      type: string
+      jsonPath: ".status.readyReplicas"
+    - name: Primary-Endpoint
+      type: string
+      jsonPath: ".status.primaryEndpoint"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
+  - name: v1
     served: true
     storage: true
     schema:
@@ -89,8 +128,10 @@ spec:
     - name: Age
       type: date
       jsonPath: ".metadata.creationTimestamp"
+  conversion:
+    strategy: None
   names:
-    kind: sqlmanagedinstance
+    kind: SqlManagedInstance
     plural: sqlmanagedinstances
     shortNames:
     - sqlmi
@@ -113,12 +154,14 @@ spec:
     subresources:
       status: {}
     additionalPrinterColumns:
-    - jsonPath: ".status.state"
+    - jsonPath: .status.state
       name: Status
       type: string
-    - jsonPath: ".metadata.creationTimestamp"
+    - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
+  conversion:
+    strategy: None
   names:
     kind: SqlManagedInstanceRestoreTask
     singular: sqlmanagedinstancerestoretask
@@ -136,6 +179,22 @@ spec:
   versions:
   - name: v1beta1
     served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: Status
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+  - name: v1
+    served: true
     storage: true
     schema:
       openAPIV3Schema:
@@ -144,15 +203,14 @@ spec:
     subresources:
       status: {}
     additionalPrinterColumns:
-    - jsonPath: ".status.state"
+    - jsonPath: .status.state
       name: Status
       type: string
-    - jsonPath: ".metadata.creationTimestamp"
+    - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    - name: FilePath
-      type: string
-      jsonPath: ".status.filePath"
+  conversion:
+    strategy: None
   names:
     kind: ExportTask
     singular: exporttask
@@ -170,6 +228,22 @@ spec:
   versions:
   - name: v1beta1
     served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: Status
+      type: string
+      jsonPath: ".status.state"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
+  - name: v1
+    served: true
     storage: true
     schema:
       openAPIV3Schema:
@@ -184,9 +258,13 @@ spec:
     - name: Age
       type: date
       jsonPath: ".metadata.creationTimestamp"
+  conversion:
+    strategy: None
   names:
     kind: Monitor
     plural: monitors
+    shortNames:
+    - monitor
   scope: Namespaced
 ---
 apiVersion: apiextensions.k8s.io/v1
@@ -206,13 +284,13 @@ spec:
     subresources:
       status: {}
     additionalPrinterColumns:
-    - jsonPath: ".status.state"
+    - jsonPath: .status.state
       name: Status
       type: string
-    - jsonPath: ".status.results"
+    - jsonPath: .status.results
       name: Results
       type: string
-    - jsonPath: ".metadata.creationTimestamp"
+    - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
   conversion:
