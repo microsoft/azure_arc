@@ -104,26 +104,24 @@ workflow ClientTools_01
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
+
+                            ##########################################################################
+                            # Python Installation
+                            choco install python --version=3.6.7 /y -Force
+                            New-Item -path alias:python -value 'C:\Python36\python.exe'
+                            New-Item -path alias:pip -value 'C:\Python36\Scripts\pip.exe'
+
+                            # Installing Azure ML Python SDK
+                            python -m pip install --upgrade pip
+                            pip install azureml-core
+                            pip install azureml-opendatasets
+                            ##########################################################################
                         }                        
                     }
                 }
         }
 
 ClientTools_01 | Format-Table
-
-##########################################################################
-
-# Python Installation
-choco install python --version=3.6.7 /y -Force
-New-Item -path alias:python -value 'C:\Python36\python.exe'
-New-Item -path alias:pip -value 'C:\Python36\Scripts\pip.exe'
-
-# Installing Azure ML Python SDK
-python -m pip install --upgrade pip
-pip install azureml-core
-pip install azureml-opendatasets
-
-##########################################################################
 
 # Alias for kubectl
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
