@@ -95,7 +95,7 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('sa_name'))]"
             ],
             "properties": {
-                "displayName": "storageblob",
+                "displayName": "[parameters('connections_azureblob_name')]",
                 "parameterValues": {
                     "accountName": "[parameters('sa_name')]",
                     "accessKey": "[concat(listKeys(concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', parameters('sa_name')),'2019-06-01').keys[0].value)]"
@@ -133,9 +133,10 @@
                 "[resourceId('Microsoft.Storage/storageAccounts', parameters('sa_name'))]"
             ],
             "properties": {
-                "displayName": "storagequeue",
+                "displayName": "[parameters('connections_azurequeue_name')]",
                 "parameterValues": {
-                    "storageaccount": "[parameters('sa_name')]"
+                    "storageaccount": "[parameters('sa_name')]",
+                    "sharedKey": "[concat(listKeys(concat(resourceGroup().id,'/providers/Microsoft.Storage/storageAccounts/', parameters('sa_name')),'2019-06-01').keys[0].value)]"
                 },
                 "api": {
                     "id": "[concat('/subscriptions/',subscription().subscriptionId,'/providers/Microsoft.Web/locations/',parameters('location'),'/managedApis/azurequeues')]"
