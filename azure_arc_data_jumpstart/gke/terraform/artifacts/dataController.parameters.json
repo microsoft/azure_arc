@@ -56,7 +56,7 @@
             "value": "Always"
         },
         "dockerImageTag": {
-            "value": "public-preview-jun-2021"
+            "value": "v1.0.0_2021-07-30"
         },
         "dockerRegistry": {
             "value": "mcr.microsoft.com"
@@ -82,11 +82,8 @@
         "controllerPort": {
             "value": 30080
         },
-        "serviceProxyPort": {
-            "value": 30777
-        },
         "apiVersion": {
-          "value": "2021-07-01-preview"
+          "value": "2021-08-01"
         },
         "infrastructure": {
           "value": "gcp"

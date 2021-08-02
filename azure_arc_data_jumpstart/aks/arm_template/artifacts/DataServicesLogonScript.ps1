@@ -86,7 +86,8 @@ az k8s-extension create --name arc-data-services `
                         --auto-upgrade false `
                         --scope cluster `
                         --release-namespace arc `
-                        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+                        --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
+                        --config systemDefaultValues.image=mcr.microsoft.com/arcdata/arc-bootstrapper:v1.0.0_2021-07-30 # Explicitly pull GA version, latest (default) tag returns older image as of July 31, 2021
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
@@ -107,7 +108,8 @@ Start-Sleep -Seconds 20
 az customlocation create --name 'jumpstart-cl' `
                          --resource-group $env:resourceGroup `
                          --namespace arc `
-                         --host-resource-id $connectedClusterId ` --cluster-extension-ids $extensionId
+                         --host-resource-id $connectedClusterId `
+                         --cluster-extension-ids $extensionId
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
