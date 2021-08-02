@@ -77,7 +77,7 @@ Expand-Archive -LiteralPath "C:\Temp\simple-inference-cli.zip" -DestinationPath 
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,python'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep'
             #Run commands in parallel.
             Parallel 
                 {
@@ -110,6 +110,20 @@ workflow ClientTools_01
         }
 
 ClientTools_01 | Format-Table
+
+##########################################################################
+
+# Python Installation
+choco install python --version=3.6.7 /y -Force
+New-Item -path alias:python -value 'C:\Python36\python.exe'
+New-Item -path alias:pip -value 'C:\Python36\Scripts\pip.exe'
+
+# Installing Azure ML Python SDK
+python -m pip install --upgrade pip
+pip install azureml-core
+pip install azureml-opendatasets
+
+##########################################################################
 
 # Alias for kubectl
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
