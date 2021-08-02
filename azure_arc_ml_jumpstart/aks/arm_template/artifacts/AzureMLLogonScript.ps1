@@ -50,6 +50,7 @@ Write-Host "`n"
 
 # Monitor pods across namespaces
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
+$kubectlWatchShell = Start-Process -PassThru PowerShell {kubectl get pods --all-namespaces -w}
 
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `
@@ -184,7 +185,7 @@ Do
          # Uninstall extension
          Uninstall-extension -extension "amlarc-compute" -connectedClusterName $connectedClusterName
          # Remove the namespace - blocking call
-         # kubectl delete namespace azureml --grace-period=0 --force
+         kubectl delete namespace azureml --grace-period=0 --force
       }
 
    } while (($response.installState -ne "Installed"))
@@ -401,6 +402,7 @@ add-type $code
 
 # Kill the open PowerShell monitoring kubectl get pods
 # Stop-Process -Id $kubectlMonShell.Id
+# Stop-Process -Id $kubectlWatchShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "AzureMLLogonScript" -Confirm:$false
