@@ -145,9 +145,9 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   * _`AZURE_LOCATION`_="Azure region. For example: eastus"
   * _`CAPI_WORKLOAD_CLUSTER_NAME`_="Workload cluster name. For example: arc-capi-azure". Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
   * _`AZURE_SUBSCRIPTION_ID`_="Azure subscription id"
-  * _`SPN_TENANT_ID`_="Azure tenant id"
-  * _`SPN_CLIENT_ID`_="Azure SPN application client id"
-  * _`SPN_CLIENT_SECRET`_="Azure SPN application client secret"
+  * _`AZURE_TENANT_ID`_="Azure tenant id"
+  * _`AZURE_CLIENT_ID`_="Azure SPN application client id"
+  * _`AZURE_CLIENT_SECRET`_="Azure SPN application client secret"
   * _`AZURE_CONTROL_PLANE_MACHINE_TYPE`_="Control Plane node Azure VM type .For example: Standard_D2s_v3".
   * _`AZURE_NODE_MACHINE_TYPE`_="Worker node Azure VM type .For example: Standard_D4s_v3"
 
