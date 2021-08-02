@@ -95,45 +95,100 @@ az configure --defaults workspace=$ws group=$env:resourceGroup
 # Create Azure ML workspace
 az ml workspace create -g $env:resourceGroup
 
-# Arc K8s extension enablement: Training and Inferencing
-az k8s-extension create --name amlarc-compute `
-						--extension-type Microsoft.AzureML.Kubernetes `
-						--cluster-type connectedClusters `
-						--cluster-name $connectedClusterName `
-						--resource-group $env:resourceGroup `
-						--scope cluster `
-						--configuration-settings enableTraining=True enableInference=True allowInsecureConnections=True inferenceLoadBalancerHA=False # This is since our K8s is 1 node
+########################################################################################################
+# Functions
+########################################################################################################
 
-# Poll extension status from ARM
-Write-Host "Waiting for extension install, hold tight..."
+# Install the aml-arc-compute extension - this is intentionally hardcoded because of the config parameters
+function Install-aml-extension {
+   Param ([string]$connectedClusterName)
+
+   # Arc K8s extension enablement: Training and Inferencing
+   az k8s-extension create --name amlarc-compute `
+                           --extension-type Microsoft.AzureML.Kubernetes `
+                           --cluster-type connectedClusters `
+                           --cluster-name $connectedClusterName `
+                           --resource-group $env:resourceGroup `
+                           --scope cluster `
+                           --configuration-settings enableTraining=True enableInference=True allowInsecureConnections=True inferenceLoadBalancerHA=False # This is since our K8s is 1 node
+   return 1
+}
+
+# Uninstall an extension
+function Uninstall-extension {
+   Param ([string]$extension, [string]$connectedClusterName)
+
+   az k8s-extension delete --name $extension `
+                           --cluster-type connectedClusters `
+                           --cluster-name $connectedClusterName `
+                           --resource-group $env:resourceGroup `
+                           --yes
+   return 1
+}
+
+# Get the extension install status
+function Get-ExtensionStatus {
+   Param ([string]$extension, [string]$connectedClusterName)
+
+   Write-Host "Waiting for extension install, hold tight..."
+   Do 
+   {
+      $response = az k8s-extension show --name $extension `
+                                        --cluster-type connectedClusters `
+                                        --cluster-name $connectedClusterName `
+                                        --resource-group $env:resourceGroup `
+                                        --output json | ConvertFrom-Json
+
+         Write-Host ("Status: ", $response.installState)
+
+         If ($response.installState -eq "Failed") {break}
+
+         Start-Sleep -Seconds 30
+
+   } while (($response.installState -ne "Installed") -and ($response.installState -ne "Failed"))
+
+   # Get Extension status
+   If ($response.installState -eq "Failed"){
+      Write-Host "K8s-Extension installation failed:" -ForegroundColor Red
+      Write-Host $response.errorInfo
+   }
+   elseif ($response.installState -eq "Installed"){
+      Write-Host "K8s-Extension installation successful." -ForegroundColor Green
+   }
+   else
+   {
+      Write-Host "Something else went wrong."
+   }
+
+   return $response
+}
+########################################################################################################
+# Note: As of August 2, 2021 - the amlarc-compute extension would keep failing install the first time, 
+# because the container images wouldn't pull fast enough - and ARM would report failure.
+# This is a workaround that keeps trying to install the extension until it succeeds,
+# because the second time the extension tries to install the images would already be cached in K8s.
+
+# Install extension and keep retrying until it installs successfully
 Do 
-{
-    $response = az k8s-extension show --name amlarc-compute `
-									  --cluster-type connectedClusters `
-									  --cluster-name $connectedClusterName `
-									  --resource-group $env:resourceGroup `
-									  --output json | ConvertFrom-Json
+   {
+      # Initiate the extension install
+      Write-Host "Installing amlarc-compute K8s extension" -ForegroundColor Yellow
+      Install-aml-extension -connectedClusterName $connectedClusterName
+      
+      # Get response
+      $response = Get-ExtensionStatus -extension "amlarc-compute" -connectedClusterName $connectedClusterName
 
-		Write-Host ("Status: ", $response.installState)
+      # If install failed - uninstall
+      If ($response.installState -eq "Failed") {
+         Write-Host "K8s-Extension installation failed, trying again..." -ForegroundColor Yellow
+         # Uninstall extension
+         Uninstall-extension -extension "amlarc-compute" -connectedClusterName $connectedClusterName
+         # Remove the namespace - blocking call
+         # kubectl delete namespace azureml --grace-period=0 --force
+      }
 
-		If ($response.installState -eq "Failed") {break}
-
-		Start-Sleep -Seconds 20
-
-} while (($response.installState -ne "Installed") -and ($response.installState -ne "Failed"))
-
-# Get Extension status
-If ($response.installState -eq "Failed"){
-	Write-Host "K8s-Extension installation failed:" -ForegroundColor Red
-	Write-Host $response.errorInfo
-}
-elseif ($response.installState -eq "Installed"){
-	Write-Host "K8s-Extension installation successful." -ForegroundColor Green
-}
-else
-{
-    Write-Host "Something else went wrong."
-}
+   } while (($response.installState -ne "Installed"))
+########################################################################################################
 
 # Get Arc Cluster Resource ID
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
