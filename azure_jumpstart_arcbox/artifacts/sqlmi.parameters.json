@@ -54,7 +54,7 @@
             "value": "logsSize-stage"
         },
         "dataLogsStorageSize": {
-            "value": "dataLogseSize-stage"
+            "value": "dataLogsSize-stage"
         },
         "backupsStorageSize": {
             "value": "backupsSize-stage"
@@ -64,7 +64,7 @@
         },
         "resourceTags": {
             "value": {
-                "Project": "jumpstart_azure_arc_data_services"
+                "Project": "jumpstart_arcbox"
             }
         },
         "apiVersion": {
