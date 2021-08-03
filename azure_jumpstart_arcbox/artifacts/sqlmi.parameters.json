@@ -14,26 +14,41 @@
         "subscriptionId": {
             "value": "subscriptionId-stage"
         },
-        "azdataUsername": {
+        "admin": {
             "value": "azdataUsername-stage"
         },
-        "azdataPassword": {
+        "password": {
             "value": "azdataPassword-stage"
         },
         "serviceType": {
             "value": "serviceType-stage"
-        },        
-        "vCoresMax": {
-            "value": vCoresMaxStage
         },
-        "memoryMax": {
-            "value": "memoryMax-stage"
+        "vCoresRequest": {
+            "value": "vCoresRequest-stage"
+        },
+        "memoryRequest": {
+            "value": "memoryRequest-stage"
+        },
+        "vCoresLimit": {
+            "value": "vCoresLimit-stage"
+        },
+        "memoryLimit": {
+            "value": "memoryLimit-stage"
         },
         "dataStorageSize": {
             "value": "dataSize-stage"
         },
         "dataStorageClassName": {
             "value": "dataStorageClassName-stage"
+        },
+        "logsStorageClassName": {
+            "value": "logsStorageClassName-stage"
+        },
+        "dataLogsStorageClassName": {
+            "value": "dataLogsStorageClassName-stage"
+        },
+        "backupsStorageClassName": {
+            "value": "backupsStorageClassName-stage"
         },
         "logsStorageSize": {
             "value": "logsSize-stage"
@@ -49,11 +64,17 @@
         },
         "resourceTags": {
             "value": {
-                "Project": "jumpstart_azure_arc_data"
+                "Project": "jumpstart_azure_arc_data_services"
             }
         },
         "apiVersion": {
-            "value": "2021-07-01-preview"
-        }        
+            "value": "2021-08-01"
+        },
+        "pricingTier": {
+            "value": "GeneralPurpose"
+        },        
+        "licenseType": {
+            "value": "LicenseIncluded"
+        }
     }
 }
