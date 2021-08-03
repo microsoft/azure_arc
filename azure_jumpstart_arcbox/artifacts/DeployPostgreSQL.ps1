@@ -1,7 +1,7 @@
 Start-Transcript -Path C:\ArcBox\deployPostgreSQL.log
 
 # Deployment environment variables
-$controllerName = "arcbox-dc"
+$controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
 
 # Deploying Azure Arc PostgreSQL Hyperscale
 Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
