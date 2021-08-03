@@ -187,10 +187,10 @@ Do
          Uninstall-extension -extension "amlarc-compute" -connectedClusterName $connectedClusterName
          
          # Remove the k8s namespace - blocking call
-         
-         # Need to delete the apiservice first, otherwise namespace delete hangs: https://github.com/prometheus-operator/kube-prometheus/issues/275#issuecomment-545305515
-         kubectl delete apiservice v1beta1.metrics.k8s.io
-         kubectl delete namespace azureml --grace-period=0 --force
+         # Need to delete the apiservice first, otherwise namespace delete hangs: 
+         # https://github.com/prometheus-operator/kube-prometheus/issues/275#issuecomment-545305515
+         # kubectl delete apiservice v1beta1.metrics.k8s.io
+         # kubectl delete namespace azureml --grace-period=0 --force
       }
 
    } while (($response.installState -ne "Installed"))
