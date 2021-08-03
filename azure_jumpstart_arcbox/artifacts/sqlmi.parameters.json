@@ -45,7 +45,7 @@
             "value": "logsStorageClassName-stage"
         },
         "dataLogsStorageClassName": {
-            "value": "dataLogsStorageClassName-stage"
+            "value": "dataLogStorageClassName-stage"
         },
         "backupsStorageClassName": {
             "value": "backupsStorageClassName-stage"
@@ -54,7 +54,7 @@
             "value": "logsSize-stage"
         },
         "dataLogsStorageSize": {
-            "value": "dataLogsSize-stage"
+            "value": "dataLogSize-stage"
         },
         "backupsStorageSize": {
             "value": "backupsSize-stage"
