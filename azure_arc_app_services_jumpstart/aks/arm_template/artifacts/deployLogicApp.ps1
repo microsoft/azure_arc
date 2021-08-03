@@ -41,8 +41,11 @@ Write-Host "Creating the new Azure Logic App application in the Kubernetes envir
 Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
 $logicAppName = "JumpstartLogicApp-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
-az logicapp create --resource-group $env:resourceGroup --name $logicAppName --custom-location $customLocationId --storage-account $storageAccountName
-
+# Temporary workaround - az logicapp create not currently working with Arc-enabled clusters
+# az logicapp create --resource-group $env:resourceGroup --name $logicAppName --custom-location $customLocationId --storage-account $storageAccountName
+pushd "C:\Temp\logicAppCode"
+func azure functionapp publish $logicAppName --node
+popd
 Do {
     Write-Host "Waiting for Azure Logic App to become available. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 15
