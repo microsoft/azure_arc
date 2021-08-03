@@ -184,11 +184,17 @@ Do
          Write-Host "K8s-Extension installation failed, trying again..." -ForegroundColor Yellow
          
          # Uninstall extension
+         Write-Host "Uninstalling K8s-Extension" -ForegroundColor White
          Uninstall-extension -extension "amlarc-compute" -connectedClusterName $connectedClusterName
          
+         # Sleep statement to observe if Pods are getting deleted by the Uninstall
+         Write-Host "Sleep for 2 mins" -ForegroundColor White
+         Start-Sleep -Seconds 120
+
          # Remove the k8s namespace - blocking call
          # Need to delete the apiservice first, otherwise namespace delete hangs: 
          # https://github.com/prometheus-operator/kube-prometheus/issues/275#issuecomment-545305515
+         Write-Host "Removing azureml namespace for fresh extension install" -ForegroundColor White
          kubectl delete apiservice v1beta1.metrics.k8s.io
          kubectl delete namespace azureml --grace-period=0 --force
       }
