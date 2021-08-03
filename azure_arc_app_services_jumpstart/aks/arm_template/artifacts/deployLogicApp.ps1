@@ -56,11 +56,12 @@ Do {
 
 # Deploy Logic App code
 Write-Host "Deploying Logic App code.`n"
+# az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
 # Temporary workaround - az logicapp create not currently working with Arc-enabled clusters
 pushd "C:\Temp\logicAppCode"
 func azure functionapp publish $logicAppName --node
 popd
-# az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
+# end temp workaround
 
 # Configuring Logic App settings
 Write-Host "Configuring Logic App settings.`n"
