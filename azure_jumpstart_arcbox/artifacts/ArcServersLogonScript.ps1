@@ -128,7 +128,7 @@ Set-VMHost -EnableEnhancedSessionMode $true
 
 # Downloading and extracting the 3 VMs
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-$sourceFolder = 'https://jumpstart.blob.core.windows.net/arcboxvhds'
+$sourceFolder = 'https://jumpstartarcbox.blob.core.windows.net/vms'
 $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $vmDir --recursive
 
