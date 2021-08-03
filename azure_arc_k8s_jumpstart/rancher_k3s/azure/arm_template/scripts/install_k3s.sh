@@ -10,12 +10,14 @@ echo $appId:$3 | awk '{print substr($1,2); }' >> vars.sh
 echo $password:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $tenantId:$5 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$6 | awk '{print substr($1,2); }' >> vars.sh
+echo $location:$7 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export adminPasswordOrKey=/' vars.sh
 sed -i '4s/^/export appId=/' vars.sh
 sed -i '5s/^/export password=/' vars.sh
 sed -i '6s/^/export tenantId=/' vars.sh
 sed -i '7s/^/export vmName=/' vars.sh
+sed -i '7s/^/export location=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -40,12 +42,17 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 sudo -u $adminUsername az extension add --name connectedk8s
 sudo -u $adminUsername az extension add --name k8s-configuration
+sudo -u $adminUsername az extension add --name k8s-extension
 
 sudo -u $adminUsername az login --service-principal --username $appId --password $password --tenant $tenantId
 
-# Onboard the cluster to Azure Arc
+# Onboard the cluster to Azure Arc and enabling Container Insights using Kubernetes extension
 resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
-sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
+sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815' --tags 'Project=jumpstart_arcbox'
+# This is the Custom Locations Enterprise Application ObjectID from AAD
+# sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name ArcBox-K3s --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+
+sudo service sshd restart
 
 # Creating "hello-world" Kubernetes yaml
 sudo cat <<EOT >> hello-kubernetes.yaml

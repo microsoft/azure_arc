@@ -96,13 +96,7 @@
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
-        },
-        "resourceTags": {
-            "type": "object",
-            "defaultValue": {
-                "Project": "jumpstart_azure_arc_k8s"
-            }
-        }        
+        }
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
@@ -299,7 +293,6 @@
             "apiVersion": "2019-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
-            "tags": "[parameters('resourceTags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -355,8 +348,8 @@
               "timestamp": 123456789
             },
             "protectedSettings": {
-            "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'))]",
-            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh"]  
+            "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', parameters('location'))]",
+            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/k3s_k8s/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh"]  
             }            
           }
         }                                  
