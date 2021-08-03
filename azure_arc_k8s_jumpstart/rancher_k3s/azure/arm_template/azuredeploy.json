@@ -349,7 +349,7 @@
             },
             "protectedSettings": {
             "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('adminPasswordOrKey'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', parameters('location'))]",
-            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/k3s_k8s/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh"]  
+            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/k3s_k8s/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh"]
             }            
           }
         }                                  
