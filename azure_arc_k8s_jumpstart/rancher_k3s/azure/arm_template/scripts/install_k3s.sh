@@ -17,7 +17,7 @@ sed -i '4s/^/export appId=/' vars.sh
 sed -i '5s/^/export password=/' vars.sh
 sed -i '6s/^/export tenantId=/' vars.sh
 sed -i '7s/^/export vmName=/' vars.sh
-sed -i '7s/^/export location=/' vars.sh
+sed -i '8s/^/export location=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
