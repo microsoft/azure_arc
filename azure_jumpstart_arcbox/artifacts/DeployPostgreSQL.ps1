@@ -9,13 +9,27 @@ Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group $env:resourceGroup --query id -o tsv)
+
+################################################
+# Localize ARM template
+################################################
 $ServiceType = "LoadBalancer"
-$memoryRequest = "0.25Gi"
+
+# Resource Requests
+$coordinatorCoresRequest = "2"
+$coordinatorMemoryRequest = "4Gi"
+$coordinatorCoresLimit = "4"
+$coordinatorMemoryLimit = "8Gi"
+
+# Storage
 $StorageClassName = "managed-premium"
 $dataStorageSize = "5Gi"
 $logsStorageSize = "5Gi"
 $backupsStorageSize = "5Gi"
+
+# Citus Scale out
 $numWorkers = 1
+################################################
 
 $PSQLParams = "C:\ArcBox\postgreSQL.parameters.json"
 
@@ -25,7 +39,10 @@ $PSQLParams = "C:\ArcBox\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $PSQLParams
-(Get-Content -Path $PSQLParams) -replace 'memoryRequest-stage',$memoryRequest | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'coordinatorCoresRequest-stage',$coordinatorCoresRequest | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'coordinatorMemoryRequest-stage',$coordinatorMemoryRequest | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'coordinatorCoresLimit-stage',$coordinatorCoresLimit | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'coordinatorMemoryLimit-stage',$coordinatorMemoryLimit | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'logsStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'backupStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
