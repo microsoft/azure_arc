@@ -117,7 +117,7 @@ Traefik is the (default) ingress controller for k3s and uses port 80. To test ex
 
   ![kubectl get svc command](./06.png)
 
-* In your browser, enter the *cluster_public_ip:3232* which will bring up the *hello-world* application.
+* In your browser, enter the *cluster_public_ip:32323* which will bring up the *hello-world* application.
 
   ![hello-kubernetes application in a web browser](./07.png)
 
