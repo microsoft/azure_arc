@@ -14,20 +14,26 @@
         "subscriptionId": {
             "value": "subscriptionId-stage"
         },
-        "azdataUsername": {
+        "admin": {
             "value": "azdataUsername-stage"
         },
-        "azdataPassword": {
+        "password": {
             "value": "azdataPassword-stage"
         },
         "serviceType": {
             "value": "serviceType-stage"
-        },        
-        "vCoresMax": {
-            "value": vCoresMaxStage
         },
-        "memoryMax": {
-            "value": "memoryMax-stage"
+        "vCoresRequest": {
+            "value": "vCoresRequest-stage"
+        },
+        "memoryRequest": {
+            "value": "memoryRequest-stage"
+        },
+        "vCoresLimit": {
+            "value": "vCoresLimit-stage"
+        },
+        "memoryLimit": {
+            "value": "memoryLimit-stage"
         },
         "dataStorageSize": {
             "value": "dataSize-stage"
@@ -35,11 +41,20 @@
         "dataStorageClassName": {
             "value": "dataStorageClassName-stage"
         },
+        "logsStorageClassName": {
+            "value": "logsStorageClassName-stage"
+        },
+        "dataLogsStorageClassName": {
+            "value": "dataLogStorageClassName-stage"
+        },
+        "backupsStorageClassName": {
+            "value": "backupsStorageClassName-stage"
+        },
         "logsStorageSize": {
             "value": "logsSize-stage"
         },
         "dataLogsStorageSize": {
-            "value": "dataLogseSize-stage"
+            "value": "dataLogSize-stage"
         },
         "backupsStorageSize": {
             "value": "backupsSize-stage"
@@ -49,11 +64,17 @@
         },
         "resourceTags": {
             "value": {
-                "Project": "jumpstart_azure_arc_data"
+                "Project": "jumpstart_arcbox"
             }
         },
         "apiVersion": {
-            "value": "2021-07-01-preview"
-        }        
+            "value": "2021-08-01"
+        },
+        "pricingTier": {
+            "value": "GeneralPurpose"
+        },        
+        "licenseType": {
+            "value": "LicenseIncluded"
+        }
     }
 }
