@@ -4,8 +4,8 @@ Start-Transcript -Path C:\Temp\deployLogicApp.log
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/CreateBlobFromQueueMessage/workflow.json") -OutFile (New-Item -Path "C:\Temp\logicAppCode\CreateBlobFromQueueMessage\workflow.json" -Force)
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/connections.json") -OutFile (New-Item -Path "C:\Temp\logicAppCode\connections.json" -Force)
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/host.json") -OutFile (New-Item -Path "C:\Temp\logicAppCode\host.json" -Force)
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/ARM/connectors-parameters.json") -OutFile (New-Item -Path "C:\Temp\logicAppCode\ARM\connectors-parameters.json" -Force)
-Invoke-WebRequest ($env:templateBaseUrl + "artifacts/logicAppCode/ARM/connectors-template.json") -OutFile (New-Item -Path "C:\Temp\logicAppCode\ARM\connectors-template.json" -Force)
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/ARM/connectors-parameters.json") -OutFile (New-Item -Path "C:\Temp\ARM\connectors-parameters.json" -Force)
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/ARM/connectors-template.json") -OutFile (New-Item -Path "C:\Temp\ARM\connectors-template.json" -Force)
 
 # Creating Azure Storage Account for Azure Logic App queue and blob storage
 Write-Host "`n"
@@ -17,13 +17,13 @@ $storageAccountName = "jumpstartappservices" + -join ((48..57) + (97..122) | Get
 Write-Host "`n"
 Write-Host "Configuring and deploying sample Logic App template Azure dependencies.`n"
 Write-Host "Updating connectors-parameters.json with appropriate values.`n"
-$connectorsParametersPath = "C:\Temp\logicAppCode\ARM\connectors-parameters.json"
+$connectorsParametersPath = "C:\Temp\ARM\connectors-parameters.json"
 $spnObjectId = az ad sp show --id $env:spnClientID --query objectId -o tsv
 (Get-Content -Path $connectorsParametersPath) -replace '<azureLocation>',$env:azureLocation | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<tenantId>',$env:spnTenantId | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<objectId>',$spnObjectId | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<storageAccountName>',$storageAccountName | Set-Content -Path $connectorsParametersPath
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\logicAppCode\ARM\connectors-template.json" --parameters "C:\Temp\logicAppCode\ARM\connectors-parameters.json"
+az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\ARM\connectors-template.json" --parameters "C:\Temp\ARM\connectors-parameters.json"
 $storageAccountKey = az storage account keys list --account-name $storageAccountName --query [0].value -o tsv
 $blobConnectionRuntimeUrl = az resource show --resource-group $env:resourceGroup -n azureblob --resource-type Microsoft.Web/connections --query properties.connectionRuntimeUrl -o tsv
 $queueConnectionRuntimeUrl = az resource show --resource-group $env:resourceGroup -n azurequeue --resource-type Microsoft.Web/connections --query properties.connectionRuntimeUrl -o tsv
@@ -48,13 +48,14 @@ Do {
 
 # Deploy Logic App code
 Write-Host "Packaging sample Logic App code and deploying to Azure Arc enabled Logic App.`n"
-$compress = @{
-    Path = "C:\Temp\logicAppCode\CreateBlobFromQueueMessage", "C:\Temp\logicAppCode\connections.json", "C:\Temp\logicAppCode\host.json"
-    CompressionLevel = "Fastest"
-    DestinationPath = "C:\Temp\logicAppCode.zip"
-}
-Compress-Archive @compress
-# az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
+tar -cvf c:\Temp\logicAppCode.zip c:\Temp\logicAppCode
+# $compress = @{
+#     Path = "C:\Temp\logicAppCode\CreateBlobFromQueueMessage", "C:\Temp\logicAppCode\connections.json", "C:\Temp\logicAppCode\host.json"
+#     CompressionLevel = "Fastest"
+#     DestinationPath = "C:\Temp\logicAppCode.zip"
+# }
+# Compress-Archive @compress
+az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
 # Temporary workaround - az logicapp create not currently working with Arc-enabled clusters
 # pushd "C:\Temp\logicAppCode"
 # func azure functionapp publish $logicAppName --node
