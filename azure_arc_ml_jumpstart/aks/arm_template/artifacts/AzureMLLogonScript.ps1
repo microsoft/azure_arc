@@ -49,7 +49,7 @@ Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Monitor pods across namespaces
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 15; Clear-Host }}
 $kubectlWatchShell = Start-Process -PassThru PowerShell {kubectl get pods --all-namespaces -w}
 
 # Create Kubernetes - Azure Arc Cluster
