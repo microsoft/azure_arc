@@ -67,7 +67,7 @@ az logicapp config appsettings set --name $logicAppName --resource-group $env:re
 Write-Host "Starting Logic App.`n"
 # az logicapp start --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId
 
-# Creating a While loop to generate 10 Azure Function application messages to storage queue
+# Creating a While loop to generate 10 messages to storage queue
 Write-Host "`n"
 Write-Host "Creating a While loop to generate 10 messages to storage queue"
 Write-Host "`n"
