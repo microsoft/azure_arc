@@ -54,7 +54,7 @@ Write-Host "Packaging sample Logic App code and deploying to Azure Arc enabled L
 #     DestinationPath = "C:\Temp\logicAppCode.zip"
 # }
 # Compress-Archive @compress
-7z a logicAppCode.zip c:\Temp\logicAppCode
+7z a c:\Temp\logicAppCode.zip c:\Temp\logicAppCode
 az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
 # Temporary workaround - az logicapp create not currently working with Arc-enabled clusters
 # pushd "C:\Temp\logicAppCode"
