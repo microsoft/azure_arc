@@ -1,7 +1,7 @@
 Start-Transcript -Path C:\ArcBox\deployPostgreSQL.log
 
 # Deployment environment variables
-$controllerName = "arcbox-dc"
+$controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
 
 # Deploying Azure Arc PostgreSQL Hyperscale
 Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
@@ -9,13 +9,27 @@ Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group $env:resourceGroup --query id -o tsv)
+
+################################################
+# Localize ARM template
+################################################
 $ServiceType = "LoadBalancer"
-$memoryRequest = "0.25Gi"
+
+# Resource Requests
+$coordinatorCoresRequest = "2"
+$coordinatorMemoryRequest = "4Gi"
+$coordinatorCoresLimit = "4"
+$coordinatorMemoryLimit = "8Gi"
+
+# Storage
 $StorageClassName = "managed-premium"
 $dataStorageSize = "5Gi"
 $logsStorageSize = "5Gi"
 $backupsStorageSize = "5Gi"
+
+# Citus Scale out
 $numWorkers = 1
+################################################
 
 $PSQLParams = "C:\ArcBox\postgreSQL.parameters.json"
 
@@ -25,7 +39,10 @@ $PSQLParams = "C:\ArcBox\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $PSQLParams
-(Get-Content -Path $PSQLParams) -replace 'memoryRequest-stage',$memoryRequest | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'coordinatorCoresRequest-stage',$coordinatorCoresRequest | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'coordinatorMemoryRequest-stage',$coordinatorMemoryRequest | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'coordinatorCoresLimit-stage',$coordinatorCoresLimit | Set-Content -Path $PSQLParams
+(Get-Content -Path $PSQLParams) -replace 'coordinatorMemoryLimit-stage',$coordinatorMemoryLimit | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'logsStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'backupStorageClassName-stage',$StorageClassName | Set-Content -Path $PSQLParams
@@ -49,7 +66,7 @@ Write-Host "`n"
 Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
-$podname = "arcboxpsc0-0"
+$podname = "jumpstartpsc0-0"
 Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
 kubectl exec $podname -n arc -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/AdventureWorks2019.sql" 2>&1 | Out-Null
 Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
