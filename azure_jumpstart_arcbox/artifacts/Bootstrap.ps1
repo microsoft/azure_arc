@@ -126,8 +126,6 @@ workflow ClientTools_01
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
-                            #Write-Host "Installing postgresql command line tools"
-                            #choco install postgresql --install-arguments="'--disable-components server,pgAdmin,stackbuilder'" -y -Force | Write-Output
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
