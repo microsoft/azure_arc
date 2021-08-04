@@ -48,31 +48,20 @@ Do {
 
 # Deploy Logic App code
 Write-Host "Packaging sample Logic App code and deploying to Azure Arc enabled Logic App.`n"
-# $compress = @{
-#     Path = "C:\Temp\logicAppCode\CreateBlobFromQueueMessage", "C:\Temp\logicAppCode\connections.json", "C:\Temp\logicAppCode\host.json"
-#     CompressionLevel = "Fastest"
-#     DestinationPath = "C:\Temp\logicAppCode.zip"
-# }
-# Compress-Archive @compress
 7z a c:\Temp\logicAppCode.zip c:\Temp\logicAppCode\*
 az logicapp deployment source config-zip --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --src c:\Temp\logicAppCode.zip
-# Temporary workaround - az logicapp create not currently working with Arc-enabled clusters
-# pushd "C:\Temp\logicAppCode"
-# func azure functionapp publish $logicAppName --node
-# popd
-# end temp workaround
 
 # Configuring Logic App settings
 Write-Host "Configuring Logic App settings.`n"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "resourceGroup=$env:resourceGroup"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "subscriptionId=$env:subscriptionId"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "location=$env:azureLocation"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "spnClientId=$env:spnClientId"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "spnTenantId=$env:spnTenantId"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "spnClientSecret=$env:spnClientSecret"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "storageAccountName=$storageAccountName"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "queueConnectionRuntimeUrl=$queueConnectionRuntimeUrl"
-# az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "blobConnectionRuntimeUrl=$blobConnectionRuntimeUrl"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "resourceGroup=$env:resourceGroup"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "subscriptionId=$env:subscriptionId"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "location=$env:azureLocation"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "spnClientId=$env:spnClientId"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "spnTenantId=$env:spnTenantId"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "spnClientSecret=$env:spnClientSecret"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "storageAccountName=$storageAccountName"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "queueConnectionRuntimeUrl=$queueConnectionRuntimeUrl"
+az logicapp config appsettings set --name $logicAppName --resource-group $env:resourceGroup --subscription $env:subscriptionId --settings "blobConnectionRuntimeUrl=$blobConnectionRuntimeUrl"
 
 # Start Logic App
 Write-Host "Starting Logic App.`n"
