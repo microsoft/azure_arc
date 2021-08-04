@@ -169,6 +169,9 @@ function Get-ExtensionStatus {
 # This is a workaround that keeps trying to install the extension until it succeeds,
 # because the second time the extension tries to install the images would already be cached in K8s.
 
+# PLACEHOLDER: Wait for User prompt before deploying the extension
+Read-Host -Prompt "Press any key to continue deploying amlarc-compute K8s extension"
+
 # Install extension and keep retrying until it installs successfully
 Do 
    {
