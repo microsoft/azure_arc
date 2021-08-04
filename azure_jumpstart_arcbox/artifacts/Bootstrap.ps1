@@ -126,12 +126,10 @@ workflow ClientTools_01
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
-                            #Write-Host "Installing postgresql command line tools"
-                            #choco install postgresql --install-arguments="'--disable-components server,pgAdmin,stackbuilder'" -y -Force | Write-Output
                         }                        
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
-                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\ArcBox\AZDataCLI.msi"
+                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\ArcBox\AZDataCLI.msi" | Out-Null
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\ArcBox\settingsTemplate.json"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
