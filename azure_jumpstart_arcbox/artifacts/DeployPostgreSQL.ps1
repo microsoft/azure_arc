@@ -66,7 +66,7 @@ Write-Host "`n"
 Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
-$podname = "arcboxpsc0-0"
+$podname = "jumpstartpsc0-0"
 Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
 kubectl exec $podname -n arc -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/AdventureWorks2019.sql" 2>&1 | Out-Null
 Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
