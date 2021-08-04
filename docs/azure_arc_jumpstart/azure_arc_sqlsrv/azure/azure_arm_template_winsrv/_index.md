@@ -17,8 +17,6 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 By the end of the guide, you will have an Azure VM installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
 
-> **Note: Currently, Azure Arc enabled SQL Server is in [public preview](https://docs.microsoft.com/en-us/sql/sql-server/azure-arc/overview?view=sql-server-ver15)**.
-
 ## Prerequisites
 
 * Clone the Azure Arc Jumpstart repository

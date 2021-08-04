@@ -14,7 +14,7 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 ![Deployed Architecture](./28.png)
 
-> **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
 ## Prerequisites
 

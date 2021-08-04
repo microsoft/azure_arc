@@ -14,7 +14,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 ![Deployed Architecture](./48.png)
 
-> **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
 ## Deployment Process Overview
 
