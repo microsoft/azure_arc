@@ -25,6 +25,7 @@ sed -i '5s/^/export SPN_TENANT_ID=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
+sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
