@@ -17,7 +17,7 @@ $dataStorageSize = "5"
 $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
 $backupsStorageSize = "5"
-$replicas = 1 # Value can be either 1 or 3
+$replicas = 3 # Value can be either 1 or 3
 
 $SQLParams = "C:\Temp\SQLMI.parameters.json"
 
