@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\deployPostgreSQL.log
 # Deployment environment variables
 $controllerName = "jumpstart-dc"
 
-# Deploying Azure Arc SQL Managed Instance
+# Deploying Azure Arc PostgreSQL Hyperscale
 Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
 Write-Host "`n"
 
