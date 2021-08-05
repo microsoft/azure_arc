@@ -127,7 +127,7 @@
                 },
                 "infrastructure": "[parameters('infrastructure')]",
                 "k8sRaw": {
-                    "apiVersion": "arcdata.microsoft.com/v1beta1",
+                    "apiVersion": "arcdata.microsoft.com/v1",
                     "kind": "datacontroller",
                     "spec": {
                         "credentials": {
