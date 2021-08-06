@@ -59,7 +59,7 @@ $pgWorkerPodName = "jumpstartpsw0-0"
 
     Do {
         Write-Host "Waiting for PostgreSQL Hyperscale. Hold tight, this might take a few minutes..."
-        Start-Sleep -Seconds 2
+        Start-Sleep -Seconds 45
         $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
 
