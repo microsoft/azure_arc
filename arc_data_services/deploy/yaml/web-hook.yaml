@@ -24,6 +24,66 @@ roleRef:
    name: cr-arc-webhook-job
    apiGroup: rbac.authorization.k8s.io
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{namespace}}:cr-arc-dc-watch
+rules:
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - "watch"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{namespace}}:crb-arc-dc-watch
+subjects:
+ - kind: ServiceAccount
+   name: sa-arc-controller
+   namespace: {{namespace}}
+roleRef:
+   kind: ClusterRole
+   name: {{namespace}}:cr-arc-dc-watch
+   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role-arc-webhook-job
+  namespace: {{namespace}}
+rules:
+- apiGroups: ["*"]
+  resources: ["secrets"]
+  verbs: ["create"]
+- apiGroups: ["*"]
+  resources: ["secrets"]
+  resourceNames: ["arc-webhook-secret"]
+  verbs: ["delete"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  resourceNames: ["arc-webhook-job"]
+  verbs: ["delete"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["create"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+   name: rb-arc-webhook-job
+   namespace: {{namespace}}
+subjects:
+ - kind: ServiceAccount
+   name: sa-arc-webhook-job
+   namespace: {{namespace}}
+roleRef:
+   kind: Role
+   name: role-arc-webhook-job
+   apiGroup: rbac.authorization.k8s.io
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
