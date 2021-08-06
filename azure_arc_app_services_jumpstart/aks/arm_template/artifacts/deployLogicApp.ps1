@@ -79,4 +79,5 @@ Do {
     }
 While ($i -le 10)
 
-Write-Host "Finished deploying Logic App.`n"
+Write-Host "Finished deploying Logic App."
+Write-Host "`n"
