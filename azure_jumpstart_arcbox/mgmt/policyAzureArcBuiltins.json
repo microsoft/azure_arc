@@ -103,9 +103,7 @@
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
                 "policyDefinitionId": "[variables('policyDefinitionForLinuxDeployDependencyAgent')]",
                 "parameters": {
-                    "logAnalytics": {
-                        "value": "[variables('logAnalyticsResource')]"
-                    }
+
                 }
             }
         },
