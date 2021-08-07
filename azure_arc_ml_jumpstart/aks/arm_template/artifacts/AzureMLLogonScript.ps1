@@ -60,7 +60,18 @@ az connectedk8s connect --name $connectedClusterName `
 						      --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
                         # This is the Custom Locations Enterprise Application ObjectID from AAD
 
-Start-Sleep -Seconds 10
+# Provide time for Pods to get deployed
+Start-Sleep -Seconds 120
+
+# Ensure all Azure Arc Pods are up
+Do {
+   Write-Host "Ensuring all Azure Arc Pods are up before proceeding..."
+   # Gets list of Pods in azure-arc namespace that are not in "Running" state
+	$podsPending = kubectl get pods -n azure-arc --field-selector=status.phase!=Running -o jsonpath="{.items[*].metadata.name}"
+	# Sets status to "Ready!" only if all pods are "Running"
+   $podStatus = $(if($podsPending -eq $null){"Ready!"}Else{"Nope"})
+   Start-Sleep -Seconds 5
+} while ($podStatus -eq "Nope")
 
 ###################################################################################################################
 # Azure Arc-enabled Machine Learning enablement components
@@ -136,6 +147,7 @@ function Get-ExtensionStatusHelm {
    
    return $response
 }
+
 ########################################################################################################
 # Initiate the extension install
 Write-Host "Installing amlarc-compute K8s extension..." -ForegroundColor Yellow
@@ -211,9 +223,19 @@ $JobFile = "C:\Temp\simple-train-cli\job.yml"
 # Create MNIST Dataset and register against Workspace
 python "C:\Temp\3.Create_MNIST_Dataset.py"
 
-# Train model with AML CLI
-$Job = az ml job create -f $JobFile
-$RunId = ($Job | grep '\"name\":').Split('\"')[3]
+# Function to Train model with AML CLI
+function SubmitTrainingJob {
+   Param ([string]$JobFile)
+
+   $Job = az ml job create -f $JobFile
+   $RunId = ($Job | grep '\"name\":').Split('\"')[3]
+   
+   return $RunId
+}
+
+# Submit training Job
+$RunId = SubmitTrainingJob -JobFile $JobFile
+Write-Host "RunId: $RunId"
 
 # Poll training status from ARM
 Write-Host "Training model, hold tight..."
@@ -222,13 +244,22 @@ Do
    $response = az ml job show --name $RunId --query "{Name:name,Jobstatus:status}" | ConvertFrom-Json
    Write-Host ("Job Status: ", $response.Jobstatus)
 
-	If ($response.Jobstatus -eq "Canceled") {break}
+	If ($response.Jobstatus -eq "Canceled") {
+      break
+   }
+   elseif ($response.Jobstatus -eq "Failed"){
+	   Write-Host "Job failed." -ForegroundColor Yellow
+      Write-Host "Resubmitting: " -ForegroundColor White
+      # Generates new RunId
+      $RunId = SubmitTrainingJob -JobFile $JobFile
+      Write-Host "RunId: $RunId"
+   }
 
 	Start-Sleep -Seconds 20
 
 } while (($response.Jobstatus -ne "Completed") -and ($response.Jobstatus -ne "Canceled"))
 
-# Flag for Training Status
+# Default Flag for Training Status
 $TrainingStatus = "Unsuccessful"
 
 # Get Job status
@@ -282,9 +313,6 @@ Write-Host """
 $JobFile = "C:\Temp\simple-inference-cli\endpoint.yml"
 (Get-Content -Path $JobFile) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $JobFile
 
-# Flag for Inference Status
-$InferenceStatus = "Unsuccessful"
-
 # Proceed with inference deployment only if training was successful
 If ($TrainingStatus -eq "Successful"){
    Write-Host "Copying trained model pkl to deployment folder..." -ForegroundColor White
@@ -298,8 +326,10 @@ If ($TrainingStatus -eq "Successful"){
    Write-Host "Creating model deployment on your K8s cluster, takes 5-10 minutes..." -ForegroundColor White
    az ml endpoint create -n $name -f $JobFile
 
-   # Set flag
-   $InferenceStatus = "Successful"
+   # Flag for Inference Status - if Pod is up
+   $InferenceStatus = if(kubectl get pods -l ml.azure.com/deployment-name=blue -n default | Select-String "Running" -Quiet){"Successful"}Else{"Unsuccessful"}
+   Write-Host "Inference Status: $InferenceStatus" -ForegroundColor White
+
 }
 else
 {
