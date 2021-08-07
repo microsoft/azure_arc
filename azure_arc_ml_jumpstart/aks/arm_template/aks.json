@@ -4,7 +4,7 @@
   "parameters": {
     "clusterName": {
       "type": "string",
-      "defaultValue": "Arc-Data-AKS",
+      "defaultValue": "Arc-ML-AKS",
       "metadata": {
         "description": "The name of the Kubernetes cluster resource.."
       }
@@ -97,7 +97,7 @@
     "resourceTags": {
       "type": "object",
       "defaultValue": {
-        "Project": "jumpstart_azure_arc_data_services"
+        "Project": "jumpstart_azure_arc_ml_services"
       }
     }
   },

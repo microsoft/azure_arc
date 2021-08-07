@@ -10,7 +10,7 @@
     },
     "vmName": {
       "type": "string",
-      "defaultValue": "Arc-Data-Client",
+      "defaultValue": "Arc-ML-Client",
       "metadata": {
         "description": "The name of your Virtual Machine"
       }
@@ -54,21 +54,21 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "Arc-Data-VNet",
+      "defaultValue": "Arc-ML-VNet",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
     "subnetName": {
       "type": "string",
-      "defaultValue": "Arc-Data-Subnet",
+      "defaultValue": "Arc-ML-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
     "networkSecurityGroupName": {
       "type": "string",
-      "defaultValue": "Arc-Data-Client-NSG",
+      "defaultValue": "Arc-ML-Client-NSG",
       "metadata": {
         "description": "Name of the Network Security Group"
       }
@@ -76,7 +76,7 @@
     "resourceTags": {
       "type": "object",
       "defaultValue": {
-        "Project": "jumpstart_azure_arc_data_services"
+        "Project": "jumpstart_azure_arc_ml_services"
       }
     },
     "spnClientId": {
@@ -101,22 +101,6 @@
         "description": "Tenant id of the service principal"
       }
     },
-    "azdataUsername": {
-      "type": "string",
-      "defaultValue": "arcdemo"
-    },
-    "azdataPassword": {
-      "type": "securestring",
-      "defaultValue": "ArcPassword123!!"
-    },
-    "acceptEula": {
-      "type": "string",
-      "defaultValue": "yes"
-    },
-    "arcDcName": {
-      "type": "string",
-      "defaultValue": "arcdatactrl"
-    },
     "workspaceName": {
       "type": "string",
       "metadata": {
@@ -131,7 +115,7 @@
     },
     "clusterName": {
       "type": "string",
-      "defaultValue": "Arc-Data-AKS",
+      "defaultValue": "Arc-ML-AKS",
       "metadata": {
         "description": "The name of the Kubernetes cluster resource."
       }
@@ -276,7 +260,7 @@
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -workspaceName ', parameters('workspaceName'), ' -clusterName ', parameters('clusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -workspaceName ', parameters('workspaceName'), ' -clusterName ', parameters('clusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
       }
     }
