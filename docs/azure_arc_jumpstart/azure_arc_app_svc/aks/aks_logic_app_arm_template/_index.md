@@ -237,19 +237,21 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Azure Storage Explorer portal-based view storage queue](./36.png)
 
-* To generate your own blobs using the Logic App, create a new message in the queue by using Azure Storage Explorer.
+* To generate your own blobs using the Logic App, create a new message in the queue by using Azure Storage Explorer and clicking Add Message as shown below.
 
   ![Add queue message](./37.png)
 
   ![Add queue message](./38.png)
 
+  ![Add queue message](./39.png)
+
 * Go back to the storage container and see the new added blob that was created automatically by the Logic App.
 
-  ![New message in storage queue](./39.png)
+  ![New message in storage queue](./40.png)
 
 * As part of the deployment, an Application Insights instance was also provisioned to provide you with relevant performance and application telemetry.
 
-  ![Application Insights instance](./40.png)
+  ![Application Insights instance](./41.png)
 
 ## Cluster extensions
 
@@ -257,12 +259,12 @@ In this scenario, the Azure Arc enabled app services cluster extension was deplo
 
 * In order to view cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc enabled Kubernetes resource](./41.png)
+  ![Azure Arc enabled Kubernetes resource](./42.png)
 
-  ![Azure Arc enabled Kubernetes cluster extensions settings](./42.png)
+  ![Azure Arc enabled Kubernetes cluster extensions settings](./43.png)
 
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./43.png)
+  ![Delete Azure resource group](./44.png)
