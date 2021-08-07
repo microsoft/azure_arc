@@ -44,6 +44,38 @@ Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
 
+###################################################################################################################
+# Deploy Weavescope for deployment visualization
+# https://www.weave.works/oss/scope/
+
+Write-Host "Deploying Weave Scope: "
+Write-Host "`n"
+
+$response = kubectl version --output json | ConvertFrom-Json
+$version = $response.serverVersion.gitVersion
+kubectl apply -f "https://cloud.weave.works/k8s/scope.yaml?k8s-version=$version"
+Do {
+	$podsPending = kubectl get pods -n weave --field-selector=status.phase!=Running -o jsonpath="{.items[*].metadata.name}"
+   Start-Sleep -Seconds 5
+} while ($podsPending -ne $null)
+
+# Expose Pod as LoadBalancer
+$pod = kubectl get pod -l name=weave-scope-app -n weave -o jsonpath="{.items[0].metadata.name}"
+kubectl expose pod -n weave $pod --type=LoadBalancer
+
+# Get Load Balancer IP
+Do
+{
+	$pip= kubectl get svc $pod -n weave -o jsonpath="{.status.loadBalancer.ingress[0].ip}"
+   Start-Sleep -Seconds 5
+} while ($pip -eq $null)
+
+# Start Edge - note it needs to refresh once to hit the page
+Write-Host "Launching Edge: "
+$url = "http://$pip" + ":4040"
+Start-Process microsoft-edge:"$url" -WindowStyle maximized
+###################################################################################################################
+
 # Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
