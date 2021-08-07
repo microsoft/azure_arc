@@ -91,7 +91,8 @@ az extension add -n ml
 az ml -h
 
 # Set AML workspace defaults
-$ws = $env:resourceGroup + "-amlws" # AML workspace name
+$random = ((New-Guid).Guid).Split('-')[0]
+$ws = "arcaml-$random-ws" # AML workspace name
 az configure --defaults workspace=$ws group=$env:resourceGroup
 
 # Create Azure ML workspace
@@ -101,11 +102,10 @@ az ml workspace create -g $env:resourceGroup
 # Functions
 ########################################################################################################
 
-# Install the aml-arc-compute extension - this is intentionally hardcoded because of the config parameters
+# Install the aml-arc-compute extension - with Training and Inferencing
 function Install-aml-extension {
    Param ([string]$connectedClusterName)
 
-   # Arc K8s extension enablement: Training and Inferencing
    az k8s-extension create --name amlarc-compute `
                            --extension-type Microsoft.AzureML.Kubernetes `
                            --cluster-type connectedClusters `
@@ -116,95 +116,46 @@ function Install-aml-extension {
    return 1
 }
 
-# Uninstall an extension
-function Uninstall-extension {
+# Get the extension install status from ARM
+function Get-ExtensionStatusARM {
    Param ([string]$extension, [string]$connectedClusterName)
 
-   az k8s-extension delete --name $extension `
-                           --cluster-type connectedClusters `
-                           --cluster-name $connectedClusterName `
-                           --resource-group $env:resourceGroup `
-                           --yes
-   return 1
-}
-
-# Get the extension install status
-function Get-ExtensionStatus {
-   Param ([string]$extension, [string]$connectedClusterName)
-
-   Write-Host "Waiting for extension install, hold tight..."
-   Do 
-   {
-      $response = az k8s-extension show --name $extension `
+   $response = az k8s-extension show --name $extension `
                                         --cluster-type connectedClusters `
                                         --cluster-name $connectedClusterName `
                                         --resource-group $env:resourceGroup `
                                         --output json | ConvertFrom-Json
+   return $response
+}
 
-         Write-Host ("Status: ", $response.installState)
+# Get the extension install status from Helm
+function Get-ExtensionStatusHelm {
+   Param ([string]$chart)
 
-         If ($response.installState -eq "Failed") {break}
-
-         Start-Sleep -Seconds 30
-
-   } while (($response.installState -ne "Installed") -and ($response.installState -ne "Failed"))
-
-   # Get Extension status
-   If ($response.installState -eq "Failed"){
-      Write-Host "K8s-Extension installation failed:" -ForegroundColor Red
-      Write-Host $response.errorInfo
-   }
-   elseif ($response.installState -eq "Installed"){
-      Write-Host "K8s-Extension installation successful." -ForegroundColor Green
-   }
-   else
-   {
-      Write-Host "Something else went wrong."
-   }
-
+   $response = helm list --filter $chart -A -a -o json | ConvertFrom-Json
+   
    return $response
 }
 ########################################################################################################
-# Note: As of August 2, 2021 - the amlarc-compute extension would keep failing install the first time, 
-# because the container images wouldn't pull fast enough - and ARM would report failure.
-# This is a workaround that keeps trying to install the extension until it succeeds,
-# because the second time the extension tries to install the images would already be cached in K8s.
+# Initiate the extension install
+Write-Host "Installing amlarc-compute K8s extension..." -ForegroundColor Yellow
+Install-aml-extension -connectedClusterName $connectedClusterName
 
-# PLACEHOLDER: Wait for User prompt before deploying the extension
-Read-Host -Prompt "Press any key to continue deploying amlarc-compute K8s extension"
-
-# Install extension and keep retrying until it installs successfully
+# Loop until install is successful on both ARM and Helm
 Do 
-   {
-      # Initiate the extension install
-      Write-Host "Installing amlarc-compute K8s extension" -ForegroundColor Yellow
-      Install-aml-extension -connectedClusterName $connectedClusterName
-      
-      # Get response
-      $response = Get-ExtensionStatus -extension "amlarc-compute" -connectedClusterName $connectedClusterName
+{  
+   # Get ARM response
+   $ARMresponse = Get-ExtensionStatusARM -extension "amlarc-compute" -connectedClusterName $connectedClusterName
+   Write-Host ("ARM Status: ", $ARMresponse.installState)
 
-      # If install failed - uninstall
-      If ($response.installState -eq "Failed") {
-         Write-Host "K8s-Extension installation failed, trying again..." -ForegroundColor Yellow
-         
-         # Uninstall extension
-         Write-Host "Uninstalling K8s-Extension" -ForegroundColor White
-         Uninstall-extension -extension "amlarc-compute" -connectedClusterName $connectedClusterName
-         
-         # Sleep statement to observe if Pods are getting deleted by the Uninstall
-         Write-Host "Sleep for 2 mins" -ForegroundColor White
-         Start-Sleep -Seconds 120
+   # Get Helm response
+   $Helmresponse = Get-ExtensionStatusHelm -chart "amlarc-compute"
+   Write-Host ("Helm Status: ", $Helmresponse.status)
 
-         # Remove the k8s namespace - blocking call
-         # Need to delete the apiservice first, otherwise namespace delete hangs: 
-         # https://github.com/prometheus-operator/kube-prometheus/issues/275#issuecomment-545305515
-         Write-Host "Removing azureml namespace for fresh extension install" -ForegroundColor White
-         kubectl delete apiservice v1beta1.metrics.k8s.io
-         kubectl delete namespace azureml --grace-period=0 --force
-      }
+   Start-Sleep -Seconds 15
+} while (($ARMresponse.installState -ne "Installed") -and ($Helmresponse.status -ne "deployed"))
 
-   } while (($response.installState -ne "Installed"))
-########################################################################################################
+Write-Host "Installing amlarc-compute K8s extension was successful." -ForegroundColor Green
 
 # Get Arc Cluster Resource ID
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
@@ -377,6 +328,7 @@ $RequestFile = "C:\Temp\simple-inference-cli\sample-request.json"
 If ($InferenceStatus -eq "Successful"){
    # Method 1: One-line invoke model
    Write-Host "Method 1: Calling deployed model using az ml endpoint" -ForegroundColor Yellow
+   Write-Host "The sample request represents the following numeral:" -ForegroundColor White
    az ml endpoint invoke -n $name -r $RequestFile
 
    # Method 2: Call using PowerShell Invoke-RestMethod (for demonstration)
@@ -398,6 +350,7 @@ If ($InferenceStatus -eq "Successful"){
    $headers.Add("Content-Type", "application/json")
    $body = Get-Content $RequestFile | Out-String
 
+   Write-Host "The sample request represents the following numeral:" -ForegroundColor White
    $response = Invoke-RestMethod $scoring_uri -Method 'POST' -Headers $headers -Body $body
    $response | ConvertTo-Json
 }
@@ -429,12 +382,13 @@ add-type $code
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Kill the open PowerShell monitoring kubectl get pods
-# Stop-Process -Id $kubectlMonShell.Id
-# Stop-Process -Id $kubectlWatchShell.Id
+Stop-Process -Id $kubectlMonShell.Id
+Stop-Process -Id $kubectlWatchShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "AzureMLLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
+# We intentionally keep the script running, so we have a chance to see the predictions
 # Stop-Process -Name powershell -Force
 # Stop-Transcript

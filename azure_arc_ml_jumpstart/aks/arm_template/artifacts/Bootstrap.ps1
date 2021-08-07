@@ -6,10 +6,6 @@ param (
     [string]$spnAuthority,
     [string]$subscriptionId,
     [string]$resourceGroup,
-    [string]$azdataUsername,
-    [string]$azdataPassword,
-    [string]$acceptEula,
-    [string]$arcDcName,
     [string]$azureLocation,
     [string]$workspaceName,
     [string]$clusterName,
@@ -22,10 +18,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $azdataUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $azdataPassword,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $acceptEula,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('arcDcName', $arcDcName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
@@ -69,7 +61,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-inference-cli.zip") -Out
 Invoke-WebRequest ($templateBaseUrl + "artifacts/1.Get_WS.py") -OutFile "C:\Temp\1.Get_WS.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/2.Attach_Arc.py") -OutFile "C:\Temp\2.Attach_Arc.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/3.Create_MNIST_Dataset.py") -OutFile "C:\Temp\3.Create_MNIST_Dataset.py"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png" # Wallpaper is shared from main
 
 # Unzip training and inference payloads
 Expand-Archive -LiteralPath "C:\Temp\simple-train-cli.zip" -DestinationPath "C:\Temp"

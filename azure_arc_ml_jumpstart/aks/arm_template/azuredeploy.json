@@ -61,7 +61,7 @@
     },
     "clusterName": {
       "type": "string",
-      "defaultValue": "Arc-Data-AKS",
+      "defaultValue": "Arc-ML-AKS",
       "metadata": {
         "description": "The name of the Kubernetes cluster resource."
       }
@@ -85,8 +85,8 @@
     "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
     // Virtual Network configuration
-    "virtualNetworkName": "Arc-Data-VNet",
-    "subnetName": "Arc-Data-Subnet",
+    "virtualNetworkName": "Arc-ML-VNet",
+    "subnetName": "Arc-ML-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24"
   },
