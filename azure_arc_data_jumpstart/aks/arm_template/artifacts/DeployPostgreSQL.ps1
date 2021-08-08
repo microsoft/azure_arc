@@ -55,13 +55,13 @@ az deployment group create --resource-group $env:resourceGroup --template-file "
 Write-Host "`n"
 
 # Ensures postgres container is initiated and ready to accept restores
-$pgControllerPodName = "jumpstartpsc0-0"
+$pgCoordinatorPodName = "jumpstartpsc0-0"
 $pgWorkerPodName = "jumpstartpsw0-0"
 
     Do {
         Write-Host "Waiting for PostgreSQL Hyperscale. Hold tight, this might take a few minutes..."
         Start-Sleep -Seconds 45
-        $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
+        $buildService = $(if((kubectl get pods -n arc | Select-String $pgCoordinatorPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
 
 Start-Sleep -Seconds 60
@@ -70,11 +70,11 @@ Start-Sleep -Seconds 60
 
 # # Downloading demo database and restoring onto Postgres
 # Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-# kubectl exec $pgControllerPodName -n arc -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AdventureWorks2019.sql" 2>&1 | Out-Null
+# kubectl exec $pgCoordinatorPodName -n arc -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AdventureWorks2019.sql" 2>&1 | Out-Null
 # Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-# kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
+# kubectl exec $pgCoordinatorPodName -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
 # Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-# kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
+# kubectl exec $pgCoordinatorPodName -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
 
 # Creating Azure Data Studio settings for PostgreSQL connection
 Write-Host ""
