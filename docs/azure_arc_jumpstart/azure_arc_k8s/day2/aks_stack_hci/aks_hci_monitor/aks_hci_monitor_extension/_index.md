@@ -14,7 +14,7 @@ In this guide, you will hook the AKS cluster on HCI to Azure Monitor by deployin
 
 > **Note: This guide assumes you already deployed an AKS on HCI cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_stack_hci/aks_hci_powershell/).**
 
-Kubernetes extensions are add-ons for Kubernetes clusters. The extensions feature on Azure Arc enabled Kubernetes clusters enables usage of Azure Resource Manager based APIs, CLI and portal UX for deployment of extension components (Helm charts in initial release) and will also provide lifecycle management capabilities such as auto/manual extension version upgrades for the extensions.
+Kubernetes extensions are add-ons for Kubernetes clusters. The extensions feature on Azure Arc-enabled Kubernetes clusters enables usage of Azure Resource Manager based APIs, CLI and portal UX for deployment of extension components (Helm charts in initial release) and will also provide lifecycle management capabilities such as auto/manual extension version upgrades for the extensions.
 
 The commands below and the script described in this guide should be run on the management computer.
 
@@ -63,15 +63,15 @@ The commands below and the script described in this guide should be run on the m
 
 ## Create Azure monitor extensions instance
 
-To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Azure Monitor extension on your Azure Arc enabled Kubernetes cluster
+To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Azure Monitor extension on your Azure Arc-enabled Kubernetes cluster
 
 * Before integrating the cluster with Azure Monitor for Containers, click on the "Insights (preview)" blade for the connected Arc cluster to show how the cluster is not currently being monitored.
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./01.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./01.png)
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource Insights](./02.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource Insights](./02.png)
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource Insights](./03.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource Insights](./03.png)
 
 * Edit the environment variables in the [PowerShell script](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_stack_hci/monitor_extension/azure_monitor_k8s_extension.ps1) to match your environment parameters. After that run it using the ```.\azure_monitor_k8s_extension.ps1``` command.
 
@@ -83,7 +83,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
   * Add or Update your local _connectedk8s_ and _k8s-extension_ Azure CLI extensions
   * Create monitor k8s extension instance
 
-* You can see that the monitoring is enabled once you visit the Container Insights section of the Azure Arc enabled Kubernetes cluster resource in Azure.
+* You can see that the monitoring is enabled once you visit the Container Insights section of the Azure Arc-enabled Kubernetes cluster resource in Azure.
 
     > **Note: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
@@ -99,4 +99,4 @@ The following command only deletes the extension instance, but doesn't delete th
 az k8s-extension delete --name azuremonitor-containers --cluster-type connectedClusters --cluster-name <cluster-name> --resource-group <resource-group>
 ```
 
- ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource Insights](./06.png)
+ ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource Insights](./06.png)

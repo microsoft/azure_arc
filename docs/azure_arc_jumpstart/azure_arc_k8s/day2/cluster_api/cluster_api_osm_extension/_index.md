@@ -10,13 +10,13 @@ description: >
 
 The following README will guide you on how to enable [Open Service Mesh](https://openservicemesh.io/) for a Cluster API that is projected as an Azure Arc connected cluster. Open Service Mesh (OSM) is a lightweight, extensible, Cloud Native service mesh that allows users to uniformly manage, secure, and get out-of-the-box observability features for highly dynamic microservice environments.
 
-In this guide, you will hook the Cluster API to Open Service Mesh by deploying the [Open Service Mesh extension](https://aka.ms/arc-osm-doc) on your Kubernetes cluster in order to start collecting security-related logs and telemetry. Arc enabled Open Service Mesh will have deep integrations into Azure monitor, and provide a seamless Azure experience for viewing and responding to critical KPIs provided by OSM metrics. This guide also provides you the automation to test Azure monitor integration with Arc enabled Open Service Mesh.
+In this guide, you will hook the Cluster API to Open Service Mesh by deploying the [Open Service Mesh extension](https://aka.ms/arc-osm-doc) on your Kubernetes cluster in order to start collecting security-related logs and telemetry. Arc-enabled Open Service Mesh will have deep integrations into Azure monitor, and provide a seamless Azure experience for viewing and responding to critical KPIs provided by OSM metrics. This guide also provides you the automation to test Azure monitor integration with Arc-enabled Open Service Mesh.
 
-> **Note: Currently, Azure Arc enabled Open Service Mesh is in [public preview](https://aka.ms/arc-osm-doc)**.
+> **Note: Currently, Azure Arc-enabled Open Service Mesh is in [public preview](https://aka.ms/arc-osm-doc)**.
 
 > **Note: This guide assumes you already deployed a Cluster API and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using a [Shell script](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/cluster_api/capi_azure/).**
 
-Kubernetes extensions are add-ons for Kubernetes clusters. The extensions feature on Azure Arc enabled Kubernetes clusters enables usage of Azure Resource Manager based APIs, CLI, and portal UX for the deployment of extension components (Helm charts in initial release) and will also provide lifecycle management capabilities such as auto/manual extension version upgrades for the extensions.
+Kubernetes extensions are add-ons for Kubernetes clusters. The extensions feature on Azure Arc-enabled Kubernetes clusters enables usage of Azure Resource Manager based APIs, CLI, and portal UX for the deployment of extension components (Helm charts in initial release) and will also provide lifecycle management capabilities such as auto/manual extension version upgrades for the extensions.
 
 ## Prerequisites
 
@@ -65,15 +65,15 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-* User has deployed Kubernetes using Cluster API and has it connected as Azure Arc enabled Kubernetes cluster.
+* User has deployed Kubernetes using Cluster API and has it connected as Azure Arc-enabled Kubernetes cluster.
 
 * User is editing the environment variables on the Shell script file (1-time edit) which then be used throughout the extension deployment.
 
-* User will set the current kubectl context to the connected Azure Arc enabled Kubernetes cluster.
+* User will set the current kubectl context to the connected Azure Arc-enabled Kubernetes cluster.
 
 * User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Open Service Mesh extension and Azure monitor extension on the Azure Arc connected cluster.
 
-* The script will also deploy the sample app (bookstore) to Azure Arc enabled Kubernetes cluster and onboard the app namespaces with OSM to monitor.
+* The script will also deploy the sample app (bookstore) to Azure Arc-enabled Kubernetes cluster and onboard the app namespaces with OSM to monitor.
 
 * User is verifying the cluster and make sure OSM extension enabled.
 
@@ -81,15 +81,15 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Create Open Service Mesh and Azure Monitor extension instances with sample app
 
-To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Open Service Mesh extension on your Azure Arc enabled Kubernetes cluster.
+To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Open Service Mesh extension on your Azure Arc-enabled Kubernetes cluster.
 
-> **Note: Before installing the Open Service Mesh extension, make sure that the kubectl context is pointing to your Azure Arc enabled Kubernetes cluster. To do that, you can refer to the [official Kubernetes documentation](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) to find the options to change the kubecontext to different Kubernetes clusters.**
+> **Note: Before installing the Open Service Mesh extension, make sure that the kubectl context is pointing to your Azure Arc-enabled Kubernetes cluster. To do that, you can refer to the [official Kubernetes documentation](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) to find the options to change the kubecontext to different Kubernetes clusters.**
 
 ![Screenshot showing current kubectl context pointing to CAPI cluster](./01.png)
 
-* In the screenshot below, notice how currently there are no extensions installed yet in your Arc enabled Kubernetes cluster.
+* In the screenshot below, notice how currently there are no extensions installed yet in your Arc-enabled Kubernetes cluster.
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource extensions](./02.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource extensions](./02.png)
 
 * Edit the environment variables in the [_capi_osm_extension.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_osm_extension/capi_osm_extension.sh) shell script to match your environment parameters followed by running the ```. ./capi_osm_extension.sh``` command.
 
@@ -110,7 +110,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
   * Update the namespaces to be monitored by modifying the configmap provided by the OSM
   * Deploy the apps to the namespaces
 
-* You can now see that Open Service Mesh & Azure Monitor for containers extensions are now enabled in the extension tab section of the Azure Arc enabled Kubernetes cluster resource in Azure.
+* You can now see that Open Service Mesh & Azure Monitor for containers extensions are now enabled in the extension tab section of the Azure Arc-enabled Kubernetes cluster resource in Azure.
 
   ![Screenshot extension deployment security tab](./04.png)
 
@@ -120,7 +120,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
 * It can take ~15 minutes before you will be able to verify the integration and monitoring insights coming from OSM to Azure Monitor by following the below steps in the Azure portal.
 
-  * Verify the namespaces are showing up in the insights section of the Arc enabled Kubernetes resource in Azure portal.
+  * Verify the namespaces are showing up in the insights section of the Arc-enabled Kubernetes resource in Azure portal.
 
     ![Screenshot showing the namespaces in the Container Insights](./06.png)
 
@@ -146,6 +146,6 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
     az k8s-extension delete --cluster-type connectedClusters --cluster-name <name of the cluster> --resource-group <name of the resource group> --name <name of the extension> -y
     ```
 
-* You can also delete the extensions from the Azure Portal under the extensions section of Azure Arc enabled Kubernetes cluster resource.
+* You can also delete the extensions from the Azure Portal under the extensions section of Azure Arc-enabled Kubernetes cluster resource.
 
   ![Screenshot showing uninstalling of the extension](./09.png)

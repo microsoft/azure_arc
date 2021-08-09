@@ -61,7 +61,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -135,7 +135,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
 
 * In the your directory of the cloned Jumpstart repository, navigate to where the [*arc_capi_azure*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/arc_capi_azure.sh) bash script is located.
 
-  The script will transform the kind Kubernetes cluster to a CAPI management cluster with the Azure Cluster API provisioned (CAPZ) components that are needed. It will then deploy the workload cluster and it's Azure resources based on the environment variables as described in the next bullet. Upon deployment completion, the cluster will be onboard as an Azure Arc enabled Kubernetes cluster.
+  The script will transform the kind Kubernetes cluster to a CAPI management cluster with the Azure Cluster API provisioned (CAPZ) components that are needed. It will then deploy the workload cluster and it's Azure resources based on the environment variables as described in the next bullet. Upon deployment completion, the cluster will be onboard as an Azure Arc-enabled Kubernetes cluster.
 
 * Edit the environment variables to match your Azure subscription and SPN details created in the prerequisites section in this guide as well as the required workload cluster details.
 
@@ -169,7 +169,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
 
   ![Screenshot of workload cluster deployment script runtime](./07.png)
 
-* Upon completion, you will have a new Kubernetes cluster deployed on top of Azure virtual machines  that is already onboard as an Azure Arc enabled Kubernetes cluster.
+* Upon completion, you will have a new Kubernetes cluster deployed on top of Azure virtual machines  that is already onboard as an Azure Arc-enabled Kubernetes cluster.
 
   The script will generate the cluster definition *yaml* file which was used to deploy the workload cluster as will as the *kubeconfig* file. To test the cluster is up and running use the below command.
 
@@ -179,7 +179,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
 
   ![Screenshot of the workload cluster nodes](./08.png)
 
-* In the Azure portal, you can see how all the resources were deployed in a new resource group as well as the Azure Arc enabled Kubernetes cluster resource.
+* In the Azure portal, you can see how all the resources were deployed in a new resource group as well as the Azure Arc-enabled Kubernetes cluster resource.
 
   ![Screenshot of the Azure resources](./09.png)
 

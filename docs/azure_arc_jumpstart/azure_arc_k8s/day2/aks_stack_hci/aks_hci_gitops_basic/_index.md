@@ -34,9 +34,9 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc that is running on Azure Stack HCI.
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./01.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./02.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
 * [Install or update Azure PowerShell modules](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-5.6.0). Use the below command to check your current installed version.
 
@@ -52,7 +52,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
   az --version
   ```
 
-* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription with the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```PowerShell
   Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes

@@ -18,7 +18,7 @@ The following README will guide you on how to connect an Windows machine to Azur
   az --version
   ```
 
-* Enable subscription with the resource provider for Azure Arc enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription with the resource provider for Azure Arc-enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.HybridCompute
@@ -81,9 +81,9 @@ Upon completion, you will have your Windows server, connected as a new Azure Arc
 
 ![Screenshot showing PowerShell script being run](./05.png)
 
-![Screenshot showing Azure Portal with Azure Arc enabled server resource](./06.png)
+![Screenshot showing Azure Portal with Azure Arc-enabled server resource](./06.png)
 
-![Screenshot showing Azure Portal with Azure Arc enabled server resource detail](./07.png)
+![Screenshot showing Azure Portal with Azure Arc-enabled server resource detail](./07.png)
 
 ## Delete the deployment
 

@@ -57,7 +57,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -215,11 +215,11 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Upon completion, you will have your GKE cluster connect as a new Azure Arc Kubernetes cluster resource in the new Azure resource group.
 
-  ![New Azure Arc enabled Kubernetes cluster](./30.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./30.png)
 
-  ![New Azure Arc enabled Kubernetes cluster](./31.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./31.png)
 
-  ![New Azure Arc enabled Kubernetes cluster](./32.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./32.png)
 
 ## Delete the deployment
 

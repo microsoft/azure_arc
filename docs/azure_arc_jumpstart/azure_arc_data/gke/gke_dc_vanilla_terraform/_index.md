@@ -25,7 +25,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 * Export *TFVAR* values
 * *terraform init*
 * *terraform apply*
-* User remotes into sidecar Windows VM, which automatically kicks off the [DataServicesLogonScript](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/terraform/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploys and configures Azure Arc enabled data services on the GKE cluster.
+* User remotes into sidecar Windows VM, which automatically kicks off the [DataServicesLogonScript](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/terraform/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploys and configures Azure Arc-enabled data services on the GKE cluster.
 * *kubectl delete namespace arc*
 * *terraform destroy*
 
@@ -132,7 +132,7 @@ Read the below explanation to get familiar with the automation and deployment fl
 
 * User edits and exports Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables are being used throughout the deployment.
 
-* User deploys the Terraform plan which will deploy the GKE cluster and the GCP compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and any database services you deploy on top of the data controller.
+* User deploys the Terraform plan which will deploy the GKE cluster and the GCP compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc-enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and any database services you deploy on top of the data controller.
 
 * In addition, the plan will copy the *local_ssd_sc.yaml* file which will be used to create a Kubernetes Storage Class backed by SSD disks that will be used by Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
 
@@ -157,8 +157,8 @@ Read the below explanation to get familiar with the automation and deployment fl
       * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       * Create the Azure Data Studio desktop shortcut
       * Apply the *local_ssd_sc.yaml* file on the GKE cluster
-      * Use Azure CLI to connect the GKE cluster to Azure as an Azure Arc enabled Kubernetes cluster
-      * Create a custom location for use with the Azure Arc enabled Kubernetes cluster
+      * Use Azure CLI to connect the GKE cluster to Azure as an Azure Arc-enabled Kubernetes cluster
+      * Create a custom location for use with the Azure Arc-enabled Kubernetes cluster
       * Deploy an ARM template that will deploy the Azure Arc data controller on the GKE cluster
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       * Unregister the logon script Windows schedule task so it will not run after first login
@@ -263,7 +263,7 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   ![PowerShell login script run](./35.png)
 
-* From Azure Portal, navigate to the resource group and confirm that the Azure Arc enabled Kubernetes cluster, the Azure Arc data controller resource and the Custom Location resource are present.
+* From Azure Portal, navigate to the resource group and confirm that the Azure Arc-enabled Kubernetes cluster, the Azure Arc data controller resource and the Custom Location resource are present.
 
   ![Azure Portal showing data controller resource](./38.png)
 

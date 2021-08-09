@@ -60,7 +60,7 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
 
     > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 
-* Enable your subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable your subscription with the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```powershell
   Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
@@ -132,9 +132,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * **controlPlaneNodeCount:** number of nodes for your control plane, should be an odd number 1, 3 or 5.
   * **linuxNodeCount:** number of Linux node VMs for your cluster.
   * **windowsNodeCount:** number of Windows node VMs for your cluster, if you do not need Windows nodes input 0.
-  * **resourceGroup:** resource group to connect your Azure Arc enabled Kubernetes cluster.
-  * **location:** Azure region to connect your Azure Arc enabled Kubernetes cluster.
-  * **subscriptionId:** subscription to connect your Azure Arc enabled Kubernetes cluster.
+  * **resourceGroup:** resource group to connect your Azure Arc-enabled Kubernetes cluster.
+  * **location:** Azure region to connect your Azure Arc-enabled Kubernetes cluster.
+  * **subscriptionId:** subscription to connect your Azure Arc-enabled Kubernetes cluster.
   * **appId:** the appID of the service principal created previously.
   * **password:** the password of the service principal created.
   * **tenant:** your tenantID.
@@ -183,17 +183,17 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   ![Screenshot showing the AKS on HCI deployment Windows Admin Center](./06.png)
 
-* Once the script run has finished, the AKS cluster on HCI will be projected as a new Azure Arc enabled Kubernetes cluster resource.
+* Once the script run has finished, the AKS cluster on HCI will be projected as a new Azure Arc-enabled Kubernetes cluster resource.
 
-  ![Screenshot showing Arc Enabled Kubernetes in RG](./07.png)
+  ![Screenshot showing Arc-enabled Kubernetes in RG](./07.png)
 
-  ![Screenshot showing Arc Enabled Kubernetes](./08.png)
+  ![Screenshot showing Arc-enabled Kubernetes](./08.png)
 
 ## Delete the deployment
 
-The most straightforward way is to delete the Azure Arc enabled Kubernetes cluster resource via the Azure Portal, just select the cluster and delete it.
+The most straightforward way is to delete the Azure Arc-enabled Kubernetes cluster resource via the Azure Portal, just select the cluster and delete it.
 
-![Screenshot showing how to delete Azure Arc enabled Kubernetes resource](./09.png)
+![Screenshot showing how to delete Azure Arc-enabled Kubernetes resource](./09.png)
 
 To delete the AKS cluster on HCI run the below command.
 

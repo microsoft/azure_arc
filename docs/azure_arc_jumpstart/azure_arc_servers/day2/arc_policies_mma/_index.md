@@ -8,7 +8,7 @@ description: >
 
 ## Deploy Monitoring Agent Extension to Azure Arc Linux and Windows servers using Azure Policy
 
-The following README will guide you on how to use Azure Arc enabled servers to assign Azure Policies to VMs outside of Azure, whether they are on-premises or other clouds. With this feature you can now use Azure Policy to audit settings in the operating system of an Azure Arc enabled server, if a setting is not compliant you can also trigger a remediation task.
+The following README will guide you on how to use Azure Arc-enabled servers to assign Azure Policies to VMs outside of Azure, whether they are on-premises or other clouds. With this feature you can now use Azure Policy to audit settings in the operating system of an Azure Arc-enabled server, if a setting is not compliant you can also trigger a remediation task.
 
 In this case, you will assign a policy to audit if the Azure Arc connected machine has the (Microsoft Monitoring Agent) MMA agent installed, if not, you will use the extensions feature to automatically deploy it to the VM, an enrollment experience that levels to Azure VMs. This approach can be used to make sure all your servers are onboard to services such as Azure Monitor, Azure Security Center, Azure Sentinel, etc.
 
@@ -39,9 +39,9 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
-    ![Screenshot Azure Arc enabled server on resource group](./01.png)
+    ![Screenshot Azure Arc-enabled server on resource group](./01.png)
 
-    ![Screenshot Azure Arc enabled server connected status](./02.png)
+    ![Screenshot Azure Arc-enabled server connected status](./02.png)
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 

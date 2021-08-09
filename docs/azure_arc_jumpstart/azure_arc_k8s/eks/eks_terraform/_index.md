@@ -68,7 +68,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -212,7 +212,7 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
    az group create --name arceksdemo -l EastUS -o table
    ```
 
-   > Note:  Before deploying, make sure to check the Azure Arc enabled Kubernetes region availability [page](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc).
+   > Note:  Before deploying, make sure to check the Azure Arc-enabled Kubernetes region availability [page](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc).
 
 * Deploy Arc binaries using Azure CLI:
 
@@ -220,13 +220,13 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
   az connectedk8s connect --name arceksdemo --resource-group arceksdemo --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
-* Upon completion, you will have your EKS cluster connect as a new Azure Arc enabled Kubernetes resource in a new resource group.
+* Upon completion, you will have your EKS cluster connect as a new Azure Arc-enabled Kubernetes resource in a new resource group.
 
   ![Screenshot showing ARM deployment](./image13.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./image14.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./image14.png)
 
-  ![Screenshot showing Azure POrtal with Azure Arc enabled Kubernetes resource detail](./image15.png)
+  ![Screenshot showing Azure POrtal with Azure Arc-enabled Kubernetes resource detail](./image15.png)
 
 ## Delete the deployment
 

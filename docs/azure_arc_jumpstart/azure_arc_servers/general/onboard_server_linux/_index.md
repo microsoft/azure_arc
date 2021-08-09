@@ -18,7 +18,7 @@ The following README will guide you on how to connect an Linux server to Azure A
   az --version
   ```
 
-* Enable subscription with the resource provider for Azure Arc enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription with the resource provider for Azure Arc-enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.HybridCompute
@@ -83,9 +83,9 @@ Upon completion, you will have your Linux server, connected as a new Azure Arc r
 
 ![Screenshot showing az_connect_linux script being run](./04.png)
 
-![Screenshot showing Azure Portal with Azure Arc enabled resource](./05.png)
+![Screenshot showing Azure Portal with Azure Arc-enabled resource](./05.png)
 
-![Screenshot showing Azure Portal with Azure Arc enabled resource detail](./06.png)
+![Screenshot showing Azure Portal with Azure Arc-enabled resource detail](./06.png)
 
 ## Delete the deployment
 

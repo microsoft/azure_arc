@@ -3,10 +3,10 @@
 | Wrong                           | Correct                         | Comments                       |
 |-------------------------------- |---------------------------------|--------------------------------|
 | Azure ARC                       | Azure Arc                       |                                |
-| Azure Arc Enabled Servers       | Azure Arc enabled servers       |                                |
-| Azure Arc Enabled SQL           | Azure Arc enabled SQL server    |                                |
-| Azure Arc Enabled Kubernetes    | Azure Arc enabled Kubernetes    |                                |
-| Azure Arc Enabled Data Services | Azure Arc enabled data services |                                |
+| Azure Arc-enabled Servers       | Azure Arc-enabled servers       |                                |
+| Azure Arc-enabled SQL           | Azure Arc-enabled SQL server    |                                |
+| Azure Arc-enabled Kubernetes    | Azure Arc-enabled Kubernetes    |                                |
+| Azure Arc-enabled Data Services | Azure Arc-enabled data services |                                |
 | Vmware                          | VMware                          |                                |
 | RedHat                          | Red Hat                         |                                |
 | Azure Resource Group            | Azure resource group            | Unless it's in a header/title  |

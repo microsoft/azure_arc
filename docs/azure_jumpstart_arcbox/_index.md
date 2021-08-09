@@ -21,7 +21,7 @@ ArcBox is a project that provides an easy to deploy sandbox for all things Azure
 
 ## Azure Arc capabilities available in ArcBox
 
-### Azure Arc-enabled Servers
+### Azure Arc-enabled servers
 
 ![ArcBox servers diagram](./servers.png)
 
@@ -33,7 +33,7 @@ ArcBox includes three Azure Arc-enabled server resources that are hosted using n
 
 ArcBox deploys one single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource (_ArcBox-K3s_).
 
-### Azure Arc-enabled Data Services
+### Azure Arc-enabled data services
 
 ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster with the Azure CAPZ provider, and a workload cluster is deployed onto the management cluster. The Azure Arc-enabled data services and data controller are deployed onto this workload cluster via a PowerShell script that runs when first logging into ArcBox-Client virtual machine.
 
@@ -268,7 +268,7 @@ az group delete -n <name of your resource group>
 
 Occasionally deployments of ArcBox may fail at various stages. Common reasons for failed deployments include:
 
-* Invalid service principal id or service principal secret provided in azuredeploy.parameters.json.
+* Invalid service principal id or service principal secret provided in _azuredeploy.parameters.json_ file.
 * Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 52 available.
 * Target Azure region does not support all required Azure services - ensure you are running ArcBox in one of the supported regions listed in the above section "ArcBox Azure Region Compatibility".
 

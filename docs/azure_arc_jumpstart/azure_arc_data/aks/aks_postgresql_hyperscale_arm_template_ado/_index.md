@@ -8,7 +8,7 @@ description: >
 
 ## Deploy Azure PostgreSQL Hyperscale on AKS using Azure DevOps Release Pipeline
 
-The following README will guide you on how to use [Azure DevOps (ADO) Release pipelines](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/?view=azure-devops) to deploy a "Ready to Go" environment so you can start using Azure Arc enabled data services with Azure PostgreSQL Hyperscale (Citus) on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
+The following README will guide you on how to use [Azure DevOps (ADO) Release pipelines](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/?view=azure-devops) to deploy a "Ready to Go" environment so you can start using Azure Arc-enabled data services with Azure PostgreSQL Hyperscale (Citus) on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
 By the end of this guide, you will have an Azure DevOps Release pipeline to deploy AKS cluster with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity), Azure PostgreSQL Hyperscale with a sample database and a Microsoft Windows Server 2019 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
@@ -61,7 +61,7 @@ By the end of this guide, you will have an Azure DevOps Release pipeline to depl
 
     > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc-enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.AzureArcData
@@ -111,7 +111,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of resource group and location config](./10.jpg)
 
-* As mentioned, the task will deployed the existing ARM template for deploying Azure Arc enabled data services with PostgreSQL Hyperscale that in the Azure Arc Jumpstart GitHub repository.
+* As mentioned, the task will deployed the existing ARM template for deploying Azure Arc-enabled data services with PostgreSQL Hyperscale that in the Azure Arc Jumpstart GitHub repository.
 
   * Change the Template location to "URL of the file"
 
@@ -121,7 +121,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of ARM template config](./11.jpg)
 
-  > **Known issue: Currently, Azure Arc enabled data services running on AKS with a [Kubernetes version >=1.19.x is not supported](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes#known-issues). This is due to data services cannot be deployed on AKS cluster with availability zones enabled.**
+  > **Known issue: Currently, Azure Arc-enabled data services running on AKS with a [Kubernetes version >=1.19.x is not supported](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes#known-issues). This is due to data services cannot be deployed on AKS cluster with availability zones enabled.**
 
   * *clusterName* - AKS cluster name
   * *dnsPrefix* - AKS unique DNS prefix

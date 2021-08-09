@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to use the provided [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview) to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connected it as an Azure Arc cluster resource.
 
-  > **Note: Since AKS is a 1st-party Azure solution and natively supports capabilities such as [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-overview) integration as well as GitOps configurations (currently in preview), it is not expected for an AKS cluster to be projected as an Azure Arc enabled Kubernetes cluster. The following scenario should ONLY be used for demo and testing purposes.**
+  > **Note: Since AKS is a 1st-party Azure solution and natively supports capabilities such as [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-overview) integration as well as GitOps configurations (currently in preview), it is not expected for an AKS cluster to be projected as an Azure Arc-enabled Kubernetes cluster. The following scenario should ONLY be used for demo and testing purposes.**
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -133,17 +133,17 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 * Once the script run has finished, the AKS cluster will be projected as a new Azure Arc cluster resource.
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./09.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./09.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./10.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./10.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./11.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./11.png)
 
 ## Delete the deployment
 
 The most straightforward way is to delete the Azure Arc cluster resource via the Azure Portal, just select the cluster and delete it.
 
-![Screenshot showing how to delete Azure Arc enabled Kubernetes resource](./12.png)
+![Screenshot showing how to delete Azure Arc-enabled Kubernetes resource](./12.png)
 
 If you want to nuke the entire environment, run the below commands.
 

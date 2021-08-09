@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a Windows Server virtual machine in Azure Stack HCI and connect it to Azure Arc using PowerShell
 
-The following README will guide you on how to use the provided PowerShell script to deploy a Windows Server Virtual Machine on an [Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/hci/overview) cluster and connect it as an Azure Arc enabled server.
+The following README will guide you on how to use the provided PowerShell script to deploy a Windows Server Virtual Machine on an [Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/hci/overview) cluster and connect it as an Azure Arc-enabled server.
 
 This guide will **not** provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have it provisioned. If you don't have any Azure Stack HCI cluster created, please have a look at the following [Azure Stack HCI 20H2 Evaluation Guide](https://github.com/Azure/AzureStackHCI-EvalGuide).
 
@@ -22,7 +22,7 @@ The commands below and the Powershell script described in this guide should be r
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* Enable subscription with the resource provider for Azure Arc enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription with the resource provider for Azure Arc-enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```powershell
   Register-AzResourceProvider -ProviderNamespace Microsoft.HybridCompute
@@ -189,15 +189,15 @@ As mentioned, this deployment will leverage this [PowerShell script](https://git
 
     ![Screenshot showing the VM in WAC!](./09.png)
 
-* The Windows Virtual Machine created in Azure Stack HCI will be projected as a new Azure Arc enabled Server resource.
+* The Windows Virtual Machine created in Azure Stack HCI will be projected as a new Azure Arc-enabled Server resource.
 
-    ![Screenshot showing Arc Enabled Server](./10.png)
+    ![Screenshot showing Arc-enabled Server](./10.png)
 
 ## Delete the deployment
 
-The most straightforward way is to delete the Azure Arc enabled server resource via the Azure Portal, just select the cluster and delete it.
+The most straightforward way is to delete the Azure Arc-enabled server resource via the Azure Portal, just select the cluster and delete it.
 
-![Screenshot showing how to delete Azure Arc enabled server resource](./11.png)
+![Screenshot showing how to delete Azure Arc-enabled server resource](./11.png)
 
 To delete the Windows Virtual Machine on Azure Stack HCI run the below command in the management server:
 

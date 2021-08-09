@@ -7,9 +7,9 @@ weight: 1
 
 ## Deploy an AWS EC2 instance with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Amazon Web Services (AWS) EC2 instance and connect it as an Azure Arc enabled SQL server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Amazon Web Services (AWS) EC2 instance and connect it as an Azure Arc-enabled SQL server resource.
 
-By the end of the guide, you will have an AWS EC2 instance installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL server and a running SQL assessment with data injected to Azure Log Analytics workspace.
+By the end of the guide, you will have an AWS EC2 instance installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc-enabled SQL server and a running SQL assessment with data injected to Azure Log Analytics workspace.
 
 ## Prerequisites
 
@@ -58,7 +58,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc-enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.AzureArcData
@@ -212,15 +212,15 @@ Before executing the Terraform plan, you must set the environment variables whic
 
     ![AdventureWorksLT2019 sample database ](./23.png)
 
-* In the Azure Portal, notice you now have an Azure Arc enabled server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL server resource and Azure Log Analytics deployed.
+* In the Azure Portal, notice you now have an Azure Arc-enabled server resource (with the MMA agent installed via an Extension), Azure Arc-enabled SQL server resource and Azure Log Analytics deployed.
 
     ![An Azure resource group with deployed resources](./24.png)
 
-    ![Azure Arc enabled server resource](./25.png)
+    ![Azure Arc-enabled server resource](./25.png)
 
     ![MMA agent installed via an Extension](./26.png)
 
-    ![Azure Arc enabled SQL server resources](./27.png)
+    ![Azure Arc-enabled SQL server resources](./27.png)
 
 ## Azure SQL Assessment
 

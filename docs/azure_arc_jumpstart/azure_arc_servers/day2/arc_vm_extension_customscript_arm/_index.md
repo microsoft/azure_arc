@@ -8,9 +8,9 @@ description: >
 
 ## Deploy Custom Script Extension on Azure Arc Linux and Windows servers using Extension Management
 
-The following README will guide you on how to execute custom scripts on Azure Arc enabled servers by using Virtual Machine extensions. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
+The following README will guide you on how to execute custom scripts on Azure Arc-enabled servers by using Virtual Machine extensions. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
 
-You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Shell script, or Azure policies to manage the extension deployment to Azure Arc enabled servers. In this guide, we will use an ARM template to deploy the custom script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
+You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Shell script, or Azure policies to manage the extension deployment to Azure Arc-enabled servers. In this guide, we will use an ARM template to deploy the custom script extension. This extension downloads and executes scripts on virtual machines and it is useful for post deployment configuration, software installation, or any other configuration or management tasks.
 
 > **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
@@ -35,9 +35,9 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
-    ![Screenshot Azure Arc enabled server on resource group](./01.png)
+    ![Screenshot Azure Arc-enabled server on resource group](./01.png)
 
-    ![Screenshot Azure Arc enabled server on connected status](./02.png)
+    ![Screenshot Azure Arc-enabled server on connected status](./02.png)
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
@@ -74,7 +74,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
   * [*Linux*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/custom_script_linux.sh): The script will modify the message of the day (MOTD) on the operating system.
   * [*Windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/custom_script_windows.ps1): The script will install Windows Terminal, Microsoft Edge, 7zip and Visual Studio Code [Chocolaty](https://chocolatey.org/) packages on the VM.
 
-## Azure Arc enabled servers Custom Script Extension Deployment
+## Azure Arc-enabled servers Custom Script Extension Deployment
 
 * Edit the extensions parameters file for [*Windows*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/customscript-templatewindows.parameters.json) or for [*Linux*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/customscript-templatelinux.parameters.json)
 
@@ -84,9 +84,9 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
   * The VM name as it is registered in Azure Arc.
 
-    ![Screenshot Azure Arc enabled server machine name](./04.png)
+    ![Screenshot Azure Arc-enabled server machine name](./04.png)
 
-  * The location of the resource group where you registered the Azure Arc enabled server.
+  * The location of the resource group where you registered the Azure Arc-enabled server.
 
     ![Screenshot Azure region](./05.png)
 
@@ -120,7 +120,7 @@ You can use the Azure portal, Azure CLI, an ARM template, PowerShell or Linux Sh
 
     ![Screenshot ARM template output](./06.png)
 
-* To verify a successful deployment on the Azure Arc enabled server, in the Azure Portal, by clicking on "Extensions" settings. You should see the Custom Script extension installed.
+* To verify a successful deployment on the Azure Arc-enabled server, in the Azure Portal, by clicking on "Extensions" settings. You should see the Custom Script extension installed.
 
     ![Screenshot custom script extension](./07.png)
 

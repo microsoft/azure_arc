@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a local Kubernetes Cluster using MicroK8s and connect it to Azure Arc
 
-The following README will guide you on how to use [MicroK8s](https://microk8s.io/) to run a Kubernetes cluster locally and connect it as an Azure Arc enabled Kubernetes cluster resource.
+The following README will guide you on how to use [MicroK8s](https://microk8s.io/) to run a Kubernetes cluster locally and connect it as an Azure Arc-enabled Kubernetes cluster resource.
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -177,13 +177,13 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
   az connectedk8s connect --name Arc-MicroK8s-Demo --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
-  ![New Azure Arc enabled Kubernetes cluster](./04.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./04.png)
 
 * Upon completion, you will have your MicroK8s cluster connected as a new Azure Arc Kubernetes cluster resource in a new resource group.
 
-  ![New Azure Arc enabled Kubernetes cluster](./05.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./05.png)
 
-  ![New Azure Arc enabled Kubernetes cluster](./06.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./06.png)
 
 ## Optional - Day 2 Operations
 

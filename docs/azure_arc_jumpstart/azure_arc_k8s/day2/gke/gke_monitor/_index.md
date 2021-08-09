@@ -63,9 +63,9 @@ In this guide, you will hook the GKE cluster to Azure Monitor by deploying the [
 
 * Before integrating the cluster with Azure Monitor for Containers, click on the "Insights (preview)" blade for the connected Arc cluster to show how the cluster is not currently being monitored.
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./01.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./01.png)
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource Insights](./02.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource Insights](./02.png)
 
 * Edit the environment variables in the script to match your environment parameters, upload it to the Cloud Shell environment and run it using the ```. ./gke_monitor_onboarding.sh``` command.
 
