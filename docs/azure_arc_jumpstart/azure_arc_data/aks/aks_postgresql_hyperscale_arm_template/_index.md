@@ -8,9 +8,9 @@ description: >
 
 ## Deploy Azure PostgreSQL Hyperscale in directly connected mode on AKS using an ARM Template
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) and [PostgreSQL Hyperscale](https://docs.microsoft.com/en-us/azure/azure-arc/data/what-is-azure-arc-enabled-postgres-hyperscale) deployed on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
+The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) and [PostgreSQL Hyperscale](https://docs.microsoft.com/en-us/azure/azure-arc/data/what-is-azure-arc-enabled-postgres-hyperscale) deployed on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller, PostgreSQL Hyperscale instance, and a Microsoft Windows Server 2019 (Datacenter) Azure client VM, installed & pre-configured with all the required tools needed to work with Azure Arc enabled data services:
+By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller, PostgreSQL Hyperscale instance, and a Microsoft Windows Server 2019 (Datacenter) Azure client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
 ![Deployed Architecture](./24.png)
 
@@ -72,9 +72,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * [_VNET_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/VNET.json) - Deploys a Virtual Network with a single subnet - used by our clientVM.
   * [_aks_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/aks.json) - Deploys the AKS cluster where all the Azure Arc data services will be deployed.
   * [_clientVm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/clientVm.json) - Deploys the client Windows VM. This is where all user interactions with the environment are made from.
-  * [_logAnalytics_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/logAnalytics.json) - Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs uploads.
+  * [_logAnalytics_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/logAnalytics.json) - Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs uploads.
 
-User remotes into client Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploy and configure Azure Arc enabled data services on the AKS cluster including the data controller and PostgreSQL Hyperscale.
+User remotes into client Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploy and configure Azure Arc-enabled data services on the AKS cluster including the data controller and PostgreSQL Hyperscale.
 
 ## Deployment
 
@@ -166,13 +166,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL Hyperscale instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
 
-  * Azure Arc enabled Kubernetes cluster - Azure Arc enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
+  * Azure Arc-enabled Kubernetes cluster - Azure Arc-enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
-  * Custom location - provides a way for tenant administrators to use their Azure Arc enabled Kubernetes clusters as target locations for deploying Azure services instances.
+  * Custom location - provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as target locations for deploying Azure services instances.
 
   * Azure Arc Data Controller - The data controller that is now deployed on the Kubernetes cluster.
 
-  * Azure Arc enabled PostgreSQL Hyperscale - The PostgreSQL Hyperscale instance that is now deployed on the Kubernetes cluster.
+  * Azure Arc-enabled PostgreSQL Hyperscale - The PostgreSQL Hyperscale instance that is now deployed on the Kubernetes cluster.
 
 ![additional Azure resources in the resource group](./17.png)
 
@@ -188,13 +188,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Cluster extensions
 
-In this scenario, the Azure Arc enabled data services cluster extension was deployed and used throughout this scenario in order to deploy the data services infrastructure.
+In this scenario, the Azure Arc-enabled data services cluster extension was deployed and used throughout this scenario in order to deploy the data services infrastructure.
 
-* In order to view cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
+* In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc enabled Kubernetes resource](./21.png)
+  ![Azure Arc-enabled Kubernetes resource](./21.png)
 
-  ![Azure Arc enabled Kubernetes cluster extensions settings](./22.png)
+  ![Azure Arc-enabled Kubernetes cluster extensions settings](./22.png)
 
 ## Cleanup
 

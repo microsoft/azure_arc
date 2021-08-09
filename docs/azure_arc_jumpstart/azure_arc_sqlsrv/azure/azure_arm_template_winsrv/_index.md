@@ -7,15 +7,15 @@ weight: 1
 
 ## Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform
 
-The following README will guide you on how to use the provided [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview) to deploy an Azure VM installed with Windows Server and Microsoft SQL Server 2019 (Developer edition) and connect it as an Azure Arc enabled SQL server resource.
+The following README will guide you on how to use the provided [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview) to deploy an Azure VM installed with Windows Server and Microsoft SQL Server 2019 (Developer edition) and connect it as an Azure Arc-enabled SQL server resource.
 
-Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) by default. By projecting an Azure VM as an Azure Arc enabled server, a "conflict" is created which will not allow for the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM.
+Azure VMs are leveraging the [Azure Instance Metadata Service (IMDS)](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/instance-metadata-service) by default. By projecting an Azure VM as an Azure Arc-enabled server, a "conflict" is created which will not allow for the Azure Arc server resources to be represented as one when the IMDS is being used and instead, the Azure Arc server will still "act" as a native Azure VM.
 
 However, **for demo purposes only**, the below guide will allow you to use and onboard Azure VMs to Azure Arc and by doing so, you will be able to simulate a server which is deployed outside of Azure (i.e "on-premises" or in other cloud platforms)
 
-> **Note: It is not expected for an Azure VM to be projected as an Azure Arc enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
+> **Note: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
 
-By the end of the guide, you will have an Azure VM installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
+By the end of the guide, you will have an Azure VM installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc-enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
 
 ## Prerequisites
 
@@ -62,7 +62,7 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
 
     > **Note It is optional, but highly recommended, to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc-enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.AzureArcData
@@ -92,8 +92,8 @@ The automation for this scenario include 3 PowerShell scripts executed in the fo
 
     1. Restore AdventureWorksLT2019 Database
     2. Allow Azure VM to be onboard to Azure Arc
-    3. Project VM as an Azure Arc enabled server resource
-    4. Project SQL Server as an Azure Arc enabled SQL server resource
+    3. Project VM as an Azure Arc-enabled server resource
+    4. Project SQL Server as an Azure Arc-enabled SQL server resource
     5. Deploy Log Analytics workspace and Solutions
     6. Install Log Analytics agent using extension on Azure Arc server
     7. Create SQL Assessment and inject data to Azure Log Analytics workspace
@@ -180,13 +180,13 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
     ![Screenshot showing showing PowerShell script executing in VM](./13.jpg)
 
-* Upon successful run, in the Azure portal, notice you now have a new Azure Arc enabled server (with the Microsoft Monitoring agent installed via an extension) and Azure Arc enabled SQL resources as well as Azure Log Analytics added to the resource group.
+* Upon successful run, in the Azure portal, notice you now have a new Azure Arc-enabled server (with the Microsoft Monitoring agent installed via an extension) and Azure Arc-enabled SQL resources as well as Azure Log Analytics added to the resource group.
 
-    ![Screenshot showing Azure Arc enabled SQL resources](./14.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL resources](./14.jpg)
 
-    ![Screenshot showing Azure Arc enabled SQL resources](./15.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL resources](./15.jpg)
 
-    ![Screenshot showing Azure Arc enabled SQL resources](./16.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL resources](./16.jpg)
 
 * Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed as well.
 
@@ -204,21 +204,21 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 
     Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
-    ![Screenshot showing Environment Health blade of Azure Arc enabled SQL server](./19.jpg)
+    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./19.jpg)
 
-    ![Screenshot showing Environment Health blade of Azure Arc enabled SQL server](./20.jpg)
+    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./20.jpg)
 
-    ![Screenshot showing Environment Health blade of Azure Arc enabled SQL server](./21.jpg)
+    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./21.jpg)
 
-    ![Screenshot showing Environment Health blade of Azure Arc enabled SQL server](./22.jpg)
+    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./22.jpg)
 
     It might take a bit of time, but after ~45-60min you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
     Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-    ![Screenshot showing Environment Health blade of Azure Arc enabled SQL server](./23.jpg)
+    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./23.jpg)
 
-    ![Screenshot showing Environment Health blade of Azure Arc enabled SQL server](./24.jpg)
+    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./24.jpg)
 
 ## Cleanup
 

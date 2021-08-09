@@ -63,9 +63,9 @@ In this guide, you will hook the microK8s cluster to Azure Monitor by deploying 
 
 * Before integrating the cluster with Azure Monitor for Containers, click on the "Insights (preview)" blade for the connected Arc cluster to show how the cluster is not currently being monitored.
 
-    ![An existing Azure Arc enabled Kubernetes cluster](./01.png)
+    ![An existing Azure Arc-enabled Kubernetes cluster](./01.png)
 
-    ![An existing Azure Arc enabled Kubernetes cluster with no Azure Monitor integration](./02.png)
+    ![An existing Azure Arc-enabled Kubernetes cluster with no Azure Monitor integration](./02.png)
 
 * Edit the environment variables in either of the scripts to match your environment parameters, run it using the ```. ./microk8s_monitor_onboarding.sh``` (Bash) or ```./microk8s_monitor_onboarding.ps1``` (PowerShell) command.
 

@@ -8,9 +8,9 @@ description: >-
 
 ## Deploy a VMware vSphere-based Windows Server with SQL and connect it to Azure Arc using Terraform
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a VMware vSphere virtual machine and connect it as an Azure Arc enabled SQL server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a VMware vSphere virtual machine and connect it as an Azure Arc-enabled SQL server resource.
 
-By the end of the guide, you will have a VMware vSphere VM installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
+By the end of the guide, you will have a VMware vSphere VM installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc-enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
 
 ## Prerequisites
 
@@ -59,7 +59,7 @@ By the end of the guide, you will have a VMware vSphere VM installed with Window
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc-enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.AzureArcData
@@ -194,15 +194,15 @@ Before executing the Terraform plan, you must set the environment variables whic
 
     ![Screenshot of SQL Server Management Studio](./15.jpg)
 
-* In the Azure Portal, notice you now have an Azure Arc enabled Server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL resource and Azure Log Analytics deployed.
+* In the Azure Portal, notice you now have an Azure Arc-enabled Server resource (with the MMA agent installed via an Extension), Azure Arc-enabled SQL resource and Azure Log Analytics deployed.
 
-    ![Screenshot of Azure Portal showing Azure Arc enabled SQL server resources](./16.jpg)
+    ![Screenshot of Azure Portal showing Azure Arc-enabled SQL server resources](./16.jpg)
 
-    ![Screenshot of Azure Portal showing Azure Arc enabled SQL server resources](./17.jpg)
+    ![Screenshot of Azure Portal showing Azure Arc-enabled SQL server resources](./17.jpg)
 
-    ![Screenshot of Azure Portal showing Azure Arc enabled SQL server resources](./18.jpg)
+    ![Screenshot of Azure Portal showing Azure Arc-enabled SQL server resources](./18.jpg)
 
-    ![Screenshot of Azure Portal showing Azure Arc enabled SQL server resources](./19.jpg)
+    ![Screenshot of Azure Portal showing Azure Arc-enabled SQL server resources](./19.jpg)
 
 ## Azure SQL Assessment
 
@@ -214,21 +214,21 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 
     Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
-    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./20.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL Server Environment Health](./20.jpg)
 
-    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./21.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL Server Environment Health](./21.jpg)
 
-    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./22.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL Server Environment Health](./22.jpg)
 
 * After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
     Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./23.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL Server Environment Health](./23.jpg)
 
-    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./24.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL Server Environment Health](./24.jpg)
 
-    ![Screenshot showing Azure Arc enabled SQL Server Environment Health](./25.jpg)
+    ![Screenshot showing Azure Arc-enabled SQL Server Environment Health](./25.jpg)
 
 ## Cleanup
 

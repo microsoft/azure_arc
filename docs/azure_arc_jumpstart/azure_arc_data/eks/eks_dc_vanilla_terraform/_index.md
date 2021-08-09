@@ -132,7 +132,7 @@ Read the below explanation to get familiar with the automation and deployment fl
 
 * User edits and exports Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables are being used throughout the deployment.
 
-* User deploys the Terraform plan which will deploy the EKS cluster and the AWS compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and any database services you deploy on top of the data controller.
+* User deploys the Terraform plan which will deploy the EKS cluster and the AWS compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc-enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and any database services you deploy on top of the data controller.
 
 * In addition, the plan will copy the EKS *kubeconfig* file as well as the *configmap.yml* file (which is responsible for having the EKS nodes communicate with the cluster control plane) on to the Windows instance.
 
@@ -153,8 +153,8 @@ Read the below explanation to get familiar with the automation and deployment fl
       * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
       * Create the Azure Data Studio desktop shortcut
       * Apply the *configmap.yml* file on the EKS cluster
-      * Use Azure CLI to connect the EKS cluster to Azure as an Azure Arc enabled Kubernetes cluster
-      * Create a custom location for use with the Azure Arc enabled Kubernetes cluster
+      * Use Azure CLI to connect the EKS cluster to Azure as an Azure Arc-enabled Kubernetes cluster
+      * Create a custom location for use with the Azure Arc-enabled Kubernetes cluster
       * Deploy an ARM template that will deploy the Azure Arc data controller on the EKS cluster
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       * Unregister the logon script Windows schedule task so it will not run after first login

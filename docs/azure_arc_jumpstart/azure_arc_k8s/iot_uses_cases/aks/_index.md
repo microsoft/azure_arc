@@ -12,7 +12,7 @@ This scenario allows us to see how Azure IoT Edge and Azure Arc services complem
 
   > **Note: Azure Kubernetes Service is now in preview on Azure IoT Edge. You can find more details about this service in the [IoT Edge's support for Kubernetes document](https://microsoft.github.io/iotedge-k8s-doc/)**
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connect it as an Azure Arc enabled Kubernetes resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connect it as an Azure Arc-enabled Kubernetes resource.
 
 ## Prerequisites
 
@@ -59,7 +59,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -211,7 +211,7 @@ provisioning:
 
 ![Screenshot environment variables section](./13.png)
 
-* Once the script run has finished, the AKS cluster will be projected as a new Azure Arc enabled Kubernetes resource. We will proceed to connect to our AKS cluster and in a couple of minutes you should see the workload modules defined in the edge deployment running as pods along with edgeagent and iotedged.
+* Once the script run has finished, the AKS cluster will be projected as a new Azure Arc-enabled Kubernetes resource. We will proceed to connect to our AKS cluster and in a couple of minutes you should see the workload modules defined in the edge deployment running as pods along with edgeagent and iotedged.
 We can use the following commands to check it:
 
 ![Screenshot environment variables section](./16.png)
@@ -223,7 +223,7 @@ kubectl logs -n iotedge <replace-with-iot-edge-pod-name> simulatedtemperaturesen
 
 ## Delete the deployment
 
-The most straightforward way is to delete the Azure Arc enabled Kubernetes resource via the Azure Portal, just select the Resource Group and delete it.
+The most straightforward way is to delete the Azure Arc-enabled Kubernetes resource via the Azure Portal, just select the Resource Group and delete it.
 
 ![Screenshot showing delete function in Azure Portal](./14.png)
 

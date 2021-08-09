@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a GCP Windows instance and connect it to Azure Arc using a Terraform plan
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server GCP virtual machine and connect it as an Azure Arc enabled server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server GCP virtual machine and connect it as an Azure Arc-enabled server resource.
 
 ## Prerequisites
 
@@ -110,13 +110,13 @@ Before executing the Terraform plan, you must set and then export the environmen
 
     ![Screenshot showing terraform init being run](./08.png)
 
-* Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion of the Terraform script, you will have deployed a GCP Windows Server 2019 VM and initiated a script to download the Azure Arc agent to the VM and connect the VM as a new Azure Arc enabled server inside a new Azure resource group. It will take a few minutes for the agent to finish provisioning so grab a coffee.
+* Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion of the Terraform script, you will have deployed a GCP Windows Server 2019 VM and initiated a script to download the Azure Arc agent to the VM and connect the VM as a new Azure Arc-enabled server inside a new Azure resource group. It will take a few minutes for the agent to finish provisioning so grab a coffee.
 
     ![Screenshot of terraform apply being run](./09.png)
 
 * After a few minutes, you should be able to open the Azure portal and navigate to the resource group "Arc-GCP-Demo". The Windows Server virtual machine created in GCP will be visible as a resource.
 
-    ![Screenshot of Azure Portal showing Azure Arc enabled server](./33.png)
+    ![Screenshot of Azure Portal showing Azure Arc-enabled server](./33.png)
 
 ## Semi-Automated Deployment (Optional)
 

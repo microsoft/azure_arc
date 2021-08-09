@@ -34,9 +34,9 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * As mentioned, this guide starts at the point where you already have a connected GKE cluster to Azure Arc.
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./01.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./02.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
 * [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 

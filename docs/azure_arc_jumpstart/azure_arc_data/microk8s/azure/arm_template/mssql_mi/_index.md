@@ -6,11 +6,11 @@ weight: 2
 description: >
 ---
 
-## Deploy Azure Arc enabled SQL Managed Instance in directly connected mode on a Microk8s Kubernetes cluster in an Azure VM using ARM Templates
+## Deploy Azure Arc-enabled SQL Managed Instance in directly connected mode on a Microk8s Kubernetes cluster in an Azure VM using ARM Templates
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) and [SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-arc/data/managed-instance-overview) deployed on a single-node [Microk8s](https://microk8s.io/) Kubernetes cluster.
+The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) and [SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-arc/data/managed-instance-overview) deployed on a single-node [Microk8s](https://microk8s.io/) Kubernetes cluster.
 
-By the end of this guide, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller & SQL Managed Instance (with a sample database), and a Microsoft Windows Server 2019 (Datacenter) Azure Client VM, installed & pre-configured with all the required tools needed to work with Azure Arc enabled data services:
+By the end of this guide, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller & SQL Managed Instance (with a sample database), and a Microsoft Windows Server 2019 (Datacenter) Azure Client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
 ![Deployed Architecture](./01.png)
 
@@ -67,7 +67,7 @@ From the [Microk8s GitHub repo](https://github.com/ubuntu/microk8s):
 
 _"Microk8s is a single-package, fully conformant, lightweight Kubernetes that works on 42 flavors of Linux. Perfect for Developer workstations, IoT, Edge & CI/CD. MicroK8s tracks upstream and releases beta, RC and final bits the same day as upstream K8s."_
 
-In this guide, we automate the installation of Microk8s on an Ubuntu 18.04 VM running on Azure using a few simple commands to install from the [Snap Store](https://snapcraft.io/microk8s), before proceeding to onboard it as an Azure Arc enabled Kubernetes Cluster.
+In this guide, we automate the installation of Microk8s on an Ubuntu 18.04 VM running on Azure using a few simple commands to install from the [Snap Store](https://snapcraft.io/microk8s), before proceeding to onboard it as an Azure Arc-enabled Kubernetes Cluster.
 
 Once our K8s Cluster is onboarded, we proceed to create a [Custom Location](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/custom-locations), and deploy an Azure Arc Data Controller in [Directly Connected mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity#connectivity-modes).
 
@@ -83,9 +83,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - [_ubuntuMicrok8s_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/ubuntuMicrok8s.json) - Deploys an Ubuntu Linux VM which will have Microk8s installed from the Snap Store.
   - [_clientVm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/clientVm.json) - Deploys the Client Windows VM. This is where all user interactions with the environment are made from.
   - [_mgmtStagingStorage_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/mgmtStagingStorage.json) - Used for staging files in automation scripts and [kubeconfig](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
-  - [_logAnalytics_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/logAnalytics.json) - Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs upload.
+  - [_logAnalytics_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/logAnalytics.json) - Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs upload.
 
-- User remotes into Client Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploys and configure Azure Arc enabled data services on the Microk8s Kubernetes cluster - including the data controller.
+- User remotes into Client Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploys and configure Azure Arc-enabled data services on the Microk8s Kubernetes cluster - including the data controller.
 
 ## Deployment
 
@@ -158,13 +158,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **17 various Azure resources deployed**. The important ones to notice are:
 
-  - **Azure Arc enabled Kubernetes cluster** - Azure Arc enabled data services deployed in directly connected mode is using this resource to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
+  - **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled data services deployed in directly connected mode is using this resource to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
-  - **Custom location** - provides a way for tenant administrators to use their Azure Arc enabled Kubernetes clusters as a target location for deploying Azure services.
+  - **Custom location** - provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as a target location for deploying Azure services.
 
   - **Azure Arc Data Controller** - The data controller that is now deployed on the Kubernetes cluster.
 
-  - **Azure Arc enabled SQL Managed Instance** - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
+  - **Azure Arc-enabled SQL Managed Instance** - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
   ![Addtional Azure resources in the resource group](./07.png)
 
@@ -178,20 +178,20 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Cluster extensions
 
-In this scenario, **three** Azure Arc enabled Kubernetes cluster extensions were deployed:
+In this scenario, **three** Azure Arc-enabled Kubernetes cluster extensions were deployed:
 
 - `microsoft.azuredefender.kubernetes` - The Azure Defender cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Defender with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_defender_extension/#create-azure-defender-extensions-instance) scenario.
 
 - `azuremonitor-containers` - The Azure Monitor for containers cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/) scenario.
 
-- `arc-data-services` - The Azure Arc enabled data services cluster extension that was used throughout this scenario in order to deploy the data services infrastructure.
+- `arc-data-services` - The Azure Arc-enabled data services cluster extension that was used throughout this scenario in order to deploy the data services infrastructure.
 
-  In order to view these cluster extensions, click on the Azure Arc enabled Kubernetes resource Extensions settings.
+  In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc enabled Kubernetes resource](./10.png)
+  ![Azure Arc-enabled Kubernetes resource](./10.png)
 
   And we see the installed extensions:
-  ![Azure Arc enabled Kubernetes Cluster Extensions settings](./11.png)
+  ![Azure Arc-enabled Kubernetes Cluster Extensions settings](./11.png)
 
 ## Cleanup
 

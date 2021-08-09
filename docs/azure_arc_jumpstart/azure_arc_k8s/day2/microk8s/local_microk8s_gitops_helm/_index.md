@@ -36,9 +36,9 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * As mentioned, this guide starts at the point where you already have a connected MicroK8s cluster to Azure Arc.
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./01.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./02.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
 * [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
@@ -151,7 +151,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 ### The Mechanism (In a nutshell)
 
-In the process of creating Azure Arc enabled Kubernetes GitOps configuration, [Weaveworks Flux Kubernetes Operator](https://github.com/fluxcd/flux) is deployed on the cluster.
+In the process of creating Azure Arc-enabled Kubernetes GitOps configuration, [Weaveworks Flux Kubernetes Operator](https://github.com/fluxcd/flux) is deployed on the cluster.
 
 The Operator is aware of the "HelmRelease" Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart. Due to this configuration, a user can choose to leave the chart values intact or to have different values for different releases.
 

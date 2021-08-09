@@ -44,7 +44,7 @@ The following README will guide you on how to use the provided [Terraform](https
   terraform -v
   ```
 
-* [Enable Azure subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes. Login with an identity with sufficient authorizations.
+* [Enable Azure subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes. Login with an identity with sufficient authorizations.
 
   ```shell
   az login

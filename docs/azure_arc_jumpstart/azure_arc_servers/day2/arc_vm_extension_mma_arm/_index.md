@@ -8,11 +8,11 @@ description: >
 
 ## Deploy Monitoring Agent Extension on Azure Arc Linux and Windows servers using Extension Management
 
-The following README will guide you on how to manage extensions on Azure Arc enabled servers. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
+The following README will guide you on how to manage extensions on Azure Arc-enabled servers. Virtual machine extensions are small applications that provide post-deployment configuration and automation tasks such as software installation, anti-virus protection, or a mechanism to run a custom script.
 
-Azure Arc enabled servers, enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multi-cloud management experience that levels to Azure VMs.
+Azure Arc-enabled servers, enables you to deploy Azure VM extensions to non-Azure Windows and Linux VMs, giving you a hybrid or multi-cloud management experience that levels to Azure VMs.
 
-You can use the Azure portal, Azure CLI, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Azure Arc enabled servers, both Linux and Windows. In this guide, you will use an ARM template deploy the Microsoft Monitoring Agent (MMA) to your servers so they are onboard on Azure services that leverage this agent: Azure Monitor, Azure Security Center, Azure Sentinel, etc.
+You can use the Azure portal, Azure CLI, an ARM template, PowerShell script or Azure policies to manage the extension deployment to Azure Arc-enabled servers, both Linux and Windows. In this guide, you will use an ARM template deploy the Microsoft Monitoring Agent (MMA) to your servers so they are onboard on Azure services that leverage this agent: Azure Monitor, Azure Security Center, Azure Sentinel, etc.
 
 > **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
@@ -39,9 +39,9 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
-    ![Screenshot Azure Arc enabled server on resource group](./01.png)
+    ![Screenshot Azure Arc-enabled server on resource group](./01.png)
 
-    ![Screenshot Azure Arc enabled server connected status](./02.png)
+    ![Screenshot Azure Arc-enabled server connected status](./02.png)
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
@@ -86,7 +86,7 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
   --parameters <The *log_analytics-template.parameters.json* template file location>
   ```
 
-## Azure Arc enabled servers Microsoft Monitoring Agent Extension Deployment
+## Azure Arc-enabled servers Microsoft Monitoring Agent Extension Deployment
 
 * Edit the [*extensions parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/extensions/arm/mma-template.parameters.json)
 
@@ -96,15 +96,15 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
 
   * The VM name as it is registered in Azure Arc.
 
-    ![Screenshot Azure Arc enabled server computer name](./05.png)
+    ![Screenshot Azure Arc-enabled server computer name](./05.png)
 
-  * The location of the resource group where you registered the Azure Arc enabled server.
+  * The location of the resource group where you registered the Azure Arc-enabled server.
 
-    ![Screenshot Azure Arc enabled server location](./06.png)
+    ![Screenshot Azure Arc-enabled server location](./06.png)
 
   * Information of the Log Analytics workspace you previously created: workspace ID and key. These parameters will be used to configure the MMA agent. You can get this information by going to your Log Analytics workspace and under "Settings" select "Agent management".
 
-    ![Screenshot Azure Arc enabled server Agent management](./07.png)
+    ![Screenshot Azure Arc-enabled server Agent management](./07.png)
 
     ![Screenshot workspace configuration](./08.png)
 
