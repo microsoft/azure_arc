@@ -71,7 +71,7 @@
             "value": "2021-08-01"
         },
         "pricingTier": {
-            "value": "GeneralPurpose"
+            "value": "BusinessCritical"
         },        
         "licenseType": {
             "value": "LicenseIncluded"
