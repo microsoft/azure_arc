@@ -1,0 +1,38 @@
+{
+  "managedApiConnections": {
+    "azurequeue": {
+      "api": {
+        "id": "/subscriptions/@appsetting('subscriptionId')/providers/Microsoft.Web/locations/@appsetting('location')/managedApis/azurequeues"
+      },
+      "connection": {
+        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroup')/providers/Microsoft.Web/connections/azurequeues"
+      },
+      "connectionRuntimeUrl": "@appsetting('queueConnectionRuntimeUrl')",
+      "authentication": {
+        "type": "ActiveDirectoryOAuth",
+        "audience": "https://management.core.windows.net/",
+        "credentialType": "Secret",
+        "clientId": "@appsetting('spnClientId')",
+        "tenant": "@appsetting('spnTenantId')",
+        "secret": "@appsetting('spnClientSecret')"
+      }
+    },
+    "azureblob": {
+      "api": {
+        "id": "/subscriptions/@appsetting('subscriptionId')/providers/Microsoft.Web/locations/@appsetting('location')/managedApis/azureblob"
+      },
+      "connection": {
+        "id": "/subscriptions/@appsetting('subscriptionId')/resourceGroups/@appsetting('resourceGroup')/providers/Microsoft.Web/connections/azureblob"
+      },
+      "connectionRuntimeUrl": "@appsetting('blobConnectionRuntimeUrl')",
+      "authentication": {
+        "type": "ActiveDirectoryOAuth",
+        "audience": "https://management.core.windows.net/",
+        "credentialType": "Secret",
+        "clientId": "@appsetting('spnClientId')",
+        "tenant": "@appsetting('spnTenantId')",
+        "secret": "@appsetting('spnClientSecret')"
+      }
+    }
+  }
+}
