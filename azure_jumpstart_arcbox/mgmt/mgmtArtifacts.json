@@ -57,6 +57,7 @@
       "galleryName": "Security"
     },
     "policyTemplate": "[uri(parameters('templateBaseUrl'), 'mgmt/policyAzureArcBuiltins.json')]",
+    "monitorWorkbookTemplate": "[uri(parameters('templateBaseUrl'), 'mgmt/mgmtMonitorWorkbook.json')]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",
@@ -207,6 +208,26 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('workspaceName')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "monitorWorkbookDeployment",
+      "dependsOn": [
+        "[concat(parameters('workspaceName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('monitorWorkbookTemplate')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workbookResourceId": {
+            "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('location'))]"
           }
         }
       }
