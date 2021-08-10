@@ -1,5 +1,11 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
+Write-Host "Installing SQL Server and PowerShell Module"
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+If(-not(Get-InstalledModule SQLServer -ErrorAction silentlycontinue)){
+    Install-Module SQLServer -Confirm:$False -Force
+}
+
 # Deployment environment variables
 $connectedClusterName = "Arc-Data-AKS"
 
