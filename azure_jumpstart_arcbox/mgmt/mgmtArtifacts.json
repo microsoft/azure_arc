@@ -24,7 +24,7 @@
     },
     "workbookId": {
       "type": "string",
-      "defaultValue": "ArcBoxWorkbook",
+      "defaultValue": "[newGuid()]",
       "metadata": {
         "description": "Name for your Azure Monitor workbook"
       }
