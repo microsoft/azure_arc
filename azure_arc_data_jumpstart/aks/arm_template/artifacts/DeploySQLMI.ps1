@@ -29,14 +29,14 @@ $dataLogsStorageSize = "5"
 $backupsStorageSize = "5"
 
 # If flag set, deploy SQL MI "General Purpose" tier
-if ( $env:deploySQLMIHA -eq $false )
+if ( $env:SQLMIHA -eq $false )
 {
     $replicas = 1 # Value can be only 1
     $pricingTier = "GeneralPurpose"
 }
 
 # If flag set, deploy SQL MI "Business Critical" tier
-if ( $env:deploySQLMIHA -eq $true )
+if ( $env:SQLMIHA -eq $true )
 {
     $replicas = 3 # Value can be either 2 or 3
     $pricingTier = "BusinessCritical"
