@@ -294,7 +294,11 @@
                 "osProfile": {
                     "computerName": "[variables('vmName')]",
                     "adminUsername": "[parameters('windowsAdminUsername')]",
-                    "adminPassword": "[parameters('windowsAdminPassword')]"
+                    "adminPassword": "[parameters('windowsAdminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": false
+                    }
                 }
             }
         },
