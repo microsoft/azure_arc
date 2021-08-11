@@ -151,16 +151,10 @@ Do {
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
-# If flag set, deploy SQL MI "General Purpose" tier
-if ( $env:deploySQLMI -eq $true -and $env:deploySQLMIHA -eq $false )
+# If flag set, deploy SQL MI
+if ( $env:deploySQLMI -eq $true )
 {
 & "C:\Temp\DeploySQLMI.ps1"
-}
-
-# If flag set, deploy SQL MI "Business Critical" tier
-if ( $env:deploySQLMI -eq $true -and $env:deploySQLMIHA -eq $true )
-{
-& "C:\Temp\DeploySQLMIHA.ps1"
 }
 
 # If flag set, deploy PostgreSQL
