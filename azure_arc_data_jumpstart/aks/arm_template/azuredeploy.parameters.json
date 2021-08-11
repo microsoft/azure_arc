@@ -29,6 +29,9 @@
     "deploySQLMI": {
       "value": "<SQL Managed Instance deployment (true/false)>"
     },
+    "SQLMIHA": {
+      "value": "<SQL Managed Instance high-availability deployment (true/false)>"
+    },
     "deployPostgreSQL": {
       "value": "<PostgreSQL Hyperscale deployment (true/false)>"
     },
