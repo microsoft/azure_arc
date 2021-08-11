@@ -28,8 +28,20 @@ $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
 $backupsStorageSize = "5"
 
-# High Availability
-$replicas = 3 # Value can be either 1 or 3
+# If flag set, deploy SQL MI "General Purpose" tier
+if ( $env:deploySQLMIHA -eq $false )
+{
+    $replicas = 1 # Value can be only 1
+    $pricingTier = "GeneralPurpose"
+}
+
+# If flag set, deploy SQL MI "Business Critical" tier
+if ( $env:deploySQLMIHA -eq $true )
+{
+    $replicas = 3 # Value can be either 2 or 3
+    $pricingTier = "BusinessCritical"
+}
+
 ################################################
 
 $SQLParams = "C:\Temp\SQLMI.parameters.json"
@@ -54,6 +66,7 @@ $SQLParams = "C:\Temp\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'dataLogseSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'pricingTier-stage' ,$pricingTier | Set-Content -Path $SQLParams
 
 az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\SQLMI.json" --parameters "C:\Temp\SQLMI.parameters.json"
 Write-Host "`n"
