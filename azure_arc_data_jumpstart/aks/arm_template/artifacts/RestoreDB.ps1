@@ -1,3 +1,5 @@
+Start-Transcript -Path C:\Temp\RestoreDB.log
+
 # Retrieving SQL MI connection endpoint
 New-Item -Path "C:\Temp\" -Name "Endpoints.txt" -ItemType "file" 
 $Endpoints = "C:\Temp\Endpoints.txt"
@@ -12,10 +14,10 @@ $secondaryEndpoint = $secondaryEndpoint.Substring(0, $secondaryEndpoint.IndexOf(
 
 # Downloading demo database and restoring onto SQL MI
 $podname = "jumpstart-sql" + "-0"
-Write-Host "Copying AdventureWorks database to MS SQL... (1/2)"
-kubectl cp /Temp/AdventureWorks2019.bak $podname":/var/opt/mssql/data" -c arc-sqlmi -n arc
+Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
 Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-Invoke-Sqlcmd -ServerInstance $primaryEndpoint -Username $env:AZDATA_USERNAME -Password $env:AZDATA_PASSWORD -InputFile C:\Temp\RestoreDB.sql
+kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
 
 Write-Host "Creating Endpoints file Desktop shortcut"
 Write-Host "`n"
