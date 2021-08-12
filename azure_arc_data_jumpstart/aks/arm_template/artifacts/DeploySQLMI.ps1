@@ -79,21 +79,13 @@ Do {
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
-# Retrieving SQL MI connection endpoint
-$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
-$sqlstring = $sqlstring.Substring(0, $sqlstring.IndexOf(','))
-
-# Downloading demo database and restoring onto SQL MI
-$podname = "jumpstart-sql" + "-0"
-Write-Host "Copying AdventureWorks database to MS SQL... (1/2)"
-kubectl cp /Temp/AdventureWorks2019.bak $podname":/var/opt/mssql/data" -c arc-sqlmi -n arc
-Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-Invoke-Sqlcmd -ServerInstance $sqlstring -Username $env:AZDATA_USERNAME -Password $env:AZDATA_PASSWORD -InputFile C:\Temp\RestoreDB.sql
-
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
 $settingsTemplate = "C:\Temp\settingsTemplate.json"
+
+# Retrieving SQL MI connection endpoint
+$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
 # Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
