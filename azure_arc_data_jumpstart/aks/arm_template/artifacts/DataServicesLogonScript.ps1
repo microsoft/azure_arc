@@ -72,7 +72,6 @@ Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Create Kubernetes - Azure Arc Cluster
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az connectedk8s connect --name $connectedClusterName `
                         --resource-group $env:resourceGroup `
                         --location $env:azureLocation `
@@ -82,6 +81,7 @@ az connectedk8s connect --name $connectedClusterName `
 Start-Sleep -Seconds 10
 
 # Create Azure Arc enabled Data Services extension
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
