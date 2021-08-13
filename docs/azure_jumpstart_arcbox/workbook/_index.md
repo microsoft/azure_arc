@@ -94,19 +94,19 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
   With this report you will get several visualizations:
 
-  * Pod and Container restart trend graphs.
+  * *Pod and Container restart trend graphs.*
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_1.png)
 
-  * Pod count and status chart.
+  * *Pod count and status chart.*
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_2.png)
 
-  * A list of the container status for pods.
+  * *A list of the container status for pods.*
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_3.png)
 
-  * The kubernetes cluster's nodes CPU and memory working set percentage.
+  * *The kubernetes cluster's nodes CPU and memory working set percentage.*
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_4.png)
 
@@ -146,37 +146,53 @@ The "Security" tab of the Jumpstart Workbook shows insights from Azure Security 
 
 Once configured, the report will provide an overview of the secure score, you can filter information by using the parameters section:
 
-* Workspace: select one or multiple Log Analytics workspaces.
+* *Workspace* -  select one or multiple Log Analytics workspaces.
 
-* Time Range: filter the data of the report to one of the predefined time ranges.
+* *Time Range* -  filter the data of the report to one of the predefined time ranges.
 
    ![Security parameters](./security_parameters.png)
 
   With this report you will get several visualizations:
 
-  * Current score trends per subscription
+  * *Current score trends per subscription*
 
      ![Security workbook trends](./security_trends.png)
 
-  * Aggregated score for selected subscriptions over time
+  * *Aggregated score for selected subscriptions over time*
 
      ![Security workbook aggregated score](./security_score.png)
 
-  * Top recommendations with recent increase in unhealthy resources
+  * *Top recommendations with recent increase in unhealthy resources*
   
      ![Security tab top recommendations](./security_recommendations.png)
 
-  * Security controls scores over time (weekly)
+  * *Security controls scores over time (weekly)*
 
      ![Security controls scores overtime](./security_controls.png)
 
-  * Resources changed over time, to view changes over time on a specific recommendation, please select any from the list above.
+  * *Resources changed over time* - to view changes over time on a specific recommendation, please select any from the list above.
 
      ![Resources changed overtime](./security_changes.png)
 
      ![Resources changed overtime selected resources](./security_changes_resource.png)
 
 ### Change Tracking
+
+Change Tracking in Azure Automation keeps track of the changes in virtual machines hosted in Azure, on-premises, and other cloud environments to help you pinpoint operational and environmental issues with software managed by the Distribution Package Manager.
+
+In Jumpstart ArcBox all of the Azure Arc enabled servers are onboarded on Change Tracking and Inventory. The "Change Tracking" tab of the Jumpstart Workbook shows insights from Azure Automation. To use this report you need to provide the ArcBox's subscription and Log Analytics worskspace in the parameters section along with a time range.
+
+   ![Change Tracking Parameters](./changetracking_parameters.png)
+
+The tab has two different sections:
+
+* *Software Inventory* - This section provides a distinct count od publishers and applications for the servers selected. You can filter data by computer, publisher or application.
+
+   ![Change Tracking Software Inventory](./changetracking_software.png)
+
+* *Windows Services* - This section shows a table of Windows services with  their state, account and path.
+
+   ![Change Tracking Windows Services](./changetracking_services.png)
 
 ### Update Management
 
