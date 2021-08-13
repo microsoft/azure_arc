@@ -82,18 +82,21 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/artifacts/azuredeploy.parameters.example.json).
 
-  * *sshRSAPublicKey* - Your SSH public key
-  * *spnClientId* - Your Azure service principal id
-  * *spnClientSecret* - Your Azure service principal secret
-  * *spnTenantId* - Your Azure tenant id
-  * *windowsAdminUsername* - Client Windows VM Administrator name
-  * *windowsAdminPassword* - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  * *myIpAddress* - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and AKS cluster.
-  * *logAnalyticsWorkspaceName* - Unique name for the deployment log analytics workspace.
-  * *deploySQLMI* - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure SQL Managed Instance scenario, we will set it to _**true**_.
-  * *deployPostgreSQL* - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
-  * *kubernetesVersion* - AKS version
-  * *dnsPrefix* - AKS unique DNS prefix
+  * `sshRSAPublicKey` - Your SSH public key
+  * `spnClientId` - Your Azure service principal id
+  * `spnClientSecret` - Your Azure service principal secret
+  * `spnTenantId` - Your Azure tenant id
+  * `windowsAdminUsername` - Client Windows VM Administrator name
+  * `windowsAdminPassword` - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  * `myIpAddress` - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and AKS cluster.
+  * `logAnalyticsWorkspaceName` - Unique name for the deployment log analytics workspace.
+  * `deploySQLMI` - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure SQL Managed Instance scenario, we will set it to _**true**_.
+  * `SQLMIHA` - Boolean that sets whether or not to deploy SQL Managed Instance in an highly-available configuration, set this to either _**true**_ or _**false**_.
+  * `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
+  * `kubernetesVersion` - AKS version
+  * `dnsPrefix` - AKS unique DNS prefix
+
+    > **Note: In case you decided to deploy SQL Managed Instance in an highly-available fashion, refer to the ["High Availability"](##-High-Availability-with-Always-On-availability-groups) section in this readme. Also note that this capability is currently in [preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template) and run the below command:
 
@@ -203,6 +206,12 @@ In this scenario, the Azure Arc-enabled data services cluster extension was depl
   ![Azure Arc-enabled Kubernetes resource](./25.png)
 
   ![Azure Arc-enabled Kubernetes cluster extensions settings](./26.png)
+
+## High Availability with Always On availability groups
+
+Azure Arc-enabled SQL Managed Instance is deployed on Kubernetes as a containerized application and uses kubernetes constructs such as stateful sets and persistent storage to provide built-in health monitoring, failure detection, and failover mechanisms to maintain service health. For increased reliability, you can also configure Azure Arc-enabled SQL Managed Instance to deploy with extra replicas in a high availability configuration.
+
+For showcasing and testing SQL Managed Instance with [Always On availability groups](https://docs.microsoft.com/en-us/azure/azure-arc/data/managed-instance-high-availability#deploy-with-always-on-availability-groups), a dedicated [Jumpstart scenario]() is available to help you simulate failures and get hands-on experience with this deployment model.
 
 ## Cleanup
 
