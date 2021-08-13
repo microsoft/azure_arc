@@ -196,6 +196,40 @@ The tab has two different sections:
 
 ### Update Management
 
+Azure Automation provides Update Management to take care of the operating system updates for Windows and Linux  Azure VMs or Azure Arc enabled servers. The solution assesses the status of available updates and manages the process of installing required updates for your machines reporting to Update Management. In Jumpstart ArcBox all of the Azure Arc enabled servers are onboarded on Update Management. The "Update Management" tab of the Jumpstart Workbook shows insights from Azure Automation. To use this report you need to provide the ArcBox's subscription, resource group and Log Analytics worskspace in the parameters section along with a time range.
+
+   ![Update Management parameters](./update_parameters.png)
+
+The tab has two different sections, one for Windows and one for Linux machines:
+
+* *Windows VM Updates* - This section provides serveral reports:
+
+  * *Types of Windows Updates* - this donut chart shows the number of Windows Updates grouped by type.
+
+   ![Update Windows Updates](./update_windows.png)
+
+  * *Top Windows VMs with Updates* - shows the top Windows machines with updates available and the number of updates per machine.
+
+   ![ Update Windows Top](./uptade_windows_top.png)
+
+  * *Update Summary* - shows a table with the updates available for each of the Windows VM and its severity. By selecting one of the resources names you will get additional information on the available updates.
+
+   ![ Update Windows Summary](./update_windows_summary.png)
+
+* *Linux VM Updates* - This section provides serveral reports:
+
+  * *Types of Linux Updates* - this donut chart shows the number of Windows Updates grouped by type.
+
+   ![Update Linux Updates](./update_linux.png)
+
+  * *Top Linux VMs with Updates* - shows the top Linux machines with updates available and the number of updates per machine.
+
+   ![ Update Linux Top](./uptade_linux_top.png)
+
+  * *Update Summary* - shows a table with the updates available for each of the Linux VM and its severity. By selecting one of the resources names you will get additional information on the available updates.
+
+   ![ Update Linux Summary](./update_linux_summary.png)
+
 ### SQL Healthcheck
 
 ### Next steps
