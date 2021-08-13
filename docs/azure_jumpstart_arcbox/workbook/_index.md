@@ -112,12 +112,75 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
 ### Security
 
+Azure Security Center can monitor the security posture of your hybrid and multicloud deployments that have been onboarded onto Azure Arc. Once those deployments are registered in Azure you can take care of the security baseline and audit, apply, or automate requirements from recommended security controls as well as identify and provide mitigation guidance for security-related business risks.
+
+The "Security" tab of the Jumpstart Workbook shows insights from Azure Security Center assessments. To be able to use this report, you will need to configure continuous export to export Azure Security Center's data to ArcBox's Log Analytics workspace:
+
+* From Security Center's sidebar, select Pricing & settings.
+
+   ![Security Center Configuration](./security_center_config_1.png)
+
+* Select the specific subscription for which you want to configure the data export.
+
+   ![Security Center Configuration](./security_center_config_2.png)
+
+* From the sidebar of the settings page for that subscription, select Continuous Export.
+
+   ![Security Center Configuration](./security_center_config_3.png)
+
+* Set the export target to Log Analytics workspace.
+
+   ![Security Center Configuration](./security_center_config_4.png)
+
+* Select the following data types: Security recommendations and Secure Score (Preview).
+
+   ![Security Center Configuration](./security_center_config_5.png)
+
+* From the export frequency options, select Streaming and Snapshots.
+
+   ![Security Center Configuration](./security_center_config_6.png)
+
+* Make sure to select ArcBox's subscription, resource group and Log Analytics workspace as the export target. Select Save.
+
+   ![Security Center Configuration](./security_center_config_7.png)
+
+Once configured, the report will provide an overview of the secure score, you can filter information by using the parameters section:
+
+* Workspace: select one or multiple Log Analytics workspaces.
+
+* Time Range: filter the data of the report to one of the predefined time ranges.
+
+   ![Security parameters](./security_parameters.png)
+
+  With this report you will get several visualizations:
+
+  * Current score trends per subscription
+
+     ![Security workbook trends](./security_trends.png)
+
+  * Aggregated score for selected subscriptions over time
+
+     ![Security workbook aggregated score](./security_score.png)
+
+  * Top recommendations with recent increase in unhealthy resources
+  
+     ![Security tab top recommendations](./security_recommendations.png)
+
+  * Security controls scores over time (weekly)
+
+     ![Security controls scores overtime](./security_controls.png)
+
+  * Resources changed over time, to view changes over time on a specific recommendation, please select any from the list above.
+
+     ![Resources changed overtime](./security_changes.png)
+
+     ![Resources changed overtime selected resources](./security_changes_resource.png)
+
 ### Change Tracking
 
 ### Update Management
 
 ### SQL Healthcheck
-
 
 ### Next steps
   
