@@ -82,11 +82,33 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
    ![Monitoring Azure Arc enabled Server Metrics](./monitoring_arc_servers.png)
 
 * *Azure Arc enabled Kubernetes* - Shows information and metrics from ArcBox's Azure Arc enabled Kubernetes clusters. Use the parameters section to filter data:
-  * Time Range: provide a time range for the metrics.
-  * Subscription: select one or multiple subscriptions in your environment to show available alerts.
+  * Time Range: provide a time range for the metrics and logs to be displayed.
+  * Subscription: select your subscription where ArcBox is deployed.
   * Log Analytics Workspace: select ArcBox's Log Analytics workspace.
+  * Azure Arcenabled K8s cluster: choose one of ArcBox's Azure Arc enabled Kubernetes clusters.
+  * Workload Type: choose one or multiple kubernetes deployment types.
+  * Namespace: choose one or multiple namespaces in the Kubernetes cluster.
+  * Workload Name: choose one of the deployments in your cluster.
+  * Pod Status: filter by Pod status like Pending/Running/Failed etc.
+  * Pod Name: filter by pod name in the namespace and workloadname selected.
 
-   ![Inventory Resource List](./inventory_resource_list.png)
+  With this report you will get several visualizations:
+
+  * Pod and Container restart trend graphs.
+
+     ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_1.png)
+
+  * Pod count and status chart.
+
+     ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_2.png)
+
+  * A list of the container status for pods.
+
+     ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_3.png)
+
+  * The kubernetes cluster's nodes CPU and memory working set percentage.
+
+     ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_4.png)
 
 ### Security
 
