@@ -84,7 +84,7 @@ All databases are automatically added to the availability group, including all u
 
     ![Databases replication](./15.png)
 
-- To test that the DB replication is working, a simple table modification is needed. For this example, on the primary replica, expend the "Tables" section for the database, click on "Edit Top 200 Rows", modify one or more records and commit the changes by saving (_`Ctrl+S`_). As you can see, in this example a change was made to _"ken0"_ title and the number of vacation hours for _"rob0"_.
+- To test that the DB replication is working, a simple table modification is needed. For this example, on the primary replica, expend the "Tables" section for the database, select the _"HumanResources.Employee"_ table, click on "Edit Top 200 Rows", modify one or more records and commit the changes by saving (_`Ctrl+S`_). As you can see, in this example a change was made to _"ken0"_ title and the number of vacation hours for _"rob0"_.
 
     ![Expending database for primary](./16.png)
 
@@ -104,4 +104,34 @@ All databases are automatically added to the availability group, including all u
 
 As you already know, the availability group includes three Kubernetes replicas with a primary and two secondaries with all CRUD operations for the availability group are managed internally, including creating the availability group or joining replicas to the availability group created.
 
-- To test that a failover between the replicas, we will simulate a "crash" that will initiate an HA event and will force one of the secondary replicas to get promoted to a primary replica. Open two PowerShell 
+- To test that a failover between the replicas, we will simulate a "crash" that will trigger an HA event and will force one of the secondary replicas to get promoted to a primary replica. Open two side-by-side PowerShell sessions. On the left side session, use the _`kubectl get pods -n arc`_ to review the deployed pods. The right side session will be used to monitor the pods on the cluster using the _`kubectl get pods -n arc -w`_ command. As you can see, three SQL replicas with four containers each are running.
+
+    ![side-by-side PowerShell sessions](./22.png)
+
+> **Note: As mentioned under the ["Known Issues"](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/#known-issues) in the bootstrap Jumpstart scenario, Webhook pods error state can be safely ignored and do not impact the functionality of Azure Arc-enabled data services and the Jumpstart automation.**
+
+- In SSMS, you can also see that _jumpstart-sql-0_ is acting as the primary replica and _jumpstart-sql-1_ as the secondary. At this point, close SSMS.
+
+    ![Primary and secondary replicas](./23.png)
+
+- To trigger the HA event, delete the primary replica _jumpstart-sql-0_ using the _`kubectl delete pod jumpstart-sql-0 -n arc`_ and watch how the pod gets deleted and then being deployed again due to being part of a Kubernetes _ReplicaSet_. Wait for the _jumpstart-sql-0_ pod to become ready again (and an additional couple of minutes to let the availability group recover).
+
+    ![Pod deletion](./24.png)
+
+- Re-open SSMS and connect back to the *primary* endpoint. You can now see that _jumpstart-sql-0_ is now acting as the secondary replica and _jumpstart-sql-2_ was promoted to primary. In addition, run the _`az sql mi-arc show -n jumpstart-sql --k8s-namespace arc --use-k8s`_ command again and check the health status of the availability group.
+
+    ![Successful failover](./25.png)
+
+    ![Availability group health](./26.png)
+
+## Re-Validating Database Replication
+
+- Now that we perform a successful failover, we can re-validate and make sure replication still works as expected. In SSMS, re-add the secondary endpoint connection.
+
+    ![Re-adding secondary endpoint connection](./27.png)
+
+- In the primary endpoint connection, repeat the process of performing a change on the _AdventureWorks2019_ database _"HumanResources.Employee"_ table and check that replication is working.In the example below, you can see how new values in new rows are now replicated.
+
+    ![New table values change](./28.png)
+
+    ![Successful replication](./29.png)
