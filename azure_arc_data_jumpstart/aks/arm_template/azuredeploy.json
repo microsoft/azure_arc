@@ -79,6 +79,13 @@
         "description": "SQL Managed Instance deployment"
       }
     },
+    "SQLMIHA": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "SQL Managed Instance high-availability deployment"
+      }
+    },    
     "deployPostgreSQL": {
       "type": "bool",
       "defaultValue": false,
@@ -210,6 +217,9 @@
           },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
+          },
+          "SQLMIHA": {
+            "value": "[parameters('SQLMIHA')]"
           },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"

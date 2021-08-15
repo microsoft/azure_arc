@@ -1,5 +1,11 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
+Write-Host "Installing SQL Server and PowerShell Module"
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+If(-not(Get-InstalledModule SQLServer -ErrorAction silentlycontinue)){
+    Install-Module SQLServer -Confirm:$False -Force
+}
+
 # Deployment environment variables
 $connectedClusterName = "Arc-Data-AKS"
 
@@ -65,9 +71,6 @@ Write-Host "`n"
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 
-# Monitor pods across namespaces
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
-
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `
                         --resource-group $env:resourceGroup `
@@ -78,6 +81,7 @@ az connectedk8s connect --name $connectedClusterName `
 Start-Sleep -Seconds 10
 
 # Create Azure Arc enabled Data Services extension
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
