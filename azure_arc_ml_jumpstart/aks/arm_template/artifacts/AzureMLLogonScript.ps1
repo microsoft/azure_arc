@@ -108,7 +108,7 @@ Do {
 ###################################################################################################################
 # Azure Arc-enabled Machine Learning enablement components
 Write-Host """
- Enabling Azure Arc-enabled Machine Learning enablement components:
+ Enabling Azure Arc-enabled Machine Learning components:
 
                  /((((((((#,
                  /(((((((##,
@@ -440,5 +440,5 @@ Unregister-ScheduledTask -TaskName "AzureMLLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 # We intentionally keep the script running, so we have a chance to see the predictions
-# Stop-Process -Name powershell -Force
-# Stop-Transcript
+Stop-Process -Name powershell -Force
+Stop-Transcript
