@@ -232,7 +232,42 @@ The tab has two different sections, one for Windows and one for Linux machines:
 
 ### SQL Healthcheck
 
-### Next steps
-  
-ArcBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or kickstarter for proof of concept projects. Ultimately, you are free to do whatever you wish with ArcBox. Some suggested next steps for you to try in your ArcBox are:
+The Azure Monitor SQL Health Check solution asesses the risk and health of your Windows-based SQL Server instance that is connected to Azure Arc. The solution provides a prioritized list of recommendations specific to your deployed server infrastructure. Each recommendation provides guidance based on best practices and how to implement the suggested changes.
 
+ArcBox has one Windows VM running SQL Server that is onboarded as Azure Arc-enabled SQL Server (as well as Azure Arc-enabled Server) where the SQL Assessmenthas been run. To use the "SQL Healthcheck" tab of the ArcBox workbooks you need to provide the ArcBox's subscription, resource group and Log Analytics worskspace as parameters.
+
+   ![SQL Healthcheck parameters](./sql_healthcheck_parameters.png)
+
+The report will display the results of the assessment in four sections:
+
+* *Security and compliace* - this section has three different reports for all security and compliance recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the security and compliance recommendations.
+
+   ![SQL Healthcheck security and compliance status](./sql_healthcheck_security_status.png)
+
+   ![SQL Healthcheck security and compliance priority](./sql_healthcheck_security_priority.png)
+
+   ![SQL Healthcheck security and compliance status recommendations](./sql_healthcheck_security_recommendations.png)
+
+* *High availability and business continuity* - this section has three different reports for all high availability and business continuity  recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the high availability and business continuity  recommendations.
+
+   ![SQL Healthcheck HA status](./sql_healthcheck_ha_status.png)
+
+   ![SQL Healthcheck HA priority](./sql_healthcheck_ha_priority.png)
+
+   ![SQL Healthcheck HA status recommendations](./sql_healthcheck_ha_recommendations.png)
+
+* *Performance and scalability* - this section has three different reports for all performance and scalability recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the performance and scalability recommendations.
+
+   ![SQL Healthcheck performance status](./sql_healthcheck_performance_status.png)
+
+   ![SQL Healthcheck performance priority](./sql_healthcheck_performance_priority.png)
+
+   ![SQL Healthcheck performance status recommendations](./sql_healthcheck_performance_recommendations.png)
+
+* *Upgrade, migration and deployment* - this section has three different reports for all upgrade, migration and deployment recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the upgrade, migration and deployment recommendations.
+
+   ![SQL Healthcheck upgrade status](./sql_healthcheck_upgrade_status.png)
+
+   ![SQL Healthcheck upgrade priority](./sql_healthcheck_upgrade_priority.png)
+
+   ![SQL Healthcheck upgrade recommendations](./sql_healthcheck_upgrade_recommendations.png)
