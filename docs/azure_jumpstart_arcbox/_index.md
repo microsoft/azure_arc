@@ -137,7 +137,6 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
 * East US 2
 * West US 2
 * North Europe
-* West Europe
 * France Central
 * UK South
 * Southeast Asia
