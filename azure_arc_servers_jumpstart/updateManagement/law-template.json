@@ -56,7 +56,7 @@
       "metadata": {
         "description": "Automation account name"
       }
-    },
+    }
   },
   "variables": {
     "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]"
