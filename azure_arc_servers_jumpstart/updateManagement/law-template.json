@@ -58,6 +58,9 @@
       }
     },
   },
+  "variables": {
+    "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]"
+  },
   "resources": [
     {
       "type": "Microsoft.OperationalInsights/workspaces",
@@ -79,7 +82,7 @@
       "type": "Microsoft.Automation/automationAccounts",
       "apiVersion": "2020-01-13-preview",
       "name": "[parameters('automationAccountName')]",
-      "location": "[parameters('location')]",
+      "location": "[variables('automationAccountLocation')]",
       "dependsOn": [
         "[parameters('workspaceName')]"
       ],
