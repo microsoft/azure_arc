@@ -239,6 +239,9 @@
           },
           "workbookId": {
             "value": "[parameters('workbookId')]"
+          },
+          "workspaceName": {
+            "value": "[parameters('workspaceName')]"
           }
         }
       }
