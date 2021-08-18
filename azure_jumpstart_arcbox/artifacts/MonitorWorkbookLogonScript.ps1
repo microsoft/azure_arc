@@ -1,5 +1,8 @@
 Start-Transcript -Path C:\ArcBox\MonitorWorkbookLogonScript.log
 
+# Required for CLI commands
+az login --service-principal --username $env:spnClientID --password $env:spnClientSecret --tenant $env:spnTenantId
+
 # Configure mgmtMonitorWorkbook.json template with subscription ID and resource group values
 Write-Host "Configuring Azure Monitor Workbook ARM template."
 Write-Host "`n"
