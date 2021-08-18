@@ -22,13 +22,6 @@
         "description": "Name for your log analytics workspace"
       }
     },
-    "workbookId": {
-      "type": "string",
-      "defaultValue": "[newGuid()]",
-      "metadata": {
-        "description": "Name for your Azure Monitor workbook"
-      }
-    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -216,29 +209,6 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('workspaceName')]"
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
-      "name": "monitorWorkbookDeployment",
-      "dependsOn": [
-        "[parameters('workspaceName')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('monitorWorkbookTemplate')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "workbookResourceId": {
-            "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-          },
-          "workbookId": {
-            "value": "[parameters('workbookId')]"
           }
         }
       }
