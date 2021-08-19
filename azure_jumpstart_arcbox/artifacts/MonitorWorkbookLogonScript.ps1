@@ -10,9 +10,10 @@ $monitorWorkbook = "C:\ArcBox\mgmtMonitorWorkbook.json"
 (Get-Content -Path $monitorWorkbook) -replace '<subscriptionId>',$env:subscriptionId | Set-Content -Path $monitorWorkbook
 (Get-Content -Path $monitorWorkbook) -replace '<resourceGroup>',$env:resourceGroup | Set-Content -Path $monitorWorkbook
 
-# Configure mgmtMonitorWorkbook.parameters.json template with subscription ID and resource group values
+# Configure mgmtMonitorWorkbook.parameters.json template with workspace resource id
 $monitorWorkbookParameters = "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
-(Get-Content -Path $monitorWorkbook) -replace 'workbookResourceId-stage',$env:resourceGroup | Set-Content -Path $monitorWorkbook
+$workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+(Get-Content -Path $monitorWorkbookParameters) -replace 'workbookResourceId-stage',$workspaceResourceId | Set-Content -Path $monitorWorkbookParameters
 
 Write-Host "Deploying Azure Monitor Workbook ARM template."
 Write-Host "`n"
