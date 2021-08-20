@@ -1,11 +1,4 @@
----
-type: docs
-title: "Jumpstart ArcBox - Workbook"
-linkTitle: "Jumpstart ArcBox - Workbook"
-weight: 4
----
-
-## Jumpstart ArcBox - Azure Monitor Workbook
+# Jumpstart ArcBox - Azure Monitor Workbook
 
 [ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) is a project that provides an easy to deploy sandbox for all things Azure Arc. This document provides specific guidance on the included ArcBox [Azure Monitor Workbook](https://docs.microsoft.com/en-us/azure/azure-monitor/visualize/workbooks-overview). Please refer to the main [ArcBox documentation](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) for information on deploying and using ArcBox.
 
