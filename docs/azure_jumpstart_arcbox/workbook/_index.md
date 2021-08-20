@@ -35,7 +35,7 @@ The Jumpstart ArcBox workbook is automatically deployed for you as part of ArcBo
 
 ![Arcbox workbook overview](./workbook_overview.png)
 
-## Jumpstart ArcBox Workbook capabilities
+## ArcBox Workbook capabilities
 
 The ArcBox Workbook is a single report that combines data from diferent sources and services, providing composite views or joins across resources, enabling richer data and insights for unified operations.
 
