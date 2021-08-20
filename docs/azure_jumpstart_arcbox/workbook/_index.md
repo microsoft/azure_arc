@@ -99,7 +99,7 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_3.png)
 
-  * *The kubernetes cluster's nodes CPU and memory working set percentage.*
+  * *The Kubernetes cluster's nodes CPU and memory working set percentage.*
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_4.png)
 
