@@ -248,7 +248,7 @@ The report will display the results of the assessment in four sections:
 
    ![SQL Healthcheck security and compliance status recommendations](./sql_healthcheck_security_recommendations.png)
 
-* *High availability and business continuity* - this section has three different reports for all high availability and business continuity  recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the high availability and business continuity  recommendations.
+* *High availability and business continuity* - this section has three different reports for all high availability and business continuity recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the high availability and business continuity recommendations.
 
    ![SQL Healthcheck HA status](./sql_healthcheck_ha_status.png)
 
