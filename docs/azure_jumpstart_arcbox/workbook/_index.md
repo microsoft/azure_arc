@@ -7,7 +7,7 @@ weight: 4
 
 ## Jumpstart ArcBox - Azure Monitor Workbook
 
-ArcBox is a project that provides an easy to deploy sandbox for all things Azure Arc. Jumpstart ArcBox deploys a set of Azure Arc resources along with several management and operations services. These services include an an Azure Automation account, an Azure Log Analytics workspace with the Update Management solution and Azure Policy assignments.
+[ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) is a project that provides an easy to deploy sandbox for all things Azure Arc. This document provides specific guidance on the included ArcBox [Azure Monitor Workbook](https://docs.microsoft.com/en-us/azure/azure-monitor/visualize/workbooks-overview). Please refer to the main [ArcBox documentation](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) for information on deploying and using ArcBox.
 
 As part of ArcBox a workbook is also provided as a single pane of glass for unified operations. Using Azure's management and operations tools in hybrid, multicloud and edge deployments provides consistency in the set of tools and processes needed to  manage each environment through a common set of governance and operations management practices. The workbook acts as a flexible canvas for data analysis and visualization in the Azure portal, gathering information from several data sources from across Azure and combining them into an integrated interactive experience.
 
