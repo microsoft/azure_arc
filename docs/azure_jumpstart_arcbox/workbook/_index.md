@@ -78,7 +78,7 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
   * Time Range: provide a time range for the metrics and logs to be displayed.
   * Subscription: select your subscription where ArcBox is deployed.
   * Log Analytics Workspace: select ArcBox's Log Analytics workspace.
-  * Azure Arcenabled K8s cluster: choose one of ArcBox's Azure Arc enabled Kubernetes clusters.
+  * Azure Arcenabled K8s cluster: choose one of ArcBox's Azure Arc-enabled Kubernetes clusters.
   * Workload Type: choose one or multiple kubernetes deployment types.
   * Namespace: choose one or multiple namespaces in the Kubernetes cluster.
   * Workload Name: choose one of the deployments in your cluster.
