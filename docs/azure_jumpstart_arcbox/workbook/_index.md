@@ -70,7 +70,7 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
    ![Monitoring Alert Summary](./monitoring_alert_summary.png)
 
-* *Azure Arc Enabled Servers* - Shows metrics for CPU and memory usage on the Azure Arc enabled servers. Use the parameters section to select the select the Azure Arc enabled server as well as a time range to visualize the data.
+* *Azure Arc-enabled Servers* - Shows metrics for CPU and memory usage on the Azure Arc-enabled servers. Use the parameters section to select the select the Azure Arc-enabled server as well as a time range to visualize the data.
 
    ![Monitoring Azure Arc enabled Server Metrics](./monitoring_arc_servers.png)
 
