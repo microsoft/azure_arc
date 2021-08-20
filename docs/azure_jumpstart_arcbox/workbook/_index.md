@@ -5,7 +5,7 @@ linkTitle: "Jumpstart ArcBox - Workbook"
 weight: 4
 ---
 
-## Jumpstart ArcBox - Workbook
+## Jumpstart ArcBox - Azure Monitor Workbook
 
 ArcBox is a project that provides an easy to deploy sandbox for all things Azure Arc. Jumpstart ArcBox deploys a set of Azure Arc resources along with several management and operations services. These services include an an Azure Automation account, an Azure Log Analytics workspace with the Update Management solution and Azure Policy assignments.
 
