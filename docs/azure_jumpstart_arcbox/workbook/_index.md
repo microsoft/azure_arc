@@ -240,7 +240,7 @@ ArcBox has one Windows VM running SQL Server that is onboarded as Azure Arc-enab
 
 The report will display the results of the assessment in four sections:
 
-* *Security and compliace* - this section has three different reports for all security and compliance recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the security and compliance recommendations.
+* *Security and compliance* - this section has three different reports for all security and compliance recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the security and compliance recommendations.
 
    ![SQL Healthcheck security and compliance status](./sql_healthcheck_security_status.png)
 
