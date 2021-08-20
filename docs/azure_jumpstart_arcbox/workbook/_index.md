@@ -38,7 +38,7 @@ The Workbook is organized into several tabs that provide easier navigation and s
 
 ### Inventory
 
-By using Azure Arc, your on-premises and multi-cloud resources become part of Azure Resource Manager and therefore you can use tools such as Azure Resource Graph as a way to explore your inventory at scale. Your Azure Resource Graph queries can now include Azure Arc-enabled resources with filtering, using tags, or tracking changes.
+By using Azure Arc, your on-premises and multi-cloud resources become visible through Azure Resource Manager and therefore you can use tools such as Azure Resource Graph as a way to explore your inventory at scale. Your Azure Resource Graph queries can now include Azure Arc-enabled resources with filtering, using tags, or tracking changes.
 
 The "Inventory" tab in the ArcBox Workbook has three sections:
 
