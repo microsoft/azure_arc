@@ -74,7 +74,7 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
    ![Monitoring Azure Arc enabled Server Metrics](./monitoring_arc_servers.png)
 
-* *Azure Arc enabled Kubernetes* - Shows information and metrics from ArcBox's Azure Arc enabled Kubernetes clusters. Use the parameters section to filter data:
+* *Azure Arc-enabled Kubernetes* - Shows information and metrics from ArcBox's Azure Arc-enabled Kubernetes clusters. Use the parameters section to filter data:
   * Time Range: provide a time range for the metrics and logs to be displayed.
   * Subscription: select your subscription where ArcBox is deployed.
   * Log Analytics Workspace: select ArcBox's Log Analytics workspace.
