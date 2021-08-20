@@ -56,7 +56,7 @@ The "Inventory" tab in the ArcBox Workbook has three sections:
 
 ### Monitoring
 
-By enabling a resource in Azure Arc it gives you the ability to perform configuration management and monitoring tasks on those services as if they were first-class citizens in Azure. You are able to monitor your connected machine guest operating system performance and your Kubernetes clusters at the scope of the resource with VM and container Insights. In ArcBox the Azure Arc enabled servers and Azure Arc enabled Kubernetes clusters have been onboarded onto Azure Monitor.
+By enabling a resource in Azure Arc it gives you the ability to perform configuration management and monitoring tasks on those services as if they were first-class citizens in Azure. You are able to monitor your connected machine guest operating system performance and your Kubernetes clusters at the scope of the resource with VM and container Insights. In ArcBox the Azure Arc-enabled servers and Azure Arc-enabled Kubernetes clusters have been onboarded onto Azure Monitor.
 
 The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcBox resources organized in three sections:
 
