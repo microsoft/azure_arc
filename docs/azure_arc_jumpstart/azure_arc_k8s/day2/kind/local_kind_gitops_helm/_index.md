@@ -91,7 +91,7 @@ The demo application that will be deployed later in this guide relies on an ingr
 
     ![Running ingress nginx controller](./03.png)
 
-> **Note: If the ingress controller fails to start, you should redeploy the kind cluster with [kind_cluster_ingress.yaml](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/kind/kind_cluster_ingress.yaml) instead of kind_cluster.yaml.**
+> **Note: If the ingress controller fails to start, you should redeploy the kind cluster with [_kind_cluster_ingress.yaml_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/kind/kind_cluster_ingress.yaml) instead of _kind_cluster.yaml_.**
 
 * Finally, test that the ingress is responding to traffic. To test this, either browse to [http://localhost](http://localhost) or use the command line to connect to `localhost`. You should get a HTTP 404 response with a nginx footer. This shows that the ingress is working. The 404 response is to be expected since you haven't setup an ingress route yet. You will do that in the next section.
 
