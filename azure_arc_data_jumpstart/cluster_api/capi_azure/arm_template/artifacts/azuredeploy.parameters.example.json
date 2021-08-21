@@ -27,6 +27,9 @@
             "value": "Arc-Data-LA"
         },
         "deploySQLMI": {
+            "value": true
+        },
+        "SQLMIHA": {
             "value": false
         },
         "deployPostgreSQL": {
