@@ -56,16 +56,16 @@ Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter 
 
 # Downloading GitHub artifacts for AzureMLLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AzureMLLogonScript.ps1") -OutFile "C:\Temp\AzureMLLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-train-cli.zip") -OutFile "C:\Temp\simple-train-cli.zip"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/simple-inference-cli.zip") -OutFile "C:\Temp\simple-inference-cli.zip"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/train.zip") -OutFile "C:\Temp\train.zip"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/inference.zip") -OutFile "C:\Temp\inference.zip"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/1.Get_WS.py") -OutFile "C:\Temp\1.Get_WS.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/2.Attach_Arc.py") -OutFile "C:\Temp\2.Attach_Arc.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/3.Create_MNIST_Dataset.py") -OutFile "C:\Temp\3.Create_MNIST_Dataset.py"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png" # Wallpaper is shared from main
 
 # Unzip training and inference payloads
-Expand-Archive -LiteralPath "C:\Temp\simple-train-cli.zip" -DestinationPath "C:\Temp"
-Expand-Archive -LiteralPath "C:\Temp\simple-inference-cli.zip" -DestinationPath "C:\Temp"
+Expand-Archive -LiteralPath "C:\Temp\train.zip" -DestinationPath "C:\Temp"
+Expand-Archive -LiteralPath "C:\Temp\inference.zip" -DestinationPath "C:\Temp"
 
 # Installing tools
 workflow ClientTools_01

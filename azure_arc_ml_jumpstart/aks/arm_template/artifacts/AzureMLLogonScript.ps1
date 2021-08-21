@@ -8,7 +8,10 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 # Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
-# Set default subscription
+# Set default subscription to run commands against
+# "subscriptionId" value comes from clientVM.json ARM template, based on which 
+# subscription user deployed ARM template to. This is needed in case Service 
+# Principal has access to multiple subscriptions, which can break the automation logic
 az account set --subscription $env:subscriptionId
 
 # Registering Azure Arc providers
@@ -249,7 +252,7 @@ Write-Host """
 
 """
 # Replace staging values
-$JobFile = "C:\Temp\simple-train-cli\job.yml"
+$JobFile = "C:\Temp\train\job.yml"
 (Get-Content -Path $JobFile) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $JobFile
 
 # Create MNIST Dataset and register against Workspace
@@ -342,13 +345,13 @@ Write-Host """
                                    
 """
 # Replace staging values
-$JobFile = "C:\Temp\simple-inference-cli\endpoint.yml"
+$JobFile = "C:\Temp\inference\endpoint.yml"
 (Get-Content -Path $JobFile) -replace 'connectedClusterName-stage',$connectedClusterName | Set-Content -Path $JobFile
 
 # Proceed with inference deployment only if training was successful
 If ($TrainingStatus -eq "Successful"){
    Write-Host "Copying trained model pkl to deployment folder..." -ForegroundColor White
-   Copy-Item "C:\Temp\$RunId\outputs\*.pkl" -Destination "C:\Temp\simple-inference-cli\model"
+   Copy-Item "C:\Temp\$RunId\outputs\*.pkl" -Destination "C:\Temp\inference\model"
 
    # Deploy unique inference endpoint
    $random = ((New-Guid).Guid).Split('-')[0]
@@ -372,7 +375,7 @@ else
 # Inference Call
 #################
 
-$RequestFile = "C:\Temp\simple-inference-cli\sample-request.json"
+$RequestFile = "C:\Temp\inference\sample-request.json"
 
 # Proceed with inference call only if inference deployment was successful
 If ($InferenceStatus -eq "Successful"){

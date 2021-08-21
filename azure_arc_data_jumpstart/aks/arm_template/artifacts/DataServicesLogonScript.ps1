@@ -11,7 +11,14 @@ $connectedClusterName = "Arc-Data-AKS"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
+# Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
+
+# Set default subscription to run commands against
+# "subscriptionId" value comes from clientVM.json ARM template, based on which 
+# subscription user deployed ARM template to. This is needed in case Service 
+# Principal has access to multiple subscriptions, which can break the automation logic
+az account set --subscription $env:subscriptionId
 
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
