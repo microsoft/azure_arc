@@ -14,7 +14,7 @@ In this guide, you will first deploy a nginx ingress controller to your cluster.
 
 By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-> **Note: This guide assumes you already deployed a kind and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [kind onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/kind/local_kind/). Furthermore, kind should be deployed with [kind_cluster_ingress.yaml](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/kind/kind_cluster_ingress.yaml) instead of kind_cluster.yaml**
+> **Note: This guide assumes you already deployed a kind and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [kind onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/kind/local_kind/). Furthermore, kind should be deployed with [_kind_cluster_ingress.yaml_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/kind/kind_cluster_ingress.yaml) instead of _kind_cluster.yaml_**
 
 ## Prerequisites
 
