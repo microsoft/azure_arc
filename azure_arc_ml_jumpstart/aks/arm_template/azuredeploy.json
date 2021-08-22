@@ -53,7 +53,7 @@
       }
     },
     "kubernetesVersion": {
-      "defaultValue": "1.21.2",
+      "defaultValue": "1.19.11",
       "type": "string",
       "metadata": {
         "description": "The version of Kubernetes."
@@ -61,7 +61,7 @@
     },
     "clusterName": {
       "type": "string",
-      "defaultValue": "Arc-ML-AKS",
+      "defaultValue": "Arc-ML",
       "metadata": {
         "description": "The name of the Kubernetes cluster resource."
       }
