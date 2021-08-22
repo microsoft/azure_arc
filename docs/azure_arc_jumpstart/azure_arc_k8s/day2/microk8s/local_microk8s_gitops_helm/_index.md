@@ -88,7 +88,7 @@ By doing so, you will be able to make real-time changes to the application and s
   * Linux
 
     ```shell
-    microk8s config view > ~\.kube\microk8s
+    microk8s config view > ~/.kube/microk8s
     ```
 
 * From this point forward, this guide assumes you have exported MicroK8s config file and have set it in kubectl using `--kubeconfig` flag or `$KUBECONFIG` environment variable. More information can be found in [Organizing Cluster Access Using kubeconfig Files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
