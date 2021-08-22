@@ -9,8 +9,15 @@ $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
-# Required for CLI commands
+# Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
+
+# Set default subscription to run commands against
+# "subscriptionId" value comes from clientVM.json ARM template, based on which 
+# subscription user deployed ARM template to. This is needed in case Service 
+# Principal has access to multiple subscriptions, which can break the automation logic
+az account set --subscription $env:subscriptionId
+
 
 # Install Azure Data Studio extensions
 Write-Host "`n"
