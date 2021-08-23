@@ -255,7 +255,7 @@ The report will display the results of the assessment in four sections:
 
    ![SQL Healthcheck HA status recommendations](./sql_healthcheck_ha_recommendations.png)
 
-* *Performance and scalability* - this section has three different reports for all performance and scalability recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the performance and scalability recommendations.
+* _Performance and scalability_ - This section has three different reports for all performance and scalability recommendations. The first one shows the results for all the checks grouped by status: passed, failed, or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium, or high. Finally, there is a list with all of the performance and scalability recommendations.
 
    ![SQL Healthcheck performance status](./sql_healthcheck_performance_status.png)
 
@@ -263,7 +263,7 @@ The report will display the results of the assessment in four sections:
 
    ![SQL Healthcheck performance status recommendations](./sql_healthcheck_performance_recommendations.png)
 
-* *Upgrade, migration and deployment* - this section has three different reports for all upgrade, migration and deployment recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the upgrade, migration and deployment recommendations.
+* _Upgrade, migration, and deployment_ - This section has three different reports for all upgrade, migration, and deployment recommendations. The first one shows the results for all the checks grouped by status: passed, failed, or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium, or high. Finally, there is a list with all of the upgrade, migration, and deployment recommendations.
 
    ![SQL Healthcheck upgrade status](./sql_healthcheck_upgrade_status.png)
 
