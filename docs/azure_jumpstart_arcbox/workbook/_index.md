@@ -141,9 +141,9 @@ The "Security" tab of the Jumpstart Workbook shows insights from Azure Security 
 
 Once configured, the report will provide an overview of the secure score, you can filter information by using the parameters section:
 
-* _Workspace_ -  select one or multiple Log Analytics workspaces.
+* _Workspace_ -  Select one or multiple Log Analytics workspaces.
 
-* _Time Range_ -  filter the data of the report to one of the predefined time ranges.
+* _Time Range_ -  Filter the data of the report to one of the predefined time ranges.
 
    ![Security parameters](./security_parameters.png)
 
