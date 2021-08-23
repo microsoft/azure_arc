@@ -227,9 +227,9 @@ The tab has two different sections, one for Windows and one for Linux machines:
 
 ### SQL Healthcheck
 
-The Azure Monitor SQL Health Check solution asesses the risk and health of your Windows-based SQL Server instance that is connected to Azure Arc. The solution provides a prioritized list of recommendations specific to your deployed server infrastructure. Each recommendation provides guidance based on best practices and how to implement the suggested changes.
+The Azure Monitor SQL Health Check solution assesses the risk and health of your Windows-based SQL Server instance that is connected to Azure Arc. The solution provides a prioritized list of recommendations specific to your deployed server infrastructure. Each recommendation provides guidance based on best practices and how to implement the suggested changes.
 
-ArcBox has one Windows VM running SQL Server that is onboarded as Azure Arc-enabled SQL Server (as well as Azure Arc-enabled server) where the SQL Assessment has been run. To use the "SQL Healthcheck" tab of the ArcBox workbooks you need to provide the ArcBox's subscription, resource group and Log Analytics workspace as parameters.
+ArcBox has one Windows VM running SQL Server that is onboarded as Azure Arc-enabled SQL Server (as well as an Azure Arc-enabled server) where the SQL Assessment has been run. To use the "SQL Healthcheck" tab of the ArcBox workbooks you need to provide ArcBox's subscription, resource group, and Log Analytics workspace as parameters.
 
    ![SQL Healthcheck parameters](./sql_healthcheck_parameters.png)
 
