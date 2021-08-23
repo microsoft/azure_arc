@@ -52,23 +52,23 @@ The "Inventory" tab in the ArcBox Workbook has three sections:
 
    ![Inventory Resource by type](./inventory_count_by_type.png)
 
-* *Resource List* - this table shows a list of resources in the resource group provided in the parameters section. This is an interactive list, therefore you can click on any resource or tag for additional information.
+* _Resource List_ - this table shows a list of resources in the resource group provided in the parameters section. This is an interactive list, therefore you can click on any resource or tag for additional information.
 
    ![Inventory Resource List](./inventory_resource_list.png)
 
 ### Monitoring
 
-By enabling a resource in Azure Arc it gives you the ability to perform configuration management and monitoring tasks on those services as if they were first-class citizens in Azure. You are able to monitor your connected machine guest operating system performance and your Kubernetes clusters at the scope of the resource with VM and container Insights. In ArcBox the Azure Arc-enabled servers and Azure Arc-enabled Kubernetes clusters have been onboarded onto Azure Monitor.
+Enabling a resource in Azure Arc gives you the ability to perform configuration management and monitoring tasks on those services as if they were first-class citizens in Azure. You are able to monitor your connected machine guest operating system performance and your Kubernetes clusters at the scope of the resource with VM and container Insights. In ArcBox the Azure Arc-enabled servers and Azure Arc-enabled Kubernetes clusters have been onboarded onto Azure Monitor.
 
 The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcBox resources organized in three sections:
 
-* *Alert Summary* - Shows an overview of alerts organized by severity and status. You can use the drop down menus to apply filters to the report. The following filters are available:
+* _Alert Summary_ - Shows an overview of alerts organized by severity and status. You can use the drop-down menus to apply filters to the report. The following filters are available:
   * Subscription: select one or multiple subscriptions in your environment to show available alerts.
   * Resource Group: select one or more resource groups in your environment to show available alerts.
-  * Resource Type: select one or multiple resources types to show its alerts.
-  * Resources: select individual resources by name to visualize its alerts.
+  * Resource Type: select one or multiple resource types to show its alerts.
+  * Resources: select individual resources by name to visualize their alerts.
   * Time Range: provide a time range in which the alert has been created.
-  * State: choose the alert type between New, Acknowledged or Closed.
+  * State: choose the alert type between New, Acknowledged, or Closed.
 
    ![Monitoring Alert Summary](./monitoring_alert_summary.png)
 
