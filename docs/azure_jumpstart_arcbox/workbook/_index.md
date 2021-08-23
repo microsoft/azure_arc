@@ -235,7 +235,7 @@ ArcBox has one Windows VM running SQL Server that is onboarded as Azure Arc-enab
 
 The report will display the results of the assessment in four sections:
 
-* *Security and compliance* - this section has three different reports for all security and compliance recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the security and compliance recommendations.
+* _Security and compliance_ - This section has three different reports for all security and compliance recommendations. The first one shows the results for all the checks grouped by status: passed, failed, or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium, or high. Finally, there is a list with all of the security and compliance recommendations.
 
    ![SQL Healthcheck security and compliance status](./sql_healthcheck_security_status.png)
 
@@ -243,7 +243,7 @@ The report will display the results of the assessment in four sections:
 
    ![SQL Healthcheck security and compliance status recommendations](./sql_healthcheck_security_recommendations.png)
 
-* *High availability and business continuity* - this section has three different reports for all high availability and business continuity recommendations. The first one shows the results for all the checks grouped by status: passed, failed or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium or high. Finally, there is a list with all of the high availability and business continuity recommendations.
+* _High availability and business continuity_ - This section has three different reports for all high availability and business continuity recommendations. The first one shows the results for all the checks grouped by status: passed, failed, or inconclusive. The second report shows a donut chart with the recommendations grouped by priority low, medium, or high. Finally, there is a list with all of the high availability and business continuity recommendations.
 
    ![SQL Healthcheck HA status](./sql_healthcheck_ha_status.png)
 
