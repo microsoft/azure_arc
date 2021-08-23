@@ -197,31 +197,31 @@ Azure Automation provides Update Management to take care of the operating system
 
 The tab has two different sections, one for Windows and one for Linux machines:
 
-* *Windows VM Updates* - This section provides serveral reports:
+* _Windows VM Updates_ - This section provides several reports:
 
-  * *Types of Windows Updates* - this donut chart shows the number of Windows Updates grouped by type.
+  * _Types of Windows Updates_ - This donut chart shows the number of Windows Updates grouped by type.
 
    ![Update Windows Updates](./update_windows.png)
 
-  * *Top Windows VMs with Updates* - shows the top Windows machines with updates available and the number of updates per machine.
+  * _Top Windows VMs with Updates_ - Shows the top Windows machines with updates available and the number of updates per machine.
 
    ![ Update Windows Top](./uptade_windows_top.png)
 
-  * *Update Summary* - shows a table with the updates available for each of the Windows VM and its severity. By selecting one of the resources names you will get additional information on the available updates.
+  * _Update Summary_ - Shows a table with the updates available for each of the Windows machines and its severity. By selecting one of the names of the resources, you will get additional information on the available updates.
 
    ![ Update Windows Summary](./update_windows_summary.png)
 
-* *Linux VM Updates* - This section provides serveral reports:
+* _Linux VM Updates_ - This section provides several reports:
 
-  * *Types of Linux Updates* - this donut chart shows the number of Windows Updates grouped by type.
+  * _Types of Linux Updates_ - This donut chart shows the number of Windows Updates grouped by type.
 
    ![Update Linux Updates](./update_linux.png)
 
-  * *Top Linux VMs with Updates* - shows the top Linux machines with updates available and the number of updates per machine.
+  * _Top Linux VMs with Updates_ - Shows the top Linux machines with updates available and the number of updates per machine.
 
    ![ Update Linux Top](./uptade_linux_top.png)
 
-  * *Update Summary* - shows a table with the updates available for each of the Linux VM and its severity. By selecting one of the resources names you will get additional information on the available updates.
+  * _Update Summary_ - Shows a table with the updates available for each of the Linux machines and its severity. By selecting one of the names of the resources, you will get additional information on the available updates.
 
    ![ Update Linux Summary](./update_linux_summary.png)
 
