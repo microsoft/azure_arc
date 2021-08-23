@@ -175,17 +175,17 @@ Once configured, the report will provide an overview of the secure score, you ca
 
 Change Tracking in Azure Automation keeps track of the changes in virtual machines hosted in Azure, on-premises, and other cloud environments to help you pinpoint operational and environmental issues with software managed by the Distribution Package Manager.
 
-In Jumpstart ArcBox all of the Azure Arc-enabled servers are onboarded on Change Tracking and Inventory. The "Change Tracking" tab of the Jumpstart Workbook shows insights from Azure Automation. To use this report you need to provide the ArcBox's subscription and Log Analytics workspace in the parameters section along with a time range.
+In Jumpstart ArcBox all of the Azure Arc-enabled servers are onboarded onto Change Tracking and Inventory. The "Change Tracking" tab of the Jumpstart Workbook shows insights from Azure Automation. To use this report you need to provide ArcBox's subscription and Log Analytics workspace in the parameters section along with a time range.
 
    ![Change Tracking Parameters](./changetracking_parameters.png)
 
 The tab has two different sections:
 
-* *Software Inventory* - This section provides a distinct count od publishers and applications for the servers selected. You can filter data by computer, publisher or application.
+* _Software Inventory_ - This section provides a distinct count of publishers and applications for the servers selected. You can filter data by computer, publisher, or application.
 
    ![Change Tracking Software Inventory](./changetracking_software.png)
 
-* *Windows Services* - This section shows a table of Windows services with  their state, account and path.
+* _Windows Services_ - This section shows a table of Windows services with their state, account, and path.
 
    ![Change Tracking Windows Services](./changetracking_services.png)
 
