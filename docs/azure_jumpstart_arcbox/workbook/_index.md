@@ -89,19 +89,19 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
   With this report you will get several visualizations:
 
-  * *Pod and Container restart trend graphs.*
+  * _Pod and Container restart trend graphs._
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_1.png)
 
-  * *Pod count and status chart.*
+  * _Pod count and status chart._
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_2.png)
 
-  * *A list of the container status for pods.*
+  * _A list of the container status for pods._
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_3.png)
 
-  * *The Kubernetes cluster's nodes CPU and memory working set percentage.*
+  * _The Kubernetes cluster's nodes CPU and memory working set percentage._
 
      ![Monitoring Azure Arc enabled K8S Metrics](./monitoring_arc_kubernetes_4.png)
 
