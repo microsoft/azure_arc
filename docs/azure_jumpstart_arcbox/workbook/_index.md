@@ -107,9 +107,9 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
 ### Security
 
-Azure Security Center can monitor the security posture of your hybrid and multicloud deployments that have been onboarded onto Azure Arc. Once those deployments are registered in Azure you can take care of the security baseline and audit, apply, or automate requirements from recommended security controls as well as identify and provide mitigation guidance for security-related business risks.
+Azure Security Center can monitor the security posture of your hybrid and multi-cloud deployments that have been onboarded onto Azure Arc. Once those deployments are registered in Azure, you can take care of the security baseline and audit, apply, or automate requirements from recommended security controls as well as identify and provide mitigation guidance for security-related business risks.
 
-The "Security" tab of the Jumpstart Workbook shows insights from Azure Security Center assessments. To be able to use this report, you will need to configure continuous export to export Azure Security Center's data to ArcBox's Log Analytics workspace:
+The "Security" tab of the Jumpstart Workbook shows insights from Azure Security Center assessments. To be able to use this report, you will need to configure "continuous export" capability to export Azure Security Center's data to ArcBox's Log Analytics workspace:
 
 * From Security Center's sidebar, select Pricing & settings.
 
