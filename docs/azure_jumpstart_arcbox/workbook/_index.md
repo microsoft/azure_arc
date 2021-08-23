@@ -4,7 +4,7 @@
 
 As part of ArcBox, an Azure Monitor workbook is deployed to provide a single pane of glass for monitoring and reporting on ArcBox resources. Using Azure's management and operations tools in hybrid, multi-cloud and edge deployments provides the consistency needed to manage each environment through a common set of governance and operations management practices. The Azure Monitor workbook acts as a flexible canvas for data analysis and visualization in the Azure portal, gathering information from several data sources from across ArcBox and combining them into an integrated interactive experience.
 
-    > **Note: you will have to allow a few hours for the workbook to be able to show data for metrics, logs and assessments.**
+    > **Note: Due to the number of Azure resources included in a single ArcBox deployment and the data ingestion and analyst required, it is expected that metrics and telemetry for the workbook can take several hours to be fully available.**
 
 ## Access the ArcBox workbook
 
