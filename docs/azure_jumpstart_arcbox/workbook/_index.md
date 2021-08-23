@@ -72,11 +72,11 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
    ![Monitoring Alert Summary](./monitoring_alert_summary.png)
 
-* *Azure Arc-enabled Servers* - Shows metrics for CPU and memory usage on the Azure Arc-enabled servers. Use the parameters section to select the select the Azure Arc-enabled server as well as a time range to visualize the data.
+* _Azure Arc-enabled Servers_ - Shows metrics for CPU and memory usage on the Azure Arc-enabled servers. Use the parameters section to select the Azure Arc-enabled server as well as a time range to visualize the data.
 
    ![Monitoring Azure Arc enabled Server Metrics](./monitoring_arc_servers.png)
 
-* *Azure Arc-enabled Kubernetes* - Shows information and metrics from ArcBox's Azure Arc-enabled Kubernetes clusters. Use the parameters section to filter data:
+* _Azure Arc-enabled Kubernetes_ - Shows information and metrics from ArcBox's Azure Arc-enabled Kubernetes clusters. Use the parameters section to filter data:
   * Time Range: provide a time range for the metrics and logs to be displayed.
   * Subscription: select your subscription where ArcBox is deployed.
   * Log Analytics Workspace: select ArcBox's Log Analytics workspace.
@@ -85,7 +85,7 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
   * Namespace: choose one or multiple namespaces in the Kubernetes cluster.
   * Workload Name: choose one of the deployments in your cluster.
   * Pod Status: filter by Pod status like Pending/Running/Failed etc.
-  * Pod Name: filter by pod name in the namespace and workloadname selected.
+  * Pod Name: filter by pod name in the namespace and workload name selected.
 
   With this report you will get several visualizations:
 
