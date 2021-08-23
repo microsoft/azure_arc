@@ -228,7 +228,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
   ![Screenshot showing Azure Data Studio usage](./azdatastudio.png)
 
-* Open the [ArcBox Azure Monitor workbook](./workbook/_index.md) and explore the visualizations and reports of hybrid cloud resources. A [dedicated README](./workbook/_index.md) is available with more detail on usage of the workbook.
+* Open the [ArcBox Azure Monitor workbook](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/_index.md) and explore the visualizations and reports of hybrid cloud resources. A [dedicated README](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/_index.md) is available with more detail on usage of the workbook.
 
   ![Screenshot showing Azure Monitor workbook usage](./workbook.png)
 
