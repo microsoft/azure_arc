@@ -123,7 +123,7 @@ The "Security" tab of the Jumpstart Workbook shows insights from Azure Security 
 
    ![Security Center Configuration](./security_center_config_3.png)
 
-* Set the export target to Log Analytics workspace.
+* Set the export target to the Log Analytics workspace.
 
    ![Security Center Configuration](./security_center_config_4.png)
 
@@ -131,41 +131,41 @@ The "Security" tab of the Jumpstart Workbook shows insights from Azure Security 
 
    ![Security Center Configuration](./security_center_config_5.png)
 
-* From the export frequency options, select Streaming and Snapshots.
+* From the export frequency options, select Streaming, and Snapshots.
 
    ![Security Center Configuration](./security_center_config_6.png)
 
-* Make sure to select ArcBox's subscription, resource group and Log Analytics workspace as the export target. Select Save.
+* Make sure to select ArcBox's subscription, resource group, and Log Analytics workspace as the export target. Select Save.
 
    ![Security Center Configuration](./security_center_config_7.png)
 
 Once configured, the report will provide an overview of the secure score, you can filter information by using the parameters section:
 
-* *Workspace* -  select one or multiple Log Analytics workspaces.
+* _Workspace_ -  select one or multiple Log Analytics workspaces.
 
-* *Time Range* -  filter the data of the report to one of the predefined time ranges.
+* _Time Range_ -  filter the data of the report to one of the predefined time ranges.
 
    ![Security parameters](./security_parameters.png)
 
   With this report you will get several visualizations:
 
-  * *Current score trends per subscription*
+  * _Current score trends per subscription_
 
      ![Security workbook trends](./security_trends.png)
 
-  * *Aggregated score for selected subscriptions over time*
+  * _Aggregated score for selected subscriptions over time_
 
      ![Security workbook aggregated score](./security_score.png)
 
-  * *Top recommendations with recent increase in unhealthy resources*
+  * _Top recommendations with the recent increase in unhealthy resources_
   
      ![Security tab top recommendations](./security_recommendations.png)
 
-  * *Security controls scores over time (weekly)*
+  * _Security controls scores over time (weekly)_
 
      ![Security controls scores overtime](./security_controls.png)
 
-  * *Resources changed over time* - to view changes over time on a specific recommendation, please select any from the list above.
+  * _Resources changed over time_ - to view changes over time on a specific recommendation, please select any from the list above.
 
      ![Resources changed overtime](./security_changes.png)
 
