@@ -165,7 +165,7 @@ Once configured, the report will provide an overview of the secure score, you ca
 
      ![Security controls scores overtime](./security_controls.png)
 
-  * _Resources changed over time_ - to view changes over time on a specific recommendation, please select any from the list above.
+  * _Resources changed over time_ - To view changes over time on a specific recommendation, please select any from the list above.
 
      ![Resources changed overtime](./security_changes.png)
 
