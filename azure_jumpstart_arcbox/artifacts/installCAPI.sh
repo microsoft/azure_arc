@@ -168,6 +168,9 @@ sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
+# Remove port 22 from public internet exposure
+sed -i -e '/allow_ssh/,/allow_apiserver/ { /allow_apiserver/b; d}' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
 # Deploying CAPI Workload cluster
 sudo kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 echo ""
