@@ -133,6 +133,7 @@ workflow ClientTools_01
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\ArcBox\settingsTemplate.json"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
+                    Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "C:\ArcBox\MonitorWorkbookLogonScript.ps1"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQL.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.sh") -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
@@ -145,6 +146,8 @@ workflow ClientTools_01
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\ArcBox\postgreSQL.parameters.json"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.json") -OutFile "C:\ArcBox\sqlmi.json"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile "C:\ArcBox\sqlmi.parameters.json"
+                    Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.json"
+                    Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
                 }
         }
@@ -177,6 +180,11 @@ Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\DataServicesLogonScript.ps1'
 Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
+# Creating scheduled task for MonitorWorkbookLogonScript.ps1
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\MonitorWorkbookLogonScript.ps1'
+Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
