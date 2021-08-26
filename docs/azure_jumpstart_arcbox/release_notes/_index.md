@@ -17,6 +17,7 @@ Release notes will be released on the first week of each month and will cover th
 * Update CAPZ provider to v0.5.2
 * Update Kubernetes version to 1.20.10
 * Automation optimizations
+* Documentation revisions
 
 ## July 2021
 
