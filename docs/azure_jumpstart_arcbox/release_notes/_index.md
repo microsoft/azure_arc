@@ -9,6 +9,16 @@ toc_hide: true
 
 Release notes will be released on the first week of each month and will cover the previous month.
 
+## August 2021
+
+* New [Azure Monitor workbook](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) included that provides single pane of glass monitoring for all ArcBox resources.
+* Remove port 22 from Cluster API control plane Network Security Group
+* Update clusterctl to v0.4.2
+* Update CAPZ provider to v0.5.2
+* Update Kubernetes version to 1.20.10
+* Automation optimizations
+* Documentation revisions
+
 ## July 2021
 
 * Improvements to Azure Policy experience. Updated policy names with (ArcBox) callout to easily identify policies created by ArcBox deployment. New policies to support onboarding Dependency Agents and Azure Defender for Kubernetes.
