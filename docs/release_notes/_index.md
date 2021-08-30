@@ -9,6 +9,60 @@ weight: 3
 
 **Release notes will be released on the first week of each month and will cover the previous month.**
 
+## August 2021
+
+### Release highlights and general Jumpstart enhancements
+
+* New version of Jumpstart ArcBox
+
+* New scenarios for Azure Arc-enabled SQL Managed Instance high-availability
+
+* New scenario for Azure Arc-enabled app services with Logic App
+
+* First scenario for Azure Arc-enabled machine learning
+
+* Critical enhancements for Cluster API based scenarios
+
+### Azure Arc-enabled servers scenarios
+
+* [New demo: Enable Azure Automanage on an Azure Arc-enabled server using an ARM template](https://www.youtube.com/watch?v=Tj1ypT516zM)
+
+* [Bug fix: Update Management #725](https://github.com/microsoft/azure_arc/issues/725)
+
+### Azure Arc-enabled Kubernetes scenarios
+
+* [Bug fix: Azure Cluster API scenario for Azure Arc enabled Kubernetes script variables not matching #696](https://github.com/microsoft/azure_arc/issues/696)
+
+### Azure Arc-enabled data services scenarios
+
+* [New Scenario: Perform database failover with SQL Managed Instance Availability Groups on AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_ha/)
+
+* [New Scenario: Perform database failover with SQL Managed Instance Availability Groups on Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/cluster_api/capi_azure/capi_mssql_ha/)
+
+* [Bug fix: failed to get file "infrastructure-components.yaml" #688](https://github.com/microsoft/azure_arc/issues/688)
+
+* [Bug fix: Azure Arc enabled data services for EKS: Failed to load state error #699](https://github.com/microsoft/azure_arc/issues/699)
+
+* [Bug fix: Azure Arc enabled data services for EKS : logon script does not end #711](https://github.com/microsoft/azure_arc/issues/711)
+
+### Azure Arc-enabled app service
+
+* [New Scenario: Deploy Azure Logic App on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_logic_app_arm_template/)
+
+### Azure Arc-enabled machine learning scenarios
+
+* [New Scenario: Train, Deploy and call inference on an image classification model - MNIST dataset from Azure Blob Storage](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_ml/aks/aks_blob_mnist_arm_template/)
+
+### Jumpstart ArcBox
+
+* New [Azure Monitor workbook](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) included that provides single pane of glass monitoring for all ArcBox resources.
+* Remove port 22 from Cluster API control plane Network Security Group
+* Update clusterctl to v0.4.2
+* Update CAPZ provider to v0.5.2
+* Update Kubernetes version to 1.20.10
+* Automation optimizations
+* Documentation revisions
+
 ## July 2021
 
 ### Release highlights and general Jumpstart enhancements
