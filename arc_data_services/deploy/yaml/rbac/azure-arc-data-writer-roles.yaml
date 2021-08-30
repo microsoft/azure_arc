@@ -9,7 +9,7 @@ metadata:
       arcdata.microsoft.com/role: "true"
 rules:
     - apiGroups: ["arcdata.microsoft.com"]
-      resources: ["datacontrollers", "postgresql-11s", "postgresql-12s"]
+      resources: ["datacontrollers", "postgresqls"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
     - apiGroups: ["sql.arcdata.microsoft.com"]
       resources: ["sqlmanagedinstances"]
@@ -29,7 +29,7 @@ metadata:
       arcdata.microsoft.com/role: "true"
 rules:
     - apiGroups: ["arcdata.microsoft.com"]
-      resources: ["postgresql-11s", "postgresql-12s"]
+      resources: ["postgresqls"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
     - apiGroups: ["sql.arcdata.microsoft.com"]
       resources: ["sqlmanagedinstances"]
@@ -83,9 +83,8 @@ metadata:
       arcdata.microsoft.com/role: "true"
 rules:
     - apiGroups: ["arcdata.microsoft.com"]
-      resources: ["postgresql-11s", "postgresql-12s"]
+      resources: ["postgresqls"]
       verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
     - apiGroups: [""]
       resources: ["secrets"]
       verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
----

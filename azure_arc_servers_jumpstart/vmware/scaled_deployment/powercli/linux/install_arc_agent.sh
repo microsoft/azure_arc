@@ -4,7 +4,7 @@
 source /tmp/arctemp/vars.sh
 
 # Download the installation package
-wget https://aka.ms/azcmagent -O /tmp/arctemp/install_linux_azcmagent.sh
+curl -L https://aka.ms/azcmagent -o /tmp/arctemp/install_linux_azcmagent.sh -create-dirs
 
 # Install the hybrid agent
 bash /tmp/arctemp/install_linux_azcmagent.sh
@@ -17,4 +17,5 @@ azcmagent connect \
   --tenant-id $tenant_id \
   --location $location \
   --subscription-id $subscription_id \
-  --tags "Project=jumpstart_azure_arc_servers"
+  --tags "Project=jumpstart_azure_arc_servers" \
+  --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"

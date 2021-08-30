@@ -24,7 +24,7 @@ By doing so, you will be able to make real-time changes to the application and s
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* Fork/Clone the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
+* Fork the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
@@ -36,9 +36,9 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * As mentioned, this guide starts at the point where you already have a connected MicroK8s cluster to Azure Arc.
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./01.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./02.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
 * [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
@@ -73,7 +73,7 @@ By doing so, you will be able to make real-time changes to the application and s
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
 * Export MicroK8s config
 
@@ -88,7 +88,7 @@ By doing so, you will be able to make real-time changes to the application and s
   * Linux
 
     ```shell
-    microk8s config view > ~\.kube\microk8s
+    microk8s config view > ~/.kube/microk8s
     ```
 
 * From this point forward, this guide assumes you have exported MicroK8s config file and have set it in kubectl using `--kubeconfig` flag or `$KUBECONFIG` environment variable. More information can be found in [Organizing Cluster Access Using kubeconfig Files](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/).
@@ -151,7 +151,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 ### The Mechanism (In a nutshell)
 
-In the process of creating Azure Arc enabled Kubernetes GitOps configuration, [Weaveworks Flux Kubernetes Operator](https://github.com/fluxcd/flux) is deployed on the cluster.
+In the process of creating Azure Arc-enabled Kubernetes GitOps configuration, [Weaveworks Flux Kubernetes Operator](https://github.com/fluxcd/flux) is deployed on the cluster.
 
 The Operator is aware of the "HelmRelease" Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart. Due to this configuration, a user can choose to leave the chart values intact or to have different values for different releases.
 

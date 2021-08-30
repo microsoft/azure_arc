@@ -19,5 +19,5 @@
   
     - name:  Run connect command
       become: yes
-      shell: azcmagent show | grep -q -i "Disconnected" && azcmagent connect --service-principal-id '{{ service_principal_id }}'  --service-principal-secret '{{ service_principal_secret }}' --resource-group '{{ resource_group }}' --tenant-id '{{ tenant_id }}' --location '{{ azure_region }}' --subscription-id '{{ subscription_id }}' --tags 'Project=jumpstart_azure_arc_servers' || echo 'Machine already connected'
+      shell: azcmagent show | grep -q -i "Disconnected" && azcmagent connect --service-principal-id '{{ service_principal_id }}'  --service-principal-secret '{{ service_principal_secret }}' --resource-group '{{ resource_group }}' --tenant-id '{{ tenant_id }}' --location '{{ azure_region }}' --subscription-id '{{ subscription_id }}' --tags 'Project=jumpstart_azure_arc_servers' --correlation-id 'd009f5dd-dba8-4ac7-bac9-b54ef3a6671a' || echo 'Machine already connected'
   

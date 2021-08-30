@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a GCP Ubuntu instance and connect it to Azure Arc using a Terraform plan
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Ubuntu Server GCP virtual machine and connect it as an Azure Arc enabled server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Ubuntu Server GCP virtual machine and connect it as an Azure Arc-enabled server resource.
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
 ## Create a new GCP Project
 
@@ -106,15 +106,15 @@ Before executing the Terraform plan, you must export the environment variables w
 
     ![Screenshot showing terraform init being run](./08.png)
 
-* Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have a GCP Ubuntu VM deployed and connected as a new Azure Arc enabled server inside a new resource group.
+* Next, run the ```terraform apply --auto-approve``` command and wait for the plan to finish. Upon completion, you will have a GCP Ubuntu VM deployed and connected as a new Azure Arc-enabled server inside a new resource group.
 
 * Open the Azure portal and navigate to the resource group "Arc-GCP-Demo". The virtual machine created in GCP will be visible as a resource.
 
-    ![Screenshot of Azure Portal showing Azure Arc enabled server](./18.png)
+    ![Screenshot of Azure Portal showing Azure Arc-enabled server](./18.png)
 
 ## Semi-Automated Deployment (Optional)
 
-As you may have noticed, the last step of the run is to register the VM as a new Azure Arc enabled server resource.
+As you may have noticed, the last step of the run is to register the VM as a new Azure Arc-enabled server resource.
     ![Screenshot showing azcmagent connect script](./10.png)
 
 If you want to demo/control the actual registration process, do the following:
@@ -138,7 +138,7 @@ If you want to demo/control the actual registration process, do the following:
 * Run the following command:
 
     ```shell
-    azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-GCP-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id
+    azcmagent connect --service-principal-id $TF_VAR_client_id --service-principal-secret $TF_VAR_client_secret --resource-group "Arc-GCP-Demo" --tenant-id $TF_VAR_tenant_id --location "westus2" --subscription-id $TF_VAR_subscription_id --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
     ```
 
     ![Screenshot of azcmagent connect being run](./15.png)

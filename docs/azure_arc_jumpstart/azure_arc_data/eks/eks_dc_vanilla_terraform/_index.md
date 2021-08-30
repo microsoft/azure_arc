@@ -10,9 +10,11 @@ description: >
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on [Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks/) cluster, using [Terraform](https://www.terraform.io/).
 
-By the end of this guide, you will have an EKS cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)) and a Microsoft Windows Server 2019 (Datacenter) AWS EC2 instance VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this guide, you will have an EKS cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2019 (Datacenter) AWS EC2 instance VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services:
 
-> **Note: Currently, Azure Arc enabled data services is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+![Deployed Architecture](./40.png)
+
+> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
 ## Deployment Process Overview
 
@@ -43,7 +45,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * [Create a free Amazon Web Services account](https://aws.amazon.com/free/) if you don't already have one.
 
-* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Install Terraform >=1.0](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 * Create Azure service principal (SP)
 
@@ -72,19 +74,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
   }
   ```
 
-  > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
-
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
-
-  ```shell
-  az provider register --namespace Microsoft.AzureArcData
-  ```
-
-  You can monitor the registration process with the following commands:
-
-  ```shell
-  az provider show -n Microsoft.AzureArcData -o table
-  ```
+  > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
 ## Create a new AWS IAM Role & Key
 
@@ -138,66 +128,76 @@ Create AWS User IAM Key. An access key grants programmatic access to your resour
 
 ## Automation Flow
 
-For you to get familiar with the automation and deployment flow, below is an explanation.
+Read the below explanation to get familiar with the automation and deployment flow.
 
-* User is editing and exporting Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables values are being used throughout the deployment.
+* User edits and exports Terraform runtime environment variables, AKA *TF_VAR* (1-time edit). The variables are being used throughout the deployment.
 
-* User deploys the Terraform plan which will deploy the EKS cluster and the EC2 Windows Client instance as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services you will be able to deploy such as Azure SQL Managed Instance and PostgreSQL Hyperscale.
+* User deploys the Terraform plan which will deploy the EKS cluster and the AWS compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc-enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and any database services you deploy on top of the data controller.
 
 * In addition, the plan will copy the EKS *kubeconfig* file as well as the *configmap.yml* file (which is responsible for having the EKS nodes communicate with the cluster control plane) on to the Windows instance.
 
-* As part of the Windows Server 2019 VM deployment, there are 3 scripts executions:
+* As part of the Windows Server 2019 VM deployment, there are 3 script executions:
 
   1. *azure_arc.ps1* script will be created automatically as part of the Terraform plan runtime and is responsible on injecting the *TF_VAR* variables values on to the Windows instance which will then be used in both the *ClientTools* and the *LogonScript* scripts.
 
-  2. *ClientTools.ps1* script will run at the Terraform plan runtime Runtime and will:
-      * Create the *ClientTools.log* file  
-      * Install the required tools – az cli, az cli Powershell module, kubernetes-cli, aws-iam-authenticator, Visual C++ Redistributable (Chocolaty packages)
+  2. *Bootstrap.ps1* script will run at the Terraform plan runtime Runtime and will:
+      * Create the *Bootstrap.log* file  
+      * Install the required tools – az cli, az cli Powershell module, kubernetes-cli, Visual C++ Redistributable, helm, vscode, etc. (Chocolaty packages)
       * Download Azure Data Studio & Azure Data CLI
-      * Download the *DC_Cleanup* and *DC_Deploy* Powershell scripts
-      * Create the logon script
-      * Create the Windows schedule task to run the logon script at first login
+      * Disable Windows Server Manager, remove Internet Explorer, disable Windows Firewall
+      * Download the DataServicesLogonScript.ps1 PowerShell script
+      * Create the Windows schedule task to run the DataServicesLogonScript at first login
 
-  3. *LogonScript.ps1* script will run on user first logon to Windows and will:
-      * Create the *LogonScript.log* file
-      * Install Azure Data Studio & Azure Data CLI
+  3. *DataServicesLogonScript.ps1* script will run on user first logon to Windows and will:
+      * Create the *DataServicesLogonScript.log* file
       * Install the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
-      * Apply the *configmap.yml* file on the EKS cluster
-      * Create the *azdata* config file in user Windows profile
       * Create the Azure Data Studio desktop shortcut
+      * Apply the *configmap.yml* file on the EKS cluster
+      * Use Azure CLI to connect the EKS cluster to Azure as an Azure Arc-enabled Kubernetes cluster
+      * Create a custom location for use with the Azure Arc-enabled Kubernetes cluster
+      * Deploy an ARM template that will deploy the Azure Arc data controller on the EKS cluster
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
-      * Deploy the Arc Data Controller in **"Directly Connected" mode** using the *TF_VAR* variables values
       * Unregister the logon script Windows schedule task so it will not run after first login
 
 ## Deployment
 
 As mentioned, the Terraform plan will deploy an EKS cluster, the Azure Arc Data Controller on that cluster and an EC2 Windows Server 2019 Client instance.
 
-* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/eks/dc_vanilla/terraform/example/TF_VAR_example.sh)
+* Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart\eks\terraform\example\TF_VAR_datacontroller_only_example.sh)
 
   ![Export environment variables](./14.png)
 
-  * *export TF_VAR_AWS_ACCESS_KEY_ID*='Your AWS Access Key ID (Created in the prerequisites section)'
-  * *export TF_VAR_AWS_SECRET_ACCESS_KEY*='Your AWS Secret Key (Created in the prerequisites section)'
-  * *export TF_VAR_key_name*='Your AWS Key Pair name (Created in the prerequisites section)'
-  * *export TF_VAR_key_pair_filename*='Your AWS Key Pair *.pem filename (Created in the prerequisites section)'
   * *export TF_VAR_aws_region*='Your AWS region where resources will get deployed' (Since key pairs are regional, make sure both AWS region and availability zone matches the ones where the key pair was created)
   * *export TF_VAR_aws_availabilityzone*='Your AWS availability zone' (Since key pairs are regional, make sure both AWS region and availability zone matches the ones where the key pair was created)
+  * *export TF_VAR_key_name*='Your AWS Key Pair name (Created in the prerequisites section)'
+  * *export TF_VAR_key_pair_filename*='Your AWS Key Pair *.pem filename (Created in the prerequisites section)'
+  * *export TF_VAR_AWS_ACCESS_KEY_ID*='Your AWS Access Key ID (Created in the prerequisites section)'
+  * *export TF_VAR_AWS_SECRET_ACCESS_KEY*='Your AWS Secret Key (Created in the prerequisites section)'
+  * *export TF_VAR_hostname*='Your Windows Client EC2 instance name'
+  * *export TF_VAR_cluster_name*='Your EKS cluster name'
+  * *export TF_VAR_eks_instance_types*='Your EKS cluster instance type'
+  * *export TF_VAR_windows_instance_types*='Your Windows Client EC2 instance type'
+  * *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
+  * *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
+  * *export TF_VAR_ACCEPT_EULA*='Accepting End User License Agreement for azdata
+  * *export TF_VAR_ARC_DC_NAME*='Azure Arc Data Controller name’ (The name must consist of lowercase alphanumeric characters or ‘-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
+  * *export TF_VAR_ARC_DC_SUBSCRIPTION*='Azure Arc Data Controller Azure subscription ID'
+  * *export TF_VAR_ARC_DC_RG*='Azure resource group where all future Azure Arc resources will be deployed'
+  * *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
   * *export TF_VAR_SPN_CLIENT_ID*='Your Azure service principal name'
   * *export TF_VAR_SPN_CLIENT_SECRET*='Your Azure service principal password'
   * *export TF_VAR_SPN_TENANT_ID*='Your Azure tenant ID'
   * *export TF_VAR_SPN_AUTHORITY*=*https://login.microsoftonline.com* **Do not change**
-  * *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
-  * *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
-  * *export TF_VAR_ARC_DC_NAME*='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
-  * *export TF_VAR_ARC_DC_SUBSCRIPTION*='Azure Arc Data Controller Azure subscription ID'
-  * *export TF_VAR_ARC_DC_RG*='Azure resource group where all future Azure Arc resources will be deployed'
-  * *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+  * *export TF_VAR_deploy_SQLMI*=*'Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller only scenario we leave it set to false'
+  * *export TF_VAR_deploy_PostgreSQL*=*'Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller only scenario we leave it set to false'
+  * *export TF_VAR_templateBaseUrl*=*'GitHub URL to the deployment template - filled in by default to point to Microsoft/Azure Arc repository, but you can point this to your forked repo as well - e.g. `https://raw.githubusercontent.com/your--github--account/azure_arc/your--branch/azure_arc_data_jumpstart/eks/terraform/.`'
+  
+    > **Note: If you are running in a Windows environment and need a Linux shell, check out Ubuntu from the Microsoft Store [here](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6#activetab=pivot:overviewtab) to get a Linux terminal on your Windows Machine.**
 
 * Navigate to the folder that has Terraform binaries.
 
   ```shell
-  cd azure_arc_data_jumpstart/eks/dc_vanilla/terraform
+  cd azure_arc_data_jumpstart/eks/terraform
   ```
 
 * Run the ```terraform init``` command which is used to initialize a working directory containing Terraform configuration files and load the required Terraform providers.
@@ -246,59 +246,58 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
 * Let the script to run it's course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the EKS cluster. **The logon script run time is approximately 10min long**.
 
-    Once the script will finish it's run, the logon script PowerShell session will be close and the Azure Arc Data Controller will be deployed on the EKS cluster and be ready to use.
+    Once the script will finish it's run, the logon script PowerShell session will be closed and the Azure Arc Data Controller will be deployed on the EKS cluster and be ready to use.
 
     ![PowerShell login script run](./27.png)
 
     ![PowerShell login script run](./28.png)
 
-    ![PowerShell logon script run](./29.png)
+    ![PowerShell login script run](./29.png)
 
     ![PowerShell login script run](./30.png)
 
     ![PowerShell login script run](./31.png)
 
-    ![PowerShell logon script run](./32.png)
+    ![PowerShell login script run](./32.png)
 
-* Initially, since the data controller was deployed in "Directly Connected" mode, only after the logon script run is will be completed, a new Azure resource for the controller will be created as well.
-
-    ![Data Controller in a resource group](./33.png)
-
-    ![Data Controller resource](./34.png)
-
-* Using PowerShell, login to the Data Controller and check it's health using the below commands.
-
-  ```shell
-  azdata login --namespace $env:ARC_DC_NAME
-  azdata arc dc status show
-  ```
-
-  ![azdata login](./35.png)
+    ![Resource Group](./33.png)
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Azure Data Studio shortcut](./36.png)
+  ![Azure Data Studio shortcut](./34.png)
 
-  ![Azure Data Studio extension](./37.png)
-
-## Cleanup
-
-* To delete the Azure Arc Data Controller and all of it's Kubernetes resources, run the *DC_Cleanup.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. At the end of it's run, the script will close all PowerShell sessions. **The Cleanup script run time is ~2-3min long**.
-
-  ![DC_Cleanup PowerShell script run](./38.png)
-
-## Re-Deploy Azure Arc Data Controller
-
-* In case you deleted the Azure Arc Data Controller from the EKS cluster, you can re-deploy it by running the *DC_Deploy.ps1* PowerShell script located in *C:\tmp* on the Windows Client instance. **The Deploy script run time is approximately ~3-4min long**.
-
-  ![Re-Deploy Azure Arc Data Controller PowerShell script](./39.png)
+  ![Azure Data Studio extension](./35.png)
 
 ## Delete the deployment
 
-To completely delete the environment, follow the below steps:
+To completely delete the environment, follow the below steps.
 
-* on the Windows Client instance, run the *DC_Cleanup.ps1* PowerShell script.
+* Delete any Database resources (e.g. SQL MI, PostgreSQL), followed by the Data Controller Resource from the Azure Resource Group (i.e. via the Portal)
+* Delete any remaining resources (Custom Location, Kubernetes - Azure Arc) from the Azure Resource Group (i.e. via the Portal)
+* Use terraform to delete all of the AWS resources as well as the Azure resource group. **The `terraform destroy` run time is approximately ~5-6min long**.
 
-* Run the ```terraform destroy --auto-approve``` which will delete all of the AWS resources as well as the Azure resource group. **The *terraform destroy* run time is approximately ~5-10min long**.
+  ```shell
+  terraform destroy --auto-approve
+  ```
 
-  ![terraform destroy](./40.png)
+  ![terraform destroy](./36.png)
+
+  > **Note: Because the following resources were created by EKS that creates internal AWS dependencies that Terraform has no knowledge of from our plan, we need to delete the resources from AWS console as `terraform destroy` is cleaning up - this allows us to avoid dependency conflicts and ongoing billing from orphaned resources such as EKS Volumes.**
+
+* While the `destroy` command is running, delete any new Load Balancers created as EKS Services (`EC2 > Load Balancing > Load Balancers`) that are deployed in AWS from the Console:
+
+  ![Delete Load Balancers](./37.png)
+
+* While the `destroy` command is running, delete any new Elastic Block Stores created as EKS Persistent Volumes (`EC2 > Elastic Block Store > Volumes`) that are deployed in AWS from the Console:
+
+  ![Delete Elastic Block Stores](./38.png)
+
+* While the `destroy` command is running, delete any new Security Groups created (`EC2 > Network & Security > Security Groups`) that are deployed in AWS from the Console
+
+  ![Delete Elastic Block Stores](./39.png)
+
+## Known Issues
+
+* Webhook pods go into error state, even after Data Controller/SQL MI/Postgres pods are up, caused by a known Helm-related backend issue that is being worked on. These errors can be safely ignored and do not impact the functionality of Azure Arc-enabled data services and the Jumpstart automation.
+
+    ![webhook known issue](https://raw.githubusercontent.com/microsoft/azure_arc/main/docs/known_issues/webhook_issue.png)

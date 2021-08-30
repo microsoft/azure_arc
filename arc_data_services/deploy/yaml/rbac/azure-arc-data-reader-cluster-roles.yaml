@@ -62,6 +62,6 @@ metadata:
       arcdata.microsoft.com/aggregate-to-database-reader: "true"
 rules:
     - apiGroups: ["arcdata.microsoft.com"]
-      resources: ["postgresql-11s", "postgresql-12s"]
+      resources: ["postgresqls"]
       verbs: ["get", "list", "watch"]
 ---

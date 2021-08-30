@@ -1,0 +1,220 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "resourceGroup": {
+      "type": "String"
+    },
+    "namespace": {
+      "type": "String"
+    },
+    "connectionMode": {
+      "type": "String"
+    },
+    "controllerName": {
+      "type": "String"
+    },
+    "azdataUsername": {
+      "type": "String"
+    },
+    "azdataPassword": {
+      "type": "SecureString"
+    },
+    "customLocation": {
+      "type": "String"
+    },
+    "subscriptionId": {
+      "type": "String"
+    },
+    "spnClientId": {
+      "type": "String"
+    },
+    "spnTenantId": {
+      "type": "String"
+    },
+    "spnClientSecret": {
+      "type": "SecureString"
+    },
+    "spnAuthority": {
+      "type": "String"
+    },
+    "logAnalyticsWorkspaceId": {
+      "type": "String"
+    },
+    "logAnalyticsPrimaryKey": {
+      "type": "String"
+    },
+    "resourceTags": {
+      "type": "Object"
+    },
+    "dockerRegistryCredential": {
+      "type": "String"
+    },
+    "dockerImagePullPolicy": {
+      "type": "String"
+    },
+    "dockerImageTag": {
+      "type": "String"
+    },
+    "dockerRegistry": {
+      "type": "String"
+    },
+    "dockerRepository": {
+      "type": "String"
+    },
+    "dataStorageClass": {
+      "type": "String"
+    },
+    "dataStorageSize": {
+      "type": "String"
+    },
+    "logsStorageClass": {
+      "type": "String"
+    },
+    "logsStorageSize": {
+      "type": "String"
+    },
+    "serviceType": {
+      "type": "String"
+    },
+    "controllerPort": {
+      "type": "Int"
+    },
+    "apiVersion": {
+      "type": "String"
+    },
+    "infrastructure": {
+      "type": "String"
+    }
+  },
+  "variables": {},
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.AzureArcData/dataControllers",
+      "apiVersion": "[parameters('apiVersion')]",
+      "name": "[parameters('controllerName')]",
+      "location": "[parameters('location')]",
+      "extendedLocation": {
+        "name": "[parameters('customLocation')]",
+        "type": "CustomLocation"
+      },
+      "tags": "[parameters('resourceTags')]",
+      "properties": {
+        "basicLoginInformation": {
+          "username": "[parameters('azdataUsername')]",
+          "password": "[parameters('azdataPassword')]"
+        },
+        "uploadServicePrincipal": {
+          "clientId": "[parameters('spnClientId')]",
+          "tenantId": "[parameters('spnTenantId')]",
+          "authority": "[parameters('spnAuthority')]",
+          "clientSecret": "[parameters('spnClientSecret')]"
+        },
+        "logAnalyticsWorkspaceConfig": {
+          "workspaceId": "[parameters('logAnalyticsWorkspaceId')]",
+          "primaryKey": "[parameters('logAnalyticsPrimaryKey')]"
+        },
+        "infrastructure": "[parameters('infrastructure')]",
+        "k8sRaw": {
+          "apiVersion": "arcdata.microsoft.com/v1",
+          "kind": "DataController",
+          "spec": {
+            "credentials": {
+              "controllerAdmin": "controller-login-secret",
+              "dockerRegistry": "[parameters('dockerRegistryCredential')]",
+              "domainServiceAccount": "domain-service-account-secret",
+              "serviceAccount": "sa-arc-controller"
+            },
+            "infrastructure": "[parameters('infrastructure')]",
+            "docker": {
+              "imagePullPolicy": "[parameters('dockerImagePullPolicy')]",
+              "imageTag": "[parameters('dockerImageTag')]",
+              "registry": "[parameters('dockerRegistry')]",
+              "repository": "[parameters('dockerRepository')]"
+            },
+            "security": {
+              "allowDumps": true,
+              "allowNodeMetricsCollection": true,
+              "allowPodMetricsCollection": true,
+              "allowRunAsRoot": false
+            },
+            "services": [
+              {
+                "name": "controller",
+                "port": "[parameters('controllerPort')]",
+                "serviceType": "[parameters('serviceType')]"
+              }
+            ],
+            "settings": {
+              "ElasticSearch": {
+                "vm.max_map_count": "-1"
+              },
+              "azure": {
+                "connectionMode": "[parameters('connectionMode')]",
+                "location": "[parameters('location')]",
+                "resourceGroup": "[parameters('resourceGroup')]",
+                "subscription": "[parameters('subscriptionId')]"
+              },
+              "controller": {
+                "displayName": "[parameters('controllerName')]",
+                "enableBilling": "True",
+                "logs.rotation.days": "7",
+                "logs.rotation.size": "5000"
+              }
+            },
+            "storage": {
+              "data": {
+                "accessMode": "ReadWriteOnce",
+                "className": "[parameters('dataStorageClass')]",
+                "size": "[parameters('dataStorageSize')]"
+              },
+              "logs": {
+                "accessMode": "ReadWriteOnce",
+                "className": "[parameters('logsStorageClass')]",
+                "size": "[parameters('logsStorageSize')]"
+              }
+            }
+          },
+          "metadata": {
+            "namespace": "[parameters('namespace')]",
+            "name": "datacontroller"
+          },
+          "status": {
+            "observedGeneration":1,
+            "azure":{
+               "uploadStatus":{
+                  "metrics":{
+                     "status":{
+                        "message":"",
+                        "state":""
+                     }
+                  },
+                  "logs":{
+                     "status":{
+                        "message":"",
+                        "state":""
+                     }
+                  },
+                  "usage":{
+                     "status":{
+                        "message":"",
+                        "state":""
+                     }
+                  }
+               }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}

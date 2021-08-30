@@ -1,0 +1,26 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "machineName": {
+            "type": "String"
+        },
+        "automanageAccountName": {
+            "type": "String"
+        },
+        "configurationProfileAssignment": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.HybridCompute/machines/providers/configurationProfileAssignments",
+            "apiVersion": "2020-06-30-preview",
+            "name": "[concat(parameters('machineName'), '/Microsoft.Automanage/', 'default')]",
+            "properties": {
+                "configurationProfile": "[parameters('configurationProfileAssignment')]",
+                "accountId": "[concat(resourceGroup().id, '/providers/Microsoft.Automanage/accounts/', parameters('automanageAccountName'))]"
+            }
+        }
+    ]
+}

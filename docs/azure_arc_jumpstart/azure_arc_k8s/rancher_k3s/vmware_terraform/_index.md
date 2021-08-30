@@ -10,8 +10,6 @@ description: >
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a "Ready to Go" VMware vSphere Ubuntu Server virtual machine installed with a single-master Rancher K3s Kubernetes cluster and connected it as an Azure Arc cluster resource.
 
-> **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/)**.
-
 ## Prerequisites
 
 * Clone the Azure Arc Jumpstart repository
@@ -28,7 +26,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* A VMware vCenter Server user with [permissions to deploy](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.vm_admin.doc/GUID-8254CD05-CC06-491D-BA56-A773A32A8130.html) a Virtual Machine from a Template in the vSphere Web Client.
+* A VMware vCenter Server user with [permissions to deploy](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.vm_admin.doc/GUID-4D0F8E63-2961-4B71-B365-BBFA24673FDB.html) a Virtual Machine from a Template in the vSphere Web Client.
 
 * Create Azure service principal (SP)
 
@@ -57,9 +55,9 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -126,15 +124,15 @@ Before executing the Terraform plan, you must set the environment variables whic
 
     ![VMware vSphere Ubuntu Server VM](./04.png)
 
-    ![Azure Arc enabled Kubernetes cluster](./05.png)
+    ![Azure Arc-enabled Kubernetes cluster](./05.png)
 
-    ![Azure Arc enabled Kubernetes cluster](./06.png)
+    ![Azure Arc-enabled Kubernetes cluster](./06.png)
 
 ## Delete the deployment
 
 * The most straightforward way is to delete the cluster is via the Azure Portal, just select cluster and delete it.
 
-    ![Delete Azure Arc enabled Kubernetes cluster](./07.png)
+    ![Delete Azure Arc-enabled Kubernetes cluster](./07.png)
 
 * If you want to nuke the entire environment, just delete the Azure resource group and the newly generated *az_connect_k3s* shell script in the [*scripts*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/rancher_k3s/vmware/terraform/scripts) folder.
 

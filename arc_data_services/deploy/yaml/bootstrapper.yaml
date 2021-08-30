@@ -1,39 +1,44 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: sa-mssql-controller
+  name: sa-arc-bootstrapper
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: role-bootstrapper
 rules:
-- apiGroups:
-  - '*'
-  resources:
-  - '*'
-  verbs:
-  - '*'
+- apiGroups: [""]
+  resources: ["pods", "configmaps", "services", "persistentvolumeclaims", "secrets", "serviceaccounts", "events"]
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources: ["replicasets", "statefulsets"]
+  verbs: ["*"]
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources: ["roles", "rolebindings"]
+  verbs: ["*"]
+- apiGroups: ["sql.arcdata.microsoft.com", "tasks.sql.arcdata.microsoft.com", "tasks.arcdata.microsoft.com", "arcdata.microsoft.com"]
+  resources: ["*"]
+  verbs: ["*"]
 ---
-apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: rb-bootstrapper
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: role-bootstrapper
 subjects:
 - kind: ServiceAccount
-  name: sa-mssql-controller
+  name: sa-arc-bootstrapper
+roleRef:
+  kind: Role
+  name: role-bootstrapper
+  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  generation: 1
+  name: bootstrapper
   labels:
     app: bootstrapper
-  name: bootstrapper
 spec:
   replicas: 1
   selector:
@@ -44,22 +49,23 @@ spec:
       labels:
         app: bootstrapper
     spec:
+      serviceAccountName: sa-arc-bootstrapper
+      securityContext:
+        fsGroup: 1000700001
+      nodeSelector:
+        kubernetes.io/os: linux
+      imagePullSecrets:
+      - name: arc-private-registry
       containers:
-      - env:
-        - name: ACCEPT_EULA
-          value: "Y"
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:latest
-        imagePullPolicy: IfNotPresent
-        name: bootstrapper
-        resources: {}
+      - name: bootstrapper
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.0.0_2021-07-30
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
         securityContext:
-          runAsUser: 21006
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      serviceAccount: sa-mssql-controller
-      serviceAccountName: sa-mssql-controller
-      terminationGracePeriodSeconds: 30
+          runAsUser: 1000700001

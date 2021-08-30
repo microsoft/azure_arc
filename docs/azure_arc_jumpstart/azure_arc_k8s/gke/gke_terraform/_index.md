@@ -10,8 +10,6 @@ description: >
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Google Cloud Platform [Kubernetes Engine cluster](https://cloud.google.com/kubernetes-engine) and connected it as an Azure Arc cluster resource.
 
-> **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/)**.
-
 ## Prerequisites
 
 * Clone the Azure Arc Jumpstart repository
@@ -26,7 +24,7 @@ The following README will guide you on how to use the provided [Terraform](https
   az --version
   ```
 
-* [Create a free Google Cloud account](https://cloud.google.com/free)
+* [Create a Google Cloud account](https://cloud.google.com/free)
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
@@ -57,9 +55,9 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-  > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+  > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -73,18 +71,18 @@ The following README will guide you on how to use the provided [Terraform](https
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
-* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
+* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8s-configuration***:
 
   ```shell
   az extension add --name connectedk8s
-  az extension add --name k8sconfiguration
+  az extension add --name k8s-configuration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
   ```shell
   az extension update --name connectedk8s
-  az extension update --name k8sconfiguration
+  az extension update --name k8s-configuration
   ```
 
 ### Create a new GCP Project
@@ -171,6 +169,12 @@ The only thing you need to do before executing the Terraform plan is to export t
   export TF_VAR_gke_cluster_node_machine_type='n1-standard-2'
   ```
 
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_gcp_project_id
+    ```
+
 * Run the ```terraform init``` command which will download the required terraform providers.
 
   ![terraform init](./18.png)
@@ -187,7 +191,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 ## Connecting to Azure Arc
 
-* Now that you have a running GKE cluster, retrieve your Azure subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_gke](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/dc_vanilla/terraform/scripts/az_connect_gke.sh) shell script.
+* Now that you have a running GKE cluster, retrieve your Azure subscription ID using the ```az account list``` command and edit the environment variables section in the included [az_connect_gke](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/terraform/scripts/az_connect_gke.sh) shell script.
 
   ![Export environment variables](./23.png)
 
@@ -211,11 +215,11 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Upon completion, you will have your GKE cluster connect as a new Azure Arc Kubernetes cluster resource in the new Azure resource group.
 
-  ![New Azure Arc enabled Kubernetes cluster](./30.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./30.png)
 
-  ![New Azure Arc enabled Kubernetes cluster](./31.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./31.png)
 
-  ![New Azure Arc enabled Kubernetes cluster](./32.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./32.png)
 
 ## Delete the deployment
 

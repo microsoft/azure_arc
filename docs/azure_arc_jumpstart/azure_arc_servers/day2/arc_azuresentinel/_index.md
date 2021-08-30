@@ -6,9 +6,9 @@ weight: 6
 description: >
 ---
 
-## Connect Azure Arc enabled servers to Azure Sentinel
+## Connect Azure Arc-enabled servers to Azure Sentinel
 
-The following README will guide you on how to onboard Azure Arc enabled servers on to [Azure Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources.
+The following README will guide you on how to onboard Azure Arc-enabled servers on to [Azure Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources.
 
 In this guide, you will enable and configure Azure Sentinel on your Azure subscription. To complete this process you will:
 
@@ -16,7 +16,7 @@ In this guide, you will enable and configure Azure Sentinel on your Azure subscr
 
 * Enable Azure Sentinel on the workspace.
 
-* Onboard Azure Arc enabled servers on Sentinel by using the extension management feature and Azure Policies.
+* Onboard Azure Arc-enabled servers on Sentinel by using the extension management feature and Azure Policies.
 
 > **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
@@ -41,9 +41,9 @@ In this guide, you will enable and configure Azure Sentinel on your Azure subscr
 
 * As mentioned, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using a Google Cloud Platform (GCP) instance that has been already connected to Azure Arc and is visible as a resource in Azure.
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled server](./01.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled server](./01.png)
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled server detail](./02.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled server detail](./02.png)
 
 * [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
@@ -96,7 +96,7 @@ For example:
 
    ![Screenshot showing az deployment group create command](./04.png)
 
-## Azure Arc enabled VMs onboarding on Azure Sentinel
+## Azure Arc-enabled VMs onboarding on Azure Sentinel
 
 Once you have deployed Azure Sentinel on your Log Analytics workspace, you will need to connect data sources to it.
 
@@ -106,11 +106,11 @@ For servers and VMs, you can install the Microsoft Monitoring Agent (MMA) agent 
 
 * Using **[Extension Management](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_mma_arm/)**
 
-This feature in Azure Arc enabled servers allows you to deploy the MMA agent VM extensions to a non-Azure Windows and/or Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template as well as PowerShell script to manage extension deployment to Azure Arc enabled servers.
+This feature in Azure Arc-enabled servers allows you to deploy the MMA agent VM extensions to a non-Azure Windows and/or Linux VMs. You can use the Azure Portal, Azure CLI, an ARM template as well as PowerShell script to manage extension deployment to Azure Arc-enabled servers.
 
 * Setting up **[Azure Policies](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/)**
 
-Using this approach, you will assign an Azure Policy to audit if the Azure Arc enabled Server has the MMA agent installed. If the agent is not installed, you will use the Extensions feature to automatically deploy it to the VM using a Remediation task, an enrollment experience that compares to Azure VMs.
+Using this approach, you will assign an Azure Policy to audit if the Azure Arc-enabled Server has the MMA agent installed. If the agent is not installed, you will use the Extensions feature to automatically deploy it to the VM using a Remediation task, an enrollment experience that compares to Azure VMs.
 
 ## Clean up environment
 

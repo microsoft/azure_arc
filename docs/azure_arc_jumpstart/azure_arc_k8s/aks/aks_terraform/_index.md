@@ -8,11 +8,9 @@ description: >
 
 ## Deploy AKS cluster and connect it to Azure Arc using Terraform
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connected it as an Azure Arc enabled Kubernetes resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connected it as an Azure Arc-enabled Kubernetes resource.
 
-  > **Note: Since AKS is a 1st-party Azure solution and natively supports capabilities such as [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-overview) integration as well as GitOps configurations (currently in private preview), it is not expected for an AKS cluster to be projected as an Azure Arc enabled Kubernetes cluster. The following scenario should ONLY be used for demo and testing purposes.**
-
-  > **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/).**
+  > **Note: Since AKS is a 1st-party Azure solution and natively supports capabilities such as [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-overview) integration as well as GitOps configurations (currently in preview), it is not expected for an AKS cluster to be projected as an Azure Arc-enabled Kubernetes cluster. The following scenario should ONLY be used for demo and testing purposes.**
 
 ## Prerequisites
 
@@ -57,9 +55,9 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -90,6 +88,12 @@ In case the AKS service is not available in your region, you can change the AKS 
     ```shell
     export TF_VAR_client_id=<Your Azure service principal App ID>
     export TF_VAR_client_secret=<Your Azure service principal App Password>
+    ```
+
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_client_id
     ```
 
 * Run the ```terraform init``` command which will download the Terraform AzureRM provider.
@@ -126,15 +130,15 @@ In case the AKS service is not available in your region, you can change the AKS 
 
     ![Screenshot showing Cloud Shell upload functionality](./10.png)
 
-* Once the script run has finished, the AKS cluster will be projected as a new Azure Arc enabled Kubernetes resource.
+* Once the script run has finished, the AKS cluster will be projected as a new Azure Arc-enabled Kubernetes resource.
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled resource](./11.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled resource](./11.png)
 
-    ![Screenshot showing Azure Portal with Azure Arc enabled resource](./12.png)
+    ![Screenshot showing Azure Portal with Azure Arc-enabled resource](./12.png)
 
 ## Delete the deployment
 
-The most straightforward way is to delete the Azure Arc enabled Kubernetes resource via the Azure Portal, just select the cluster and delete it.
+The most straightforward way is to delete the Azure Arc-enabled Kubernetes resource via the Azure Portal, just select the cluster and delete it.
 
 ![Screenshot showing delete function in Azure Portal](./13.png)
 

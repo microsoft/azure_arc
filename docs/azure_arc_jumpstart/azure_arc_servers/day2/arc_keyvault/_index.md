@@ -6,11 +6,11 @@ weight: 4
 description: >
 ---
 
-## Deploy Azure Key Vault Extension to Azure Arc enabled Ubuntu server and use a Key Vault managed certificate with Nginx
+## Deploy Azure Key Vault Extension to Azure Arc-enabled Ubuntu server and use a Key Vault managed certificate with Nginx
 
-The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/key-vault-linux) extension on an Azure Arc enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server.
+The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/key-vault-linux) extension on an Azure Arc-enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server.
 
-In this guide, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
+In this guide, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc-enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
 
 > **Note: This guide assumes you already deployed an Ubuntu server that is running on-premises or in other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
@@ -32,7 +32,7 @@ In this guide, we will focus on securing an Ubuntu web server. The only prerequi
 
     ![Screenshot showing EC2 instance in AWS console](./01.png)
 
-    ![Screenshot showing Azure Arc enabled server](./02.png)
+    ![Screenshot showing Azure Arc-enabled server](./02.png)
 
 * [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
@@ -68,9 +68,9 @@ First, we will create a new Azure resource group, Azure Key Vault and a self-sig
 
     ![Screenshot of creating a self-signed certificate from Az CLI](./05.png)
 
-## Install and configure Nginx on your Azure Arc enabled Ubuntu server
+## Install and configure Nginx on your Azure Arc-enabled Ubuntu server
 
-We will use the Azure Custom Script extension on your Azure Arc enabled server to install and configure an Nginx web server. Before installing Nginx, we must open the right inbound ports on our AWS EC2 instance's security group. Then we will deploy an ARM template that will use the custom script extension to install Nginx.
+We will use the Azure Custom Script extension on your Azure Arc-enabled server to install and configure an Nginx web server. Before installing Nginx, we must open the right inbound ports on our AWS EC2 instance's security group. Then we will deploy an ARM template that will use the custom script extension to install Nginx.
 
 * Navigate to your EC2 instance on the AWS cloud console and open the "allow-all-sg" security group.
 
@@ -88,7 +88,7 @@ We will use the Azure Custom Script extension on your Azure Arc enabled server t
 
     ![Screenshot of added a security group rule in AWS cloud console](./10.png)
 
-* Configure Key Vault to allow Azure Arc enabled server to access secrets
+* Configure Key Vault to allow Azure Arc-enabled server to access secrets
 
   * Navigate to your Key Vault and open the "Access Policies" blade
 
@@ -98,7 +98,7 @@ We will use the Azure Custom Script extension on your Azure Arc enabled server t
 
     ![Screenshot showing "Add access policy" for Key Vault](./12.png)
 
-  * Next to "Select principal" Click "None selected" and search for your Azure Arc enabled server machine name and select it.
+  * Next to "Select principal" Click "None selected" and search for your Azure Arc-enabled server machine name and select it.
 
     ![Screenshot showing "Add access policy" for Key Vault](./13.png)
   
@@ -120,9 +120,9 @@ We will use the Azure Custom Script extension on your Azure Arc enabled server t
 
     ![Screenshot showing ARM deployment completing](./16.png)
 
-* SSH into your Azure Arc enabled server to update the Nginx configuration to use the certificate.
+* SSH into your Azure Arc-enabled server to update the Nginx configuration to use the certificate.
 
-  ![Screenshot showing SSH into Azure Arc enabled server](./17.png)
+  ![Screenshot showing SSH into Azure Arc-enabled server](./17.png)
 
   * Open */etc/nginx/conf.d/ssl.conf*  using nano or your preferred text editor.
 

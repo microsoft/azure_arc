@@ -24,7 +24,7 @@ By doing so, you will be able to make real-time changes to the application and s
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* Fork/Clone the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
+* Fork the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
 
 * (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
@@ -36,9 +36,9 @@ By doing so, you will be able to make real-time changes to the application and s
 
 * As mentioned, this guide starts at the point where you already have a connected GKE cluster to Azure Arc.
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./01.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 
-    ![Existing Azure Arc enabled Kubernetes cluster](./02.png)
+    ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
 * [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
@@ -73,7 +73,7 @@ By doing so, you will be able to make real-time changes to the application and s
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
 ## Cluster-level Config vs. Namespace-level Config
 
@@ -148,7 +148,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
     ![Namespace-level GitOps configurations](./12.png)
 
-    ![Azure Arc enabled Kubernetes GitOps configurations](./13.png)
+    ![Azure Arc-enabled Kubernetes GitOps configurations](./13.png)
 
     ![New GitOps configurations in Azure portal](./14.png)
 

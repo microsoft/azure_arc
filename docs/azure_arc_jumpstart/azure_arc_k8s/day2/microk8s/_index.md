@@ -2,6 +2,6 @@
 type: docs
 title: "Microk8s"
 linkTitle: "Microk8s"
-weight: 4
+weight: 6
 description: >-
 ---

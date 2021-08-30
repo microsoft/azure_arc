@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a VMware Windows VM and connect it to Azure Arc using Terraform
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server, VMware vSphere virtual machine and connect it as an Azure Arc enabled server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server, VMware vSphere virtual machine and connect it as an Azure Arc-enabled server resource.
 
 ## Prerequisites
 
@@ -26,7 +26,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* A VMware vCenter Server user with [permissions to deploy](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.vm_admin.doc/GUID-8254CD05-CC06-491D-BA56-A773A32A8130.html) a Virtual Machine from a Template in the vSphere Web Client.
+* A VMware vCenter Server user with [permissions to deploy](https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.vm_admin.doc/GUID-4D0F8E63-2961-4B71-B365-BBFA24673FDB.html) a Virtual Machine from a Template in the vSphere Web Client.
 
 * Create Azure service principal (SP)
 
@@ -55,7 +55,7 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
 ### Preparing a Window Server VMware vSphere VM Template
 
@@ -107,15 +107,15 @@ Before executing the Terraform plan, you must set the environment variables whic
 
     ![New VMware vSphere Windows Server VM](./04.png)
 
-    ![Azure Arc enabled server in an Azure resource group](./05.png)
+    ![Azure Arc-enabled server in an Azure resource group](./05.png)
 
-    ![Azure Arc enabled server in an Azure resource group](./06.png)
+    ![Azure Arc-enabled server in an Azure resource group](./06.png)
 
 ## Delete the deployment
 
 * The most straightforward way is to delete the Azure Arc resource via the Azure Portal, just select the resource and delete it. In addition, delete the VMware vSphere VM.
 
-    ![Delete Azure Arc enabled server](./07.png)
+    ![Delete Azure Arc-enabled server](./07.png)
 
 * If you delete the instance manually, then you should also delete *install_arc_agent.ps1*  which is created by the Terraform plan.
 

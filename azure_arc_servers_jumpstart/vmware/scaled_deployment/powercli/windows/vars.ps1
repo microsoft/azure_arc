@@ -3,8 +3,8 @@
 
 # Azure vars
 $env:subscription_id = 'Your Azure subscription ID'
-$env:client_id = 'Your Azure service principal name'
-$env:client_secret = 'Your Azure service principal password'
+$env:servicePrincipalClientId = 'Your Azure service principal name'
+$env:servicePrincipalSecret = 'Your Azure service principal password'
 $env:tenant_id = 'Your Azure tenant ID'
 $env:resourceGroup = 'Azure resource group name where the Azure Arc servers will be onboarded to'
 $env:location = 'Azure Region' # For example: "eastus"

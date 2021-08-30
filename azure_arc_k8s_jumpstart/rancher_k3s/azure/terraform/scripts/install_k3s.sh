@@ -20,8 +20,10 @@ sudo snap install helm --classic
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-sudo az extension add --name connectedk8s
-sudo az extension add --name k8sconfiguration
+sudo az extension add --name "connectedk8s"
+sudo az extension add --name "k8s-configuration"
+sudo az extension add --name "k8s-extension"
+sudo az extension add --name "customlocation"
 
 sudo az login --service-principal --username $appId --password $password --tenant $tenantId
 
@@ -41,3 +43,5 @@ sudo rm az.sh
 # Onboard the cluster to Azure Arc
 resourceGroup=$(az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
 az connectedk8s connect --name $vmName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
+# This is the Custom Locations Enterprise Application ObjectID from AAD
+az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers

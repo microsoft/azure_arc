@@ -78,7 +78,7 @@ function registerArcForServers() {
 
     Write-Host "Connecting Azure Connected Machine Agent"
     $context = Get-AzContext
-    $params = @("connect", "--resource-group", $env:resourceGroup, "--location", $env:location, "--subscription-id", $env:subId, "--tenant-id", $context.Tenant, "--tags", "Project=jumpstart_azure_arc_sql")
+    $params = @("connect", "--resource-group", $env:resourceGroup, "--location", $env:location, "--subscription-id", $env:subId, "--tenant-id", $context.Tenant, "--tags", "Project=jumpstart_azure_arc_sql", "--correlation-id", "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a")
 
     if ($unattended) {
         $password = $env:servicePrincipalSecret

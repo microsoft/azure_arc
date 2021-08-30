@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceGroup": {
+            "value": "resourceGroup-stage"
+        },        
+        "dataControllerId": {
+            "value": "dataControllerId-stage"
+        },
+        "customLocation": {
+            "value": "customLocation-stage"
+        },
+        "subscriptionId": {
+            "value": "subscriptionId-stage"
+        },
+        "admin": {
+            "value": "postgres"
+        },
+        "password": {
+            "value": "azdataPassword-stage"
+        },
+        "namespace": {
+            "value": "arc"
+        },
+        "serviceType": {
+            "value": "serviceType-stage"
+        },
+        "coordinatorCoresRequest": {
+            "value": "coordinatorCoresRequest-stage"
+        },
+        "coordinatorCoresLimit": {
+            "value": "coordinatorCoresLimit-stage"
+        },
+        "coordinatorMemoryRequest": {
+            "value": "coordinatorMemoryRequest-stage"
+        },
+        "coordinatorMemoryLimit": {
+            "value": "coordinatorMemoryLimit-stage"
+        },
+        "postgresEngineVersion": {
+            "value": 12
+        },
+        "dataStorageSize": {
+            "value": "dataSize-stage"
+        },
+        "dataStorageClassName": {
+            "value": "dataStorageClassName-stage"
+        },
+        "logsStorageSize": {
+            "value": "logsSize-stage"
+        },
+        "logStorageClassName": {
+            "value": "logsStorageClassName-stage"
+        },
+        "backupsStorageSize": {
+            "value": "backupsSize-stage"
+        },
+        "backupsStorageClassName": {
+            "value": "backupStorageClassName-stage"
+        },
+        "resourceTags": {
+            "value": {
+                "Project": "jumpstart_arcbox"
+            }
+        },
+        "numWorkers": {
+            "value": numWorkersStage
+        },
+        "extensions": {
+            "value": [
+                {
+                    "name": "citus"
+                }
+            ]
+        },
+        "apiVersion": {
+            "value": "2021-07-01-preview"
+        }
+    }
+}

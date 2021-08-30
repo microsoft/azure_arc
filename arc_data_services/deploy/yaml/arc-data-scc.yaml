@@ -1,39 +1,40 @@
-apiVersion: security.openshift.io/v1
-kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
 metadata:
-  annotations:
-    kubernetes.io/description: Azure Arc enabled data services custom scc is based on 'nonroot' scc plus additional capabilities.
-  generation: 2
-  name: arc-data-scc
-allowHostDirVolumePlugin: false
-allowHostIPC: false
-allowHostNetwork: false
-allowHostPID: false
-allowHostPorts: false
-allowPrivilegeEscalation: true
-allowPrivilegedContainer: false
+  name: arc-data-scc
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: false
 allowedCapabilities:
-  - SETUID
-  - SETGID
-  - CHOWN
-  - SYS_PTRACE
-defaultAddCapabilities: null
+- SETUID
+- SETGID
+- CHOWN
+- SYS_PTRACE
+defaultAddCapabilities: null
 fsGroup:
-  type: RunAsAny
-readOnlyRootFilesystem: false
+  type: RunAsAny
+groups: []
+priority: null
+readOnlyRootFilesystem: false
 requiredDropCapabilities:
-  - KILL
-  - MKNOD
+- KILL
+- MKNOD
 runAsUser:
-  type: MustRunAsNonRoot
+  type: MustRunAsNonRoot
 seLinuxContext:
-  type: MustRunAs
+  type: MustRunAs
 supplementalGroups:
-  type: RunAsAny
+  type: RunAsAny
+users: []
 volumes:
-  - configMap
-  - downwardAPI
-  - emptyDir
-  - persistentVolumeClaim
-  - projected
-  - secret
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
+---

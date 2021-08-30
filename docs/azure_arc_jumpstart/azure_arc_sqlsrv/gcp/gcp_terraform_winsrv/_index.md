@@ -8,11 +8,9 @@ description: >-
 
 ## Deploy a GCP instance with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Google Cloud Platform (GCP) virtual machine and connect it as an Azure Arc enabled SQL server resource.
+The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy a Windows Server installed with Microsoft SQL Server 2019 (Developer edition) in a Google Cloud Platform (GCP) virtual machine and connect it as an Azure Arc-enabled SQL server resource.
 
-By the end of the guide, you will have a GCP VM instance installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
-
-> **Note: Currently, Azure Arc enabled SQL Server is in [public preview](https://docs.microsoft.com/en-us/sql/sql-server/azure-arc/overview?view=sql-server-ver15)**.
+By the end of the guide, you will have a GCP VM instance installed with Windows Server 2019 with SQL Server 2019, projected as an Azure Arc-enabled SQL Server and a running SQL assessment with data injected to Azure Log Analytics workspace.
 
 ## Prerequisites
 
@@ -28,7 +26,15 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
   az --version
   ```
 
-* [Create a free Google Cloud account](https://cloud.google.com/free) if you don't have one already.
+* Google Cloud account with billing enabled - [Create a free trial account](https://cloud.google.com/free). To create Windows Server virtual machines, you must upgraded your account to enable billing. Click Billing from the menu and then select Upgrade in the lower right.
+
+    ![Screenshot showing how to enable billing on GCP account](./45.png)
+
+    ![Screenshot showing how to enable billing on GCP account](./46.png)
+
+    ![Screenshot showing how to enable billing on GCP account](./47.png)
+
+    ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
 * [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
@@ -59,9 +65,9 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc-enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.AzureArcData
@@ -170,7 +176,13 @@ Before executing the Terraform plan, you must set the environment variables whic
   export TF_VAR_admin_password='Guest OS Admin Password'
   ```
 
-  > **Note: Do not set the TF_VAR_admin_user variable to "Administrator". GCP Windows images have the administrator account [disabled by default](https://cloud.google.com/compute/docs/images/os-details#windows_server). Therefore, you must use a different username for your TF_VAR_admin_user (e.g., "arcdemo")**
+    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+
+    ```powershell
+    Set-Item -Path env:TF_VAR_gcp_project_id
+    ```
+
+    > **Note: Do not set the TF_VAR_admin_user variable to "Administrator". GCP Windows images have the administrator account [disabled by default](https://cloud.google.com/compute/docs/images/os-details#windows_server). Therefore, you must use a different username for your TF_VAR_admin_user (e.g., "arcdemo")**
 
   ![Screenshot showing exporting environment variables in shell](./19.png)
 
@@ -219,15 +231,15 @@ Before executing the Terraform plan, you must set the environment variables whic
 
   ![Screenshot showing SQL Management Studio](./34.png)
 
-* In the Azure Portal, notice you now have an Azure Arc enabled server resource (with the MMA agent installed via an Extension), Azure Arc enabled SQL resource and Azure Log Analytics deployed.
+* In the Azure Portal, notice you now have an Azure Arc-enabled server resource (with the MMA agent installed via an Extension), Azure Arc-enabled SQL resource and Azure Log Analytics deployed.
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled SQL resources](./35.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled SQL resources](./35.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled SQL resources](./36.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled SQL resources](./36.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled SQL resources](./37.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled SQL resources](./37.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled SQL resources](./38.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled SQL resources](./38.png)
 
 ## Azure SQL Assessment
 
@@ -239,11 +251,11 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 
   Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
-  ![Screenshot showing Azure Arc enabled SQL Server Environment Health blade](./39.png)
+  ![Screenshot showing Azure Arc-enabled SQL Server Environment Health blade](./39.png)
 
-  ![Screenshot showing Azure Arc enabled SQL Server Environment Health blade](./40.png)
+  ![Screenshot showing Azure Arc-enabled SQL Server Environment Health blade](./40.png)
 
-  ![Screenshot showing Azure Arc enabled SQL Server Environment Health blade](./41.png)
+  ![Screenshot showing Azure Arc-enabled SQL Server Environment Health blade](./41.png)
 
 * After few minutes you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 

@@ -10,8 +10,6 @@ description: >
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Amazon Web Services (AWS) [Kubernetes Engine cluster](https://aws.amazon.com/eks/) and connected it as an Azure Arc cluster resource.
 
-> **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/)**.
-
 ## Prerequisites
 
 * Clone the Azure Arc Jumpstart repository
@@ -68,9 +66,9 @@ The following README will guide you on how to use the provided [Terraform](https
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -84,18 +82,18 @@ The following README will guide you on how to use the provided [Terraform](https
   az provider show -n Microsoft.KubernetesConfiguration -o table
   ```
 
-* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
+* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8s-configuration***:
 
   ```shell
   az extension add --name connectedk8s
-  az extension add --name k8sconfiguration
+  az extension add --name k8s-configuration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
   ```shell
   az extension update --name connectedk8s
-  az extension update --name k8sconfiguration
+  az extension update --name k8s-configuration
   ```
 
 * Create AWS User IAM Key
@@ -155,7 +153,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
   ```shell
   mkdir ~/.kube/
-  terraform output kubeconfig>~/.kube/config
+  terraform output -raw kubeconfig > ~/.kube/config
   ```
   
   Check to see if cluster is discoverable by ```kubectl``` by running:
@@ -176,7 +174,7 @@ The following README will guide you on how to use the provided [Terraform](https
   Now let’s add the ConfigMap to the cluster from Terraform as well. The ConfigMap is a Kubernetes configuration, in this case for granting access to our EKS cluster. This ConfigMap allows our ec2 instances in the cluster to communicate with the EKS master, as well as allowing our user account access to run commands against the cluster. You’ll run the Terraform output command to a file, and the kubectl apply command to apply that file:
 
   ```shell
-  terraform output config_map_aws_auth > configmap.yml
+  terraform output -raw config_map_aws_auth > configmap.yml
   kubectl apply -f configmap.yml
   ```
 
@@ -214,7 +212,7 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
    az group create --name arceksdemo -l EastUS -o table
    ```
 
-   > **Note: Azure Arc enabled Kubernetes is currently supported in *East US* and *West Europe***
+   > Note:  Before deploying, make sure to check the Azure Arc-enabled Kubernetes region availability [page](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc).
 
 * Deploy Arc binaries using Azure CLI:
 
@@ -222,13 +220,13 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
   az connectedk8s connect --name arceksdemo --resource-group arceksdemo --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
-* Upon completion, you will have your EKS cluster connect as a new Azure Arc enabled Kubernetes resource in a new resource group.
+* Upon completion, you will have your EKS cluster connect as a new Azure Arc-enabled Kubernetes resource in a new resource group.
 
   ![Screenshot showing ARM deployment](./image13.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./image14.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./image14.png)
 
-  ![Screenshot showing Azure POrtal with Azure Arc enabled Kubernetes resource detail](./image15.png)
+  ![Screenshot showing Azure POrtal with Azure Arc-enabled Kubernetes resource detail](./image15.png)
 
 ## Delete the deployment
 

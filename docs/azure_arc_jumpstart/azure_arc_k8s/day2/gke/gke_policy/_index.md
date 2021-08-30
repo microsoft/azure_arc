@@ -28,9 +28,9 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
 * As mentioned, this guide starts at the point where you already have a connected GKE cluster to Azure Arc.
 
-    ![Existing GKE Azure Arc enabled Kubernetes cluster](./01.png)
+    ![Existing GKE Azure Arc-enabled Kubernetes cluster](./01.png)
 
-    ![Existing GKE Azure Arc enabled Kubernetes cluster](./02.png)
+    ![Existing GKE Azure Arc-enabled Kubernetes cluster](./02.png)
 
 * Before installing the Azure Policy addon or enabling any of the service features, your subscription must enable the Microsoft.PolicyInsights resource provider and create a role assignment for the cluster service principal. To do that, open [Azure Cloud Shell](https://shell.azure.com/) and run either the Azure CLI or Azure PowerShell command.
 
@@ -68,7 +68,7 @@ The following README will guide you on how to enable [Azure Policy for Kubernete
 
 * Create Azure service principal (SP)
 
-    > **Note: This guide assumes you will be working with a service principal assigned with the 'Contributor' role as described below. If you want to further limit the RBAC scope of your service Principal, you can assign it with the 'Policy Insights Data Writer (Preview)' role the Azure Arc enabled Kubernetes cluster as described [here](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/governance/policy/concepts/policy-for-kubernetes.md#install-azure-policy-add-on-for-azure-arc-enabled-kubernetes-preview).**
+    > **Note: This guide assumes you will be working with a service principal assigned with the 'Contributor' role as described below. If you want to further limit the RBAC scope of your service Principal, you can assign it with the 'Policy Insights Data Writer (Preview)' role the Azure Arc-enabled Kubernetes cluster as described [here](https://github.com/MicrosoftDocs/azure-docs/blob/master/articles/governance/policy/concepts/policy-for-kubernetes.md#install-azure-policy-add-on-for-azure-arc-enabled-kubernetes-preview).**
 
 * To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in Azure Cloud Shell).
 

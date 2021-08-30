@@ -10,8 +10,6 @@ description: >
 
 The following README will guide you on how to connect an existing Kubernetes cluster to Azure Arc using a simple shell script.
 
-> **Note: Currently, Azure Arc enabled Kubernetes is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/)**.
-
 ## Prerequisites
 
 * Make sure your *kubeconfig* file is configured properly and you are working against your [k8s cluster context](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
@@ -55,9 +53,9 @@ The following README will guide you on how to connect an existing Kubernetes clu
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest)**
+    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Enable subscription with the two resource providers for Azure Arc enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -83,7 +81,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
   az group create -l eastus -n Arc-k8s-Clusters
   ```
 
-  > **Note: Currently, Azure Arc enabled Kubernetes resource creation is supported only in the following locations: eastus, westeurope. Use the --location (or -l) flag to specify one of these locations.**
+  > **Note: Currently, Azure Arc-enabled Kubernetes resource creation is supported only in the following locations: eastus, westeurope. Use the --location (or -l) flag to specify one of these locations.**
 
   ![Screenshot showing Azure Portal with empty resource group](./01.png)
 
@@ -111,18 +109,18 @@ The following README will guide you on how to connect an existing Kubernetes clu
 
 ## Deployment
 
-* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8sconfiguration***:
+* Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8s-configuration***:
 
   ```shell
   az extension add --name connectedk8s
-  az extension add --name k8sconfiguration
+  az extension add --name k8s-configuration
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
   ```shell
   az extension update --name connectedk8s
-  az extension update --name k8sconfiguration
+  az extension update --name k8s-configuration
   ```
 
 * Login to your Azure subscription using the SP you created.  
@@ -164,17 +162,17 @@ The following README will guide you on how to connect an existing Kubernetes clu
   az connectedk8s connect --name $env:arcClusterName --resource-group $env:resourceGroup
   ```
 
-Upon completion, you will have your Kubernetes cluster, connected as a new Azure Arc enabled Kubernetes resource inside your resource group.
+Upon completion, you will have your Kubernetes cluster, connected as a new Azure Arc-enabled Kubernetes resource inside your resource group.
 
 ![Screenshot showing Azure ARM template deployment](./02.png)
 
-![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./03.png)
+![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./03.png)
 
-![Screenshot showing Azure Portal with Azure Arc enabled Kubernetes resource](./04.png)
+![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./04.png)
 
 ## Delete the deployment
 
-The most straightforward way is to delete the Azure Arc enabled Kubernetes resource is via the Azure Portal, just select cluster and delete it.
+The most straightforward way is to delete the Azure Arc-enabled Kubernetes resource is via the Azure Portal, just select cluster and delete it.
 
 ![Screenshot showing how to delete resources in Azure Portal](./05.png)
 
