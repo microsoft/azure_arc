@@ -1,0 +1,92 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "resourceGroup": {
+        "value": "resourceGroup-stage"
+      },
+      "namespace": {
+        "value": "arc"
+      },
+      "connectionMode": {
+        "value": "direct"
+      },
+      "controllerName": {
+        "value": "jumpstart-dc"
+      },
+      "azdataUsername": {
+        "value": "azdataUsername-stage"
+      },
+      "azdataPassword": {
+        "value": "azdataPassword-stage"
+      },
+      "customLocation": {
+        "value": "customLocation-stage"
+      },
+      "subscriptionId": {
+        "value": "subscriptionId-stage"
+      },
+      "spnClientId": {
+        "value": "spnClientId-stage"
+      },
+      "spnTenantId": {
+        "value": "spnTenantId-stage"
+      },
+      "spnClientSecret": {
+        "value": "spnClientSecret-stage"
+      },
+      "spnAuthority": {
+        "value": "https://login.microsoftonline.com"
+      },
+      "logAnalyticsWorkspaceId": {
+        "value": "logAnalyticsWorkspaceId-stage"
+      },
+      "logAnalyticsPrimaryKey": {
+        "value": "logAnalyticsPrimaryKey-stage"
+      },
+      "resourceTags": {
+        "value": {
+          "Project": "jumpstart_azure_arc_data_services"
+        }
+      },
+      "dockerRegistryCredential": {
+        "value": "arc-private-registry"
+      },
+      "dockerImagePullPolicy": {
+        "value": "Always"
+      },
+      "dockerImageTag": {
+        "value": "v1.0.0_2021-07-30"
+      },
+      "dockerRegistry": {
+        "value": "mcr.microsoft.com"
+      },
+      "dockerRepository": {
+        "value": "arcdata"
+      },
+      "dataStorageClass": {
+        "value": "managed-premium"
+      },
+      "dataStorageSize": {
+        "value": "15Gi"
+      },
+      "logsStorageClass": {
+        "value": "managed-premium"
+      },
+      "logsStorageSize": {
+        "value": "10Gi"
+      },
+      "serviceType": {
+        "value": "LoadBalancer"
+      },
+      "controllerPort": {
+        "value": 30080
+      },
+      "apiVersion": {
+        "value": "2021-08-01"
+      },
+      "infrastructure": {
+        "value": "azure"
+      }
+    }
+  }

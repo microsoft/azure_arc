@@ -21,4 +21,5 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
  --resource-group $env:resourceGroup `
  --tenant-id $env:tenantId `
  --location $env:location `
- --subscription-id $env:subscriptionId
+ --subscription-id $env:subscriptionId `
+ --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"

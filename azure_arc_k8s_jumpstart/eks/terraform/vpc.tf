@@ -9,9 +9,10 @@
 resource "aws_vpc" "arcdemo" {
   cidr_block = "10.0.0.0/16"
 
-  tags = map(
-    "Name", "terraform-eks-arcdemo-node",
-    "kubernetes.io/cluster/${var.cluster-name}", "shared",
+  tags = tomap({
+    "Name"                                      = "terraform-eks-arcdemo-node"
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
+    }
   )
 }
 
@@ -23,9 +24,10 @@ resource "aws_subnet" "arcdemo" {
   map_public_ip_on_launch = true
   vpc_id                  = aws_vpc.arcdemo.id
 
-  tags = map(
-    "Name", "terraform-eks-arcdemo-node",
-    "kubernetes.io/cluster/${var.cluster-name}", "shared",
+  tags = tomap({
+    "Name"                                      = "terraform-eks-arcdemo-node"
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
+    }
   )
 }
 

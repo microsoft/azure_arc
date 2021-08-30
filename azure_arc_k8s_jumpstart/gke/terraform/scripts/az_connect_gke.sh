@@ -32,10 +32,10 @@ sudo apt-get update
 sudo apt-get install azure-cli
 
 az extension remove --name connectedk8s
-az extension remove --name k8sconfiguration
+az extension remove --name k8s-configuration
 rm -rf ~/.azure/AzureArcCharts
 az extension add --name connectedk8s
-az extension add --name k8sconfiguration
+az extension add --name k8s-configuration
 
 echo "Log in to Azure using service principal"
 az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId

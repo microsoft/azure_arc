@@ -17,11 +17,11 @@ az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --
 
 # Create Cluster-level GitOps-Config for deploying nginx-ingress
 echo "Create Cluster-level GitOps-Config for deploying nginx-ingress"
-az k8sconfiguration create \
+az k8s-configuration create \
 --name nginx-ingress \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name cluster-mgmt --operator-namespace cluster-mgmt \
---enable-helm-operator --helm-operator-version='0.6.0' \
+--enable-helm-operator \
 --helm-operator-params='--set helm.versions=v3' \
 --repository-url $appClonedRepo \
 --scope cluster --cluster-type connectedClusters \
@@ -29,11 +29,11 @@ az k8sconfiguration create \
 
 # Create Namespace-level GitOps-Config for deploying the "Hello Arc" application
 echo "Create Namespace-level GitOps-Config for deploying the 'Hello Arc' application"
-az k8sconfiguration create \
+az k8s-configuration create \
 --name hello-arc \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
 --operator-instance-name hello-arc --operator-namespace prod \
---enable-helm-operator --helm-operator-version='0.6.0' \
+--enable-helm-operator \
 --helm-operator-params='--set helm.versions=v3' \
 --repository-url $appClonedRepo \
 --scope namespace --cluster-type connectedClusters \

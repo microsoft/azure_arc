@@ -16,8 +16,8 @@ az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --
 
 # Deleting GitOps Configurations from Azure Arc Kubernetes cluster
 echo "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
-az k8sconfiguration delete --name hello-arc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
-az k8sconfiguration delete --name nginx-ingress --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
+az k8s-configuration delete --name hello-arc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
+az k8s-configuration delete --name nginx-ingress --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
 
 # Cleaning Kubernetes cluster
 echo "Cleaning Kubernetes cluster. You can safely ignore non-exist resources"

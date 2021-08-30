@@ -7,6 +7,10 @@ assignees: ''
 
 ---
 
+**Is your feature request related to a new Jumpstart scenario you would like to contribute?**
+That's great! Use our Jumpstart Scenario Write-up Guidelines
+https://azurearcjumpstart.io/scenario_guidelines
+
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. As a user of ... I would like to have [...]
 

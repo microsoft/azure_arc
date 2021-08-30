@@ -57,7 +57,8 @@ sudo azcmagent connect \
   --tenant-id "${TENANTID}" \
   --location "${LOCATION}" \
   --subscription-id "${SUBSCRIPTIONID}" \
-  --tags "Project=jumpstart_azure_arc_servers"
+  --tags "Project=jumpstart_azure_arc_servers" \
+  --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 rm -f /home/$USER/.bash_profile
 

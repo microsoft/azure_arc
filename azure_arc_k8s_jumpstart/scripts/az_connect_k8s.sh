@@ -20,7 +20,7 @@ echo "Installing Azure CLI & Azure Arc Extensions"
 sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 sudo az extension add --name connectedk8s
-sudo az extension add --name k8sconfiguration
+sudo az extension add --name k8s-configuration
 
 echo "Log in to Azure using service principal"
 sudo az login --service-principal --username $appId --password $password --tenant $tenantId
