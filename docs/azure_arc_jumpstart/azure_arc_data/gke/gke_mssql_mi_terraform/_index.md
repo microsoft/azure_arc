@@ -10,7 +10,7 @@ description: >
 
 The following scanario will guide you on how to deploy a "Ready to Go" environment so you can deploy Azure Arc-enabled data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster using [Terraform](https://www.terraform.io/).
 
-By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)), Azure SQL MI with a sample database and a Microsoft Windows Server 2022 (Datacenter) GKE compute instance VM installed and pre-configured with all the required tools needed to work with Azure Arc data services:
+By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)), Azure SQL MI with a sample database and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM installed and pre-configured with all the required tools needed to work with Azure Arc data services:
 
 ![Deployed Architecture](./50.png)
 
