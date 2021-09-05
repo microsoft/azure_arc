@@ -99,6 +99,20 @@ $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{
 (Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
 
+# Unzip SqlQueryStress
+Expand-Archive -Path C:\Temp\SqlQueryStress.zip -DestinationPath C:\Temp\SqlQueryStress
+
+# Create SQLQueryStress desktop shortcut
+Write-Host "`n"
+Write-Host "Creating SQLQueryStress Desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Temp\SqlQueryStress\SqlQueryStress.exe"
+$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SqlQueryStress.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
 # If PostgreSQL isn't being deployed, clean up settings file
 if ( $env:deployPostgreSQL -eq $false )
 {
