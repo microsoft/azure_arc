@@ -389,7 +389,7 @@ If ($InferenceStatus -eq "Successful"){
    # Get OAuth token
    $token = $(az ml endpoint get-credentials --name $name `
                                              --resource-group $env:resourceGroup `
-                                             --workspace-name $ws | ConvertFrom-Json).primaryKey
+                                             --workspace-name $ws | ConvertFrom-Json).accessToken
    # Get scoring URL
    $scoring_uri = $(az ml endpoint show --name $name `
                                         --resource-group $env:resourceGroup `
