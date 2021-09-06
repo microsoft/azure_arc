@@ -1,5 +1,5 @@
 type: online
-auth_mode: aml_token
+auth_mode: key
 target: azureml:connectedClusterName-stage
 traffic:
   blue: 100
