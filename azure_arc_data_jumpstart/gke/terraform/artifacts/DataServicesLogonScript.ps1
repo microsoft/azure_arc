@@ -145,13 +145,20 @@ az k8s-extension create --name "azure-defender" `
                         --cluster-type connectedClusters `
                         --extension-type Microsoft.AzureDefender.Kubernetes
 
+# Creating Log Analytics Workspace for Metric Upload
+Write-Host "Deploying Log Analytics Workspace"
+Write-Host "`n"
+
+az monitor log-analytics workspace create --resource-group $env:resourceGroup `
+                                          --workspace-name "jumpstartlaws"
+
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
-$workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
+$workspaceId = $(az resource show --resource-group $env:resourceGroup --name "jumpstartlaws" --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name "jumpstartlaws" --query primarySharedKey -o tsv)
 
 $dataControllerParams = "C:\Temp\dataController.parameters.json"
 
