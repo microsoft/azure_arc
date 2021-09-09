@@ -22,7 +22,7 @@ function Disable-ieESC {
 Disable-ieESC
 
 # Installing tools
-$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140,kubernetes-helm,vscode,putty.install,microsoft-edge,azcopy10,grep"
+$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140,kubernetes-helm,vscode,putty.install,microsoft-edge,azcopy10,grep,dotnetcore-3.1-sdk"
 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
     try{
@@ -63,6 +63,8 @@ Invoke-WebRequest ($env:templateBaseUrl + "artifacts/postgreSQL.json") -OutFile 
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\Temp\postgreSQL.parameters.json"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\Temp\DeployPostgreSQL.ps1"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\Temp\DeploySQLMI.ps1"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\Temp\SQLMIEndpoints.ps1"
+Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\Temp\SqlQueryStress.zip"
 Invoke-WebRequest ($env:templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
 
 Write-Output "Unzipping and installing Data Studio"
