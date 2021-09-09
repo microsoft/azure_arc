@@ -84,7 +84,7 @@ workflow ClientTools_01
                 [Parameter (Mandatory = $true)]
                 [string]$templateBaseUrl
             )
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
             #Run commands in parallel.
             Parallel 
                 {
@@ -133,6 +133,8 @@ workflow ClientTools_01
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile "C:\ArcBox\sqlmi.parameters.json"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.json"
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
+                    Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\ArcBox\SQLMIEndpoints.ps1"
+                    Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\ArcBox\SqlQueryStress.zip"                    
                     Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
                 }
         }
