@@ -214,11 +214,26 @@ if ( $env:deployPostgreSQL -eq $true )
     & "C:\Temp\DeployPostgreSQL.ps1"
 }
 
-# Applying Azure Data Studio settings template file
+# Applying Azure Data Studio settings template file and operations url shortcut
 if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
     Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+
+    # Creating desktop url shortcuts for built-in Grafana and Kibana services 
+    $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $GrafanaURL = "https://"+$GrafanaURL+":3000"
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Grafana.url")
+    $Favorite.TargetPath = $GrafanaURL;
+    $Favorite.Save()
+
+    $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $KibanaURL = "https://"+$KibanaURL+":5601"
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Kibana.url")
+    $Favorite.TargetPath = $KibanaURL;
+    $Favorite.Save()
 }
 
 # Deleting AWS Desktop shortcuts

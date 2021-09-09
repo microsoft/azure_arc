@@ -12,7 +12,7 @@ The following scanario will guide you on how to deploy a "Ready to Go" environme
 
 By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)), Azure SQL MI with a sample database and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM installed and pre-configured with all the required tools needed to work with Azure Arc data services:
 
-![Deployed Architecture](./50.png)
+![Deployed Architecture](./57.png)
 
 > **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -46,11 +46,11 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 * Google Cloud account with billing enabled - [Create a free trial account](https://cloud.google.com/free). To create Windows Server virtual machines, you must upgraded your account to enable billing. Click Billing from the menu and then select Upgrade in the lower right.
 
-    ![Screenshot showing how to enable billing on GCP account](./46.png)
+    ![Screenshot showing how to enable billing on GCP account](./59.png)
 
-    ![Screenshot showing how to enable billing on GCP account](./47.png)
+    ![Screenshot showing how to enable billing on GCP account](./60.png)
 
-    ![Screenshot showing how to enable billing on GCP account](./48.png)
+    ![Screenshot showing how to enable billing on GCP account](./61.png)
 
     ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
@@ -281,6 +281,66 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
   ![Azure Data studio sample database](./42.png)
 
+## Operations
+
+### Azure Arc-enabled SQL Managed Instance Stress Simulation
+
+Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQueryStress_ automatically installed for you on the Client VM. _SqlQueryStress_ will allow you to generate load on the Azure Arc-enabled SQL Managed Instance that can be done used to showcase how the SQL database and services are performing as well to highlight operational practices described in the next section.
+
+* To start with, open the _SqlQueryStress_ desktop shortcut and connect to the SQL Managed Instance endpoint IP address. This can be found in the _SQLMI Endpoints_ text file desktop shortcut that was also created for you alongside the username and password you used to deploy the environment.
+
+  ![Open SqlQueryStress](./43.png)
+
+  ![SQLMI Endpoints text file](./44.png)
+
+* To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
+
+  ![SqlQueryStress connected](./45.png)
+
+* To generate some load, we will be running a simple stored procedure. Copy the below procedure and change the number of iterations you want it to run as well as the number of threads to generate even more load on the database. In addition, change the delay between queries to 1ms for allowing the stored procedure to run for a while.
+
+    ```sql
+    exec [dbo].[uspGetEmployeeManagers] @BusinessEntityID = 8
+    ```
+
+* As you can see from the example below, the configuration settings are 100,000 iterations, five threads per iteration, and a 1ms delay between queries. These configurations should allow you to have the stress test running for a while.
+
+  ![SqlQueryStress settings](./46.png)
+
+  ![SqlQueryStress running](./47.png)
+
+### Azure Arc-enabled SQL Managed Instance monitoring using Grafana
+
+When deploying Azure Arc-enabled data services, a [Grafana](https://grafana.com/) instance is also automatically deployed on the same Kubernetes cluster and include built-in dashboards for both Kubernetes infrastructure as well SQL Managed Instance monitoring (PostgreSQL dashboards are included as well but we will not be covering these in this section).
+
+* Now that you have the _SqlQueryStress_ stored procedure running and generating load, we can look how this is shown in the the built-in Grafana dashboard. As part of the automation, a new URL desktop shortcut simply named "Grafana" was created.
+
+  ![Grafana desktop shortcut](./48.png)
+
+* [Optional] The IP address for this instance represents the Kubernetes _LoadBalancer_ external IP that was provision as part of Azure Arc-enabled data services. Use the _```kubectl get svc -n arc```_ command to view the _metricsui_ external service IP address.
+
+  ![metricsui Kubernetes service](./49.png)
+
+* To log in, use the same username and password that is in the _SQLMI Endpoints_ text file desktop shortcut.
+
+  ![Grafana username and password](./50.png)
+
+* Navigate to the built-in "SQL Managed Instance Metrics" dashboard.
+
+  ![Grafana dashboards](./51.png)
+
+  ![Grafana "SQL Managed Instance Metrics" dashboard](./52.png)
+
+* Change the dashboard time range to "Last 5 minutes" and re-run the stress test using _SqlQueryStress_ (in case it was already finished).
+
+  ![Last 5 minutes time range](./53.png)
+
+* You can now see how the SQL graphs are starting to show increased activity and load on the database instance.
+
+  ![Increased load activity](./54.png)
+
+  ![Increased load activity](./55.png)
+
 ## Delete the deployment
 
 To completely delete the environment, follow the below steps.
@@ -291,7 +351,7 @@ To completely delete the environment, follow the below steps.
   kubectl delete namespace arc
   ```
 
-  ![Delete database resources](./49.png)
+  ![Delete database resources](./56.png)
 
 * Use terraform to delete all of the GCP resources as well as the Azure resource group. **The *terraform destroy* run time is approximately ~5-6min long**.
 
@@ -299,7 +359,7 @@ To completely delete the environment, follow the below steps.
   terraform destroy --auto-approve
   ```
 
-  ![terraform destroy](./43.png)
+  ![terraform destroy](./58.png)
 
 ## Known Issues
 
