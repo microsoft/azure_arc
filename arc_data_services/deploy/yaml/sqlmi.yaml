@@ -21,6 +21,7 @@ spec:
   dev: true #options: [true, false]
   licenseType: LicenseIncluded #options: [LicenseIncluded, BasePrice].  BasePrice is used for Azure Hybrid Benefits.
   tier: GeneralPurpose #options: [GeneralPurpose, BusinessCritical]
+  security: sql1-login-secret
   scheduling:
     default:
       resources:
