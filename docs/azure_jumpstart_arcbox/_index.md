@@ -231,9 +231,17 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
   ![Screenshot showing Azure Data Studio usage](./azdatastudio.png)
 
-* Open the [ArcBox Azure Monitor workbook](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) and explore the visualizations and reports of hybrid cloud resources. A [dedicated README](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) is available with more detail on usage of the workbook.
+### ArcBox Azure Monitor workbook
+
+Open the [ArcBox Azure Monitor workbook](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) and explore the visualizations and reports of hybrid cloud resources. A [dedicated README](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) is available with more detail on usage of the workbook.
 
   ![Screenshot showing Azure Monitor workbook usage](./workbook.png)
+
+### Azure Arc-enabled data services operations
+
+Open the [data services operations page](https://azurearcjumpstart.io/azure_jumpstart_arcbox/data_ops/) and explore various ways you can perform operations against the Azure Arc-enabled data services deployed with ArcBox.
+
+  ![Screenshot showing Grafana dashboard](./data_ops/activity1.png)
 
 ### Included tools
 
@@ -247,6 +255,7 @@ The following tools are including on the ArcBox-Client VM.
 * 7zip
 * Terraform
 * Git
+* SqlQueryStress
 
 ### Next steps
   
