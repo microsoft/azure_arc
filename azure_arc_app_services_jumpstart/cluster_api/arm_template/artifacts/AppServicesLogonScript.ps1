@@ -80,6 +80,7 @@ Write-Host "`n"
 kubectl get nodes
 
 # Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
+Write-Host "`n"
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_app_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
