@@ -8,9 +8,6 @@ param (
     [string]$azureLocation,
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
-    [string]$clusterName,
-    [string]$dnsPrefix,
-    [string]$kubernetesVersion,
     [string]$deployAppService,
     [string]$deployFunction,
     [string]$deployLogicApp,
@@ -26,9 +23,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('dnsPrefix', $dnsPrefix,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('kubernetesVersion', $kubernetesVersion,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAppService', $deployAppService,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployFunction', $deployFunction,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployLogicApp,[System.EnvironmentVariableTarget]::Machine)
@@ -43,30 +37,17 @@ Start-Transcript "C:\Temp\Bootstrap.log"
 
 $ErrorActionPreference = 'SilentlyContinue'
 
-# Uninstall Internet Explorer
-Disable-WindowsOptionalFeature -FeatureName Internet-Explorer-Optional-amd64 -Online -NoRestart
-
-# Disabling IE Enhanced Security Configuration
-Write-Host "Disabling IE Enhanced Security Configuration"
-function Disable-ieESC {
-    $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
-    $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
-    Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0
-    Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
-    Stop-Process -Name Explorer
-    Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
-}
-Disable-ieESC
-
 # Extending C:\ partition to the maximum size
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 # Downloading GitHub artifacts for AppServicesLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/capiStorageClass.yaml") -OutFile "C:\Temp\capiStorageClass.yaml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -OutFile "C:\Temp\AppServicesLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"  
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1" 
-Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1" 
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Installing tools
 
@@ -104,7 +85,6 @@ workflow ClientTools_01
                             }
                         }                        
                     }
-                    Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
                 }
         }
 
