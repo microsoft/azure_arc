@@ -1,6 +1,6 @@
 Start-Transcript -Path C:\Temp\AppServicesLogonScript.log
 
-$connectedClusterName = "Arc-AppSvc-CAPI"
+$connectedClusterName = "Arc-App-CAPI"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -22,8 +22,8 @@ az account set --subscription $env:subscriptionId
 Write-Host "`n"
 Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
 Write-Host "`n"
-az network public-ip create --resource-group $env:resourceGroup --name "Arc-AppSvc-PIP" --sku STANDARD
-$staticIp = $(az network public-ip show --resource-group $env:resourceGroup --name "Arc-AppSvc-PIP" --output tsv --query ipAddress)
+az network public-ip create --resource-group $env:resourceGroup --name "Arc-App-PIP" --sku STANDARD
+$staticIp = $(az network public-ip show --resource-group $env:resourceGroup --name "Arc-App-PIP" --output tsv --query ipAddress)
 
 # Registering Azure Arc providers
 Write-Host "`n"

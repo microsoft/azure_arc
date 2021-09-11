@@ -87,8 +87,8 @@
     "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
     // Virtual Network configuration
-    "virtualNetworkName": "Arc-AppSvc-CAPI-VNet",
-    "subnetName": "Arc-AppSvc-CAPI-Subnet",
+    "virtualNetworkName": "Arc-App-CAPI-VNet",
+    "subnetName": "Arc-App-CAPI-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24"
   },
