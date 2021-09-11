@@ -115,29 +115,29 @@ $workspaceKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($wor
 #     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
 #     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${workspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${workspaceKeyEnc}"
 
+
 $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
-    --cluster-type connectedClusters `
-    --cluster-name $connectedClusterName `
-    --extension-type 'Microsoft.Web.Appservice' `
-    --release-train stable `
-    --auto-upgrade-minor-version true `
-    --scope cluster `
-    --release-namespace $namespace `
-    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
-    --configuration-settings "appsNamespace=${namespace}" `
-    --configuration-settings "clusterName=${kubeEnvironmentName}" `
-    --configuration-settings "loadBalancerIp=${staticIp}" `
-    --configuration-settings "keda.enabled=true" `
-    --configuration-settings "buildService.storageClassName=managed-premium" `
-    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
-    --configuration-settings "customConfigMap=${namespace}/kube-environment-config" `
-    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=${env:resourceGroup}" `
-    --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
-    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
-    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
-
-
-az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version "2020-07-01-preview"
+   --cluster-type connectedClusters `
+   --cluster-name $connectedClusterName `
+   --extension-type 'Microsoft.Web.Appservice' `
+   --release-train stable `
+   --auto-upgrade-minor-version true `
+   --scope cluster `
+   --release-namespace $namespace `
+   --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
+   --configuration-settings "appsNamespace=${namespace}" `
+   --configuration-settings "clusterName=${kubeEnvironmentName}" `
+   --configuration-settings "loadBalancerIp=${staticIp}" `
+   --configuration-settings "keda.enabled=true" `
+   --configuration-settings "buildService.storageClassName=managed-premium" `
+   --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
+   --configuration-settings "customConfigMap=${namespace}/kube-environment-config" `
+   --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=${connectedClusterName}" `
+   --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
+   --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
+   --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
+    
+az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
 
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
@@ -148,7 +148,7 @@ Do {
 Do {
    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
    Start-Sleep -Seconds 15
-   $logProcessorStatus = $(if(kubectl describe daemonset ($extensionName + "-k8se-log-processor") -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
+   $logProcessorStatus = $(if(kubectl describe daemonset ($extensionName + "-k8se-log-processor") -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
    } while ($logProcessorStatus -eq "Nope")
 
 Write-Host "`n"
@@ -157,7 +157,7 @@ Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
-az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --location $env:azureLocation --output none 
+az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --location $env:azureLocation --output none
 
 Do {
    Write-Host "Waiting for kube environment to become available. Hold tight, this might take a few minutes..."
