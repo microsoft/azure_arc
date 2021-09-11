@@ -75,8 +75,8 @@ kubectl label node --all topology.kubernetes.io/zone-
 kubectl label node --all failure-domain.beta.kubernetes.io/zone= --overwrite
 kubectl label node --all topology.kubernetes.io/zone= --overwrite
 
-Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
+Write-Host "Checking kubernetes nodes"
 kubectl get nodes
 
 # Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
@@ -100,22 +100,44 @@ $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-
 $workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $workspaceKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
-$extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
-    --cluster-type connectedClusters -c $connectedClusterName `
-    --extension-type 'Microsoft.Web.Appservice' --release-train stable --auto-upgrade-minor-version true `
-    --scope cluster --release-namespace "$namespace" `
-    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default"  `
-    --configuration-settings "appsNamespace=$namespace"  `
-    --configuration-settings "clusterName=$kubeEnvironmentName"  `
-    --configuration-settings "loadBalancerIp=$staticIp"  `
-    --configuration-settings "keda.enabled=true"  `
-    --configuration-settings "buildService.storageClassName=default"  `
-    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
-    --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
-    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
-    --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${workspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${workspaceKeyEnc}"
+# $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
+#     --cluster-type connectedClusters -c $connectedClusterName `
+#     --extension-type 'Microsoft.Web.Appservice' --release-train stable --auto-upgrade-minor-version true `
+#     --scope cluster --release-namespace "$namespace" `
+#     --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default"  `
+#     --configuration-settings "appsNamespace=$namespace"  `
+#     --configuration-settings "clusterName=$kubeEnvironmentName"  `
+#     --configuration-settings "loadBalancerIp=$staticIp"  `
+#     --configuration-settings "keda.enabled=true"  `
+#     --configuration-settings "buildService.storageClassName=managed-premium"  `
+#     --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
+#     --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
+#     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
+#     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${workspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${workspaceKeyEnc}"
 
-az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
+$extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
+    --cluster-type connectedClusters `
+    --cluster-name $connectedClusterName `
+    --extension-type 'Microsoft.Web.Appservice' `
+    --release-train stable `
+    --auto-upgrade-minor-version true `
+    --scope cluster `
+    --release-namespace $namespace `
+    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
+    --configuration-settings "appsNamespace=${namespace}" `
+    --configuration-settings "clusterName=${kubeEnvironmentName}" `
+    --configuration-settings "loadBalancerIp=${staticIp}" `
+    --configuration-settings "keda.enabled=true" `
+    --configuration-settings "buildService.storageClassName=managed-premium" `
+    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
+    --configuration-settings "customConfigMap=${namespace}/kube-environment-config" `
+    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=${env:resourceGroup}" `
+    --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
+    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
+    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
+
+
+az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version "2020-07-01-preview"
 
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
