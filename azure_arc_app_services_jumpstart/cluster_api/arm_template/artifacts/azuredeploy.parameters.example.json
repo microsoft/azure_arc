@@ -24,7 +24,7 @@
             "value": "88.88.88.88"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "Arc-AppSvc-LA"
+            "value": "Arc-App-LA"
         },
         "deployAppService": {
             "value": false
