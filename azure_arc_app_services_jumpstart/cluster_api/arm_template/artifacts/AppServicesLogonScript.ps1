@@ -69,6 +69,7 @@ kubectl config rename-context "arc-app-capi-k8s-admin@arc-app-capi-k8s" "arc-app
 Write-Host "`n"
 Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
 kubectl apply -f "C:\Temp\capiStorageClass.yaml"
+$storageClassName = "managed premium"
 
 kubectl label node --all failure-domain.beta.kubernetes.io/zone-
 kubectl label node --all topology.kubernetes.io/zone-
@@ -97,8 +98,8 @@ $extensionName = "arc-app-services"
 $kubeEnvironmentName=$connectedClusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
-$workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
-$workspaceKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
+$logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
+$logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
 # $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
 #     --cluster-type connectedClusters -c $connectedClusterName `
@@ -113,7 +114,7 @@ $workspaceKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($wor
 #     --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
 #     --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
 #     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
-#     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${workspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${workspaceKeyEnc}"
+#     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
 
 $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
@@ -129,7 +130,7 @@ $extensionId = az k8s-extension create --resource-group $env:resourceGroup --nam
    --configuration-settings "clusterName=${kubeEnvironmentName}" `
    --configuration-settings "loadBalancerIp=${staticIp}" `
    --configuration-settings "keda.enabled=true" `
-   --configuration-settings "buildService.storageClassName=managed-premium" `
+   --configuration-settings "buildService.storageClassName=${storageClassName}" `
    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
    --configuration-settings "customConfigMap=${namespace}/kube-environment-config" `
    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=${connectedClusterName}" `
