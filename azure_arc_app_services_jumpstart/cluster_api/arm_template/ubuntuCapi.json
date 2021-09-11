@@ -10,7 +10,7 @@
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-CAPI-K8s",
+            "defaultValue": "Arc-App-CAPI-K8s",
             "metadata": {
                 "description": "The name of you Virtual Machine."
             }
@@ -54,21 +54,21 @@
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-CAPI-VNet",
+            "defaultValue": "Arc-App-CAPI-VNet",
             "metadata": {
                 "description": "Name of the VNet"
             }
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-CAPI-Subnet",
+            "defaultValue": "Arc-App-CAPI-Subnet",
             "metadata": {
                 "description": "Name of the subnet in the virtual network"
             }
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "Arc-AppSvc-CAPI-K8s-NSG",
+            "defaultValue": "Arc-App-CAPI-K8s-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
