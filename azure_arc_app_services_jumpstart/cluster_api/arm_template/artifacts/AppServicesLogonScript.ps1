@@ -93,14 +93,14 @@ Write-Host "`n"
 
 $namespace="appservices"
 $extensionName = "arc-app-services"
-$kubeEnvironmentName=$env:clusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
+$kubeEnvironmentName=$connectedClusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 $workspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $workspaceKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
 $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
-    --cluster-type connectedClusters -c $env:clusterName `
+    --cluster-type connectedClusters -c $connectedClusterName `
     --extension-type 'Microsoft.Web.Appservice' --release-train stable --auto-upgrade-minor-version true `
     --scope cluster --release-namespace "$namespace" `
     --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default"  `
@@ -131,8 +131,8 @@ Do {
 Write-Host "`n"
 Write-Host "Deploying App Service Kubernetes Environment"
 Write-Host "`n"
-$connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
+$connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
 az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --location $env:azureLocation --output none 
 
