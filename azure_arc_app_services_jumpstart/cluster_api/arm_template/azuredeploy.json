@@ -52,26 +52,6 @@
         "description": "Name for your log analytics workspace"
       }
     },
-    "clusterName": {
-      "type": "string",
-      "defaultValue":"Arc-App-AKS",
-        "metadata": {
-          "description": "The name of the Kubernetes cluster resource.."
-      }
-    },
-    "dnsPrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
-      }
-    },
-    "kubernetesVersion": {
-      "type": "string",
-      "defaultValue": "1.19.11",
-      "metadata": {
-        "description": "The version of Kubernetes."
-      }
-    },
     "deployAppService": {
       "type": "bool",
       "defaultValue": false,
@@ -107,8 +87,8 @@
     "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
     // Virtual Network configuration
-    "virtualNetworkName": "Arc-Data-CAPI-VNet",
-    "subnetName": "Arc-Data-CAPI-Subnet",
+    "virtualNetworkName": "Arc-AppSvc-CAPI-VNet",
+    "subnetName": "Arc-AppSvc-CAPI-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24"
   },
@@ -220,23 +200,23 @@
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
-          "templateBaseUrl": {
-            "value": "[parameters('templateBaseUrl')]"
-          },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
           },
-          "deploySQLMI": {
-            "value": "[parameters('deploySQLMI')]"
+          "deployAppService": {
+            "value": "[parameters('deployAppService')]"
           },
-          "SQLMIHA": {
-            "value": "[parameters('SQLMIHA')]"
-          },          
-          "deployPostgreSQL": {
-            "value": "[parameters('deployPostgreSQL')]"
+          "deployFunction": {
+            "value": "[parameters('deployFunction')]"
+          },
+          "deployLogicApp": {
+            "value": "[parameters('deployLogicApp')]"
+          },
+          "templateBaseUrl": {
+            "value": "[parameters('templateBaseUrl')]"
           }
         }
       }
@@ -256,7 +236,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs upload",
+      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc-enabled app services logs upload",
       "apiVersion": "2019-10-01",
       "name": "logAnalyticsDeployment",
       "properties": {
