@@ -110,32 +110,31 @@
       }
     },
     "deployAppService": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Azure Web App deployment."
-      }
+        "type": "bool",
+        "defaultValue": false,
+        "metadata": {
+            "description": "Azure Web App deployment."
+        }
     },
     "deployFunction": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Azure Function deployment"
-      }
+        "type": "bool",
+        "defaultValue": false,
+        "metadata": {
+            "description": "Azure Function deployment"
+        }
     },
     "deployLogicApp": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Azure Logic App deployment"
-      }
+        "type": "bool",
+        "defaultValue": false,
+        "metadata": {
+            "description": "Azure Logic App deployment"
+        }
     },
     "templateBaseUrl": {
-      "type": "string",
-      "metadata": {
-        "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
-      }
-    }
+        "type": "string",
+        "metadata": {
+            "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+        }
   },
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
