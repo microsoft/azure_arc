@@ -58,12 +58,12 @@ az -v
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
-$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arc-appsvc-capi-k8s"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arc-app-capi-k8s"
 $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
-kubectl config rename-context "arc-appsvc-capi-k8s-admin@arc-appsvc-capi-k8s" "arc-appsvc-capi-k8s"
+kubectl config rename-context "arc-app-capi-k8s-admin@arc-app-capi-k8s" "arc-app-capi-k8s"
 
 # Creating Storage Class with azure-managed-disk for the CAPI cluster
 Write-Host "`n"
