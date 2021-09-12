@@ -111,7 +111,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```shell
-    az group create --name Arc-Data-Demo --location "East US"
+    az group create --name Arc-AppSvc-Demo --location "East US"
     az deployment group create \
     --resource-group Arc-AppSvc-Demo \
     --name arcappsvc \
@@ -187,7 +187,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Wallpaper change](./25.png)
 
-* Since this scenario is deploying both the app service plan and a sample web application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
+* Since this scenario is deploying both the app service plan and a sample Logic App application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
   * **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
