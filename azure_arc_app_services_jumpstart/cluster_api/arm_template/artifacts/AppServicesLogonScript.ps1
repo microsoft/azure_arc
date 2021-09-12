@@ -69,7 +69,7 @@ kubectl config rename-context "arc-app-capi-k8s-admin@arc-app-capi-k8s" "arc-app
 Write-Host "`n"
 Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
 kubectl apply -f "C:\Temp\capiStorageClass.yaml"
-$storageClassName = "managed premium"
+$storageClassName = "managed-premium"
 
 kubectl label node --all failure-domain.beta.kubernetes.io/zone-
 kubectl label node --all topology.kubernetes.io/zone-
@@ -90,6 +90,7 @@ Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
 
 # Deploying Azure App environment
+Write-Host "`n"
 Write-Host "Deploying Azure App Service Kubernetes environment"
 Write-Host "`n"
 
