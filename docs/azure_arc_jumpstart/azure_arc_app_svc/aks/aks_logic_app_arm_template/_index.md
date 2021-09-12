@@ -121,7 +121,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: The deployment time for this scenario can take ~5-10min**
 
-    > **Note: Since Azure Arc-enabled app services is currently in preview, deployment regions availability is limited to East US and West Europe.**
+    > **Note: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **7 various Azure resources** deployed.
 
@@ -187,7 +187,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Wallpaper change](./25.png)
 
-* Since this scenario is deploying both the app service plan and a sample Azure Logic App, you will also notice additional Azure resources in the resource group (at this point you should have **17 various Azure resources deployed**. The important ones to notice are:
+* Since this scenario is deploying both the app service plan and a sample web application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
   * **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
