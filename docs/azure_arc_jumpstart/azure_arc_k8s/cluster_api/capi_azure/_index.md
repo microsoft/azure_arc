@@ -66,6 +66,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
+  az provider register --namespace Microsoft.ExtendedLocation
   ```
 
   You can monitor the registration process with the following commands:
@@ -73,6 +74,7 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
+  az provider show -n Microsoft.ExtendedLocation -o table
   ```
 
 * As mentioned, you will need to deploy a local, small footprint Kubernetes cluster using kind which will act the management/provisioner cluster. To install kind on your machine, use the below command.

@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled app services](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration) deployed on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will have an AKS cluster deployed with an App Service plan, a sample Azure Logic App that reads messages from an Azure storage account queue and creates blobs in an Azure storage account container, and a Microsoft Windows Server 2019 (Datacenter) Azure VM installed & pre-configured with all the required tools needed to work with Azure Arc-enabled app services.
+By the end of this guide, you will have an AKS cluster deployed with an App Service plan, a sample Azure Logic App that reads messages from an Azure storage account queue and creates blobs in an Azure storage account container, and a Microsoft Windows Server 2022 (Datacenter) Azure VM installed & pre-configured with all the required tools needed to work with Azure Arc-enabled app services.
 
 > **Note: Currently, Azure Arc-enabled app services is in preview.**
 
@@ -111,7 +111,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```shell
-    az group create --name Arc-Data-Demo --location "East US"
+    az group create --name Arc-AppSvc-Demo --location "East US"
     az deployment group create \
     --resource-group Arc-AppSvc-Demo \
     --name arcappsvc \
@@ -121,7 +121,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: The deployment time for this scenario can take ~5-10min**
 
-    > **Note: Since Azure Arc-enabled app services is currently in preview, deployment regions availability is limited to East US and West Europe.**
+    > **Note: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **7 various Azure resources** deployed.
 
@@ -187,7 +187,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Wallpaper change](./25.png)
 
-* Since this scenario is deploying both the app service plan and a sample Azure Logic App, you will also notice additional Azure resources in the resource group (at this point you should have **17 various Azure resources deployed**. The important ones to notice are:
+* Since this scenario is deploying both the app service plan and a sample Logic App application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
   * **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 

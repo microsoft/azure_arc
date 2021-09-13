@@ -19,6 +19,7 @@ The following is a guide on how to use the Azure Cloud Shell to deploy an [Azure
   ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
+  az provider register --namespace Microsoft.ExtendedLocation
   ```
 
   You can monitor the registration process with the following commands:
@@ -26,6 +27,7 @@ The following is a guide on how to use the Azure Cloud Shell to deploy an [Azure
   ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
+  az provider show -n Microsoft.ExtendedLocation -o table
   ```
 
 ## Deployment

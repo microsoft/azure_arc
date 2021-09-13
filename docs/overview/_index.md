@@ -43,7 +43,7 @@ Oh, and one last thing before you go. Please consider subscribing to the channel
 
 Enjoy!
 
-## Jumpstart Lighting
+## Jumpstart Lightning
 
 Jumpstart Lightning is the show where you get a chance to share with our team and the world your Azure Arc, Jumpstart contribution and Hybrid cloud awesome stories. Who knows?! You might find yourself on our YouTube channel!
 

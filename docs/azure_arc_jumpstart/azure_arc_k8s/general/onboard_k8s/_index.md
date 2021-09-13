@@ -60,6 +60,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
   ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
+  az provider register --namespace Microsoft.ExtendedLocation
   ```
 
   You can monitor the registration process with the following commands:
@@ -67,6 +68,7 @@ The following README will guide you on how to connect an existing Kubernetes clu
   ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
+  az provider show -n Microsoft.ExtendedLocation -o table
   ```
 
 * Create a new Azure resource group where you want your cluster(s) to show up.

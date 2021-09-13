@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) and [SQL Managed Instance](https://docs.microsoft.com/en-us/azure/azure-arc/data/managed-instance-overview) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
 
-By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an Azure Arc Data Controller, SQL Managed Instance (with a sample database), and a Microsoft Windows Server 2019 (Datacenter) Azure sidecar VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services.
+By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an Azure Arc Data Controller, SQL Managed Instance (with a sample database), and a Microsoft Windows Server 2022 (Datacenter) Azure sidecar VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services.
 
 > **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -217,11 +217,71 @@ In this scenario, three Azure Arc-enabled Kubernetes cluster extensions were dep
 
   ![Azure Arc-enabled Kubernetes cluster extensions settings](./22.png)
 
+## Operations
+
+### Azure Arc-enabled SQL Managed Instance Stress Simulation
+
+Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQueryStress_ automatically installed for you on the Client VM. _SqlQueryStress_ will allow you to generate load on the Azure Arc-enabled SQL Managed Instance that can be done used to showcase how the SQL database and services are performing as well to highlight operational practices described in the next section.
+
+* To start with, open the _SqlQueryStress_ desktop shortcut and connect to the SQL Managed Instance endpoint IP address. This can be found in the _SQLMI Endpoints_ text file desktop shortcut that was also created for you alongside the username and password you used to deploy the environment.
+
+  ![Open SqlQueryStress](./23.png)
+
+  ![SQLMI Endpoints text file](./24.png)
+
+* To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
+
+  ![SqlQueryStress connected](./25.png)
+
+* To generate some load, we will be running a simple stored procedure. Copy the below procedure and change the number of iterations you want it to run as well as the number of threads to generate even more load on the database. In addition, change the delay between queries to 1ms for allowing the stored procedure to run for a while.
+
+    ```sql
+    exec [dbo].[uspGetEmployeeManagers] @BusinessEntityID = 8
+    ```
+
+* As you can see from the example below, the configuration settings are 100,000 iterations, five threads per iteration, and a 1ms delay between queries. These configurations should allow you to have the stress test running for a while.
+
+  ![SqlQueryStress settings](./26.png)
+
+  ![SqlQueryStress running](./27.png)
+
+### Azure Arc-enabled SQL Managed Instance monitoring using Grafana
+
+When deploying Azure Arc-enabled data services, a [Grafana](https://grafana.com/) instance is also automatically deployed on the same Kubernetes cluster and include built-in dashboards for both Kubernetes infrastructure as well SQL Managed Instance monitoring (PostgreSQL dashboards are included as well but we will not be covering these in this section).
+
+* Now that you have the _SqlQueryStress_ stored procedure running and generating load, we can look how this is shown in the the built-in Grafana dashboard. As part of the automation, a new URL desktop shortcut simply named "Grafana" was created.
+
+  ![Grafana desktop shortcut](./28.png)
+
+* [Optional] The IP address for this instance represents the Kubernetes _LoadBalancer_ external IP that was provision as part of Azure Arc-enabled data services. Use the _```kubectl get svc -n arc```_ command to view the _metricsui_ external service IP address.
+
+  ![metricsui Kubernetes service](./29.png)
+
+* To log in, use the same username and password that is in the _SQLMI Endpoints_ text file desktop shortcut.
+
+  ![Grafana username and password](./30.png)
+
+* Navigate to the built-in "SQL Managed Instance Metrics" dashboard.
+
+  ![Grafana dashboards](./31.png)
+
+  ![Grafana "SQL Managed Instance Metrics" dashboard](./32.png)
+
+* Change the dashboard time range to "Last 5 minutes" and re-run the stress test using _SqlQueryStress_ (in case it was already finished).
+
+  ![Last 5 minutes time range](./33.png)
+
+* You can now see how the SQL graphs are starting to show increased activity and load on the database instance.
+
+  ![Increased load activity](./34.png)
+
+  ![Increased load activity](./35.png)
+
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Delete Azure resource group](./23.png)
+    ![Delete Azure resource group](./36.png)
 
 ## Known Issues
 

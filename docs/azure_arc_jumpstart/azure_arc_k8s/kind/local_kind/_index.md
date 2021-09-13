@@ -70,6 +70,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   ```shell
   az provider register --namespace Microsoft.Kubernetes
   az provider register --namespace Microsoft.KubernetesConfiguration
+  az provider register --namespace Microsoft.ExtendedLocation
   ```
 
   You can monitor the registration process with the following commands:
@@ -77,6 +78,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   ```shell
   az provider show -n Microsoft.Kubernetes -o table
   az provider show -n Microsoft.KubernetesConfiguration -o table
+  az provider show -n Microsoft.ExtendedLocation -o table
   ```
 
 * Install the Azure Arc for Kubernetes CLI extensions ***connectedk8s*** and ***k8s-configuration***:

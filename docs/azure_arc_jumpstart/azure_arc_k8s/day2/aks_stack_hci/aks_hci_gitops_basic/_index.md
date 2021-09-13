@@ -52,11 +52,12 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
   az --version
   ```
 
-* Enable subscription with the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription with the resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```PowerShell
   Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
   Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
+  Register-AzResourceProvider -ProviderNamespace Microsoft.ExtendedLocation
   ```
 
   You can monitor the registration process with the following commands:
@@ -64,6 +65,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
   ```PowerShell
   Get-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes
   Get-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration
+  Get-AzResourceProvider -ProviderNamespace Microsoft.ExtendedLocation
   ```
   
 * Create Azure service principal (SP)

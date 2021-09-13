@@ -434,6 +434,10 @@ namespace Win32{
 add-type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
+# We intentionally keep the script running, so we have a chance to see the predictions
+Write-Host -NoNewLine 'Press any key to quit this script...' -ForegroundColor Yellow
+$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
 Stop-Process -Id $kubectlWatchShell.Id
@@ -442,6 +446,5 @@ Stop-Process -Id $kubectlWatchShell.Id
 Unregister-ScheduledTask -TaskName "AzureMLLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
-# We intentionally keep the script running, so we have a chance to see the predictions
 Stop-Process -Name powershell -Force
 Stop-Transcript

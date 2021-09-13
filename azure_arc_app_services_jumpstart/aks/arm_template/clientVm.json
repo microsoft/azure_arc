@@ -12,7 +12,7 @@
             "type": "string",
             "defaultValue": "Arc-App-Client",
             "metadata": {
-                "description": "The name for the sidecar virtual machine"
+                "description": "The name of your Virtual Machine"
             }
         },
         "windowsAdminUsername": {
@@ -33,7 +33,7 @@
         },
         "windowsOSVersion": {
             "type": "string",
-            "defaultValue": "2019-Datacenter",
+            "defaultValue": "2022-datacenter-g2",
             "metadata": {
                 "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
             }

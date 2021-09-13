@@ -13,7 +13,7 @@ The following README will guide you on how to deploy an end-to-end Machine Learn
 By the end of this guide, you will have:
 
 - An AKS cluster onboarded with Azure Arc
-- A Microsoft Windows Server 2019 (Datacenter) Azure client VM (with optional steps outlined to remote access via [Azure Bastion](https://docs.microsoft.com/en-us/azure/bastion/bastion-overview) for increased Security Posture)
+- A Microsoft Windows Server 2022 (Datacenter) Azure client VM (with optional steps outlined to remote access via [Azure Bastion](https://docs.microsoft.com/en-us/azure/bastion/bastion-overview) for increased Security Posture)
 - Azure Machine Learning with:
 
   - Attached [Kubernetes (Preview) Compute](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-attach-compute-targets#kubernetes) (Azure Arc)
