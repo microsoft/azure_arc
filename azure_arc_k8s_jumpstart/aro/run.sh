@@ -3,7 +3,7 @@
 # Random string generator - don't change this.
 RAND="$(echo $RANDOM | tr '[0-9]' '[a-z]')"
 
-regPassword="HCI78pW+tjidbT=/l54ZTvx9fvwx9uKM"
+regPassword="wXmyYa38fM5dtp6LPZob0C24ABO2tNN+"
 LOCATION="eastus"
 RESOURCEGROUP="arcarodemo-$RAND"
 

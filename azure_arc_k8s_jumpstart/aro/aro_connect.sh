@@ -224,7 +224,7 @@ echo "Upload kubeconfig to blob."
 storageName="arcstoragearo$RAND$RAND"
 if [ "$($az storage account check-name --name $storageName --query nameAvailable -o tsv 2>/dev/null)" = "true" ]; then
     $az storage account create --name $storageName --resource-group $RESOURCEGROUP --location $LOCATION --sku Standard_ZRS -o none 2>/dev/null
-    $az storage container create --alsccount-name $storageName --name arccontainer --public-access blob -o none 2>/dev/null
+    $az storage container create --account-name $storageName --name arccontainer --public-access blob -o none 2>/dev/null
     $az storage blob upload --account-name $storageName --container-name arccontainer --name config --auth-mode key --file /root/.kube/config -o table
     $az group update -n $RESOURCEGROUP --tag currentStatus=kubectlUploaded fileurl="https://${storageName}.blob.core.windows.net/arccontainer/config" aroAdminUser=$adminUser aroAdminPassword=$adminPassword aroUrl=$apiURL 2>/dev/null
     echo "File Uploaded."
