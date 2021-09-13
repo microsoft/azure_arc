@@ -145,13 +145,20 @@ az k8s-extension create --name "azure-defender" `
                         --cluster-type connectedClusters `
                         --extension-type Microsoft.AzureDefender.Kubernetes
 
+# Creating Log Analytics Workspace for Metric Upload
+Write-Host "Deploying Log Analytics Workspace"
+Write-Host "`n"
+
+az monitor log-analytics workspace create --resource-group $env:resourceGroup `
+                                          --workspace-name "jumpstartlaws"
+
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
-$workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
+$workspaceId = $(az resource show --resource-group $env:resourceGroup --name "jumpstartlaws" --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name "jumpstartlaws" --query primarySharedKey -o tsv)
 
 $dataControllerParams = "C:\Temp\dataController.parameters.json"
 
@@ -191,11 +198,26 @@ if ( $env:deployPostgreSQL -eq $true )
     & "C:\Temp\DeployPostgreSQL.ps1"
 }
 
-# Applying Azure Data Studio settings template file
+# Applying Azure Data Studio settings template file and operations url shortcut
 if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
     Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+
+    # Creating desktop url shortcuts for built-in Grafana and Kibana services 
+    $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $GrafanaURL = "https://"+$GrafanaURL+":3000"
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Grafana.url")
+    $Favorite.TargetPath = $GrafanaURL;
+    $Favorite.Save()
+
+    $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $KibanaURL = "https://"+$KibanaURL+":5601"
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Kibana.url")
+    $Favorite.TargetPath = $KibanaURL;
+    $Favorite.Save()
 }
 
 # Changing to Client VM wallpaper
