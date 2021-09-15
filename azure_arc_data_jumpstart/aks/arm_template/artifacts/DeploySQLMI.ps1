@@ -107,6 +107,9 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
+# Creating SQLMI Endpoints data
+& "C:\Temp\SQLMIEndpoints.ps1"
+
 # If PostgreSQL isn't being deployed, clean up settings file
 if ( $env:deployPostgreSQL -eq $false )
 {

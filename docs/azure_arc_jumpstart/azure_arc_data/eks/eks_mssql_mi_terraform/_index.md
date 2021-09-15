@@ -277,11 +277,13 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
 Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQueryStress_ automatically installed for you on the Client VM. _SqlQueryStress_ will allow you to generate load on the Azure Arc-enabled SQL Managed Instance that can be done used to showcase how the SQL database and services are performing as well to highlight operational practices described in the next section.
 
-* To start with, open the _SqlQueryStress_ desktop shortcut and connect to the SQL Managed Instance endpoint IP address. This can be found in the _SQLMI Endpoints_ text file desktop shortcut that was also created for you alongside the username and password you used to deploy the environment.
+* To start with, open the _SqlQueryStress_ desktop shortcut and connect to the SQL Managed Instance **primary** endpoint IP address. This can be found in the _SQLMI Endpoints_ text file desktop shortcut that was also created for you alongside the username and password you used to deploy the environment.
 
   ![Open SqlQueryStress](./36.png)
 
   ![SQLMI Endpoints text file](./37.png)
+
+> **Note: Secondary SQL Managed Instance endpoint will be available only when using the HA deployment model ("Business Critical").**
 
 * To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
 
