@@ -50,10 +50,11 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kubectl --classic
 
 # Set CAPI deployment environment variables
-export CLUSTERCTL_VERSION="0.4.0" # Do not change!
+export CLUSTERCTL_VERSION="0.4.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
+export CAPI_PROVIDER_VERSION="0.5.2" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.19.11"
+export KUBERNETES_VERSION="1.20.10" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
@@ -113,7 +114,7 @@ kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-lit
 
 # Transforming the Rancher K3s cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure azure
+clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
 echo "Making sure cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
@@ -166,6 +167,32 @@ sed -i -e "$line"' i\        secret:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
+# Remove port 22 from public internet exposure
+line=$(expr $(grep -n -B 1 "vnet" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "networkSpec" | cut -f1 -d-) + 3)
+sed -i -e "$line"' i\          - 10.0.2.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        role: node' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-node" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              sourcePorts: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              source: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              destinationPorts: "6443"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              destination: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              protocol: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              priority: 2202' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              direction: "Inbound"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              description: "Allow K8s API Server"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\            - name: "allow_apiserver"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          securityRules:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"" i\          name: ${CAPI_WORKLOAD_CLUSTER_NAME}-controlplane-nsg" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        securityGroup:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          - 10.0.1.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        role: control-plane' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-cp" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\    subnets:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        - 10.0.0.0/16' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\      cidrBlocks:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # Deploying CAPI Workload cluster
 sudo kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml

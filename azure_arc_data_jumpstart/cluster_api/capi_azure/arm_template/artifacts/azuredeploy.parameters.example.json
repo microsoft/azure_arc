@@ -27,10 +27,16 @@
             "value": "Arc-Data-LA"
         },
         "deploySQLMI": {
+            "value": true
+        },
+        "SQLMIHA": {
             "value": false
         },
         "deployPostgreSQL": {
             "value": false
+        },
+        "templateBaseUrl": {
+            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template"
         }
     }
 }

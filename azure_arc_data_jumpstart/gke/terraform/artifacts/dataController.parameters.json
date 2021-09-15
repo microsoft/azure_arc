@@ -46,7 +46,7 @@
         },
         "resourceTags": {
             "value": {
-                "Project": "jumpstart_azure_arc_data"
+                "Project": "jumpstart_azure_arc_data_services"
             }
         },
         "dockerRegistryCredential": {
@@ -56,7 +56,7 @@
             "value": "Always"
         },
         "dockerImageTag": {
-            "value": "public-preview-may-2021"
+            "value": "v1.0.0_2021-07-30"
         },
         "dockerRegistry": {
             "value": "mcr.microsoft.com"
@@ -82,8 +82,11 @@
         "controllerPort": {
             "value": 30080
         },
-        "serviceProxyPort": {
-            "value": 30777
+        "apiVersion": {
+          "value": "2021-08-01"
+        },
+        "infrastructure": {
+          "value": "gcp"
         }
     }
 }

@@ -17,7 +17,7 @@
         "admin": {
             "value": "postgres"
         },
-        "azdataPassword": {
+        "password": {
             "value": "azdataPassword-stage"
         },
         "namespace": {
@@ -26,8 +26,17 @@
         "serviceType": {
             "value": "serviceType-stage"
         },
-        "memoryRequest": {
-            "value": "memoryRequest-stage"
+        "coordinatorCoresRequest": {
+            "value": "coordinatorCoresRequest-stage"
+        },
+        "coordinatorCoresLimit": {
+            "value": "coordinatorCoresLimit-stage"
+        },
+        "coordinatorMemoryRequest": {
+            "value": "coordinatorMemoryRequest-stage"
+        },
+        "coordinatorMemoryLimit": {
+            "value": "coordinatorMemoryLimit-stage"
         },
         "postgresEngineVersion": {
             "value": 12
@@ -67,6 +76,6 @@
         },
         "apiVersion": {
             "value": "2021-07-01-preview"
-        }        
+        }
     }
 }

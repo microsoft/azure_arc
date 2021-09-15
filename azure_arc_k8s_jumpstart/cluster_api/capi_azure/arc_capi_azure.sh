@@ -1,9 +1,10 @@
 #!/bin/bash
-export CAPI_PROVIDER="azure" # Do not change!
-export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 
 # Set deployment environment variables
-export KUBERNETES_VERSION="<Kubernetes version>" # For example: "1.18.17"
+export CAPI_PROVIDER="azure" # Do not change!
+export CAPI_PROVIDER_VERSION="0.5.2" # Do not change!
+export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
+export KUBERNETES_VERSION="1.20.10" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
 export WORKER_MACHINE_COUNT="<Workers node count>"
 export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
@@ -15,15 +16,24 @@ export AZURE_CLIENT_SECRET="<Azure SPN application client secret>"
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="<Control Plane node Azure VM type>" # For example: "Standard_D2s_v3"
 export AZURE_NODE_MACHINE_TYPE="<Worker node Azure VM type>" # For example: "Standard_D4s_v3"
 
-# Azure cloud settings - Do not change!
+# Base64 encode the variables - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$AZURE_SUBSCRIPTION_ID" | base64 | tr -d '\n')"
-export AZURE_TENANT_ID_B64="$(echo -n "$AZURE_TENANT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_ID_B64="$(echo -n "$AZURE_CLIENT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_SECRET_B64="$(echo -n "$AZURE_CLIENT_SECRET" | base64 | tr -d '\n')"
+export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
+
+# Settings needed for AzureClusterIdentity used by the AzureCluster
+export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
+export CLUSTER_IDENTITY_NAME="cluster-identity"
+export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+
+# Create a secret to include the password of the Service Principal identity created in Azure
+# This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
+kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
 # Transforming the kind cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure azure -b kubeadm:v0.3.19 -c kubeadm:v0.3.19 --core cluster-api:v0.3.19
+clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
 echo "Making sure cluster is ready..."
 echo ""
 kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
@@ -32,7 +42,7 @@ echo ""
 # Deploy CAPI Workload cluster
 echo "Deploying Kubernetes workload cluster"
 echo ""
-clusterctl config cluster $CAPI_WORKLOAD_CLUSTER_NAME \
+clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --kubernetes-version v$KUBERNETES_VERSION \
   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
@@ -74,6 +84,31 @@ sed -i -e "$line"' i\          key: audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 sed -i -e "$line"' i\        secret:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
+# Remove port 22 from public internet exposure
+line=$(expr $(grep -n -B 1 "vnet" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "networkSpec" | cut -f1 -d-) + 3)
+sed -i -e "$line"' i\          - 10.0.2.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        role: node' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-node" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              sourcePorts: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              source: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              destinationPorts: "6443"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              destination: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              protocol: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              priority: 2202' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              direction: "Inbound"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\              description: "Allow K8s API Server"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\            - name: "allow_apiserver"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          securityRules:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"" i\          name: ${CAPI_WORKLOAD_CLUSTER_NAME}-controlplane-nsg" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        securityGroup:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          - 10.0.1.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        role: control-plane' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-cp" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\    subnets:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        - 10.0.0.0/16' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i -e "$line"' i\      cidrBlocks:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 echo ""
@@ -101,7 +136,7 @@ kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
 echo ""
 
 echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 echo ""
 
 rm -rf ~/.azure/AzureArcCharts
@@ -128,4 +163,4 @@ rm extension_output
 fi
 echo ""
 
-az connectedk8s connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
+az connectedk8s connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --custom-locations-oid "51dfe1e8-70c6-4de5-a08e-e18aff23d815" --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig

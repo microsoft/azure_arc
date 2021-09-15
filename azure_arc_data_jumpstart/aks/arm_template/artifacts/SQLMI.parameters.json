@@ -14,20 +14,26 @@
         "subscriptionId": {
             "value": "subscriptionId-stage"
         },
-        "azdataUsername": {
+        "admin": {
             "value": "azdataUsername-stage"
         },
-        "azdataPassword": {
+        "password": {
             "value": "azdataPassword-stage"
         },
         "serviceType": {
             "value": "serviceType-stage"
         },
-        "vCoresMax": {
-            "value": vCoresMaxStage
+        "vCoresRequest": {
+            "value": "vCoresRequest-stage"
         },
-        "memoryMax": {
-            "value": "memoryMax-stage"
+        "memoryRequest": {
+            "value": "memoryRequest-stage"
+        },
+        "vCoresLimit": {
+            "value": "vCoresLimit-stage"
+        },
+        "memoryLimit": {
+            "value": "memoryLimit-stage"
         },
         "dataStorageSize": {
             "value": "dataSize-stage"
@@ -62,7 +68,13 @@
             }
         },
         "apiVersion": {
-            "value": "2021-07-01-preview"
+            "value": "2021-08-01"
+        },
+        "pricingTier": {
+            "value": "pricingTier-stage"
+        },
+        "licenseType": {
+            "value": "LicenseIncluded"
         }
     }
 }

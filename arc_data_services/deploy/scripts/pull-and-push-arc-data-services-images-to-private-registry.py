@@ -1,6 +1,6 @@
 #This version of the script is for the "new" platform version in the July release
 
-# requires installation of Docker: https://docs.docker.com/install/ 
+# requires installation of Docker: https://docs.docker.com/install/
 
 from subprocess import check_output, CalledProcessError, STDOUT, Popen, PIPE
 import os
@@ -36,7 +36,7 @@ else:
     SOURCE_DOCKER_PASSWORD = os.environ["SOURCE_DOCKER_PASSWORD"]
 
 if (os.getenv("SOURCE_DOCKER_TAG") is None):
-    SOURCE_DOCKER_TAG = input("Provide container image tag for the images at the source - press ENTER for using 'public-preview-jun-2021': ") or "public-preview-jun-2021"
+    SOURCE_DOCKER_TAG = input("Provide container image tag for the images at the source - press ENTER for using 'v1.0.0_2021-07-30': ") or "v1.0.0_2021-07-30"
 else:
     SOURCE_DOCKER_TAG = os.environ["SOURCE_DOCKER_TAG"]
 
@@ -66,10 +66,8 @@ else:
     TARGET_DOCKER_TAG = os.environ["TARGET_DOCKER_TAG"]
 
 images = [  'arc-bootstrapper',
-            'arc-postgres-11',
-            'arc-postgres-12',
             'arc-controller',
-            'arc-sqlmi',
+            'arc-controller-db',
             'arc-monitor-collectd',
             'arc-monitor-elasticsearch',
             'arc-monitor-fluentbit',
@@ -77,13 +75,14 @@ images = [  'arc-bootstrapper',
             'arc-monitor-influxdb',
             'arc-monitor-kibana',
             'arc-monitor-telegraf',
-            'arc-server-controller',
             'arc-service-proxy',
-            'arc-dns',
+            'arc-security-support',
+            'arc-sqlmi',
             'arc-ha-operator',
             'arc-ha-supervisor',
-            'arc-security-support'
-            ]
+            'arc-postgres-11',
+            'arc-postgres-12'
+        ]
 
 taggedimages = [image + ":" + SOURCE_DOCKER_TAG for image in images]
 

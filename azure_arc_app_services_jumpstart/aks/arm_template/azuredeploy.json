@@ -15,7 +15,7 @@
       "metadata": {
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
       }
-    },    
+    },
     "myIpAddress": {
       "type": "string",
       "metadata": {
@@ -91,6 +91,11 @@
       "defaultValue": false,
       "metadata": {
         "description": "Azure API Management deployment"
+    "deployLogicApp": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Azure Logic App deployment"
       }
     },
     "templateBaseUrl": {
@@ -160,6 +165,8 @@
           },
           "deployApiMgmt": {
             "value": "[parameters('deployApiMgmt')]"
+          "deployLogicApp": {
+            "value": "[parameters('deployLogicApp')]"
           },
           "templateBaseUrl": {
             "value": "[parameters('templateBaseUrl')]"
@@ -186,6 +193,6 @@
           }
         }
       }
-    }    
+    }
   ]
 }

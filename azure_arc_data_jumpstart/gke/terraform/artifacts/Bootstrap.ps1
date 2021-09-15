@@ -22,7 +22,7 @@ function Disable-ieESC {
 Disable-ieESC
 
 # Installing tools
-$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140,kubernetes-helm,vscode,putty.install,microsoft-edge,azcopy10"
+$chocolateyAppList = "azure-cli,az.powershell,kubernetes-cli,vcredist140,kubernetes-helm,vscode,putty.install,microsoft-edge,azcopy10,grep,dotnetcore-3.1-sdk"
 if ([string]::IsNullOrWhiteSpace($chocolateyAppList) -eq $false)
 {
     try{
@@ -49,17 +49,26 @@ Write-Output "Downloading Azure Data Studio and azdata CLI"
 Write-Output "`n"
 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/settingsTemplate.json" -OutFile "C:\Temp\settingsTemplate.json"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/dataController.json" -OutFile "C:\Temp\dataController.json"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/dataController.parameters.json" -OutFile "C:\Temp\dataController.parameters.json"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/sqlmi.json" -OutFile "C:\Temp\sqlmi.json"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/sqlmi.parameters.json" -OutFile "C:\Temp\sqlmi.parameters.json"     
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/postgreSQL.json" -OutFile "C:\Temp\postgreSQL.json"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/postgreSQL.parameters.json" -OutFile "C:\Temp\postgreSQL.parameters.json"     
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/DeployPostgreSQL.ps1" -OutFile "C:\Temp\DeployPostgreSQL.ps1"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/artifacts/DeploySQLMI.ps1" -OutFile "C:\Temp\DeploySQLMI.ps1"     
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
+# Downloading GitHub artifacts for DataServicesLogonScript.ps1
+Write-Output "Downloading artifacts from Github"
+Write-Output "`n"
+
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\Temp\settingsTemplate.json"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.json") -OutFile "C:\Temp\dataController.json"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "C:\Temp\dataController.parameters.json"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.json") -OutFile "C:\Temp\sqlmi.json"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile "C:\Temp\sqlmi.parameters.json"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\Temp\postgreSQL.json"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\Temp\postgreSQL.parameters.json"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\Temp\DeployPostgreSQL.ps1"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\Temp\DeploySQLMI.ps1"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\Temp\SQLMIEndpoints.ps1"
+Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\Temp\SqlQueryStress.zip"
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\Temp\wallpaper.png"
+
+Write-Output "Unzipping and installing Data Studio"
+Write-Output "`n"
 Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
 Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
 
@@ -73,26 +82,6 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
-
-# Changing to Client VM wallpaper
-$imgPath="C:\Temp\wallpaper.png"
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-     public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-         
-         public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
-         }
-    }
- } 
-'@
-
-add-type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
 
 #Stopping log for Bootstrap.ps1
 Stop-Transcript

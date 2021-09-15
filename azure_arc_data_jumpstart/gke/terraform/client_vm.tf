@@ -181,6 +181,7 @@ resource "local_file" "azure_arc" {
     azureLocation          = var.ARC_DC_REGION
     deploySQLMI            = var.deploy_SQLMI
     deployPostgreSQL       = var.deploy_PostgreSQL
+    templateBaseUrl        = var.templateBaseUrl
     }
   )
   filename = "artifacts/azure_arc.ps1"

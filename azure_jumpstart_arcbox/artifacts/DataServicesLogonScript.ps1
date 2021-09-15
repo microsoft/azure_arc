@@ -37,12 +37,8 @@ az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 
-# Adding Azure Arc CLI extensions
-Write-Host "Adding Azure Arc CLI extensions"
-az extension add --name "connectedk8s" -y
-az extension add --name "k8s-configuration" -y
-az extension add --name "k8s-extension" -y
-az extension add --name "customlocation" -y
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
@@ -90,17 +86,19 @@ $extensionId = az k8s-extension show --name arc-data-services --cluster-type con
 Start-Sleep -Seconds 20
 az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
 
+$workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
+az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # Deploying Azure Defender Kubernetes extension instance
 Write-Host "`n"
 Write-Host "Create Azure Defender Kubernetes extension instance"
 Write-Host "`n"
-az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
+az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
@@ -127,7 +125,7 @@ az deployment group create --resource-group $env:resourceGroup --template-file "
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take few minutes..."
+    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
@@ -161,6 +159,22 @@ Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config"
 Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config-k3s"
 Move-Item -Path "C:\Users\$env:USERNAME\.kube\config_tmp" -Destination "C:\users\$env:USERNAME\.kube\config"
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
+kubectx
+
+# Creating desktop url shortcuts for built-in Grafana and Kibana services 
+$GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+$GrafanaURL = "https://"+$GrafanaURL+":3000"
+$Shell = New-Object -ComObject ("WScript.Shell")
+$Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Grafana.url")
+$Favorite.TargetPath = $GrafanaURL;
+$Favorite.Save()
+
+$KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+$KibanaURL = "https://"+$KibanaURL+":5601"
+$Shell = New-Object -ComObject ("WScript.Shell")
+$Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Kibana.url")
+$Favorite.TargetPath = $KibanaURL;
+$Favorite.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
 $imgPath="C:\ArcBox\wallpaper.png"

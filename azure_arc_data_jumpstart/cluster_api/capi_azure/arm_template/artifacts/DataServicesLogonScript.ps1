@@ -4,22 +4,33 @@ $connectedClusterName = "Arc-Data-CAPI"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
+# Required for azcopy
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
 
+# Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
+# Set default subscription to run commands against
+# "subscriptionId" value comes from clientVM.json ARM template, based on which 
+# subscription user deployed ARM template to. This is needed in case Service 
+# Principal has access to multiple subscriptions, which can break the automation logic
+az account set --subscription $env:subscriptionId
+
+
+# Install Azure Data Studio extensions
+Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
-
 $env:argument1="--install-extension"
 $env:argument2="Microsoft.arc"
 $env:argument3="microsoft.azuredatastudio-postgresql"
-
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument3
 
+# Create Azure Data Studio desktop shortcut
+Write-Host "`n"
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
@@ -48,11 +59,7 @@ Write-Host "`n"
 
 # Adding Azure Arc CLI extensions
 Write-Host "Adding Azure Arc CLI extensions"
-Write-Host "`n"
-az extension add --name "connectedk8s" -y
-az extension add --name "k8s-configuration" -y
-az extension add --name "k8s-extension" -y
-az extension add --name "customlocation" -y
+az config set extension.use_dynamic_install=yes_without_prompt
 
 Write-Host "`n"
 az -v
@@ -85,10 +92,19 @@ azdata --version
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
-
+az k8s-extension create --name arc-data-services `
+                        --extension-type microsoft.arcdataservices `
+                        --cluster-type connectedClusters `
+                        --cluster-name $connectedClusterName `
+                        --resource-group $env:resourceGroup `
+                        --auto-upgrade false `
+                        --scope cluster `
+                        --release-namespace arc `
+                        --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
+                        --config systemDefaultValues.image=mcr.microsoft.com/arcdata/arc-bootstrapper:v1.0.0_2021-07-30 # Explicitly pull GA version, latest (default) tag returns older image as of July 31, 2021
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
     Start-Sleep -Seconds 20
@@ -98,14 +114,20 @@ Do {
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+az customlocation create --name 'jumpstart-cl' `
+                         --resource-group $env:resourceGroup `
+                         --namespace arc `
+                         --host-resource-id $connectedClusterId `
+                         --cluster-extension-ids $extensionId
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
+Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
 Write-Host "`n"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
 # Deploying Azure Defender Kubernetes extension instance
+Write-Host "`n"
 Write-Host "Create Azure Defender Kubernetes extension instance"
 Write-Host "`n"
 az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
@@ -152,11 +174,26 @@ if ( $env:deployPostgreSQL -eq $true )
     & "C:\Temp\DeployPostgreSQL.ps1"
 }
 
-# Applying Azure Data Studio settings template file
+# Applying Azure Data Studio settings template file and operations url shortcut
 if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
     Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+
+    # Creating desktop url shortcuts for built-in Grafana and Kibana services 
+    $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $GrafanaURL = "https://"+$GrafanaURL+":3000"
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Grafana.url")
+    $Favorite.TargetPath = $GrafanaURL;
+    $Favorite.Save()
+
+    $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $KibanaURL = "https://"+$KibanaURL+":5601"
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Kibana.url")
+    $Favorite.TargetPath = $KibanaURL;
+    $Favorite.Save()
 }
 
 # Changing to Client VM wallpaper

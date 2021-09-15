@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: sa-mssql-controller
+  name: sa-arc-controller
 ---
-apiVersion: arcdata.microsoft.com/v1beta1
-kind: datacontroller
+apiVersion: arcdata.microsoft.com/v1
+kind: DataController
 metadata:
   generation: 1
   name: arc-dc
@@ -12,24 +12,20 @@ spec:
   credentials:
     controllerAdmin: controller-login-secret
     dockerRegistry: arc-private-registry #Create a registry secret named 'arc-private-registry' if you are going to pull from a private registry instead of MCR.
-    serviceAccount: sa-mssql-controller
+    serviceAccount: sa-arc-controller
   docker:
     imagePullPolicy: Always
-    imageTag: latest
+    imageTag: v1.0.0_2021-07-30
     registry: mcr.microsoft.com
     repository: arcdata
   infrastructure: other #Must be a value in the array [alibaba, aws, azure, gcp, onpremises, other]
   security:
-    allowDumps: true
-    allowNodeMetricsCollection: true
-    allowPodMetricsCollection: true
-    allowRunAsRoot: false
+    allowDumps: true #Set this to false if deploying on OpenShift
+    allowNodeMetricsCollection: true #Set this to false if deploying on OpenShift
+    allowPodMetricsCollection: true #Set this to false if deploying on OpenShift
   services:
   - name: controller
     port: 30080
-    serviceType: LoadBalancer # Modify serviceType based on your Kubernetes environment
-  - name: serviceProxy
-    port: 30777
     serviceType: LoadBalancer # Modify serviceType based on your Kubernetes environment
   settings:
     ElasticSearch:
