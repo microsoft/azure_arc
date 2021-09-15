@@ -14,9 +14,8 @@ param (
     [string]$deployFunction,
     [string]$deployApiMgmt,
     [string]$templateBaseUrl,
-    [string]$adminEmail
-    [string]$deployLogicApp,
-    [string]$templateBaseUrl
+    [string]$adminEmail,
+    [string]$deployLogicApp
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
