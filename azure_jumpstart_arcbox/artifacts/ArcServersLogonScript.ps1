@@ -89,6 +89,13 @@ Function Set-VMNetworkConfiguration {
     }
 }
 
+# Required for CLI commands
+az login --service-principal --username $env:spnClientID --password $env:spnClientSecret --tenant $env:spnTenantId
+
+# Register Azure providers
+az provider register --namespace Microsoft.HybridCompute --wait
+az provider register --namespace Microsoft.GuestConfiguration --wait
+
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Output "Configure DHCP service"
 $dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
@@ -119,10 +126,11 @@ New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.
 Write-Output "Enable Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
-# Downloading and extracting the 3 VMs
+# Downloading nested VMs VHDX files
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-$sourceFolder = 'https://jumpstartarcbox.blob.core.windows.net/vms'
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*? $vmDir --recursive
+$sourceFolder = 'https://jumpstart.blob.core.windows.net/arcboxvhds'
+$sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $vmDir --recursive
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"

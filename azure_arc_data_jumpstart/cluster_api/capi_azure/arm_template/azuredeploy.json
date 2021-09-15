@@ -15,17 +15,17 @@
       "metadata": {
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
       }
-    },    
+    },
     "myIpAddress": {
       "type": "string",
       "metadata": {
-        "description": "IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address."
+        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address."
       }
     },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
-        "description": "RSA public key used for securing SSH access to ArcBox resources."
+        "description": "RSA public key used for securing SSH access to Azure resources."
       }
     },
     "spnClientId": {
@@ -53,33 +53,79 @@
       }
     },
     "deploySQLMI": {
-        "type": "bool",
-        "defaultValue": false,
-        "metadata": {
-            "description": "SQL Managed Instance deployment"
-        }
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "SQL Managed Instance deployment"
+      }
     },
+    "SQLMIHA": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "SQL Managed Instance high-availability deployment"
+      }
+    },    
     "deployPostgreSQL": {
-        "type": "bool",
-        "defaultValue": false,
-        "metadata": {
-            "description": "PostgreSQL Hyperscale deployment"
-        }
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "PostgreSQL Hyperscale deployment"
+      }
+    },
+    "templateBaseUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Base URL for ARM template"
+      }
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/",
-    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuCapi.json')]",
-    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",    
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmtStagingStorage.json')]",
-    "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]"
+    "capiTemplateUrl": "[uri(parameters('templateBaseUrl'), 'ubuntuCapi.json')]",
+    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
+    "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
+    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
+    "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
+    // Virtual Network configuration
+    "virtualNetworkName": "Arc-Data-CAPI-VNet",
+    "subnetName": "Arc-Data-CAPI-Subnet",
+    "addressPrefix": "172.16.0.0/16",
+    "subnetAddressPrefix": "172.16.1.0/24"
   },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys a VNET and Subnet for Client and K8s VM",
+      "apiVersion": "2019-10-01",
+      "name": "VNETDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('VNETUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "addressPrefix": {
+            "value": "[variables('addressPrefix')]"
+          },
+          "subnetAddressPrefix": {
+            "value": "[variables('subnetAddressPrefix')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploy the CAPI environment",
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment" ],
+      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -104,15 +150,25 @@
           },
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
+          },
+          "templateBaseUrl": {
+            "value": "[parameters('templateBaseUrl')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
           }
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys the Client Windows VM",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment" ],
+      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -137,24 +193,37 @@
           },
           "myIpAddress": {
             "value": "[parameters('myIpAddress')]"
-          },         
+          },
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
+          "templateBaseUrl": {
+            "value": "[parameters('templateBaseUrl')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
           },
+          "SQLMIHA": {
+            "value": "[parameters('SQLMIHA')]"
+          },          
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
-          }          
+          }
         }
       }
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Storage Account used for staging kubectl config and staging scripts",
       "apiVersion": "2019-10-01",
       "name": "stagingStorageAccountDeployment",
       "properties": {
@@ -167,6 +236,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs upload",
       "apiVersion": "2019-10-01",
       "name": "logAnalyticsDeployment",
       "properties": {
@@ -181,6 +251,6 @@
           }
         }
       }
-    }    
+    }
   ]
 }

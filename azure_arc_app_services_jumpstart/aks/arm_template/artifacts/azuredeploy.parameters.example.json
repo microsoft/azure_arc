@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sshRSAPublicKey": {
-            "value": "ssh-rsa THISISTOPSECRETSTUFF1234XXXXXXXXXXXXXtEbhbVqD bilbo@MacBook-Pro.localdomain"
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCXWqEGfBYFHo6zVPp3VT7aFlb+UjjyzUv3YPIoQqKtdj0KR5YL0qQPsWk7MtzfiaBzuePckXstyU/Vf5MuzUq0z5Cx8jEtw9EueiJ7x6soTcCBcebfa+TwsmlUXH1WAr7lDdRtOOWMVgxwiYnb6YVbNO2dyJNFtOlgAaFKMKmeklyvK+j1Q1LV4p4VlSzjHH6BpqslEvaaE0Ktmcq2zvMI9khjvDJCV49JuUmRg1njAsBOWk83gYwuMdPO36k1TXhCZ4AGUfkedy6M6tiW7gzY1xwzb7SsT4RyduE3O94t8OzhENTWRStBzghn4PCqshEjSpuIpGAdsJ+qlwx5CgNFxUQFDzYz2RWkfBPAoGIg2Yc0DCfwUWXBcwKxi7RKOFu4sjzUf3WxG049X6jqB6CLrzeekYu8PvfI7Xq5S4NPC25L74kjuvzVNZY8SD1UViqk03aopPa2UZExFJN6V/m/hOHHLdt29XJfjgppK5BsAB5+NtFobckfB1wOeDerDOf2Hp6M5fABkwaBs1Bhe4rFE0vFxm6VDN9cHeowm6Oe4mi8eGdkxeZ6DTzqCyqYCCK6DDa+k6Y4L4F7QXeGpTm1vNZxwWtqqjnPZiTpOo1k6E3zpyUp4RyV3DTNqLntbrzUJDT/Btvn3tWry++KdL/5UN2JDX3QfducvDB/Of5K6Q== saitcho@outlook"
         },
         "spnClientId": {
             "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
@@ -38,7 +38,10 @@
         "deployFunction": {
             "value": false
         },
-        "deployApiMgmt": {
+	"deployApiMgmt": {
+	    "value": false
+	},
+        "deployLogicApp": {
             "value": false
         },
         "templateBaseUrl": {

@@ -12,7 +12,7 @@
             "type": "string",
             "defaultValue": "Arc-App-Client",
             "metadata": {
-                "description": "The name for the sidecar virtual machine"
+                "description": "The name of your Virtual Machine"
             }
         },
         "windowsAdminUsername": {
@@ -33,7 +33,7 @@
         },
         "windowsOSVersion": {
             "type": "string",
-            "defaultValue": "2019-Datacenter",
+            "defaultValue": "2022-datacenter-g2",
             "metadata": {
                 "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
             }
@@ -142,6 +142,11 @@
             "defaultValue": false,
             "metadata": {
                 "description": "Azure API Management deployment"
+        "deployLogicApp": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Azure Logic App deployment"
             }
         },
         "templateBaseUrl": {
@@ -201,6 +206,9 @@
             "apiVersion": "2019-02-01",
             "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('azureLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
             "properties": {
                 "securityRules": [
                     {
@@ -297,7 +305,11 @@
                 "osProfile": {
                     "computerName": "[variables('vmName')]",
                     "adminUsername": "[parameters('windowsAdminUsername')]",
-                    "adminPassword": "[parameters('windowsAdminPassword')]"
+                    "adminPassword": "[parameters('windowsAdminPassword')]",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": false
+                    }
                 }
             }
         },
@@ -321,7 +333,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ', parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl'),' -adminEmail ', parameters('adminEmail'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ', parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl'),' -adminEmail ', parameters('adminEmail'))]"
                 }
             }
         }

@@ -40,6 +40,9 @@
         },
         "deployApiMgmt": {
             "value": false
+	 },
+        "deployLogicApp": {
+            "value": false
         },
         "templateBaseUrl": {
             "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/aks/arm_template/"

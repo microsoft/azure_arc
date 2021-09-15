@@ -1,0 +1,76 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Create_blob_(V2)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "azureblob"
+                        }
+                    },
+                    "method": "post",
+                    "body": "Azure Arc Jumpstart is amazing!",
+                    "headers": {
+                        "ReadFileMetadataFromServer": true
+                    },
+                    "path": "/v2/datasets/@{encodeURIComponent(encodeURIComponent(appsetting('storageAccountName')))}/files",
+                    "queries": {
+                        "folderPath": "/jumpstart-blobs",
+                        "name": "@triggerBody()?['MessageId']",
+                        "queryParametersSingleEncoded": true
+                    }
+                },
+                "runAfter": {},
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                }
+            },
+            "Delete_message_(V2)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "azurequeue"
+                        }
+                    },
+                    "method": "delete",
+                    "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(appsetting('storageAccountName')))}/queues/@{encodeURIComponent('jumpstart-queue')}/messages/@{encodeURIComponent(triggerBody()?['MessageId'])}",
+                    "queries": {
+                        "popreceipt": "@triggerBody()?['PopReceipt']"
+                    }
+                },
+                "runAfter": {
+                    "Create_blob_(V2)": [
+                        "Succeeded"
+                    ]
+                }
+            }
+        },
+        "triggers": {
+            "When_there_are_messages_in_a_queue_(V2)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "referenceName": "azurequeue"
+                        }
+                    },
+                    "method": "get",
+                    "path": "/v2/storageAccounts/@{encodeURIComponent(encodeURIComponent(appsetting('storageAccountName')))}/queues/@{encodeURIComponent('jumpstart-queue')}/message_trigger"
+                },
+                "recurrence": {
+                    "frequency": "Second",
+                    "interval": 15
+                },
+                "splitOn": "@triggerBody()?['QueueMessagesList']?['QueueMessage']"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {}
+    },
+    "kind": "Stateful"
+}

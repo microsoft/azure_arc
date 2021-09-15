@@ -15,6 +15,8 @@ param (
     [string]$deployApiMgmt,
     [string]$templateBaseUrl,
     [string]$adminEmail
+    [string]$deployLogicApp,
+    [string]$templateBaseUrl
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -31,6 +33,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('deployAppService', $deployAppService,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployFunction', $deployFunction,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployApiMgmt', $deployApiMgmt,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployLogicApp,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminEmail', $adminEmail,[System.EnvironmentVariableTarget]::Machine)
 
@@ -67,6 +70,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/AppServicesLogonScript.ps1") -O
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployAppService.ps1") -OutFile "C:\Temp\deployAppService.ps1"  
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployFunction.ps1") -OutFile "C:\Temp\deployFunction.ps1" 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/deployApiMgmt.ps1") -OutFile "C:\Temp\deployApiMgmt.ps1" 
+Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "C:\Temp\deployLogicApp.ps1" 
 
 # Installing tools
 
@@ -75,7 +79,7 @@ Invoke-WebRequest -Uri https://github.com/Azure/azure-cli/releases/download/azur
 
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp,microsoftazurestorageexplorer'
+            $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp,microsoftazurestorageexplorer,7zip'
             #Run commands in parallel.
             Parallel 
                 {

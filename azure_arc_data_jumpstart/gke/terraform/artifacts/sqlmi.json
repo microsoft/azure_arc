@@ -21,10 +21,10 @@
         "subscriptionId": {
             "type": "String"
         },        
-        "azdataUsername": {
+        "admin": {
             "type": "String"
         },
-        "azdataPassword": {
+        "password": {
             "type": "SecureString"
         },
         "namespace": {
@@ -32,16 +32,19 @@
             "defaultValue": "arc"
         },
         "serviceType": {
-            "type": "String",
-            "defaultValue": "LoadBalancer"
+            "type": "String"
         },
-        "vCoresMax": {
-            "type": "Int",
-            "defaultValue": 4
+        "vCoresRequest": {
+            "type": "String"
         },
-        "memoryMax": {
-            "type": "String",
-            "defaultValue": "8"
+        "memoryRequest": {
+            "type": "String"
+        },
+        "vCoresLimit": {
+            "type": "String"
+        },
+        "memoryLimit": {
+            "type": "String"
         },
         "dataStorageSize": {
             "type": "String",
@@ -55,30 +58,36 @@
             "defaultValue": "5"
         },
         "logsStorageClassName": {
-            "type": "String",
-            "defaultValue": "local-ssd"
+            "type": "String"
         },
         "dataLogsStorageSize": {
             "type": "String",
             "defaultValue": "5"
         },
         "dataLogsStorageClassName": {
-            "type": "String",
-            "defaultValue": "local-ssd"
+            "type": "String"
         },
         "backupsStorageSize": {
             "type": "String",
             "defaultValue": "5"
         },
         "backupsStorageClassName": {
-            "type": "String",
-            "defaultValue": "local-ssd"
+            "type": "String"
         },
         "replicas": {
             "type": "Int"
         },
         "resourceTags": {
             "type": "Object"
+        },
+        "apiVersion": {
+            "type": "String"
+        },
+        "pricingTier": {
+            "type": "String"
+        },
+        "licenseType": {
+            "type": "String"
         }
     },
     "variables": {},
@@ -86,7 +95,7 @@
     "resources": [
         {
             "type": "Microsoft.AzureArcData/sqlManagedInstances",
-            "apiVersion": "2021-06-01-preview",
+            "apiVersion": "[parameters('apiVersion')]",
             "name": "jumpstart-sql",
             "location": "[parameters('location')]",
             "extendedLocation": {
@@ -94,15 +103,20 @@
                 "name": "[parameters('customLocation')]"
             },
             "tags": "[parameters('resourceTags')]",
+            "sku": {
+                "name": "vCore",
+                "tier": "[parameters('pricingTier')]"
+              },
             "properties": {
-                "admin": "[parameters('azdataUsername')]",
+                "admin": "[parameters('admin')]",
                 "basicLoginInformation": {
-                    "username": "[parameters('azdataUsername')]",
-                    "password": "[parameters('azdataPassword')]"
+                    "username": "[parameters('admin')]",
+                    "password": "[parameters('password')]"
                 },
+                "licenseType": "[parameters('licenseType')]",
                 "k8sRaw": {
                     "spec": {
-                        "dev": false,
+                        "dev": true,
                         "services": {
                             "primary": {
                                 "type": "[parameters('serviceType')]"
@@ -113,8 +127,12 @@
                             "default": {
                                 "resources": {
                                     "requests": {
-                                        "vcores": "[parameters('vCoresMax')]",
-                                        "memory": "[parameters('memoryMax')]"
+                                        "cpu": "[parameters('vCoresRequest')]",
+                                        "memory": "[parameters('memoryRequest')]"
+                                    },
+                                    "limits": {
+                                        "cpu": "[parameters('vCoresLimit')]",
+                                        "memory": "[parameters('memoryLimit')]"
                                     }
                                 }
                             }
