@@ -91,6 +91,7 @@
       "defaultValue": false,
       "metadata": {
         "description": "Azure API Management deployment"
+    },
     "deployLogicApp": {
       "type": "bool",
       "defaultValue": false,
@@ -165,6 +166,7 @@
           },
           "deployApiMgmt": {
             "value": "[parameters('deployApiMgmt')]"
+          },
           "deployLogicApp": {
             "value": "[parameters('deployLogicApp')]"
           },
