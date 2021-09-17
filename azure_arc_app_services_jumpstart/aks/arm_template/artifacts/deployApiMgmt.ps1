@@ -57,7 +57,7 @@ $json = $Body | ConvertTo-Json
 $restUri = "https://management.azure.com/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.ApiManagement/service/$APIName/gateways/$APIName/generateToken?api-version=2021-01-01-preview"
 $tokenAPI =  Invoke-RestMethod -Uri $restUri -Body $json -Method Post -Headers $authHeader
 $token =  "GatewayKey " + $tokenAPI.value
-$endpoint="https://$APIName.management.azure-api.net/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.ApiManagement/service/$APIName?api-version=2021-01-01-preview"
+$endpoint="https://$APIName.management.azure-api.net/subscriptions/$env:subscriptionId/resourceGroups/$env:resourceGroup/providers/Microsoft.ApiManagement/service/$APIName?api-version=2021-01-01-preview"
 
 # Deploy API Management gateway extension
 Write-Host "Deploying Azure API Management Gateway Extension"
