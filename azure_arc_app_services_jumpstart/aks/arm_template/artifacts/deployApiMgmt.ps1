@@ -71,7 +71,7 @@ az k8s-extension create --cluster-type connectedClusters --cluster-name $env:clu
 # Importing an API
 Write-Host "Importing an API in the Kubernetes environment"
 Write-Host "`n"
-Import-AzApiManagementApi -Context $apimContext -SpecificationFormat OpenApi -SpecificationUrl https://conferenceapi.azurewebsites.net/?format=json -Path conference
+Import-AzApiManagementApi -Context $apimContext -SpecificationFormat OpenApi -SpecificationUrl https://conferenceapi.azurewebsites.net/?format=json -Path conference -Protocol http,https
 $appid = Get-AzApiManagementApi -Context $apimContext -Name "Demo Conference API"
 Add-AzApiManagementApiToGateway -Context $apimContext -GatewayId $APIName -ApiId $appid.ApiId
 
