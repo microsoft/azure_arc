@@ -97,7 +97,7 @@ At the end of its run, the script will generate a URL for you to click on, this 
 
   ![Installing the OMS agent on the cluster](./04.png)
 
-* Click the "Connected Clusters" tab and see the Azure Arc connected cluster was added. Now that your cluster is being monitored, navigate trough the different tabs and sections and watch the monitoring telemetry for the cluster nodes and pods.  
+* Click the "Connected Clusters" tab and see the Azure Arc connected cluster was added. Now that your cluster is being monitored, navigate through the different tabs and sections and watch the monitoring telemetry for the cluster nodes and pods.  
 
     ![Agent install on the cluster](./05.png)
 
