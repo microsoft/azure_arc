@@ -73,12 +73,12 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/deployLogicApp.ps1") -OutFile "
 
 # Installing tools
 
-Invoke-WebRequest -Uri https://github.com/Azure/azure-cli/releases/download/azure-cli-2.28.0/azure-cli-2.28.0.msi -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+#Invoke-WebRequest -Uri https://github.com/Azure/azure-cli/releases/download/azure-cli-2.28.0/azure-cli-2.28.0.msi -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
 # Pindown az cli version to avoid current Azure Arc-enabled app services version compatibility issues
 
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp,microsoftazurestorageexplorer,7zip'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp,microsoftazurestorageexplorer,7zip'
             #Run commands in parallel.
             Parallel 
                 {
