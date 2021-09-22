@@ -30,7 +30,7 @@ $apimContext = New-AzApiManagementContext -ResourceGroupName $env:resourceGroup 
 $location = New-AzApiManagementResourceLocationObject -Name "n1" -City "c1" -District "d1" -CountryOrRegion "r1"
 New-AzApiManagementGateway -Context $apimContext -GatewayId $APIName -Description "ArcAPIMgmt" -LocationData $location
 
-#Enable Management REST API 
+# Enable Management REST API 
 Write-Host "Enabling REST API Management for Azure API Management"
 Set-AzApiManagementTenantAccess -Context $apimContext -Enabled $True
 Get-AzApiManagementTenantAccess -Context $apimContext
