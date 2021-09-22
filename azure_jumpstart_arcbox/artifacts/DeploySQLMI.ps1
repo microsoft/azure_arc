@@ -66,6 +66,11 @@ Do {
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
+# Update Service Port from 1433 to Non-Standard
+$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
+kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
+Sleep 5 # To allow the CRD to update
+
 # Downloading demo database and restoring onto SQL MI
 $podname = "jumpstart-sql-0"
 Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
