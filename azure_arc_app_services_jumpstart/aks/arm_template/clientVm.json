@@ -137,6 +137,13 @@
                 "description": "Azure Function deployment"
             }
         },
+        "deployApiMgmt": {
+            "type": "bool",
+            "defaultValue": false,
+            "metadata": {
+                "description": "Azure API Management deployment"
+            }
+        },
         "deployLogicApp": {
             "type": "bool",
             "defaultValue": false,
@@ -148,6 +155,12 @@
             "type": "string",
             "metadata": {
                 "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+            }
+        },
+        "adminEmail": {
+            "type": "string",
+            "metadata": {
+                "description": "Email address to which all notifications from the deployment will be sent"
             }
         }
     },
@@ -322,7 +335,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployLogicApp ', parameters('deployLogicApp'), ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ',parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl')) ]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ', parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl'),' -adminEmail ', parameters('adminEmail'))]"
                 }
             }
         }

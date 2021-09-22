@@ -145,6 +145,12 @@ if ( $env:deployFunction -eq $true )
     & "C:\Temp\deployFunction.ps1"
 }
 
+
+if ( $env:deployApiMgmt -eq $true )
+{
+    & "C:\Temp\deployApiMgmt.ps1"
+}
+
 if ( $env:deployLogicApp -eq $true )
 {
     & "C:\Temp\deployLogicApp.ps1"
