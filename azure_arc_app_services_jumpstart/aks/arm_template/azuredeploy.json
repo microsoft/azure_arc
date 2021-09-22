@@ -86,6 +86,13 @@
         "description": "Azure Function deployment"
       }
     },
+    "deployApiMgmt": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Azure API Management deployment"
+      }
+    },
     "deployLogicApp": {
       "type": "bool",
       "defaultValue": false,
@@ -97,6 +104,12 @@
       "type": "string",
       "metadata": {
         "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+      }
+    },
+    "adminEmail": {
+      "type": "string",
+      "metadata": {
+        "description": "Email address used on the Azure API Management deployment to receive all system notifications"
       }
     }
   },
@@ -152,11 +165,17 @@
           "deployFunction": {
             "value": "[parameters('deployFunction')]"
           },
+          "deployApiMgmt": {
+            "value": "[parameters('deployApiMgmt')]"
+          },
           "deployLogicApp": {
             "value": "[parameters('deployLogicApp')]"
           },
           "templateBaseUrl": {
             "value": "[parameters('templateBaseUrl')]"
+          },
+          "adminEmail": {
+            "value": "[parameters('adminEmail')]"
           }
         }
       }
