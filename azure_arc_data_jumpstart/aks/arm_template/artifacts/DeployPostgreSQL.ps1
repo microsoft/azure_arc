@@ -63,6 +63,12 @@ $pgWorkerPodName = "jumpstartpsw0-0"
         Start-Sleep -Seconds 45
         $buildService = $(if((kubectl get pods -n arc | Select-String $pgCoordinatorPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
+Write-Host "Azure Arc-enabled PostgreSQL Hyperscale is ready!"
+Write-Host "`n"
+
+# Update Service Port from 5432 to Non-Standard
+$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-pgsql\",\"port\":15432,\"targetPort\":5432}]}}'
+kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
 
 Start-Sleep -Seconds 60
 
