@@ -55,6 +55,12 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
     sudo visudo
     ```
     
+    Or you could also edit the /etc/sudoers file directly with the command:
+    
+     ```shell
+    vi /etc/sudoers
+    ```
+
   * Append the following line replacing <username> with the appropriate user name.
 
     ```shell
