@@ -45,6 +45,22 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
 
   * VMware vCenter Server user assigned with a ["Read Only Role"](https://docs.vmware.com/en/VMware-vSphere/6.7/com.vmware.vsphere.security.doc/GUID-93B962A7-93FA-4E96-B68F-AE66D3D6C663.html)
 
+* An operating system user account on the Linux guest VM. This user account must not prompt for password on sudo commands. To configure passwordless sudo:
+
+  * Login to the linux VM.
+ 
+  * Run the below command.
+  
+    ```shell
+    sudo visudo
+    ```
+    
+  * Append the following line replacing <username> with the appropriate user name.
+
+    ```shell
+    <username> ALL=(ALL) NOPASSWD:ALL
+    ```
+        
 * Create Azure service principal (SP)
 
     To connect the VMware vSphere virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
