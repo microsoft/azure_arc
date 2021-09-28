@@ -59,7 +59,7 @@ sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --
 # Onboard the cluster to Azure Arc and enabling Container Insights using Kubernetes extension
 resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$stagingStorageAccountName']".[resourceGroup] --resource-type "Microsoft.Storage/storageAccounts" -o tsv)
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815' --tags 'Project=jumpstart_arcbox'
+sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox'
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name ArcBox-K3s --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 sudo service sshd restart
