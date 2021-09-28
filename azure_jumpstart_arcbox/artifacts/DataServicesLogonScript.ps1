@@ -70,7 +70,7 @@ azdata --version
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
 $connectedClusterName="ArcBox-CAPI-Data"
-az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox'
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
@@ -84,7 +84,7 @@ Do {
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId
+az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config"
 
 $workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
 
