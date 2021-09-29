@@ -26,7 +26,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Create a Google Cloud account](https://cloud.google.com/free)
 
-* [Install Terraform >=0.12](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Install Terraform >=1.0](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 * Create Azure service principal (SP)
 
@@ -142,7 +142,7 @@ The only thing you need to do before executing the Terraform plan is to export t
   export TF_VAR_servicePrincipalTenantId='<Your Azure tenant ID'
   export TF_VAR_gcp_project_id='<Your GCP Project ID>'
   export TF_VAR_location='<Azure Region>'
-  export TF_VAR_resourceGroup='<Azure resource group name>'
+  export TF_VAR_resource_group_name='<Azure resource group name>'
   export TF_VAR_gcp_credentials_filename='<Location on the Keys JSON file>'
   export TF_VAR_gcp_region='<GCP Region to deploy resources>'
   export TF_VAR_gke_cluster_name='<GKE cluster name>'
