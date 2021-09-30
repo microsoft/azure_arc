@@ -9,6 +9,58 @@ weight: 3
 
 **Release notes will be released on the first week of each month and will cover the previous month.**
 
+## September 2021
+
+### Release highlights and general Jumpstart enhancements
+
+* New Azure Arc-enabled app service scenarios
+
+* Multiple security and benchmark enhancements
+
+* Updating all Azure-based scenarios to use Windows Server 2022
+
+* In this release, we introduced open-source version of the [Azure Arc validated architecture diagrams and visualization](https://azurearcjumpstart.io/overview/#diagrams)
+
+### Azure Arc-enabled Kubernetes scenarios
+
+* [Bug fix: Terraform plan for GKE basic onboarding not compatible with TF 1.0 or with GKE clusters running 1.19 or higher #781](https://github.com/microsoft/azure_arc/issues/781)
+
+### Azure Arc-enabled data services scenarios
+
+* [Enhancement: Change SQL MI AKS LB port from 1433 to non-standard #763](https://github.com/microsoft/azure_arc/issues/763)
+
+* [Enhancement: Upgrade Client-VM to Windows Server 2022 on Azure-based scenarios #740](https://github.com/microsoft/azure_arc/issues/740)
+
+* [Enhancement: Benchmarking tools for Azure Arc-enabled data services scenarios #739](https://github.com/microsoft/azure_arc/issues/739)
+
+* [Bug fix: PostgreSQL Hyperscale Deployment on EKS - data controller deployment failure #743](https://github.com/microsoft/azure_arc/issues/743)
+
+### Azure Arc-enabled app service
+
+* [Enhancement: Upgrade Client-VM to Windows Server 2022 on Azure-based scenarios #740](https://github.com/microsoft/azure_arc/issues/740)
+
+* [New Scenario: Deploy an Azure API Management gateway on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_azure_apimgmt_arm_template/)
+
+* [New Scenario: Deploy an App Service app using custom container on Cluster API using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/apps_service_arm_template/)
+
+* [New Scenario: Deploy an App Service app using custom container on Cluster API using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/azure_function_arm_template/)
+
+### Azure Arc-enabled machine learning scenarios
+
+* [Enhancement: Upgrade Client-VM to Windows Server 2022 on Azure-based scenarios #740](https://github.com/microsoft/azure_arc/issues/740)
+
+* [Bug fix: error when installing AZURE ML training model piece #758](https://github.com/microsoft/azure_arc/issues/758)
+
+### Jumpstart ArcBox
+
+* [Enhancement: Change SQL MI and PostgreSQL ports to non standard #767](https://github.com/microsoft/azure_arc/issues/767)
+
+* [Enhancement: Upgrade Client-VM to Windows Server 2022 on Azure-based scenarios #740](https://github.com/microsoft/azure_arc/issues/740)
+
+* [Enhancement: Benchmarking tools for Azure Arc-enabled data services scenarios #739](https://github.com/microsoft/azure_arc/issues/739)
+
+* [Enhancement: Remove custom-locations-oid parameter from connected cluster onboarding scripts and adding _`--kubeconfig`_ parameter to custom location creation #778](https://github.com/microsoft/azure_arc/pull/778)
+
 ## August 2021
 
 ### Release highlights and general Jumpstart enhancements
