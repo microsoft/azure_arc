@@ -163,4 +163,4 @@ rm extension_output
 fi
 echo ""
 
-az connectedk8s connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --custom-locations-oid "51dfe1e8-70c6-4de5-a08e-e18aff23d815" --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
+az connectedk8s connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
