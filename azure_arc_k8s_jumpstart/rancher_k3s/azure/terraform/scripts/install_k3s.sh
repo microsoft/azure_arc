@@ -43,5 +43,4 @@ sudo rm az.sh
 # Onboard the cluster to Azure Arc
 resourceGroup=$(az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
 az connectedk8s connect --name $vmName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
-# This is the Custom Locations Enterprise Application ObjectID from AAD
 az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers

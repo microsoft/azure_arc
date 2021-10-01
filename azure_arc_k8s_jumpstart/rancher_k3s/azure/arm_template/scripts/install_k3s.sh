@@ -50,7 +50,6 @@ sudo -u $adminUsername az login --service-principal --username $appId --password
 # Onboard the cluster to Azure Arc and enabling Container Insights using Kubernetes extension
 resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$vmName']".[resourceGroup] --resource-type "Microsoft.Compute/virtualMachines" -o tsv)
 sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_azure_arc_k8s'
-# This is the Custom Locations Enterprise Application ObjectID from AAD
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
 sudo service sshd restart
