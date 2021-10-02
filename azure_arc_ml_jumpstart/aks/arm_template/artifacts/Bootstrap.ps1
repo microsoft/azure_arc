@@ -71,10 +71,10 @@ Expand-Archive -LiteralPath "C:\Temp\train.zip" -DestinationPath "C:\Temp"
 Expand-Archive -LiteralPath "C:\Temp\inference.zip" -DestinationPath "C:\Temp"
 Write-Host "Extraction complete."
 
-<# # Installing tools
+# Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,postman'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep'
             #Run commands in parallel.
             Parallel 
                 {
@@ -121,7 +121,7 @@ workflow ClientTools_01
 ClientTools_01 | Format-Table
 
 # Alias for kubectl
-New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe' #>
+New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
 # Creating scheduled task for AzureMLLogonScript.ps1
 Write-Host "Creating scheduled task for next logon:"
