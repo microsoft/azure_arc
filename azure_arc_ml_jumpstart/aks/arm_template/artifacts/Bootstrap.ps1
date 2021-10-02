@@ -55,7 +55,6 @@ Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 # Downloading GitHub artifacts for AzureMLLogonScript.ps1
-Write-Host "Downloading Azure ML payload..."
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AzureMLLogonScript.ps1") -OutFile "C:\Temp\AzureMLLogonScript.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/train.zip") -OutFile "C:\Temp\train.zip"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/inference.zip") -OutFile "C:\Temp\inference.zip"
@@ -63,15 +62,12 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/1.Get_WS.py") -OutFile "C:\Temp
 Invoke-WebRequest ($templateBaseUrl + "artifacts/2.Attach_Arc.py") -OutFile "C:\Temp\2.Attach_Arc.py"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/3.Create_MNIST_Dataset.py") -OutFile "C:\Temp\3.Create_MNIST_Dataset.py"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png" # Wallpaper is shared from main
-Write-Host "Download complete."
 
 # Unzip training and inference payloads
-Write-Host "Extracting payload..."
 Expand-Archive -LiteralPath "C:\Temp\train.zip" -DestinationPath "C:\Temp"
 Expand-Archive -LiteralPath "C:\Temp\inference.zip" -DestinationPath "C:\Temp"
-Write-Host "Extraction complete."
 
-<# # Installing tools
+# Installing tools
 workflow ClientTools_01
         {
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,postman'
@@ -121,14 +117,12 @@ workflow ClientTools_01
 ClientTools_01 | Format-Table
 
 # Alias for kubectl
-New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe' #>
+New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 
 # Creating scheduled task for AzureMLLogonScript.ps1
-Write-Host "Creating scheduled task for next logon:"
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\AzureMLLogonScript.ps1'
 Register-ScheduledTask -TaskName "AzureMLLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
-Write-Host "Bootstrap successful."
