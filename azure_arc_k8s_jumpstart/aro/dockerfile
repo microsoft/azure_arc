@@ -1,5 +1,4 @@
 FROM mcr.microsoft.com/azure-cli:2.18.0
-LABEL Ali Hussain "alhussai@microsoft.com"
 
 ADD ./ /root/
 RUN az extension add --name connectedk8s
