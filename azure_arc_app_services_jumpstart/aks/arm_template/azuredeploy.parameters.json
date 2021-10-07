@@ -40,7 +40,7 @@
         },
         "deployApiMgmt": {
             "value": false
-	 },
+	    },
         "deployLogicApp": {
             "value": false
         },
