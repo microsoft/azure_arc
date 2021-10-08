@@ -183,6 +183,12 @@ if ( $env:deployLogicApp -eq $true )
     & "C:\Temp\deployLogicApp.ps1"
 }
 
+if ( $env:deployApiMgmt -eq $true )
+{
+    & "C:\Temp\deployApiMgmt.ps1"
+}
+
+
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "`n"
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
