@@ -221,7 +221,7 @@ To demonstrate that the self-hosted gateway is processing API requests you need 
 
 Once you have obtained these two parameters, replace them on the following code snippet and run it from the client VM PowerShell.
 
-    ```powershell
+  ```powershell
     $publicip = <self hosted gateway public IP>
     $subscription = <self hosted gateway subscription>
     
@@ -236,7 +236,7 @@ Once you have obtained these two parameters, replace them on the following code 
     Invoke-RestMethod -URI $url -Headers $headers
     $i++
     }
-    ```
+  ```
 
   ![API calls test](./21.png)
 
@@ -246,6 +246,6 @@ In the Overview page of the API Management service, you can now see how the self
 
 ## Cleanup
 
-* If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
+* If you want to delete the entire environment, simply delete the deployed resource group from the Azure Portal.
 
   ![Delete Azure resource group](./23.png)
