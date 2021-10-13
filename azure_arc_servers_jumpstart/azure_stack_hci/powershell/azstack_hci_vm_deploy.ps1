@@ -36,11 +36,17 @@ $leftPart = $vmdir.Substring(0, $pos)
 $rightPart = $vmdir.Substring($pos+1)
 $nodepath = "\\" + $NodeName + '\' +  $leftPart + "$" + $rightpart
 
+# Installing Choco
+Write-Verbose "Installing Choco" -Verbose
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install azcopy10
+
 # Download of Windows VM VHDX file 
 New-Item -Path $nodepath -Name "ArcJumpstart" -ItemType "directory"
 Write-Verbose "Downloading Windows Server VHDX file. Hold tight, this might take a few minutes..." -Verbose
-function downloadVHDx() {$ProgressPreference="SilentlyContinue"; Invoke-WebRequest -Uri "https://jumpstart.blob.core.windows.net/jumpstartvhds/ArcVM-HCIJS-win.vhdx"  -OutFile $nodepath\ArcJumpstart\ArcVM-HCIJS-win.vhdx}
-downloadVHDx
+$sourceFolder = 'https://jumpstart.blob.core.windows.net/jumpstartvhds/ArcVM-HCIJS-win.vhdx'
+$sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
+azcopy cp $sourceFolder/*$sas $nodepath\ArcJumpstart\ArcVM-HCIJS-win.vhdx
 
 # Enable CredSSP
 Set-Item WSMAN:\localhost\client\auth\credssp –value $true
