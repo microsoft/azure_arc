@@ -240,6 +240,6 @@ In the Overview page of the API Management service, you can now see how the self
 
 ## Cleanup
 
-* If you want to delete the entire environment, simply delete the deployed resource group from the Azure Portal.
+* If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
   ![Delete Azure resource group](./23.png)
