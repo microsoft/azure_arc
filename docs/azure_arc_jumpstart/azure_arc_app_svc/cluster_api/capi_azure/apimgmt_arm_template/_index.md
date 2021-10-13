@@ -181,7 +181,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 In this scenario, the Azure Arc-enabled API Management cluster extension was deployed and used throughout this scenario in order to deploy the self-hosted API Management gateway services infrastructure.
 
-* In order to view cluster extensions, click on theAzure Arc-enabled Kubernetes resource Extensions settings.
+* In order to view cluster extensions, click on the azure Arc-enabled Kubernetes resource Extensions settings.
 
   ![Azure Arc enabled Kubernetes resource](./12.png)
 
