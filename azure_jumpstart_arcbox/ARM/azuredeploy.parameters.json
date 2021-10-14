@@ -25,6 +25,12 @@
         },
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
+        },
+        "flavor": {
+            "value": "Full"
+        },
+        "automationTriggerAtLogon": {
+            "value": true
         }
     }
 }

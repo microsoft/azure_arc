@@ -51,10 +51,25 @@
       "metadata": {
         "description": "Name for your log analytics workspace"
       }
+    },
+    "flavor": {
+      "type": "string",
+      "metadata": {
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+      },
+      "allowedValues": [ "Full", "ITPro", "Developer" ],
+      "defaultValue": "Full"
+    },
+    "automationTriggerAtLogon": {
+      "type": "bool",
+      "metadata": {
+        "description": "If true, automation scripts will not trigger until user logs into ArcBox-Client virtual machine via RDP. If false, automation scripts occur automatically without user action."
+      },
+      "defaultValue": true
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/",
+    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_flavors/azure_jumpstart_arcbox/",
     "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuRancher.json')]",
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm/clientVm.json')]",
@@ -175,6 +190,12 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
+          },
+          "automationTriggerAtLogon": {
+            "value": "[parameters('automationTriggerAtLogon')]"
           }
         }
       }
