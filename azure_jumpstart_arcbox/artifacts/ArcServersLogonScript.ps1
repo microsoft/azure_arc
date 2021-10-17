@@ -128,36 +128,47 @@ Set-VMHost -EnableEnhancedSessionMode $true
 
 # Downloading nested VMs VHDX files
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-$sourceFolder = 'https://jumpstart.blob.core.windows.net/arcboxvhds'
+$sourceFolder = 'https://jumpstart.blob.core.windows.net/temp'
 $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $vmDir --recursive
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
-New-VM -Name ArcBox-Win -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
-Set-VMProcessor -VMName ArcBox-Win -Count 2
+New-VM -Name ArcBox-Win2K19 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win2K19.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+Set-VMProcessor -VMName ArcBox-Win2K19 -Count 2
+
+New-VM -Name ArcBox-Win2K22 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win2K22.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+Set-VMProcessor -VMName ArcBox-Win2K22 -Count 2
 
 New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-SQL.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
-New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMFirmware -VMName ArcBox-Ubuntu -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
-Set-VMProcessor -VMName ArcBox-Ubuntu -Count 2
+Set-VMProcessor -VMName ArcBox-Ubuntu -Count 1
+
+New-VM -Name ArcBox-CentOS -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-CentOS.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+Set-VMFirmware -VMName ArcBox-CentOS -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
+Set-VMProcessor -VMName ArcBox-CentOS -Count 1
 
 # We always want the VMs to start with the host and shut down cleanly with the host
 Write-Output "Set VM auto start/stop"
-Set-VM -Name ArcBox-Win -AutomaticStartAction Start -AutomaticStopAction ShutDown
+Set-VM -Name ArcBox-Win2K19 -AutomaticStartAction Start -AutomaticStopAction ShutDown
+Set-VM -Name ArcBox-Win2K22 -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name ArcBox-SQL -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name ArcBox-Ubuntu -AutomaticStartAction Start -AutomaticStopAction ShutDown
+Set-VM -Name ArcBox-CentOS -AutomaticStartAction Start -AutomaticStopAction ShutDown
 
 Write-Output "Enabling Guest Integration Service"
 Get-VM | Get-VMIntegrationService | Where-Object {-not($_.Enabled)} | Enable-VMIntegrationService -Verbose
 
 # Start all the VMs
 Write-Output "Start VMs"
-Start-VM -Name ArcBox-Win
+Start-VM -Name ArcBox-Win2K19
+Start-VM -Name ArcBox-Win2K22
 Start-VM -Name ArcBox-SQL
 Start-VM -Name ArcBox-Ubuntu
+Start-VM -Name ArcBox-CentOS
 
 Start-Sleep -Seconds 20
 $username = "Administrator"
@@ -165,7 +176,8 @@ $password = "ArcDemo123!!"
 $secstr = New-Object -TypeName System.Security.SecureString
 $password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $secstr
-Invoke-Command -VMName ArcBox-Win -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
+Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
+Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
 Invoke-Command -VMName ArcBox-SQL -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
 
 Start-Sleep -Seconds 5
@@ -183,14 +195,24 @@ $nestedLinuxUsername = "arcdemo"
 $nestedLinuxPassword = "ArcDemo123!!"
 
 # Getting the Ubuntu nested VM IP address
-Get-VM -Name ArcBox-Ubuntu | Select-Object -ExpandProperty NetworkAdapters | Select-Object IPAddresses | Format-List | Out-File "$agentScript\IP.txt"
-$ipFile = "$agentScript\IP.txt"
-(Get-Content $ipFile | Select-Object -Skip 2) | Set-Content $ipFile
-$string = Get-Content "$ipFile"
-$string.split(',')[0] | Set-Content $ipFile
-$string = Get-Content "$ipFile"
-$string.split('{')[-1] | Set-Content $ipFile
-$vmIp = Get-Content "$ipFile"
+Get-VM -Name ArcBox-Ubuntu | Select-Object -ExpandProperty NetworkAdapters | Select-Object IPAddresses | Format-List | Out-File "$agentScript\Ubuntu-IP.txt"
+$UbuntuIP = "$agentScript\Ubuntu-IP.txt"
+(Get-Content $UbuntuIP | Select-Object -Skip 2) | Set-Content $UbuntuIP
+$string = Get-Content "$UbuntuIP"
+$string.split(',')[0] | Set-Content $UbuntuIP
+$string = Get-Content "$UbuntuIP"
+$string.split('{')[-1] | Set-Content $UbuntuIP
+$UbuntuVmIp = Get-Content "$UbuntuIP"
+
+# Getting the CentOS nested VM IP address
+Get-VM -Name ArcBox-CentOS | Select-Object -ExpandProperty NetworkAdapters | Select-Object IPAddresses | Format-List | Out-File "$agentScript\CentOS-IP.txt"
+$CentOSIP = "$agentScript\CentOS-IP.txt"
+(Get-Content $CentOSIP | Select-Object -Skip 2) | Set-Content $CentOSIP
+$string = Get-Content "$CentOSIP"
+$string.split(',')[0] | Set-Content $CentOSIP
+$string = Get-Content "$CentOSIP"
+$string.split('{')[-1] | Set-Content $CentOSIP
+$CentOSVmIp = Get-Content "$CentOSIP"
 
 # Copying the Azure Arc Connected Agent to nested VMs
 Write-Output "Copying the Azure Arc onboarding script to the nested VMs"
@@ -198,9 +220,11 @@ Write-Output "Copying the Azure Arc onboarding script to the nested VMs"
 (Get-Content -path "$agentScript\installArcAgentSQL.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$myResourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$logAnalyticsWorkspaceName',"'$env:workspaceName'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
 (Get-Content -path "$agentScript\installArcAgent.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.sh"
 
-Copy-VMFile ArcBox-Win -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
+Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
+Copy-VMFile ArcBox-Win2K22 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath C:\Temp\installArcAgentSQL.ps1 -CreateFullPath -FileSource Host
-echo y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModified.sh" $nestedLinuxUsername@"$vmIp":/home/"$nestedLinuxUsername"
+Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModified.sh" $nestedLinuxUsername@"$UbuntuVmIp":/home/"$nestedLinuxUsername"
+Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModified.sh" $nestedLinuxUsername@"$CentOSVmIp":/home/"$nestedLinuxUsername"
 
 # Onboarding the nested VMs as Azure Arc enabled servers
 Write-Output "Onboarding the nested Windows VMs as Azure Arc enabled servers"
@@ -208,15 +232,20 @@ $secstr = New-Object -TypeName System.Security.SecureString
 $nestedWindowsPassword.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $nestedWindowsUsername, $secstr
 
-Invoke-Command -VMName ArcBox-Win -ScriptBlock { powershell -File C:\Temp\installArcAgent.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File C:\Temp\installArcAgent.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File C:\Temp\installArcAgent.ps1 } -Credential $cred
 Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\Temp\installArcAgentSQL.ps1 } -Credential $cred
 
-Write-Output "Onboarding the nested Linux VM as an Azure Arc enabled server"
+Write-Output "Onboarding the nested Linux VMs as an Azure Arc enabled server"
 $secpasswd = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($nestedLinuxUsername, $secpasswd)
-$SessionID = New-SSHSession -ComputerName $vmIp -Credential $Credentials -Force #Connect Over SSH
-$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModified.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModified.sh"
 
+$SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force #Connect Over SSH
+$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModified.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModified.sh"
+Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
+
+$SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force #Connect Over SSH
+$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModified.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModified.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 # Creating Hyper-V Manager desktop shortcut
