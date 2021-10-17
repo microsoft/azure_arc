@@ -182,8 +182,8 @@ Invoke-Command -VMName ArcBox-SQL -ScriptBlock { Get-NetAdapter | Restart-NetAda
 
 Start-Sleep -Seconds 5
 
-# Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc enabled servers
-Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc enabled servers"
+# Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
+Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
 Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
 New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
@@ -218,16 +218,16 @@ $CentOSVmIp = Get-Content "$CentOSIP"
 Write-Output "Copying the Azure Arc onboarding script to the nested VMs"
 (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
 (Get-Content -path "$agentScript\installArcAgentSQL.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$myResourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$logAnalyticsWorkspaceName',"'$env:workspaceName'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
-(Get-Content -path "$agentScript\installArcAgent.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.sh"
+(Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 
 Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-Win2K22 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath C:\Temp\installArcAgentSQL.ps1 -CreateFullPath -FileSource Host
-Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModified.sh" $nestedLinuxUsername@"$UbuntuVmIp":/home/"$nestedLinuxUsername"
-Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModified.sh" $nestedLinuxUsername@"$CentOSVmIp":/home/"$nestedLinuxUsername"
+Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedUbuntu.sh" $nestedLinuxUsername@"$UbuntuVmIp":/home/"$nestedLinuxUsername"
+Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedCentOS.sh" $nestedLinuxUsername@"$CentOSVmIp":/home/"$nestedLinuxUsername"
 
-# Onboarding the nested VMs as Azure Arc enabled servers
-Write-Output "Onboarding the nested Windows VMs as Azure Arc enabled servers"
+# Onboarding the nested VMs as Azure Arc-enabled servers
+Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
 $secstr = New-Object -TypeName System.Security.SecureString
 $nestedWindowsPassword.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $nestedWindowsUsername, $secstr
@@ -236,16 +236,19 @@ Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File C:\Temp\in
 Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File C:\Temp\installArcAgent.ps1 } -Credential $cred
 Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\Temp\installArcAgentSQL.ps1 } -Credential $cred
 
-Write-Output "Onboarding the nested Linux VMs as an Azure Arc enabled server"
+Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
+# Converting Linux credentials to secure string  
 $secpasswd = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($nestedLinuxUsername, $secpasswd)
 
+# Onboarding nested Ubuntu server VM
 $SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force #Connect Over SSH
-$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModified.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModified.sh"
+$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
+# Onboarding nested CentOS server VM
 $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force #Connect Over SSH
-$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModified.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModified.sh"
+$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 # Creating Hyper-V Manager desktop shortcut
