@@ -3,7 +3,8 @@
 # Block Azure IMDS
 sudo systemctl enable firewalld
 sudo systemctl start firewalld
-sudo firewall-cmd --direct --add-rule ipv4 filter OUTPUT 0 -d 169.254.169.254  -j REJECT
+sudo firewall-cmd --permanent --direct --add-rule ipv4 filter OUTPUT 0 -d 169.254.169.254  -j REJECT
+sudo firewall-cmd --permanent --zone=public --set-target=ACCEPT
 sudo firewall-cmd --reload
 
 # Download the installation package
