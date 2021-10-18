@@ -253,12 +253,12 @@ $Credentials = New-Object System.Management.Automation.PSCredential($nestedLinux
 # Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 $SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force #Connect Over SSH
-$Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
+$Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh" | Out-Null
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 # Onboarding nested CentOS server VM
 $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force #Connect Over SSH
-$Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
+$Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh" | Out-Null
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 # Creating Hyper-V Manager desktop shortcut
