@@ -243,13 +243,22 @@ $secpasswd = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($nestedLinuxUsername, $secpasswd)
 
 # Onboarding nested Ubuntu server VM
+# $SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force #Connect Over SSH
+# $Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
+# Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
+
+# # Onboarding nested CentOS server VM
+# $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force #Connect Over SSH
+# $Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
+# Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
+
 $SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force #Connect Over SSH
-$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
+$Command = "bash /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 # Onboarding nested CentOS server VM
 $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force #Connect Over SSH
-$Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
+$Command = "bash /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 # Creating Hyper-V Manager desktop shortcut
