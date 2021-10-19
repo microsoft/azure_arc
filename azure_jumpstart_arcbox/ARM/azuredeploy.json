@@ -69,12 +69,12 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_flavors/azure_jumpstart_arcbox/ARM/",
-    "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuRancher.json')]",
-    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuCapi.json')]",
-    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm/clientVm.json')]",
-    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'mgmt/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmt/mgmtStagingStorage.json')]"
+    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_flavors/azure_jumpstart_arcbox/",
+    "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuRancher.json')]",
+    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
+    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]"
   },
   "resources": [
     {
