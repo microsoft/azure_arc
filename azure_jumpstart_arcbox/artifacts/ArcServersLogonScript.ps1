@@ -145,11 +145,11 @@ Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
 New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMFirmware -VMName ArcBox-Ubuntu -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
-Set-VMProcessor -VMName ArcBox-Ubuntu -Count 2
+Set-VMProcessor -VMName ArcBox-Ubuntu -Count 1
 
 New-VM -Name ArcBox-CentOS -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-CentOS.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMFirmware -VMName ArcBox-CentOS -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
-Set-VMProcessor -VMName ArcBox-CentOS -Count 2
+Set-VMProcessor -VMName ArcBox-CentOS -Count 1
 
 # We always want the VMs to start with the host and shut down cleanly with the host
 Write-Output "Set VM auto start/stop"
@@ -241,16 +241,6 @@ Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 # Converting Linux credentials to secure string  
 $secpasswd = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
 $Credentials = New-Object System.Management.Automation.PSCredential($nestedLinuxUsername, $secpasswd)
-
-# Onboarding nested Ubuntu server VM
-# $SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force #Connect Over SSH
-# $Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
-# Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
-
-# # Onboarding nested CentOS server VM
-# $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force #Connect Over SSH
-# $Command = "sudo chmod +x /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh;sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
-# Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command | Out-Null
 
 $SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force -WarningAction SilentlyContinue #Connect Over SSH
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
