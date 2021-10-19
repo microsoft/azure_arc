@@ -1,18 +1,18 @@
 ---
 type: docs
-title: "Azure Function ARM Template"
-linkTitle: "Azure Function ARM Template"
-weight: 2
+title: "Azure API Management Gateway ARM Template"
+linkTitle: "Azure API Management Gateway ARM Template"
+weight: 3
 description: >
 ---
 
-## Deploy an App Service app using custom container on Cluster API using an ARM Template
+## Deploy an Azure API Management gateway on Cluster API (CAPI) using an ARM Template
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled app services](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/) cluster using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
+The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [a self-hosted Azure API Management Gateway](https://docs.microsoft.com/en-us/azure/api-management/how-to-deploy-self-hosted-gateway-azure-arc) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/) cluster using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an App Service plan, a sample Azure Function application that sends messages to an Azure storage account queue and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled app services.
+By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an Azure API Management gateway, a backend API and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with the Azure API Management gateway.
 
-> **Note: Currently, Azure Arc-enabled app services is in preview.**
+> **Note: Currently, API Management self-hosted gateway on Azure Arc is in preview. The deployment time for this scenario can take ~60-90 minutes**
 
 ## Prerequisites
 
@@ -97,11 +97,12 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * _`myIpAddress`_ - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and CAPI cluster nodes.
   * _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
   * _`deployAppService`_ - Boolean that sets whether or not to deploy App Service plan and a Web App. For this scenario, we leave it set to _**false**_.
-  * _`deployFunction`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Function application. For this scenario, we leave it set to _**true**_.
+  * _`deployFunction`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Function application. For this scenario, we leave it set to _**false**_.
   * _`deployLogicApp`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**false**_.
-  * _`deployApiMgmt`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**false**_.
+  * _`deployApiMgmt`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**true**_.
   * _`templateBaseUrl`_ - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
-
+  * _`adminEmail`_ - Your email address, it will be used to notify you once the API management deployment is done.
+  
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template) and run the below command:
 
     ```shell
@@ -118,17 +119,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```shell
-    az group create --name Arc-AppSvc-Demo --location "East US"
+    az group create --name Arc-API-Demo --location "East US"
     az deployment group create \
-    --resource-group Arc-AppSvc-Demo \
+    --resource-group Arc-API-Demo \
     --name arcappsvc \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/app_svc_capi/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template/azuredeploy.json \
     --parameters azuredeploy.parameters.json
     ```
 
-    > **Note: The deployment time for this scenario can take ~5-10min**
-
-    > **Note: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
+    > **Note: The deployment time for this scenario can take ~60-90 minutes**
 
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed.
 
@@ -142,7 +141,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Client VM public IP](./03.png)
 
-* At first login, as mentioned in the "Automation Flow" section above, the [_AppServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AppServicesLogonScript.ps1) PowerShell logon script will start it's run.
+* At first login, as mentioned in the "Automation Flow" section above, the [_AppServicesLogonScript_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AppServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 * Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure web application will be deployed on the cluster and be ready to use.
 
@@ -160,39 +159,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![PowerShell logon script run](./09.png)
 
-    ![PowerShell logon script run](./10.png)
+  Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the API Management gateway and the sample API will be configured on the cluster.
 
-    ![PowerShell logon script run](./11.png)
+    ![Wallpaper change](./10.png)
 
-    ![PowerShell logon script run](./12.png)
-
-    ![PowerShell logon script run](./13.png)
-
-    ![PowerShell logon script run](./14.png)
-
-    ![PowerShell logon script run](./15.png)
-
-    ![PowerShell logon script run](./16.png)
-
-    ![PowerShell logon script run](./17.png)
-
-    ![PowerShell logon script run](./18.png)
-
-    ![PowerShell logon script run](./19.png)
-
-    ![PowerShell logon script run](./20.png)
-
-    ![PowerShell logon script run](./21.png)
-
-    ![PowerShell logon script run](./22.png)
-
-    ![PowerShell logon script run](./23.png)
-
-    ![PowerShell logon script run](./24.png)
-
-  Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the app service plan and the sample web application deployed on the cluster will be ready.
-
-    ![Wallpaper change](./25.png)
+* Since this scenario is deploying both the app service plan and a sample web application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
   * **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
@@ -200,66 +171,81 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   * [**App Service Kubernetes Environment**](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#app-service-kubernetes-environment) - The App Service Kubernetes environment resource is required before apps may be created. It enables configuration common to apps in the custom location, such as the default DNS suffix.
 
-  * [**App Service plan**](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans) - In App Service (Web Apps, API Apps, or Mobile Apps), an app always runs in an App Service plan. In addition, Azure Functions also has the option of running in an App Service plan. An App Service plan defines a set of compute resources for an Azure Function to run.
+  * [**App Service plan**](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans) - In App Service (Web Apps, API Apps, or Mobile Apps), an app always runs in an App Service plan. In addition, Azure Functions also has the option of running in an App Service plan. An App Service plan defines a set of compute resources for a web app to run.
 
-  * [**Azure Function**](https://docs.microsoft.com/en-us/azure/azure-functions/functions-overview) - Azure Functions is a serverless solution that allows you to write less code, maintain less infrastructure, and save on costs.
+  * [**App Service**](https://docs.microsoft.com/en-us/azure/app-service/overview) - Azure App Service is an HTTP-based service for hosting web applications, REST APIs, and mobile back ends.
 
-  * [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) - Application Insights, a feature of Azure Monitor, is an extensible Application Performance Management (APM) service for developers and DevOps professionals. Use it to monitor your live applications.
+  ![Additional Azure resources in the resource group](./11.png)
 
-  * Azure Storage Account - The storage account deployed in this scenario is used for hosting the [queue storage](https://docs.microsoft.com/en-us/azure/storage/queues/storage-queues-introduction) where the Azure Function will be sending messages to that can be leveraged later in an application event-driven architecture.
+## API Management self-hosted gateway
 
-  ![Additional Azure resources in the resource group](./26.png)
+In this scenario, the Azure Arc-enabled API Management cluster extension was deployed and used throughout this scenario in order to deploy the self-hosted API Management gateway services infrastructure.
 
-* In this scenario, **a sample Jumpstart Azure Function application** was deployed. To open the deployed Function application in your web browser, simply click the Browse button.
+* In order to view cluster extensions, click on the azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Function URL](./27.png)
+  ![Azure Arc enabled Kubernetes resource](./12.png)
 
-  ![Azure Function open in a web browser](./28.png)
+  ![Azure Arc enabled Kubernetes cluster extensions settings](./13.png)
 
-* To demonstrate the messaging queuing element and to show how messages are stored in the queue storage, the Azure Function deployment script also generates 10 sample messages. To view it, click on the newly created storage account and go to the "Queues" section where you will see the new queue and the stored messages.
+Deploying the API Management gateway extension to an Azure Arc-enabled Kubernetes cluster creates an Azure API Management self-hosted gateway. You can verify this from the portal by going to the Resource Group and selecting the API management service.
 
-  ![Azure Storage Account](./29.png)
+  ![API management service](./14.png)
 
-  ![Azure storage queue](./30.png)
+Select Gateways on the Deployment + infrastructure section.
 
-  ![Azure Function messages in storage queue](./31.png)
+  ![Self-hosted Gateway](./15.png)
 
-* Alternatively, you can view the same queue storage using the Azure Storage Explorer client application installed automatically in the Client VM or using the Azure Storage Explorer portal-based view.
+A self-hosted gateway should be deployed with one connected node.
 
-  ![Azure Storage Explorer client application storage queue](./32.png)
+  ![Connected node on self-hosted gateway](./16.png)
 
-  ![Azure Storage Explorer portal-based view](./33.png)
+In this scenario, a sample Demo conference API was deployed. To view the deployed API, simply click on the self-hosted gateway resource and select on APIs.
 
-  ![Azure Storage Explorer portal-based view storage queue](./34.png)
+  ![Demo Conference API](./17.png)
 
-* To generate your own messages using the Function application, use the Function invoke URL. As part of the deployment script, a _`funcUrl.txt`_ text file located in the Client VM under _C:\Temp_ folder that includes invoke URL was created for you. Copy the URL and open it in your web browser while adding the message text to it using the _`?name=<Something>`_ syntax, for example, _`?name=Bilbo`_.
+To demonstrate that the self-hosted gateway is processing API requests you need to identify two elements:
 
-  ![funcUrl.txt file](./35.png)
+* Public IP address of the self-hosted gateway, by running the command below from the client VM.
 
-  ![Invoke URL](./36.png)
+    ```powershell
+    kubectl get svc -n apimgmt
+    ```
 
-  ![Invoke URL in web browser](./37.png)
+  ![Self-hosted gateway public IP](./18.png)
 
-* Go back to the storage queue and see the new added message.
+* API management subscription key, from the Azure portal on the API Management service resource select Subscriptions under APIs and select Show/hide keys for the one with display name "Built-in all-access subscription".
 
-  ![New message in storage queue](./38.png)
+  ![Self-hosted gateway subscriptions](./19.png)
 
-* As part of the deployment, an Application Insights instance was also provisioned to provide you with relevant performance and application telemetry.
+  ![Subscription key](./20.png)
 
-  ![Application Insights instance](./39.png)
+Once you have obtained these two parameters, replace them on the following code snippet and run it from the client VM PowerShell.
 
-## Cluster extensions
+  ```powershell
+    $publicip = <self hosted gateway public IP>
+    $subscription = <self hosted gateway subscription>
+    
+    $url = "http://$($publicip):5000/conference/topics"
+    $headers = @{
+    'Ocp-Apim-Subscription-Key' = $subscription
+    'Ocp-Apim-Trace' = 'true'
+    }
+    $i=1
+    While ($i -le 10)
+    {
+    Invoke-RestMethod -URI $url -Headers $headers
+    $i++
+    }
+  ```
 
-In this scenario, the Azure Arc-enabled app services cluster extension was deployed and used throughout this scenario in order to deploy the app services infrastructure. In addition, both the Azure Monitor for Containers and the Azure Defender extensions were also installed on the cluster.
+  ![API calls test](./21.png)
 
-* In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
+In the Overview page of the API Management service, you can now see how the self-hosted gateway API requests are now shown.
 
-  ![Azure Arc-enabled Kubernetes resource](./40.png)
-
-  ![Azure Arc-enabled Kubernetes cluster extensions settings](./41.png)
+  ![API requests metrics](./22.png)
 
 ## Cleanup
 
-* If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
+* If you want to delete the entire environment, simply delete the deployed resource group from the Azure Portal.
 
-  ![Delete Azure resource group](./42.png)
+  ![Delete Azure resource group](./23.png)

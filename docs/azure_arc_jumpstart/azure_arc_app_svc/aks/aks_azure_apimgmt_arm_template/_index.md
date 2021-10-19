@@ -115,9 +115,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```shell
-    az group create --name Arc-AppSvc-Demo --location "East US"
+    az group create --name Arc-API-Demo --location "East US"
     az deployment group create \
-    --resource-group Arc-AppSvc-Demo \
+    --resource-group Arc-API-Demo \
     --name arcappsvc \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/aks/arm_template/azuredeploy.json \
     --parameters azuredeploy.parameters.json
@@ -139,7 +139,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 * Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure web application will be deployed on the cluster and be ready to use.
 
-    > **Note: As you will notices from the screenshots below, during theAzure Arc-enabled app services environment, the _log-processor_ service pods will be restarted and will go through multiple Kubernetes pod lifecycle stages. This is normal and can safely be ignored. To learn more about the various Azure Arc-enabled app services Kubernetes components, visit the official [Azure Docs page](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#pods-created-by-the-app-service-extension).**
+    > **Note: As you will notices from the screenshots below, during the Azure Arc-enabled app services environment, the _log-processor_ service pods will be restarted and will go through multiple Kubernetes pod lifecycle stages. This is normal and can safely be ignored. To learn more about the various Azure Arc-enabled app services Kubernetes components, visit the official [Azure Docs page](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#pods-created-by-the-app-service-extension).**
 
     ![PowerShell logon script run](./04.png)
 
@@ -157,7 +157,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Wallpaper change](./10.png)
 
-* Since this scenario is deploying both the app service plan and a sample web application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
+* There will be newly deployed Azure resources in the resources group. The important ones to notice are:
 
   * **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
@@ -215,7 +215,7 @@ To demonstrate that the self-hosted gateway is processing API requests you need 
 
 Once you have obtained these two parameters, replace them on the following code snippet and run it from the client VM PowerShell.
 
-    ```powershell
+  ```powershell
     $publicip = <self hosted gateway public IP>
     $subscription = <self hosted gateway subscription>
     
@@ -230,7 +230,7 @@ Once you have obtained these two parameters, replace them on the following code 
     Invoke-RestMethod -URI $url -Headers $headers
     $i++
     }
-    ```
+  ```
 
   ![API calls test](./21.png)
 
