@@ -86,7 +86,7 @@ workflow ClientTools_01
         {
             param(
                 [Parameter (Mandatory = $true)]
-                [string]$templateBaseUrl
+                [string]$templateBaseUrl,
                 [Parameter (Mandatory = $true)]
                 [string]$flavor
             )
@@ -157,7 +157,7 @@ workflow ClientTools_01
                 }
         }
 
-ClientTools_01 -templateBaseUrl $templateBaseUrl $flavor | Format-Table
+ClientTools_01 -templateBaseUrl $templateBaseUrl -flavor $flavor | Format-Table
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
