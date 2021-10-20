@@ -129,8 +129,8 @@ workflow ClientTools_01
                         Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
                         Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
                         Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQL.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
-                        Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.sh") -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
-
+                        Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentUbuntu.sh") -OutFile "C:\ArcBox\agentScript\installArcAgentUbuntu.sh"
+                        Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentCentOS.sh") -OutFile "C:\ArcBox\agentScript\installArcAgentCentOS.sh"
                     }
 
                     # Developers
