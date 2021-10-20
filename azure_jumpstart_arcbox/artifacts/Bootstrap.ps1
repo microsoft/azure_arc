@@ -87,6 +87,8 @@ workflow ClientTools_01
             param(
                 [Parameter (Mandatory = $true)]
                 [string]$templateBaseUrl
+                [Parameter (Mandatory = $true)]
+                [string]$flavor
             )
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
             #Run commands in parallel.
@@ -155,7 +157,7 @@ workflow ClientTools_01
                 }
         }
 
-ClientTools_01 -templateBaseUrl $templateBaseUrl | Format-Table
+ClientTools_01 -templateBaseUrl $templateBaseUrl $flavor | Format-Table
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
