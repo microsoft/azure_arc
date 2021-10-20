@@ -51,15 +51,30 @@
       "metadata": {
         "description": "Name for your log analytics workspace"
       }
+    },
+    "flavor": {
+      "type": "string",
+      "metadata": {
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+      },
+      "allowedValues": [ "Full", "ITPro" ],
+      "defaultValue": "Full"
+    },
+    "automationTriggerAtLogon": {
+      "type": "bool",
+      "metadata": {
+        "description": "If true, automation scripts will not trigger until user logs into ArcBox-Client virtual machine via RDP. If false, automation scripts occur automatically without user action."
+      },
+      "defaultValue": true
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/box_new_vm/azure_jumpstart_arcbox/",
-    "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuRancher.json')]",
-    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuCapi.json')]",
-    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm/clientVm.json')]",
-    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'mgmt/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmt/mgmtStagingStorage.json')]"
+    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_flavors/azure_jumpstart_arcbox/",
+    "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuRancher.json')]",
+    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
+    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]"
   },
   "resources": [
     {
@@ -175,6 +190,12 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
+          },
+          "automationTriggerAtLogon": {
+            "value": "[parameters('automationTriggerAtLogon')]"
           }
         }
       }
