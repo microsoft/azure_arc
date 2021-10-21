@@ -91,26 +91,31 @@ workflow ClientTools_01
                 [string]$flavor
             )
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
-            if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
-            {
-                try{
-                    choco config get cacheLocation
-                }catch{
-                    Write-Output "Chocolatey not detected, trying to install now"
-                    iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-                }
-            }
-            if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-                Write-Host "Chocolatey Apps Specified"  
-                
-                $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
-            
-                foreach ($app in $appsToInstall)
+            InlineScript {
+                param (
+                    [string]$chocolateyAppList
+                )
+                if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
                 {
-                    Write-Host "Installing $app"
-                    & choco install $app /y -Force| Write-Output
+                    try{
+                        choco config get cacheLocation
+                    }catch{
+                        Write-Output "Chocolatey not detected, trying to install now"
+                        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+                    }
                 }
-            }                        
+                if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
+                    Write-Host "Chocolatey Apps Specified"  
+                    
+                    $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+                
+                    foreach ($app in $appsToInstall)
+                    {
+                        Write-Host "Installing $app"
+                        & choco install $app /y -Force| Write-Output
+                    }
+                }                        
+            }
 
             # All flavors
             Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
@@ -152,16 +157,12 @@ New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cl
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
 workflow ClientTools_02
-        {
-            #Run commands in parallel.
-            Parallel
-            {
-                InlineScript {
-                    Expand-Archive C:\ArcBox\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    Start-Process msiexec.exe -Wait -ArgumentList '/I C:\ArcBox\AZDataCLI.msi /quiet'
-                }
-            }
-        }
+{
+    InlineScript {
+        Expand-Archive C:\ArcBox\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
+        Start-Process msiexec.exe -Wait -ArgumentList '/I C:\ArcBox\AZDataCLI.msi /quiet'
+    }
+}
         
 if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
     ClientTools_02 | Format-Table 
