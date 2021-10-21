@@ -75,6 +75,7 @@
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [ "stagingStorageAccountDeployment" ],
+      "condition": "[equals(parameters('flavor'),'Full')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -111,6 +112,7 @@
       "apiVersion": "2019-10-01",
       "name": "ubuntuRancherDeployment",
       "dependsOn": [ "stagingStorageAccountDeployment" ],
+      "condition": "[equals(parameters('flavor'),'Full')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
