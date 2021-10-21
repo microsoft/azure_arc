@@ -179,7 +179,7 @@ if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
 
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
-    if ($automationTriggerAtLogon) {
+    if ($automationTriggerAtLogon -eq $true) {
         $Trigger = New-ScheduledTaskTrigger -AtLogOn
     }
     else {
@@ -191,7 +191,7 @@ if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
 
 if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
     # Creating scheduled task for DataServicesLogonScript.ps1
-    if ($automationTriggerAtLogon) {
+    if ($automationTriggerAtLogon -eq $true) {
         $Trigger = New-ScheduledTaskTrigger -AtLogOn
     }
     else {
@@ -202,7 +202,7 @@ if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
 }
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
-if ($automationTriggerAtLogon) {
+if ($automationTriggerAtLogon -eq $true) {
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
 }
 else {
