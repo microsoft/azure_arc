@@ -179,35 +179,20 @@ if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
 
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
-    if ($automationTriggerAtLogon -eq $true) {
-        $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    }
-    else {
-        $Trigger = New-ScheduledTaskTrigger -AtStartup   
-    }
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\ArcServersLogonScript.ps1'
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
     # Creating scheduled task for DataServicesLogonScript.ps1
-    if ($automationTriggerAtLogon -eq $true) {
-        $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    }
-    else {
-        $Trigger = New-ScheduledTaskTrigger -AtStartup   
-    }
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn 
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\DataServicesLogonScript.ps1'
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
-if ($automationTriggerAtLogon -eq $true) {
-    $Trigger = New-ScheduledTaskTrigger -AtLogOn
-}
-else {
-    $Trigger = New-ScheduledTaskTrigger -AtStartup   
-}
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\MonitorWorkbookLogonScript.ps1'
 Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 

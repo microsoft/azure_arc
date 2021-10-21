@@ -59,13 +59,6 @@
       },
       "allowedValues": [ "Full", "ITPro" ],
       "defaultValue": "Full"
-    },
-    "automationTriggerAtLogon": {
-      "type": "bool",
-      "metadata": {
-        "description": "If true, automation scripts will not trigger until user logs into ArcBox-Client virtual machine via RDP. If false, automation scripts occur automatically without user action."
-      },
-      "defaultValue": true
     }
   },
   "variables": {
@@ -193,9 +186,6 @@
           },
           "flavor": {
             "value": "[parameters('flavor')]"
-          },
-          "automationTriggerAtLogon": {
-            "value": "[parameters('automationTriggerAtLogon')]"
           }
         }
       }
