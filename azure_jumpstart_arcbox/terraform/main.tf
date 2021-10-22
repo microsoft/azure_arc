@@ -103,6 +103,8 @@ module "management_storage" {
   source = "./modules/mgmtStorage"
 
   resource_group_name = azurerm_resource_group.rg.name
+
+  depends_on = [azurerm_resource_group.rg]
 }
 
 module "management_artifacts" {
@@ -112,6 +114,8 @@ module "management_artifacts" {
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   workspace_name       = var.workspace_name
+
+  depends_on = [azurerm_resource_group.rg]
 }
 
 module "management_policy" {
@@ -120,6 +124,8 @@ module "management_policy" {
   resource_group_name = azurerm_resource_group.rg.name
   workspace_name      = var.workspace_name
   workspace_id        = module.management_artifacts.workspace_id
+
+  depends_on = [azurerm_resource_group.rg, module.management_artifacts]
 }
 
 module "client_vm" {
@@ -137,4 +143,6 @@ module "client_vm" {
   spn_client_secret    = var.spn_client_secret
   spn_tenant_id        = var.spn_tenant_id
   deployment_flavor    = var.deployment_flavor
+
+  depends_on = [azurerm_resource_group.rg, module.management_storage]
 }
