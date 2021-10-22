@@ -204,7 +204,7 @@ Set-AzContext -Subscription $subId
 # Check if machine is registered with Azure Arc for Servers
 # Register machine if necessary
 #
-$arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
+$arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername -ResourceGroupName $resourceGroup
 if ($null -eq $arcResource) {
     Write-Host "Arc for Servers resource not found. Registering the current machine now."
 
