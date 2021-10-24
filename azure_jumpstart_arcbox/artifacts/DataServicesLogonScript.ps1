@@ -166,7 +166,6 @@ if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
     & "C:\ArcBox\DeploymentStatus.ps1"
 }
 
-
 # Creating desktop url shortcuts for built-in Grafana and Kibana services 
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 $GrafanaURL = "https://"+$GrafanaURL+":3000"
