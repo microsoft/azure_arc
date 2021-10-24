@@ -28,3 +28,4 @@ if ( $arcNumResources -cne 11 -and $arcNumResources -cne 6) {
     Write-Host "Too bad, not all Azure Arc resources onboarded"
     az storage message put --content "Failed Jumpstart ArcBox ($flavor) deployment" --account-name "jumpstartusage" --queue-name "arcboxusage" --sas-token "?sv=2020-08-04&ss=q&srt=sco&sp=wa&se=2031-11-01T07:34:50Z&st=2021-10-18T23:34:50Z&spr=https&sig=tQMbCj5EthrwachHMuzLSJ4SgSOtEqqWcAbid6b87vU%3D" --time-to-live -1
 }
+

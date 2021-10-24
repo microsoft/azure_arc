@@ -224,6 +224,7 @@ if ($flavor -eq "ITPro") {
     & "C:\ArcBox\DeploymentStatus.ps1"
 }
 
+
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
