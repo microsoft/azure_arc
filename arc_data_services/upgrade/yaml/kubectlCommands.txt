@@ -1,0 +1,4 @@
+kubectl apply -n arc --f service-account.yaml
+kubectl apply -n arc --f cluster-role.yaml
+kubectl apply -n arc --f cluster-role-binding.yaml
+kubectl apply -n arc --f job.yaml

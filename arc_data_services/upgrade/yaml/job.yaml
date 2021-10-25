@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: arc-bootstrapper-upgrade-job
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: your-private-registry
+      containers:
+      - name: bootstrapper
+        image: your-private-registry-url/your-private-repo/arc-bootstrapper:imagetag
+        imagePullPolicy: Always
+        command: ["/opt/bootstrapper/bin/bootstrapper"]
+        args: ["-image", "your-private-registry-url/your-private-repo/arc-bootstrapper:imagetag", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
+      restartPolicy: Never
+      serviceAccountName: sa-arc-upgrade-worker
+  backoffLimit: 0
