@@ -9,13 +9,37 @@ The following yaml files can be used to upgrade an existing Azure Arc-enabled da
 1. [Service account](./service-account.yaml)
 This yaml file describes a service account named `sa-arc-upgrade-worker` to run the upgrade.
 
+   Example command:
+
+   ```kubectl
+   kubectl apply -n arc --f service-account.yaml
+   ```
+
 1. [Cluster role](./cluster-role.yaml)
 This yaml file describes a cluster role for the upgrade named `cr-upgrade-worker`.
+
+   Example command:
+
+   ```kubectl
+   kubectl apply -n arc --f cluster-role.yaml
+   ```
 
 1. [Cluster role binding](./cluster-role-binding.yaml)
 This yaml file creates a cluster role binding named ` arc:crb-upgrade-worker`.
 
+   Example command:
+
+   ```kubectl
+   kubectl apply -n arc --f cluster-role-binding.yaml
+   ```
+
 1. [Job](./job.yaml)
 This yaml file creates the data controller resources.
+
+   Example command:
+
+   ```kubectl
+   kubectl apply -n arc --f job.yaml
+   ```
 
 For deployment resources, see [Deploy](../../deploy/readme.md).
