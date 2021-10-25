@@ -1,0 +1,12 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+   name: arc:crb-upgrade-worker
+subjects:
+ - kind: ServiceAccount
+   name: sa-arc-upgrade-worker
+   namespace: arc
+roleRef:
+   kind: ClusterRole
+   name: arc:crb-upgrade-worker
+   apiGroup: rbac.authorization.k8s.io
