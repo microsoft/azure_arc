@@ -47,11 +47,11 @@ helm repo update
 helm install nginx ingress-nginx/ingress-nginx -n cluster-mgmt
 
 az k8s-configuration create \
---name hello-arc \
+--name cluster-config \
 --cluster-name $arcClusterName --resource-group $resourceGroup \
---operator-instance-name hello-arc --operator-namespace prod \
+--operator-instance-name cluster-config --operator-namespace cluster-config \
 --enable-helm-operator \
 --helm-operator-params='--set helm.versions=v3' \
 --repository-url $appClonedRepo \
 --scope namespace --cluster-type connectedClusters \
---operator-params="--git-poll-interval 3s --git-readonly --git-path=releases/prod"
+--operator-params="--git-poll-interval 3s --git-readonly"
