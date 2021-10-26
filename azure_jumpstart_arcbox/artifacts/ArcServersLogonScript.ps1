@@ -251,6 +251,11 @@ $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 120 -WarningAction SilentlyContinue | Out-Null
 
+# Sending deployement status message to Azure storage account queue
+if ($flavor -eq "ITPro") {
+    & "C:\ArcBox\DeploymentStatus.ps1"
+}
+
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
