@@ -129,9 +129,9 @@ The following README will guide you on how to use the provided [Terraform](https
   * Set your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key.
 
       ```shell
-      export AWS_ACCESS_KEY_ID="an access key"
-      export AWS_SECRET_ACCESS_KEY="a secret key"
-      export AWS_DEFAULT_REGION="us-west-2"
+      export TF_VAR_AWS_ACCESS_KEY_ID="an access key"
+      export TF_VAR_AWS_SECRET_ACCESS_KEY="a secret key"
+      export TF_VAR_AWS_DEFAULT_REGION="us-west-2"
       ```
 
 ## Deployment
