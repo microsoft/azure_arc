@@ -162,7 +162,7 @@ $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 kubectx
 
 # Sending deployement status message to Azure storage account queue
-if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
     & "C:\ArcBox\DeploymentStatus.ps1"
 }
 
