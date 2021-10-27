@@ -261,7 +261,7 @@ Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administra
 
 
 # Changing to Jumpstart ArcBox wallpaper
-if ($flavor -eq "ITPro") {
+if ($env:flavor -eq "ITPro") {
 $imgPath="C:\ArcBox\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
