@@ -213,7 +213,7 @@ if ($null -eq $arcResource) {
     $timeout = New-TimeSpan -Seconds 30
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     do {
-        $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
+        $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername -ResourceGroupName $resourceGroup
         start-sleep -seconds 10
     } while ($null -eq $arcResource -and $stopwatch.elapsed -lt $timeout)
 
