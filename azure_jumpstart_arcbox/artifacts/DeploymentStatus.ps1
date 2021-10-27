@@ -3,6 +3,7 @@ Start-Transcript -Path C:\ArcBox\DeploymentStatus.log
 $env:AZURE_STORAGE_CONNECTION_STRING ='BlobEndpoint=https://jumpstartusage.blob.core.windows.net/;QueueEndpoint=https://jumpstartusage.queue.core.windows.net/;FileEndpoint=https://jumpstartusage.file.core.windows.net/;TableEndpoint=https://jumpstartusage.table.core.windows.net/;SharedAccessSignature=sv=2020-08-04&ss=q&srt=sco&sp=wa&se=2031-12-02T06:42:34Z&st=2021-10-27T21:42:34Z&spr=https&sig=isIcZalrTQHykaOvDXUYkYac1QmvT9UW9lJOBl%2B5W84%3D'
 
 # Adding Resource Graph Azure CLI extension
+Write-Host "`n"
 Write-Host "Adding Resource Graph Azure CLI extension"
 Write-Host "`n"
 az extension add --name "resource-graph" -y
