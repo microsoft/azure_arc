@@ -252,7 +252,9 @@ $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 120 -WarningAction SilentlyContinue | Out-Null
 
 # Sending deployement status message to Azure storage account queue
-if ($env:flavor -eq "ITPro") {
+if ($flavor -eq "ITPro") {
+    # Sleeping for allowing Azure Resource Manager API updates
+    Start-Sleep -Seconds 30
     & "C:\ArcBox\DeploymentStatus.ps1"
 }
 
