@@ -11,17 +11,17 @@ var policyDefinitionForAddResourceTag = '/providers/Microsoft.Authorization/poli
 var policyDefinitionForLinuxDeployDependencyAgent = '/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43'
 var policyDefinitionForWindowsDeployDependencyAgent = '/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4'
 var policyDefinitionForEnableAzureDefenderKubernetes = '/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c'
-var policyNameForLinuxDeployLogAnalytics_var = '(ArcBox) Deploy Linux Log Analytics agents'
-var policyNameForWindowsDeployLogAnalytics_var = '(ArcBox) Deploy Windows Log Analytics agents'
-var policyNameForLinuxDeployDependencyAgent_var = '(ArcBox) Deploy Linux Dependency Agents'
-var policyNameForWindowsDeployDependencyAgent_var = '(ArcBox) Deploy Windows Dependency Agents'
-var policyNameForAddResourceTag_var = '(ArcBox) Tag resources'
-var policyNameForEnableAzureDefenderKubernetes_var = '(ArcBox) Enable Azure Defender on Kubernetes clusters'
+var policyNameForLinuxDeployLogAnalytics = '(ArcBox) Deploy Linux Log Analytics agents'
+var policyNameForWindowsDeployLogAnalytics = '(ArcBox) Deploy Windows Log Analytics agents'
+var policyNameForLinuxDeployDependencyAgent = '(ArcBox) Deploy Linux Dependency Agents'
+var policyNameForWindowsDeployDependencyAgent = '(ArcBox) Deploy Windows Dependency Agents'
+var policyNameForAddResourceTagName = '(ArcBox) Tag resources'
+var policyNameForEnableAzureDefenderKubernetes = '(ArcBox) Enable Azure Defender on Kubernetes clusters'
 var logAnalyticsContributorRoleDefinition = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
 var tagContributorRoleDefinition = '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
 
-resource policyNameForLinuxDeployLogAnalytics 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
-  name: policyNameForLinuxDeployLogAnalytics_var
+resource policyForLinuxDeployLogAnalytics 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
+  name: policyNameForLinuxDeployLogAnalytics
   location: azureLocation
   identity: {
     type: 'SystemAssigned'
@@ -36,17 +36,17 @@ resource policyNameForLinuxDeployLogAnalytics 'Microsoft.Authorization/policyAss
   }
 }
 
-resource policyNameForLinuxDeployLogAnalytics_id 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(policyNameForLinuxDeployLogAnalytics_var, resourceGroup().id)
+resource policyForLinuxDeployLogAnalyticsRoleAssigment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(policyNameForLinuxDeployLogAnalytics, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyNameForLinuxDeployLogAnalytics.id, '2019-09-01', 'full').identity.principalId
+    principalId: reference(policyForLinuxDeployLogAnalytics.id, '2019-09-01', 'full').identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource policyNameForWindowsDeployLogAnalytics 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
-  name: policyNameForWindowsDeployLogAnalytics_var
+resource policyForWindowsDeployLogAnalytics 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
+  name: policyNameForWindowsDeployLogAnalytics
   identity: {
     type: 'SystemAssigned'
   }
@@ -61,17 +61,17 @@ resource policyNameForWindowsDeployLogAnalytics 'Microsoft.Authorization/policyA
   }
 }
 
-resource policyNameForWindowsDeployLogAnalytics_id 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(policyNameForWindowsDeployLogAnalytics_var, resourceGroup().id)
+resource policyForWindowsDeployLogAnalyticsRoleAssigment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(policyNameForWindowsDeployLogAnalytics, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyNameForWindowsDeployLogAnalytics.id, '2019-09-01', 'full').identity.principalId
+    principalId: reference(policyForWindowsDeployLogAnalytics.id, '2019-09-01', 'full').identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource policyNameForLinuxDeployDependencyAgent 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
-  name: policyNameForLinuxDeployDependencyAgent_var
+resource policyForLinuxDeployDependencyAgent 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
+  name: policyNameForLinuxDeployDependencyAgent
   location: azureLocation
   identity: {
     type: 'SystemAssigned'
@@ -82,17 +82,17 @@ resource policyNameForLinuxDeployDependencyAgent 'Microsoft.Authorization/policy
   }
 }
 
-resource policyNameForLinuxDeployDependencyAgent_id 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(policyNameForLinuxDeployDependencyAgent_var, resourceGroup().id)
+resource policyForLinuxDeployDependencyAgentRoleAssigment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(policyNameForLinuxDeployDependencyAgent, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyNameForLinuxDeployDependencyAgent.id, '2019-09-01', 'full').identity.principalId
+    principalId: reference(policyForLinuxDeployDependencyAgent.id, '2019-09-01', 'full').identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource policyNameForWindowsDeployDependencyAgent 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
-  name: policyNameForWindowsDeployDependencyAgent_var
+resource policyForWindowsDeployDependencyAgent 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
+  name: policyNameForWindowsDeployDependencyAgent
   identity: {
     type: 'SystemAssigned'
   }
@@ -103,17 +103,17 @@ resource policyNameForWindowsDeployDependencyAgent 'Microsoft.Authorization/poli
   }
 }
 
-resource policyNameForWindowsDeployDependencyAgent_id 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(policyNameForWindowsDeployDependencyAgent_var, resourceGroup().id)
+resource policyForWindowsDeployDependencyAgentRoleAssigment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(policyNameForWindowsDeployDependencyAgent, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyNameForWindowsDeployDependencyAgent.id, '2019-09-01', 'full').identity.principalId
+    principalId: reference(policyForWindowsDeployDependencyAgent.id, '2019-09-01', 'full').identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource policyNameForAddResourceTag 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
-  name: policyNameForAddResourceTag_var
+resource policyForAddResourceTag 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
+  name: policyNameForAddResourceTagName
   identity: {
     type: 'SystemAssigned'
   }
@@ -131,17 +131,17 @@ resource policyNameForAddResourceTag 'Microsoft.Authorization/policyAssignments@
   }
 }
 
-resource policyNameForAddResourceTag_id 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(policyNameForAddResourceTag_var, resourceGroup().id)
+resource policyForAddResourceTagRoleAssigment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(policyNameForAddResourceTagName, resourceGroup().id)
   properties: {
     roleDefinitionId: tagContributorRoleDefinition
-    principalId: reference(policyNameForAddResourceTag.id, '2019-09-01', 'full').identity.principalId
+    principalId: reference(policyForAddResourceTag.id, '2019-09-01', 'full').identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
 
-resource policyNameForEnableAzureDefenderKubernetes 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
-  name: policyNameForEnableAzureDefenderKubernetes_var
+resource policyForEnableAzureDefenderKubernetes 'Microsoft.Authorization/policyAssignments@2021-06-01' = {
+  name: policyNameForEnableAzureDefenderKubernetes
   identity: {
     type: 'SystemAssigned'
   }
@@ -152,11 +152,11 @@ resource policyNameForEnableAzureDefenderKubernetes 'Microsoft.Authorization/pol
   }
 }
 
-resource policyNameForEnableAzureDefenderKubernetes_id 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: guid(policyNameForEnableAzureDefenderKubernetes_var, resourceGroup().id)
+resource policyForEnableAzureDefenderKubernetesRoleAssigment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(policyNameForEnableAzureDefenderKubernetes, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyNameForEnableAzureDefenderKubernetes.id, '2019-09-01', 'full').identity.principalId
+    principalId: reference(policyForEnableAzureDefenderKubernetes.id, '2019-09-01', 'full').identity.principalId
     principalType: 'ServicePrincipal'
   }
 }

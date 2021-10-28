@@ -51,14 +51,13 @@ param stagingStorageAccountName string
 @description('The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template.')
 param templateBaseUrl string
 
-var vmName_var = concat(vmName)
-var publicIpAddressName_var = '${vmName}-PIP'
-var networkInterfaceName_var = '${vmName}-NIC'
+var publicIpAddressName = '${vmName}-PIP'
+var networkInterfaceName = '${vmName}-NIC'
 var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, subnetName)
 var osDiskType = 'Premium_LRS'
 
-resource networkInterfaceName 'Microsoft.Network/networkInterfaces@2018-10-01' = {
-  name: networkInterfaceName_var
+resource networkInterface 'Microsoft.Network/networkInterfaces@2018-10-01' = {
+  name: networkInterfaceName
   location: azureLocation
   properties: {
     ipConfigurations: [
@@ -70,18 +69,18 @@ resource networkInterfaceName 'Microsoft.Network/networkInterfaces@2018-10-01' =
           }
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: {
-            id: publicIpAddressName.id
+            id: publicIpAddress.id
           }
         }
       }
     ]
     networkSecurityGroup: {
-      id: networkSecurityGroupName_resource.id
+      id: networkSecurityGroup.id
     }
   }
 }
 
-resource networkSecurityGroupName_resource 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
   name: networkSecurityGroupName
   location: azureLocation
   properties: {
@@ -103,8 +102,8 @@ resource networkSecurityGroupName_resource 'Microsoft.Network/networkSecurityGro
   }
 }
 
-resource publicIpAddressName 'Microsoft.Network/publicIpAddresses@2019-02-01' = {
-  name: publicIpAddressName_var
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2019-02-01' = {
+  name: publicIpAddressName
   location: azureLocation
   properties: {
     publicIPAllocationMethod: 'Static'
@@ -116,8 +115,8 @@ resource publicIpAddressName 'Microsoft.Network/publicIpAddresses@2019-02-01' = 
   }
 }
 
-resource vmName_resource 'Microsoft.Compute/virtualMachines@2019-03-01' = {
-  name: vmName_var
+resource vm 'Microsoft.Compute/virtualMachines@2019-03-01' = {
+  name: vmName
   location: azureLocation
   tags: resourceTags
   properties: {
@@ -126,7 +125,7 @@ resource vmName_resource 'Microsoft.Compute/virtualMachines@2019-03-01' = {
     }
     storageProfile: {
       osDisk: {
-        name: '${vmName_var}-OSDisk'
+        name: '${vmName}-OSDisk'
         caching: 'ReadWrite'
         createOption: 'FromImage'
         managedDisk: {
@@ -143,12 +142,12 @@ resource vmName_resource 'Microsoft.Compute/virtualMachines@2019-03-01' = {
     networkProfile: {
       networkInterfaces: [
         {
-          id: networkInterfaceName.id
+          id: networkInterface.id
         }
       ]
     }
     osProfile: {
-      computerName: vmName_var
+      computerName: vmName
       adminUsername: adminUsername
       linuxConfiguration: {
         disablePasswordAuthentication: true
@@ -165,8 +164,8 @@ resource vmName_resource 'Microsoft.Compute/virtualMachines@2019-03-01' = {
   }
 }
 
-resource vmName_installscript_CAPI 'Microsoft.Compute/virtualMachines/extensions@2019-07-01' = {
-  parent: vmName_resource
+resource vmInstallscriptCAPI 'Microsoft.Compute/virtualMachines/extensions@2019-07-01' = {
+  parent: vm
   name: 'installscript_CAPI'
   location: azureLocation
   properties: {
