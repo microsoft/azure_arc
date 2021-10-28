@@ -11,7 +11,7 @@ param windowsAdminUsername string = 'arcdemo'
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string = 'ArcPassword123!!'
+param windowsAdminPassword string
 
 @description('The Windows version for the VM. This will pick a fully patched image of this given Windows version')
 param windowsOSVersion string = '2022-datacenter-g2'
@@ -147,7 +147,6 @@ resource publicIpAddressName 'Microsoft.Network/publicIpAddresses@2019-02-01' = 
   }
   sku: {
     name: 'Basic'
-    tier: 'Regional'
   }
 }
 
