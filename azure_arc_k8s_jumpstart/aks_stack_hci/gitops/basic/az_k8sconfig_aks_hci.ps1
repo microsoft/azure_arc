@@ -31,9 +31,10 @@ choco install kubernetes-helm
 # Add the official stable repo
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
-helm install nginx ingress-nginx/ingress-nginx -n cluster-mgmt
 
 # Use Helm to deploy an NGINX ingress controller
+helm install nginx ingress-nginx/ingress-nginx -n cluster-mgmt
+
 kubectl create ns hello-arc
 
 az k8s-configuration create `
