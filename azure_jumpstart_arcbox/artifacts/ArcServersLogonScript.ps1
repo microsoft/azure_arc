@@ -134,7 +134,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $vmDir --recu
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
-New-VM -Name ArcBox-Win2K19 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win2K19XXXXXX.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-Win2K19 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win2K19.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K19 -Count 2
 
 New-VM -Name ArcBox-Win2K22 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win2K22.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
