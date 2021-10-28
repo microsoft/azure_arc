@@ -26,12 +26,12 @@ var Security = {
   galleryName: 'Security'
 }
 
-var automationAccountName_var = 'ArcBox-Automation-${uniqueString(resourceGroup().id)}'
+var automationAccountName = 'ArcBox-Automation-${uniqueString(resourceGroup().id)}'
 var subnetAddressPrefix = '172.16.1.0/24'
 var addressPrefix = '172.16.0.0/16'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 
-resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
   location: location
   properties: {
@@ -53,7 +53,7 @@ resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2021-03-
   }
 }
 
-resource workspaceName_resource 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
+resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   name: workspaceName
   location: location
   properties: {
@@ -67,7 +67,7 @@ resource UpdatesGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pre
   location: location
   name: Updates.name
   properties: {
-    workspaceResourceId: workspaceName_resource.id
+    workspaceResourceId: workspace.id
   }
   plan: {
     name: Updates.name
@@ -77,14 +77,14 @@ resource UpdatesGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pre
   }
 }
 
-resource VMInsights_Microsoft_OperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   location: location
-  name: 'VMInsights(${split(workspaceName_resource.id, '/')[8]})'
+  name: 'VMInsights(${split(workspace.id, '/')[8]})'
   properties: {
-    workspaceResourceId: workspaceName_resource.id
+    workspaceResourceId: workspace.id
   }
   plan: {
-    name: 'VMInsights(${split(workspaceName_resource.id, '/')[8]})'
+    name: 'VMInsights(${split(workspace.id, '/')[8]})'
     product: 'OMSGallery/VMInsights'
     promotionCode: ''
     publisher: 'Microsoft'
@@ -95,13 +95,13 @@ resource ChangeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11
   name: ChangeTracking.name
   location: location
   plan: {
-    name: 'ChangeTracking(${split(workspaceName_resource.id, '/')[8]})'
+    name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
     promotionCode: ''
     product: 'OMSGallery/${ChangeTracking.galleryName}'
     publisher: 'Microsoft'
   }
   properties: {
-    workspaceResourceId: workspaceName_resource.id
+    workspaceResourceId: workspace.id
   }
 }
 
@@ -109,18 +109,18 @@ resource SecurityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
   name: Security.name
   location: location
   plan: {
-    name: 'ChangeTracking(${split(workspaceName_resource.id, '/')[8]})'
+    name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
     promotionCode: ''
     product: 'OMSGallery/${Security.galleryName}'
     publisher: 'Microsoft'
   }
   properties: {
-    workspaceResourceId: workspaceName_resource.id
+    workspaceResourceId: workspace.id
   }
 }
 
-resource automationAccountName 'Microsoft.Automation/automationAccounts@2021-06-22' = {
-  name: automationAccountName_var
+resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' = {
+  name: automationAccountName
   location: automationAccountLocation
   properties: {
     sku: {
@@ -128,15 +128,15 @@ resource automationAccountName 'Microsoft.Automation/automationAccounts@2021-06-
     }
   }
   dependsOn: [
-    workspaceName_resource
+    workspace
   ]
 }
 
-resource workspaceName_Automation 'Microsoft.OperationalInsights/workspaces/linkedServices@2015-11-01-preview' = {
-  parent: workspaceName_resource
+resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedServices@2015-11-01-preview' = {
+  parent: workspace
   name: 'Automation'
   properties: {
-    resourceId: automationAccountName.id
+    resourceId: automationAccount.id
   }
 }
 
