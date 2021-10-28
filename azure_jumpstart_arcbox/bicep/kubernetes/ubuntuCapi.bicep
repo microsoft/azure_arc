@@ -113,7 +113,6 @@ resource publicIpAddressName 'Microsoft.Network/publicIpAddresses@2019-02-01' = 
   }
   sku: {
     name: 'Basic'
-    tier: 'Regional'
   }
 }
 

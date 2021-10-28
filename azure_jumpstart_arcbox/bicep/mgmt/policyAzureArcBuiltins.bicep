@@ -27,7 +27,6 @@ resource policyNameForLinuxDeployLogAnalytics 'Microsoft.Authorization/policyAss
     type: 'SystemAssigned'
   }
   properties: {
-    scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
     policyDefinitionId: policyDefinitionForLinuxDeployLogAnalytics
     parameters: {
       logAnalytics: {
@@ -53,7 +52,6 @@ resource policyNameForWindowsDeployLogAnalytics 'Microsoft.Authorization/policyA
   }
   location: azureLocation
   properties: {
-    scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
     policyDefinitionId: policyDefinitionForWindowsDeployLogAnalytics
     parameters: {
       logAnalytics: {
@@ -79,7 +77,6 @@ resource policyNameForLinuxDeployDependencyAgent 'Microsoft.Authorization/policy
     type: 'SystemAssigned'
   }
   properties: {
-    scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
     policyDefinitionId: policyDefinitionForLinuxDeployDependencyAgent
     parameters: {}
   }
@@ -101,7 +98,6 @@ resource policyNameForWindowsDeployDependencyAgent 'Microsoft.Authorization/poli
   }
   location: azureLocation
   properties: {
-    scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
     policyDefinitionId: policyDefinitionForWindowsDeployDependencyAgent
     parameters: {}
   }
@@ -123,7 +119,6 @@ resource policyNameForAddResourceTag 'Microsoft.Authorization/policyAssignments@
   }
   location: azureLocation
   properties: {
-    scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
     policyDefinitionId: policyDefinitionForAddResourceTag
     parameters: {
       tagName: {
@@ -152,7 +147,6 @@ resource policyNameForEnableAzureDefenderKubernetes 'Microsoft.Authorization/pol
   }
   location: azureLocation
   properties: {
-    scope: subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)
     policyDefinitionId: policyDefinitionForEnableAzureDefenderKubernetes
     parameters: {}
   }
