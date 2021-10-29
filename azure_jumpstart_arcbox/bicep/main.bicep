@@ -34,7 +34,8 @@ param logAnalyticsWorkspaceName string
 ])
 param flavor string = 'Full'
 
-var templateBaseUrl = 'https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_flavors/azure_jumpstart_arcbox/'
+@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
+param resourceBaseUrl string = 'https://raw.githubusercontent.com/microsoft/azure_arc/azure_jumpstart_arcbox/'
 
 module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full') {
   name: 'ubuntuCAPIDeployment'
@@ -45,7 +46,7 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
-    templateBaseUrl: templateBaseUrl
+    templateBaseUrl: resourceBaseUrl
   }
   dependsOn: [
     mgmtArtifactsAndPolicyDeployment
@@ -62,7 +63,7 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
-    templateBaseUrl: templateBaseUrl
+    templateBaseUrl: resourceBaseUrl
   }
   dependsOn: [
     mgmtArtifactsAndPolicyDeployment
@@ -80,7 +81,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     myIpAddress: myIpAddress
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
-    templateBaseUrl: templateBaseUrl
+    templateBaseUrl: resourceBaseUrl
     flavor: flavor
   }
   dependsOn: [

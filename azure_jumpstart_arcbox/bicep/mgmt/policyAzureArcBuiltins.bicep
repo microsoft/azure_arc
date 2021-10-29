@@ -2,9 +2,8 @@
 param azureLocation string
 
 @description('Name of your log analytics workspace')
-param logAnalyticsWorkspace string
+param logAnalyticsWorkspaceId string
 
-var logAnalyticsResource = resourceId('Microsoft.OperationalInsights/workspaces', logAnalyticsWorkspace)
 var policyDefinitionForLinuxDeployLogAnalytics = '/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf'
 var policyDefinitionForWindowsDeployLogAnalytics = '/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203'
 var policyDefinitionForAddResourceTag = '/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26'
@@ -30,7 +29,7 @@ resource policyForLinuxDeployLogAnalytics 'Microsoft.Authorization/policyAssignm
     policyDefinitionId: policyDefinitionForLinuxDeployLogAnalytics
     parameters: {
       logAnalytics: {
-        value: logAnalyticsResource
+        value: logAnalyticsWorkspaceId
       }
     }
   }
@@ -40,7 +39,7 @@ resource policyForLinuxDeployLogAnalyticsRoleAssigment 'Microsoft.Authorization/
   name: guid(policyNameForLinuxDeployLogAnalytics, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyForLinuxDeployLogAnalytics.id, '2019-09-01', 'full').identity.principalId
+    principalId: policyForLinuxDeployLogAnalytics.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -55,7 +54,7 @@ resource policyForWindowsDeployLogAnalytics 'Microsoft.Authorization/policyAssig
     policyDefinitionId: policyDefinitionForWindowsDeployLogAnalytics
     parameters: {
       logAnalytics: {
-        value: logAnalyticsResource
+        value: logAnalyticsWorkspaceId
       }
     }
   }
@@ -65,7 +64,7 @@ resource policyForWindowsDeployLogAnalyticsRoleAssigment 'Microsoft.Authorizatio
   name: guid(policyNameForWindowsDeployLogAnalytics, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyForWindowsDeployLogAnalytics.id, '2019-09-01', 'full').identity.principalId
+    principalId: policyForWindowsDeployLogAnalytics.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -86,7 +85,7 @@ resource policyForLinuxDeployDependencyAgentRoleAssigment 'Microsoft.Authorizati
   name: guid(policyNameForLinuxDeployDependencyAgent, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyForLinuxDeployDependencyAgent.id, '2019-09-01', 'full').identity.principalId
+    principalId: policyForLinuxDeployDependencyAgent.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -107,7 +106,7 @@ resource policyForWindowsDeployDependencyAgentRoleAssigment 'Microsoft.Authoriza
   name: guid(policyNameForWindowsDeployDependencyAgent, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyForWindowsDeployDependencyAgent.id, '2019-09-01', 'full').identity.principalId
+    principalId: policyForWindowsDeployDependencyAgent.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -135,7 +134,7 @@ resource policyForAddResourceTagRoleAssigment 'Microsoft.Authorization/roleAssig
   name: guid(policyNameForAddResourceTagName, resourceGroup().id)
   properties: {
     roleDefinitionId: tagContributorRoleDefinition
-    principalId: reference(policyForAddResourceTag.id, '2019-09-01', 'full').identity.principalId
+    principalId: policyForAddResourceTag.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
@@ -156,7 +155,7 @@ resource policyForEnableAzureDefenderKubernetesRoleAssigment 'Microsoft.Authoriz
   name: guid(policyNameForEnableAzureDefenderKubernetes, resourceGroup().id)
   properties: {
     roleDefinitionId: logAnalyticsContributorRoleDefinition
-    principalId: reference(policyForEnableAzureDefenderKubernetes.id, '2019-09-01', 'full').identity.principalId
+    principalId: policyForEnableAzureDefenderKubernetes.identity.principalId
     principalType: 'ServicePrincipal'
   }
 }
