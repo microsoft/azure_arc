@@ -82,6 +82,9 @@ Write-Host "`n"
 # Monitor pods across namespaces
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
 
+Write-Host -NoNewLine 'Press any key to continue...';
+$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `
                         --resource-group $env:resourceGroup `
