@@ -45,8 +45,8 @@ param spnTenantId string
 @description('Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json')
 param stagingStorageAccountName string
 
-@description('The base URL used for accessing resources and automation artifacts.')
-param resourceBaseUrl string
+@description('The base URL used for accessing artifacts and automation artifacts.')
+param artifactsBaseUrl string
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -173,7 +173,7 @@ resource vmInstallscriptCAPI 'Microsoft.Compute/virtualMachines/extensions@2021-
     protectedSettings: {
       commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName}'
       fileUris: [
-        '${resourceBaseUrl}artifacts/installCAPI.sh'
+        '${artifactsBaseUrl}artifacts/installCAPI.sh'
       ]
     }
   }

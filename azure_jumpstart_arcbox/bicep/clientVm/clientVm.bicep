@@ -22,11 +22,8 @@ param location string = resourceGroup().location
 @description('The size of the VM')
 param vmSize string = 'Standard_D16s_v3'
 
-@description('Name of the VNET')
-param virtualNetworkName string = 'ArcBox-Vnet'
-
-@description('Name of the subnet in the virtual network')
-param subnetName string = 'ArcBox-Subnet'
+@description('Resource Id of the subnet in the virtual network')
+param subnetId string
 
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'ArcBox-NSG'
@@ -47,12 +44,12 @@ param spnTenantId string
 param azdataUsername string = 'arcdemo'
 
 @secure()
-param azdataPassword string = 'ArcPassword123!!'
+param azdataPassword string
 param acceptEula string = 'yes'
 param registryUsername string = 'registryUser'
 
 @secure()
-param registryPassword string = 'registrySecret'
+param registryPassword string
 param arcDcName string = 'arcdatactrl'
 param mssqlmiName string = 'arcsqlmidemo'
 
@@ -74,8 +71,8 @@ param stagingStorageAccountName string
 @description('Name for the environment Azure Log Analytics workspace')
 param workspaceName string
 
-@description('The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template.')
-param templateBaseUrl string
+@description('The base URL used for accessing artifacts and automation artifacts.')
+param artifactsBaseUrl string
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
 @allowed([
@@ -87,10 +84,9 @@ param flavor string = 'Full'
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
-var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, subnetName)
 var osDiskType = 'Premium_LRS'
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2018-10-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: networkInterfaceName
   location: location
   properties: {
@@ -99,7 +95,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2018-10-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: subnetRef
+            id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: {
@@ -114,7 +110,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2018-10-01' = {
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
   name: networkSecurityGroupName
   location: location
   properties: {
@@ -136,7 +132,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-02-0
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2019-02-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
   name: publicIpAddressName
   location: location
   properties: {
@@ -149,7 +145,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2019-02-01' = {
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2019-03-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
   name: vmName
   location: location
   tags: resourceTags
@@ -193,7 +189,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2019-03-01' = {
   }
 }
 
-resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2019-07-01' = {
+resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
   parent: vm
   name: 'Bootstrap'
   location: location
@@ -207,9 +203,9 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2019-07-01' =
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: [
-        uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
+        uri(artifactsBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -flavor ${flavor}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${artifactsBaseUrl} -flavor ${flavor}'
     }
   }
 }

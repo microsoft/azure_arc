@@ -17,7 +17,7 @@
         "windowsAdminUsername": {
             "value": "arcdemo"
         },
-        "windowsAdminPassword": {
+        "password": {
             "value": "<your windows admin password>"
         },
         "myIpAddress": {
