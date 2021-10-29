@@ -46,11 +46,9 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
-    templateBaseUrl: resourceBaseUrl
+    resourceBaseUrl: resourceBaseUrl
+    subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
-  dependsOn: [
-    mgmtArtifactsAndPolicyDeployment
-  ]
 }
 
 module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full') {
@@ -63,11 +61,9 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
-    templateBaseUrl: resourceBaseUrl
+    resourceBaseUrl: resourceBaseUrl
+    subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
-  dependsOn: [
-    mgmtArtifactsAndPolicyDeployment
-  ]
 }
 
 module clientVmDeployment 'clientVm/clientVm.bicep' = {

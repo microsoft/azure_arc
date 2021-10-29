@@ -23,11 +23,8 @@ param azureLocation string = resourceGroup().location
 @description('The size of the VM')
 param vmSize string = 'Standard_D4s_v3'
 
-@description('Name of the VNet')
-param virtualNetworkName string = 'ArcBox-VNet'
-
-@description('Name of the subnet in the virtual network')
-param subnetName string = 'ArcBox-Subnet'
+@description('Resource Id of the subnet in the virtual network')
+param subnetId string 
 
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'ArcBox-K3s-NSG'
@@ -51,15 +48,14 @@ param stagingStorageAccountName string
 @description('Name of the Log Analytics workspace used with Azure Monitor for Containers extension.')
 param logAnalyticsWorkspace string
 
-@description('The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template.')
-param templateBaseUrl string
+@description('The base URL used for accessing resources and automation artifacts.')
+param resourceBaseUrl string
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
-var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, subnetName)
 var osDiskType = 'Premium_LRS'
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2018-10-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: networkInterfaceName
   location: azureLocation
   properties: {
@@ -68,7 +64,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2018-10-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: subnetRef
+            id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: {
@@ -83,7 +79,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2018-10-01' = {
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
   name: networkSecurityGroupName
   location: azureLocation
   properties: {
@@ -183,7 +179,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2019-02-0
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2019-02-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
   name: publicIpAddressName
   location: azureLocation
   properties: {
@@ -196,7 +192,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2019-02-01' = {
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2019-03-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
   name: vmName
   location: azureLocation
   tags: resourceTags
@@ -245,7 +241,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2019-03-01' = {
   }
 }
 
-resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2019-07-01' = {
+resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
   parent: vm
   name: 'installscript_k3s'
   location: azureLocation
@@ -258,7 +254,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2019-0
     protectedSettings: {
       commandToExecute: 'bash installK3s.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
       fileUris: [
-        '${templateBaseUrl}artifacts/installK3s.sh'
+        '${resourceBaseUrl}artifacts/installK3s.sh'
       ]
     }
   }

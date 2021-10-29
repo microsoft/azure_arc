@@ -31,7 +31,7 @@ var subnetAddressPrefix = '172.16.1.0/24'
 var addressPrefix = '172.16.0.0/16'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
   location: location
   properties: {
@@ -40,16 +40,16 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         addressPrefix
       ]
     }
-    subnets: [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: subnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-    ]
+  }
+}
+
+resource arcSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' = {
+  name: subnetName
+  parent: arcVirtualNetwork
+  properties: {
+    addressPrefix: subnetAddressPrefix
+    privateEndpointNetworkPolicies: 'Enabled'
+    privateLinkServiceNetworkPolicies: 'Enabled'
   }
 }
 
@@ -147,3 +147,6 @@ module policyDeployment './policyAzureArcBuiltins.bicep' = {
     logAnalyticsWorkspaceId: workspace.id
   }
 }
+
+output vnetId string = arcVirtualNetwork.id
+output subnetId string = arcSubnet.id
