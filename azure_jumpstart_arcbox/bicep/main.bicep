@@ -22,7 +22,7 @@ param windowsAdminUsername string
 @minLength(12)
 @maxLength(123)
 @secure()
-param windowsAdminPassword string
+param password string
 
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
@@ -35,7 +35,7 @@ param logAnalyticsWorkspaceName string
 param flavor string = 'Full'
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
-param resourceBaseUrl string = 'https://raw.githubusercontent.com/microsoft/azure_arc/azure_jumpstart_arcbox/'
+param artifactsBaseUrl string = 'https://raw.githubusercontent.com/microsoft/azure_arc/azure_jumpstart_arcbox/'
 
 module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full') {
   name: 'ubuntuCAPIDeployment'
@@ -46,7 +46,7 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
-    resourceBaseUrl: resourceBaseUrl
+    artifactsBaseUrl: artifactsBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
 }
@@ -61,7 +61,7 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
-    resourceBaseUrl: resourceBaseUrl
+    artifactsBaseUrl: artifactsBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
 }
@@ -70,20 +70,19 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
   params: {
     windowsAdminUsername: windowsAdminUsername
-    windowsAdminPassword: windowsAdminPassword
+    windowsAdminPassword: password
+    azdataPassword: password
+    registryPassword: password
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     myIpAddress: myIpAddress
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
-    templateBaseUrl: resourceBaseUrl
+    artifactsBaseUrl: artifactsBaseUrl
     flavor: flavor
+    subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
-  dependsOn: [
-    ubuntuRancherDeployment
-    mgmtArtifactsAndPolicyDeployment
-  ]
 }
 
 module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
