@@ -18,7 +18,7 @@
             "value": "arcdemo"
         },
         "windowsAdminPassword": {
-            "value": "ArcPassword123!!"
+            "value": "<your windows admin password>"
         },
         "myIpAddress": {
             "value": "<your IP address>"

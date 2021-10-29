@@ -13,15 +13,15 @@ param location string = resourceGroup().location
 @description('SKU, leave default pergb2018')
 param sku string = 'pergb2018'
 
-var Updates = {
+var updates = {
   name: 'Updates(${workspaceName})'
   galleryName: 'Updates'
 }
-var ChangeTracking = {
+var changeTracking = {
   name: 'ChangeTracking(${workspaceName})'
   galleryName: 'ChangeTracking'
 }
-var Security = {
+var security = {
   name: 'Security(${workspaceName})'
   galleryName: 'Security'
 }
@@ -63,17 +63,17 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   }
 }
 
-resource UpdatesGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+resource updatesWorkpace 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   location: location
-  name: Updates.name
+  name: updates.name
   properties: {
     workspaceResourceId: workspace.id
   }
   plan: {
-    name: Updates.name
+    name: updates.name
     publisher: 'Microsoft'
     promotionCode: ''
-    product: 'OMSGallery/${Updates.galleryName}'
+    product: 'OMSGallery/${updates.galleryName}'
   }
 }
 
@@ -91,31 +91,31 @@ resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/
   }
 }
 
-resource ChangeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
-  name: ChangeTracking.name
+resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+  name: changeTracking.name
   location: location
+  properties: {
+    workspaceResourceId: workspace.id
+  }
   plan: {
     name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
     promotionCode: ''
-    product: 'OMSGallery/${ChangeTracking.galleryName}'
+    product: 'OMSGallery/${changeTracking.galleryName}'
     publisher: 'Microsoft'
-  }
-  properties: {
-    workspaceResourceId: workspace.id
   }
 }
 
-resource SecurityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
-  name: Security.name
+resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+  name: security.name
   location: location
+  properties: {
+    workspaceResourceId: workspace.id
+  }
   plan: {
     name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
     promotionCode: ''
-    product: 'OMSGallery/${Security.galleryName}'
+    product: 'OMSGallery/${security.galleryName}'
     publisher: 'Microsoft'
-  }
-  properties: {
-    workspaceResourceId: workspace.id
   }
 }
 
@@ -144,6 +144,6 @@ module policyDeployment './policyAzureArcBuiltins.bicep' = {
   name: 'policyDeployment'
   params: {
     azureLocation: location
-    logAnalyticsWorkspace: workspaceName
+    logAnalyticsWorkspaceId: workspace.id
   }
 }
