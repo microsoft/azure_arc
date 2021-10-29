@@ -133,8 +133,8 @@ Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # Deploy SQL MI and PostgreSQL data services
-#& "C:\ArcBox\DeploySQLMI.ps1"
-#& "C:\ArcBox\DeployPostgreSQL.ps1"
+& "C:\ArcBox\DeploySQLMI.ps1"
+& "C:\ArcBox\DeployPostgreSQL.ps1"
 
 # Replacing Azure Data Studio settings template file
 Write-Host "Replacing Azure Data Studio settings template file"
