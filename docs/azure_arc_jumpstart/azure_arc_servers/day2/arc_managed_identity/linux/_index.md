@@ -309,9 +309,7 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
 
 ## Accessing Key Vault secrets
 
-You will access other endpoints when using PaaS services such as Azure Key Vault, Azure Storage Account, Azure PaaS databases etc.
-
-The token acquisition process is the same except you have to change the resource (or audience) in the query of the call.
+You will access other endpoints when using PaaS services such as Azure Key Vault, Azure Storage Account, Azure PaaS databases, etc. The token acquisition process is the same except you have to change the resource (or audience) in the query of the call.
 
 * Acquire a token for the Key Vault service
 
