@@ -360,9 +360,7 @@ The token acquisition process is the same except you have to change the resource
 
     > Note that the resource is set to `https://storage.azure.com` in the query.
 
-* Create a container
-
-    Create a container named `uploads`.
+- Create a container named `uploads`.
 
     ```shell
     curl -X PUT -d "" -H "Authorization: Bearer $storageToken" -H "x-ms-version: 2020-10-02" https://$name.blob.core.windows.net/uploads?restype=container
