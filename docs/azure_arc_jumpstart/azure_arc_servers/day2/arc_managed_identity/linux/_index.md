@@ -264,13 +264,11 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
     challengeTokenPath=$(curl -s -D - -H Metadata:true "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fmanagement.azure.com" | grep Www-Authenticate | cut -d "=" -f 2 | tr -d "[:cntrl:]")
     ```
 
-
-    The filepath is included in the headers returned by the REST API call.
+    The file path is included in the headers returned by the REST API call.
 
     ![Screenshot showing the command output](./12.png)
 
-    The file is created in a path that only the root and himds IDs can access.
-
+    The file is created in a path that only the root and HIMDS IDs can access.
 
 1. Read the content of the file into a variable
 
