@@ -87,7 +87,7 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
 
   > **Note that your value for `$name` will be different to the one in the screenshot above.**
 
-* Create an Azure Storage account
+- Create an Azure Storage account
 
   ```shell
   az storage account create --name $name --sku Standard_LRS --resource-group $rg --location $loc
