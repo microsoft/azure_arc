@@ -104,9 +104,7 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
   ![Screenshot showing the Azure Key Vault creation](./05.png)
 
 
-* Create a secret
-
-  Create an example secret.
+- Create an example secret.
 
   ```shell
   az keyvault secret set --vault-name $name --name scenario --value "Managed Identity"
