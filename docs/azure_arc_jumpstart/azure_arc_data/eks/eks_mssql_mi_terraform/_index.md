@@ -84,7 +84,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
   az ad sp show --id 'bc313c14-388c-4e7d-a58e-70017303ee3b' --query objectId -o tsv
 
   # 51dfe1e8-70c6-4de5-a08e-e18aff23d815 <-- This is the OBJECT ID specific to Microsoft's AAD Tenant
-  # ^This output will be different for your tenant - use this
+  # This output will be different for your tenant - use this
 
   ```
 
