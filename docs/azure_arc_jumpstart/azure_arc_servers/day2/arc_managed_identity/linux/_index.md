@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Use Managed Identity on an Azure Arc-enabled server
+## Using Managed Identity on Azure Arc-enabled servers
 
 The following README will guide you on how to work with the Hybrid Instance Metadata Service on an Azure Arc-enabled server, and authenticate the system assigned Managed Identity against Azure APIs.
 
@@ -58,61 +58,61 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
 
 - Set variables
 
-  ```shell
-  rg=arc_managed_identity_scenario
-  loc=westeurope
-  ```
+    ```shell
+    rg=arc_managed_identity_scenario
+    loc=westeurope
+    ```
 
 - Create an Azure resource group
 
-  ```shell
-  az group create --name $rg --location $loc
-  rgid=$(az group show --name $rg --query id --output tsv)
-  ```
+    ```shell
+    az group create --name $rg --location $loc
+    rgid=$(az group show --name $rg --query id --output tsv)
+    ```
 
-  ![Screenshot showing resource group being created](./02.png)
+    ![Screenshot showing resource group being created](./02.png)
 
 - Create a unique name for the FQDNs
 
   The fully qualified domain names must be globally unique.
 
-  ```shell
-  name=arcmi$(az account show --query id --output tsv | cut -f1 -d-)
-  echo "Name: $name"
-  ```
+    ```shell
+    name=arcmi$(az account show --query id --output tsv | cut -f1 -d-)
+    echo "Name: $name"
+    ```
 
-  The command uses the first eight characters from your subscription ID and suffixes to the string `arcmi` to create a name for the FQDNs.
+    The command uses the first eight characters from your subscription ID and suffixes to the string `arcmi` to create a name for the FQDNs.
 
-  ![Screenshot showing an example unique name for the FQDNs](./03.png)
+    ![Screenshot showing an example unique name for the FQDNs](./03.png)
 
-  > **Note that your value for `$name` will be different to the one in the screenshot above.**
+    > **Note that your value for `$name` will be different to the one in the screenshot above.**
 
 - Create an Azure Storage account
 
-  ```shell
-  az storage account create --name $name --sku Standard_LRS --resource-group $rg --location $loc
-  ```
+    ```shell
+    az storage account create --name $name --sku Standard_LRS --resource-group $rg --location $loc
+    ```
 
-  ![Screenshot showing the storage account creation](./04.png)
+    ![Screenshot showing the storage account creation](./04.png)
 
 - Create an Azure Key Vault
 
-  ```shell
-  az keyvault create --name $name --retention-days 7 --resource-group $rg --location $loc
-  ```
+    ```shell
+    az keyvault create --name $name --retention-days 7 --resource-group $rg --location $loc
+    ```
 
-  ![Screenshot showing the Azure Key Vault creation](./05.png)
+    ![Screenshot showing the Azure Key Vault creation](./05.png)
 
 
 - Create an example secret.
 
-  ```shell
-  az keyvault secret set --vault-name $name --name scenario --value "Managed Identity"
-  ```
+    ```shell
+    az keyvault secret set --vault-name $name --name scenario --value "Managed Identity"
+    ```
 
-      The below image represents a secret example. In your environment, secrets are more likely to be passwords, database connection strings, etc.
-  
-      ![Screenshot showing the created secret](./06.png)
+    The below image represents a secret example. In your environment, secrets are more likely to be passwords, database connection strings, etc.
+
+    ![Screenshot showing the created secret](./06.png)
 
 ## Add RBAC role assignments for the managed identity
 
@@ -243,7 +243,7 @@ The HIMDS endpoint provides information about the onboarded server (e.g. subscri
 
 - Working with tags and _jq_
 
-    The examples below show the tags and tags list and then pulls the value for a tag called platform.
+    The example commands below display the tags and then set a variable to a tag's value.
 
     ```shell
     jq .compute.tags <<< $imds
@@ -311,7 +311,7 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
 
 You will access other endpoints when using PaaS services such as Azure Key Vault, Azure Storage Account, Azure PaaS databases, etc. The token acquisition process is the same except you have to change the resource (or audience) in the query of the call.
 
-- Acquire a token for the Key Vault service
+- Acquire a token for the Key Vault service with resource set to `https://vault.azure.net` in the query
 
     ```shell
     challengeTokenPath=$(curl -s -D - -H Metadata:true "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fvault.azure.net" | grep Www-Authenticate | cut -d "=" -f 2 | tr -d "[:cntrl:]")
@@ -319,7 +319,8 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
     vaultToken=$(curl -s -H Metadata:true -H "Authorization: Basic $challengeToken" "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fvault.azure.net" | jq -r .access_token)
     ```
 
-    > Note that the resource is set to `https://vault.azure.net` in the query.
+    ![Screenshot showing the command output](./17.png)
+
 
 - Query the secret's value
 
@@ -327,20 +328,20 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
     curl -sSL -X GET -H "Authorization: Bearer $vaultToken" -H "Content-Type: application/json" https://$name.vault.azure.net/secrets/scenario/?api-version=7.2 | jq .
     ```
 
-    ![Screenshot showing the command output](./17.png)
+    ![Screenshot showing the command output](./18.png)
 
-- Read into a Bash variable
+- Set a variable to the secret's value
 
     ```shell
     secret=$(curl -sSL -X GET -H "Authorization: Bearer $vaultToken" -H "Content-Type: application/json" https://$name.vault.azure.net/secrets/scenario/?api-version=7.2 | jq -r .value)
     echo "$secret"
     ```
 
-    ![Screenshot showing the command output](./18.png)
+    ![Screenshot showing the command output](./19.png)
 
 ## Uploading a file to Azure Storage Account blob service
 
-- Acquire the token
+- Acquire the token with resource set to `https://storage.azure.com`
 
     ```shell
     challengeTokenPath=$(curl -s -D - -H Metadata:true "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fstorage.azure.com" | grep Www-Authenticate | cut -d "=" -f 2 | tr -d "[:cntrl:]")
@@ -348,9 +349,9 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
     storageToken=$(curl -s -H Metadata:true -H "Authorization: Basic $challengeToken" "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fstorage.azure.com" | jq -r .access_token)
     ```
 
-    > Note that the resource is set to `https://storage.azure.com` in the query.
+    ![Screenshot showing the command output](./20.png)
 
-- Create a container named `uploads`.
+- Create a container named `uploads`
 
     ```shell
     curl -X PUT -d "" -H "Authorization: Bearer $storageToken" -H "x-ms-version: 2020-10-02" https://$name.blob.core.windows.net/uploads?restype=container
@@ -364,17 +365,19 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
 
     The `-i` (or `--include`) displays the headers in the response including the md5sum.
 
-    ![Screenshot showing the command output](./19.png)
+    ![Screenshot showing the command output](./21.png)
 
 - Check the blob in the Azure portal
 
-  ![Successful upload](./20.png)
+  ![Successful upload](./22.png)
 
   The managed identity on the Azure Arc-enabled server has successfully uploaded a file to an Azure Storage account.
 
 ## Clean up environment
 
-- If you created the resource group, key vault, and storage account using the example pre-requisite commands then you can delete the whole resource group in the portal.
+- Delete the _arc_managed_identity_scenario_ resource group in the portal.
+
+  ![Successful upload](./23.png)
 
 - To remove the Ubuntu virtual machines from each environment by following the teardown instructions from each guide.
 
