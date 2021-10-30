@@ -52,7 +52,7 @@ In this guide you will use Bash commands and REST API calls to:
 
 ## Azure Key Vault and Azure Storage account
 
-The scenario will demonstrate how to integrate with Azure services by accessing a secret in an Azure Key Vault and uploading a blob to an Azure Storage account.
+This scenario will demonstrate how to integrate with Azure services by accessing a secret in an Azure Key Vault and uploading a blob to an Azure Storage account.
 
 Login to your Azure account to run the commands. (This can also be done in [Azure Cloud Shell](https://shell.azure.com/bash).)
 
