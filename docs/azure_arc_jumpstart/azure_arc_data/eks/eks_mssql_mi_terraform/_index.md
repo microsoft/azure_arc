@@ -77,6 +77,17 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
+* Follow the steps [here](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/custom-locations#enable-custom-locations-on-cluster) or run the command below to retrieve your AAD Tenant Specific ObjectID for the "Custom Locations RP" Enterprise Application needed to onboard Custom Locations on EKS:
+  
+  ```shell
+  # Note that the APPLICATION ID: bc313c14-388c-4e7d-a58e-70017303ee3b is constant across all tenants
+  az ad sp show --id 'bc313c14-388c-4e7d-a58e-70017303ee3b' --query objectId -o tsv
+
+  # 51dfe1e8-70c6-4de5-a08e-e18aff23d815 <-- This is the OBJECT ID specific to Microsoft's AAD Tenant
+  # This output will be different for your tenant - use this
+
+  ```
+
 ## Create a new AWS IAM Role & Key
 
 Create AWS User IAM Key. An access key grants programmatic access to your resources which we will be using later on in this guide.
@@ -188,6 +199,7 @@ As mentioned, the Terraform plan will deploy an EKS cluster, the Azure Arc Data 
   * *export TF_VAR_SPN_CLIENT_ID*='Your Azure service principal name'
   * *export TF_VAR_SPN_CLIENT_SECRET*='Your Azure service principal password'
   * *export TF_VAR_SPN_TENANT_ID*='Your Azure tenant ID'
+  * *export TF_VAR_CUSTOM_LOCATION_OID*='Your AAD tenant specific Custom Locations RP Object ID'
   * *export TF_VAR_SPN_AUTHORITY*=*https://login.microsoftonline.com* **Do not change**
   * *export TF_VAR_deploy_SQLMI*=*'Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we set to true’
   * *export TF_VAR_deploy_PostgreSQL*=*'Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this scenario we set to false'
