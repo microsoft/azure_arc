@@ -72,7 +72,7 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
 
   ![Screenshot showing resource group being created](./02.png)
 
-* Create a unique name for the FQDNs
+- Create a unique name for the FQDNs
 
   The fully qualified domain names must be globally unique.
 
