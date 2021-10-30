@@ -107,6 +107,12 @@ variable "SPN_TENANT_ID" {
   type        = string
 }
 
+variable "CUSTOM_LOCATION_OID" {
+  description = "Your AAD tenant specific Custom Locations RP Object ID"
+  type        = string
+}
+
+
 variable "SPN_AUTHORITY" {
   description = "The Service Principal authority - i.e. https://login.microsoftonline.com"
   type        = string
