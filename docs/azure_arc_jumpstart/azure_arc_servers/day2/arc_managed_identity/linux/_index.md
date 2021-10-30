@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Ubuntu"
-linkTitle: "Ubuntu"
+title: "Managed Identity with Ubuntu server"
+linkTitle: "Managed Identity with Ubuntu server"
 weight: 1
 description: >
 ---
