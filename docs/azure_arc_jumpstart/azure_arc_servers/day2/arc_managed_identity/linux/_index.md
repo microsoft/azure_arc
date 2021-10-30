@@ -277,17 +277,16 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
     ```
     ![Screenshot showing the command output](./13.png)
 
-1. Access the identity endpoint to acquire the resource token
+- Access the identity endpoint to acquire the resource token
 
     ```shell
     token=$(curl -s -H Metadata:true -H "Authorization: Basic $challengeToken" "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fmanagement.azure.com" | jq -r .access_token)
     ```
 
-    Note the resource value in the query and the challenge token in the header.
+    Note the resource value in the query and the challenge token in the header and that the resulting token is valid for 24 hours.
 
     ![Screenshot showing the command output](./14.png)
 
-    The resulting token is valid for 24 hours.
 
 ## JWT Token
 
