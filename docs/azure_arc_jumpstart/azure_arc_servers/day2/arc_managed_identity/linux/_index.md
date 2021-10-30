@@ -42,9 +42,9 @@ In this guide you will use Bash commands and REST API calls to:
 
     ![Screenshot showing the tagged Azure Arc-enabled server](./01.png)
 
-* jq and curl
+* *jq* and *curl*
 
-    SSH on to the Ubuntu server and install the jq and curl packages.
+    SSH on to the Ubuntu server and install the _jq_ and _curl_ packages.
 
     ```shell
     sudo apt-get update && sudo apt-get install -y jq curl
