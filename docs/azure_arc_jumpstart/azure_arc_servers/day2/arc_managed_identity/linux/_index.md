@@ -243,7 +243,7 @@ The HIMDS endpoint provides information about the onboarded server (e.g. subscri
 
 - Working with tags and _jq_
 
-    The example commands below display the tags and then set a variable to a tag's value.
+    The example commands below display the tags and then set a variable using a tag's value.
 
     ```shell
     jq .compute.tags <<< $imds
