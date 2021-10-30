@@ -270,14 +270,11 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
 
     The file is created in a path that only the root and HIMDS IDs can access.
 
-1. Read the content of the file into a variable
+- Read the content of the file into a variable. The challenge token files may only be used once and are automatically removed.
 
     ```shell
     challengeToken=$(sudo cat $challengeTokenPath)
     ```
-
-    The challenge token files may only be used once and are automatically removed.
-
     ![Screenshot showing the command output](./13.png)
 
 1. Access the identity endpoint to acquire the resource token
