@@ -134,7 +134,7 @@ By default, the managed identity on an Azure Arc-enabled server will have no acc
   ![Screenshot showing the assigned Reader role](./07.png)
 
 
-* Add an access policy to the key vault
+- Add an access policy to the Azure Key Vault
 
     ```shell
     az keyvault set-policy --name $name --object-id $objectId --secret-permissions get list
