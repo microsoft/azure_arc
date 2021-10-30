@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Use Managed Identity on an Azure Arc-enabled server
+## Using Managed Identity on Azure Arc-enabled servers
 
 The following README will guide you on how to work with the Hybrid Instance Metadata Service on an Azure Arc-enabled server, and authenticate the system assigned Managed Identity against Azure APIs.
 
