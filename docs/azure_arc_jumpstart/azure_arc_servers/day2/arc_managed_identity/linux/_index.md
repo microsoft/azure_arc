@@ -258,7 +258,7 @@ The HIMDS endpoint provides information about the onboarded server (e.g. subscri
 
 The token process for an onboarded Azure Arc-enabled server is multi-step.
 
-1. Access the identity endpoint to create a challenge token
+- Access the identity endpoint to create a challenge token
 
     ```shell
     challengeTokenPath=$(curl -s -D - -H Metadata:true "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fmanagement.azure.com" | grep Www-Authenticate | cut -d "=" -f 2 | tr -d "[:cntrl:]")
