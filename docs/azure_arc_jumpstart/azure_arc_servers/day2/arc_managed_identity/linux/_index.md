@@ -118,9 +118,7 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
 
 By default, the managed identity on an Azure Arc-enabled server will have no access to Azure resources. The steps below will show how to use standard RBAC assignments to give the required access.
 
-* Get the Managed Identity's object ID
-
-    Change the `--name` and `--resource-group` values to the correct values for your onboarded Ubuntu VM.
+- Get the Managed Identity's object ID. Use the below command to output the object ID to a parameter by changing the `--name` and `--resource-group` values to the correct values for your onboarded Ubuntu Azure Arc-enabled server.
 
     ```shell
     objectId=$(az connectedmachine show --name my_ubuntu_vm --resource-group my_resource_group --query identity.principalId --output tsv)
