@@ -149,7 +149,7 @@ By default, the managed identity on an Azure Arc-enabled server will have no acc
     saId=$(az storage account show --name $name --resource-group $rg --query id --output tsv)
     ```
 
-* Add the Storage Blob Data Contributor role to the storage account
+- Add the Storage Blob Data Contributor role to the storage account
 
     ```shell
     az role assignment create --assignee $objectId --role "Storage Blob Data Contributor" --scope $saId
