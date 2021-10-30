@@ -321,7 +321,7 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
 
     > Note that the resource is set to `https://vault.azure.net` in the query.
 
-* Query the secret's value
+- Query the secret's value
 
     ```shell
     curl -sSL -X GET -H "Authorization: Bearer $vaultToken" -H "Content-Type: application/json" https://$name.vault.azure.net/secrets/scenario/?api-version=7.2 | jq .
