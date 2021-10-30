@@ -169,7 +169,7 @@ Below are the endpoints for comparison:
 | IMDS | `http://169.254.169.254` | `http://169.254.169.254/metadata/identity/oauth2/token`
 | HIMDS | `http://localhost:40342` | `http://localhost:40342/metadata/identity/oauth2/token`
 
-The HIMDS endpoint provides information about the onboarded server (e.g. subscription, resource group, tags etc.) as well as an endpoint to acquire the Managed Identity's authentication tokens.
+The HIMDS endpoint provides information about the onboarded server (e.g. subscription, resource group, tags, etc.) as well as an endpoint to acquire the Managed Identity's authentication tokens.
 
 * SSH on to your Ubuntu server
 
