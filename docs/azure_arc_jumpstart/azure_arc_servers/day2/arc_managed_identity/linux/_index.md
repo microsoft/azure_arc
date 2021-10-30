@@ -374,7 +374,7 @@ The token acquisition process is the same except you have to change the resource
 
     ![Screenshot showing the command output](./19.png)
 
-* Check the blob in the portal
+- Check the blob in the Azure portal
 
   ![Successful upload](./20.png)
 
