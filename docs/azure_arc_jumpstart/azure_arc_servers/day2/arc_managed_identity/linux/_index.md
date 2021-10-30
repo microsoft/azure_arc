@@ -56,7 +56,7 @@ This scenario will demonstrate how to integrate with Azure services by accessing
 
 Login to your Azure account to run the commands. (This can also be done in [Azure Cloud Shell](https://shell.azure.com/bash).)
 
-* Set variables
+- Set variables
 
   ```shell
   rg=arc_managed_identity_scenario
