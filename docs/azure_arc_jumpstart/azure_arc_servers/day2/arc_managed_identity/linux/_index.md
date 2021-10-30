@@ -374,7 +374,7 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
 
 ## Clean up environment
 
-* If you created the resource group, key vault and storage account using the example pre-requisite commands then you can delete the whole resource group in the portal.
+- If you created the resource group, key vault, and storage account using the example pre-requisite commands then you can delete the whole resource group in the portal.
 
 - To remove the Ubuntu virtual machines from each environment by following the teardown instructions from each guide.
 
