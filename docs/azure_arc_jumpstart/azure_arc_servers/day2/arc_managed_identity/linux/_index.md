@@ -156,7 +156,7 @@ By default, the managed identity on an Azure Arc-enabled server will have no acc
     ```
   ![Screenshot showing the Azure Storage account role assignments](./09.png)
 
-The onboarded Ubuntu VM's managed identity now has sufficient access to complete the lab.
+  The onboarded Ubuntu Azure Arc-enabled server managed identity now has sufficient access to complete the lab.
 
 ## Hybrid Instance Metadata Service
 
