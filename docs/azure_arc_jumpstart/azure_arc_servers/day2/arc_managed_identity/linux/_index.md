@@ -296,9 +296,7 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
 
 ## Accessing the ARM REST API
 
-* List out the tags used in the subscription
-
-    This command is purely to demonstrate that the Azure Resource Manager API can be accessed by the trusted compute.
+- List out the tags used in the subscription. The below command demonstrates that the Azure Resource Manager API can be accessed by a trusted computer.
 
     ```shell
     curl -sSL -X GET -H "Authorization: Bearer $token" -H "Content-Type: application/json" https://management.azure.com/subscriptions/$subscriptionId/tagNames?api-version=2021-04-01 | jq .value[].tagName
