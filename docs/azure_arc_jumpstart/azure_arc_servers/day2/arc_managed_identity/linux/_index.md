@@ -311,7 +311,7 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
 
 You will access other endpoints when using PaaS services such as Azure Key Vault, Azure Storage Account, Azure PaaS databases, etc. The token acquisition process is the same except you have to change the resource (or audience) in the query of the call.
 
-* Acquire a token for the Key Vault service
+- Acquire a token for the Key Vault service
 
     ```shell
     challengeTokenPath=$(curl -s -D - -H Metadata:true "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fvault.azure.net" | grep Www-Authenticate | cut -d "=" -f 2 | tr -d "[:cntrl:]")
