@@ -171,11 +171,11 @@ Below are the endpoints for comparison:
 
 The HIMDS endpoint provides information about the onboarded server (e.g. subscription, resource group, tags, etc.) as well as an endpoint to acquire the Managed Identity's authentication tokens.
 
-* SSH on to your Ubuntu server
+- SSH on to your Ubuntu server
 
    From this point onwards the scenario will be working purely on the Ubuntu server that you have onboarded.
 
-* Access the HIMDS endpoint
+- Access the HIMDS endpoint
 
     ```shell
     curl -sSL -H Metadata:true http://localhost:40342/metadata/instance?api-version=2020-06-01 | jq .
