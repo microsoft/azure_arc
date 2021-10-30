@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Using Managed Identity on Azure Arc-enabled servers
+## Using Managed Identity on an Ubuntu Azure Arc-enabled server
 
 The following README will guide you on how to work with the Hybrid Instance Metadata Service on an Azure Arc-enabled server, and authenticate the system assigned Managed Identity against Azure APIs.
 
@@ -20,15 +20,15 @@ In this guide you will use Bash commands and REST API calls to:
 
 ## Prerequisites
 
-- An onboarded Ubuntu VM or server running on-premises or other clouds connected to Azure Arc
+- An onboarded Ubuntu server running on-premises or other clouds connected to Azure Arc
 
     If you haven't, this repository offers you a way to do so in an automated fashion:
 
-    - **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
-    - **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
-    - **[Azure Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/)**
-    - **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/)**
-    - **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)**
+  - **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
+  - **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
+  - **[Azure Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/)**
+  - **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/)**
+  - **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)**
 
 - Tagging
 
@@ -42,7 +42,7 @@ In this guide you will use Bash commands and REST API calls to:
 
     ![Screenshot showing the tagged Azure Arc-enabled server](./01.png)
 
-* *jq* and *curl*
+- *jq* and *curl*
 
     SSH on to the Ubuntu server and install the _jq_ and _curl_ packages.
 
@@ -103,7 +103,6 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
 
     ![Screenshot showing the Azure Key Vault creation](./05.png)
 
-
 - Create an example secret.
 
     ```shell
@@ -133,7 +132,6 @@ By default, the managed identity on an Azure Arc-enabled server will have no acc
 
   ![Screenshot showing the assigned Reader role](./07.png)
 
-
 - Add an access policy to the Azure Key Vault
 
     ```shell
@@ -141,7 +139,6 @@ By default, the managed identity on an Azure Arc-enabled server will have no acc
     ```
 
   ![Screenshot showing the access policy](./08.png)
-
 
 - Get the storage account's resource ID
 
@@ -154,13 +151,14 @@ By default, the managed identity on an Azure Arc-enabled server will have no acc
     ```shell
     az role assignment create --assignee $objectId --role "Storage Blob Data Contributor" --scope $saId
     ```
+
   ![Screenshot showing the Azure Storage account role assignments](./09.png)
 
   The onboarded Ubuntu Azure Arc-enabled server managed identity now has sufficient access to complete the lab.
 
 ## Hybrid Instance Metadata Service
 
-The Hybrid Instance Metedata Service (HIMDS) is the hybrid counterpart to the [IMDS](https://docs.microsoft.com/azure/virtual-machines/linux/instance-metadata-service?tabs=linux) endpoint.
+The Hybrid Instance Metadata Service (HIMDS) is the hybrid counterpart to the [IMDS](https://docs.microsoft.com/azure/virtual-machines/linux/instance-metadata-service?tabs=linux) endpoint.
 
 Below are the endpoints for comparison:
 
@@ -275,6 +273,7 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
     ```shell
     challengeToken=$(sudo cat $challengeTokenPath)
     ```
+
     ![Screenshot showing the command output](./13.png)
 
 - Access the identity endpoint to acquire the resource token
@@ -286,7 +285,6 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
     Note the resource value in the query and the challenge token in the header and that the resulting token is valid for 24 hours.
 
     ![Screenshot showing the command output](./14.png)
-
 
 ## JWT Token
 
@@ -304,7 +302,6 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
 
     ![Screenshot showing the command output](./16.png)
 
-
     The above REST API call will fail if you have not assigned the _Reader_ role to the subscription scope for the managed identity.
 
 ## Accessing Key Vault secrets
@@ -320,7 +317,6 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
     ```
 
     ![Screenshot showing the command output](./17.png)
-
 
 - Query the secret's value
 
@@ -371,7 +367,6 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
 
   ![Successful upload](./22.png)
 
-
 ## Clean up environment
 
 - Delete the _arc_managed_identity_scenario_ resource group in the portal.
@@ -380,8 +375,8 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
 
 - To remove the Ubuntu virtual machines from each environment by following the teardown instructions from each guide.
 
-    - **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
-    - **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
-    - **[Azure Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/)**
-    - **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/)**
-    - **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)**
+  - **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
+  - **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
+  - **[Azure Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure/azure_arm_template_linux/)**
+  - **[VMware vSphere Ubuntu VM](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/)**
+  - **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)**
