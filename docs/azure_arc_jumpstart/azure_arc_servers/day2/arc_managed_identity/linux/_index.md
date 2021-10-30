@@ -63,7 +63,7 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
   loc=westeurope
   ```
 
-* Create the resource group
+- Create an Azure resource group
 
   ```shell
   az group create --name $rg --location $loc
