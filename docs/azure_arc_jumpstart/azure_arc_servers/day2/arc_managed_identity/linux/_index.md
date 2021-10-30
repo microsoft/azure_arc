@@ -356,7 +356,7 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
     curl -X PUT -d "" -H "Authorization: Bearer $storageToken" -H "x-ms-version: 2020-10-02" https://$name.blob.core.windows.net/uploads?restype=container
     ```
 
-* Upload a file
+- Upload a file
 
     ```shell
     curl -i -X PUT -H "Authorization: Bearer $storageToken" -H "x-ms-blob-type: BlockBlob" -H "x-ms-version: 2020-10-02" --data-binary @/etc/hosts https://$name.blob.core.windows.net/uploads/hosts.txt
