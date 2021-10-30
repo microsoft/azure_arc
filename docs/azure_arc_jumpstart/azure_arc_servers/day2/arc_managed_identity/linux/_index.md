@@ -110,9 +110,9 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
   az keyvault secret set --vault-name $name --name scenario --value "Managed Identity"
   ```
 
-  ![Screenshot showing the created secret](./06.png)
-
-  This is just an example. Your secrets are more likely to be passwords, database connection strings etc.
+      The below image represents a secret example. In your environment, secrets are more likely to be passwords, database connection strings, etc.
+  
+      ![Screenshot showing the created secret](./06.png)
 
 ## Add RBAC role assignments for the managed identity
 
