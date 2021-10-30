@@ -95,7 +95,7 @@ Login to your Azure account to run the commands. (This can also be done in [Azur
 
   ![Screenshot showing the storage account creation](./04.png)
 
-* Create an Azure Key Vault
+- Create an Azure Key Vault
 
   ```shell
   az keyvault create --name $name --retention-days 7 --resource-group $rg --location $loc
