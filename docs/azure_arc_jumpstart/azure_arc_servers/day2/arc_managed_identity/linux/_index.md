@@ -329,7 +329,7 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
 
     ![Screenshot showing the command output](./17.png)
 
-* Read into a Bash variable
+- Read into a Bash variable
 
     ```shell
     secret=$(curl -sSL -X GET -H "Authorization: Bearer $vaultToken" -H "Content-Type: application/json" https://$name.vault.azure.net/secrets/scenario/?api-version=7.2 | jq -r .value)
