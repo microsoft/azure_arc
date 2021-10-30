@@ -243,7 +243,7 @@ The HIMDS endpoint provides information about the onboarded server (e.g. subscri
 
   ![Screenshot showing the command output](./10.png)
 
-* Working with tags and jq
+- Working with tags and _jq_
 
     The examples below show the tags and tags list and then pulls the value for a tag called platform.
 
