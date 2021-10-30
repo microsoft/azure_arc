@@ -126,7 +126,7 @@ By default, the managed identity on an Azure Arc-enabled server will have no acc
     objectId=$(az connectedmachine show --name my_ubuntu_vm --resource-group my_resource_group --query identity.principalId --output tsv)
     ```
 
-* Add the Reader role to the subscription scope
+- Add the Reader role to the subscription scope
 
     ```shell
     subscriptionScope=/subscriptions/$(az account show --query id --output tsv)
