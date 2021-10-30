@@ -230,9 +230,7 @@ The HIMDS endpoint provides information about the onboarded server (e.g. subscri
     }
     ```
 
-* Use values from the HIMDS
-
-    Example commands to set variables:
+- Use values from the HIMDS. Below is an example commands to set variables:
 
     ```shell
     imds=$(curl -sSL -H Metadata:true http://localhost:40342/metadata/instance?api-version=2020-06-01)
