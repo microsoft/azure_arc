@@ -305,7 +305,7 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
     ![Screenshot showing the command output](./16.png)
 
 
-    This REST API call will fail if you have not assigned the Reader role to the subscription scope for the managed identity.
+    The above REST API call will fail if you have not assigned the _Reader_ role to the subscription scope for the managed identity.
 
 ## Accessing Key Vault secrets
 
