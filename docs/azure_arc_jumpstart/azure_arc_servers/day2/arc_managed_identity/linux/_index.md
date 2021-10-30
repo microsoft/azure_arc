@@ -143,7 +143,7 @@ By default, the managed identity on an Azure Arc-enabled server will have no acc
   ![Screenshot showing the access policy](./08.png)
 
 
-* Get the storage account's resource ID
+- Get the storage account's resource ID
 
     ```shell
     saId=$(az storage account show --name $name --resource-group $rg --query id --output tsv)
