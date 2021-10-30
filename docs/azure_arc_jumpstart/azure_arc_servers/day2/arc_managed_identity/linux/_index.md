@@ -367,11 +367,10 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
 
     ![Screenshot showing the command output](./21.png)
 
-- Check the blob in the Azure portal
+- Check the blob in the Azure portal. Notice how the managed identity on the Azure Arc-enabled server has successfully uploaded a file to an Azure Storage account.
 
   ![Successful upload](./22.png)
 
-  The managed identity on the Azure Arc-enabled server has successfully uploaded a file to an Azure Storage account.
 
 ## Clean up environment
 
