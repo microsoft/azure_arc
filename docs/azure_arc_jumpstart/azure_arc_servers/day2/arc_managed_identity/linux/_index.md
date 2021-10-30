@@ -290,9 +290,9 @@ The token process for an onboarded Azure Arc-enabled server is multi-step.
 
 ## JWT Token
 
-* The resulting token may be pasted into <https://jwt.ms> to decode it and view the claims.
+- The resulting token may be pasted into <https://jwt.ms> to decode it and view the claims.
 
-  ![https://jwt.ms](./15.png#bordered)
+  ![https://jwt.ms](./15.png)
 
 ## Accessing the ARM REST API
 
