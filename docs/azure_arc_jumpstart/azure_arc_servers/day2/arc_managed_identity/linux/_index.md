@@ -340,7 +340,7 @@ You will access other endpoints when using PaaS services such as Azure Key Vault
 
 ## Uploading a file to Azure Storage Account blob service
 
-* Acquire the token
+- Acquire the token
 
     ```shell
     challengeTokenPath=$(curl -s -D - -H Metadata:true "http://127.0.0.1:40342/metadata/identity/oauth2/token?api-version=2019-11-01&resource=https%3A%2F%2Fstorage.azure.com" | grep Www-Authenticate | cut -d "=" -f 2 | tr -d "[:cntrl:]")
