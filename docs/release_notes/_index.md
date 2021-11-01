@@ -9,6 +9,48 @@ weight: 3
 
 **Release notes will be released on the first week of each month and will cover the previous month.**
 
+## October 2021
+
+### Release highlights and general Jumpstart enhancements
+
+* New Azure Arc-enabled servers scenario
+
+* New Azure Arc-enabled app service scenario
+
+* Updating all scenarios with Azure CLI version to 2.25.0 or higher prerequisite
+
+* Reliability bugs and docs fixes
+
+### Azure Arc-enabled servers scenarios
+
+* [New Scenario: Using Managed Identity on an Ubuntu Azure Arc-enabled server](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_managed_identity/linux/)
+
+* [Bug fix: Broken VHD blob link in Azure Arc-enabled servers for HCI scenario #802](https://github.com/microsoft/azure_arc/issues/802)
+
+### Azure Arc-enabled Kubernetes scenarios
+
+* [Bug fix: The GKE basic gitops scenario screenshots to not match the actual deployments #783](https://github.com/microsoft/azure_arc/issues/783)
+
+* [Bug fix: k3s Azure ARM template - hardcoded iod #785](https://github.com/microsoft/azure_arc/issues/785)
+
+* [Bug fix: EKS K8s onboarding scenario - environment variables mapping to Terraform variables need to be prefixed with TF_VAR #792](https://github.com/microsoft/azure_arc/issues/792)
+
+* [Bug fix: gitops scenario uses helm even in "basic" scenario #814](https://github.com/microsoft/azure_arc/issues/814)
+
+### Azure Arc-enabled data services scenarios
+
+* [Bug fix: PostgreSQL Hyperscale ARM Template failing #765](https://github.com/microsoft/azure_arc/issues/765)
+
+* [Bug fix: az cli 2.25 bump](https://github.com/microsoft/azure_arc/issues/805)
+
+### Azure Arc-enabled app service
+
+* [New Scenario: Deploy an Azure API Management gateway on Cluster API (CAPI) using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/apimgmt_arm_template/)
+
+### Jumpstart ArcBox
+
+* [Bug fix: Azure ArcBox fail to deploy because of bad dependencies between nested templates #809](https://github.com/microsoft/azure_arc/issues/809)
+
 ## September 2021
 
 ### Release highlights and general Jumpstart enhancements
