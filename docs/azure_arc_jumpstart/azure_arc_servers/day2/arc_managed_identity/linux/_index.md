@@ -33,10 +33,9 @@ In this guide you will use Bash commands and REST API calls to:
 - Tagging
 
     Add a tag to your Azure Arc-enabled server.
-
-    | Tag | Value |
-    |---|---|
-    | scenario | Managed Identity |
+    
+    - Tag: **scenario**
+    - Value: **Managed Identity**
 
     The tag will be seen later in the guide when accessing the Hybrid Instance Metadata Service.
 
@@ -162,10 +161,14 @@ The Hybrid Instance Metadata Service (HIMDS) is the hybrid counterpart to the [I
 
 Below are the endpoints for comparison:
 
-| Service | IMDS_ENDPOINT | IDENTITY_ENDPOINT |
-|---|---|---|
-| IMDS | `http://169.254.169.254` | `http://169.254.169.254/metadata/identity/oauth2/token`
-| HIMDS | `http://localhost:40342` | `http://localhost:40342/metadata/identity/oauth2/token`
+- Instance Metadata Service (IMDS)
+    - Availability: Azure virtual machines, Azure containers (AKS/ACI)
+    - IMDS_ENDPOINT:  `http://169.254.169.254`
+    - IDENTITY_ENDPOINT: `http://169.254.169.254/metadata/identity/oauth2/token`
+- Hybrid Instance Metadata Service (IMDS)
+    - Availability: Azure Arc-enabled servers
+    - IMDS_ENDPOINT:  `http://localhost:40342`
+    - IDENTITY_ENDPOINT: `http://localhost:40342/metadata/identity/oauth2/token`
 
 The HIMDS endpoint provides information about the onboarded server (e.g. subscription, resource group, tags, etc.) as well as an endpoint to acquire the Managed Identity's authentication tokens.
 
