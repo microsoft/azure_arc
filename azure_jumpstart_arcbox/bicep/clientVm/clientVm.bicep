@@ -37,7 +37,7 @@ param spnClientId string
 @description('Client secret of the service principal')
 @secure()
 param spnClientSecret string
-param spnAuthority string = 'https://login.microsoftonline.com'
+param spnAuthority string = environment().authentication.loginEndpoint
 
 @description('Tenant id of the service principal')
 param spnTenantId string
