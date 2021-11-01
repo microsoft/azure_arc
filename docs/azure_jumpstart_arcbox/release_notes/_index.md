@@ -13,6 +13,7 @@ Release notes will be released on the first week of each month and will cover th
 
 * Update required Azure CLI version to 2.25.0 or higher
 * Fix missing dependencies in ARM templates
+* Documentation revisions
 
 ## September 2021
 
