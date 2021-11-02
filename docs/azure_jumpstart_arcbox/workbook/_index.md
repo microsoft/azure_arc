@@ -178,6 +178,36 @@ Once configured, the report will provide an overview of the secure score, you ca
 
      ![Resources changed overtime selected resources](./security_changes_resource.png)
 
+This part of the workbook also includes a section dedicated to agent monitoring. For Azure Defender to be able to monitor an Azure Arc enabled-servers certain configurations have to be in place and the workbook will help visualize machines that may not be properly reporting to the Log Analytics workspace.
+
+In the parameters section select the Log Analytics workspace used by ArcBox.
+
+   ![Resources changed overtime](./agentmgmt_parameters.png)
+
+From within the Agent Monitoring section you will get several tabs:
+
+* _Overview_ - with three visualizations:
+
+  * _Log Analytics Agent installation status_ shows the Log Analytics Agent installation status as reported by Azure Security Center.
+
+     ![Log Analytics Agent installation status](./agentmgmt_overviewstatus.png)
+
+  * _Log Analytics Agent reporting status_ shows the current Log Analytics Agent reporting status of the Azure Arc-enabled servers. Machines that are sending current heartbeat information within the last 15 minutes are considered as currently reporting.
+
+     ![Log Analytics Agent reporting status](./agentmgmt_overviewsreport.png)
+
+  * _Azure Defender coverage_ shows the status of Azure Defender for Servers across all servers that are protected by Azure Security Center.
+
+     ![Azure Defender coverage](./agentmgmt_overviewscoverage.png)
+
+* _Machines not reporting to Log Analytics workspace_ - this has four lists of machines that are not sending heartbeats to the Log Analytics workspace in different periods of time: 15 minutes, 24 hours, 48 hours and 7 days. Please not that there are no machines listed on the image as all of them are properly sending heartbeats to the workspace.
+
+   ![Machines not reporting](./agentmgmt_machinesnotreport.png)
+
+* _Security status_ - has a full report of Azure VMs and Azure Arc enabled-servers security configurations including its Log Analytics workspace and the agent status.
+
+   ![Security Status](./agentmgmt_securitystatus.png)
+
 ### Change Tracking
 
 Change Tracking in Azure Automation keeps track of the changes in virtual machines hosted in Azure, on-premises, and other cloud environments to help you pinpoint operational and environmental issues with software managed by the Distribution Package Manager.
@@ -198,9 +228,9 @@ The tab has two different sections:
 
 ### Update Management
 
-Azure Automation provides Update Management to take care of the operating system updates for Windows and Linux  Azure VMs or Azure Arc-enabled servers. 
+Azure Automation provides Update Management to take care of the operating system updates for Windows and Linux  Azure VMs or Azure Arc-enabled servers.
 
-The solution assesses the status of available updates and manages the process of installing required updates for your machines reporting to Update Management. In ArcBox, all of the Azure Arc-enabled servers are onboarded onto Update Management with the "Update Management" tab of the Jumpstart Workbook shows insights from Azure Automation. 
+The solution assesses the status of available updates and manages the process of installing required updates for your machines reporting to Update Management. In ArcBox, all of the Azure Arc-enabled servers are onboarded onto Update Management with the "Update Management" tab of the Jumpstart Workbook shows insights from Azure Automation.
 
 To use this report you need to provide ArcBox's subscription, resource group, and Log Analytics workspace in the parameters section along with a time range.
 
