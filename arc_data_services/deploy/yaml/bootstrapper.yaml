@@ -58,7 +58,7 @@ spec:
       - name: arc-private-registry
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.0.0_2021-07-30
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.1.0_2021-11-02
         imagePullPolicy: Always
         resources:
           limits:
