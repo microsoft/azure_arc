@@ -5,8 +5,6 @@ sudo ufw --force enable
 sudo ufw deny out from any to 169.254.169.254
 sudo ufw default allow incoming
 
-sudo apt-get update
-
 # Download the installation package
 wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh # 2>/dev/null
 
