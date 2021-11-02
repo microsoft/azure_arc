@@ -5,26 +5,27 @@ linkTitle: "Jumpstart ArcBox"
 weight: 3
 ---
 
-## Jumpstart ArcBox - Overview
+## Jumpstart ArcBox "Full" Edition - Overview
 
 ArcBox is a solution that provides an easy to deploy sandbox for all things Azure Arc. ArcBox is designed to be completely self-contained within a single Azure subscription and resource group, which will make it easy for a user to get hands-on with all available Azure Arc technology with nothing more than an available Azure subscription.
 
+![ArcBox architecture diagram](./arch_full.png)
+
 ### Use cases
 
-* Sandbox environment for getting hands-on with Azure Arc
+* Sandbox environment for getting hands-on with Azure Arc technologies
 * Accelerator for Proof-of-concepts or pilots
 * Training tool for Azure Arc skills development
 * Demo environment for customer presentations or events
 * Rapid integration testing platform
 
-<<<<<<< HEAD
 ## Azure Arc capabilities available in ArcBox
 
 ### Azure Arc-enabled servers
 
 ![ArcBox servers diagram](./servers.png)
 
-ArcBox includes three Azure Arc-enabled server resources that are hosted using nested virtualization in Azure. As part of the deployment, a Hyper-V host (ArcBox-Client) is deployed with three guest virtual machines. These machines, _ArcBoxWin_, _ArcBoxUbuntu_, and _ArcBoxSQL_ are connected as Azure Arc-enabled servers via the ArcBox automation.
+ArcBox includes five Azure Arc-enabled server resources that are hosted using nested virtualization in Azure. As part of the deployment, a Hyper-V host (ArcBox-Client) is deployed with five guest virtual machines. These machines, _ArcBox-Win2k22_, _ArcBox-Win2k19_, _ArcBox-SQL_, _ArcBox-CentOS_, and _ArcBox-Ubuntu_ are connected as Azure Arc-enabled servers via the ArcBox automation.
 
 ### Azure Arc-enabled Kubernetes
 
@@ -46,7 +47,7 @@ ArcBox deploys several management and operations services that work with ArcBox'
 
 ## ArcBox Azure Consumption Costs
 
-ArcBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxilliary services. These services generate approximately $20-30 USD per day. Note that Azure consumption costs vary depending the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Users may review cost analysis of ArcBox by using [Azure Cost Analysis](https://docs.microsoft.com/en-us/azure/cost-management-billing/costs/quick-acm-cost-analysis).
+ArcBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxilliary services. These services generate approximately $30-40 USD per day. Note that Azure consumption costs vary depending the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Users may review cost analysis of ArcBox by using [Azure Cost Analysis](https://docs.microsoft.com/en-us/azure/cost-management-billing/costs/quick-acm-cost-analysis).
 
 ## Automation flow
 
@@ -61,10 +62,12 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   * Storage account template - used for staging files in automation scripts
   * Management artifacts template - deploys Azure Log Analytics workspace and solutions and Azure Policy artifacts
 * User remotes into Client Windows VM, which automatically kicks off multiple scripts that:
-  * Deploy and configure three (3) nested virtual machines in Hyper-V
-    * Windows VM - onboarded as Azure Arc-enabled Server
-    * Ubuntu VM - onboarded as Azure Arc-enabled Server
+  * Deploy and configure five (5) nested virtual machines in Hyper-V
+    * Windows Server 2022 VM - onboarded as Azure Arc-enabled Server
+    * Windows Server 2019 VM - onboarded as Azure Arc-enabled Server
     * Windows VM running SQL Server - onboarded as Azure Arc-enabled SQL Server (as well as Azure Arc-enabled Server)
+    * Ubuntu VM - onboarded as Azure Arc-enabled Server
+    * CentOS VM - onboarded as Azure Arc-enabled server
   * Deploy and configure Azure Arc-enabled data services on the CAPI workload cluster including a data controller, a SQL MI instance, and a PostgreSQL Hyperscale cluster. After deployment, Azure Data Studio opens automatically with connection entries for each database instance. Note that the SQI MI instance and the PostgreSQL Hyperscale instance are exposed by the load balancer on non-standard ports (SQLMI/11433 and PostgreSQL/15432) Data services deployed by the script are:
     * Data controller
     * SQL MI instance
@@ -73,7 +76,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Prerequisites
 
-* ArcBox requires 52 vCPUs when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
+* ArcBox Full requires 52 DSv3-series vCPUs when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location <your location> --output table
@@ -81,7 +84,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing az vm list-usage](./azvmlistusage.png)
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -148,7 +151,7 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
 
 ## Deployment Option 1: Azure Portal
 
-* Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_jumpstart_arcbox%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
+* Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2FARM%2Fazure_jumpstart_arcbox%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
   ![Screenshot showing Azure Portal deployment of ArcBox](./portaldeploy.png)
 
@@ -174,6 +177,7 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
   * *windowsAdminPassword* - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   * *myIpAddress* - Your local IP address. This is used to allow remote RDP and SSH connections to the Client Windows VM and K3s Rancher VM.
   * *logAnalyticsWorkspaceName* - Unique name for the ArcBox log analytics workspace
+  * *flavor* - Use the value "Full" to specify that you want to deploy the complete version of ArcBox (ArcBox Full)
 
     ![Screenshot showing example parameters](./parameters.png)
 
@@ -240,7 +244,7 @@ Open the [ArcBox Azure Monitor workbook](https://azurearcjumpstart.io/azure_jump
 
 Open the [data services operations page](https://azurearcjumpstart.io/azure_jumpstart_arcbox/data_ops/) and explore various ways you can perform operations against the Azure Arc-enabled data services deployed with ArcBox.
 
-  ![Screenshot showing Grafana dashboard](./data_ops/activity1.png)
+  ![Screenshot showing Grafana dashboard](./activity1.png)
 
 ### Included tools
 
@@ -283,20 +287,17 @@ az group delete -n <name of your resource group>
 ![Screenshot showing group delete from Azure Portal](./portaldelete.png)
 
 ## Basic Troubleshooting
-=======
-### ArcBox "Flavors"
->>>>>>> 50f0bd2e7a7b32b014d7e4eed95290b1d22d5cd6
 
-ArcBox comes in multiple "flavors", or configurations, which can be selected to best suit your needs. Currently, the available flavors are:
+Occasionally deployments of ArcBox may fail at various stages. Common reasons for failed deployments include:
 
-* [ArcBox "Full"](https://azurearcjumpstart.io/azure_jumpstart_arcbox/flavors/Full)
-    As the name implies, this flavor includes all ArcBox features including Azure Arc-enabled servers, Azure Arc-enabled Kubernetes, and Azure Arc-enabled data services. Use this flavor if you want to experience everything ArcBox has to offer.
+* Invalid service principal id or service principal secret provided in _azuredeploy.parameters.json_ file.
+* Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 52 available.
+* Target Azure region does not support all required Azure services - ensure you are running ArcBox in one of the supported regions listed in the above section "ArcBox Azure Region Compatibility".
 
-    ![ArcBox architecture diagram](./arch_full.png)
+## Known issues
 
-* [ArcBox for IT Pros](https://azurearcjumpstart.io.azure_jumpstart_arcbox/flavors/ITPro)
-    ArcBox for IT Pros focuses specifically on Azure Arc-enabled servers and Azure Arc-enabled SQL Server functionality. This flavor omits anything related to Azure Arc-enabled Kubernetes or Azure Arc-enabled data services.
+* Azure Arc-enabled SQL Server assessment report not always visible in Azure Portal
 
-    ![ArcBox for IT Pros architecture diagram](./arch_itpro.png)
+* Webhook pods go into error state, even after Data Controller/SQL MI/Postgres pods are up, caused by a known Helm-related backend issue that is being worked on. These errors can be safely ignored and do not impact the functionality of Azure Arc-enabled data services and the Jumpstart automation.
 
-To get started with one of the flavors of ArcBox, click the relevant links above to view the detailed README for each flavor.
+    ![webhook known issue](https://raw.githubusercontent.com/microsoft/azure_arc/main/docs/known_issues/webhook_issue.png)

@@ -66,8 +66,8 @@ Write-Host "`n"
 kubectl get nodes
 azdata --version
 
-# Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
+Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 $connectedClusterName="ArcBox-CAPI-Data"
 az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox'
@@ -160,6 +160,11 @@ Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config-k3s"
 Move-Item -Path "C:\Users\$env:USERNAME\.kube\config_tmp" -Destination "C:\users\$env:USERNAME\.kube\config"
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 kubectx
+
+# Sending deployement status message to Azure storage account queue
+if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
+    & "C:\ArcBox\DeploymentStatus.ps1"
+}
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services 
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'

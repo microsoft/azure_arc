@@ -204,7 +204,7 @@ Set-AzContext -Subscription $subId
 # Check if machine is registered with Azure Arc for Servers
 # Register machine if necessary
 #
-$arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
+$arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername -ResourceGroupName $resourceGroup
 if ($null -eq $arcResource) {
     Write-Host "Arc for Servers resource not found. Registering the current machine now."
 
@@ -213,7 +213,7 @@ if ($null -eq $arcResource) {
     $timeout = New-TimeSpan -Seconds 30
     $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
     do {
-        $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
+        $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername -ResourceGroupName $resourceGroup
         start-sleep -seconds 10
     } while ($null -eq $arcResource -and $stopwatch.elapsed -lt $timeout)
 
