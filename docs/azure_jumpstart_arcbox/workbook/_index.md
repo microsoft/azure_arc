@@ -198,9 +198,9 @@ The tab has two different sections:
 
 ### Update Management
 
-Azure Automation provides Update Management to take care of the operating system updates for Windows and Linux  Azure VMs or Azure Arc-enabled servers. 
+Azure Automation provides Update Management to take care of the operating system updates for Windows and Linux  Azure VMs or Azure Arc-enabled servers.
 
-The solution assesses the status of available updates and manages the process of installing required updates for your machines reporting to Update Management. In ArcBox, all of the Azure Arc-enabled servers are onboarded onto Update Management with the "Update Management" tab of the Jumpstart Workbook shows insights from Azure Automation. 
+The solution assesses the status of available updates and manages the process of installing required updates for your machines reporting to Update Management. In ArcBox, all of the Azure Arc-enabled servers are onboarded onto Update Management with the "Update Management" tab of the Jumpstart Workbook shows insights from Azure Automation.
 
 To use this report you need to provide ArcBox's subscription, resource group, and Log Analytics workspace in the parameters section along with a time range.
 
