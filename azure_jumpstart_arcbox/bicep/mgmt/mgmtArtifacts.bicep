@@ -40,16 +40,16 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         addressPrefix
       ]
     }
-  }
-}
-
-resource arcSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' = {
-  name: subnetName
-  parent: arcVirtualNetwork
-  properties: {
-    addressPrefix: subnetAddressPrefix
-    privateEndpointNetworkPolicies: 'Enabled'
-    privateLinkServiceNetworkPolicies: 'Enabled'
+    subnets: [
+      {
+        name: subnetName
+        properties: {
+          addressPrefix: subnetAddressPrefix
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
+    ]
   }
 }
 
@@ -98,7 +98,7 @@ resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11
     workspaceResourceId: workspace.id
   }
   plan: {
-    name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
+    name: changeTracking.name
     promotionCode: ''
     product: 'OMSGallery/${changeTracking.galleryName}'
     publisher: 'Microsoft'
@@ -112,7 +112,7 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
     workspaceResourceId: workspace.id
   }
   plan: {
-    name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
+    name: security.name
     promotionCode: ''
     product: 'OMSGallery/${security.galleryName}'
     publisher: 'Microsoft'
@@ -149,4 +149,4 @@ module policyDeployment './policyAzureArcBuiltins.bicep' = {
 }
 
 output vnetId string = arcVirtualNetwork.id
-output subnetId string = arcSubnet.id
+output subnetId string = arcVirtualNetwork.properties.subnets[0].id
