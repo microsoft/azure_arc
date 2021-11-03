@@ -44,12 +44,12 @@ param spnTenantId string
 param azdataUsername string = 'arcdemo'
 
 @secure()
-param azdataPassword string
+param azdataPassword string = 'ArcPassword123!!'
 param acceptEula string = 'yes'
 param registryUsername string = 'registryUser'
 
 @secure()
-param registryPassword string
+param registryPassword string = 'registrySecret'
 param arcDcName string = 'arcdatactrl'
 param mssqlmiName string = 'arcsqlmidemo'
 
