@@ -22,7 +22,7 @@ param windowsAdminUsername string
 @minLength(12)
 @maxLength(123)
 @secure()
-param password string
+param windowsAdminPassword string
 
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
@@ -70,9 +70,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   name: 'clientVmDeployment'
   params: {
     windowsAdminUsername: windowsAdminUsername
-    windowsAdminPassword: password
-    azdataPassword: password
-    registryPassword: password
+    windowsAdminPassword: windowsAdminPassword
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
