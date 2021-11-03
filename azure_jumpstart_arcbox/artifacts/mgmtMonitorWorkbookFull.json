@@ -450,7 +450,7 @@
                         "crossComponentResources": [
                           "value::all"
                         ],
-                        "value": "arcbox01",
+                        "value": "<resourceGroup>",
                         "typeSettings": {
                           "additionalResourceOptions": []
                         },
@@ -467,7 +467,7 @@
                         "label": "Azure Arc Enabled Server",
                         "type": 5,
                         "isRequired": true,
-                        "value": null,
+                        "value": "ArcBox-Ubuntu",
                         "typeSettings": {
                           "additionalResourceOptions": [],
                           "showDefault": false
@@ -496,6 +496,13 @@
                     },
                     "queryType": 0,
                     "resourceType": "microsoft.hybridcompute/machines",
+                    "crossComponentResources": [
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.HybridCompute/machines/ArcBox-CentOS",
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.HybridCompute/machines/ArcBox-SQL",
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.HybridCompute/machines/ArcBox-Ubuntu",
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.HybridCompute/machines/ArcBox-Win2K19",
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.HybridCompute/machines/ArcBox-Win2K22"
+                    ],
                     "visualization": "timechart"
                   },
                   "customWidth": "50",
@@ -516,6 +523,9 @@
                     },
                     "queryType": 0,
                     "resourceType": "microsoft.operationalinsights/workspaces",
+                    "crossComponentResources": [
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                    ],
                     "visualization": "timechart"
                   },
                   "customWidth": "50",
@@ -536,7 +546,7 @@
                   "content": {
                     "version": "KqlParameterItem/1.0",
                     "crossComponentResources": [
-                      "{LoganalyticWorkspace}"
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
                     ],
                     "parameters": [
                       {
@@ -608,7 +618,7 @@
                         "label": "Subscription",
                         "type": 6,
                         "isRequired": true,
-                        "value": null,
+                        "value": "/subscriptions/<subscriptionId>",
                         "typeSettings": {
                           "additionalResourceOptions": [],
                           "includeAll": true,
@@ -630,7 +640,7 @@
                         "crossComponentResources": [
                           "{subscription}"
                         ],
-                        "value": "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/arcboxlogsdk1234",
+                        "value": "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>",
                         "typeSettings": {
                           "additionalResourceOptions": [],
                           "showDefault": false
@@ -653,7 +663,7 @@
                         "crossComponentResources": [
                           "{subscription}"
                         ],
-                        "value": "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.Kubernetes/connectedClusters/ArcBox-CAPI-Data",
+                        "value": "/subscriptions/<subscriptionId>/resourceGroups/Arc-ML-demo/providers/Microsoft.Kubernetes/connectedClusters/Arc-AML-AKS",
                         "typeSettings": {
                           "additionalResourceOptions": [],
                           "showDefault": false
@@ -855,8 +865,9 @@
                         "isRequired": true,
                         "query": "KubePodInventory\r\n{clusterIdWhereClause}\r\n{namespaceWhereClause}\r\n{workloadKindWhereClause}\r\n| distinct ControllerName\r\n| where isnotempty(ControllerName)\r\n| order by ControllerName asc",
                         "crossComponentResources": [
-                          "{LoganalyticWorkspace}"
+                          "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
                         ],
+                        "value": null,
                         "typeSettings": {
                           "additionalResourceOptions": [
                             "value::1"
@@ -864,7 +875,7 @@
                           "showDefault": false
                         },
                         "timeContext": {
-                          "durationMs": 7776000000
+                          "durationMs": 0
                         },
                         "timeContextFromParameter": "timeRange",
                         "defaultValue": "value::1",
@@ -1100,11 +1111,14 @@
                     "showAnalytics": true,
                     "title": "Azure Arc enabled kubernetes - Pod Restart Trend",
                     "timeContext": {
-                      "durationMs": 7776000000
+                      "durationMs": 0
                     },
                     "timeContextFromParameter": "timeRange",
                     "queryType": 0,
-                    "resourceType": "microsoft.operationalinsights/workspaces"
+                    "resourceType": "microsoft.operationalinsights/workspaces",
+                    "crossComponentResources": [
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                    ]
                   },
                   "customWidth": "50",
                   "showPin": true,
@@ -1123,11 +1137,14 @@
                     "showAnalytics": true,
                     "title": "Azure Arc enabled kubernetes - Container restart trend",
                     "timeContext": {
-                      "durationMs": 7776000000
+                      "durationMs": 0
                     },
                     "timeContextFromParameter": "timeRange",
                     "queryType": 0,
                     "resourceType": "microsoft.operationalinsights/workspaces",
+                    "crossComponentResources": [
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                    ],
                     "visualization": "timechart"
                   },
                   "customWidth": "50",
@@ -1216,11 +1233,14 @@
                     "showAnalytics": true,
                     "title": "Azure Arc enabled kubernetes - Container Status for Pods",
                     "timeContext": {
-                      "durationMs": 7776000000
+                      "durationMs": 0
                     },
                     "timeContextFromParameter": "timeRange",
                     "queryType": 0,
                     "resourceType": "microsoft.operationalinsights/workspaces",
+                    "crossComponentResources": [
+                      "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                    ],
                     "gridSettings": {
                       "formatters": [
                         {
@@ -1599,9 +1619,7 @@
                         "multiSelect": true,
                         "quote": "'",
                         "delimiter": ",",
-                        "value": [
-                          "/subscriptions/{Subscription}"
-                        ],
+                        "value": [],
                         "typeSettings": {
                           "additionalResourceOptions": [
                             "value::all"
@@ -2157,9 +2175,7 @@
                         "multiSelect": true,
                         "quote": "'",
                         "delimiter": ",",
-                        "value": [
-                          "/subscriptions/{Subscription}"
-                        ],
+                        "value": [],
                         "typeSettings": {
                           "additionalResourceOptions": [
                             "value::1",
