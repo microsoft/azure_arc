@@ -9,6 +9,7 @@ Write-Host "`n"
 $monitorWorkbook = "C:\ArcBox\mgmtMonitorWorkbook.json"
 (Get-Content -Path $monitorWorkbook) -replace '<subscriptionId>',$env:subscriptionId | Set-Content -Path $monitorWorkbook
 (Get-Content -Path $monitorWorkbook) -replace '<resourceGroup>',$env:resourceGroup | Set-Content -Path $monitorWorkbook
+(Get-Content -Path $monitorWorkbook) -replace '<workspaceName>',$env:workspaceName | Set-Content -Path $monitorWorkbook
 
 # Configure mgmtMonitorWorkbook.parameters.json template with workspace resource id
 $monitorWorkbookParameters = "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
