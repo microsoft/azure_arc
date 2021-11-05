@@ -73,7 +73,7 @@ Write-Host "`n"
 az connectedk8s connect --name $env:clusterName `
                         --resource-group $env:resourceGroup `
                         --location $env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_app_services' `
+                        --tags 'Project=jumpstart_azure_arc_app_services'
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
