@@ -121,8 +121,6 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of ARM template config](./11.jpg)
 
-  > **Known issue: Currently, Azure Arc-enabled data services running on AKS with a [Kubernetes version >=1.19.x is not supported](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes#known-issues). This is due to data services cannot be deployed on AKS cluster with availability zones enabled.**
-
   * *clusterName* - AKS cluster name
   * *dnsPrefix* - AKS unique DNS prefix
   * *nodeAdminUsername* - AKS Node Username

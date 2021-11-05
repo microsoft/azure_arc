@@ -261,8 +261,4 @@ When deploying Azure Arc-enabled data services, a [Grafana](https://grafana.com/
 
   ![Delete Azure resource group](./25.png)
 
-## Known Issues
-
-- Webhook pods go into error state, even after Data Controller/SQL MI/Postgres pods are up, caused by a known Helm-related backend issue that is being worked on. These errors can be safely ignored and do not impact the functionality of Azure Arc-enabled data services and the Jumpstart automation.
-
-    ![webhook known issue](https://raw.githubusercontent.com/microsoft/azure_arc/main/docs/known_issues/webhook_issue.png)
+<!-- ## Known Issues -->
