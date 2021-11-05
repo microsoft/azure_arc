@@ -73,9 +73,7 @@ Write-Host "`n"
 az connectedk8s connect --name $env:clusterName `
                         --resource-group $env:resourceGroup `
                         --location $env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_app_services' `
-                        --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
-                        # This is the Custom Locations Enterprise Application ObjectID from AAD
+                        --tags 'Project=jumpstart_azure_arc_app_services'
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
@@ -126,7 +124,7 @@ Write-Host "Deploying App Service Kubernetes Environment"
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
-$customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId  --query id -o tsv)
+$customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config" --query id -o tsv)
 az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --location $env:azureLocation --output none 
 
 Do {
