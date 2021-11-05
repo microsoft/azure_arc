@@ -68,7 +68,7 @@
             }
         },
         "apiVersion": {
-            "value": "2021-08-01"
+            "value": "2021-11-01"
         },
         "pricingTier": {
             "value": "GeneralPurpose"
