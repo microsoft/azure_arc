@@ -75,7 +75,7 @@
             ]
         },
         "apiVersion": {
-            "value": "2021-11-01"
+            "value": "2021-11-01-Preview"
         }
     }
 }
