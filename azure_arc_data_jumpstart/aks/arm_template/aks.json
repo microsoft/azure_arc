@@ -42,7 +42,7 @@
     },
     "agentVMSize": {
       "type": "string",
-      "defaultValue": "Standard_DS3_v2",
+      "defaultValue": "Standard_D8s_v3",
       "metadata": {
         "description": "The size of the Virtual Machine."
       }
