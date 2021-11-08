@@ -1674,7 +1674,7 @@
                         "queryType": 1,
                         "resourceType": "microsoft.resourcegraph/resources",
                         "value": [
-                          "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/arcboxlogsdk1234"
+                          "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
                         ]
                       }
                     ],
