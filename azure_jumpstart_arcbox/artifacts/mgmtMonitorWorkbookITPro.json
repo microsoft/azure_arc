@@ -15,7 +15,7 @@
         "description": "The gallery that the workbook will been shown under. Supported values include workbook, tsg, etc. Usually, this is 'workbook'"
       }
     },
-    "workbookSourceId": {
+    "workbookResourceId": {
       "type": "string",
       "defaultValue": "workbookresourceid-stage",
       "metadata": {
@@ -773,7 +773,7 @@
                       "queryType": 1,
                       "resourceType": "microsoft.resourcegraph/resources",
                       "value": [
-                        "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/arcboxlogsdk1234"
+                        "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
                       ]
                     }
                   ],
@@ -3615,7 +3615,7 @@
         "displayName": "[parameters('workbookDisplayName')]",
         "serializedData": "[string(variables('workbookContent'))]",
         "version": "1.0",
-        "sourceId": "[parameters('workbookSourceId')]",
+        "sourceId": "[parameters('workbookResourceId')]",
         "category": "[parameters('workbookType')]"
       }
     }
