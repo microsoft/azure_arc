@@ -69,7 +69,7 @@ Start-Sleep -Seconds 60
 # Update Service Port from 5432 to Non-Standard
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-pgsql\",\"port\":15432,\"targetPort\":5432}]}}'
 kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
-Sleep 5 # To allow the CRD to update
+Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
 Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
