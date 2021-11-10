@@ -129,19 +129,19 @@ clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-# # Building Microsoft Defender for Cloud plumbing for Cluster API
-# curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+# Building Microsoft Defender for Cloud plumbing for Cluster API
+curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
-# cat <<EOF | sudo kubectl apply -f -
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: audit
-# type: Opaque
-# data:
-#   audit.yaml: $(cat "audit.yaml" | base64 -w0)
-#   username: $(echo -n "jumpstart" | base64 -w0)
-# EOF
+cat <<EOF | sudo kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: audit
+type: Opaque
+data:
+  audit.yaml: $(cat "audit.yaml" | base64 -w0)
+  username: $(echo -n "jumpstart" | base64 -w0)
+EOF
 
 # line=$(expr $(grep -n -B 1 "extraArgs" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 5)
 # sed -i -e "$line"' i\          readOnly: true' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
@@ -166,7 +166,7 @@ clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
 # sed -i -e "$line"' i\        secret:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 # sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-# sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # # Remove port 22 from public internet exposure
 # line=$(expr $(grep -n -B 1 "vnet" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "networkSpec" | cut -f1 -d-) + 3)
