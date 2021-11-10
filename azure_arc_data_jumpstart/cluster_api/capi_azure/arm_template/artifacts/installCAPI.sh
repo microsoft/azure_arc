@@ -129,70 +129,70 @@ clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-# Building Azure Defender plumbing for Cluster API
-curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+# # Building Microsoft Defender for Cloud plumbing for Cluster API
+# curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
-cat <<EOF | sudo kubectl apply -f -
-apiVersion: v1
-kind: Secret
-metadata:
-  name: audit
-type: Opaque
-data:
-  audit.yaml: $(cat "audit.yaml" | base64 -w0)
-  username: $(echo -n "jumpstart" | base64 -w0)
-EOF
+# cat <<EOF | sudo kubectl apply -f -
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: audit
+# type: Opaque
+# data:
+#   audit.yaml: $(cat "audit.yaml" | base64 -w0)
+#   username: $(echo -n "jumpstart" | base64 -w0)
+# EOF
 
-line=$(expr $(grep -n -B 1 "extraArgs" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 5)
-sed -i -e "$line"' i\          readOnly: true' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          name: audit-policy' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          mountPath: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        - hostPath: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          name: kubeaudit' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          mountPath: /var/log/kube-apiserver' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        - hostPath: /var/log/kube-apiserver' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-line=$(expr $(grep -n -B 1 "extraArgs" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 2)
-sed -i -e "$line"' i\          audit-policy-file: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          audit-log-path: /var/log/kube-apiserver/audit.log' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          audit-log-maxsize: "100"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          audit-log-maxbackup: "10"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          audit-log-maxage: "30"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-line=$(expr $(grep -n -A 3 files: $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "control-plane" | cut -f1 -d-) + 5)
-sed -i -e "$line"' i\      permissions: "0644"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\      path: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\      owner: root:root' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          name: audit' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          key: audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        secret:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# line=$(expr $(grep -n -B 1 "extraArgs" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 5)
+# sed -i -e "$line"' i\          readOnly: true' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          name: audit-policy' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          mountPath: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        - hostPath: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          name: kubeaudit' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          mountPath: /var/log/kube-apiserver' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        - hostPath: /var/log/kube-apiserver' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# line=$(expr $(grep -n -B 1 "extraArgs" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 2)
+# sed -i -e "$line"' i\          audit-policy-file: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          audit-log-path: /var/log/kube-apiserver/audit.log' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          audit-log-maxsize: "100"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          audit-log-maxbackup: "10"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          audit-log-maxage: "30"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# line=$(expr $(grep -n -A 3 files: $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "control-plane" | cut -f1 -d-) + 5)
+# sed -i -e "$line"' i\      permissions: "0644"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\      path: /etc/kubernetes/audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\      owner: root:root' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          name: audit' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          key: audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        secret:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-# Remove port 22 from public internet exposure
-line=$(expr $(grep -n -B 1 "vnet" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "networkSpec" | cut -f1 -d-) + 3)
-sed -i -e "$line"' i\          - 10.0.2.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        role: node' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-node" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              sourcePorts: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              source: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              destinationPorts: "6443"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              destination: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              protocol: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              priority: 2202' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              direction: "Inbound"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              description: "Allow K8s API Server"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\            - name: "allow_apiserver"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          securityRules:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"" i\          name: ${CAPI_WORKLOAD_CLUSTER_NAME}-controlplane-nsg" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        securityGroup:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          - 10.0.1.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        role: control-plane' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-cp" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\    subnets:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        - 10.0.0.0/16' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\      cidrBlocks:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# # Remove port 22 from public internet exposure
+# line=$(expr $(grep -n -B 1 "vnet" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "networkSpec" | cut -f1 -d-) + 3)
+# sed -i -e "$line"' i\          - 10.0.2.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        role: node' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-node" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\              sourcePorts: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\              source: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\              destinationPorts: "6443"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\              destination: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\              protocol: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\              priority: 2202' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\              direction: "Inbound"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\              description: "Allow K8s API Server"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\            - name: "allow_apiserver"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          securityRules:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"" i\          name: ${CAPI_WORKLOAD_CLUSTER_NAME}-controlplane-nsg" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        securityGroup:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\          - 10.0.1.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        role: control-plane' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-cp" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\    subnets:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\        - 10.0.0.0/16' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+# sed -i -e "$line"' i\      cidrBlocks:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # Deploying CAPI Workload cluster
 sudo kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
