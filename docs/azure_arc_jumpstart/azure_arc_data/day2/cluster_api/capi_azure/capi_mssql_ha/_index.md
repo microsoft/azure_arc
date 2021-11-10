@@ -56,7 +56,7 @@ To retrieve the SQL Managed Instance endpoints, a desktop shortcut for a _SQLMI 
 
 ![Endpoints text file](./06.png)
 
-- Open Microsoft SQL Server Management Studio (SSMS) which is installed automatically for you as part of the [bootstrap Jumpstart scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/) and use the primary endpoint IP address and login to the primary DB instance using the username and password provided in the text file mentioned above.
+- Open Microsoft SQL Server Management Studio (SSMS) which is installed automatically for you as part of the [bootstrap Jumpstart scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/cluster_api/capi_azure/capi_mssql_ha/) and use the primary endpoint IP address and login to the primary DB instance using the username and password provided in the text file mentioned above.
 
     ![Microsoft SQL Server Management Studio](./07.png)
 
@@ -98,7 +98,7 @@ As you already know, the availability group includes three Kubernetes replicas w
 
     ![side-by-side PowerShell sessions](./19.png)
 
-- In SSMS, you can also see that _jumpstart-sql-0_ is acting as the primary replica and _jumpstart-sql-1_ as the secondary. At this point, close SSMS.
+- In SSMS, you can also see that _jumpstart-sql-0_ is acting as the primary replica and _jumpstart-sql-1_ and _jumpstart-sql-2_ are the secondary. At this point, close SSMS.
 
     ![Primary and secondary replicas](./20.png)
 
@@ -106,7 +106,9 @@ As you already know, the availability group includes three Kubernetes replicas w
 
     ![Pod deletion](./21.png)
 
-- Re-open SSMS and connect back to the *primary* endpoint. You can now see that _jumpstart-sql-0_ and _jumpstart-sql-2_ are now acting as the secondary replica and _jumpstart-sql-1_ was promoted to primary. In addition, run the _`az sql mi-arc show -n jumpstart-sql --k8s-namespace arc --use-k8s`_ command again and check the health status of the availability group.
+- Re-open SSMS and connect back to previous *secondary* endpoint. You can now see that _jumpstart-sql-0_ and _jumpstart-sql-2_ are now acting as the secondary replica and _jumpstart-sql-1_ was promoted to primary. In addition, run the _`az sql mi-arc show -n jumpstart-sql --k8s-namespace arc --use-k8s`_ command again and check the health status of the availability group.
+
+    > **Note: It might take a few minutes for the availability group to return to an healthy state.**
 
     ![Successful failover](./22.png)
 
@@ -114,9 +116,9 @@ As you already know, the availability group includes three Kubernetes replicas w
 
 ## Re-Validating Database Replication
 
-- Now that we perform a successful failover, we can re-validate and make sure replication still works as expected. In SSMS, re-add the secondary endpoint connection.
+- Now that we perform a successful failover, we can re-validate and make sure replication still works as expected. In SSMS, re-add the second instance.
 
-    ![Re-adding secondary endpoint connection](./24.png)
+    ![Re-adding instance](./24.png)
 
 - In the primary endpoint connection, repeat the process of performing a change on the _AdventureWorks2019_ database _"HumanResources.Employee"_ table and check that replication is working In the example below, you can see how new values in new rows are now replicated.
 
