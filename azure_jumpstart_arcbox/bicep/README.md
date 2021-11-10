@@ -1,4 +1,4 @@
-# Sample commands to deploy ARcBox for IT Pros using bicep
+# Sample commands to deploy ArcBox for IT Pros using Azure Bicep
 
 ```azurecli-interactive
 az login
