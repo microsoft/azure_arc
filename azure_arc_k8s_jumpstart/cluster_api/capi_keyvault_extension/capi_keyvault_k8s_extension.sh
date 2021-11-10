@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # <--- Change the following environment variables according to your Azure service principal name --->
