@@ -10,12 +10,13 @@ $primaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonp
 $primaryEndpoint = $primaryEndpoint.Substring(0, $primaryEndpoint.IndexOf(',')) + ",11433" | Add-Content $Endpoints
 Add-Content $Endpoints ""
 
-if ( $env:SQLMIHA -eq $true )
-{
-    Add-Content $Endpoints "Secondary SQL Managed Instance external endpoint:"
-    $secondaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.secondaryEndpoint}'
-    $secondaryEndpoint = $secondaryEndpoint.Substring(0, $secondaryEndpoint.IndexOf(',')) + ",11433" | Add-Content $Endpoints
-}
+# The below commented-out code is used in other Jumpstart scenarios where SQL MI High Availability is used. In ArcBox we are not deploying SQL MI with HA at this time.
+# if ( $env:SQLMIHA -eq $true )
+# {
+#     Add-Content $Endpoints "Secondary SQL Managed Instance external endpoint:"
+#     $secondaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.secondaryEndpoint}'
+#     $secondaryEndpoint = $secondaryEndpoint.Substring(0, $secondaryEndpoint.IndexOf(',')) + ",11433" | Add-Content $Endpoints
+# }
 
 # Retrieving SQL MI connection username and password
 Add-Content $Endpoints ""
