@@ -12,6 +12,10 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 # Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
+# Remove port 22 from public internet exposure and updating API server access
+sudo -u az network nsg rule delete --resource-group $env:resourceGroup --nsg-name $connectedClusterName-k8s-controlplane-nsg -n "allow_ssh"
+sudo -u az network nsg rule update --resource-group $env:resourceGroup --nsg-name $connectedClusterName-k8s-controlplane-nsg -n "allow_apiserver" --protocol '*' --source-address-prefixes '*' --destination-address-prefixes '*'
+
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
 # subscription user deployed ARM template to. This is needed in case Service 
