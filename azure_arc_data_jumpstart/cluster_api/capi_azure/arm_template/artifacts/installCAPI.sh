@@ -168,7 +168,7 @@ sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-# # Remove port 22 from public internet exposure
+# Remove port 22 from public internet exposure
 # line=$(expr $(grep -n -B 1 "vnet" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "networkSpec" | cut -f1 -d-) + 3)
 # sed -i -e "$line"' i\          - 10.0.2.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 # sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
@@ -226,6 +226,10 @@ cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubecon
 export KUBECONFIG=~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
 sudo service sshd restart
+
+# Remove port 22 from public internet exposure and updating API server access
+az network nsg rule delete -g $resourceGroup --nsg-name $CAPI_WORKLOAD_CLUSTER_NAME-controlplane-nsg -n "allow_ssh"
+az network nsg rule update -g $resourceGroup --nsg-name $CAPI_WORKLOAD_CLUSTER_NAME-controlplane-nsg -n "allow_apiserver" --protocol '*' --source-address-prefixes '*' --destination-address-prefixes '*'
 
 # Copying workload CAPI kubeconfig file to staging storage account
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
