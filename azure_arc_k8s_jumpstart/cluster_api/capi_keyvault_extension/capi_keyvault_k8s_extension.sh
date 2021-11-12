@@ -6,8 +6,9 @@ export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 export keyVaultResourceGroup='<KeyVault Resource Group name>'
 export keyVaultLocation='<Key Vault Location>'
-export resourceGroup='arc-capi-azure'
-export arcClusterName='arc-capi-azure'
+export resourceGroup='<Azure Arc CLuster Resource Group name>'
+export arcClusterName='<Azure Arc Cluster Name>'
+export namespace='hello-arc'
 export k8sExtensionName='sscsi'
 export keyVaultName=secret-store-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 
@@ -68,20 +69,19 @@ echo "Create Azure Key Vault Kubernetes extension instance"
 az k8s-extension create --name $k8sExtensionName --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --release-train preview --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
 # Create a namespace for your ingress resources
-kubectl create ns hello-arc
+kubectl create ns $namespace
 
 # Create the Kubernetes secret with the service principal credentials
-kubectl create secret generic secrets-store-creds --namespace hello-arc --from-literal clientid=${appId} --from-literal clientsecret=${password}
-kubectl label secret secrets-store-creds secrets-store.csi.k8s.io/used=true
+kubectl create secret generic secrets-store-creds --namespace $namespace --from-literal clientid=${appId} --from-literal clientsecret=${password}
+kubectl --namespace $namespace label secret secrets-store-creds secrets-store.csi.k8s.io/used=true
 
 # Deploy SecretProviderClass
 echo "Creating Secret Provider Class"
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl apply -n $namespace -f -
 apiVersion: secrets-store.csi.x-k8s.io/v1
 kind: SecretProviderClass
 metadata:
   name: azure-kv-sync
-  namespace: hello-arc
 spec:
   provider: azure
   secretObjects:   
@@ -106,12 +106,11 @@ EOF
 
 # Create the pod with volume referencing the secrets-store.csi.k8s.io driver
 echo "Deploying App referencing the secret"
-cat <<EOF | kubectl apply -f -
+cat <<EOF | kubectl apply -n $namespace -f -
 apiVersion: v1
 kind: Pod
 metadata:
   name: busybox-secrets-sync
-  namespace: hello-arc
 spec:
   containers:
   - name: busybox
