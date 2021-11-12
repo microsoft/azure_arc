@@ -225,11 +225,11 @@ cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubecon
 cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 export KUBECONFIG=~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
-sudo service sshd restart
-
 # Remove port 22 from public internet exposure and updating API server access
-az network nsg rule delete -g $resourceGroup --nsg-name $CAPI_WORKLOAD_CLUSTER_NAME-controlplane-nsg -n "allow_ssh"
-az network nsg rule update -g $resourceGroup --nsg-name $CAPI_WORKLOAD_CLUSTER_NAME-controlplane-nsg -n "allow_apiserver" --protocol '*' --source-address-prefixes '*' --destination-address-prefixes '*'
+sudo -u az network nsg rule delete -g $resourceGroup --nsg-name $CAPI_WORKLOAD_CLUSTER_NAME-controlplane-nsg -n "allow_ssh"
+sudo -u az network nsg rule update -g $resourceGroup --nsg-name $CAPI_WORKLOAD_CLUSTER_NAME-controlplane-nsg -n "allow_apiserver" --protocol '*' --source-address-prefixes '*' --destination-address-prefixes '*'
+
+sudo service sshd restart
 
 # Copying workload CAPI kubeconfig file to staging storage account
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
