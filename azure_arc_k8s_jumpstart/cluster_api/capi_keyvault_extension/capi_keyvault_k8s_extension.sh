@@ -35,7 +35,7 @@ rm -rf ~/.azure/AzureArcCharts
 echo "Login to Az CLI using the service principal"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
-echo "Checking if you have up-to-date Azure Arc AZ CLI 'connectedk8s' extension..."
+echo "Checking if you have up-to-date Azure Arc Az CLI 'connectedk8s' extension..."
 az extension show --name "connectedk8s" &> extension_output
 if cat extension_output | grep -q "not installed"; then
 az extension add --name "connectedk8s"
