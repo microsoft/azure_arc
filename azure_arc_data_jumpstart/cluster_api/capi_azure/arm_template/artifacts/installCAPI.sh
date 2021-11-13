@@ -175,7 +175,7 @@ sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-# # Remove port 22 from public internet exposure
+# # # Remove port 22 from public internet exposure
 # line=$(expr $(grep -n -B 1 "vnet" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "networkSpec" | cut -f1 -d-) + 3)
 # sed -i -e "$line"' i\          - 10.0.2.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 # sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
@@ -200,6 +200,20 @@ sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resource
 # sed -i -e "$line"' i\subnets:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 # sed -i -e "$line"' i\        - 10.0.0.0/16' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 # sed -i -e "$line"' i\cidrBlocks:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
+
+sed '/^      role: control-plane$/r'<(
+    echo '      securityRules:'
+    echo '       - name: "allow_apiserver"'
+    echo '         description: "Allow K8s API Server"'
+    echo '         direction: "Inbound"'
+    echo '         priority: 2201'
+    echo '         protocol: "*"'
+    echo '         destination: "*"'
+    echo '         destinationPorts: "6443"'
+    echo '         source: "*"'
+    echo '         sourcePorts: "*"'
+) -i -- $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # Deploying CAPI Workload cluster
 sudo kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
