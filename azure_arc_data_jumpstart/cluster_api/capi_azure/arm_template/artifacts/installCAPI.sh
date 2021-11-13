@@ -216,14 +216,14 @@ sed '/^      role: control-plane$/r'<(
     echo "        name: $CAPI_WORKLOAD_CLUSTER_NAME-cp-nsg"
     echo '        securityRules:'
     echo '          - name: "allow_apiserver"'
-    echo '          description: "Allow K8s API Server"'
-    echo '          direction: "Inbound"'
-    echo '          priority: 2201'
-    echo '          protocol: "*"'
-    echo '          destination: "*"'
-    echo '          destinationPorts: "6443"'
-    echo '          source: "*"'
-    echo '          sourcePorts: "*"'
+    echo '            description: "Allow K8s API Server"'
+    echo '            direction: "Inbound"'
+    echo '            priority: 2201'
+    echo '            protocol: "*"'
+    echo '            destination: "*"'
+    echo '            destinationPorts: "6443"'
+    echo '            source: "*"'
+    echo '            sourcePorts: "*"'
 ) -i -- $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # Deploying CAPI Workload cluster
