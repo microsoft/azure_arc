@@ -202,19 +202,28 @@ sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resource
 # sed -i -e "$line"' i\cidrBlocks:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 
+sed '/^  networkSpec:$/r'<(
+    echo '    vnet:'
+    echo "      name: $CAPI_WORKLOAD_CLUSTER_NAME-vnet"
+    echo '      cidrBlocks:'
+    echo '        - 10.0.0.0/16'
+) -i -- $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
 sed '/^      role: control-plane$/r'<(
-    echo '    securityGroup:'
-    echo "      name: $CAPI_WORKLOAD_CLUSTER_NAME-cp-nsg"
-    echo '      securityRules:'
-    echo '       - name: "allow_apiserver"'
-    echo '         description: "Allow K8s API Server"'
-    echo '         direction: "Inbound"'
-    echo '         priority: 2201'
-    echo '         protocol: "*"'
-    echo '         destination: "*"'
-    echo '         destinationPorts: "6443"'
-    echo '         source: "*"'
-    echo '         sourcePorts: "*"'
+    echo '      cidrBlocks:'
+    echo '      - 10.0.1.0/24'
+    echo '      securityGroup:'
+    echo "        name: $CAPI_WORKLOAD_CLUSTER_NAME-cp-nsg"
+    echo '        securityRules:'
+    echo '          - name: "allow_apiserver"'
+    echo '        description: "Allow K8s API Server"'
+    echo '        direction: "Inbound"'
+    echo '        priority: 2201'
+    echo '        protocol: "*"'
+    echo '        destination: "*"'
+    echo '        destinationPorts: "6443"'
+    echo '        source: "*"'
+    echo '        sourcePorts: "*"'
 ) -i -- $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # Deploying CAPI Workload cluster
