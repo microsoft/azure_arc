@@ -203,6 +203,8 @@ sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resource
 
 
 sed '/^      role: control-plane$/r'<(
+    echo '    securityGroup:'
+    echo "      name: $CAPI_WORKLOAD_CLUSTER_NAME-cp-nsg"
     echo '      securityRules:'
     echo '       - name: "allow_apiserver"'
     echo '         description: "Allow K8s API Server"'
