@@ -12,10 +12,6 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 # Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
-# # Remove port 22 from public internet exposure and updating API server access
-# az network nsg rule delete --resource-group $env:resourceGroup --nsg-name $connectedClusterName-k8s-controlplane-nsg -n "allow_ssh"
-# az network nsg rule update --resource-group $env:resourceGroup --nsg-name $connectedClusterName-k8s-controlplane-nsg -n "allow_apiserver" --protocol '*' --source-address-prefixes '*' --destination-address-prefixes '*'
-
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
 # subscription user deployed ARM template to. This is needed in case Service 
@@ -81,15 +77,6 @@ kubectl config rename-context "arc-data-capi-k8s-admin@arc-data-capi-k8s" "arc-d
 Write-Host "`n"
 Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
 kubectl apply -f "C:\Temp\capiStorageClass.yaml"
-
-# kubectl label node --all failure-domain.beta.kubernetes.io/zone-
-# kubectl label node --all failure-domain.beta.kubernetes.io/region-
-# kubectl label node --all failure-domain.beta.kubernetes.io/zone= --overwrite
-# kubectl label node --all failure-domain.beta.kubernetes.io/region= --overwrite
-# kubectl label node --all topology.kubernetes.io/zone-
-# kubectl label node --all topology.kubernetes.io/region-
-# kubectl label node --all topology.kubernetes.io/zone= --overwrite
-# kubectl label node --all topology.kubernetes.io/region= --overwrite
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
