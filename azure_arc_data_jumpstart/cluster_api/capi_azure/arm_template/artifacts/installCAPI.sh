@@ -123,8 +123,15 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
+# clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
+#   --kubernetes-version v$KUBERNETES_VERSION \
+#   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
+#   --worker-machine-count=$WORKER_MACHINE_COUNT \
+#   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
 clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --kubernetes-version v$KUBERNETES_VERSION \
+  --from https://github.com/kubernetes-sigs/cluster-api-provider-azure/blob/main/templates/cluster-template-machinepool.yaml \
   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
