@@ -55,7 +55,7 @@ export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.0.0" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export KUBERNETES_VERSION="1.21.2" # Do not change!
-export CONTROL_PLANE_MACHINE_COUNT="1"
+export CONTROL_PLANE_MACHINE_COUNT="2"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
 export CAPI_WORKLOAD_CLUSTER_NAME="arc-data-capi-k8s" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
@@ -123,18 +123,18 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
-# clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
-#   --kubernetes-version v$KUBERNETES_VERSION \
-#   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
-#   --worker-machine-count=$WORKER_MACHINE_COUNT \
-#   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-
 clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --kubernetes-version v$KUBERNETES_VERSION \
-  --from https://github.com/kubernetes-sigs/cluster-api-provider-azure/blob/main/templates/cluster-template-machinepool.yaml \
   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
+# clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
+#   --kubernetes-version v$KUBERNETES_VERSION \
+#   --from https://github.com/kubernetes-sigs/cluster-api-provider-azure/blob/main/templates/cluster-template-machinepool.yaml \
+#   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
+#   --worker-machine-count=$WORKER_MACHINE_COUNT \
+#   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # Building Microsoft Defender for Cloud plumbing for Cluster API
 curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
