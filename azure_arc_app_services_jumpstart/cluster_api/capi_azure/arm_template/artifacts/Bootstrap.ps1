@@ -61,7 +61,7 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,vscode-csharp,microsoftazurestorageexplorer,7zip'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,azure-functions-core-tools-3,azurefunctions-vscode,dotnetcore-sdk,dotnet-sdk,dotnet-6.0-runtime,vscode-csharp,microsoftazurestorageexplorer,7zip'
             #Run commands in parallel.
             Parallel 
                 {
