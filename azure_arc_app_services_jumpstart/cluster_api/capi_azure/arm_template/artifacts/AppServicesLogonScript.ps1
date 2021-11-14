@@ -91,6 +91,7 @@ Write-Host "`n"
 
 $namespace="appservices"
 $extensionName = "arc-app-services"
+$apiVersion = "2020-07-01-preview"
 $kubeEnvironmentName=$connectedClusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
@@ -112,8 +113,10 @@ $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($
 #     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
 #     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
-
-$extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
+# $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
+az k8s-extension create 
+   --resource-group $env:resourceGroup `
+   --name $extensionName `
    --cluster-type connectedClusters `
    --cluster-name $connectedClusterName `
    --extension-type 'Microsoft.Web.Appservice' `
@@ -133,8 +136,17 @@ $extensionId = az k8s-extension create --resource-group $env:resourceGroup --nam
    --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
-    
-az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
+
+extensionId=$(az k8s-extension show \
+   --cluster-type connectedClusters \
+   --cluster-name $connectedClusterName \
+   --resource-group $env:resourceGroup \
+   --name $extensionName \
+   --query id \
+   --output tsv)   
+
+az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version $apiVersion
+# az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
 
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
