@@ -139,8 +139,8 @@ az k8s-extension create `
 
 $extensionId=$(az k8s-extension show `
    --cluster-type connectedClusters `
-   --cluster-name $clusterName `
-   --resource-group $groupName `
+   --cluster-name $connectedClusterName `
+   --resource-group $env:resourceGroup `
    --name $extensionName `
    --query id `
    --output tsv)
