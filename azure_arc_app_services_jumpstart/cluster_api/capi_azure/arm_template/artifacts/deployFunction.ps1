@@ -23,23 +23,31 @@ $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-gr
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
 az functionapp create --resource-group $env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
 
-Do {
-    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-    Start-Sleep -Seconds 45
-    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($logProcessorStatus -eq "Nope")
+# Do {
+#     Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
+#     Start-Sleep -Seconds 45
+#     $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
+#     } while ($logProcessorStatus -eq "Nope")
 
 Do {
     Write-Host "Waiting for Azure Function application to become available. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 1
     $buildService = $(if(kubectl get pods -n appservices | Select-String $functionAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
+    
+# Do {
+#    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
+#    Start-Sleep -Seconds 45
+#    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
+#    } while ($logProcessorStatus -eq "Nope")
+
 
 Do {
-   Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-   Start-Sleep -Seconds 45
-   $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
-   } while ($logProcessorStatus -eq "Nope")
+Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
+Start-Sleep -Seconds 45
+$logProcessorStatus = $(if(kubectl describe daemonset ($extensionName + "-k8se-log-processor") -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
+} while ($logProcessorStatus -eq "Nope")   
+   
 
 # Retrieving the Azure Storage connection string & Registering binding extensions
 Write-Host "`n"
