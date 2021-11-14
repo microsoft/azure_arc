@@ -114,7 +114,7 @@ $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($
 #     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
 # $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
-az k8s-extension create 
+az k8s-extension create `
    --resource-group $env:resourceGroup `
    --name $extensionName `
    --cluster-type connectedClusters `
@@ -137,13 +137,13 @@ az k8s-extension create
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
-extensionId=$(az k8s-extension show \
-   --cluster-type connectedClusters \
-   --cluster-name $connectedClusterName \
-   --resource-group $env:resourceGroup \
-   --name $extensionName \
-   --query id \
-   --output tsv)   
+$extensionId=$(az k8s-extension show `
+   --cluster-type connectedClusters `
+   --cluster-name $clusterName `
+   --resource-group $groupName `
+   --name $extensionName `
+   --query id `
+   --output tsv)
 
 az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version $apiVersion
 # az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
