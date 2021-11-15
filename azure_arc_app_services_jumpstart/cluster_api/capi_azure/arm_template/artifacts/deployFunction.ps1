@@ -26,7 +26,7 @@ az functionapp create --resource-group $env:resourceGroup --name $functionAppNam
 
 Do {
     Write-Host "Waiting for Azure Function application to become available. Hold tight, this might take a few minutes..."
-    Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 15
     $buildService = $(if(kubectl get pods -n appservices | Select-String $functionAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
     
