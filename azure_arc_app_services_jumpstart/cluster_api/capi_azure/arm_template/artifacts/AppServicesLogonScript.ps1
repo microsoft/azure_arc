@@ -71,11 +71,6 @@ Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
 kubectl apply -f "C:\Temp\capiStorageClass.yaml"
 $storageClassName = "managed-premium"
 
-kubectl label node --all failure-domain.beta.kubernetes.io/zone-
-kubectl label node --all topology.kubernetes.io/zone-
-kubectl label node --all failure-domain.beta.kubernetes.io/zone= --overwrite
-kubectl label node --all topology.kubernetes.io/zone= --overwrite
-
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
 kubectl get nodes
@@ -96,29 +91,16 @@ Write-Host "`n"
 
 $namespace="appservices"
 $extensionName = "arc-app-services"
+$apiVersion = "2020-07-01-preview"
 $kubeEnvironmentName=$connectedClusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
-# $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
-#     --cluster-type connectedClusters -c $connectedClusterName `
-#     --extension-type 'Microsoft.Web.Appservice' --release-train stable --auto-upgrade-minor-version true `
-#     --scope cluster --release-namespace "$namespace" `
-#     --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default"  `
-#     --configuration-settings "appsNamespace=$namespace"  `
-#     --configuration-settings "clusterName=$kubeEnvironmentName"  `
-#     --configuration-settings "loadBalancerIp=$staticIp"  `
-#     --configuration-settings "keda.enabled=true"  `
-#     --configuration-settings "buildService.storageClassName=managed-premium"  `
-#     --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
-#     --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
-#     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
-#     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
-
-
-$extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
+az k8s-extension create `
+   --resource-group $env:resourceGroup `
+   --name $extensionName `
    --cluster-type connectedClusters `
    --cluster-name $connectedClusterName `
    --extension-type 'Microsoft.Web.Appservice' `
@@ -138,8 +120,16 @@ $extensionId = az k8s-extension create --resource-group $env:resourceGroup --nam
    --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
-    
-az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
+
+$extensionId=$(az k8s-extension show `
+   --cluster-type connectedClusters `
+   --cluster-name $connectedClusterName `
+   --resource-group $env:resourceGroup `
+   --name $extensionName `
+   --query id `
+   --output tsv)
+
+az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version $apiVersion
 
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
