@@ -146,7 +146,6 @@ $extensionId=$(az k8s-extension show `
    --output tsv)
 
 az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version $apiVersion
-# az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
 
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
