@@ -98,22 +98,6 @@ $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
-# $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
-#     --cluster-type connectedClusters -c $connectedClusterName `
-#     --extension-type 'Microsoft.Web.Appservice' --release-train stable --auto-upgrade-minor-version true `
-#     --scope cluster --release-namespace "$namespace" `
-#     --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default"  `
-#     --configuration-settings "appsNamespace=$namespace"  `
-#     --configuration-settings "clusterName=$kubeEnvironmentName"  `
-#     --configuration-settings "loadBalancerIp=$staticIp"  `
-#     --configuration-settings "keda.enabled=true"  `
-#     --configuration-settings "buildService.storageClassName=managed-premium"  `
-#     --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
-#     --configuration-settings "customConfigMap=$namespace/kube-environment-config" `
-#     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=$env:resourceGroup" `
-#     --configuration-settings "logProcessor.appLogs.destination=log-analytics" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
-
-# $extensionId = az k8s-extension create --resource-group $env:resourceGroup --name $extensionName --query id -o tsv `
 az k8s-extension create `
    --resource-group $env:resourceGroup `
    --name $extensionName `

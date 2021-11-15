@@ -38,9 +38,9 @@
         "deployFunction": {
             "value": false
         },
-	"deployApiMgmt": {
-	    "value": false
-	},
+        "deployApiMgmt": {
+            "value": false
+        },
         "deployLogicApp": {
             "value": false
         },
