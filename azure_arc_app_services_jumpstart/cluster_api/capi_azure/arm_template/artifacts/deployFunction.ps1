@@ -17,6 +17,7 @@ Push-Location C:\Temp\JumpstartFunctionProj
 func new --name HttpJumpstart --template "HTTP trigger" --authlevel "anonymous"
 
 # Creating the new function application in the Kubernetes environment 
+$extensionName = "arc-app-services"
 Write-Host "Creating the new Azure Function application in the Kubernetes environment"
 Write-Host "`n"
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
@@ -24,29 +25,25 @@ $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Rand
 az functionapp create --resource-group $env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
 
 Do {
-    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-    Start-Sleep -Seconds 45
-    $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($logProcessorStatus -eq "Nope")
-
-Do {
     Write-Host "Waiting for Azure Function application to become available. Hold tight, this might take a few minutes..."
-    Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 15
     $buildService = $(if(kubectl get pods -n appservices | Select-String $functionAppName | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
-
+    
 Do {
-   Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
-   Start-Sleep -Seconds 45
-   $logProcessorStatus = $(if(kubectl describe daemonset "arc-app-services-k8se-log-processor" -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
-   } while ($logProcessorStatus -eq "Nope")
+    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
+    Start-Sleep -Seconds 45
+    $logProcessorStatus = $(if(kubectl describe daemonset ($extensionName + "-k8se-log-processor") -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($logProcessorStatus -eq "Nope")
+   
 
 # Retrieving the Azure Storage connection string & Registering binding extensions
 Write-Host "`n"
 Write-Host "Retrieving the Azure Storage connection string & Registering binding extensions"
 Write-Host "`n"
 func azure functionapp fetch-app-settings $functionAppName
-dotnet add package Microsoft.Azure.WebJobs.Extensions.Storage --version 3.0.4
+# dotnet add package Microsoft.Azure.WebJobs.Extensions.Storage --version 3.0.4
+dotnet add package Microsoft.Azure.WebJobs.Extensions.Storage
 
 $filePath = "C:\Temp\JumpstartFunctionProj\HttpJumpstart.cs"
 $toAdd=@'
