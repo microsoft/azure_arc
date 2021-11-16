@@ -58,7 +58,7 @@ echo "Creating Key Vault Secret"
 az keyvault secret set --vault-name $keyVaultName --name dbusername --value "HelloArc!"
 
 echo "Create Azure Key Vault Kubernetes extension instance"
-az k8s-extension create --name $k8sExtensionName --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --release-train preview --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
+az k8s-extension create --name $k8sExtensionName --extension-type Microsoft.AzureKeyVaultSecretsProvider --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --release-train preview --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
 # Create a namespace for your ingress resources
 kubectl create ns $namespace
