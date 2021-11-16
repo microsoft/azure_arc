@@ -38,7 +38,7 @@ helm install nginx ingress-nginx/ingress-nginx -n cluster-mgmt
 kubectl create ns hello-arc
 
 az k8s-configuration create `
---cluster-name $arcClusterName `
+--cluster-name $clusterName `
 --resource-group $resourceGroup `
 --name cluster-config `
 --operator-instance-name cluster-config --operator-namespace cluster-config `
