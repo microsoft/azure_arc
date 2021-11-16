@@ -28,9 +28,6 @@
         },
         "flavor": {
             "value": "Full"
-        },
-        "automationTriggerAtLogon": {
-            "value": true
         }
     }
 }

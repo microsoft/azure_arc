@@ -143,11 +143,11 @@ Set-VMProcessor -VMName ArcBox-Win2K22 -Count 2
 New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-SQL.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
-New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Ubuntu.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMFirmware -VMName ArcBox-Ubuntu -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
 Set-VMProcessor -VMName ArcBox-Ubuntu -Count 1
 
-New-VM -Name ArcBox-CentOS -MemoryStartupBytes 8GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-CentOS.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-CentOS -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-CentOS.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMFirmware -VMName ArcBox-CentOS -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
 Set-VMProcessor -VMName ArcBox-CentOS -Count 1
 
@@ -244,15 +244,44 @@ $Credentials = New-Object System.Management.Automation.PSCredential($nestedLinux
 
 $SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force -WarningAction SilentlyContinue #Connect Over SSH
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
-Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -Timeout 60 -WarningAction SilentlyContinue | Out-Null
+Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -Timeout 120 -WarningAction SilentlyContinue | Out-Null
 
 # Onboarding nested CentOS server VM
 $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force -WarningAction SilentlyContinue #Connect Over SSH
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
-Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 60 -WarningAction SilentlyContinue | Out-Null
+Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 120 -WarningAction SilentlyContinue | Out-Null
+
+# Sending deployement status message to Azure storage account queue
+if ($env:flavor -eq "ITPro") {
+    # Sleeping for allowing Azure Resource Manager API updates
+    Start-Sleep -Seconds 30
+    & "C:\ArcBox\DeploymentStatus.ps1"
+}
 
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
+
+# Changing to Jumpstart ArcBox wallpaper
+if ($env:flavor -eq "ITPro") {
+$imgPath="C:\ArcBox\wallpaper.png"
+$code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
+    
+     public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+         
+         public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+         }
+    }
+ } 
+'@
+
+add-type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
+}
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
