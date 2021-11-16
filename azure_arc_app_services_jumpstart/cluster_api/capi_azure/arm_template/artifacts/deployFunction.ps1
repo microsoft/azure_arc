@@ -12,7 +12,7 @@ Write-Host "`n"
 Write-Host "Creating local Azure Function application project"
 Write-Host "`n"
 Push-Location C:\Temp
-func init JumpstartFunctionProj --dotnet
+func init JumpstartFunctionProj --dotnet --version 5.0
 Push-Location C:\Temp\JumpstartFunctionProj
 func new --name HttpJumpstart --template "HTTP trigger" --authlevel "anonymous"
 
