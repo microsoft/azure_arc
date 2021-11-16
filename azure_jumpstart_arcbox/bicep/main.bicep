@@ -35,7 +35,7 @@ param logAnalyticsWorkspaceName string
 param flavor string = 'Full'
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
-param artifactsBaseUrl string = 'https://raw.githubusercontent.com/microsoft/azure_arc/azure_jumpstart_arcbox/'
+param artifactsBaseUrl string = 'https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_flavors/azure_jumpstart_arcbox/'
 
 module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full') {
   name: 'ubuntuCAPIDeployment'
