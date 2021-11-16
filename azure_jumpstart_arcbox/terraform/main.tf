@@ -26,10 +26,22 @@ variable "resource_group_name" {
   default     = "ArcBox-RG"
 }
 
-variable "vm_name" {
+variable "client_vm_name" {
   type        = string
   description = "The name of the client virtual machine."
   default     = "ArcBox-Client"
+}
+
+variable "capi_vm_name" {
+  type        = string
+  description = "The name of the client virtual machine."
+  default     = "ArcBox-CAPI-MGMT"
+}
+
+variable "rancher_vm_name" {
+  type        = string
+  description = "The name of the client virtual machine."
+  default     = "ArcBox-K3s"
 }
 
 variable "virtual_network_name" {
@@ -75,6 +87,7 @@ variable "spn_client_id" {
 variable "spn_client_secret" {
   type        = string
   description = "Arc Service Principal client secret."
+  sensitive   = true
 }
 
 variable "spn_tenant_id" {
@@ -82,11 +95,35 @@ variable "spn_tenant_id" {
   description = "Arc Service Principal tenantID."
 }
 
+variable "client_admin_username" {
+  type        = string
+  description = "Username for the client virtual machine."
+  default     = "arcdemo"
+}
+
+variable "client_admin_password" {
+  type        = string
+  description = "Password for Windows admin account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
+  default     = "ArcPassword123!!"
+  sensitive   = true
+}
+
+variable "client_admin_ssh" {
+  type        = string
+  description = "SSH Key for the Linux VM's."
+  sensitive   = true
+}
+
 ### This should be swapped to a lower-case value to avoid case sensitivity ###
 variable "deployment_flavor" {
   type        = string
-  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'."
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', or 'Developer'."
   default     = "Full"
+
+  validation {
+    condition     = contains(["Full", "ITPro", "Developer"], var.deployment_flavor)
+    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', and 'Developer'."
+  }
 }
 ##############################################################################
 
@@ -125,14 +162,14 @@ module "management_policy" {
   workspace_name      = var.workspace_name
   workspace_id        = module.management_artifacts.workspace_id
 
-  depends_on = [azurerm_resource_group.rg, module.management_artifacts]
+  depends_on = [azurerm_resource_group.rg]
 }
 
 module "client_vm" {
   source = "./modules/clientVm"
 
   resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = var.vm_name
+  vm_name              = var.client_vm_name
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   user_ip_address      = var.user_ip_address
@@ -143,6 +180,60 @@ module "client_vm" {
   spn_client_secret    = var.spn_client_secret
   spn_tenant_id        = var.spn_tenant_id
   deployment_flavor    = var.deployment_flavor
+  admin_username       = var.client_admin_username
+  admin_password       = var.client_admin_password
+  github_repo          = var.github_repo
+  github_branch        = var.github_branch
 
-  depends_on = [azurerm_resource_group.rg, module.management_storage]
+  depends_on = [
+    azurerm_resource_group.rg,
+    module.management_artifacts
+  ]
+}
+
+module "capi_vm" {
+  source = "./modules/ubuntuCapi"
+  count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
+
+  resource_group_name  = azurerm_resource_group.rg.name
+  vm_name              = var.capi_vm_name
+  virtual_network_name = var.virtual_network_name
+  subnet_name          = var.subnet_name
+  user_ip_address      = var.user_ip_address
+  template_base_url    = local.template_base_url
+  storage_account_name = module.management_storage.storage_account_name
+  spn_client_id        = var.spn_client_id
+  spn_client_secret    = var.spn_client_secret
+  spn_tenant_id        = var.spn_tenant_id
+  admin_username       = var.client_admin_username
+  admin_ssh_key        = var.client_admin_ssh
+
+  depends_on = [
+    azurerm_resource_group.rg,
+    module.management_artifacts
+  ]
+}
+
+module "rancher_vm" {
+  source = "./modules/ubuntuRancher"
+  count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
+
+  resource_group_name  = azurerm_resource_group.rg.name
+  vm_name              = var.rancher_vm_name
+  virtual_network_name = var.virtual_network_name
+  subnet_name          = var.subnet_name
+  user_ip_address      = var.user_ip_address
+  template_base_url    = local.template_base_url
+  storage_account_name = module.management_storage.storage_account_name
+  spn_client_id        = var.spn_client_id
+  spn_client_secret    = var.spn_client_secret
+  spn_tenant_id        = var.spn_tenant_id
+  admin_username       = var.client_admin_username
+  admin_ssh_key        = var.client_admin_ssh
+  workspace_name       = var.workspace_name
+
+  depends_on = [
+    azurerm_resource_group.rg,
+    module.management_artifacts
+  ]
 }
