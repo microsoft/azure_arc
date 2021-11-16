@@ -9,7 +9,7 @@ export keyVaultLocation='<Key Vault Location>'
 export resourceGroup='<Azure Arc CLuster Resource Group name>'
 export arcClusterName='<Azure Arc Cluster Name>'
 export namespace='hello-arc'
-export k8sExtensionName='sscsi'
+export k8sExtensionName='akvsecretsprovider'
 export keyVaultName=secret-store-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 
 # Installing Helm 3
@@ -55,12 +55,12 @@ az group create --name $keyVaultResourceGroup --location $keyVaultLocation
 az keyvault create --name $keyVaultName --resource-group $keyVaultResourceGroup --location $keyVaultLocation
 
 echo "Creating Key Vault Secret"
-az keyvault secret set --vault-name $keyVaultName --name dbusername --value "HelloArc!"
+az keyvault secret set --vault-name $keyVaultName --name dbusername --value 'HelloArc!'
 
 echo "Create Azure Key Vault Kubernetes extension instance"
 az k8s-extension create --name $k8sExtensionName --extension-type Microsoft.AzureKeyVaultSecretsProvider --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --release-train preview --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
 
-# Create a namespace for your ingress resources
+# Create a namespace for your workload resources
 kubectl create ns $namespace
 
 # Create the Kubernetes secret with the service principal credentials
@@ -106,7 +106,7 @@ metadata:
 spec:
   containers:
   - name: busybox
-    image: k8s.gcr.io/e2e-test-images/busybox:1.29-1
+    image: k8s.gcr.io/e2e-test-images/busybox:1.29
     env:
     - name: SECRET_USERNAME
       valueFrom:
