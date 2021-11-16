@@ -74,7 +74,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment" ],
+      "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
+      "condition": "[equals(parameters('flavor'),'Full')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -110,7 +111,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "ubuntuRancherDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment" ],
+      "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
+      "condition": "[equals(parameters('flavor'),'Full')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
