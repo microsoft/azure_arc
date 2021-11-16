@@ -36,7 +36,7 @@ az k8s-configuration create `
 Write-Host "Create Namespace-level GitOps-Config for deploying the 'Hello Arc' application"
 az k8s-configuration create `
 --name hello-arc `
---cluster-name $arcClusterName --resource-group $resourceGroup `
+--cluster-name $ClusterName --resource-group $resourceGroup `
 --operator-instance-name hello-arc --operator-namespace prod `
 --enable-helm-operator `
 --helm-operator-params='--set helm.versions=v3' `
