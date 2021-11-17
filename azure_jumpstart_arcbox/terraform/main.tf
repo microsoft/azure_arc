@@ -137,7 +137,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "management_storage" {
-  source = "./modules/mgmtStorage"
+  source = "./modules/mgmt/mgmtStorage"
 
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -145,7 +145,7 @@ module "management_storage" {
 }
 
 module "management_artifacts" {
-  source = "./modules/mgmtArtifacts"
+  source = "./modules/mgmt/mgmtArtifacts"
 
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = var.virtual_network_name
@@ -156,7 +156,7 @@ module "management_artifacts" {
 }
 
 module "management_policy" {
-  source = "./modules/mgmtPolicy"
+  source = "./modules/mgmt/mgmtPolicy"
 
   resource_group_name = azurerm_resource_group.rg.name
   workspace_name      = var.workspace_name
@@ -192,7 +192,7 @@ module "client_vm" {
 }
 
 module "capi_vm" {
-  source = "./modules/ubuntuCapi"
+  source = "./modules/kubernetes/ubuntuCapi"
   count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
@@ -215,7 +215,7 @@ module "capi_vm" {
 }
 
 module "rancher_vm" {
-  source = "./modules/ubuntuRancher"
+  source = "./modules/kubernetes/ubuntuRancher"
   count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name

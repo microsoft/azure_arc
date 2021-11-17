@@ -203,6 +203,64 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
   az group create --name "<resource-group-name>"  --location "<preferred-location>"
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
+## Deployment Option 4: Terraform Deployment
+
+* Clone the Azure Arc Jumpstart repository
+
+  ```shell
+  git clone https://github.com/microsoft/azure_arc.git
+  ```
+
+* Download & install the latest version of Terraform [here](https://www.terraform.io/downloads.html)
+
+  *NOTE: Terraform 1.x or higher is supported for this deployment. Tested with Terraform v1.011.*
+
+* Create a `terraform.tfvars` file in the root of the terrform directory and supply some values for your environment.
+
+  ```json
+  azure_location    = "westus2"
+  spn_client_id     = "1414133c-9786-53a4-b231-f87c143ebdb1"
+  spn_client_secret = "tgG7R~ef4w1rcvzfNmZoFNhgpRrMw25iLXEcS"
+  spn_tenant_id     = "33572583-d294-5b56-c4e6-dcf9a297ec17"
+  user_ip_address   = "24.17.99.79"
+  client_admin_ssh  = "C:/Temp/rsa.pub"
+  deployment_flavor = "ITPro"
+  ```
+
+* Variable Reference:
+  * ***azure_location*** - Azure location code (e.g. 'eastus', 'westus2', etc.)
+  * *resource_group_name* - Resource group which will contain all of the ArcBox artifacts
+  * ***spn_client_id*** - Your Azure service principal id
+  * ***spn_client_secret*** - Your Azure service principal secret
+  * ***spn_tenant_id*** - Your Azure tenant id
+  * ***user_ip_address*** - Your local IP address. This is used to allow remote RDP and SSH connections to the Client Windows VM and K3s Rancher VM. If you don't know your public IP, you can find it [here](https://www.whatismyip.com/)
+  * ***client_admin_ssh*** - SSH public key path, used for Linux VM's
+  * ***deployment_flavor*** - Use the value "ITPro" to specify that you want to deploy ArcBox for IT Pros
+  * *client_admin_username* - Admin username for Windows & Linux VM's
+  * *client_admin_password* - Admin password for Windows VM's. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  * *workspace_name* - Unique name for the ArcBox Log Analytics workspace
+
+  *NOTE: Any variables in **bold** are required. If any optional parameters are not provided, defaults will be used.*
+
+* Now you will deploy the Terraform file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/bicep) and run the commands below:
+
+  ```shell
+  terraform init
+  terraform plan -out=infra.out
+  terraform apply "infra.out"
+  ```
+  
+* Example output from `terraform init`:
+
+  ![terraform init](./terraform_init.png)
+
+* Example output from `terraform plan -out=infra.out`:
+
+  ![terraform plan](./terraform_plan.png)
+
+* Example output from `terraform apply "infra.out"`:
+
+  ![terraform plan](./terraform_apply.png)
 
 ## Start post-deployment automation
 
