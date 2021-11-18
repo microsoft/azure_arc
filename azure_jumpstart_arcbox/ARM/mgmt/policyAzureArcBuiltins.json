@@ -17,7 +17,7 @@
         "flavor": {
             "type": "string",
             "metadata": {
-               "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
             }
         }
     },
@@ -206,19 +206,21 @@
                 "parameters": {
 
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForEnableAzureDefenderKubernetes'), resourceGroup().id)]",
-            "dependsOn": [ "[concat('Microsoft.Authorization/policyAssignments/',variables('policyNameForEnableAzureDefenderKubernetes'))]" ],
-            "apiVersion": "2020-04-01-preview",
-            "condition": "[equals(parameters('flavor'),'Full')]",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForEnableAzureDefenderKubernetes')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Authorization/roleAssignments",
+                    "name": "[guid(variables('policyNameForEnableAzureDefenderKubernetes'), resourceGroup().id)]",
+                    "dependsOn": [ "[concat('Microsoft.Authorization/policyAssignments/',variables('policyNameForEnableAzureDefenderKubernetes'))]" ],
+                    "apiVersion": "2020-04-01-preview",
+                    "condition": "[equals(parameters('flavor'),'Full')]",
+                    "properties": {
+                        "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
+                        "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForEnableAzureDefenderKubernetes')),'2019-09-01', 'full').identity.principalId]",
+                        "principalType": "ServicePrincipal"
+                    }
+                }
+            ]
         },
         {
             "type": "Microsoft.Authorization/policyAssignments",
