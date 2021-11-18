@@ -198,6 +198,7 @@
             "identity": {
                 "type": "SystemAssigned"
             },
+            "condition": "[equals(parameters('flavor'),'Full')]",
             "location": "[parameters('azureLocation')]",
             "properties": {
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
@@ -210,9 +211,9 @@
         {
             "type": "Microsoft.Authorization/roleAssignments",
             "name": "[guid(variables('policyNameForEnableAzureDefenderKubernetes'), resourceGroup().id)]",
+            "dependsOn": [ "[concat('Microsoft.Authorization/policyAssignments',variables('policyNameForEnableAzureDefenderKubernetes'))]" ],
             "apiVersion": "2020-04-01-preview",
             "condition": "[equals(parameters('flavor'),'Full')]",
-            "dependsOn": [ "[variables('policyNameForEnableAzureDefenderKubernetes')]" ],
             "properties": {
                 "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
                 "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForEnableAzureDefenderKubernetes')),'2019-09-01', 'full').identity.principalId]",
