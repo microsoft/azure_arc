@@ -17,7 +17,6 @@ ArcBox is a solution that provides an easy to deploy sandbox for all things Azur
 * Demo environment for customer presentations or events
 * Rapid integration testing platform
 
-<<<<<<< HEAD
 ## Azure Arc capabilities available in ArcBox
 
 ### Azure Arc-enabled servers
@@ -232,7 +231,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
 ### ArcBox Azure Monitor workbook
 
-Open the [ArcBox Azure Monitor workbook](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) and explore the visualizations and reports of hybrid cloud resources. A [dedicated README](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) is available with more detail on usage of the workbook.
+Open the [ArcBox Azure Monitor workbook](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/flavors/Full/) and explore the visualizations and reports of hybrid cloud resources. A [dedicated README](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/flavors/Full) is available with more detail on usage of the workbook.
 
   ![Screenshot showing Azure Monitor workbook usage](./workbook.png)
 
@@ -283,9 +282,8 @@ az group delete -n <name of your resource group>
 ![Screenshot showing group delete from Azure Portal](./portaldelete.png)
 
 ## Basic Troubleshooting
-=======
+
 ### ArcBox "Flavors"
->>>>>>> 50f0bd2e7a7b32b014d7e4eed95290b1d22d5cd6
 
 ArcBox comes in multiple "flavors", or configurations, which can be selected to best suit your needs. Currently, the available flavors are:
 
