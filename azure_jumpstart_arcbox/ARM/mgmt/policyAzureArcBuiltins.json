@@ -42,7 +42,7 @@
         "policyNameForChangeTrackingLinuxArc": "(ArcBox) Enable ChangeTracking on Linux Arc-enabled servers",
         "policyNameForChangeTrackingWindowsArc": "(Arcbox) Enable ChangeTracking on Windows Arc-enabled servers",
         "policyNameForPeriodicUpdateCheck": "(ArcBox) Enable checks for updates on Azure Arc servers",
-        "policyNameForConfigureSQLExtension": "(ArcBox) Configure SQL Extension on Arc servers running SQL Server",
+        "policyNameForConfigureSQLExtension": "(ArcBox) Configure SQL Extension on Arc servers with SQL Server",
         "logAnalyticsContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
         "tagContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]"
     },
