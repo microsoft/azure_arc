@@ -51,7 +51,7 @@ The following README will guide you on how to use the provided [Terraform](https
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    az ad sp create-for-rbac -n "AzureArcK8s" --role contributor
     ```
 
     Output should look like this:
@@ -60,7 +60,7 @@ The following README will guide you on how to use the provided [Terraform](https
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "displayName": "AzureArcK8s",
-    "name": "http://AzureArcK8s",
+    "name": "AzureArcK8s",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
@@ -89,6 +89,7 @@ The following README will guide you on how to use the provided [Terraform](https
   ```shell
   az extension add --name connectedk8s
   az extension add --name k8s-configuration
+  az extension add --name connectedlocation
   ```
 
   > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
@@ -96,6 +97,7 @@ The following README will guide you on how to use the provided [Terraform](https
   ```shell
   az extension update --name connectedk8s
   az extension update --name k8s-configuration
+  az extension update --name connectedlocation
   ```
 
 * Create AWS User IAM Key
@@ -126,12 +128,27 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ![Screenshot showing how to create AWS IAM key](./image5.png)
 
-  * Set your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key.
+  * Set your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key. Terraform will use these to access your AWS account.
 
+    If you are running Linux or MacOS:
       ```shell
       export TF_VAR_AWS_ACCESS_KEY_ID="an access key"
       export TF_VAR_AWS_SECRET_ACCESS_KEY="a secret key"
       export TF_VAR_AWS_DEFAULT_REGION="us-west-2"
+      ```
+      If you are running Windows, you will need to manually add the environment variables to settings. Click on the search bar (windows 10) or search icon (windows 11) in the taskbar, and type in environment.  You should get a suggested app of "Edit the system environment variables" Open that, and on the lower right corner, click on Environment Variables.  Under the user section, add the following variables
+      ```shell
+      New Variable
+      variable field: TF_VAR_AWS_ACCESS_KEY_ID
+      Value field: "an access key"
+      
+      New Variable
+      variable field: TF_VAR_AWS_SECRET_ACCESS_KEY
+      variable field: "a secret key"
+      
+      New Variable
+      variable field:TF_VAR_AWS_DEFAULT_REGION
+      value field: "us-west-2"
       ```
 
 ## Deployment
@@ -142,20 +159,35 @@ The following README will guide you on how to use the provided [Terraform](https
   cd azure_arc_k8s_jumpstart/eks/terraform
   ```
 
-* Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:
+* Initalize terraform, creating the state file to track our work:
+
+  ```shell
+  terraform init
+  ```
 
   ![Screenshot showing terraform init being run](./image6.png)
 
-* Deploy EKS by running the ```terraform apply --auto-approve``` command.
+* Deploy EKS:
+
+  ```shell
+  terraform apply --auto-approve
+  ```
+
   Wait for the plan to finish:
 
   ![Screenshot showing terraform apply being run](./image7.png)
 
 * You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
 
+If in Linux or MacOS
   ```shell
   mkdir ~/.kube/
   terraform output -raw kubeconfig > ~/.kube/config
+  ```
+If in Windows:
+  ```shell
+  mkdir %HOMEPATH%\.kube
+  terraform output -raw kubeconfig > %HOMEPATH%\.kube\config
   ```
   
   Check to see if cluster is discoverable by ```kubectl``` by running:
