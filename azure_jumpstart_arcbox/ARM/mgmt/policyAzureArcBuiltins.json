@@ -211,7 +211,7 @@
         {
             "type": "Microsoft.Authorization/roleAssignments",
             "name": "[guid(variables('policyNameForEnableAzureDefenderKubernetes'), resourceGroup().id)]",
-            "dependsOn": [ "[concat('Microsoft.Authorization/policyAssignments',variables('policyNameForEnableAzureDefenderKubernetes'))]" ],
+            "dependsOn": [ "[concat('Microsoft.Authorization/policyAssignments/',variables('policyNameForEnableAzureDefenderKubernetes'))]" ],
             "apiVersion": "2020-04-01-preview",
             "condition": "[equals(parameters('flavor'),'Full')]",
             "properties": {
