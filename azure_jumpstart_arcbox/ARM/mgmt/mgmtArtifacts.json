@@ -41,6 +41,12 @@
       "metadata": {
         "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
       }
+    },
+    "flavor": {
+      "type": "string",
+      "metadata": {
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+      }
     }
   },
   "variables": {
@@ -207,6 +213,9 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('workspaceName')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
           }
         }
       }
