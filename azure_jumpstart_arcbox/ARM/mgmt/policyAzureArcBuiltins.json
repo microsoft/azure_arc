@@ -198,7 +198,6 @@
             "identity": {
                 "type": "SystemAssigned"
             },
-            "condition": "[equals(parameters('flavor'),'Full')]",
             "location": "[parameters('azureLocation')]",
             "properties": {
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
