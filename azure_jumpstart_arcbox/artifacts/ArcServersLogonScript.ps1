@@ -95,6 +95,7 @@ az login --service-principal --username $env:spnClientID --password $env:spnClie
 # Register Azure providers
 az provider register --namespace Microsoft.HybridCompute --wait
 az provider register --namespace Microsoft.GuestConfiguration --wait
+az provider register --namespace Microsoft.AzureArcData --wait
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Output "Configure DHCP service"
