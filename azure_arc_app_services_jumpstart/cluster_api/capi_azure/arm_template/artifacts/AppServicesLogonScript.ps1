@@ -56,6 +56,8 @@ az extension add --yes --source "https://aka.ms/logicapp-latest-py2.py3-none-any
 Write-Host "`n"
 az -v
 
+dotnet new globaljson --sdk-version 3.1.415
+
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
 $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arc-app-capi-k8s"
