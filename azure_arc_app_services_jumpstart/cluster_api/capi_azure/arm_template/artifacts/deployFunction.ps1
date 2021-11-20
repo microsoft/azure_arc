@@ -42,7 +42,6 @@ Write-Host "`n"
 Write-Host "Retrieving the Azure Storage connection string & Registering binding extensions"
 Write-Host "`n"
 func azure functionapp fetch-app-settings $functionAppName
-# dotnet add package Microsoft.Azure.WebJobs.Extensions.Storage --version 3.0.4
 dotnet add package Microsoft.Azure.WebJobs.Extensions.Storage
 
 $filePath = "C:\Temp\JumpstartFunctionProj\HttpJumpstart.cs"
