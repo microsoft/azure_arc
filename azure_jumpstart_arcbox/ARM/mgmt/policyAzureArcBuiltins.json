@@ -93,14 +93,14 @@
             "type": "Microsoft.Authorization/policyAssignments",
             "name": "[variables('policies')[copyIndex()].name]",
             "apiVersion": "2019-09-01",
-            "condition": "[contains(variables('policies')[copyIndex()]['flavors'], parameters('flavor'))]",
+            "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
             "location": "[parameters('azureLocation')]",
             "identity": {
                 "type": "SystemAssigned"
             },
             "properties": {
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policies')[copyIndex()]['definitionId']]",
+                "policyDefinitionId": "[variables('policies')[copyIndex()].definitionId]",
                 "parameters": {
                     "logAnalytics": {
                         "value": "[variables('logAnalyticsResource')]"
@@ -114,13 +114,13 @@
         },
         {
             "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policies')[copyIndex()]['name'], resourceGroup().id)]",
-            "condition": "[contains(variables('policies')[copyIndex()]['flavors'], parameters('flavor'))]",
-            "dependsOn": [ "[variables('policies')[copyIndex()]['name']]" ],
+            "name": "[guid(variables('policies')[copyIndex()].name, resourceGroup().id)]",
+            "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
+            "dependsOn": [ "[variables('policies')[copyIndex()].name]" ],
             "apiVersion": "2020-04-01-preview",
             "properties": {
-                "roleDefinitionId": "[variables('policies')[copyIndex()]['roleDefinition']]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[copyIndex()]['name']),'2019-09-01', 'full').identity.principalId]",
+                "roleDefinitionId": "[variables('policies')[copyIndex()].roleDefinitionId]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[copyIndex()].name),'2019-09-01', 'full').identity.principalId]",
                 "principalType": "ServicePrincipal"
             },
             "copy": {
