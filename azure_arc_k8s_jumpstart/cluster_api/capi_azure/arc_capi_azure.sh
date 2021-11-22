@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # Set deployment environment variables
+export CLUSTERCTL_VERSION="1.0.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="0.5.2" # Do not change!
+export CAPI_PROVIDER_VERSION="1.0.0" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.20.10" # Do not change!
+export KUBERNETES_VERSION="1.22.1" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
-export WORKER_MACHINE_COUNT="<Workers node count>"
+export WORKER_MACHINE_COUNT="<Workers node count>" 
 export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
 export CAPI_WORKLOAD_CLUSTER_NAME="<Workload cluster name>" # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 export AZURE_SUBSCRIPTION_ID="<Azure subscription id>"
@@ -18,14 +19,26 @@ export AZURE_NODE_MACHINE_TYPE="<Worker node Azure VM type>" # For example: "Sta
 
 # Base64 encode the variables - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$AZURE_SUBSCRIPTION_ID" | base64 | tr -d '\n')"
-export AZURE_TENANT_ID_B64="$(echo -n "$SPN_TENANT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_ID_B64="$(echo -n "$SPN_CLIENT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_SECRET_B64="$(echo -n "$SPN_CLIENT_SECRET" | base64 | tr -d '\n')"
+export AZURE_TENANT_ID_B64="$(echo -n "$AZURE_TENANT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_ID_B64="$(echo -n "$AZURE_CLIENT_ID" | base64 | tr -d '\n')"
+export AZURE_CLIENT_SECRET_B64="$(echo -n "$AZURE_CLIENT_SECRET" | base64 | tr -d '\n')"
 
 # Settings needed for AzureClusterIdentity used by the AzureCluster
 export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+
+# Installing clusterctl
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
+sudo chmod +x ./clusterctl
+sudo mv ./clusterctl /usr/local/bin/clusterctl
+clusterctl version
+
+# Installing Helm 3
+echo "Installing Helm 3"
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
 
 # Create a secret to include the password of the Service Principal identity created in Azure
 # This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
@@ -48,6 +61,7 @@ clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
+# Building Microsoft Defender for Cloud plumbing for Cluster API
 curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
 cat <<EOF | kubectl apply -f -
@@ -84,31 +98,32 @@ sed -i -e "$line"' i\          key: audit.yaml' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 sed -i -e "$line"' i\        secret:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 sed -i -e "$line"' i\    - contentFrom:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
-# Remove port 22 from public internet exposure
-line=$(expr $(grep -n -B 1 "vnet" $CAPI_WORKLOAD_CLUSTER_NAME.yaml | grep "networkSpec" | cut -f1 -d-) + 3)
-sed -i -e "$line"' i\          - 10.0.2.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        role: node' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-node" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              sourcePorts: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              source: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              destinationPorts: "6443"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              destination: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              protocol: "*"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              priority: 2202' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              direction: "Inbound"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\              description: "Allow K8s API Server"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\            - name: "allow_apiserver"' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          securityRules:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"" i\          name: ${CAPI_WORKLOAD_CLUSTER_NAME}-controlplane-nsg" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        securityGroup:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\          - 10.0.1.0/24' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        cidrBlocks: ' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        role: control-plane' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"" i\      - name: ${CAPI_WORKLOAD_CLUSTER_NAME}-subnet-cp" $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\    subnets:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\        - 10.0.0.0/16' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
-sed -i -e "$line"' i\      cidrBlocks:' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+sed -i 's/resourceGroup: '$CAPI_WORKLOAD_CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
+# Pre-configuring CAPI cluster control plane Azure Network Security Group to allow only inbound 6443 traffic
+sed '/^  networkSpec:$/r'<(
+    echo '    vnet:'
+    echo "      name: $CAPI_WORKLOAD_CLUSTER_NAME-vnet"
+    echo '      cidrBlocks:'
+    echo '        - 10.0.0.0/16'
+) -i -- $CAPI_WORKLOAD_CLUSTER_NAME.yaml
+
+sed '/^      role: control-plane$/r'<(
+    echo '      cidrBlocks:'
+    echo '      - 10.0.1.0/24'
+    echo '      securityGroup:'
+    echo "        name: $CAPI_WORKLOAD_CLUSTER_NAME-cp-nsg"
+    echo '        securityRules:'
+    echo '          - name: "allow_apiserver"'
+    echo '            description: "Allow K8s API Server"'
+    echo '            direction: "Inbound"'
+    echo '            priority: 2201'
+    echo '            protocol: "*"'
+    echo '            destination: "*"'
+    echo '            destinationPorts: "6443"'
+    echo '            source: "*"'
+    echo '            sourcePorts: "*"'
+) -i -- $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 kubectl apply -f $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 echo ""
@@ -136,7 +151,7 @@ kubectl --kubeconfig=./$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig get nodes
 echo ""
 
 echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
+az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 echo ""
 
 rm -rf ~/.azure/AzureArcCharts
