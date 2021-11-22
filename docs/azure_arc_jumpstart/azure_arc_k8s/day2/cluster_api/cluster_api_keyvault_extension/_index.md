@@ -30,7 +30,7 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
   az --version
   ```
 
-* Create Azure service principal (SP)
+- Create Azure service principal (SP)
 
     To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
