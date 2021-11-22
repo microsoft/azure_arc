@@ -19,12 +19,10 @@
             "metadata": {
                 "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
             }
-        }
-    },
-    "variables": {
-        "logAnalyticsResource": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]",
+        },
         "policies": {
-            "value": [
+            "type": "array",
+            "defaultValue": [
                 {
                     "name": "(ArcBox) Deploy Linux Log Analytics agents",
                     "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
@@ -88,19 +86,23 @@
             ]
         }
     },
+    "variables": {
+        "logAnalyticsResource": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]",
+        
+    },
     "resources": [
         {
             "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policies')[copyIndex()].name]",
+            "name": "[parameters('policies')[copyIndex()].name]",
             "apiVersion": "2019-09-01",
-            "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
+            "condition": "[contains(parameters('policies')[copyIndex()].flavors, parameters('flavor'))]",
             "location": "[parameters('azureLocation')]",
             "identity": {
                 "type": "SystemAssigned"
             },
             "properties": {
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policies')[copyIndex()].definitionId]",
+                "policyDefinitionId": "[parameters('policies')[copyIndex()].definitionId]",
                 "parameters": {
                     "logAnalytics": {
                         "value": "[variables('logAnalyticsResource')]"
@@ -109,23 +111,23 @@
             },
             "copy": {
                 "name": "policyAssignmentCopy",
-                "count": "[length(variables('policies'))]"
+                "count": "[length(parameters('policies'))]"
             }
         },
         {
             "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policies')[copyIndex()].name, resourceGroup().id)]",
-            "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
-            "dependsOn": [ "[variables('policies')[copyIndex()].name]" ],
+            "name": "[guid(parameters('policies')[copyIndex()].name, resourceGroup().id)]",
+            "condition": "[contains(parameters('policies')[copyIndex()].flavors, parameters('flavor'))]",
+            "dependsOn": [ "[parameters('policies')[copyIndex()].name]" ],
             "apiVersion": "2020-04-01-preview",
             "properties": {
-                "roleDefinitionId": "[variables('policies')[copyIndex()].roleDefinitionId]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[copyIndex()].name),'2019-09-01', 'full').identity.principalId]",
+                "roleDefinitionId": "[parameters('policies')[copyIndex()].roleDefinitionId]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', parameters('policies')[copyIndex()].name),'2019-09-01', 'full').identity.principalId]",
                 "principalType": "ServicePrincipal"
             },
             "copy": {
                 "name": "roleAssignmentCopy",
-                "count": "[length(variables('policies'))]"
+                "count": "[length(parameters('policies'))]"
             }
         }
     ]
