@@ -95,13 +95,13 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
    The script will:
 
-  * Login to your Azure subscription using the SPN credentials
-  * Add or Update your local _connectedk8s_ and _k8s-extension_ Azure CLI extensions
-  * Create Resource Group, Key Vault and sample secret
-  * Create Azure Key Vault k8s extension instance
-  * Create Kubernetes Secret for supporting SPN Authentication
-  * Create Secret Provider Class to read the secrets
-  * Deploy the app
+  - Login to your Azure subscription using the SPN credentials
+  - Add or Update your local _connectedk8s_ and _k8s-extension_ Azure CLI extensions
+  - Create Resource Group, Key Vault and a sample secret
+  - Create Azure Key Vault k8s extension instance
+  - Create Kubernetes Secret for supporting SPN Authentication
+  - Create Secret Provider Class to read the secrets
+  - Deploy the app
 
 * You can now see that Azure Key Vault extensions are now enabled in the extension tab section of the Azure Arc-enabled Kubernetes cluster resource in Azure.
 
