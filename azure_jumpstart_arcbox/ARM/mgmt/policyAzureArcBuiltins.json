@@ -17,315 +17,115 @@
         "flavor": {
             "type": "string",
             "metadata": {
-               "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
             }
         }
     },
     "variables": {
         "logAnalyticsResource": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]",
-        "policyDefinitionForLinuxDeployLogAnalytics": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
-        "policyDefinitionForWindowsDeployLogAnalytics": "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203",
-        "policyDefinitionForAddResourceTag": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
-        "policyDefinitionForLinuxDeployDependencyAgent": "/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43",
-        "policyDefinitionForWindowsDeployDependencyAgent": "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4",
-        "policyDefinitionForEnableAzureDefenderKubernetes": "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c",
-        "policyDefinitionForChangeTrackingLinuxArc": "/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278",
-        "policyDefinitionForChangeTrackingWindowsArc": "/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5",
-        "policyDefinitionForPeriodicUpdateCheck": "/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46",
-        "policyDefinitionForConfigureSQLExtension": "/providers/Microsoft.Authorization/policyDefinitions/fd2d1a6e-6d95-4df2-ad00-504bf0273406",
-        "policyNameForLinuxDeployLogAnalytics": "(ArcBox) Deploy Linux Log Analytics agents",
-        "policyNameForWindowsDeployLogAnalytics": "(ArcBox) Deploy Windows Log Analytics agents",
-        "policyNameForLinuxDeployDependencyAgent": "(ArcBox) Deploy Linux Dependency Agents",
-        "policyNameForWindowsDeployDependencyAgent": "(ArcBox) Deploy Windows Dependency Agents",
-        "policyNameForAddResourceTag": "(ArcBox) Tag resources",
-        "policyNameForEnableAzureDefenderKubernetes": "(ArcBox) Enable Azure Defender on Kubernetes clusters",
-        "policyNameForChangeTrackingLinuxArc": "(ArcBox) Enable ChangeTracking on Linux Arc-enabled servers",
-        "policyNameForChangeTrackingWindowsArc": "(Arcbox) Enable ChangeTracking on Windows Arc-enabled servers",
-        "policyNameForPeriodicUpdateCheck": "(ArcBox) Enable checks for updates on Azure Arc servers",
-        "policyNameForConfigureSQLExtension": "(ArcBox) Configure SQL Extension on Arc servers with SQL Server",
-        "logAnalyticsContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-        "tagContributorRoleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]"
+        "policies": {
+            "value": [
+                {
+                    "name": "(ArcBox) Deploy Linux Log Analytics agents",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                },
+                {
+                    "name": "(ArcBox) Deploy Windows Log Analytics agents",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                },
+                {
+                    "name": "(ArcBox) Deploy Linux Dependency Agents",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                },
+                {
+                    "name": "(ArcBox) Deploy Windows Dependency Agents",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                },
+                {
+                    "name": "(ArcBox) Tag resources",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]"
+                },
+                {
+                    "name": "(ArcBox) Enable Azure Defender on Kubernetes clusters",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c",
+                    "flavors": [ "Full" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                },
+                {
+                    "name": "(ArcBox) Enable ChangeTracking on Linux Arc-enabled servers",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                },
+                {
+                    "name": "(Arcbox) Enable ChangeTracking on Windows Arc-enabled servers",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                },
+                {
+                    "name": "(ArcBox) Enable checks for updates on Azure Arc servers",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                },
+                {
+                    "name": "(ArcBox) Configure SQL Extension on Arc servers with SQL Server",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/fd2d1a6e-6d95-4df2-ad00-504bf0273406",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]"
+                }
+            ]
+        }
     },
     "resources": [
         {
             "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForLinuxDeployLogAnalytics')]",
+            "name": "[variables('policies')[copyIndex()]['name']]",
             "apiVersion": "2019-09-01",
+            "condition": "[contains(variables('policies')[copyIndex()]['flavors'], parameters('flavor'))]",
             "location": "[parameters('azureLocation')]",
             "identity": {
                 "type": "SystemAssigned"
             },
             "properties": {
                 "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForLinuxDeployLogAnalytics')]",
+                "policyDefinitionId": "[variables('policies')[copyIndex()]['definitionId']]",
                 "parameters": {
                     "logAnalytics": {
                         "value": "[variables('logAnalyticsResource')]"
                     }
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForLinuxDeployLogAnalytics'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForLinuxDeployLogAnalytics')]" ],
-            "apiVersion": "2020-04-01-preview",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForLinuxDeployLogAnalytics')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForWindowsDeployLogAnalytics')]",
-            "apiVersion": "2019-09-01",
-            "identity": {
-                "type": "SystemAssigned"
             },
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForWindowsDeployLogAnalytics')]",
-                "parameters": {
-                    "logAnalytics": {
-                        "value": "[variables('logAnalyticsResource')]"
-                    }
-                }
+            "copy": {
+                "name": "policyAssignmentCopy",
+                "count": "[length(variables('policies'))]"
             }
         },
         {
             "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForWindowsDeployLogAnalytics'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForWindowsDeployLogAnalytics')]" ],
+            "name": "[guid(variables('policies')[copyIndex()]['name'], resourceGroup().id)]",
+            "condition": "[contains(variables('policies')[copyIndex()]['flavors'], parameters('flavor'))]",
+            "dependsOn": [ "[variables('policies')[copyIndex()]['name']]" ],
             "apiVersion": "2020-04-01-preview",
             "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForWindowsDeployLogAnalytics')),'2019-09-01', 'full').identity.principalId]",
+                "roleDefinitionId": "[variables('policies')[copyIndex()]['roleDefinition']]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[copyIndex()]['name']),'2019-09-01', 'full').identity.principalId]",
                 "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForLinuxDeployDependencyAgent')]",
-            "apiVersion": "2019-09-01",
-            "location": "[parameters('azureLocation')]",
-            "identity": {
-                "type": "SystemAssigned"
             },
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForLinuxDeployDependencyAgent')]",
-                "parameters": {
-
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForLinuxDeployDependencyAgent'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForLinuxDeployDependencyAgent')]" ],
-            "apiVersion": "2020-04-01-preview",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForLinuxDeployDependencyAgent')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForWindowsDeployDependencyAgent')]",
-            "apiVersion": "2019-09-01",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForWindowsDeployDependencyAgent')]",
-                "parameters": {
-
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForWindowsDeployDependencyAgent'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForWindowsDeployDependencyAgent')]" ],
-            "apiVersion": "2020-04-01-preview",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForWindowsDeployDependencyAgent')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForAddResourceTag')]",
-            "apiVersion": "2019-09-01",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForAddResourceTag')]",
-                "parameters": {
-                    "tagName": {
-                        "value": "Project"
-                    },
-                    "tagValue": {
-                        "value": "jumpstart_arcbox"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForAddResourceTag'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForAddResourceTag')]" ],
-            "apiVersion": "2020-04-01-preview",
-            "properties": {
-                "roleDefinitionId": "[variables('tagContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForAddResourceTag')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForEnableAzureDefenderKubernetes')]",
-            "apiVersion": "2019-09-01",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "condition": "[equals(parameters('flavor'),'Full')]",
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForEnableAzureDefenderKubernetes')]",
-                "parameters": {
-
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForEnableAzureDefenderKubernetes'), resourceGroup().id)]",
-            "dependsOn": [ "[if( equals(parameters('flavor'),'Full'), variables('policyNameForEnableAzureDefenderKubernetes'), null())]" ],
-            "apiVersion": "2020-04-01-preview",
-            "condition": "[equals(parameters('flavor'),'Full')]",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForEnableAzureDefenderKubernetes')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForChangeTrackingLinuxArc')]",
-            "apiVersion": "2019-09-01",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForChangeTrackingLinuxArc')]",
-                "parameters": {
-
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForChangeTrackingLinuxArc'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForChangeTrackingLinuxArc')]" ],
-            "apiVersion": "2020-04-01-preview",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForChangeTrackingLinuxArc')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForChangeTrackingWindowsArc')]",
-            "apiVersion": "2019-09-01",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForChangeTrackingWindowsArc')]",
-                "parameters": {
-
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForChangeTrackingWindowsArc'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForChangeTrackingWindowsArc')]" ],
-            "apiVersion": "2020-04-01-preview",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForChangeTrackingWindowsArc')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForPeriodicUpdateCheck')]",
-            "apiVersion": "2019-09-01",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForPeriodicUpdateCheck')]",
-                "parameters": {
-
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForPeriodicUpdateCheck'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForPeriodicUpdateCheck')]" ],
-            "apiVersion": "2020-04-01-preview",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForPeriodicUpdateCheck')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policyNameForConfigureSQLExtension')]",
-            "apiVersion": "2019-09-01",
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
-                "policyDefinitionId": "[variables('policyDefinitionForConfigureSQLExtension')]",
-                "parameters": {
-
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid(variables('policyNameForConfigureSQLExtension'), resourceGroup().id)]",
-            "dependsOn": [ "[variables('policyNameForConfigureSQLExtension')]" ],
-            "apiVersion": "2020-04-01-preview",
-            "properties": {
-                "roleDefinitionId": "[variables('logAnalyticsContributorRoleDefinition')]",
-                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policyNameForConfigureSQLExtension')),'2019-09-01', 'full').identity.principalId]",
-                "principalType": "ServicePrincipal"
+            "copy": {
+                "name": "roleAssignmentCopy",
+                "count": "[length(variables('policies'))]"
             }
         }
     ]
