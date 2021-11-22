@@ -103,11 +103,11 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
   - Create Secret Provider Class to read the secrets
   - Deploy the app
 
-* You can now see that Azure Key Vault extensions are now enabled in the extension tab section of the Azure Arc-enabled Kubernetes cluster resource in Azure.
+- You can now see that Azure Key Vault extensions are now enabled in the extension tab section of the Azure Arc-enabled Kubernetes cluster resource in Azure.
 
     ![Screenshot extension deployment extensions tab](./04.png)
 
-* You can also verify the deployment by running the below _kubectl_ commands and see the deployed artifacts in the _kube-system_ namespace.
+- You can also verify the deployment by running the below _kubectl_ commands and seeing the deployed artifacts in the _kube-system_ namespace.
 
     ```shell
     kubectl get pods,secret -n hello-arc
