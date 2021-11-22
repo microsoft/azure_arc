@@ -132,7 +132,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
     ![Screenshot Kubernetes App Pod secret store](./07.png)
 
-* Run the below command to print a test secret held in secrets-store:
+- Run the below command to print a test secret held in secrets-store:
 
     ```shell
     kubectl -n hello-arc exec busybox-secrets-sync -- sh -c 'echo $SECRET_USERNAME'
