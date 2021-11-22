@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set deployment environment variables
-export CLUSTERCTL_VERSION="1.0.0" # Do not change!
+export CLUSTERCTL_VERSION="1.0.1" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.0.0" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
@@ -27,6 +27,16 @@ export AZURE_CLIENT_SECRET_B64="$(echo -n "$AZURE_CLIENT_SECRET" | base64 | tr -
 export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+
+# Registering Azure Arc providers
+echo "Registering Azure Arc providers"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+
+az provider show -n Microsoft.Kubernetes -o table
+az provider show -n Microsoft.KubernetesConfiguration -o table
+az provider show -n Microsoft.ExtendedLocation -o table
 
 # Installing clusterctl
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
