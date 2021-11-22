@@ -63,17 +63,17 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-* User has deployed Kubernetes cluster using Cluster API and has it connected as Azure Arc-enabled Kubernetes cluster.
+- User has deployed the Kubernetes cluster using Cluster API and has it connected as Azure Arc-enabled Kubernetes cluster.
 
-* User is editing the environment variables in the Shell script file (1-time edit) which then be used throughout the extension deployment.
+- User is editing the environment variables in the Shell script file (1-time edit) which then be used throughout the extension deployment.
 
-* User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Azure Key Vault Secrets Provider extension on the Azure Arc connected cluster.
+- User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Azure Key Vault Secrets Provider extension on the Azure Arc connected cluster.
 
-* The script will also deploy the Key Vault, sample secret to Azure Subscription, and a sample app to Azure Arc-enabled Kubernetes cluster
+- The script will also deploy the Key Vault, sample secret to Azure Subscription, and a sample app to Azure Arc-enabled Kubernetes cluster
 
-* User is veryfing the cluster and make sure the extension is deployed.
+- User is verifying the cluster and making sure the extension is deployed.
 
-* User is checking the secret value mounted in pod.
+- User is checking the secret value mounted in a Kubernetes pod.
 
 ## Create Azure Key Vault extensions instance
 
