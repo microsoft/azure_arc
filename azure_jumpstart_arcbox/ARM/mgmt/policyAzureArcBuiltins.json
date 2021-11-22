@@ -51,9 +51,7 @@
                     "flavors": [ "Full", "ITPro" ],
                     "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
                     "parameters": {
-                        "logAnalytics": {
-                            "value": "[variables('logAnalyticsResource')]"
-                        }
+
                     }
                 },
                 {
@@ -62,9 +60,7 @@
                     "flavors": [ "Full", "ITPro" ],
                     "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
                     "parameters": {
-                        "logAnalytics": {
-                            "value": "[variables('logAnalyticsResource')]"
-                        }
+
                     }
                 },
                 {
@@ -82,25 +78,12 @@
                     }
                 },
                 {
-                    "name": "(ArcBox) Enable Azure Defender on Kubernetes clusters",
-                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c",
-                    "flavors": [ "Full" ],
-                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                    "parameters": {
-                        "logAnalytics": {
-                            "value": "[variables('logAnalyticsResource')]"
-                        }
-                    }
-                },
-                {
                     "name": "(ArcBox) Enable ChangeTracking on Linux Arc-enabled servers",
                     "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278",
                     "flavors": [ "Full", "ITPro" ],
                     "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
                     "parameters": {
-                        "logAnalytics": {
-                            "value": "[variables('logAnalyticsResource')]"
-                        }
+
                     }
                 },
                 {
@@ -109,9 +92,7 @@
                     "flavors": [ "Full", "ITPro" ],
                     "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
                     "parameters": {
-                        "logAnalytics": {
-                            "value": "[variables('logAnalyticsResource')]"
-                        }
+
                     }
                 },
                 {
