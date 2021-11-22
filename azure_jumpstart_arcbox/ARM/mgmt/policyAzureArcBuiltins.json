@@ -91,7 +91,7 @@
     "resources": [
         {
             "type": "Microsoft.Authorization/policyAssignments",
-            "name": "[variables('policies')[copyIndex()]['name']]",
+            "name": "[variables('policies')[copyIndex()].name]",
             "apiVersion": "2019-09-01",
             "condition": "[contains(variables('policies')[copyIndex()]['flavors'], parameters('flavor'))]",
             "location": "[parameters('azureLocation')]",
