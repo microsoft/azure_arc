@@ -83,7 +83,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
 ![Screenshot showing current kubectl context pointing to CAPI cluster](./01.png)
 
-* In the screenshot below, notice how currently there are no extensions installed yet in your Arc-enabled Kubernetes cluster.
+- In the screenshot below, notice how currently there are no extensions installed yet in your Arc-enabled Kubernetes cluster.
 
     ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource extensions](./02.png)
 
