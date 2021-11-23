@@ -66,10 +66,11 @@ $pgWorkerPodName = "jumpstartpsw0-0"
 Write-Host "Azure Arc-enabled PostgreSQL Hyperscale is ready!"
 Write-Host "`n"
 
+Start-Sleep -Seconds 60
+
 # Update Service Port from 5432 to Non-Standard
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-pgsql\",\"port\":15432,\"targetPort\":5432}]}}'
 kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
-
 Start-Sleep -Seconds 60
 
 ###### Currently instant restore is not working on AKS ######
