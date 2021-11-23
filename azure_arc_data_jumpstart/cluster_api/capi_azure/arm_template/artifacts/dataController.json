@@ -108,7 +108,11 @@
       },
       "tags": "[parameters('resourceTags')]",
       "properties": {
-        "basicLoginInformation": {
+        "metricsDashboardCredential": {
+          "username": "[parameters('azdataUsername')]",
+          "password": "[parameters('azdataPassword')]"
+        },
+        "logsDashboardCredential": {
           "username": "[parameters('azdataUsername')]",
           "password": "[parameters('azdataPassword')]"
         },
