@@ -155,6 +155,17 @@
                 "name": "roleAssignmentCopy",
                 "count": "[length(parameters('policies'))]"
             }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "name": "[guid('roleIdOnly', resourceGroup().id)]",
+            "dependsOn": [ "(ArcBox) Configure SQL Extension on Arc servers with SQL Server" ],
+            "apiVersion": "2020-04-01-preview",
+            "properties": {
+                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Configure SQL Extension on Arc servers with SQL Server'),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
         }
     ]
 }
