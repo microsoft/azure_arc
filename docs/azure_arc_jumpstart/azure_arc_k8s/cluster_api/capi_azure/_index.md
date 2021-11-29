@@ -102,18 +102,18 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   The script will transform the kind Kubernetes cluster to a CAPI management cluster with the Azure Cluster API provisioned (CAPZ) components that are needed. It will then deploy the workload cluster and it's Azure resources based on the environment variables as described in the next bullet. Upon deployment completion, the cluster will be onboard as an Azure Arc-enabled Kubernetes cluster.
 
 - Edit the environment variables to match your Azure subscription and SPN details created in the prerequisites section in this guide as well as the required workload cluster details.
-
-  - _`KUBERNETES_VERSION`_="Kubernetes version. For example: 1.22.1"
-  - _`CONTROL_PLANE_MACHINE_COUNT`_="Control Plane node count. For example: 1"
-  - _`WORKER_MACHINE_COUNT`_="Workers node count. For example: 2"
-  - _`AZURE_LOCATION`_="Azure region. For example: eastus"
-  - _`CAPI_WORKLOAD_CLUSTER_NAME`_="Workload cluster name. For example: arc-capi-azure". Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
-  - _`AZURE_SUBSCRIPTION_ID`_="Azure subscription id"
-  - _`AZURE_TENANT_ID`_="Azure tenant id"
-  - _`AZURE_CLIENT_ID`_="Azure SPN application client id"
-  - _`AZURE_CLIENT_SECRET`_="Azure SPN application client secret"
-  - _`AZURE_CONTROL_PLANE_MACHINE_TYPE`_="Control Plane node Azure VM type .For example: Standard_D2s_v3".
-   _`AZURE_NODE_MACHINE_TYPE`_="Worker node Azure VM type .For example: Standard_D4s_v3"
+_`sshRSAPublicKey`_
+  - _`KUBERNETES_VERSION`_ - Kubernetes version. For example: 1.22.1
+  - _`CONTROL_PLANE_MACHINE_COUNT`_ - Control Plane node count. For example: 1
+  - _`WORKER_MACHINE_COUNT`_ - Workers node count. For example: 2
+  - _`AZURE_LOCATION`_ - Azure region. For example: eastus
+  - _`CAPI_WORKLOAD_CLUSTER_NAME`_ - Workload cluster name. For example: _arc-capi-azure_. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+  - _`AZURE_SUBSCRIPTION_ID`_ - Azure subscription id
+  - _`AZURE_TENANT_ID`_ - Azure tenant id
+  - _`AZURE_CLIENT_ID`_ - Azure SPN application client id
+  - _`AZURE_CLIENT_SECRET`_ - Azure SPN application client secret
+  - _`AZURE_CONTROL_PLANE_MACHINE_TYPE`_ - Control Plane node Azure VM type .For example: Standard_D2s_v3
+  - _`AZURE_NODE_MACHINE_TYPE`_ - Worker node Azure VM type .For example: Standard_D4s_v3
 
   ![Screenshot of user environment variables](./03.png)
 
