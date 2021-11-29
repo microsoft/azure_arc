@@ -91,13 +91,17 @@ Write-Host "`n"
 # Monitor pods across namespaces
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pods --all-namespaces; Start-Sleep -Seconds 5; Clear-Host }}
 
+# Localize kubeconfig
+$env:KUBECONTEXT = kubectl config current-context
+$env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
+
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `
                         --resource-group $env:resourceGroup `
                         --location $env:azureLocation `
                         --tags 'Project=jumpstart_azure_arc_data_services' `
-                        --custom-locations-oid $env:customLocationOid
-                        # This is the Custom Locations Enterprise Application ObjectID from AAD
+                        --kube-config $env:KUBECONFIG `
+                        --kube-context $env:KUBECONTEXT
 
 Start-Sleep -Seconds 10
 
@@ -132,7 +136,8 @@ az customlocation create --name 'jumpstart-cl' `
                          --resource-group $env:resourceGroup `
                          --namespace arc `
                          --host-resource-id $connectedClusterId `
-                         --cluster-extension-ids $extensionId
+                         --cluster-extension-ids $extensionId `
+                         --kubeconfig $env:KUBECONFIG
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
