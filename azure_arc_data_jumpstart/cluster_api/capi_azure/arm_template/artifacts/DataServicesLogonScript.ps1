@@ -89,8 +89,8 @@ azdata --version
 # az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags '' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
 
 # Localize kubeconfig
-$env:KUBECONTEXT = kubectl config current-context
-$env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
+# $env:KUBECONTEXT = kubectl config current-context
+# $env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
 
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `
