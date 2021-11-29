@@ -83,10 +83,9 @@ Write-Host "`n"
 kubectl get nodes
 azdata --version
 
-# # Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
-# Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-# Write-Host "`n"
-# az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags '' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+# Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
+Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+Write-Host "`n"
 
 # Localize kubeconfig
 $env:KUBECONTEXT = kubectl config current-context
