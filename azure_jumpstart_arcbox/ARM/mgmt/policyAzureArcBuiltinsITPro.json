@@ -108,16 +108,8 @@
                     "name": "(ArcBox) Configure SQL Extension on Arc servers with SQL Server",
                     "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/fd2d1a6e-6d95-4df2-ad00-504bf0273406",
                     "flavors": [ "Full", "ITPro" ],
-                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                    "parameters": {
-
-                    }
-                },
-                {
-                    "name": "(ArcBox) Configure SQL Extension on Arc servers with SQL Server",
-                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/fd2d1a6e-6d95-4df2-ad00-504bf0273406",
-                    "flavors": [ "Full", "ITPro" ],
-                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]",
+                    "roleDefinition": ["[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                                       "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]" ],
                     "parameters": {
 
                     }
@@ -126,8 +118,7 @@
         }
     },
     "variables": {
-        "logAnalyticsResource": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]",
-
+        "logAnalyticsResource": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
     },
     "resources": [
         {
@@ -147,7 +138,10 @@
             "copy": {
                 "name": "policyAssignmentCopy",
                 "count": "[length(parameters('policies'))]"
-            }
+            },
+            "resources": [
+                
+            ]
         },
         {
             "type": "Microsoft.Authorization/roleAssignments",
@@ -156,13 +150,13 @@
             "dependsOn": [ "[parameters('policies')[copyIndex()].name]" ],
             "apiVersion": "2020-04-01-preview",
             "properties": {
-                "roleDefinitionId": "[parameters('policies')[copyIndex()].roleDefinition]",
+                "roleDefinitionId": "[parameters('policies')[copyIndex()].roleDefinition[copyIndex()]]",
                 "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', parameters('policies')[copyIndex()].name),'2019-09-01', 'full').identity.principalId]",
                 "principalType": "ServicePrincipal"
             },
             "copy": {
                 "name": "roleAssignmentCopy",
-                "count": "[length(parameters('policies'))]"
+                "count": "[length(parameters('policies')[copyIndex()].roleDefinition)]"
             }
         }
     ]
