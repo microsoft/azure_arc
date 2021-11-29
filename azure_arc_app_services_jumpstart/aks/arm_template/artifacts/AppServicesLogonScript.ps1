@@ -67,6 +67,9 @@ az extension add --yes --source "https://aka.ms/logicapp-latest-py2.py3-none-any
 Write-Host "`n"
 az -v
 
+Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+Write-Host "`n"
+
 # Localize kubeconfig
 $env:KUBECONTEXT = kubectl config current-context
 $env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
