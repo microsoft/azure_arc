@@ -74,6 +74,10 @@ $storageClassName = "managed-premium"
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
 kubectl get nodes
+Write-Host "`n"
+
+Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+Write-Host "`n"
 
 # Localize kubeconfig
 $env:KUBECONTEXT = kubectl config current-context
