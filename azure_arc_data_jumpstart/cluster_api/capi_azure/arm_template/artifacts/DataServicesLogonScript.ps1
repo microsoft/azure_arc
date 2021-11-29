@@ -83,10 +83,21 @@ Write-Host "`n"
 kubectl get nodes
 azdata --version
 
-# Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-Write-Host "`n"
-az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+# # Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
+# Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# Write-Host "`n"
+# az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags '' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+
+# Localize kubeconfig
+$env:KUBECONTEXT = kubectl config current-context
+$env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
+
+# Create Kubernetes - Azure Arc Cluster
+az connectedk8s connect --name $connectedClusterName `
+                        --resource-group $env:resourceGroup `
+                        --location $env:azureLocation `
+                        --tags 'Project=jumpstart_azure_arc_data_services'
+
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
