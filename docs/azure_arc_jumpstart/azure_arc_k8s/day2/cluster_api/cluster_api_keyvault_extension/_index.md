@@ -87,7 +87,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
     ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource extensions](./02.png)
 
-- Edit the environment variables in the script to match your environment parameters followed by running the ```. ./azure_keyvault_k8s_extension.sh``` command.
+- Edit the environment variables [in the script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_keyvault_extension/capi_keyvault_k8s_extension.sh) to match your environment parameters followed by running the ```. ./azure_keyvault_k8s_extension.sh``` command.
 
     ![Screenshot parameter examples](./03.png)
 
