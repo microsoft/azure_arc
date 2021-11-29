@@ -158,7 +158,7 @@
         },
         {
             "type": "Microsoft.Authorization/roleAssignments",
-            "name": "[guid('(ArcBox) Configure SQL Extension on Arc servers with SQL Server (new role id)', resourceGroup().id)]",
+            "name": "[guid('roleIdOnly', resourceGroup().id)]",
             "dependsOn": [ "(ArcBox) Configure SQL Extension on Arc servers with SQL Server" ],
             "apiVersion": "2020-04-01-preview",
             "properties": {
