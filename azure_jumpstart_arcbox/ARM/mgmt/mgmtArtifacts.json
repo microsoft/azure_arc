@@ -62,7 +62,7 @@
       "name": "[concat('Security', '(', parameters('workspaceName'), ')')]",
       "galleryName": "Security"
     },
-    "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
+    "policyTemplate": "[if(equals(parameters('flavor'),'ITPro'), uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsITPro.json'),uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsFull.json'))]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",
