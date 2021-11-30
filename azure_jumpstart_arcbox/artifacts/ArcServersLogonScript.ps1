@@ -151,9 +151,9 @@ New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$vm
 Set-VMFirmware -VMName ArcBox-Ubuntu -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
 Set-VMProcessor -VMName ArcBox-Ubuntu -Count 1
 
-New-VM -Name ArcBox-Debian -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Debian.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
-Set-VMFirmware -VMName ArcBox-Debian -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
-Set-VMProcessor -VMName ArcBox-Debian -Count 1
+New-VM -Name ArcBox-CentOS -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-CentOS.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
+Set-VMFirmware -VMName ArcBox-CentOS -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
+Set-VMProcessor -VMName ArcBox-CentOS -Count 1
 
 # We always want the VMs to start with the host and shut down cleanly with the host
 Write-Output "Set VM auto start/stop"
@@ -161,7 +161,7 @@ Set-VM -Name ArcBox-Win2K19 -AutomaticStartAction Start -AutomaticStopAction Shu
 Set-VM -Name ArcBox-Win2K22 -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name ArcBox-SQL -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name ArcBox-Ubuntu -AutomaticStartAction Start -AutomaticStopAction ShutDown
-Set-VM -Name ArcBox-Debian -AutomaticStartAction Start -AutomaticStopAction ShutDown
+Set-VM -Name ArcBox-CentOS -AutomaticStartAction Start -AutomaticStopAction ShutDown
 
 Write-Output "Enabling Guest Integration Service"
 Get-VM | Get-VMIntegrationService | Where-Object {-not($_.Enabled)} | Enable-VMIntegrationService -Verbose
@@ -172,7 +172,7 @@ Start-VM -Name ArcBox-Win2K19
 Start-VM -Name ArcBox-Win2K22
 Start-VM -Name ArcBox-SQL
 Start-VM -Name ArcBox-Ubuntu
-Start-VM -Name ArcBox-Debian
+Start-VM -Name ArcBox-CentOS
 
 # Expand Windows partition sizes
 # $User = "Administrator"
@@ -217,27 +217,27 @@ $string = Get-Content "$UbuntuIP"
 $string.split('{')[-1] | Set-Content $UbuntuIP
 $UbuntuVmIp = Get-Content "$UbuntuIP"
 
-# Getting the Debian nested VM IP address
-Get-VM -Name ArcBox-Debian | Select-Object -ExpandProperty NetworkAdapters | Select-Object IPAddresses | Format-List | Out-File "$agentScript\Debian-IP.txt"
-$DebianIP = "$agentScript\Debian-IP.txt"
-(Get-Content $DebianIP | Select-Object -Skip 2) | Set-Content $DebianIP
-$string = Get-Content "$DebianIP"
-$string.split(',')[0] | Set-Content $DebianIP
-$string = Get-Content "$DebianIP"
-$string.split('{')[-1] | Set-Content $DebianIP
-$DebianVmIp = Get-Content "$DebianIP"
+# Getting the CentOS nested VM IP address
+Get-VM -Name ArcBox-CentOS | Select-Object -ExpandProperty NetworkAdapters | Select-Object IPAddresses | Format-List | Out-File "$agentScript\CentOS-IP.txt"
+$CentOSIP = "$agentScript\CentOS-IP.txt"
+(Get-Content $CentOSIP | Select-Object -Skip 2) | Set-Content $CentOSIP
+$string = Get-Content "$CentOSIP"
+$string.split(',')[0] | Set-Content $CentOSIP
+$string = Get-Content "$CentOSIP"
+$string.split('{')[-1] | Set-Content $CentOSIP
+$CentOSVmIp = Get-Content "$CentOSIP"
 
 # Copying the Azure Arc Connected Agent to nested VMs
 Write-Output "Copying the Azure Arc onboarding script to the nested VMs"
 (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
 (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
-(Get-Content -path "$agentScript\installArcAgentDebian.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedDebian.sh"
+(Get-Content -path "$agentScript\installArcAgentCentOS.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedCentOS.sh"
 
 Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-Win2K22 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedUbuntu.sh" $nestedLinuxUsername@"$UbuntuVmIp":/home/"$nestedLinuxUsername"
-Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedDebian.sh" $nestedLinuxUsername@"$DebianVmIp":/home/"$nestedLinuxUsername"
+Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedCentOS.sh" $nestedLinuxUsername@"$CentOSVmIp":/home/"$nestedLinuxUsername"
 
 # Onboarding the nested VMs as Azure Arc-enabled servers
 Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
@@ -258,9 +258,9 @@ $SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -Timeout 120 -WarningAction SilentlyContinue | Out-Null
 
-# Onboarding nested Debian server VM
-$SessionID = New-SSHSession -ComputerName $DebianVmIp -Credential $Credentials -Force -WarningAction SilentlyContinue #Connect Over SSH
-$Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedDebian.sh"
+# Onboarding nested CentOS server VM
+$SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force -WarningAction SilentlyContinue #Connect Over SSH
+$Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 120 -WarningAction SilentlyContinue | Out-Null
 
 # Sending deployement status message to Azure storage account queue
