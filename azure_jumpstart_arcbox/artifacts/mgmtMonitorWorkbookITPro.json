@@ -472,7 +472,7 @@
                         "additionalResourceOptions": [],
                         "showDefault": false
                       },
-                      "jsonData": "[[\r\n    { \"value\":\"ArcBox-SQL\", \"label\":\"ArcBox-SQL\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu\", \"label\":\"ArcBox-Ubuntu\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K19\", \"label\":\"ArcBox-Win2K19\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K22\", \"label\":\"ArcBox-Win2K22\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Debian\", \"label\":\"ArcBox-Debian\", \"group\":\"Select\" }\r\n]",
+                      "jsonData": "[[\r\n    { \"value\":\"ArcBox-SQL\", \"label\":\"ArcBox-SQL\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu\", \"label\":\"ArcBox-Ubuntu\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K19\", \"label\":\"ArcBox-Win2K19\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K22\", \"label\":\"ArcBox-Win2K22\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-CentOS\", \"label\":\"ArcBox-CentOS\", \"group\":\"Select\" }\r\n]",
                       "timeContext": {
                         "durationMs": 86400000
                       }
