@@ -229,7 +229,7 @@ The tab has two different sections, one for Windows and one for Linux machines:
 
    ![Update Linux Updates](./update_linux.png)
 
-  * _Top Linux VMs with Updates_ - Shows the top Linux machines with updates available and the number of updates per machine.
+  * _Top Linux VMs with Updates_ - Shows the top Linux machines with updates available and the number of updates per machine. Please note there are no updates available for the Azure Arc-enabled servers in Arcbox for IT Pros in this instance.
 
    ![ Update Linux Top](./uptade_linux_top.png)
 
