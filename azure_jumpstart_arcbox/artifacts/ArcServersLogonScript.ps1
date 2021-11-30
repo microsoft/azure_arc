@@ -141,6 +141,7 @@ Set-VMProcessor -VMName ArcBox-Win2K19 -Count 2
 New-VM -Name ArcBox-Win2K22 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win2K22.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K22 -Count 2
 
+Resize-VHD -Path "$vmdir\ArcBox-SQL.vhdx" -SizeBytes 50Gb
 New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-SQL.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
@@ -170,6 +171,15 @@ Start-VM -Name ArcBox-Win2K22
 Start-VM -Name ArcBox-SQL
 Start-VM -Name ArcBox-Ubuntu
 Start-VM -Name ArcBox-Debian
+
+# Expand ArcBox-SQL partition size
+$User = "Administrator"
+$Password = ConvertTo-SecureString -String "ArcDemo123!!" -AsPlainText -Force
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $Password
+Enter-PSSession -VMName ArcBox-SQL -Credential $Credential
+$MaxSize = (Get-PartitionSupportedSize -DriveLetter c).SizeMax
+Resize-Partition -DriveLetter C -Size $MaxSize
+Exit-PSSession
 
 Start-Sleep -Seconds 20
 $username = "Administrator"
