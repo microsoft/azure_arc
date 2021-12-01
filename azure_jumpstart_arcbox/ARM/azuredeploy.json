@@ -140,7 +140,7 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },   
+          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           }
@@ -179,7 +179,7 @@
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },          
+          },
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
@@ -220,6 +220,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
           }
         }
       }

@@ -41,6 +41,12 @@
       "metadata": {
         "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
       }
+    },
+    "flavor": {
+      "type": "string",
+      "metadata": {
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+      }
     }
   },
   "variables": {
@@ -56,7 +62,7 @@
       "name": "[concat('Security', '(', parameters('workspaceName'), ')')]",
       "galleryName": "Security"
     },
-    "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
+    "policyTemplate": "[if(equals(parameters('flavor'),'ITPro'), uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsITPro.json'),uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsFull.json'))]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",
@@ -120,6 +126,9 @@
       "apiVersion": "2015-11-01-preview",
       "type": "Microsoft.OperationsManagement/solutions",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+      ],
       "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
       "properties": {
         "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
@@ -136,6 +145,9 @@
       "apiVersion": "2015-11-01-preview",
       "name": "[variables('ChangeTracking').name]",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+      ],
       "plan": {
         "name": "[concat('ChangeTracking', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
         "promotionCode": "",
@@ -151,6 +163,9 @@
       "apiVersion": "2015-11-01-preview",
       "name": "[variables('Security').name]",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+      ],
       "plan": {
         "name": "[concat('ChangeTracking', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
         "promotionCode": "",
@@ -207,6 +222,9 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('workspaceName')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
           }
         }
       }
