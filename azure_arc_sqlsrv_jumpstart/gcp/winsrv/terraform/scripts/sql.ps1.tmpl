@@ -83,7 +83,7 @@ $Location = "${location}"
 Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
 
 # Create the workspace
-New-AzOperationalInsightsWorkspace -Location $Location -Name $WorkspaceName -Sku Standard -ResourceGroupName $resourceGroup -Verbose
+New-AzOperationalInsightsWorkspace -Location $Location -Name $WorkspaceName -Sku PerNode -ResourceGroupName $resourceGroup -Verbose
 
 Write-Host "Enabling Log Analytics Solutions"
 $Solutions = "Security", "Updates", "SQLAssessment"
