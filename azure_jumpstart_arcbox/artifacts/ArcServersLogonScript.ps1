@@ -95,6 +95,7 @@ az login --service-principal --username $env:spnClientID --password $env:spnClie
 # Register Azure providers
 az provider register --namespace Microsoft.HybridCompute --wait
 az provider register --namespace Microsoft.GuestConfiguration --wait
+az provider register --namespace Microsoft.AzureArcData --wait
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Output "Configure DHCP service"
@@ -128,18 +129,21 @@ Set-VMHost -EnableEnhancedSessionMode $true
 
 # Downloading nested VMs VHDX files
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-$sourceFolder = 'https://jumpstart.blob.core.windows.net/temp'
+$sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
 $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $vmDir --recursive
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
+#Resize-VHD -Path "$vmdir\ArcBox-Win2K19.vhdx" -SizeBytes 50Gb
 New-VM -Name ArcBox-Win2K19 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win2K19.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K19 -Count 2
 
+#Resize-VHD -Path "$vmdir\ArcBox-Win2K22.vhdx" -SizeBytes 50Gb
 New-VM -Name ArcBox-Win2K22 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-Win2K22.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K22 -Count 2
 
+#Resize-VHD -Path "$vmdir\ArcBox-SQL.vhdx" -SizeBytes 50Gb
 New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$vmdir\ArcBox-SQL.vhdx" -Path $vmdir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
@@ -169,6 +173,15 @@ Start-VM -Name ArcBox-Win2K22
 Start-VM -Name ArcBox-SQL
 Start-VM -Name ArcBox-Ubuntu
 Start-VM -Name ArcBox-CentOS
+
+# Expand Windows partition sizes
+# $User = "Administrator"
+# $Password = ConvertTo-SecureString -String "ArcDemo123!!" -AsPlainText -Force
+# $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $Password
+# Enter-PSSession -VMName ArcBox-SQL -Credential $Credential
+# $MaxSize = (Get-PartitionSupportedSize -DriveLetter c).SizeMax
+# Resize-Partition -DriveLetter C -Size $MaxSize
+# Exit-PSSession
 
 Start-Sleep -Seconds 20
 $username = "Administrator"
@@ -217,13 +230,12 @@ $CentOSVmIp = Get-Content "$CentOSIP"
 # Copying the Azure Arc Connected Agent to nested VMs
 Write-Output "Copying the Azure Arc onboarding script to the nested VMs"
 (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
-(Get-Content -path "$agentScript\installArcAgentSQL.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$myResourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$logAnalyticsWorkspaceName',"'$env:workspaceName'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
 (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 (Get-Content -path "$agentScript\installArcAgentCentOS.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedCentOS.sh"
 
 Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-Win2K22 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
-Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath C:\Temp\installArcAgentSQL.ps1 -CreateFullPath -FileSource Host
+Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\Temp\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedUbuntu.sh" $nestedLinuxUsername@"$UbuntuVmIp":/home/"$nestedLinuxUsername"
 Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedCentOS.sh" $nestedLinuxUsername@"$CentOSVmIp":/home/"$nestedLinuxUsername"
 
@@ -235,7 +247,7 @@ $cred = new-object -typename System.Management.Automation.PSCredential -argument
 
 Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File C:\Temp\installArcAgent.ps1 } -Credential $cred
 Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File C:\Temp\installArcAgent.ps1 } -Credential $cred
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\Temp\installArcAgentSQL.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\Temp\installArcAgent.ps1 } -Credential $cred
 
 Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 # Converting Linux credentials to secure string  

@@ -1,0 +1,153 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "azureLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "Location of your Azure resources"
+            }
+        },
+        "logAnalyticsWorkspace": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of your log analytics workspace"
+            }
+        },
+        "flavor": {
+            "type": "string",
+            "metadata": {
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+            }
+        },
+        "policies": {
+            "type": "array",
+            "defaultValue": [
+                {
+                    "name": "(ArcBox) Deploy Linux Log Analytics agents",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                    "parameters": {
+                        "logAnalytics": {
+                            "value": "[variables('logAnalyticsResource')]"
+                        }
+                    }
+                },
+                {
+                    "name": "(ArcBox) Deploy Windows Log Analytics agents",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                    "parameters": {
+                        "logAnalytics": {
+                            "value": "[variables('logAnalyticsResource')]"
+                        }
+                    }
+                },
+                {
+                    "name": "(ArcBox) Deploy Linux Dependency Agents",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                    "parameters": {
+
+                    }
+                },
+                {
+                    "name": "(ArcBox) Deploy Windows Dependency Agents",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                    "parameters": {
+
+                    }
+                },
+                {
+                    "name": "(ArcBox) Tag resources",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                    "parameters": {
+                        "tagName": {
+                            "value": "Project"
+                        },
+                        "tagValue": {
+                            "value": "jumpstart_arcbox"
+                        }
+                    }
+                },
+                {
+                    "name": "(ArcBox) Enable checks for updates on Azure Arc servers",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                    "parameters": {
+
+                    }
+                },
+                {
+                    "name": "(ArcBox) Configure SQL Extension on Arc servers with SQL Server",
+                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/fd2d1a6e-6d95-4df2-ad00-504bf0273406",
+                    "flavors": [ "Full", "ITPro" ],
+                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                    "parameters": {
+
+                    }
+                }
+            ]
+        }
+    },
+    "variables": {
+        "logAnalyticsResource": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]",
+
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "name": "[parameters('policies')[copyIndex()].name]",
+            "apiVersion": "2019-09-01",
+            "condition": "[contains(parameters('policies')[copyIndex()].flavors, parameters('flavor'))]",
+            "location": "[parameters('azureLocation')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "scope": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', resourceGroup().name)]",
+                "policyDefinitionId": "[parameters('policies')[copyIndex()].definitionId]",
+                "parameters": "[parameters('policies')[copyIndex()].parameters]"
+            },
+            "copy": {
+                "name": "policyAssignmentCopy",
+                "count": "[length(parameters('policies'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "name": "[guid(parameters('policies')[copyIndex()].name, resourceGroup().id)]",
+            "condition": "[contains(parameters('policies')[copyIndex()].flavors, parameters('flavor'))]",
+            "dependsOn": [ "[parameters('policies')[copyIndex()].name]" ],
+            "apiVersion": "2020-04-01-preview",
+            "properties": {
+                "roleDefinitionId": "[parameters('policies')[copyIndex()].roleDefinition]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', parameters('policies')[copyIndex()].name),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "copy": {
+                "name": "roleAssignmentCopy",
+                "count": "[length(parameters('policies'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "name": "[guid('roleIdOnly', resourceGroup().id)]",
+            "dependsOn": [ "(ArcBox) Configure SQL Extension on Arc servers with SQL Server" ],
+            "apiVersion": "2020-04-01-preview",
+            "properties": {
+                "roleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', '(ArcBox) Configure SQL Extension on Arc servers with SQL Server'),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            }
+        }
+    ]
+}
