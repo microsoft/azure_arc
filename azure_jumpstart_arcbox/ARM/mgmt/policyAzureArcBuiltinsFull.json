@@ -89,24 +89,6 @@
                     }
                 },
                 {
-                    "name": "(ArcBox) Enable ChangeTracking on Linux Arc-enabled servers",
-                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/10caed8a-652c-4d1d-84e4-2805b7c07278",
-                    "flavors": [ "Full", "ITPro" ],
-                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                    "parameters": {
-
-                    }
-                },
-                {
-                    "name": "(Arcbox) Enable ChangeTracking on Windows Arc-enabled servers",
-                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/4bb303db-d051-4099-95d2-e3e1428a4cd5",
-                    "flavors": [ "Full", "ITPro" ],
-                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                    "parameters": {
-
-                    }
-                },
-                {
                     "name": "(ArcBox) Enable checks for updates on Azure Arc servers",
                     "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46",
                     "flavors": [ "Full", "ITPro" ],
