@@ -14,4 +14,4 @@ wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh # 2>/dev/null
 bash ~/install_linux_azcmagent.sh # 2>/dev/null
 
 # Run connect command
-azcmagent connect --service-principal-id $spnClientId --service-principal-secret $spnClientSecret --resource-group $resourceGroup --tenant-id $spnTenantId --location $Azurelocation --subscription-id $subscriptionId --resource-name "ArcBox-Debian" --cloud "AzureCloud" --tags "Project=jumpstart_arcbox" --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+azcmagent connect --service-principal-id $spnClientId --service-principal-secret $spnClientSecret --resource-group $resourceGroup --tenant-id $spnTenantId --location $Azurelocation --subscription-id $subscriptionId --resource-name "ArcBox-CentOS" --cloud "AzureCloud" --tags "Project=jumpstart_arcbox" --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
