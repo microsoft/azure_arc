@@ -311,42 +311,42 @@ if($result.ProvisioningState -eq "Failed")
 
 Write-Host "SQL Server - Azure Arc resources should show up in resource group in less than 1 minute."
 
-# # Get the resource group
-# Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
+# Get the resource group
+Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
 
-# Write-Host "Enabling Log Analytics Solutions"
-# $Solutions = "Security", "Updates", "SQLAssessment"
-# foreach ($solution in $Solutions) {
-#     Set-AzOperationalInsightsIntelligencePack -ResourceGroupName $resourceGroup -WorkspaceName $workspaceName -IntelligencePackName $solution -Enabled $true -Verbose
-# }
+Write-Host "Enabling Log Analytics Solutions"
+$Solutions = "Security", "Updates", "SQLAssessment"
+foreach ($solution in $Solutions) {
+    Set-AzOperationalInsightsIntelligencePack -ResourceGroupName $resourceGroup -WorkspaceName $workspaceName -IntelligencePackName $solution -Enabled $true -Verbose
+}
 
-# # Get the workspace ID and Key
-# $workspaceId = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-# $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName --query primarySharedKey -o tsv)
+# Get the workspace ID and Key
+$workspaceId = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName --query primarySharedKey -o tsv)
 
-# $Setting = @{ "workspaceId" = $workspaceId }
-# $protectedSetting = @{ "workspaceKey" = $workspaceKey }
-# New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $env:computername -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
+$Setting = @{ "workspaceId" = $workspaceId }
+$protectedSetting = @{ "workspaceKey" = $workspaceKey }
+New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $env:computername -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
 
-# $nestedWindowsUsername = "Administrator"
-# $nestedWindowsPassword = "ArcDemo123!!"
+$nestedWindowsUsername = "Administrator"
+$nestedWindowsPassword = "ArcDemo123!!"
 
-# Write-Host "Create SQL Azure Assessment"
-# Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip"
-# Expand-Archive "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
-# $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
-# Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
-# $SecureString = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
-# Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
+Write-Host "Create SQL Azure Assessment"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip"
+Expand-Archive "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
+$env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
+Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
+$SecureString = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
+Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
-# $name = "Recurring HealthService Restart"
-# $repeat = (New-TimeSpan -Minutes 10)
-# $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "Restart-Service -Name HealthService -Force"
-# $duration = (New-TimeSpan -Days 1)
-# $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval $repeat -RepetitionDuration $duration
-# $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable -DontStopOnIdleEnd
-# Register-ScheduledTask -TaskName $name -Action $action -Trigger $trigger -RunLevel Highest -User $nestedWindowsUsername -Password $nestedWindowsPassword -Settings $settings
-# Start-Sleep -Seconds 3
-# Start-ScheduledTask -TaskName $name
+$name = "Recurring HealthService Restart"
+$repeat = (New-TimeSpan -Minutes 10)
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "Restart-Service -Name HealthService -Force"
+$duration = (New-TimeSpan -Days 1)
+$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval $repeat -RepetitionDuration $duration
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable -DontStopOnIdleEnd
+Register-ScheduledTask -TaskName $name -Action $action -Trigger $trigger -RunLevel Highest -User $nestedWindowsUsername -Password $nestedWindowsPassword -Settings $settings
+Start-Sleep -Seconds 3
+Start-ScheduledTask -TaskName $name
 
 Stop-Transcript
