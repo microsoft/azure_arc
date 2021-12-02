@@ -13,7 +13,7 @@ $resourceGroup = $myResourceGroup
 $location = $azureLocation
 $proxy=""
 $resourceTags= @{"Project"="jumpstart_arcbox"}
-$arcMachineName = 
+$arcMachineName = "ArcBox-SQL"
 $workspaceName = $logAnalyticsWorkspaceName
 
 # These optional variables can be replaced with valid service principal details
