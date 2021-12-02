@@ -13,7 +13,7 @@ $resourceGroup = $myResourceGroup
 $location = $azureLocation
 $proxy=""
 $resourceTags= @{"Project"="jumpstart_arcbox"}
-$arcMachineName = "ArcBox-SQL"
+$arcMachineName = 
 $workspaceName = $logAnalyticsWorkspaceName
 
 # These optional variables can be replaced with valid service principal details
@@ -267,35 +267,35 @@ if (!$arcResource) {
     return
 }
 
-# Write-Verbose "Getting managed Identity ID of $arcMachineName."
+Write-Verbose "Getting managed Identity ID of $arcMachineName."
 
-# $spID = $arcResource.IdentityPrincipalId
+$spID = $arcResource.IdentityPrincipalId
 
 
-# if($null -eq $spID) {
-#     Write-Warning -Message "Failed to get $arcMacineName Identity Id. Please check if Arc machine exist and rerun this step."
-#     return
-# }
+if($null -eq $spID) {
+    Write-Warning -Message "Failed to get $arcMacineName Identity Id. Please check if Arc machine exist and rerun this step."
+    return
+}
 
-# $currentRoleAssignment = Get-AzRoleAssignment -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ObjectId $spID -ResourceGroupName $resourceGroup
+$currentRoleAssignment = Get-AzRoleAssignment -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ObjectId $spID -ResourceGroupName $resourceGroup
 
-# $retryCount = 6
-# $count = 0
-# $waitTimeInSeconds = 10
+$retryCount = 6
+$count = 0
+$waitTimeInSeconds = 10
 
-# while(!$currentRoleAssignment -and $count -le $retryCount)
-# {
-#     Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
-#     $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-#     sleep $waitTimeInSeconds
-#     $count++
-# }
+while(!$currentRoleAssignment -and $count -le $retryCount)
+{
+    Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
+    $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+    sleep $waitTimeInSeconds
+    $count++
+}
 
-# if(!$currentRoleAssignment)
-# {
-#     Write-Verbose "Unable to assign Azure Connected SQL Server Onboarding role to Arc managed Identity. Skipping role assignment."
-#     return
-# }
+if(!$currentRoleAssignment)
+{
+    Write-Verbose "Unable to assign Azure Connected SQL Server Onboarding role to Arc managed Identity. Skipping role assignment."
+    return
+}
 
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
