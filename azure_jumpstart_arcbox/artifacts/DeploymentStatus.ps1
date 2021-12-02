@@ -9,7 +9,7 @@ Write-Host "`n"
 az extension add --name "resource-graph" -y
 
 # Sending deployement status message to Azure storage account queue
-$arcNumResources = az graph query -q "Resources | where type =~ 'Microsoft.HybridCompute/machines' or type=~'Microsoft.Kubernetes/connectedClusters' or type=~'Microsoft.AzureArcData/SqlServerInstances' or type=~'Microsoft.AzureArcData/dataControllers' or type=~'Microsoft.AzureArcData/sqlManagedInstances' or type=~'Microsoft.AzureArcData/postgresInstances' | where resourceGroup=~'$env:resourceGroup' | where tags.Project=~'jumpstart_arcbox' | project name, location, resourceGroup, tags | summarize count()" | Select-String "count_"
+$arcNumResources = az graph query -q "Resources | where type =~ 'Microsoft.HybridCompute/machines' or type=~'Microsoft.Kubernetes/connectedClusters' or type=~'Microsoft.AzureArcData/SqlServerInstances' or type=~'Microsoft.AzureArcData/dataControllers' or type=~'Microsoft.AzureArcData/sqlManagedInstances' or type=~'Microsoft.AzureArcData/postgresInstances' | where resourceGroup=~'$env:resourceGroup' | project name, location, resourceGroup, tags | summarize count()" | Select-String "count_"
 $arcNumResources = $arcNumResources -replace "[^0-9]" , ''
 Write-Host "You now have $arcNumResources Azure Arc resources in '$env:resourceGroup' resource group"
 Write-Host "`n"
