@@ -76,15 +76,6 @@
                             "value": "jumpstart_arcbox"
                         }
                     }
-                },
-                {
-                    "name": "(ArcBox) Enable checks for updates on Azure Arc servers",
-                    "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46",
-                    "flavors": [ "Full", "ITPro" ],
-                    "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
-                    "parameters": {
-
-                    }
                 }
             ]
         }
