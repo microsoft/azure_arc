@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Windows server with Configuration Manager using a script"
-linkTitle: "Windows server with Configuration Manager using a script"
+title: "Windows server with Configuration Manager using PowerShell"
+linkTitle: "Windows server with Configuration Manager using PowerShell"
 weight: 4
 description: >
 ---
@@ -9,8 +9,10 @@ description: >
 
 The following README will guide you on how to connect an Windows machine to Azure Arc with a PowerShell script using Configuration Manager.
 
+This guide assumes that you already have an installation of Microsoft Configuration Manager, at least one Windows server client connecting to it and a basic understanding of the product.
 ## Prerequisites
 
+* Make sure you have all the Configuration Manager [pre-requisites](https://docs.microsoft.com/mem/configmgr/apps/deploy-use/create-deploy-scripts#prerequisites) in place to use the "Run Script" feature.
 * [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
@@ -23,11 +25,11 @@ The following README will guide you on how to connect an Windows machine to Azur
   az provider register --namespace Microsoft.HybridCompute
   ```
 
-You can monitor the registration process with the following commands:
+  You can monitor the registration process with the following commands:
 
-  ```shell
-  az provider show -n Microsoft.HybridCompute -o table
-  ```
+    ```shell
+    az provider show -n Microsoft.HybridCompute -o table
+    ```
 
 * Create Azure service principal (SP)
 
@@ -64,6 +66,8 @@ You can monitor the registration process with the following commands:
 
 * Download the [az_connect_win](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script.
 
-* Change the environment variables according to your environment and copy the script to the designated machine.
+* Change the environment variables according to your environment and save the script.
 
     ![Screenshot showing PowerShell script](./02.png)
+
+## Deployment
