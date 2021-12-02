@@ -13,7 +13,7 @@ $resourceGroup = $myResourceGroup
 $location = $azureLocation
 $proxy=""
 $resourceTags= @{"Project"="jumpstart_arcbox"}
-$arcMachineName = [Environment]::MachineName
+$arcMachineName = "ArcBox-SQL"
 $workspaceName = $logAnalyticsWorkspaceName
 
 # These optional variables can be replaced with valid service principal details
@@ -322,6 +322,7 @@ foreach ($solution in $Solutions) {
 }
 
 # Get the workspace ID and Key
+az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
 $workspaceId = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName --query primarySharedKey -o tsv)
 
