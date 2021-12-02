@@ -233,17 +233,6 @@ if (-Not (Set-AzContext -Subscription $subId -ErrorAction SilentlyContinue)) {
     return
 }
 
-# $roleWritePermissions = Get-AzRoleAssignment -Scope "/subscriptions/$subId/resourcegroups/$resourceGroup/providers/Microsoft.Authorization/roleAssignments/write"
-
-# if(!$roleWritePermissions)
-# {
-#     Write-Warning "User does not have permissions to assign roles. This is pre-requisite to on board SQL Server - Azure Arc resources."
-#     return
-# }
-
-# Check if machine is registered with Azure Arc for Servers
-# Register machine if necessary
-#
 $arcResource = Get-AzConnectedMachine -ResourceGroupName $resourceGroup -Name $arcMachineName -ErrorAction SilentlyContinue
 
 if ($null -eq $arcResource) {
@@ -283,20 +272,9 @@ $retryCount = 6
 $count = 0
 $waitTimeInSeconds = 10
 
-while(!$currentRoleAssignment -and $count -le $retryCount)
-{
-    Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
-    $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-    sleep $waitTimeInSeconds
-    $count++
-}
 
-if(!$currentRoleAssignment)
-{
-    Write-Verbose "Unable to assign Azure Connected SQL Server Onboarding role to Arc managed Identity. Skipping role assignment."
-    return
-}
-
+New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+sleep 60
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
