@@ -12,8 +12,9 @@ Write-Host "`n"
 Write-Host "Creating local Azure Function application project"
 Write-Host "`n"
 Push-Location C:\Temp
-func init JumpstartFunctionProj --dotnet
+func init JumpstartFunctionProj --dotnet --version 3.1
 Push-Location C:\Temp\JumpstartFunctionProj
+dotnet new globaljson --sdk-version 3.1.415
 func new --name HttpJumpstart --template "HTTP trigger" --authlevel "anonymous"
 
 # Creating the new function application in the Kubernetes environment 
