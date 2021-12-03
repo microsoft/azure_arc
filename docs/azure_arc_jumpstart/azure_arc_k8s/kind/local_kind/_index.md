@@ -38,7 +38,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
 * Create Azure service principal (SP)
 
-  To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+  The Azure service principal assigned with the "Contributor" role is required to complete the scenario and its related automation. To create it, log in to your Azure account run the below command (you could also do this in [Azure Cloud Shell](https://shell.azure.com/)).
 
   ```shell
   az login
@@ -51,7 +51,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
   ```
 
-  Output should look like this:
+  The output should look like this:
 
   ```json
   {
@@ -63,7 +63,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   }
   ```
 
-  > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
+  > **Note: The Jumpstart scenarios are designed with ease of use in mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**.
 
 * [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
@@ -88,7 +88,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   az extension add --name k8s-configuration
   ```
 
-  > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
+  > **Note: If you already used this guide before and/or have the extensions installed, use the below commands:**
 
   ```shell
   az extension update --name connectedk8s
@@ -106,7 +106,7 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
   chmod +x ./kind
   sudo mv ./kind /usr/local/bin/kind
   ```
-  
+
   On MacOS:
 
   ```shell
@@ -135,19 +135,19 @@ The following README will guide you on how to use [kind](https://kind.sigs.k8s.i
 
   > **Note: By default, kind will store the kubeconfig file used to connect to your cluster in the ~/.kube directory. If you want to use a custom directory to store the kubeconfig file, use the `--kube-config` flag.**
 
-  If you did chose a specific location for the cluster's *kubeconfig* file make sure you are exporting its location as an environment variable using the `export KUBECONFIG=kubeconfig location` or in Windows, add this location to your PATH.
-  
-* Verify your cluster was created successfully and you can access the cluster using `kubectl`.
+  If you chose a specific location for the cluster's *kubeconfig* file, make sure you export its location as an environment variable using the `export KUBECONFIG=/path/to/kubeconfig` location or in Windows, add this location to your PATH.
+
+* Verify that kind has created the cluster successfully, and you can access the cluster using `kubectl`.
 
   ```shell
   kubectl get nodes
   ```
-  
+
   ![kubectl get nodes](./02.png)
 
 ## Connecting to Azure Arc
 
-* Now that you have a running kind cluster, lets connect the kind cluster to Azure Arc.
+* Now that you have a running kind cluster let's connect the kind cluster to Azure Arc.
 
   ```shell
   az login --service-principal -u mySpnClientId -p mySpnClientSecret --tenant myTenantID
