@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sshRSAPublicKey": {
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCXWqEGfBYFHo6zVPp3VT7aFlb+UjjyzUv3YPIoQqKtdj0KR5YL0qQPsWk7MtzfiaBzuePckXstyU/Vf5MuzUq0z5Cx8jEtw9EueiJ7x6soTcCBcebfa+TwsmlUXH1WAr7lDdRtOOWMVgxwiYnb6YVbNO2dyJNFtOlgAaFKMKmeklyvK+j1Q1LV4p4VlSzjHH6BpqslEvaaE0Ktmcq2zvMI9khjvDJCV49JuUmRg1njAsBOWk83gYwuMdPO36k1TXhCZ4AGUfkedy6M6tiW7gzY1xwzb7SsT4RyduE3O94t8OzhENTWRStBzghn4PCqshEjSpuIpGAdsJ+qlwx5CgNFxUQFDzYz2RWkfBPAoGIg2Yc0DCfwUWXBcwKxi7RKOFu4sjzUf3WxG049X6jqB6CLrzeekYu8PvfI7Xq5S4NPC25L74kjuvzVNZY8SD1UViqk03aopPa2UZExFJN6V/m/hOHHLdt29XJfjgppK5BsAB5+NtFobckfB1wOeDerDOf2Hp6M5fABkwaBs1Bhe4rFE0vFxm6VDN9cHeowm6Oe4mi8eGdkxeZ6DTzqCyqYCCK6DDa+k6Y4L4F7QXeGpTm1vNZxwWtqqjnPZiTpOo1k6E3zpyUp4RyV3DTNqLntbrzUJDT/Btvn3tWry++KdL/5UN2JDX3QfducvDB/Of5K6Q== saitcho@outlook"
+        },
+        "spnClientId": {
+            "value": "9e379ecc-545f-4750-a7b5-9027abc9f3f3"
+        },
+        "spnClientSecret": {
+            "value": "8Kteu80H~ow~R4~Sh3f-UtMv3Oxbm4VFPt"
+        },
+        "spnTenantId": {
+            "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+        },
+        "windowsAdminUsername": {
+            "value": "arcdemo"
+        },
+        "windowsAdminPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "myIpAddress": {
+            "value": "99.106.206.153"
+        },
+        "logAnalyticsWorkspaceName": {
+            "value": "arcboxlogsdk1234"
+        },
+        "flavor": {
+            "value": "Full"
+        }
+    }
+}
