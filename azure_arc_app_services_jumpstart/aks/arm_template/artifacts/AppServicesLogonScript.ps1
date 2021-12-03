@@ -120,7 +120,7 @@ Do {
    } while ($logProcessorStatus -eq "Nope")
 
 Write-Host "`n"
-Write-Host "Deploying App Service Kubernetes Environment"
+Write-Host "Deploying App Service Kubernetes Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
