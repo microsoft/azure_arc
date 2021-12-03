@@ -86,7 +86,19 @@ azdata --version
 # Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
-az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_azure_arc_data_services' --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
+
+# Localize kubeconfig
+$env:KUBECONTEXT = kubectl config current-context
+$env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
+
+# Create Kubernetes - Azure Arc Cluster
+az connectedk8s connect --name $connectedClusterName `
+                        --resource-group $env:resourceGroup `
+                        --location $env:azureLocation `
+                        --tags 'Project=jumpstart_azure_arc_data_services' `
+                        --kube-config $env:KUBECONFIG `
+                        --kube-context $env:KUBECONTEXT
+
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
@@ -108,11 +120,14 @@ Do {
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
+
+# Create Custom Location
 az customlocation create --name 'jumpstart-cl' `
                          --resource-group $env:resourceGroup `
                          --namespace arc `
                          --host-resource-id $connectedClusterId `
-                         --cluster-extension-ids $extensionId
+                         --cluster-extension-ids $extensionId `
+                         --kubeconfig $env:KUBECONFIG
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "`n"
