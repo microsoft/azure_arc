@@ -74,18 +74,6 @@ description: >
   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
 
-- Create an Azure resource group where you want the PMK cluster to show up.
-
-  ```shell
-  az group create -l <Azure Region> -n <resource group name>
-  ```
-
-  See below example of creating a resource group.
-  ![Screenshot of Creating Resource Group](./01.png)
-
-  You can verify it from the Azure portal.
-  ![Screenshot of Resource Group](./02.png)
-
 ## Deployment
 
 This deployment consists of 3 sections.
@@ -98,7 +86,7 @@ This deployment consists of 3 sections.
 
 - Login to your Management Plane.
 
-  ![Screenshot of PMK Management Plane Login Page](./03.png)
+  ![Screenshot of PMK Management Plane Login Page](./01.png)
 
   > **Note: If you do not have a registered Management Plane with Platform9, you can create one easily using [PMK Free Tier deployment](https://platform9.com/managed-kubernetes/)**
 
@@ -106,12 +94,12 @@ This deployment consists of 3 sections.
 
   For a BareOS cluster, you will need to have the nodes registered with the PMK Management Plane on which the cluster is to be deployed. For this first, add the node.
 
-  ![Screenshot of Adding a node](./04.png)
+  ![Screenshot of Adding a node](./02.png)
 
   This should take you to the Node onboarding page. A **pf9ctl** utility is provided to set up the nodes and get connected with Management Plane.
   Follow the instructions to download and install the utility, which we will use to prepare the node and connect it with your Platform9 Management Plane.
 
-  ![Screenshot of PF9 CLI](./05.png)
+  ![Screenshot of PF9 CLI](./03.png)
 
   > **Note: Preparing the node and connecting it to Management Plane might take approximately 4-5 minutes to complete.**
 
@@ -122,19 +110,19 @@ This deployment consists of 3 sections.
 
   - Click to add a cluster to the Management Plane.
 
-  ![Screenshot of Adding Cluster](./06.png)
+  ![Screenshot of Adding Cluster](./04.png)
 
   - Create a cluster from the nodes onboarded to the Management Plane.
 
-  ![Screenshot of Creating One Click Cluster](./07.png)
+  ![Screenshot of Creating One Click Cluster](./05.png)
 
   - Enter the cluster name and k8s version. Submit the page and it will trigger the cluster creation on the node.
 
-  ![Screenshot of Cluster name entry](./08.png)
+  ![Screenshot of Cluster name entry](./06.png)
 
   - The cluster should get created in a few minutes and the status should be reported as **Healthy** and **Online**.
 
-  ![Screenshot of Cluster Created](./09.png)
+  ![Screenshot of Cluster Created](./07.png)
 
 ### Connect the cluster to Microsoft Azure Arc
 
@@ -147,13 +135,13 @@ This deployment consists of 3 sections.
 
 - Set the variables according to your Azure service principal name and Azure environment in the *pf9_az_connect_k8s.sh* script.
 
-  ![Screenshot of Exporting values](./10.png)
+  ![Screenshot of Exporting values](./08.png)
 
-  > **Note: The values can referenced from the service principal and resource groups outputs.**
+  > **Note: The values can referenced from the service principal output.**
 
 - Set the KUBECONFIG variable for connecting to the K8s cluster. The kubeconfig file for the cluster is available for download from the Management Plane.
 
-  ![Screenshot to Download Kubeconfig](./11.png)
+  ![Screenshot to Download Kubeconfig](./09.png)
 
   - An example output is shown below for setting the _KUBECONFIG_ variable;
 
@@ -167,25 +155,25 @@ This deployment consists of 3 sections.
   sh ./pf9_az_connect_k8s.sh
   ```
 
-  ![Screenshot to Connect to Azure Arc](./12.png)
+  ![Screenshot to Connect to Azure Arc](./10.png)
 
 
 ## Verification
 
 - The cluster should be seen onboarded as a new Azure Arc-enabled Kubernetes resource.
 
-  ![Screenshot of Cluster Verification](./13.png)
+  ![Screenshot of Cluster Verification](./11.png)
 
 - Azure Arc agents are running in the cluster.
 
-  ![Screenshot to List pods azure-arc](./14.png)
+  ![Screenshot to List pods azure-arc](./12.png)
 
 ## Deleting the Deployment
 
 - The Azure Arc-enabled Kubernetes resource can be deleted via the Azure Portal.
 
-  ![Screenshot of Azure Arc cluster deletion](./15.png)
+  ![Screenshot of Azure Arc cluster deletion](./13.png)
 
 - For deleting the entire environment, just delete the Azure resource group that was created.
 
-  ![Screenshot of Azure Resource group deletion](./16.png)
+  ![Screenshot of Azure Resource group deletion](./14.png)

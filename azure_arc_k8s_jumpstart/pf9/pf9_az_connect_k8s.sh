@@ -9,6 +9,7 @@ export appId='<Your Azure service principal name>'
 export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
+export azureRegion='<Enter your Azure Region, for example : eastus>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
 # Register the Microsoft providers
@@ -20,6 +21,9 @@ az provider register --namespace Microsoft.ExtendedLocation --wait
 echo "Installing the Azure Arc Extensions"
 az extension add --name connectedk8s
 az extension add --name k8s-configuration
+
+echo "Creating the Resource Group"
+az group create -l $azureRegion -n $resourceGroup
 
 echo "Log in to Azure using service principal"
 az login --service-principal --username $appId --password $password --tenant $tenantId
