@@ -1,16 +1,15 @@
 #!/bin/sh
 
-if [ $(awk -F= '/^NAME/{print $2}' /etc/os-release | tr -d '"') != "Ubuntu" ]; then
-	echo "Please run this script on an Ubuntu host"
-	exit 1;
-fi
+sudo apt-get update
 
-if [ -e "./pf9_az.env"]; then
-    . ./pf9_az.env
-else
-    echo "The pf9_az environment config file doesn't exist. Please complete the Pre-requisites before running this script";
-    exit 1;
-fi
+# <--- Change the following environment variables according to your Azure service principal name --->
+
+echo "Exporting environment variables"
+export appId='<Your Azure service principal name>'
+export password='<Your Azure service principal password>'
+export tenantId='<Your Azure tenant ID>'
+export resourceGroup='<Azure resource group name>'
+export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
 # Register the Microsoft providers
 az provider register --namespace Microsoft.Kubernetes --wait
