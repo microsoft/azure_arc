@@ -75,7 +75,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 - Login to AZ CLI using the ```az login``` command.
 
-- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple is required:
+- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple RBAC roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
   - "User Access Administrator" - Required for onboarding the Azure Arc-enabled SQL server resource
