@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a local Ubuntu server hosted with Vagrant and connect it to Azure Arc
 
-The following doc will guide you through deploying a local **Ubuntu** virtual machine using [Vagrant](https://www.vagrantup.com/) and connecting it as an Azure Arc-enabled server resource.
+The following README will guide you through deploying a local **Ubuntu** virtual machine using [Vagrant](https://www.vagrantup.com/) and connecting it as an Azure Arc-enabled server resource.
 
 ## Prerequisites
 
