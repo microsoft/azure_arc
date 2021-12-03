@@ -67,13 +67,20 @@ az extension add --yes --source "https://aka.ms/logicapp-latest-py2.py3-none-any
 Write-Host "`n"
 az -v
 
-# Onboarding the AKS cluster as an Azure Arc enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
 Write-Host "`n"
-az connectedk8s connect --name $env:clusterName `
+
+# Localize kubeconfig
+$env:KUBECONTEXT = kubectl config current-context
+$env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
+
+# Create Kubernetes - Azure Arc Cluster
+az connectedk8s connect --name $connectedClusterName `
                         --resource-group $env:resourceGroup `
                         --location $env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_app_services'
+                        --tags 'Project=jumpstart_azure_arc_app_services' `
+                        --kube-config $env:KUBECONFIG `
+                        --kube-context $env:KUBECONTEXT
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
@@ -120,7 +127,7 @@ Do {
    } while ($logProcessorStatus -eq "Nope")
 
 Write-Host "`n"
-Write-Host "Deploying App Service Kubernetes Environment"
+Write-Host "Deploying App Service Kubernetes Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $env:clusterName --resource-group $env:resourceGroup --query id -o tsv
