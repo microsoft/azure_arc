@@ -70,10 +70,10 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - Management artifacts template/plan - deploys Azure Log Analytics workspace and solutions and Azure Policy artifacts
 - User remotes into Client Windows VM, which automatically kicks off multiple scripts that:
   - Deploy and configure five (5) nested virtual machines in Hyper-V
-    - Windows Server 2022 VM - onboarded as Azure Arc-enabled Server
-    - Windows Server 2019 VM - onboarded as Azure Arc-enabled Server
-    - Windows VM running SQL Server - onboarded as Azure Arc-enabled SQL server (as well as Azure Arc-enabled Server)
-    - Ubuntu VM - onboarded as Azure Arc-enabled Server
+    - Windows Server 2022 VM - onboarded as Azure Arc-enabled server
+    - Windows Server 2019 VM - onboarded as Azure Arc-enabled server
+    - Windows VM running SQL Server - onboarded as Azure Arc-enabled SQL server (as well as Azure Arc-enabled server)
+    - Ubuntu VM - onboarded as Azure Arc-enabled server
     - CentOS VM - onboarded as Azure Arc-enabled server
   - Deploy an Azure Monitor workbook that provides example reports and metrics for monitoring ArcBox components
 
