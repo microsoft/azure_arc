@@ -307,6 +307,7 @@ $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-
 $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
 New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $env:computername -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
+Start-Sleep -Seconds 60
 
 $nestedWindowsUsername = "Administrator"
 $nestedWindowsPassword = "ArcDemo123!!"
