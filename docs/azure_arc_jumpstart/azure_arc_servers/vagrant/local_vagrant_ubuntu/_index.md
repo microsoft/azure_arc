@@ -24,6 +24,18 @@ The following README will guide you on how to deploy a local **Ubuntu** virtual 
   az --version
   ```
 
+* Enable subscription with the resource provider for Azure Arc-enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  ```shell
+  az provider register --namespace Microsoft.HybridCompute
+  ```
+
+You can monitor the registration process with the following commands:
+
+  ```shell
+  az provider show -n Microsoft.HybridCompute -o table
+  ```
+
 * Vagrant relies on an underlying hypervisor. For the purpose of this guide, we will be using "Oracle VM VirtualBox".
 
   * Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads).
