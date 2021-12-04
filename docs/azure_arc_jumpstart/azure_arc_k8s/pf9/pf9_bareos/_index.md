@@ -26,9 +26,7 @@ description: >
   sudo apt-get install -y kubectl
   ```
 
-  > **Note:** The *kubectl* package is installed from Kubernetes repository, hence the Google Cloud public signing key need to be downloaded to enable the repository.
-
-  > **Note: All PMK cluster nodes would have kubectl installed once cluster is deployed.**
+  > **Note: The *kubectl* package is installed from the Kubernetes repository, hence the Google Cloud public signing key need to be downloaded to enable the repository. Note: All PMK cluster nodes would have kubectl installed once the cluster is deployed.**
 
 - [Install or update Azure CLI (az) to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). 
 
