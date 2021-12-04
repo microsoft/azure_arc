@@ -146,7 +146,7 @@ This deployment consists of 3 sections.
   - An example output is shown below for setting the _KUBECONFIG_ variable;
 
   ```shell
-  export KUBECONFIG=<Enter the kubeconfig file path>
+  export KUBECONFIG=~/path/to/config/file
   ```
 
 - Run the _pf9_az_connect_k8s.sh_ script to connect the Platform9 Managed Kubernetes (PMK) cluster to Azure Arc.
