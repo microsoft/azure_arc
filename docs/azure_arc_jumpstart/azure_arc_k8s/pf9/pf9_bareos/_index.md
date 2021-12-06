@@ -8,9 +8,9 @@ description: >
 
 ## Deploy a Platform9 Managed Kubernetes cluster and connect it to Azure Arc
 
- > **Note: This scenario was contributed by the Platform9 team as part of the "Jumpstart Friends" program**
+ > **Disclaimer: This scenario was contributed by the Platform9 team as part of the "Jumpstart Friends" program**
 
-<p align="center"><img src="../img/jumpstart_friends_logo.png" alt="jumpstart-friends-logo" width="250"></p>
+<p align="center"><img src="/img/jumpstart_friends_logo.png" alt="jumpstart-friends-logo" width="250"></p>
 
 - The following document will guide on how to deploy a Kubernetes cluster with [Platform9 Managed Kubernetes (PMK)](https://platform9.com/managed-kubernetes/) and have it as a connected Azure Arc Kubernetes resource. With PMK, you can have your clusters deployed on-premises, in public clouds, or at the edge. In this document, we'll explain the steps on how to create an **on-premise [BareOS](https://platform9.com/docs/kubernetes/bareos-what-is-bareos) cluster** using **PMK** and connect it to **Microsoft Azure Arc**.
 
@@ -18,7 +18,7 @@ description: >
 
 - An Ubuntu 20.04 installed physical machine or VM. In this scenario, we would be using single node kubernetes cluster installation. This machine would also act as our management host.
 
-- The [kubectl](https://platform9.com/learn/tutorials/kubectl) executable binary for local cluster management. If you would want to have a seperate host for cluster management, follow the below steps to [install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management) on it.
+- The [kubectl](https://platform9.com/learn/tutorials/kubectl) executable binary for local cluster management. If you would want to have a separate host for cluster management, follow the below steps to [install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/#install-using-native-package-management) on it.
 
   ```shell
   sudo apt-get update
@@ -31,7 +31,7 @@ description: >
 
   > **Note: The *kubectl* package is installed from the Kubernetes repository, hence the Google Cloud public signing key need to be downloaded to enable the repository. Note: All PMK cluster nodes would have kubectl installed once the cluster is deployed.**
 
-- [Install or update Azure CLI (az) to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). 
+- [Install or update Azure CLI (az) to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 
   Use the below command to check your current installed version.
 
@@ -74,7 +74,6 @@ description: >
 
   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-
 ## Deployment
 
 This deployment consists of 3 sections.
@@ -104,7 +103,6 @@ This deployment consists of 3 sections.
 
   > **Note: Preparing the node and connecting it to Management Plane might take approximately 4-5 minutes to complete.**
 
-
 ### Creating a PMK Cluster
 
 - The onboarded node should now be seen on our Management Plane. To create a [PMK cluster](https://platform9.com/learn/learn/get-started-bare-metal) via the PMK Management Plane UI, follow the steps as described below.
@@ -127,7 +125,7 @@ This deployment consists of 3 sections.
 
 ### Connect the cluster to Microsoft Azure Arc
 
-- Clone the [azure_arc](https://github.com/microsoft/azure_arc) Jumpstart repository and change to the pf9 script directory.
+- Clone the [Azure Arc Jumpstart repository](https://github.com/microsoft/azure_arc) and change to the pf9 script directory.
 
   ```shell
   git clone https://github.com/microsoft/azure_arc.git
@@ -157,7 +155,6 @@ This deployment consists of 3 sections.
   ```
 
   ![Screenshot to Connect to Azure Arc](./10.png)
-
 
 ## Verification
 
