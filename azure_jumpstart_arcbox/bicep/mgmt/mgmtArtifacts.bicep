@@ -7,6 +7,13 @@ param subnetName string = 'ArcBox-Subnet'
 @description('Name for your log analytics workspace')
 param workspaceName string
 
+@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
+@allowed([
+  'Full'
+  'ITPro'
+])
+param flavor string
+
 @description('Azure Region to deploy the Log Analytics Workspace')
 param location string = resourceGroup().location
 
@@ -140,11 +147,12 @@ resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedSer
   }
 }
 
-module policyDeployment './policyAzureArcBuiltins.bicep' = {
+module policyDeployment './policyAzureArcITPro.bicep' = {
   name: 'policyDeployment'
   params: {
     azureLocation: location
     logAnalyticsWorkspaceId: workspace.id
+    flavor: flavor
   }
 }
 
