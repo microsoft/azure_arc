@@ -5,7 +5,7 @@ linkTitle: "Windows server with Configuration Manager using PowerShell"
 weight: 4
 description: >
 ---
-## Connect an existing Windows server to Azure Arc with Configuration Manager using a script
+## Connect an existing Windows server to Azure Arc using Configuration Manager with PowerShell
 
 The following README will guide you on how to connect an Windows machine to Azure Arc with a PowerShell script using Configuration Manager.
 
@@ -69,5 +69,27 @@ This guide assumes that you already have an installation of Microsoft Configurat
 * Change the environment variables according to your environment and save the script.
 
     ![Screenshot showing PowerShell script](./02.png)
+
+## Setting the PowerShell execution policy in Configuration Manager
+
+In order for Configuration Manager to run the PowerShell script in this scenario, we will need to set the PowerShell execution policy and allow the script authors to approve their own scripts.
+
+   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is recommended to follow the security recommendations in your organization when it comes to PowerShell scripts execution policy and approvals**
+
+* Login to the Configuration Manager console.
+
+* After logging in, click the “Administration” dropdown . Under “Site Configuration”, select “Client Settings” and open the properties of the "Default Client Settings".
+
+   > **Note: You might have different client settings, choose the appropriate one that is deployed to the servers you are onboarding to Azure Arc**
+
+    ![Screenshot showing client settings in the configuration manager console](./03.png)
+
+* Click the “Computer Agent” settings, change the “PowerShell execution policy” to “Bypass”.
+
+    ![Screenshot showing Computer Agent settings in the configuration manager console](./04.png)
+
+## Configuration of the PowerShell script approval settings in Configuration Manager
+
+* 
 
 ## Deployment
