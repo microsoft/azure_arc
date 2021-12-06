@@ -274,7 +274,7 @@ $waitTimeInSeconds = 10
 
 
 New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-sleep 60
+sleep 180
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
