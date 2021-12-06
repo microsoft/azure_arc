@@ -92,5 +92,6 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   name: 'mgmtArtifactsAndPolicyDeployment'
   params: {
     workspaceName: logAnalyticsWorkspaceName
+    flavor: flavor
   }
 }
