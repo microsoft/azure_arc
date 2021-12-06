@@ -147,7 +147,7 @@ resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedSer
   }
 }
 
-module policyDeployment './policyAzureArcBuiltins.bicep' = {
+module policyDeployment './policyAzureArcITPro.bicep' = {
   name: 'policyDeployment'
   params: {
     azureLocation: location
