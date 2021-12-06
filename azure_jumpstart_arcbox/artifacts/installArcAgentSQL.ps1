@@ -266,15 +266,15 @@ if($null -eq $spID) {
     return
 }
 
-$currentRoleAssignment = Get-AzRoleAssignment -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ObjectId $spID -ResourceGroupName $resourceGroup
+# $currentRoleAssignment = Get-AzRoleAssignment -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ObjectId $spID -ResourceGroupName $resourceGroup
 
-$retryCount = 6
-$count = 0
-$waitTimeInSeconds = 10
+# $retryCount = 6
+# $count = 0
+# $waitTimeInSeconds = 10
 
 
 New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-sleep 180
+Start-Sleep -Seconds 180
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
