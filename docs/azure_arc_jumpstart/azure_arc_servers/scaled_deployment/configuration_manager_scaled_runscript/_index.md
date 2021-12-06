@@ -78,7 +78,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
 * Login to the Configuration Manager console.
 
-* After logging in, click the “Administration” dropdown . Under “Site Configuration”, select “Client Settings” and open the properties of the "Default Client Settings".
+* After logging in, go to the “Administration” workspace. Under “Site Configuration”, select “Client Settings” and open the properties of the "Default Client Settings".
 
    > **Note: You might have different client settings, choose the appropriate one that is deployed to the servers you are onboarding to Azure Arc**
 
@@ -90,6 +90,34 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
 ## Configuration of the PowerShell script approval settings in Configuration Manager
 
-* 
+* Go to the “Administration” workspace. Under “Site Configuration”, select “Sites” and select the Configuration Manager site.
+* Click on “Hierarchy Settings”.
+    
+    ![Screenshot showing sites settings in the configuration manager console](./05.png)
+
+* In the “General” tab, uncheck the “Script authors require additional script approver” option.
+    
+    ![Screenshot showing script approval settings in the configuration manager console](./06.png)
 
 ## Deployment
+
+* Go to the “Software Library” workspace. Click on “Create Script”.
+    
+    ![Screenshot showing script creation in the configuration manager console](./07.png)
+
+* Provide a name to the script. Paste the content of the [az_connect_win](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script you downloaded earlier. Click “Next” and “Close”.
+    
+    ![Screenshot showing script creation in the configuration manager console](./08.png)
+
+* Select the script and click “Approve/Deny”. Proceed to approve the script and close.
+    
+    ![Screenshot showing script approval settings in the configuration manager console](./09.png)
+
+    ![Screenshot showing script approving in the configuration manager console](./10.png)
+
+* Go to the “Assets and Compliance” workspace. Expand on “Device Collections” and select the collection that contains the sever(s) you want to onboard. Right-click the collection and click on “Run Script”.
+
+    ![Screenshot showing opening the run script context menu in the configuration manager console](./11.png)
+
+* Select the script you created and proceed to the script execution.
+    ![Screenshot showing running the script in the configuration manager console](./12.png)
