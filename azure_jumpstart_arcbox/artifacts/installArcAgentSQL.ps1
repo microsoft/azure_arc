@@ -256,6 +256,7 @@ if (!$arcResource) {
     return
 }
 
+Start-Sleep -Seconds 60
 Write-Verbose "Getting managed Identity ID of $arcMachineName."
 
 $spID = $arcResource.IdentityPrincipalId
@@ -266,15 +267,24 @@ if($null -eq $spID) {
     return
 }
 
-# $currentRoleAssignment = Get-AzRoleAssignment -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ObjectId $spID -ResourceGroupName $resourceGroup
-
-# $retryCount = 6
-# $count = 0
-# $waitTimeInSeconds = 10
-
-
-New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-Start-Sleep -Seconds 180
+$currentRoleAssignment = $null
+$retryCount = 10
+$count = 0
+$waitTimeInSeconds = 10
+# while(!$currentRoleAssignment -and $count -le $retryCount)
+# {
+#     Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
+#     $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+#     sleep $waitTimeInSeconds
+#     $count++
+# }
+Write-Host "Arc machine managed Identity requires Azure Connected SQL Server Onboarding role. Assigning it now."
+while($count -le $retryCount)
+{
+    $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+    sleep $waitTimeInSeconds
+    $count++
+}
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
