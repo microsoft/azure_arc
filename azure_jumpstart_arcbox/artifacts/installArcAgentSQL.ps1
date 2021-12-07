@@ -281,7 +281,7 @@ $waitTimeInSeconds = 10
 Write-Host "Arc machine managed Identity requires Azure Connected SQL Server Onboarding role. Assigning it now."
 while($count -le $retryCount)
 {
-    $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+    New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
     sleep $waitTimeInSeconds
     $count++
 }
