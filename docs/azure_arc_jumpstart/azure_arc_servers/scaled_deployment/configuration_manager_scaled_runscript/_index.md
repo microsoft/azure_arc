@@ -128,7 +128,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
     ![Screenshot showing the script results in the configuration manager console](./14.png)
 
-* Click on the “Run Details” tab. Double click on “Script Output” to see the output of the script.
+- Click on the “Run Details” tab. Double click on “Script Output” to see the output of the script.
 
     ![Screenshot showing the script result message in the configuration manager console](./15.png)
 
