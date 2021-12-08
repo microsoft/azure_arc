@@ -134,7 +134,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
     ![Screenshot showing the script output in the configuration manager console](./16.png)
 
-* Upon completion, you will have your Windows server, connected as a new Azure Arc resource inside your resource group.
+- Upon completion, you will have your Windows server, connected as a new Azure Arc-enabled server resource inside your resource group.
 
     ![Screenshot showing Azure Portal with Azure Arc-enabled server resource](./17.png)
 
