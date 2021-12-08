@@ -9,7 +9,7 @@ description: >
 
 The following README will guide you on how to connect an Windows machine to Azure Arc with a PowerShell script using Configuration Manager.
 
-This guide assumes that you already have an installation of Microsoft Configuration Manager, at least one Windows server client connecting to it and a basic understanding of the product.
+This guide assumes that you already have an installation of Microsoft Configuration Manager, at least one active Windows server client and a basic understanding of the product.
 ## Prerequisites
 
 * Make sure you have all the Configuration Manager [pre-requisites](https://docs.microsoft.com/mem/configmgr/apps/deploy-use/create-deploy-scripts#prerequisites) in place to use the "Run Script" feature.
@@ -119,5 +119,32 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
     ![Screenshot showing opening the run script context menu in the configuration manager console](./11.png)
 
-* Select the script you created and proceed to the script execution.
+* Select the script you created and click “Next”. Wait for the script to finish execution.
+
     ![Screenshot showing running the script in the configuration manager console](./12.png)
+
+    ![Screenshot showing the script progress in the configuration manager console](./13.png)
+
+    ![Screenshot showing the script results in the configuration manager console](./14.png)
+
+* Click on the “Run Details” tab. Double click on “Script Output” to see the output of the script.
+
+    ![Screenshot showing the script result message in the configuration manager console](./15.png)
+
+    ![Screenshot showing the script output in the configuration manager console](./16.png)
+
+* Upon completion, you will have your Windows server, connected as a new Azure Arc resource inside your resource group.
+
+    ![Screenshot showing Azure Portal with Azure Arc-enabled server resource](./17.png)
+
+    ![Screenshot showing Azure Portal with Azure Arc-enabled server resource detail](./18.png)
+
+## Delete the deployment
+
+The most straightforward way is to delete the server via the Azure Portal, just select server and delete it.
+
+![Screenshot showing delete resource function in Azure Portal](./19.png)
+
+If you want to delete the entire environment, just delete the Azure resource group.
+
+![Screenshot showing delete resource group function in Azure Portal](./20.png)
