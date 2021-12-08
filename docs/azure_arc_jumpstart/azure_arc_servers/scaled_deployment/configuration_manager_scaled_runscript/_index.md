@@ -92,8 +92,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
 ## Configuration of the PowerShell script approval settings in Configuration Manager
 
-* Go to the “Administration” workspace. Under “Site Configuration”, select “Sites” and select the Configuration Manager site.
-* Click on “Hierarchy Settings”.
+- Go to the “Administration” workspace. Under “Site Configuration”, select “Sites” and select the Configuration Manager site. Click on “Hierarchy Settings”.
     
     ![Screenshot showing sites settings in the configuration manager console](./05.png)
 
