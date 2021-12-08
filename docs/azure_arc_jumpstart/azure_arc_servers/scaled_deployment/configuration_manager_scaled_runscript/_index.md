@@ -120,7 +120,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
     ![Screenshot showing opening the run script context menu in the configuration manager console](./11.png)
 
-* Select the script you created and click “Next”. Wait for the script to finish execution.
+- Select the script you created and click “Next”. Wait for the script to finish execution.
 
     ![Screenshot showing running the script in the configuration manager console](./12.png)
 
