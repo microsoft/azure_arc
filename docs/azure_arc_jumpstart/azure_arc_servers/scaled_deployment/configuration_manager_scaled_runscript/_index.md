@@ -96,7 +96,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
     
     ![Screenshot showing sites settings in the configuration manager console](./05.png)
 
-* In the “General” tab, uncheck the “Script authors require additional script approver” option.
+- In the “General” tab, uncheck the “Script authors require additional script approver” option.
     
     ![Screenshot showing script approval settings in the configuration manager console](./06.png)
 
