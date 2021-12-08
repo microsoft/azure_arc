@@ -78,7 +78,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is recommended to follow the security recommendations in your organization when it comes to PowerShell scripts execution policy and approvals**
 
-* Login to the Configuration Manager console.
+- Login to the Configuration Manager console.
 
 - After logging in, go to the “Administration” workspace. Under “Site Configuration”, select “Client Settings” and open the properties of the "Default Client Settings".
 
