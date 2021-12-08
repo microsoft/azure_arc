@@ -106,7 +106,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
     
     ![Screenshot showing script creation in the configuration manager console](./07.png)
 
-* Provide a name to the script. Paste the content of the [az_connect_win](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script you downloaded earlier. Click “Next” and “Close”.
+- Provide a name to the script. Paste the content of the [_az_connect_win_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script you downloaded earlier. Click “Next” and “Close”.
     
     ![Screenshot showing script creation in the configuration manager console](./08.png)
 
