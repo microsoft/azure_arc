@@ -62,13 +62,13 @@ This guide assumes that you already have an installation of [Microsoft Configura
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-* Create a new Azure resource group where you want your machine(s) to show up.
+- Create a new Azure resource group where you want your machine(s) to show up.
 
     ![Screenshot showing Azure Portal with empty resource group](./01.png)
 
-* Download the [az_connect_win](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script.
+- Download the [_az_connect_win_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script.
 
-* Change the environment variables according to your environment and save the script.
+- Change the environment variables according to your environment and save the script.
 
     ![Screenshot showing PowerShell script](./02.png)
 
