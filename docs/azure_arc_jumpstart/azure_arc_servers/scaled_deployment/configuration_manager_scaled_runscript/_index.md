@@ -10,6 +10,7 @@ description: >
 The following README will guide you on how to connect a Windows machine to Azure Arc with a PowerShell script using Configuration Manager.
 
 This guide assumes that you already have an installation of [Microsoft Configuration Manager](https://docs.microsoft.com/en-us/mem/configmgr/core/understand/introduction), at least one active Windows server client, and a basic understanding of the product.
+
 ## Prerequisites
 
 * Make sure you have all the Configuration Manager [pre-requisites](https://docs.microsoft.com/mem/configmgr/apps/deploy-use/create-deploy-scripts#prerequisites) in place to use the "Run Script" feature.
