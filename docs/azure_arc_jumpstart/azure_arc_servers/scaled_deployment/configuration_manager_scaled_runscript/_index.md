@@ -86,7 +86,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
     ![Screenshot showing client settings in the configuration manager console](./03.png)
 
-* Click the “Computer Agent” settings, change the “PowerShell execution policy” to “Bypass”.
+- Click the “Computer Agent” settings, change the “PowerShell execution policy” to “Bypass”.
 
     ![Screenshot showing Computer Agent settings in the configuration manager console](./04.png)
 
