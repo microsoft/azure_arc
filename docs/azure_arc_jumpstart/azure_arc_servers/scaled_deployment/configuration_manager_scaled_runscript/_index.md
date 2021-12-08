@@ -116,7 +116,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
     ![Screenshot showing script approving in the configuration manager console](./10.png)
 
-* Go to the “Assets and Compliance” workspace. Expand on “Device Collections” and select the collection that contains the sever(s) you want to onboard. Right-click the collection and click on “Run Script”.
+- Go to the “Assets and Compliance” workspace. Expand on “Device Collections” and select the collection that contains the server(s) you want to onboard. Right-click the collection and click on “Run Script”.
 
     ![Screenshot showing opening the run script context menu in the configuration manager console](./11.png)
 
