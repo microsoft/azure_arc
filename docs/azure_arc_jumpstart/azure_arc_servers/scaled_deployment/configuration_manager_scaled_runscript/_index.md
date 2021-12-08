@@ -21,7 +21,7 @@ This guide assumes that you already have an installation of [Microsoft Configura
   az --version
   ```
 
-* Enable subscription with the resource provider for Azure Arc-enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+- Enable subscription with the resource provider for Azure Arc-enabled Servers. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.HybridCompute
