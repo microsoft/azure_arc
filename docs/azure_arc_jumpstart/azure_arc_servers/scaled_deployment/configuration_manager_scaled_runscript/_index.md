@@ -102,7 +102,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
 ## Deployment
 
-* Go to the “Software Library” workspace. Click on “Create Script”.
+- Go to the “Software Library” workspace. Click on “Create Script”.
     
     ![Screenshot showing script creation in the configuration manager console](./07.png)
 
