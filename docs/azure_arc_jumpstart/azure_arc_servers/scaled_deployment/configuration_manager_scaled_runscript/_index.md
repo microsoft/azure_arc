@@ -110,7 +110,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
     
     ![Screenshot showing script creation in the configuration manager console](./08.png)
 
-* Select the script and click “Approve/Deny”. Proceed to approve the script and close.
+- Select the script and click “Approve/Deny”. Proceed to approve the script and close.
     
     ![Screenshot showing script approval settings in the configuration manager console](./09.png)
 
