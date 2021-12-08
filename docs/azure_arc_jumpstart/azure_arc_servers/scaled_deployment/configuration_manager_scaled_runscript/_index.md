@@ -80,7 +80,7 @@ In order for Configuration Manager to run the PowerShell script in this scenario
 
 * Login to the Configuration Manager console.
 
-* After logging in, go to the “Administration” workspace. Under “Site Configuration”, select “Client Settings” and open the properties of the "Default Client Settings".
+- After logging in, go to the “Administration” workspace. Under “Site Configuration”, select “Client Settings” and open the properties of the "Default Client Settings".
 
    > **Note: You might have different client settings, choose the appropriate one that is deployed to the servers you are onboarding to Azure Arc**
 
