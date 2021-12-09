@@ -1,0 +1,13 @@
+{
+    "if": {
+      "allOf": [
+        {
+          "field": "Microsoft.ContainerService/managedClusters/networkProfile.networkPolicy",
+          "notEquals": "calico"
+        }
+      ]
+    },
+    "then": {
+      "effect": "audit"
+    }
+  }

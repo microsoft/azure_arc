@@ -1,0 +1,22 @@
+{
+    "properties": {
+      "policyType": "Custom",
+      "mode": "All",
+      "metadata": {
+        "version": "1.0.0"
+      },
+      "policyRule": {
+        "if": {
+          "allOf": [
+            {
+              "field": "Microsoft.ContainerService/managedClusters/networkProfile.networkPolicy",
+              "notEquals": "calico"
+            }
+          ]
+        },
+        "then": {
+          "effect": "audit"
+        }
+      }
+    }
+}    
