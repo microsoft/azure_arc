@@ -32,10 +32,11 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Register Azure providers
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
+az provider register --namespace 'Microsoft.Kubernetes' --wait
+az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
+az provider register --namespace 'Microsoft.ExtendedLocation' --wait
+az provider register --namespace 'Microsoft.AzureArcData' --wait
+az provider register --namespace 'Microsoft.PolicyInsights' --wait
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
@@ -82,6 +83,9 @@ Start-Sleep -Seconds 20
 az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config"
 
 $workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+
+# Configuring Azure Policy for Kubernetes on the cluster
+az k8s-extension create --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "`n"
