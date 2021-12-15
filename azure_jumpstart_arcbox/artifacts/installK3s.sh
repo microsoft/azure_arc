@@ -65,8 +65,8 @@ sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cl
 sudo service sshd restart
 
 # Enable Azure Policy for Kubernetes on the cluster
-az provider register --namespace 'Microsoft.PolicyInsights' --wait
-az k8s-extension create --cluster-type connectedClusters --cluster-name $vmName --resource-group $resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
+sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
+sudo -u $adminUsername az k8s-extension create --cluster-type connectedClusters --cluster-name $vmName --resource-group $resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
 
 # Copying Rancher K3s kubeconfig file to staging storage account
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
