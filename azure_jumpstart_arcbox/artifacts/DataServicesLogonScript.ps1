@@ -161,9 +161,9 @@ $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 kubectx
 
 # Sending deployement status message to Azure storage account queue
-if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
-    & "C:\ArcBox\DeploymentStatus.ps1"
-}
+# if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
+#     & "C:\ArcBox\DeploymentStatus.ps1"
+# }
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services 
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
