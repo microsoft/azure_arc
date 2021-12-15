@@ -265,11 +265,11 @@ $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 120 -WarningAction SilentlyContinue | Out-Null
 
 # Sending deployement status message to Azure storage account queue
-if ($env:flavor -eq "ITPro") {
-    # Sleeping for allowing Azure Resource Manager API updates
-    Start-Sleep -Seconds 30
-    & "C:\ArcBox\DeploymentStatus.ps1"
-}
+# if ($env:flavor -eq "ITPro") {
+#     # Sleeping for allowing Azure Resource Manager API updates
+#     Start-Sleep -Seconds 30
+#     & "C:\ArcBox\DeploymentStatus.ps1"
+# }
 
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
