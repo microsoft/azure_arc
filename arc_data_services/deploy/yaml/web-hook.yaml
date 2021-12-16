@@ -61,6 +61,10 @@ rules:
 - apiGroups: ["*"]
   resources: ["secrets"]
   resourceNames: ["arc-webhook-secret"]
+  verbs: ["get"]
+- apiGroups: ["*"]
+  resources: ["secrets"]
+  resourceNames: ["arc-webhook-secret"]
   verbs: ["delete"]
 - apiGroups: ["batch"]
   resources: ["jobs"]
@@ -96,7 +100,7 @@ spec:
       containers:
       - name: bootstrapper
         image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.2.0_2021-12-15
-        command: ["/opt/webhook/webhook-job.sh",  "{{namespace}}"]
+        command: ["/opt/webhook/create-and-deploy-webhook.sh",  "{{namespace}}", "arc-webhook-job"]
       restartPolicy: Never
       serviceAccountName: sa-arc-webhook-job
   backoffLimit: 4
