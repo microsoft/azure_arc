@@ -225,6 +225,14 @@ if ( $env:deployPostgreSQL -eq $true )
     & "C:\Temp\DeployPostgreSQL.ps1"
 }
 
+# Enabling data controller auto metrics & logs upload to log analytics
+Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
+Write-Host "`n"
+$Env:WORKSPACE_ID=$(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName  --query primarySharedKey -o tsv)
+az arcdata dc update --name jumpstart-dc --resource-group $env:resourceGroup --auto-upload-logs true
+az arcdata dc update --name jumpstart-dc --resource-group $env:resourceGroup --auto-upload-metrics true
+
 # Applying Azure Data Studio settings template file and operations url shortcut
 if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
     Write-Host "Copying Azure Data Studio settings template file"
