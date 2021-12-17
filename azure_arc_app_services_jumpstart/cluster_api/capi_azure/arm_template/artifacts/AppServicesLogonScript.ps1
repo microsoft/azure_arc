@@ -115,7 +115,8 @@ az k8s-extension create `
    --cluster-name $connectedClusterName `
    --extension-type 'Microsoft.Web.Appservice' `
    --release-train stable `
-   --auto-upgrade-minor-version true `
+   --version "0.10.0" `
+   --auto-upgrade-minor-version false `
    --scope cluster `
    --release-namespace $namespace `
    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
