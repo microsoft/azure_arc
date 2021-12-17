@@ -52,10 +52,10 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Monitoring Metrics Publisher"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher"
     ```
 
     Output should look like this:

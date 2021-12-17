@@ -48,9 +48,9 @@ By the end of this guide, you will have an AKS cluster deployed with an App Serv
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader"
+    az ad sp create-for-rbac -n "JumpstartArcAppSvc" --role "Contributor"
+    az ad sp create-for-rbac -n "JumpstartArcAppSvc" --role "Security admin"
+    az ad sp create-for-rbac -n "JumpstartArcAppSvc" --role "Security reader"
     ```
 
     Output should look like this:

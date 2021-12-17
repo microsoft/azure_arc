@@ -48,9 +48,9 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader"
+    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Contributor"
+    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Security admin"
+    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Security reader"
     ```
 
     Output should look like this:
