@@ -30,19 +30,27 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
   az --version
   ```
 
-* Create Azure service principal (SP)
+* Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
 
-    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+  * "Contributor" - Required for provisioning Azure resources
+  * "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
+  * "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
+
+    To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader"
     ```
 
     Output should look like this:
@@ -50,8 +58,8 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcK8s",
-    "name": "http://AzureArcK8s",
+    "displayName": "AzureArcAppK8s",
+    "name": "http://AzureArcAppK8s",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }

@@ -32,19 +32,30 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 * [Generate SSH Key](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
 
-* Create Azure service principal (SP)
+* Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
 
-    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+  * "Contributor" - Required for provisioning Azure resources
+  * "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
+  * "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
+  * "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
+
+    To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher"
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Monitoring Metrics Publisher"
     ```
 
     Output should look like this:

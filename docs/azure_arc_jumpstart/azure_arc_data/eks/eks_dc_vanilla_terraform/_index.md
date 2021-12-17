@@ -47,32 +47,43 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * [Install Terraform >=1.0](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure service principal (SP)
+* Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
 
-  To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+  * "Contributor" - Required for provisioning Azure resources
+  * "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
+  * "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
+  * "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
 
-  ```shell
-  az login
-  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
-  ```
+    To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
-  For example:
+    ```shell
+    az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher"
+    ```
 
-  ```shell
-  az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
-  ```
+    For example:
 
-  Output should look like this
+    ```shell
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Monitoring Metrics Publisher"
+    ```
 
-  ```json
-  {
-  "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "displayName": "AzureArcK8s",
-  "name": "http://AzureArcK8s",
-  "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  }
-  ```
+    Output should look like this:
+
+    ```json
+    {
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "displayName": "AzureArcData",
+    "name": "http://AzureArcData",
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+    ```
 
   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 

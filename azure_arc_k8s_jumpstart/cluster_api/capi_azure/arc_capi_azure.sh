@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Set deployment environment variables
-export CLUSTERCTL_VERSION="1.0.1" # Do not change!
+export CLUSTERCTL_VERSION="1.0.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.0.0" # Do not change!
+export CAPI_PROVIDER_VERSION="1.0.2" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.22.1" # Do not change!
+export KUBERNETES_VERSION="1.22.4" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
 export WORKER_MACHINE_COUNT="<Workers node count>" 
 export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
