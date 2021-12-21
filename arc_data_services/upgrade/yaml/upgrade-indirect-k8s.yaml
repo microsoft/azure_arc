@@ -25,7 +25,7 @@ subjects:
    namespace: {{namespace}}
 roleRef:
    kind: ClusterRole
-   name: {{namespace}}:crb-upgrade-worker
+   name: {{namespace}}:cr-upgrade-worker
    apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: batch/v1
