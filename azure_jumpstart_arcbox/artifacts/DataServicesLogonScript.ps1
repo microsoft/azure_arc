@@ -60,6 +60,8 @@ kubectl apply -f "C:\ArcBox\capiStorageClass.yaml"
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
+
+Write-Host "`n"
 azdata --version
 
 # Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
