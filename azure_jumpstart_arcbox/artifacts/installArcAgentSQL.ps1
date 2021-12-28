@@ -282,10 +282,11 @@ Write-Host "Arc machine managed Identity requires Azure Connected SQL Server Onb
 while($count -le $retryCount)
 {
     New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-    sleep $waitTimeInSeconds
+    Start-Sleep $waitTimeInSeconds
     $count++
 }
 
+Write-Host "`n"
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
 $Settings = '{ "SqlManagement" : { "IsEnabled" : true }}'
