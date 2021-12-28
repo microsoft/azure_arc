@@ -8,5 +8,5 @@ subjects:
    namespace: arc
 roleRef:
    kind: ClusterRole
-   name: arc:crb-upgrade-worker
+   name: arc:cr-upgrade-worker
    apiGroup: rbac.authorization.k8s.io
