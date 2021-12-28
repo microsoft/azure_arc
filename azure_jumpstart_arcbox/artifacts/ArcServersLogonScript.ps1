@@ -249,7 +249,8 @@ $cred = new-object -typename System.Management.Automation.PSCredential -argument
 
 Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
 Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgentSQL.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
+# Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgentSQL.ps1 } -Credential $cred
 
 Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 # Converting Linux credentials to secure string  
