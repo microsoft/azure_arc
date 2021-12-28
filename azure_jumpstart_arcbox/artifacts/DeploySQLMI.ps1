@@ -29,7 +29,7 @@ $dataLogsStorageSize = "5"
 $backupsStorageSize = "5"
 
 # High Availability
-$replicas = 1 # Value can be either 1 or 3
+$replicas = 3 # Deploy SQL MI "Business Critical" tier
 ################################################
 
 $SQLParams = "C:\ArcBox\SQLMI.parameters.json"
@@ -69,7 +69,7 @@ Write-Host "`n"
 # Update Service Port from 1433 to Non-Standard
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
 kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
-Sleep 5 # To allow the CRD to update
+Start-Sleep 5 # To allow the CRD to update
 
 # Downloading demo database and restoring onto SQL MI
 $podname = "jumpstart-sql-0"
