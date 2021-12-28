@@ -46,3 +46,11 @@ spec:
       restartPolicy: Never
       serviceAccountName: sa-arc-upgrade-worker
   backoffLimit: 0
+---
+apiVersion: arcdata.microsoft.com/v2
+kind: DataController
+metadata:
+  name: arc
+spec:
+  docker:
+    imageTag: v1.2.0_2021-12-15
