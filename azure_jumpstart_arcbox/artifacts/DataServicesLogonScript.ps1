@@ -140,10 +140,10 @@ New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -N
 Copy-Item -Path "C:\ArcBox\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-# Write-Host "`n"
-# az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+Write-Host "`n"
+Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
+Write-Host "`n"
+az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # Deploying Azure Defender Kubernetes extension instance
 Write-Host "`n"
