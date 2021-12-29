@@ -227,13 +227,13 @@ echo ""
 # CAPI workload cluster kubeconfig housekeeping
 cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
-export KUBECONFIG=~/.kube/config.arcbox-capi-data
+export KUBECONFIG=~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
 sudo service sshd restart
 
 # Onboard the cluster to Azure Arc
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-sudo -u $adminUsername az connectedk8s connect --name ArcBox-CAPI-Data --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox' --kube-config ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME --kube-context "arcbox-capi-data-admin@arcbox-capi-data"
+sudo -u $adminUsername az connectedk8s connect --name ArcBox-CAPI-Data --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox' --kube-config /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME --kube-context arcbox-capi-data-admin@arcbox-capi-data
 
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
@@ -243,7 +243,7 @@ sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cl
 sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
 sudo -u $adminUsername az k8s-extension create --cluster-type connectedClusters --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy --only-show-errors
 
-sudo kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml --kubeconfig ~/.kube/config.arcbox-capi-data
+sudo kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml --kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
 # Copying workload CAPI kubeconfig file to staging storage account
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
