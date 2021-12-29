@@ -47,7 +47,6 @@ chown -R staginguser /home/${adminUsername}/.kube/config.staging
 sudo snap install helm --channel=3.6/stable --classic # pinning 3.6 due to breaking changes in aak8s onboarding with 3.7
 
 # Installing Azure CLI & Azure Arc Extensions
-sudo apt-get update
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 sudo -u $adminUsername az extension add --name connectedk8s
