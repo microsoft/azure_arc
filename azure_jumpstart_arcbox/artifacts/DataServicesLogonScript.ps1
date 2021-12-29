@@ -87,7 +87,7 @@ az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup 
 # $workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
 
 # Configuring Azure Policy for Kubernetes on the cluster
-az k8s-extension create --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
+# az k8s-extension create --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
