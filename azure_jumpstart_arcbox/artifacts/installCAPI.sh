@@ -17,6 +17,7 @@ echo $SPN_TENANT_ID:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
 echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
+echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
 sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
@@ -24,6 +25,7 @@ sed -i '5s/^/export SPN_TENANT_ID=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
+sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -234,3 +236,11 @@ localPath="/home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
 sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
+
+# Onboard the cluster to Azure Arc
+workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox'
+
+# Enabling Container Insights and Azure Defender cluster extensions
+sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --output none 2>/dev/null

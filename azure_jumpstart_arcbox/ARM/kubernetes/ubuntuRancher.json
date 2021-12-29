@@ -106,7 +106,7 @@
         "logAnalyticsWorkspace": {
             "type": "string",
             "metadata": {
-                "description": "Name of the Log Analytics workspace used with Azure Monitor for Containers extension."
+                "description": "Name of the Log Analytics workspace used with cluster extensions."
             }
         },
         "templateBaseUrl": {
