@@ -65,11 +65,11 @@ Write-Host "`n"
 azdata --version
 
 # Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
-Write-Host "`n"
-$connectedClusterName="ArcBox-CAPI-Data"
-az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox'
-Start-Sleep -Seconds 10
+# Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
+# Write-Host "`n"
+# $connectedClusterName="ArcBox-CAPI-Data"
+# az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox'
+# Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
@@ -139,17 +139,17 @@ Write-Host "Replacing Azure Data Studio settings template file"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "C:\ArcBox\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
-# Deploying Azure Monitor for containers Kubernetes extension instance
-Write-Host "`n"
-Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+# # Deploying Azure Monitor for containers Kubernetes extension instance
+# Write-Host "`n"
+# Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
+# Write-Host "`n"
+# az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
-# Deploying Azure Defender Kubernetes extension instance
-Write-Host "`n"
-Write-Host "Create Azure Defender Kubernetes extension instance"
-Write-Host "`n"
-az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --output none 2>$null
+# # Deploying Azure Defender Kubernetes extension instance
+# Write-Host "`n"
+# Write-Host "Create Azure Defender Kubernetes extension instance"
+# Write-Host "`n"
+# az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --output none 2>$null
 
 # Downloading Rancher K3s kubeconfig file
 Write-Host "Downloading Rancher K3s kubeconfig file"
