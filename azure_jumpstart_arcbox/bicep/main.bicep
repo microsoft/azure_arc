@@ -46,6 +46,7 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
     artifactsBaseUrl: artifactsBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
