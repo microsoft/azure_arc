@@ -29,9 +29,12 @@ sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
-
-# Installing Azure CLI
+# Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+sudo -u $adminUsername az extension add --name connectedk8s
+sudo -u $adminUsername az extension add --name k8s-configuration
+sudo -u $adminUsername az extension add --name k8s-extension
 
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
