@@ -12,20 +12,20 @@
             "type": "string",
             "defaultValue": "ArcBox-CAPI-MGMT",
             "metadata": {
-                "description": "The name of you Virtual Machine."
+                "description": "The name of you Virtual Machine"
             }
         },
         "adminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
             "metadata": {
-                "description": "Username for the Virtual Machine."
+                "description": "Username for the Virtual Machine"
             }
         },
         "sshRSAPublicKey": {
             "type": "securestring",
             "metadata": {
-                "description": "SSH Key for the Virtual Machine. SSH key is recommended over password."
+                "description": "SSH Key for the Virtual Machine. SSH key is recommended over password"
             }
         },
         "ubuntuOSVersion": {
@@ -35,7 +35,7 @@
                 "18.04-LTS"
             ],
             "metadata": {
-                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
             }
         },
         "azureLocation": {
@@ -106,13 +106,13 @@
         "logAnalyticsWorkspace": {
             "type": "string",
             "metadata": {
-                "description": "Name of the Log Analytics workspace used with cluster extensions."
+                "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
         },        
         "templateBaseUrl": {
             "type": "string",
             "metadata": {
-                "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+                "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template"
             }
         }
     },

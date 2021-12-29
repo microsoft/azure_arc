@@ -1,23 +1,23 @@
 @description('Your public IP address, used to RDP to the client VM')
 param myIpAddress string
 
-@description('The name of you Virtual Machine.')
+@description('The name of you Virtual Machine')
 param vmName string = 'ArcBox-CAPI-MGMT'
 
-@description('Username for the Virtual Machine.')
+@description('Username for the Virtual Machine')
 param adminUsername string = 'arcdemo'
 
-@description('SSH Key for the Virtual Machine. SSH key is recommended over password.')
+@description('SSH Key for the Virtual Machine. SSH key is recommended over password')
 @secure()
 param sshRSAPublicKey string
 
-@description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
+@description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version')
 @allowed([
   '18.04-LTS'
 ])
 param ubuntuOSVersion string = '18.04-LTS'
 
-@description('Location for all resources.')
+@description('Location for all resources')
 param azureLocation string = resourceGroup().location
 
 @description('The size of the VM')
@@ -45,7 +45,10 @@ param spnTenantId string
 @description('Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json')
 param stagingStorageAccountName string
 
-@description('The base URL used for accessing artifacts and automation artifacts.')
+@description('Name of the Log Analytics workspace used with cluster extensions')
+param logAnalyticsWorkspace string
+
+@description('The base URL used for accessing artifacts and automation artifacts')
 param artifactsBaseUrl string
 
 var publicIpAddressName = '${vmName}-PIP'
@@ -171,7 +174,7 @@ resource vmInstallscriptCAPI 'Microsoft.Compute/virtualMachines/extensions@2021-
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName}'
+      commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
       fileUris: [
         '${artifactsBaseUrl}artifacts/installCAPI.sh'
       ]

@@ -36,7 +36,7 @@ az provider register --namespace 'Microsoft.Kubernetes' --wait
 az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
 az provider register --namespace 'Microsoft.ExtendedLocation' --wait
 az provider register --namespace 'Microsoft.AzureArcData' --wait
-az provider register --namespace 'Microsoft.PolicyInsights' --wait
+# az provider register --namespace 'Microsoft.PolicyInsights' --wait
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
@@ -67,7 +67,7 @@ azdata --version
 # Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
 # Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 # Write-Host "`n"
-# $connectedClusterName="ArcBox-CAPI-Data"
+$connectedClusterName="ArcBox-CAPI-Data"
 # az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox'
 # Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
@@ -84,7 +84,7 @@ $extensionId = az k8s-extension show --name arc-data-services --cluster-type con
 Start-Sleep -Seconds 20
 az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config"
 
-$workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+# $workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
 
 # Configuring Azure Policy for Kubernetes on the cluster
 az k8s-extension create --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
