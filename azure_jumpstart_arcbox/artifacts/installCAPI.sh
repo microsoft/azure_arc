@@ -233,7 +233,7 @@ sudo service sshd restart
 
 # Onboard the cluster to Azure Arc
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-sudo -u $adminUsername az connectedk8s connect --name ArcBox-CAPI-Data --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox' --only-show-errors
+sudo -u $adminUsername az connectedk8s connect --name ArcBox-CAPI-Data --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox' --kube-config ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME --kube-context arcbox-capi-data
 
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
