@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo -u $USER mkdir /home/${USER}/logs
 exec >installCAPI.log
 exec >/home/${USER}/logs/installCAPI.log
 exec 2>&1

@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo -u $USER mkdir /home/${USER}/logs
 exec >installK3s.log
 exec >/home/${USER}/logs/installK3s.log
 exec 2>&1
