@@ -1,7 +1,7 @@
 #!/bin/bash
-sudo -u $USER mkdir /home/${USER}/logs
+sudo -u $USER mkdir /home/${USER}/jumpstart_logs
 exec >installK3s.log
-exec >/home/${USER}/logs/installK3s.log
+exec >/home/${USER}/jumpstart_logs/installK3s.log
 exec 2>&1
 
 sudo apt-get update

@@ -1,7 +1,7 @@
 #!/bin/bash
-sudo -u $USER mkdir /home/${USER}/logs
+sudo -u $USER mkdir /home/${USER}/jumpstart_logs
 exec >installCAPI.log
-exec >/home/${USER}/logs/installCAPI.log
+exec >/home/${USER}/jumpstart_logs/installCAPI.log
 exec 2>&1
 
 sudo apt-get update
