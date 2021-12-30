@@ -58,9 +58,9 @@ sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --
 # Registering Azure resource providers
 sudo -u $adminUsername az provider register --namespace 'Microsoft.Kubernetes' --wait
 sudo -u $adminUsername az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
 sudo -u $adminUsername az provider register --namespace 'Microsoft.ExtendedLocation' --wait
 sudo -u $adminUsername az provider register --namespace 'Microsoft.AzureArcData' --wait
-sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
 
 sudo service sshd restart
 
