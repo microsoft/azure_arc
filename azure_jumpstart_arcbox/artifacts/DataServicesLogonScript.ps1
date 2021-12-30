@@ -31,13 +31,6 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-# Register Azure providers
-# az provider register --namespace 'Microsoft.Kubernetes' --wait
-# az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
-# az provider register --namespace 'Microsoft.ExtendedLocation' --wait
-# az provider register --namespace 'Microsoft.AzureArcData' --wait
-# az provider register --namespace 'Microsoft.PolicyInsights' --wait
-
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"

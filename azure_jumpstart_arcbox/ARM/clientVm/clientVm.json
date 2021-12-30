@@ -47,7 +47,7 @@
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_D16s_v3",
+            "defaultValue": "Standard_D16ds_v4",
             "metadata": {
                 "description": "The size of the VM"
             }
@@ -189,7 +189,7 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "osDiskType": "Premium_LRS"
+        "osDiskType": "UltraSSD_LRS"
     },
     "resources": [
         {
