@@ -1,5 +1,6 @@
 #!/bin/bash
 exec >installK3s.log
+exec >/home/${adminUsername}/logs/installK3s.log
 exec 2>&1
 
 sudo apt-get update

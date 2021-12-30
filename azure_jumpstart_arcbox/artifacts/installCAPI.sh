@@ -1,5 +1,6 @@
 #!/bin/bash
 exec >installCAPI.log
+exec >/home/${adminUsername}/logs/installCAPI.log
 exec 2>&1
 
 sudo apt-get update
