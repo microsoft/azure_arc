@@ -50,7 +50,7 @@ $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
-kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-capi"
+# kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-capi"
 
 # Creating Storage Class with azure-managed-disk for the CAPI cluster
 Write-Host "`n"
