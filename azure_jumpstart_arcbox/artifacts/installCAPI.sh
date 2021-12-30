@@ -44,13 +44,6 @@ resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$stagi
 az -v
 echo ""
 
-# Registering Azure providers
-sudo -u $adminUsername az provider register --namespace 'Microsoft.Kubernetes' --wait
-sudo -u $adminUsername az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
-sudo -u $adminUsername az provider register --namespace 'Microsoft.ExtendedLocation' --wait
-sudo -u $adminUsername az provider register --namespace 'Microsoft.AzureArcData' --wait
-sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
-
 # Installing snap
 sudo apt install snapd
 
