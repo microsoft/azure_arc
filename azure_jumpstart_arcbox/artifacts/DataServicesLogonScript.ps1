@@ -32,10 +32,10 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Register Azure providers
-az provider register --namespace 'Microsoft.Kubernetes' --wait
-az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
-az provider register --namespace 'Microsoft.ExtendedLocation' --wait
-az provider register --namespace 'Microsoft.AzureArcData' --wait
+# az provider register --namespace 'Microsoft.Kubernetes' --wait
+# az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
+# az provider register --namespace 'Microsoft.ExtendedLocation' --wait
+# az provider register --namespace 'Microsoft.AzureArcData' --wait
 # az provider register --namespace 'Microsoft.PolicyInsights' --wait
 
 # Making extension install dynamic
@@ -50,12 +50,6 @@ $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
-# kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-capi"
-
-# Creating Storage Class with azure-managed-disk for the CAPI cluster
-Write-Host "`n"
-Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
-kubectl apply -f "C:\ArcBox\capiStorageClass.yaml"
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -64,12 +58,10 @@ kubectl get nodes
 Write-Host "`n"
 azdata --version
 
-# Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
-# Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
-# Write-Host "`n"
+# Installing the Azure Arc-enabled data services cluster extension
+Write-Host "Installing the Azure Arc-enabled data services cluster extension"
+Write-Host "`n"
 $connectedClusterName="ArcBox-CAPI-Data"
-# az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox'
-# Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
@@ -79,15 +71,13 @@ Do {
     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($podStatus -eq "Nope")
 
+# Configuring Azure Arc Custom Location on the cluster 
+Write-Host "Configuring Azure Arc Custom Location on the cluster"
+Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
 az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config"
-
-# $workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-
-# Configuring Azure Policy for Kubernetes on the cluster
-# az k8s-extension create --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
@@ -138,18 +128,6 @@ az arcdata dc update --name arcbox-dc --resource-group $env:resourceGroup --auto
 Write-Host "Replacing Azure Data Studio settings template file"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "C:\ArcBox\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-
-# # Deploying Azure Monitor for containers Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-# Write-Host "`n"
-# az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-
-# # Deploying Azure Defender Kubernetes extension instance
-# Write-Host "`n"
-# Write-Host "Create Azure Defender Kubernetes extension instance"
-# Write-Host "`n"
-# az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --output none 2>$null
 
 # Downloading Rancher K3s kubeconfig file
 Write-Host "Downloading Rancher K3s kubeconfig file"

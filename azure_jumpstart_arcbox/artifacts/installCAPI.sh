@@ -29,6 +29,7 @@ sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
+
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
@@ -42,6 +43,13 @@ subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
 resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$stagingStorageAccountName']".[resourceGroup] --resource-type "Microsoft.Storage/storageAccounts" -o tsv)
 az -v
 echo ""
+
+# Registering Azure providers
+sudo -u $adminUsername az provider register --namespace 'Microsoft.Kubernetes' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.ExtendedLocation' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.AzureArcData' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
 
 # Installing snap
 sudo apt install snapd
@@ -113,7 +121,7 @@ sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >
 sudo kubectl get nodes
 echo ""
 
-# Create a secret to include the password of the Service Principal identity created in Azure
+# Creating a secret to include the password of the Service Principal identity created in Azure
 # This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
 kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
@@ -231,7 +239,7 @@ export KUBECONFIG=~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
 sudo service sshd restart
 
-# Onboard the cluster to Azure Arc
+# Onboarding the cluster to Azure Arc
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
 sudo -u $adminUsername az connectedk8s connect --name ArcBox-CAPI-Data --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox' --kube-config /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME --kube-context 'arcbox-capi-data-admin@arcbox-capi-data'
 
@@ -239,16 +247,14 @@ sudo -u $adminUsername az connectedk8s connect --name ArcBox-CAPI-Data --resourc
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 # sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
 
-# Enable Azure Policy for Kubernetes on the cluster
-sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
+# Enabling Azure Policy for Kubernetes on the cluster
 sudo -u $adminUsername az k8s-extension create --cluster-type connectedClusters --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
 
 # Creating Storage Class with azure-managed-disk for the CAPI cluster
 sudo kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml --kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
-
+# Renaming CAPI cluster context name 
 sudo kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-capi" --kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
-
 
 # Copying workload CAPI kubeconfig file to staging storage account
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
