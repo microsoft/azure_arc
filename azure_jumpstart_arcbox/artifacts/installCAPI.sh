@@ -31,8 +31,8 @@ chmod +x vars.sh
 . ./vars.sh
 
 mkdir -p /home/$adminUsername/jumpstart_logs
-watch -n 1 'rsync -avuP installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI1.log' &>/dev/null &
-watch -n 1 'rsync -avuP installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI2.log' &>/dev/null &
+watch -n 1 'rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI1.log' &>/dev/null &
+watch -n 1 'rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI2.log' &>/dev/null &
 
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
