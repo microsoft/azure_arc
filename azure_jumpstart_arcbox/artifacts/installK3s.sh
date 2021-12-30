@@ -46,7 +46,7 @@ chown -R staginguser /home/${adminUsername}/.kube/config.staging
 # Installing Helm 3
 sudo snap install helm --channel=3.6/stable --classic # pinning 3.6 due to breaking changes in aak8s onboarding with 3.7
 
-# Installing Azure CLI & Azure Arc Extensions
+# Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 sudo -u $adminUsername az extension add --name connectedk8s
@@ -54,6 +54,13 @@ sudo -u $adminUsername az extension add --name k8s-configuration
 sudo -u $adminUsername az extension add --name k8s-extension
 
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
+
+# Registering Azure resource providers
+sudo -u $adminUsername az provider register --namespace 'Microsoft.Kubernetes' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.ExtendedLocation' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.AzureArcData' --wait
+sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
 
 sudo service sshd restart
 

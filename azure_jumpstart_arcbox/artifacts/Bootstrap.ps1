@@ -142,7 +142,6 @@ workflow ClientTools_01
 
             # Developers
             if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/capiStorageClass.yaml") -OutFile "C:\ArcBox\capiStorageClass.yaml"
                 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
                 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\ArcBox\AZDataCLI.msi"
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\ArcBox\settingsTemplate.json"
