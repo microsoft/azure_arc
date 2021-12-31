@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo -s mkdir -p /home/$USER/jumpstart_logs5
 exec >installCAPI.log
 exec 2>&1
 
@@ -35,6 +36,8 @@ sudo -u $adminUsername watch -n 1 'sudo -u $adminUsername rsync -a /var/lib/waag
 sudo -u $adminUsername watch -n 1 'rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI2.log' &>/dev/null &
 sudo -s watch -n 1 'sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI3.log' &>/dev/null &
 sudo -s watch -n 1 'rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI4.log' &>/dev/null &
+watch -n 1 'sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI5.log'
+watch -n 1 'sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI6.log' &>/dev/null &
 
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
