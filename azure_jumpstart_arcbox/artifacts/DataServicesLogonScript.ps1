@@ -1,4 +1,5 @@
 $ArcBoxLogsDir = "C:\ArcBox\Logs"
+
 Start-Transcript -Path $ArcBoxLogsDir\DataServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
@@ -48,12 +49,14 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERN
 # Downloading 'installCAPI.log' log file
 Write-Host "Downloading 'installCAPI.log' log file"
 $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$ArcBoxLogsDir\installCAPI.log"
 
 # Downloading 'installK3s.log' log file
 Write-Host "Downloading 'installK3s.log' log file"
 $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s.log"
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installK3s.log"
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$ArcBoxLogsDir\installK3s.log"
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"

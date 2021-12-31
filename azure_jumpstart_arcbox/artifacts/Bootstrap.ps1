@@ -67,7 +67,7 @@ New-Item -Path $vmDir -ItemType directory -Force
 New-Item -Path $tempDir -ItemType directory -Force
 New-Item -Path $agentScript -ItemType directory -Force
 
-Start-Transcript "C:\ArcBox\Bootstrap.log"
+Start-Transcript -Path $ArcBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
