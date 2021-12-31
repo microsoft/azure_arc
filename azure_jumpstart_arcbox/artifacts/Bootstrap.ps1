@@ -57,11 +57,11 @@ param (
 # Create path
 Write-Output "Create ArcBox path"
 $ArcBoxDir = "C:\ArcBox"
-$vmDir = "C:\ArcBox\Virtual Machines"
+$Env:vmDir = "C:\ArcBox\Virtual Machines"
 $agentScript = "C:\ArcBox\agentScript"
 $tempDir = "C:\Temp"
 New-Item -Path $ArcBoxDir -ItemType directory -Force
-New-Item -Path $vmDir -ItemType directory -Force
+New-Item -Path $Env:vmDir -ItemType directory -Force
 New-Item -Path $tempDir -ItemType directory -Force
 New-Item -Path $agentScript -ItemType directory -Force
 
@@ -90,7 +90,7 @@ workflow ClientTools_01
                 [Parameter (Mandatory = $true)]
                 [string]$flavor
             )
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
+            $chocolateyAppList = 'azure-cli,az.powershell,azcopy10,kubernetes-cli,vcredist140,microsoft-edge,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
             InlineScript {
                 param (
                     [string]$chocolateyAppList
@@ -177,12 +177,14 @@ if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
 
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
-    
+
     # Downloading nested VMs VHDX files
+    Update-SessionEnvironment
     Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
     $sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
     $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
-    azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $vmDir --recursive
+    azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $Env:vmDir --recursive
+    azcopy
 
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\ArcServersLogonScript.ps1'
