@@ -202,3 +202,8 @@ Stop-Process -Id $kubectlMonShell.Id
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
+
+# Creating deployment logs bundle
+Write-Host "`n"
+Write-Host "Creating deployment logs bundle"
+Compress-Archive -Path $ArcBoxLogsDir -DestinationPath $ArcBoxLogsDir\LogsBundle.zip
