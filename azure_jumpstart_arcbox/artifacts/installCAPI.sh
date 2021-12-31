@@ -30,42 +30,9 @@ sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 chmod +x vars.sh 
 . ./vars.sh
 
-# mkdir -p /home/$adminUsername/jumpstart_logs
+# Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
-# sudo -u $adminUsername watch -n 1 'sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI1.log' &>/dev/null &
-# sudo -u $adminUsername watch -n 1 'rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI2.log' &>/dev/null &
-# sudo -s watch -n 1 'sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI3.log' &>/dev/null &
-# sudo -s watch -n 1 'rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI4.log' &>/dev/null &
-# watch -n 1 'sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI5.log'
-# watch -n 1 'sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI6.log' &>/dev/null &
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI7.log
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI8.log &>/dev/null &
-# sudo -u $adminUsername watch -n 1 rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI9.log
-# sudo -u $adminUsername watch -n 1 rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI10.log &>/dev/null &
-# watch -n 1 sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI11.log &>/dev/null &
-# watch -n 1 sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI12.log
-# watch -n 1 sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/arcdemo/jumpstart_logs/installCAPI13.log &>/dev/null &
-# watch -n 1 sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/arcdemo/jumpstart_logs/installCAPI14.log
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/arcdemo/jumpstart_logs/installCAPI15.log &>/dev/null &
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/arcdemo/jumpstart_logs/installCAPI16.log
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI17.log &>/dev/null &
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI18.log &
-# watch -n 1 sudo -u $adminUsername cp /var/lib/waagent/custom-script/download/0/installCAPI.log /home/$adminUsername/jumpstart_logs/installCAPI19.log &
-# watch -n 1 sudo -u $adminUsername cp /var/lib/waagent/custom-script/download/0/installCAPI.log /home/arcdemo/jumpstart_logs/installCAPI20.log &
-# watch -n 1 sudo -u $adminUsername cp /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI21.log &
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI22.log &
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI23.log &>/dev/null &
-
-
-while sleep 2; do sudo -u $adminUsername \cp -r /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI23.log; done &
-while sleep 2; do sudo -u $adminUsername \cp -r installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI24.log; done &
-while sleep 2; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI24.log; done &
-
-# while :; do
-#   watch -n 1 sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/arcdemo/jumpstart_logs/installCAPI7.log
-#   sleep 1
-# done
-
+while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI.log; done &
 
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -294,3 +261,7 @@ localPath="/home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
 sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
+
+# Uploading this script log to staging storage for ease of troubleshooting
+log="/home/${adminUsername}/jumpstart_logs/installCAPI.log"
+sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $log

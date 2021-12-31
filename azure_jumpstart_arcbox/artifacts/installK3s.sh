@@ -1,7 +1,5 @@
 #!/bin/bash
-sudo -u $USER mkdir /home/${USER}/jumpstart_logs
 exec >installK3s.log
-exec >/home/${USER}/jumpstart_logs/installK3s.log
 exec 2>&1
 
 sudo apt-get update
@@ -31,6 +29,10 @@ sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
+
+# Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
+sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
+while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
 
 publicIp=$(curl icanhazip.com)
 
@@ -87,3 +89,7 @@ localPath="/home/$adminUsername/.kube/config"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
 sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
+
+# Uploading this script log to staging storage for ease of troubleshooting
+log="/home/${adminUsername}/jumpstart_logs/installK3s.log"
+sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $log

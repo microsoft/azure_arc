@@ -1,4 +1,5 @@
-Start-Transcript -Path C:\ArcBox\DataServicesLogonScript.log
+$ArcBoxLogsDir = "C:\ArcBox\Logs"
+Start-Transcript -Path $ArcBoxLogsDir\DataServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -43,6 +44,16 @@ $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
+
+# Downloading 'installCAPI.log' log file
+Write-Host "Downloading 'installCAPI.log' log file"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
+
+# Downloading 'installK3s.log' log file
+Write-Host "Downloading 'installK3s.log' log file"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s.log"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installK3s.log"
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
