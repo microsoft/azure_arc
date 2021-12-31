@@ -4,7 +4,10 @@ param (
     [string]$servicePrincipalTenantId
 )
 
-Start-Transcript -Path C:\ArcBox\installArcAgentSQL.log
+$ArcBoxLogsDir = "C:\ArcBox\Logs"
+
+Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
+
 $ErrorActionPreference = 'SilentlyContinue'
 
 # These settings will be replaced by the portal when the script is generated

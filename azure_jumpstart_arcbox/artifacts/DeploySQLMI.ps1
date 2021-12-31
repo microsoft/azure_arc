@@ -1,4 +1,6 @@
-Start-Transcript -Path C:\ArcBox\deploySQL.log
+$ArcBoxLogsDir = "C:\ArcBox\Logs"
+
+Start-Transcript -Path $ArcBoxLogsDir\deploySQL.log
 
 # Deployment environment variables
 $controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.

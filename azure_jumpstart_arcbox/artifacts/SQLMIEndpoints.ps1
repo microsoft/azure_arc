@@ -1,4 +1,6 @@
-Start-Transcript -Path C:\ArcBox\SQLMIEndpoints.log
+$ArcBoxLogsDir = "C:\ArcBox\Logs"
+
+Start-Transcript -Path $ArcBoxLogsDir\SQLMIEndpoints.log
 
 # Creating SQLMI Endpoints file 
 New-Item -Path "C:\ArcBox\" -Name "SQLMIEndpoints.txt" -ItemType "file" 
