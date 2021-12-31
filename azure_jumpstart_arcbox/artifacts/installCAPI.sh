@@ -56,12 +56,10 @@ sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 # watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI22.log &
 # watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI23.log &>/dev/null &
 
-# watch -n 1 sudo -u $adminUsername cp /var/lib/waagent/custom-script/download/0/installCAPI.log /home/arcdemo/jumpstart_logs_temp/installCAPI20.log &
-# watch -n 1 sudo -u $adminUsername cp /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs_temp/installCAPI21.log &
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs_temp/installCAPI22.log &
-# watch -n 1 sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs_temp/installCAPI23.log &>/dev/null &
 
-while sleep 2; do sudo -u $adminUsername rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI23.log; done &
+while sleep 2; do sudo -u $adminUsername \cp -r /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI23.log; done &
+while sleep 2; do sudo -u $adminUsername \cp -r installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI24.log; done &
+while sleep 2; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI24.log; done &
 
 # while :; do
 #   watch -n 1 sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/arcdemo/jumpstart_logs/installCAPI7.log
