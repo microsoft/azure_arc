@@ -206,4 +206,4 @@ Start-Sleep -Seconds 5
 # Creating deployment logs bundle
 Write-Host "`n"
 Write-Host "Creating deployment logs bundle"
-Compress-Archive -Path $ArcBoxLogsDir -DestinationPath $ArcBoxLogsDir\LogsBundle.zip
+Compress-Archive -Path $ArcBoxLogsDir -DestinationPath $ArcBoxLogsDir\LogsBundle.zip -CompressionLevel Optimal -Force

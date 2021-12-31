@@ -128,16 +128,11 @@ Write-Output "Enable Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
 # Downloading nested VMs VHDX files
-# Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-# $sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
-# $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
-# azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFolder/*$sas $ArcBoxVMDir --recursive --cap-mbps 4000
-
 Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
 $sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
 $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
 $Env:AZCOPY_BUFFER_GB=4
-azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 800 --log-level=ERROR
+azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 1500 --log-level=ERROR
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
@@ -181,14 +176,6 @@ Start-VM -Name ArcBox-Ubuntu
 Start-VM -Name ArcBox-CentOS
 
 # Expand Windows partition sizes
-# $User = "Administrator"
-# $Password = ConvertTo-SecureString -String "ArcDemo123!!" -AsPlainText -Force
-# $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User, $Password
-# Enter-PSSession -VMName ArcBox-SQL -Credential $Credential
-# $MaxSize = (Get-PartitionSupportedSize -DriveLetter c).SizeMax
-# Resize-Partition -DriveLetter C -Size $MaxSize
-# Exit-PSSession
-
 Start-Sleep -Seconds 20
 $username = "Administrator"
 $password = "ArcDemo123!!"
@@ -252,9 +239,9 @@ $secstr = New-Object -TypeName System.Security.SecureString
 $nestedWindowsPassword.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $nestedWindowsUsername, $secstr
 
-Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File $ArcBoxDir\installArcAgent.ps1 } -Credential $cred
-Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File $ArcBoxDir\installArcAgent.ps1 } -Credential $cred
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File $ArcBoxDir\installArcAgentSQL.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgentSQL.ps1 } -Credential $cred
 
 Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 # Converting Linux credentials to secure string  
@@ -304,3 +291,8 @@ add-type $code
 }
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
+
+# Creating deployment logs bundle
+Write-Host "`n"
+Write-Host "Creating deployment logs bundle"
+Compress-Archive -Path $ArcBoxLogsDir -DestinationPath $ArcBoxLogsDir\LogsBundle.zip -CompressionLevel Optimal -Force
