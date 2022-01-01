@@ -132,19 +132,16 @@ Write-Output "Downloading nested VMs VHDX files. This can take some time, hold t
 $sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
 $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
 $Env:AZCOPY_BUFFER_GB=4
-azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 1500 --log-level=ERROR
+azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
-#Resize-VHD -Path "$ArcBoxVMDir\ArcBox-Win2K19.vhdx" -SizeBytes 50Gb
 New-VM -Name ArcBox-Win2K19 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$ArcBoxVMDir\ArcBox-Win2K19.vhdx" -Path $ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K19 -Count 2
 
-#Resize-VHD -Path "$ArcBoxVMDir\ArcBox-Win2K22.vhdx" -SizeBytes 50Gb
 New-VM -Name ArcBox-Win2K22 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$ArcBoxVMDir\ArcBox-Win2K22.vhdx" -Path $ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K22 -Count 2
 
-#Resize-VHD -Path "$ArcBoxVMDir\ArcBox-SQL.vhdx" -SizeBytes 50Gb
 New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$ArcBoxVMDir\ArcBox-SQL.vhdx" -Path $ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
@@ -295,4 +292,4 @@ Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 # Creating deployment logs bundle
 Write-Host "`n"
 Write-Host "Creating deployment logs bundle"
-Compress-Archive -Path $ArcBoxLogsDir -DestinationPath $ArcBoxLogsDir\LogsBundle.zip -CompressionLevel Optimal -Force
+7z a $ArcBoxLogsDir\LogsBundle.zip $ArcBoxLogsDir\*.log -xr!C:\ArcBox\Logs\*.zip
