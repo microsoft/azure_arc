@@ -92,7 +92,7 @@ workflow ClientTools_01
                 [Parameter (Mandatory = $true)]
                 [string]$flavor
             )
-            $chocolateyAppList = 'azure-cli,az.powershell,azcopy10,kubernetes-cli,vcredist140,microsoft-edge,vscode,vscode-powershell,vscode-kubernetes-tools,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
+            $chocolateyAppList = 'azure-cli,az.powershell,azcopy10,kubernetes-cli,vcredist140,microsoft-edge,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
             InlineScript {
                 param (
                     [string]$chocolateyAppList
@@ -124,7 +124,6 @@ workflow ClientTools_01
             Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "C:\ArcBox\MonitorWorkbookLogonScript.ps1"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile "C:\ArcBox\DeploymentStatus.ps1"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/LogBundle.ps1") -OutFile "C:\ArcBox\LogBundle.ps1"
             
             # Workbook template
             if ($flavor -eq "ITPro") {
