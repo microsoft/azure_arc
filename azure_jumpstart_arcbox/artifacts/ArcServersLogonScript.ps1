@@ -293,3 +293,7 @@ Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 Write-Host "`n"
 Write-Host "Creating deployment logs bundle"
 7z a $ArcBoxLogsDir\LogsBundle.zip $ArcBoxLogsDir\*.log -xr!C:\ArcBox\Logs\*.zip
+
+
+7z a $ArcBoxLogsDir\"LogsBundle-"+"$env:subscriptionId".zip $ArcBoxLogsDir\*.log -xr!C:\ArcBox\Logs\*.zip
+7z a $ArcBoxDir\"LogsBundle-"+"$env:subscriptionId".zip $ArcBoxLogsDir\*.log -xr!C:\ArcBox\Logs\*.zip
