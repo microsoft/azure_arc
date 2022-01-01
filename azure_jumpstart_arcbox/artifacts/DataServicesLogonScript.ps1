@@ -1,3 +1,4 @@
+$ArcBoxDir = "C:\ArcBox"
 $ArcBoxLogsDir = "C:\ArcBox\Logs"
 
 Start-Transcript -Path $ArcBoxLogsDir\DataServicesLogonScript.log
@@ -94,7 +95,7 @@ $customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "C:\ArcBox\dataController.parameters.json"
+$dataControllerParams = "$ArcBoxDir\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
@@ -107,7 +108,7 @@ $dataControllerParams = "C:\ArcBox\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\ArcBox\dataController.json" --parameters "C:\ArcBox\dataController.parameters.json"
+az deployment group create --resource-group $env:resourceGroup --template-file "$ArcBoxDir\dataController.json" --parameters "$ArcBoxDir\dataController.parameters.json"
 Write-Host "`n"
 
 Do {
@@ -119,8 +120,8 @@ Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # Deploy SQL MI and PostgreSQL data services
-& "C:\ArcBox\DeploySQLMI.ps1"
-& "C:\ArcBox\DeployPostgreSQL.ps1"
+& "$ArcBoxDir\DeploySQLMI.ps1"
+& "$ArcBoxDir\DeployPostgreSQL.ps1"
 
 # Enabling data controller auto metrics & logs upload to log analytics
 Write-Host "`n"
@@ -134,7 +135,7 @@ az arcdata dc update --name arcbox-dc --resource-group $env:resourceGroup --auto
 # Replacing Azure Data Studio settings template file
 Write-Host "Replacing Azure Data Studio settings template file"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "C:\ArcBox\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+Copy-Item -Path "$ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
 # Downloading Rancher K3s kubeconfig file
 Write-Host "Downloading Rancher K3s kubeconfig file"
@@ -158,7 +159,7 @@ kubectx
 
 # Sending deployement status message to Azure storage account queue
 # if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
-#     & "C:\ArcBox\DeploymentStatus.ps1"
+#     & "$ArcBoxDir\DeploymentStatus.ps1"
 # }
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services 
@@ -177,7 +178,7 @@ $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
-$imgPath="C:\ArcBox\wallpaper.png"
+$imgPath = "$ArcBoxDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
@@ -203,7 +204,5 @@ Stop-Process -Id $kubectlMonShell.Id
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
-# Creating deployment logs bundle
-Write-Host "`n"
-Write-Host "Creating deployment logs bundle"
-7z a $ArcBoxLogsDir\LogsBundle.zip $ArcBoxLogsDir\*.log -xr!C:\ArcBox\Logs\*.zip
+# Executing the deployment logs bundle PowerShell script in a new window
+Start-Process PoweShell $ArcBoxDir\LogBundle.ps1
