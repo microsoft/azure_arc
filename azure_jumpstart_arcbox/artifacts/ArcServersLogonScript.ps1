@@ -289,11 +289,5 @@ add-type $code
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 
-# Creating deployment logs bundle
-Write-Host "`n"
-Write-Host "Creating deployment logs bundle"
-7z a $ArcBoxLogsDir\LogsBundle.zip $ArcBoxLogsDir\*.log -xr!C:\ArcBox\Logs\*.zip
-
-
-7z a $ArcBoxLogsDir\"LogsBundle-"+"$env:subscriptionId".zip $ArcBoxLogsDir\*.log -xr!C:\ArcBox\Logs\*.zip
-7z a $ArcBoxDir\"LogsBundle-"+"$env:subscriptionId".zip $ArcBoxLogsDir\*.log -xr!C:\ArcBox\Logs\*.zip
+# Executing the deployment logs bundle PowerShell script in a new window
+Start-Process PoweShell $ArcBoxDir\LogBundle.ps1

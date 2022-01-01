@@ -1,4 +1,5 @@
-$ArcBoxLogsDir = "C:\ArcBox\Logs"
+$ArcBoxDir = "C:\ArcBox"
+$ArcBoxLogsDir = "$ArcBoxDir\Logs"
 
 Start-Transcript -Path $ArcBoxLogsDir\deployPostgreSQL.log
 
@@ -33,7 +34,7 @@ $backupsStorageSize = "5Gi"
 $numWorkers = 1
 ################################################
 
-$PSQLParams = "C:\ArcBox\postgreSQL.parameters.json"
+$PSQLParams = "$ArcBoxDir\postgreSQL.parameters.json"
 
 (Get-Content -Path $PSQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $PSQLParams
@@ -53,7 +54,7 @@ $PSQLParams = "C:\ArcBox\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'numWorkersStage',$numWorkers | Set-Content -Path $PSQLParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\ArcBox\postgreSQL.json" --parameters "C:\ArcBox\postgreSQL.parameters.json"
+az deployment group create --resource-group $env:resourceGroup --template-file "$ArcBoxDir\postgreSQL.json" --parameters "$ArcBoxDir\postgreSQL.parameters.json"
 Write-Host "`n"
 
 # Ensures postgres container is initiated and ready to accept restores
@@ -84,7 +85,7 @@ kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -d adve
 # Creating Azure Data Studio settings for PostgreSQL connection
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
-$settingsTemplate = "C:\ArcBox\settingsTemplate.json"
+$settingsTemplate = "$ArcBoxDir\settingsTemplate.json"
 # Retrieving PostgreSQL connection endpoint
 $pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
