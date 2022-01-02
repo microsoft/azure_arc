@@ -56,11 +56,11 @@ param (
 
 # Creating ArcBox path
 Write-Output "Creating ArcBox path"
-$ArcBoxDir = "C:\ArcBox"
-$ArcBoxLogsDir = "C:\ArcBox\Logs"
-$ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
-$agentScript = "C:\ArcBox\agentScript"
-$tempDir = "C:\Temp"
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+$Env:ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
+$Env:agentScript = "C:\ArcBox\agentScript"
+$Env:tempDir = "C:\Temp"
 New-Item -Path $ArcBoxDir -ItemType directory -Force
 New-Item -Path $ArcBoxLogsDir -ItemType directory -Force
 New-Item -Path $ArcBoxVMDir -ItemType directory -Force
