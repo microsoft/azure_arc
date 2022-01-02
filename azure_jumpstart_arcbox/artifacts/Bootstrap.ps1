@@ -169,7 +169,7 @@ workflow ClientTools_02
 {
     InlineScript {
         Expand-Archive $Env:ArcBoxDir\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-        Start-Process msiexec.exe -Wait -ArgumentList '/I $Env:ArcBoxDir\AZDataCLI.msi /quiet'
+        Start-Process msiexec.exe -Wait -ArgumentList '/I C:\ArcBox\AZDataCLI.msi /quiet'
     }
 }
         
@@ -180,20 +180,20 @@ if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '$Env:ArcBoxDir\ArcServersLogonScript.ps1'
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
     # Creating scheduled task for DataServicesLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn 
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '$Env:ArcBoxDir\DataServicesLogonScript.ps1'
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '$Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1'
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
 Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
