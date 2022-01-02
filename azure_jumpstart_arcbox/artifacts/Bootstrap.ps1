@@ -54,8 +54,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('flavor', $flavor,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon,[System.EnvironmentVariableTarget]::Machine)
 
-# Create path
-Write-Output "Create ArcBox path"
+# Creating ArcBox path
+Write-Output "Creating ArcBox path"
 $ArcBoxDir = "C:\ArcBox"
 $ArcBoxLogsDir = "C:\ArcBox\Logs"
 $ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
@@ -120,44 +120,44 @@ workflow ClientTools_01
             }
 
             # All flavors
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "$ArcBoxDir\wallpaper.png"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "$ArcBoxDir\MonitorWorkbookLogonScript.ps1"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "$ArcBoxDir\mgmtMonitorWorkbook.parameters.json"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile "$ArcBoxDir\DeploymentStatus.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile $ArcBoxDir\wallpaper.png
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile $ArcBoxDir\MonitorWorkbookLogonScript.ps1
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile $ArcBoxDir\mgmtMonitorWorkbook.parameters.json
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $ArcBoxDir\DeploymentStatus.ps1
             
             # Workbook template
             if ($flavor -eq "ITPro") {
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookITPro.json") -OutFile "$ArcBoxDir\mgmtMonitorWorkbook.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookITPro.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.json"
             }
             else {
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookFull.json") -OutFile "$ArcBoxDir\mgmtMonitorWorkbook.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookFull.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.json"
             }
 
             # ITPro
             if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile "$ArcBoxDir\ArcServersLogonScript.ps1"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.ps1") -OutFile "$ArcBoxDir\agentScript\installArcAgent.ps1"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQL.ps1") -OutFile "$ArcBoxDir\agentScript\installArcAgentSQL.ps1"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentUbuntu.sh") -OutFile "$ArcBoxDir\agentScript\installArcAgentUbuntu.sh"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentCentOS.sh") -OutFile "$ArcBoxDir\agentScript\installArcAgentCentOS.sh"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQL.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentUbuntu.sh") -OutFile "C:\ArcBox\agentScript\installArcAgentUbuntu.sh"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentCentOS.sh") -OutFile "C:\ArcBox\agentScript\installArcAgentCentOS.sh"
             }
 
             # Developers
             if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
-                Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "$ArcBoxDir\azuredatastudio.zip"
-                Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "$ArcBoxDir\AZDataCLI.msi"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "$ArcBoxDir\settingsTemplate.json"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "$ArcBoxDir\DataServicesLogonScript.ps1"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "$ArcBoxDir\DeployPostgreSQL.ps1"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "$ArcBoxDir\DeploySQLMI.ps1"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "$ArcBoxDir\dataController.json"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "$ArcBoxDir\dataController.parameters.json"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "$ArcBoxDir\postgreSQL.json"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "$ArcBoxDir\postgreSQL.parameters.json"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.json") -OutFile "$ArcBoxDir\sqlmi.json"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile "$ArcBoxDir\sqlmi.parameters.json"
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "$ArcBoxDir\SQLMIEndpoints.ps1"
-                Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "$ArcBoxDir\SqlQueryStress.zip"                    
+                Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
+                Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\ArcBox\AZDataCLI.msi"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\ArcBox\settingsTemplate.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\ArcBox\DeployPostgreSQL.ps1"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\ArcBox\DeploySQLMI.ps1"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "C:\ArcBox\dataController.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "C:\ArcBox\dataController.parameters.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\ArcBox\postgreSQL.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\ArcBox\postgreSQL.parameters.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.json") -OutFile "C:\ArcBox\sqlmi.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile "C:\ArcBox\sqlmi.parameters.json"
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\ArcBox\SQLMIEndpoints.ps1"
+                Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\ArcBox\SqlQueryStress.zip"                    
             }
         }
 
@@ -168,7 +168,7 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 workflow ClientTools_02
 {
     InlineScript {
-        Expand-Archive $ArcBoxDir\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
+        Expand-Archive C:\ArcBox\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
         Start-Process msiexec.exe -Wait -ArgumentList '/I C:\ArcBox\AZDataCLI.msi /quiet'
     }
 }
