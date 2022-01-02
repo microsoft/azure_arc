@@ -266,7 +266,7 @@ Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administra
 
 
 # Changing to Jumpstart ArcBox wallpaper
-if ($env:flavor -eq "ITPro") {
+if ($env:flavor -eq "Full" -or "ITPro") {
 $imgPath="$ArcBoxDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
@@ -293,12 +293,12 @@ Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 Invoke-Expression 'cmd /c start powershell -Command { 
     $ArcBoxDir = "C:\ArcBox"
     $ArcBoxLogsDir = "$ArcBoxDir\Logs"
+    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
 
-    # Creating deployment logs bundle
     Write-Host "`n"
     Write-Host "Sleeping for 10 seconds before creating deployment logs bundle"
     Start-Sleep -Seconds 10
     Write-Host "`n"
     Write-Host "Creating deployment logs bundle"
-    7z a $ArcBoxLogsDir\LogsBundle-"$env:subscriptionId".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
+    7z a $ArcBoxLogsDir\LogsBundle-"$RandomString".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
  }'

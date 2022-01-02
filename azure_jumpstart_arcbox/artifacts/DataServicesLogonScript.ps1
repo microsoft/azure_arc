@@ -177,26 +177,6 @@ $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
-# Changing to Jumpstart ArcBox wallpaper
-$imgPath = "$ArcBoxDir\wallpaper.png"
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-     public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-         
-         public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
-         }
-    }
- } 
-'@
-
-add-type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
-
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
 
@@ -208,12 +188,12 @@ Start-Sleep -Seconds 5
 Invoke-Expression 'cmd /c start powershell -Command { 
     $ArcBoxDir = "C:\ArcBox"
     $ArcBoxLogsDir = "$ArcBoxDir\Logs"
+    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
 
-    # Creating deployment logs bundle
     Write-Host "`n"
     Write-Host "Sleeping for 10 seconds before creating deployment logs bundle"
     Start-Sleep -Seconds 10
     Write-Host "`n"
     Write-Host "Creating deployment logs bundle"
-    7z a $ArcBoxLogsDir\LogsBundle-"$env:subscriptionId".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
+    7z a $ArcBoxLogsDir\LogsBundle-"$RandomString".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
  }'
