@@ -128,11 +128,24 @@ Write-Output "Enable Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
 # Downloading nested VMs VHDX files
-Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+$ArcBoxDir = "C:\ArcBox"
+$ArcBoxLogsDir = "$ArcBoxDir\Logs"
+$ArcBoxVMDir = "$ArcBoxDir\Virtual Machines"
+$agentScript = "$ArcBoxDir\agentScript"
+
+
 $sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
 $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
 $Env:AZCOPY_BUFFER_GB=4
-azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
+if ($env:flavor -eq "Full") {
+    # The "Full" ArcBox flavor has an azcopy network throughput capping
+    Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."  
+    azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
+} else {
+    # Other ArcBox flavors does not have an azcopy network throughput capping
+    Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
+    azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --log-level=ERROR
+}
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
@@ -264,7 +277,6 @@ Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 120 -Wa
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-
 # Changing to Jumpstart ArcBox wallpaper
 if ($env:flavor -eq "Full" -or "ITPro") {
 $imgPath="$ArcBoxDir\wallpaper.png"
@@ -290,15 +302,17 @@ add-type $code
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 
 # Executing the deployment logs bundle PowerShell script in a new window
-Invoke-Expression 'cmd /c start powershell -Command { 
-    $ArcBoxDir = "C:\ArcBox"
-    $ArcBoxLogsDir = "$ArcBoxDir\Logs"
-    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-
-    Write-Host "`n"
-    Write-Host "Sleeping for 10 seconds before creating deployment logs bundle"
-    Start-Sleep -Seconds 10
-    Write-Host "`n"
-    Write-Host "Creating deployment logs bundle"
-    7z a $ArcBoxLogsDir\LogsBundle-"$RandomString".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
- }'
+if ($env:flavor -eq "Full" -or "ITPro") {
+    Invoke-Expression 'cmd /c start powershell -Command { 
+        $ArcBoxDir = "C:\ArcBox"
+        $ArcBoxLogsDir = "$ArcBoxDir\Logs"
+        $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+    
+        Write-Host "`n"
+        Write-Host "Sleeping for 10 seconds before creating deployment logs bundle"
+        Start-Sleep -Seconds 10
+        Write-Host "`n"
+        Write-Host "Creating deployment logs bundle"
+        7z a $ArcBoxLogsDir\LogsBundle-"$RandomString".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
+     }'
+}
