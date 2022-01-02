@@ -61,13 +61,13 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
 $Env:agentScript = "C:\ArcBox\agentScript"
 $Env:tempDir = "C:\Temp"
-New-Item -Path $ArcBoxDir -ItemType directory -Force
-New-Item -Path $ArcBoxLogsDir -ItemType directory -Force
-New-Item -Path $ArcBoxVMDir -ItemType directory -Force
-New-Item -Path $tempDir -ItemType directory -Force
-New-Item -Path $agentScript -ItemType directory -Force
+New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxVMDir -ItemType directory -Force
+New-Item -Path $Env:tempDir -ItemType directory -Force
+New-Item -Path $Env:agentScript -ItemType directory -Force
 
-Start-Transcript -Path $ArcBoxLogsDir\Bootstrap.log
+Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
