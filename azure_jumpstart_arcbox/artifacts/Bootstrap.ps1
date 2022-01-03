@@ -90,7 +90,7 @@ workflow ClientTools_01
                 [Parameter (Mandatory = $true)]
                 [string]$flavor
             )
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk,setdefaultbrowser'
             InlineScript {
                 param (
                     [string]$chocolateyAppList
@@ -114,8 +114,22 @@ workflow ClientTools_01
                         Write-Host "Installing $app"
                         & choco install $app /y -Force| Write-Output
                     }
-                }                        
+                }
             }
+
+            # Set Edge as the Default Browser
+            & SetDefaultBrowser.exe HKLM "Microsoft Edge"
+
+            # Disable Edge 'First Run' Setup
+            $RegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+            $RegistryName  = 'HideFirstRunExperience'
+            $RegistryValue = '0x00000001'
+
+            If (-NOT (Test-Path $RegistryPath)) {
+              New-Item -Path $RegistryPath -Force | Out-Null
+            }
+
+            New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force 
 
             # All flavors
             Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
