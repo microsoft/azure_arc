@@ -181,6 +181,18 @@ $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
 # Kill the open PowerShell monitoring kubectl get pods
+$pgControllerPodName = "jumpstartpsc0-0"
+$pgWorkerPodName = "jumpstartpsw0-0"
+
+Do {
+    Write-Host "Waiting Azure Arc-enabled data services to be ready. Hold tight, this might take a few minutes..."
+    Start-Sleep -Seconds 1
+    $SQLStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    $PGService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
+} while ($SQLStatus -eq "Nope" -or $PGService -eq "Nope")
+Write-Host "Azure Arc-enabled data services are ready!"
+Write-Host "`n"
+
 Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
