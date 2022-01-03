@@ -124,6 +124,7 @@ workflow ClientTools_01
             Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
             Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.parameters.json
             Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:ArcBoxDir\DeploymentStatus.ps1
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/LogBundleUpload.txt") -OutFile $Env:ArcBoxLogsDir\LogBundleUpload.txt
             
             # Workbook template
             if ($flavor -eq "ITPro") {
