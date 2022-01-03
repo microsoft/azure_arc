@@ -276,6 +276,20 @@ if ($env:flavor -eq "ITPro") {
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
+# Replace variables in Arc-enabled SQL onboarding scripts
+(Get-Content -path "$agentScript\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"'$env:subscriptionId'" -replace '<resourceGroup>',"'$env:resourceGroup'" -replace '<location>',"'$env:azureLocation'" | Set-Content -Path "$agentScript\ArcSQL.ps1"
+(Get-Content -path "$agentScript\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"'$env:subscriptionId'" -replace '<resourceGroup>',"'$env:resourceGroup'" -replace '<sqlServerName>',"'$sqlServerName'" | Set-Content -Path "$agentScript\ArcSQLOnboard.ps1"
+
+# Creating Arc-enabled SQL Server onboarding desktop shortcut
+$SourceFileLocation = "${ArcBoxDir}\ArcSQLOnboard.ps1"
+$ShortcutLocation = "$env:Public\Desktop\Onboard SQL Server.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation)
+$Shortcut.TargetPath = "powershell.exe"
+$Shortcut.Arguments = "-ExecutionPolicy Bypass -File $SourceFileLocation"
+$Shortcut.IconLocation="${ArcBoxDir}\ArcSQLIcon.ico, 0"
+$Shortcut.WindowStyle = 3
+$Shortcut.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
 if ($env:flavor -eq "ITPro") {
