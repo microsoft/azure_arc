@@ -80,6 +80,7 @@ Do {
     } while ($podStatus -eq "Nope")
 
 # Configuring Azure Arc Custom Location on the cluster 
+Write-Host "`n"
 Write-Host "Configuring Azure Arc Custom Location on the cluster"
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
@@ -88,6 +89,7 @@ Start-Sleep -Seconds 20
 az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config"
 
 # Deploying Azure Arc Data Controller
+Write-Host "`n"
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
@@ -120,11 +122,8 @@ Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # Deploy SQL MI and PostgreSQL data services
-# & "$Env:ArcBoxDir\DeploySQLMI.ps1"
-# & "$Env:ArcBoxDir\DeployPostgreSQL.ps1"
-
-Start-Process Powershell -Argumentlist "-file $Env:ArcBoxDir\DeploySQLMI.ps1"
-Start-Process Powershell -Argumentlist "-file $Env:ArcBoxDir\DeployPostgreSQL.ps1"
+& "$Env:ArcBoxDir\DeploySQLMI.ps1"
+& "$Env:ArcBoxDir\DeployPostgreSQL.ps1"
 
 # Enabling data controller auto metrics & logs upload to log analytics
 Write-Host "`n"
@@ -159,6 +158,7 @@ Remove-Item -Path "C:\Users\$env:USERNAME\.kube\config-k3s"
 Move-Item -Path "C:\Users\$env:USERNAME\.kube\config_tmp" -Destination "C:\users\$env:USERNAME\.kube\config"
 $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 kubectx
+Write-Host "`n"
 
 # Sending deployement status message to Azure storage account queue
 # if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
@@ -179,19 +179,6 @@ $Shell = New-Object -ComObject ("WScript.Shell")
 $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
-
-# Kill the open PowerShell monitoring kubectl get pods
-$pgControllerPodName = "jumpstartpsc0-0"
-$pgWorkerPodName = "jumpstartpsw0-0"
-
-Do {
-    Write-Host "Waiting Azure Arc-enabled data services to be ready. Hold tight, this might take a few minutes..."
-    Start-Sleep -Seconds 1
-    $SQLStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
-    $PGService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
-} while ($SQLStatus -eq "Nope" -or $PGService -eq "Nope")
-Write-Host "Azure Arc-enabled data services are ready!"
-Write-Host "`n"
 
 Stop-Process -Id $kubectlMonShell.Id
 
