@@ -1,7 +1,7 @@
 ﻿param(
-    [string]$subId = "cbcf295f-8554-44fa-a2ac-69f28c4b5429",
-    [string]$resourceGroup = "ArcBox-RG",
-    [string]$sqlServerName = "ArcBox-SQL"
+    [string]$subId = "<subscriptionId>",
+    [string]$resourceGroup = "<resourceGroup>",
+    [string]$sqlServerName = "<sqlServerName>"
 )
 
 Add-Type -AssemblyName PresentationCore, PresentationFramework
@@ -9,7 +9,7 @@ Add-Type -AssemblyName PresentationCore, PresentationFramework
 $WarningPreference = 'SilentlyContinue'
 
 $logLocation = 'C:\ArcBox\Logs'
-$scriptLocation = 'C:\Temp'
+$scriptLocation = 'C:\ArcBox'
 
 # Define function to display pop-up message boxes
 
