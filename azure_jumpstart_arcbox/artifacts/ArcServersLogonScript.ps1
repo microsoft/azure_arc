@@ -302,17 +302,14 @@ add-type $code
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 
 # Executing the deployment logs bundle PowerShell script in a new window
-if ($env:flavor -eq "Full" -or "ITPro") {
-    Invoke-Expression 'cmd /c start powershell -Command { 
-        $ArcBoxDir = "C:\ArcBox"
-        $ArcBoxLogsDir = "$ArcBoxDir\Logs"
-        $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-    
-        Write-Host "`n"
-        Write-Host "Sleeping for 10 seconds before creating deployment logs bundle"
-        Start-Sleep -Seconds 10
-        Write-Host "`n"
-        Write-Host "Creating deployment logs bundle"
-        7z a $ArcBoxLogsDir\LogsBundle-"$RandomString".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
-     }'
-}
+Invoke-Expression 'cmd /c start powershell -Command { 
+    $ArcBoxDir = "C:\ArcBox"
+    $ArcBoxLogsDir = "$ArcBoxDir\Logs"
+    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+
+    Write-Host "Sleeping for 10 seconds before creating deployment logs bundle..."
+    Start-Sleep -Seconds 10
+    Write-Host "`n"
+    Write-Host "Creating deployment logs bundle"
+    7z a $ArcBoxLogsDir\LogsBundle-"$RandomString".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
+    }'

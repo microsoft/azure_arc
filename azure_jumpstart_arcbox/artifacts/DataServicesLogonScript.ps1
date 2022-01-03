@@ -1,7 +1,7 @@
-$ArcBoxDir = "C:\ArcBox"
-$ArcBoxLogsDir = "C:\ArcBox\Logs"
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 
-Start-Transcript -Path $ArcBoxLogsDir\DataServicesLogonScript.log
+Start-Transcript -Path $Env:ArcBoxLogsDir\DataServicesLogonScript.log
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -51,13 +51,13 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERN
 Write-Host "Downloading 'installCAPI.log' log file"
 $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
 $sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$ArcBoxLogsDir\installCAPI.log"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
 
 # Downloading 'installK3s.log' log file
 Write-Host "Downloading 'installK3s.log' log file"
 $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s.log"
 $sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$ArcBoxLogsDir\installK3s.log"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installK3s.log"
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -95,7 +95,7 @@ $customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group
 $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "$ArcBoxDir\dataController.parameters.json"
+$dataControllerParams = "$Env:ArcBoxDir\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
@@ -108,7 +108,7 @@ $dataControllerParams = "$ArcBoxDir\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "$ArcBoxDir\dataController.json" --parameters "$ArcBoxDir\dataController.parameters.json"
+az deployment group create --resource-group $env:resourceGroup --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController.parameters.json"
 Write-Host "`n"
 
 Do {
@@ -120,8 +120,15 @@ Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # Deploy SQL MI and PostgreSQL data services
-& "$ArcBoxDir\DeploySQLMI.ps1"
-& "$ArcBoxDir\DeployPostgreSQL.ps1"
+# & "$Env:ArcBoxDir\DeploySQLMI.ps1"
+# & "$Env:ArcBoxDir\DeployPostgreSQL.ps1"
+
+workflow RunDataSvcScripts {
+    parallel {
+        InlineScript { & "$Env:ArcBoxDir\DeploySQLMI.ps1" }   
+        InlineScript { & "$Env:ArcBoxDir\DeployPostgreSQL.ps1" }
+    }
+}
 
 # Enabling data controller auto metrics & logs upload to log analytics
 Write-Host "`n"
@@ -135,7 +142,7 @@ az arcdata dc update --name arcbox-dc --resource-group $env:resourceGroup --auto
 # Replacing Azure Data Studio settings template file
 Write-Host "Replacing Azure Data Studio settings template file"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "$ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
 # Downloading Rancher K3s kubeconfig file
 Write-Host "Downloading Rancher K3s kubeconfig file"
@@ -159,7 +166,7 @@ kubectx
 
 # Sending deployement status message to Azure storage account queue
 # if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
-#     & "$ArcBoxDir\DeploymentStatus.ps1"
+#     & "$Env:ArcBoxDir\DeploymentStatus.ps1"
 # }
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services 
