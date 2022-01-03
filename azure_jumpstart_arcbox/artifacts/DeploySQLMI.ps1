@@ -1,12 +1,13 @@
-$ArcBoxDir = "C:\ArcBox"
-$ArcBoxLogsDir = "$ArcBoxDir\Logs"
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 
-Start-Transcript -Path $ArcBoxLogsDir\deploySQL.log
+Start-Transcript -Path $Env:ArcBoxLogsDir\deploySQL.log
 
 # Deployment environment variables
 $controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
 
 # Deploying Azure Arc SQL Managed Instance
+Write-Host "`n"
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
@@ -35,7 +36,7 @@ $backupsStorageSize = "5"
 $replicas = 3 # Deploy SQL MI "Business Critical" tier
 ################################################
 
-$SQLParams = "$ArcBoxDir\SQLMI.parameters.json"
+$SQLParams = "$Env:ArcBoxDir\SQLMI.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $SQLParams
@@ -58,7 +59,7 @@ $SQLParams = "$ArcBoxDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "$ArcBoxDir\SQLMI.json" --parameters "$ArcBoxDir\SQLMI.parameters.json"
+az deployment group create --resource-group $env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI.parameters.json"
 Write-Host "`n"
 
 Do {
@@ -84,7 +85,7 @@ kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S loca
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-$settingsTemplate = "$ArcBoxDir\settingsTemplate.json"
+$settingsTemplate = "$Env:ArcBoxDir\settingsTemplate.json"
 # Retrieving SQL MI connection endpoint
 $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
@@ -95,13 +96,13 @@ $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
 
 # Unzip SqlQueryStress
-Expand-Archive -Path $ArcBoxDir\SqlQueryStress.zip -DestinationPath $ArcBoxDir\SqlQueryStress
+Expand-Archive -Path $Env:ArcBoxDir\SqlQueryStress.zip -DestinationPath $Env:ArcBoxDir\SqlQueryStress
 
 # Create SQLQueryStress desktop shortcut
 Write-Host "`n"
 Write-Host "Creating SQLQueryStress Desktop shortcut"
 Write-Host "`n"
-$TargetFile = "$ArcBoxDir\SqlQueryStress\SqlQueryStress.exe"
+$TargetFile = "$Env:ArcBoxDir\SqlQueryStress\SqlQueryStress.exe"
 $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SqlQueryStress.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
@@ -109,4 +110,4 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Creating SQLMI Endpoints data
-& "$ArcBoxDir\SQLMIEndpoints.ps1"
+& "$Env:ArcBoxDir\SQLMIEndpoints.ps1"

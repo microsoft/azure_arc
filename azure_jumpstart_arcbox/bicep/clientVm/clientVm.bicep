@@ -7,7 +7,7 @@ param vmName string = 'ArcBox-Client'
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
 
-@description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.')
+@description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
 @minLength(12)
 @maxLength(123)
 @secure()
@@ -20,7 +20,7 @@ param windowsOSVersion string = '2022-datacenter-g2'
 param location string = resourceGroup().location
 
 @description('The size of the VM')
-param vmSize string = 'Standard_D16s_v3'
+param vmSize string = 'Standard_D16s_v4'
 
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
