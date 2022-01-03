@@ -1,11 +1,11 @@
-$ArcBoxDir = "C:\ArcBox"
-$ArcBoxLogsDir = "$ArcBoxDir\Logs"
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 
-Start-Transcript -Path $ArcBoxLogsDir\SQLMIEndpoints.log
+Start-Transcript -Path $Env:ArcBoxLogsDir\SQLMIEndpoints.log
 
 # Creating SQLMI Endpoints file 
-New-Item -Path "$ArcBoxDir\" -Name "SQLMIEndpoints.txt" -ItemType "file" 
-$Endpoints = "$ArcBoxDir\SQLMIEndpoints.txt"
+New-Item -Path "$Env:ArcBoxDir\" -Name "SQLMIEndpoints.txt" -ItemType "file" 
+$Endpoints = "$Env:ArcBoxDir\SQLMIEndpoints.txt"
 
 # Retrieving SQL MI connection endpoints
 Add-Content $Endpoints "Primary SQL Managed Instance external endpoint:"
