@@ -1,9 +1,9 @@
-$ArcBoxDir = "C:\ArcBox"
-$ArcBoxLogsDir = "$ArcBoxDir\Logs"
-$ArcBoxVMDir = "$ArcBoxDir\Virtual Machines"
-$agentScript = "$ArcBoxDir\agentScript"
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
+$Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
+$agentScript = "$Env:ArcBoxDir\agentScript"
 
-Start-Transcript -Path $ArcBoxLogsDir\ArcServersLogonScript.log
+Start-Transcript -Path $Env:ArcBoxLogsDir\ArcServersLogonScript.log
 
 Function Set-VMNetworkConfiguration {
     [CmdletBinding()]
@@ -127,42 +127,35 @@ New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.
 Write-Output "Enable Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
-# Downloading nested VMs VHDX files
-$ArcBoxDir = "C:\ArcBox"
-$ArcBoxLogsDir = "$ArcBoxDir\Logs"
-$ArcBoxVMDir = "$ArcBoxDir\Virtual Machines"
-$agentScript = "$ArcBoxDir\agentScript"
-
-
 $sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
 $sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
 $Env:AZCOPY_BUFFER_GB=4
 if ($env:flavor -eq "Full") {
     # The "Full" ArcBox flavor has an azcopy network throughput capping
     Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."  
-    azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
+    azcopy cp $sourceFolder/*$sas $Env:ArcBoxVMDir --recursive=true --check-length=false --cap-mbps 1200 --log-level=ERROR
 } else {
     # Other ArcBox flavors does not have an azcopy network throughput capping
     Write-Output "Downloading nested VMs VHDX files. This can take some time, hold tight..."
-    azcopy cp $sourceFolder/*$sas $ArcBoxVMDir --recursive=true --check-length=false --log-level=ERROR
+    azcopy cp $sourceFolder/*$sas $Env:ArcBoxVMDir --recursive=true --check-length=false --log-level=ERROR
 }
 
 # Create the nested VMs
 Write-Output "Create Hyper-V VMs"
-New-VM -Name ArcBox-Win2K19 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$ArcBoxVMDir\ArcBox-Win2K19.vhdx" -Path $ArcBoxVMDir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-Win2K19 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-Win2K19.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K19 -Count 2
 
-New-VM -Name ArcBox-Win2K22 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$ArcBoxVMDir\ArcBox-Win2K22.vhdx" -Path $ArcBoxVMDir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-Win2K22 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-Win2K22.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K22 -Count 2
 
-New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$ArcBoxVMDir\ArcBox-SQL.vhdx" -Path $ArcBoxVMDir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-SQL -Count 2
 
-New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$ArcBoxVMDir\ArcBox-Ubuntu.vhdx" -Path $ArcBoxVMDir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-Ubuntu -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-Ubuntu.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMFirmware -VMName ArcBox-Ubuntu -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
 Set-VMProcessor -VMName ArcBox-Ubuntu -Count 1
 
-New-VM -Name ArcBox-CentOS -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$ArcBoxVMDir\ArcBox-CentOS.vhdx" -Path $ArcBoxVMDir -Generation 2 -Switch $switchName
+New-VM -Name ArcBox-CentOS -MemoryStartupBytes 4GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-CentOS.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMFirmware -VMName ArcBox-CentOS -EnableSecureBoot On -SecureBootTemplate 'MicrosoftUEFICertificateAuthority'
 Set-VMProcessor -VMName ArcBox-CentOS -Count 1
 
@@ -237,9 +230,9 @@ Write-Output "Copying the Azure Arc onboarding script to the nested VMs"
 (Get-Content -path "$agentScript\installArcAgentCentOS.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedCentOS.sh"
 (Get-Content -path "$agentScript\installArcAgentSQL.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$myResourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$logAnalyticsWorkspaceName',"'$env:workspaceName'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
 
-Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
-Copy-VMFile ArcBox-Win2K22 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
-Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host
+Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
+Copy-VMFile ArcBox-Win2K22 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgent.ps1" -CreateFullPath -FileSource Host
+Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath "$Env:ArcBoxDir\installArcAgentSQL.ps1" -CreateFullPath -FileSource Host
 Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedUbuntu.sh" $nestedLinuxUsername@"$UbuntuVmIp":/home/"$nestedLinuxUsername"
 Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedCentOS.sh" $nestedLinuxUsername@"$CentOSVmIp":/home/"$nestedLinuxUsername"
 
@@ -279,7 +272,7 @@ Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administra
 
 # Changing to Jumpstart ArcBox wallpaper
 if ($env:flavor -eq "Full" -or "ITPro") {
-$imgPath="$ArcBoxDir\wallpaper.png"
+$imgPath="$Env:ArcBoxDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
@@ -303,13 +296,10 @@ Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Invoke-Expression 'cmd /c start powershell -Command { 
-    $ArcBoxDir = "C:\ArcBox"
-    $ArcBoxLogsDir = "$ArcBoxDir\Logs"
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-
-    Write-Host "Sleeping for 10 seconds before creating deployment logs bundle..."
-    Start-Sleep -Seconds 10
+    Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
+    Start-Sleep -Seconds 5
     Write-Host "`n"
     Write-Host "Creating deployment logs bundle"
-    7z a $ArcBoxLogsDir\LogsBundle-"$RandomString".zip $ArcBoxLogsDir\*.log -xr!$ArcBoxLogsDir\*.zip
-    }'
+    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log -xr!$Env:ArcBoxLogsDir\*.zip
+}'
