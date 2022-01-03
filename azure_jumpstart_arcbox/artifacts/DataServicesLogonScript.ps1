@@ -123,12 +123,8 @@ Write-Host "`n"
 # & "$Env:ArcBoxDir\DeploySQLMI.ps1"
 # & "$Env:ArcBoxDir\DeployPostgreSQL.ps1"
 
-workflow RunDataSvcScripts {
-    parallel {
-        InlineScript { & "$Env:ArcBoxDir\DeploySQLMI.ps1" }   
-        InlineScript { & "$Env:ArcBoxDir\DeployPostgreSQL.ps1" }
-    }
-}
+Start-Process Powershell -Argumentlist "-file $Env:ArcBoxDir\DeploySQLMI.ps1"
+Start-Process Powershell -Argumentlist "-file $Env:ArcBoxDir\DeployPostgreSQL.ps1"
 
 # Enabling data controller auto metrics & logs upload to log analytics
 Write-Host "`n"
