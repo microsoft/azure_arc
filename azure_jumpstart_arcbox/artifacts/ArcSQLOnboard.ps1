@@ -93,7 +93,7 @@ Set-Clipboard -Value $rx.match($loginMessage).Groups['Code'].Value
 
 Write-Host "Opening Edge browser window, please paste authentication code from clipboard..."
 
-$edge = Start-Process 'https://www.microsoft.com/devicelogin' -PassThru
+$edge = Start-Process microsoft-edge:'http://www.microsoft.com/devicelogin' -WindowStyle Maximized -PassThru
 
 Write-Host -NoNewLine "Waiting for login..."
 #Wait-Job $loginJob
