@@ -64,7 +64,7 @@ This guide assumes that you already have an installation of [Microsoft Configura
 
     ![Screenshot showing Azure Portal with empty resource group](./01.png)
 
-- Download the [_az_connect_win_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script.
+- Download the [_az_connect_win_ConfigMgr_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win.ps1) PowerShell script.
 
 - Change the environment variables according to your environment and save the script.
 
