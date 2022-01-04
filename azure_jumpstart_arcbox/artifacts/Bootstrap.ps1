@@ -114,14 +114,8 @@ workflow ClientTools_01
                         Write-Host "Installing $app"
                         & choco install $app /y -Force| Write-Output
                     }
-                }
+                }                        
             }
-
-            If (-NOT (Test-Path $RegistryPath)) {
-              New-Item -Path $RegistryPath -Force | Out-Null
-            }
-
-            New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force 
 
             # All flavors
             Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
