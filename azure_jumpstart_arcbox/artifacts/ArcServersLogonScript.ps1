@@ -277,8 +277,10 @@ if ($env:flavor -eq "ITPro") {
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
 # Replace variables in Arc-enabled SQL onboarding scripts
-(Get-Content -path "$agentScript\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"'$env:subscriptionId'" -replace '<resourceGroup>',"'$env:resourceGroup'" -replace '<location>',"'$env:azureLocation'" | Set-Content -Path "$agentScript\ArcSQL.ps1"
-(Get-Content -path "$agentScript\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"'$env:subscriptionId'" -replace '<resourceGroup>',"'$env:resourceGroup'" -replace '<sqlServerName>',"'$sqlServerName'" | Set-Content -Path "$agentScript\ArcSQLOnboard.ps1"
+$sqlServerName = "ArcBox-SQL"
+
+(Get-Content -path "$ArcBoxDir\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<location>',"$env:azureLocation" | Set-Content -Path "$ArcBoxDir\ArcSQL.ps1"
+(Get-Content -path "$ArcBoxDir\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$ArcBoxDir\ArcSQLOnboard.ps1"
 
 # Set Edge as the Default Browser
 & SetDefaultBrowser.exe HKLM "Microsoft Edge"
