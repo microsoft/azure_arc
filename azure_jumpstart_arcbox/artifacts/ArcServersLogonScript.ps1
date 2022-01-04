@@ -280,16 +280,30 @@ Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administra
 (Get-Content -path "$agentScript\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"'$env:subscriptionId'" -replace '<resourceGroup>',"'$env:resourceGroup'" -replace '<location>',"'$env:azureLocation'" | Set-Content -Path "$agentScript\ArcSQL.ps1"
 (Get-Content -path "$agentScript\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"'$env:subscriptionId'" -replace '<resourceGroup>',"'$env:resourceGroup'" -replace '<sqlServerName>',"'$sqlServerName'" | Set-Content -Path "$agentScript\ArcSQLOnboard.ps1"
 
+# Set Edge as the Default Browser
+& SetDefaultBrowser.exe HKLM "Microsoft Edge"
+
+# Disable Edge 'First Run' Setup
+$registryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+$registryName  = 'HideFirstRunExperience'
+$registryValue = '0x00000001'
+
+If (-NOT (Test-Path $registryPath)) {
+    New-Item -Path $registryPath -Force | Out-Null
+}
+
+New-ItemProperty -Path $registryPath -Name $registryName -Value $registryValue -PropertyType DWORD -Force
+
 # Creating Arc-enabled SQL Server onboarding desktop shortcut
-$SourceFileLocation = "${ArcBoxDir}\ArcSQLOnboard.ps1"
-$ShortcutLocation = "$env:Public\Desktop\Onboard SQL Server.lnk"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutLocation)
-$Shortcut.TargetPath = "powershell.exe"
-$Shortcut.Arguments = "-ExecutionPolicy Bypass -File $SourceFileLocation"
-$Shortcut.IconLocation="${ArcBoxDir}\ArcSQLIcon.ico, 0"
-$Shortcut.WindowStyle = 3
-$Shortcut.Save()
+$sourceFileLocation = "${ArcBoxDir}\ArcSQLOnboard.ps1"
+$shortcutLocation = "$env:Public\Desktop\Onboard SQL Server.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "powershell.exe"
+$shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
+$shortcut.IconLocation="${ArcBoxDir}\ArcSQLIcon.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
 if ($env:flavor -eq "ITPro") {
