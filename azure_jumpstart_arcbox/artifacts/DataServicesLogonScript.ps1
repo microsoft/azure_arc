@@ -135,12 +135,16 @@ az arcdata dc update --name arcbox-dc --resource-group $env:resourceGroup --auto
 az arcdata dc update --name arcbox-dc --resource-group $env:resourceGroup --auto-upload-metrics true
 
 # Replacing Azure Data Studio settings template file
+Write-Host "`n"
 Write-Host "Replacing Azure Data Studio settings template file"
+Write-Host "`n"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
 # Downloading Rancher K3s kubeconfig file
+Write-Host "`n"
 Write-Host "Downloading Rancher K3s kubeconfig file"
+Write-Host "`n"
 $sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
@@ -148,7 +152,9 @@ $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config-k3s"
 
 # Merging kubeconfig files from CAPI and Rancher K3s
+Write-Host "`n"
 Write-Host "Merging kubeconfig files from CAPI and Rancher K3s clusters"
+Write-Host "`n"
 Copy-Item -Path "C:\Users\$env:USERNAME\.kube\config" -Destination "C:\Users\$env:USERNAME\.kube\config.backup"
 $env:KUBECONFIG="C:\Users\$env:USERNAME\.kube\config;C:\Users\$env:USERNAME\.kube\config-k3s"
 kubectl config view --raw > C:\users\$env:USERNAME\.kube\config_tmp
