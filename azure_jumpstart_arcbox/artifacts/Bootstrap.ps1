@@ -117,16 +117,6 @@ workflow ClientTools_01
                 }
             }
 
-            InlineScript {
-                # Set Edge as the Default Browser
-                & SetDefaultBrowser.exe HKLM "Microsoft Edge"
-
-                # Disable Edge 'First Run' Setup
-                $RegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
-                $RegistryName  = 'HideFirstRunExperience'
-                $RegistryValue = '0x00000001'
-            }
-
             If (-NOT (Test-Path $RegistryPath)) {
               New-Item -Path $RegistryPath -Force | Out-Null
             }
