@@ -146,7 +146,7 @@ In order for Configuration Manager to onboard servers in this scenario, we will 
 
     ![Screenshot showing adding the PowerShell script details](./20.png)
 
--  Paste the content of the [_az_connect_win_ConfigMgr_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win_ConfigMgr.ps1) PowerShell script you downloaded earlier and click “Ok”.
+- Paste the content of the [_az_connect_win_ConfigMgr_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/scripts/az_connect_win_ConfigMgr.ps1) PowerShell script you downloaded earlier and click “Ok”.
 
     ![Screenshot showing adding the PowerShell script code](./21.png)
 
@@ -164,7 +164,7 @@ In order for Configuration Manager to onboard servers in this scenario, we will 
 
     ![Screenshot showing selecting the task sequence to deploy](./24.png)
 
-- Choose the deployment to be available (the deployment can be required or available based on your scenario). 
+- Choose the deployment to be available (the deployment can be required or available based on your scenario).
 
     ![Screenshot showing selecting the enforcement method](./25.png)
 
@@ -190,7 +190,7 @@ In order for Configuration Manager to onboard servers in this scenario, we will 
 
     ![Screenshot showing the server onboarded](./31.png)
 
-    ![Screenshot showing the server connected succesfully](./32.png)
+    ![Screenshot showing the server connected successfully](./32.png)
 
 ## Delete the deployment
 
@@ -201,4 +201,3 @@ The most straightforward way is to delete the server via the Azure Portal, just 
 If you want to delete the entire environment, just delete the Azure resource group.
 
 ![Screenshot showing delete resource group function in Azure Portal](./34.png)
-
