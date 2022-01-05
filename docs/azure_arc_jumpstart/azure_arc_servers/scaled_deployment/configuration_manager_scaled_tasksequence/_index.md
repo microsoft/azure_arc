@@ -9,7 +9,7 @@ description: >
 
 The following README will guide you on how to connect a Windows machine to Azure Arc with a Task Sequence using Configuration Manager.
 
-This guide assumes that you already have an installation of [Microsoft Configuration Manager](https://docs.microsoft.com/en-us/mem/configmgr/core/understand/introduction), at least one active Windows server client, an active distribution point and a basic understanding of the product.
+This guide assumes that you already have an installation of [Microsoft Configuration Manager](https://docs.microsoft.com/en-us/mem/configmgr/core/understand/introduction) and a basic understanding of the product, at least one active Windows server client, an active distribution point.
 
 ## Prerequisites
 
