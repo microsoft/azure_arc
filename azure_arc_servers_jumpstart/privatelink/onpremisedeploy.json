@@ -1,0 +1,450 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "azure_rg": {
+            "type": "string",
+            "defaultValue": "Arc-Azure-PL-Demo",
+            "metadata": {
+                "description": "Azure's resource Group"
+            }
+        },
+        "vmName": {
+            "type": "string",
+            "defaultValue": "Arc-Linux-Demo",
+            "metadata": {
+                "description": "The name of you Virtual Machine."
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D4s_v3",
+            "metadata": {
+                "description": "The size of the VM"
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            }
+        },
+        "authenticationType": {
+            "type": "string",
+            "defaultValue": "password",
+            "allowedValues": [
+                "sshPublicKey",
+                "password"
+            ],
+            "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+            }
+        },
+        "adminPasswordOrKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+            }
+        },
+        "ubuntuOSVersion": {
+            "type": "string",
+            "defaultValue": "18.04-LTS",
+            "allowedValues": [
+                "12.04.5-LTS",
+                "14.04.5-LTS",
+                "16.04.0-LTS",
+                "18.04-LTS"
+            ],
+            "metadata": {
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+            }
+        },
+        "subscriptionID": {
+            "type": "string",
+            "metadata": {
+                "description": "Subscription ID"
+            }
+        },
+        "servicePrincipalClient": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure service principal name"
+            }
+        },
+        "servicePrincipalClientSecret": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure service principal password"
+            }
+        },
+        "tenantID": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure tenant ID"
+            }
+        },
+        "bastionHostName": {
+            "type": "String",
+            "metadata": {
+                "description": "Azure Bastion Hostname"
+            }
+        },
+        "location1": {
+            "type": "string",
+            "metadata": {
+                "description": "Location where first VNET, Gateway, PublicIP and Connection will be deployed."
+            }
+        },
+        "location2": {
+            "type": "string",
+            "metadata": {
+                "description": "Location where first VNET, Gateway, PublicIP and Connection will be deployed."
+            }
+        },
+        "sharedKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The shared key used to establish connection between the two VirtualNetworkGateways."
+            }
+        },
+        "gatewayName1": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the first VirtualNetworkGateway."
+            }
+        },
+        "virtualNetworkName2": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the second VNET."
+            }
+        },
+        "addressPrefix2": {
+            "type": "string",
+            "metadata": {
+                "description": "Address space for the second VNET."
+            }
+        },
+        "addressPrefixBastion": {
+            "type": "string",
+            "metadata": {
+                "description": "Address space for the Bastion Subnet."
+            }
+        },
+        "subnet1Prefix2": {
+            "type": "string",
+            "metadata": {
+                "description": "The prefix for the first subnet in the second VNET."
+            }
+        },
+        "gatewaySubnetPrefix2": {
+            "type": "string",
+            "metadata": {
+                "description": "The prefix for the GatewaySubnet where the second VirtualNetworkGateway will be deployed. This must be at least /29."
+            }
+        },
+        "gatewayName2": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the second VirtualNetworkGateway."
+            }
+        },
+        "NetworkSecurityGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the second connection, connecting the second VirtualNetworkGateway to the first VirtualNetworkGateway."
+            }
+        }
+    },
+    "variables": {
+        "gwRef": "[concat('/subscriptions/',parameters('subscriptionID'),'/resourceGroups/',parameters('azure_rg'),'/providers/Microsoft.Network/virtualNetworkGateways/',parameters('gatewayName1'))]",
+        "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
+        "subnet1Name2": "onpremise-subnet",
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName2'), variables('subnet1Name2'))]",
+        "gatewayPublicIPName2": "[concat(parameters('gatewayName2'),'-PIP')]",
+        "osDiskType": "Standard_LRS",
+        "publicIpAddressName": "[concat(parameters('bastionHostName'),'-PIP')]",
+        "enableIpConnect": "false",
+        "enableTunneling": "false",
+        "bastionHostScaleUnits": "2",
+        "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                        "keyData": "[parameters('adminPasswordOrKey')]"
+                    }
+                ]
+            }
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-05-01",
+            "location": "[parameters('location2')]",
+            "name": "[variables('publicIpAddressName')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "location": "[parameters('location2')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName2')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix2')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnet1Name2')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet1Prefix2')]"
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('gatewaySubnetPrefix2')]"
+                        }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('addressPrefixBastion')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "location": "[parameters('location2')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('gatewayPublicIPName2')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-06-01",
+            "location": "[parameters('location2')]",
+            "name": "[parameters('NetworkSecurityGroupName')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "SSH",
+                        "properties": {
+                            "priority": 1000,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "location": "[parameters('location2')]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "name": "[parameters('gatewayName2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('gatewayPublicIPName2'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName2'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName2'), 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gatewayPublicIPName2'))]"
+                            }
+                        },
+                        "name": "vnetGatewayConfig2"
+                    }
+                ],
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": false
+            }
+        },
+        {
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location2')]",
+            "type": "Microsoft.Network/bastionHosts",
+            "name": "[parameters('bastionHostName')]",
+            "sku": {
+                "name": "Basic"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName2'))]"
+            ],
+            "properties": {
+                "enableIpConnect": "[variables('enableIpConnect')]",
+                "enableTunneling": "[variables('enableTunneling')]",
+                "ipConfigurations": [
+                    {
+                        "name": "IpConf",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName2'),'AzureBastionSubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "scaleUnits": "[variables('bastionHostScaleUnits')]"
+            }
+        },
+        {
+
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "location": "[parameters('location2')]",
+            "name": "[variables('networkInterfaceName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName2'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic"
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2020-06-01",
+            "location": "[parameters('location2')]",
+            "name": "[parameters('vmName')]",
+                        "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "[parameters('ubuntuOSVersion')]",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPasswordOrKey')]",
+                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "location": "[parameters('location2')]",
+            "name": "[concat(parameters('vmName'),'/allowarc')]",
+            "apiVersion": "2015-05-01-preview",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh"
+                    ],
+                    "commandToExecute": "[concat('./install_arc_agent.sh ', parameters('adminUsername'), ' ', parameters ('subscriptionID'), ' ', parameters('servicePrincipalClient'), ' ', parameters('servicePrincipalClientSecret'), ' ', parameters('tenantId'), ' ', parameters('azure_rg'), ' ', parameters('location1'), ' ', parameters('vmName') )]"
+                }
+            }
+        },
+
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/connections",
+            "name": "connection1",
+            "location": "[parameters('location1')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworkGateways/', parameters('gatewayName2'))]"
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[variables('gwRef')]"
+                },
+                "virtualNetworkGateway2": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gatewayName2'))]"
+                },
+                "connectionType": "Vnet2Vnet",
+                "routingWeight": 3,
+                "sharedKey": "[parameters('sharedKey')]"
+            }
+        },
+            {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/connections",
+            "name": "connection2",
+            "location": "[parameters('location2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworkGateways/', parameters('gatewayName2'))]"
+            ],
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways',parameters('gatewayName2'))]"
+                },
+                "virtualNetworkGateway2": {
+                    "id": "[variables('gwRef')]"
+                },
+                "connectionType": "Vnet2Vnet",
+                "routingWeight": 3,
+                "sharedKey": "[parameters('sharedKey')]"
+            }
+        }
+    ]
+}
