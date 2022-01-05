@@ -5,11 +5,15 @@ metadata:
 rules:
 - apiGroups: ["admissionregistration.k8s.io"]
   resources: ["mutatingwebhookconfigurations"]
-  resourceNames: ["arcdata.microsoft.com-{{namespace}}"]
-  verbs: ["delete"]
+  resourceNames: ["arcdata.microsoft.com-webhook-{{namespace}}"]
+  verbs: ["get","delete"]
 - apiGroups: ["admissionregistration.k8s.io"]
   resources: ["mutatingwebhookconfigurations"]
   verbs: ["create"]
+- apiGroups: ["*"]
+  resources: ["namespaces"]
+  resourceNames: ["{{namespace}}"]
+  verbs: ["patch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
