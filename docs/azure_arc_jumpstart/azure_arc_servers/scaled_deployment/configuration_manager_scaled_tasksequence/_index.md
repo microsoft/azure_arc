@@ -76,9 +76,9 @@ az provider show -n Microsoft.HybridCompute -o table
 
 - After logging in, go to the “Software Library” workspace. Under “Application Management”, click  “Applications” and click "Create Application".
 
-    ![Screenshot showing creation of a new application](./03.png)
+    ![Screenshot showing the creation of a new application](./03.png)
 
-- Browse to the location of the downloaded Azure Connected Machine agent msi package and click “Next”.
+- Browse to the location of the downloaded Azure Connected Machine agent MSI package and click “Next”.
 
     ![Screenshot showing the path of the agent](./04.png)
 
