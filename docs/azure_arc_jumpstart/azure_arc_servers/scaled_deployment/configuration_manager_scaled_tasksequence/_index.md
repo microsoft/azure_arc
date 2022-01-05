@@ -172,7 +172,7 @@ In order for Configuration Manager to onboard servers in this scenario, we will 
 
     ![Screenshot showing software center](./26.png)
 
-- Select on the Task Sequence deployment and click “Install”.
+- Click on the Task Sequence deployment and click “Install”.
 
     ![Screenshot showing software center installation step](./27.png)
 
