@@ -101,6 +101,9 @@
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
+          "logAnalyticsWorkspace": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },          
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           }
@@ -151,7 +154,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "ubuntuRancherDeployment", "mgmtArtifactsAndPolicyDeployment" ],
+      "dependsOn": [ "mgmtArtifactsAndPolicyDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
