@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "gatewaySubnetPrefix1": {
+            "value": "192.168.100.16/28"
+        },
+        "location1": {
+            "value": "northeurope"
+        },
+        "virtualNetworkName1": {
+            "value": "Vnet1"
+        },
+        "gatewayName1": {
+            "value": "Vnet1Gw"
+        },
+        "addressPrefix1": {
+            "value": "192.168.100.0/24"
+        },
+        "subnet1Name1": {
+            "value": "PLSubnet"
+        },
+        "subnet1Prefix1": {
+            "value": "192.168.100.0/28"
+        },
+        "sqlAdministratorLogin": {
+            "value": "arcdemo"
+        },
+        "sqlAdministratorLoginPassword": {
+            "value": "ArcPassword123!!"
+        }
+    }
+}

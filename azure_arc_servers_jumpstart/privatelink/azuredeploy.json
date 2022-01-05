@@ -1,0 +1,252 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "gatewaySubnetPrefix1": {
+      "type": "string",
+      "metadata": {
+        "description": "The prefix for the GatewaySubnet where the first VirtualNetworkGateway will be deployed. This must be at least /29."
+      }
+    },
+    "location1": {
+      "type": "string",
+      "metadata": {
+        "description": "Location where first VNET, Gateway, PublicIP and Connection will be deployed."
+      }
+    },
+    "virtualNetworkName1": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the first VNET."
+      }
+    },
+    "addressPrefix1": {
+      "type": "string",
+      "metadata": {
+        "description": "Address space for the first VNET."
+      }
+    },
+    "subnet1Name1": {
+      "type": "string",
+      "defaultValue": "Subnet-1",
+      "metadata": {
+        "description": "Name of the first subnet in the first VNET. Please note, an additional subnet called GatewaySubnet will be created where the VirtualNetworkGateway will be deployed. The name of that subnet must not be changed from GatewaySubnet."
+      }
+    },
+    "subnet1Prefix1": {
+      "type": "string",
+      "metadata": {
+        "description": "The prefix for the first subnet in the first VNET."
+      }
+    },
+    "gatewayName1": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the first VirtualNetworkGateway."
+      }
+    },
+    "sqlAdministratorLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "The administrator username of the SQL logical server"
+      }
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The administrator password of the SQL logical server."
+      }
+    }
+  },
+  "variables": {
+    "sqlServerName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
+    "gatewayPublicIPName1": "[concat(parameters('gatewayName1'),'-PIP')]",
+    "databaseName": "[concat(variables('sqlServerName'),'/arc-db')]",
+    "privateEndpointName": "ArcPrivateEndpoint",
+    "privateDnsZoneName": "[concat('ArcPL', environment().suffixes.sqlServerHostname)]",
+    "pvtendpointdnsgroupname": "[concat(variables('privateEndpointName'),'/arcdnsgroupname')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2020-05-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName1')]",
+      "location": "[parameters('location1')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('addressPrefix1')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('subnet1Name1')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnet1Prefix1')]",
+              "privateEndpointNetworkPolicies": "Disabled"
+            }
+          },
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[parameters('gatewaySubnetPrefix1')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2020-05-01",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('gatewayPublicIPName1')]",
+      "location": "[parameters('location1')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "apiVersion": "2020-05-01",
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "name": "[parameters('gatewayName1')]",
+      "location": "[parameters('location1')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses/', variables('gatewayPublicIPName1'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName1'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName1'), 'GatewaySubnet')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gatewayPublicIPName1'))]"
+              }
+            },
+            "name": "vnetGatewayConfig1"
+          }
+        ],
+        "gatewayType": "Vpn",
+        "vpnType": "RouteBased",
+        "enableBgp": false
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2020-02-02-preview",
+      "name": "[variables('sqlServerName')]",
+      "location": "[parameters('location1')]",
+      "kind": "v12.0",
+      "tags": {
+        "displayName": "[variables('sqlServerName')]"
+      },
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0",
+        "publicNetworkAccess": "Disabled"
+      },
+      "resources": [
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2020-02-02-preview",
+      "name": "[variables('databaseName')]",
+      "location": "[parameters('location1')]",
+      "sku": {
+        "name": "Basic",
+        "tier": "Basic",
+        "capacity": 5
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
+      ],
+      "tags": {
+        "displayName": "[variables('databaseName')]"
+      },
+      "properties": {
+        "collation": "SQL_Latin1_General_CP1_CI_AS",
+        "edition": "Basic",
+        "maxSizeBytes": 104857600,
+        "requestedServiceObjectiveName": "Basic",
+        "sampleName": "AdventureWorksLT"
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('privateEndpointName')]",
+      "location": "[parameters('location1')]",
+      "dependsOn": [
+        "[parameters('virtualNetworkName1')]",
+        "[variables('sqlServerName')]"
+      ],
+      "properties": {
+        "subnet": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName1'), parameters('subnet1Name1'))]"
+        },
+        "privateLinkServiceConnections": [
+          {
+            "name": "[variables('privateEndpointName')]",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.Sql/servers',variables('sqlServerName'))]",
+              "groupIds": [
+                "sqlServer"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones",
+      "apiVersion": "2020-01-01",
+      "name": "[variables('privateDnsZoneName')]",
+      "location": "global",
+      "dependsOn": [
+        "[parameters('virtualNetworkName1')]"
+      ],
+      "properties": ""
+    },
+    {
+      "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+      "apiVersion": "2020-01-01",
+      "name": "[concat(variables('privateDnsZoneName'), '/', variables('privateDnsZoneName'), '-link')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName1'))]"
+      ],
+      "properties": {
+        "registrationEnabled": false,
+        "virtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName1'))]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('pvtendpointdnsgroupname')]",
+      "location": "[parameters('location1')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]",
+        "[variables('privateEndpointName')]"
+      ],
+      "properties": {
+        "privateDnsZoneConfigs": [
+          {
+            "name": "config1",
+            "properties": {
+              "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDnsZoneName'))]"
+            }
+          }
+        ]
+      }
+    }
+
+  ]
+}
