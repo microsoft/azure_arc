@@ -5,70 +5,75 @@ variable "resource_group_name" {
 
 variable "vm_name" {
   type        = string
-  description = "The name of the capi virtual machine."
+  description = "The name of the capi virtual machine"
 }
 
 variable "vm_size" {
   type        = string
-  description = "The size of the capi virtual machine."
+  description = "The size of the capi virtual machine"
   default     = "Standard_D4s_v3"
 }
 
 variable "os_sku" {
   type        = string
-  description = "The Linux version for the capi VM."
+  description = "The Linux version for the capi VM"
   default     = "18.04-LTS"
   ### Add limit list, currently only 18.04-LTS ###
 }
 
 variable "admin_username" {
   type        = string
-  description = "Username for the Linux capi virtual machine."
+  description = "Username for the Linux capi virtual machine"
 }
 
 variable "admin_ssh_key" {
   type        = string
-  description = "SSH Key for the Linux VM's."
+  description = "SSH Key for the Linux VM's"
 }
 
 variable "virtual_network_name" {
   type        = string
-  description = "ArcBox vNET name."
+  description = "ArcBox VNET name"
 }
 
 variable "subnet_name" {
   type        = string
-  description = "ArcBox subnet name."
+  description = "ArcBox subnet name"
 }
 
 variable "user_ip_address" {
   type        = string
-  description = "Users public IP address, used to RDP to the client VM."
+  description = "Users public IP address, used to RDP to the client VM"
 }
 
 variable "template_base_url" {
   type        = string
-  description = "Base URL for the GitHub repo where the ArcBox artifacts are located."
+  description = "Base URL for the GitHub repo where the ArcBox artifacts are located"
 }
 
 variable "storage_account_name" {
   type        = string
-  description = "Name for the staging storage account used to hold kubeconfig."
+  description = "Name for the staging storage account used to hold kubeconfig"
 }
 
 variable "spn_client_id" {
   type        = string
-  description = "Arc Service Principal clientID."
+  description = "Arc Service Principal clientID"
 }
 
 variable "spn_client_secret" {
   type        = string
-  description = "Arc Service Principal client secret."
+  description = "Arc Service Principal client secret"
 }
 
 variable "spn_tenant_id" {
   type        = string
-  description = "Arc Service Principal tenantID."
+  description = "Arc Service Principal tenantID"
+}
+
+variable "workspace_name" {
+  type        = string
+  description = "Log Analytics workspace name"
 }
 
 locals {

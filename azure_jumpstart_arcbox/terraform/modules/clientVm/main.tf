@@ -11,7 +11,7 @@ variable "vm_name" {
 variable "vm_size" {
   type        = string
   description = "The size of the client virtual machine."
-  default     = "Standard_D16s_v3"
+  default     = "Standard_D16s_v4"
 }
 
 variable "os_sku" {
