@@ -62,6 +62,10 @@ Once everything is deployed you will be able to access the Azure SQL private IP 
 
   > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
+## Automation Flow
+
+For you to get familiar with the automation and deployment flow, below is an explanation.
+
 1. User is editing the ARM templates parameters file (1-time edit). These parameters values are being used throughout the deployment. Two separate files are provided, one per resource group.
 
 2. User creates two resource groups in two different regions:
@@ -191,7 +195,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy an AR
 
 * Now that all resources are deployed in both resources groups, you can verify that there is a private connection from the Azure Arc-enabled server to the Azure SQL database, this connection will go through the VPN gateways that connect the two VNETs and the traffic will continue over the Microsoft's network to reach the PaaS service on its private IP address since Azure Private link has been enabled.
 
-* To perform the test you will need the database's private IP address, navigate to the Azure's resource group in the Azure Portal as described below
+* To perform the test you will need the database's private IP address, navigate to the Azure's resource group in the Azure Portal as described below:
 
   * Select the Private endpoint resource:
 
@@ -217,7 +221,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy an AR
     telnet 192.168.100.4 1433
     ```
 
-When Telnet connects successfully, you'll see a message like the below image:
+* When Telnet connects successfully, you'll see a message like the below image:
 
   ![Telnet connection](./12.png)
 
