@@ -100,13 +100,13 @@ az provider show -n Microsoft.HybridCompute -o table
 
     ![Screenshot showing the application being distributed](./09.png)
 
-- Click “Add”, select “Distribution Point” and select one or more distribution points where you would like to distribute the application to.
+- Click “Add”, select “Distribution Point” and select one or more distribution points where you would like to distribute the application.
 
     ![Screenshot showing the distribution point option](./10.png)
 
     ![Screenshot showing the distribution point selection](./11.png)
 
-- Click “Next” to finalize the wizard and initate the content distributtion.
+- Click “Next” to finalize the wizard and initiate the content distribution.
 
     ![Screenshot showing a successful content distribution](./12.png)
 
