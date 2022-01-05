@@ -29,6 +29,8 @@ You can monitor the registration process with the following commands:
 
 ```shell
 az provider show -n Microsoft.HybridCompute -o table
+```
+
 - Create Azure service principal (SP)
 
     To connect a server to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
