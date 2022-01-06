@@ -73,7 +73,7 @@ Invoke-Command -Session $Server01 -ScriptBlock {Install-Module -Name Az -AllowCl
 
 Write-Host "Copying Arc-enabled SQL onboarding script to ${sqlServerName}.."
 
-Copy-Item –Path $scriptLocation\SQL.ps1 –Destination $scriptLocation –ToSession $Server01 -Force
+Copy-Item –Path $scriptLocation\ArcSQL.ps1 –Destination $scriptLocation –ToSession $Server01 -Force
 
 # Authenticate to Azure PowerShell SDK
 
@@ -139,7 +139,7 @@ Write-Host "User ($user) has 'write' permissions to Resource Group '${resourceGr
 
 # Onboard Arc-enabled SQL Server
 
-$sqlJob = Invoke-Command -Session $Server01 -FilePath $scriptLocation\SQL.ps1 -AsJob
+$sqlJob = Invoke-Command -Session $Server01 -FilePath $scriptLocation\ArcSQL.ps1 -AsJob
 
 $sqlJobId = $sqlJob.Id
 
