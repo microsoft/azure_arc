@@ -154,39 +154,39 @@ clusterctl generate yaml --from arcbox.yaml > template.yaml
 # Building Microsoft Defender for Cloud plumbing for Cluster API
 curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
-# cat <<EOF | sudo kubectl apply -f -
-# apiVersion: v1
-# kind: Secret
-# metadata:
-#   name: audit
-# type: Opaque
-# data:
-#   audit.yaml: $(cat "audit.yaml" | base64 -w0)
-#   username: $(echo -n "jumpstart" | base64 -w0)
-# EOF
+cat <<EOF | sudo kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: audit
+type: Opaque
+data:
+  audit.yaml: $(cat "audit.yaml" | base64 -w0)
+  username: $(echo -n "jumpstart" | base64 -w0)
+EOF
 
-# line=$(expr $(grep -n -B 1 "extraArgs" $CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 5)
-# sed -i -e "$line"' i\          readOnly: true' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          name: audit-policy' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          mountPath: /etc/kubernetes/audit.yaml' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\        - hostPath: /etc/kubernetes/audit.yaml' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          name: kubeaudit' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          mountPath: /var/log/kube-apiserver' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\        - hostPath: /var/log/kube-apiserver' $CLUSTER_NAME.yaml
-# line=$(expr $(grep -n -B 1 "extraArgs" $CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 2)
-# sed -i -e "$line"' i\          audit-policy-file: /etc/kubernetes/audit.yaml' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          audit-log-path: /var/log/kube-apiserver/audit.log' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          audit-log-maxsize: "100"' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          audit-log-maxbackup: "10"' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          audit-log-maxage: "30"' $CLUSTER_NAME.yaml
-# line=$(expr $(grep -n -A 3 files: $CLUSTER_NAME.yaml | grep "control-plane" | cut -f1 -d-) + 5)
-# sed -i -e "$line"' i\      permissions: "0644"' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\      path: /etc/kubernetes/audit.yaml' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\      owner: root:root' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          name: audit' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\          key: audit.yaml' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\        secret:' $CLUSTER_NAME.yaml
-# sed -i -e "$line"' i\    - contentFrom:' $CLUSTER_NAME.yaml
+line=$(expr $(grep -n -B 1 "extraArgs" $CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 5)
+sed -i -e "$line"' i\          readOnly: true' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          name: audit-policy' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          mountPath: /etc/kubernetes/audit.yaml' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        - hostPath: /etc/kubernetes/audit.yaml' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          name: kubeaudit' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          mountPath: /var/log/kube-apiserver' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        - hostPath: /var/log/kube-apiserver' $CLUSTER_NAME.yaml
+line=$(expr $(grep -n -B 1 "extraArgs" $CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 2)
+sed -i -e "$line"' i\          audit-policy-file: /etc/kubernetes/audit.yaml' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          audit-log-path: /var/log/kube-apiserver/audit.log' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          audit-log-maxsize: "100"' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          audit-log-maxbackup: "10"' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          audit-log-maxage: "30"' $CLUSTER_NAME.yaml
+line=$(expr $(grep -n -A 3 files: $CLUSTER_NAME.yaml | grep "control-plane" | cut -f1 -d-) + 5)
+sed -i -e "$line"' i\      permissions: "0644"' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\      path: /etc/kubernetes/audit.yaml' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\      owner: root:root' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          name: audit' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\          key: audit.yaml' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\        secret:' $CLUSTER_NAME.yaml
+sed -i -e "$line"' i\    - contentFrom:' $CLUSTER_NAME.yaml
 
 # sed -i 's/resourceGroup: '$CLUSTER_NAME'/resourceGroup: '$resourceGroup'/g' $CLUSTER_NAME.yaml
 

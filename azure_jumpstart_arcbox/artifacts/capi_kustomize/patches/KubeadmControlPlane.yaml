@@ -12,7 +12,9 @@ spec:
           audit-log-maxbackup: "10"
           audit-log-maxsize: "100"
           audit-log-path: /var/log/kube-apiserver/audit.log
-          audit-policy-file: /etc/kubernetes/audit.yaml          
+          audit-policy-file: /etc/kubernetes/audit.yaml
+          cloud-config: /etc/kubernetes/azure.json
+          cloud-provider: azure
         extraVolumes:
         - hostPath: /var/log/kube-apiserver
           mountPath: /var/log/kube-apiserver
