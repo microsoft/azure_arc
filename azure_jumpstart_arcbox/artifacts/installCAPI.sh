@@ -3,6 +3,7 @@ exec >installCAPI.log
 exec 2>&1
 
 sudo apt-get update
+sudo apt-get install subversion -y
 
 sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
 sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
@@ -51,9 +52,8 @@ AZURE_RESOURCE_GROUP=$(sudo -u $adminUsername az resource list --query "[?name==
 az -v
 echo ""
 
-# Installing snap & svn
+# Installing snap
 sudo apt install snapd
-sudo apt install subversion
 
 # Installing Docker
 sudo snap install docker
