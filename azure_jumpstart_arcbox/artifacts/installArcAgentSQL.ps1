@@ -13,7 +13,7 @@ $resourceGroup = $myResourceGroup
 $location = $azureLocation
 $proxy=""
 $resourceTags= @{"Project"="jumpstart_arcbox"}
-$arcMachineName = "ArcBox-SQL"
+$arcMachineName = [Environment]::MachineName
 $workspaceName = $logAnalyticsWorkspaceName
 
 # These optional variables can be replaced with valid service principal details
@@ -68,96 +68,6 @@ function Install-PowershellModule() {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
     Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force
-}
-
-function registerArcForServers() {
-    # Download the package
-    #
-    $ProgressPreference = "SilentlyContinue"; 
-    Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi
-    
-    # Install the package
-    #
-    Write-Host "Installing the Azure Arc for Servers package"
-    $params = @("/i", "AzureConnectedMachineAgent.msi", "/l*v", "installationlog.txt", "/qn")
-    
-    $install_success = (Start-Process -FilePath msiexec.exe -ArgumentList $params -Wait -Passthru).ExitCode
-    if ($install_success -ne 0) {
-        Write-Error -Message "Azure Arc for Servers package installation failed."
-        return
-    }
-
-    if ($proxy) {
-        # Set the proxy environment variable. Note that authenticated proxies are not supported for Public Preview.
-        [System.Environment]::SetEnvironmentVariable("https_proxy", $proxy, "Machine")
-        $env:https_proxy = [System.Environment]::GetEnvironmentVariable("https_proxy", "Machine")
-        
-        # The agent service needs to be restarted after the proxy environment variable is set in order for the changes to take effect.
-        Restart-Service -Name himds
-    }
-
-    Write-Host "Connecting Azure Connected Machine Agent"
-    $context = Get-AzContext
-    $params = @("connect", "--resource-group", $resourceGroup, "--location", $location, "--subscription-id", $subId, "--tenant-id", $context.Tenant, "--tags", $resourceTags, "--correlation-id", "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a")
-
-    if ($unattended) {
-        $password = $servicePrincipalSecret
-        if ($servicePrincipalSecret -is [SecureString]) {
-            $cred = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalAppId, $servicePrincipalSecret)
-            $password = $cred.GetNetworkCredential().Password
-        } 
-        $params += "--service-principal-id"
-        $params += $servicePrincipalAppId
-        $params += "--service-principal-secret"
-        $params += $password
-    }
-    elseif (Get-InstalledModule -Name Az.Accounts -MinimumVersion 2.2) {
-        # New versions of Az.Account support getting access tokens
-        #
-        $token = Get-AzAccessToken
-        $params += "--access-token"
-        $params += $token.Token
-    }
-
-    & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" $params
-
-    if ($LastExitCode -ne 0) {
-        Write-Error -Message "Failure when connecting Azure Connected Machine Agent."
-        return
-    }
-}
-
-function checkResourceCreation($newResource, $instProp, $name) {
-    if ($null -eq $newResource) {
-        Write-Host ("Failed to create resource: {0}" -f $name)
-        return
-    }
-    else {
-        Write-Host ("SQL Server - Azure Arc resource: {0} created" -f $resource_name)
-    }
-    $errors = New-Object System.Collections.ArrayList
-    foreach ($key in $instProp.Keys) {
-        # check that key exists in created resource
-        if (Get-Member -inputobject $newResource.Properties -name $key -Membertype Properties) {
-            $expectedvalue = $instProp[$key]
-            $foundValue = ($newResource.Properties).$key
-            if ($expectedvalue -ne $foundValue) {
-                $errors.Add("Property {0} has value of {1}, but expected {2}" -f $key, $foundValue, $expectedvalue) > $null
-            }
-        }
-        else {
-            $errors.Add("Property {0} expected, but not present in Azure Resource" -f $key) > $null
-        }
-    }
-    if ($errors.Count -ne 0) {
-        Write-Host ("Errors found when creating resource: {0}" -f $newResource.Name)
-        foreach ($e in $errors) {
-            Write-Warning $e
-        }
-    }
-    else {
-        $newResource
-    }
 }
 
 # Confirm that Azure powershell module is installed, and install if not present
@@ -233,6 +143,18 @@ if (-Not (Set-AzContext -Subscription $subId -ErrorAction SilentlyContinue)) {
     return
 }
 
+$roleWritePermissions = Get-AzRoleAssignment -Scope "/subscriptions/$subId/resourcegroups/$resourceGroup/providers/Microsoft.Authorization/roleAssignments/write"
+
+if(!$roleWritePermissions)
+{
+    Write-Warning "User does not have permissions to assign roles. This is pre-requisite to on board SQL Server - Azure Arc resources."
+    return
+}
+
+
+# Check if machine is registered with Azure Arc for Servers
+# Register machine if necessary
+#
 $arcResource = Get-AzConnectedMachine -ResourceGroupName $resourceGroup -Name $arcMachineName -ErrorAction SilentlyContinue
 
 if ($null -eq $arcResource) {
@@ -272,9 +194,20 @@ $retryCount = 6
 $count = 0
 $waitTimeInSeconds = 10
 
+while(!$currentRoleAssignment -and $count -le $retryCount)
+{
+    Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
+    $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+    sleep $waitTimeInSeconds
+    $count++
+}
 
-New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-sleep 60
+if(!$currentRoleAssignment)
+{
+    Write-Verbose "Unable to assign Azure Connected SQL Server Onboarding role to Arc managed Identity. Skipping role assignment."
+    return
+}
+
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
@@ -300,13 +233,12 @@ foreach ($solution in $Solutions) {
 }
 
 # Get the workspace ID and Key
-az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
-$workspaceId = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName --query primarySharedKey -o tsv)
+$workspaceId = $(Get-AzOperationalInsightsWorkspace -Name $workspaceName -ResourceGroupName $resourceGroup).CustomerId.Guid
+$workspaceKey = $(Get-AzOperationalInsightsWorkspaceSharedKey -Name $workspaceName -ResourceGroupName $resourceGroup).PrimarySharedKey
 
 $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
-New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $env:computername -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
+New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
 
 $nestedWindowsUsername = "Administrator"
 $nestedWindowsPassword = "ArcDemo123!!"
