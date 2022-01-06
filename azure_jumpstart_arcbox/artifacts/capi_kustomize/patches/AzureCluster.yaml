@@ -26,6 +26,15 @@ spec:
               destinationPorts: "6443"
               source: "*"
               sourcePorts: "*"
+            - name: "allow_apiserver_443"
+              description: "Allow K8s API Server 443"
+              direction: "Inbound"
+              priority: 2202
+              protocol: "*"
+              destination: "*"
+              destinationPorts: "443"
+              source: "*"
+              sourcePorts: "*"              
       - name: node-subnet
         role: node
         cidrBlocks: 
