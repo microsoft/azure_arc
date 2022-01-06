@@ -137,7 +137,7 @@ echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
 echo ""
 
-sudo svn export https://github.com/microsoft/azure_arc/branches/capi_kustomize/azure_jumpstart_arcbox/artifacts/capi_kustomize
+svn export https://github.com/microsoft/azure_arc/branches/capi_kustomize/azure_jumpstart_arcbox/artifacts/capi_kustomize
 kubectl kustomize capi_kustomize/ > arcbox.yaml
 clusterctl generate yaml --from arcbox.yaml > template.yaml
 
@@ -216,7 +216,7 @@ EOF
 # ) -i -- $CLUSTER_NAME.yaml
 
 # Deploying CAPI Workload cluster
-sudo kubectl apply -f $CLUSTER_NAME.yaml
+sudo kubectl apply -f template.yaml
 echo ""
 
 until sudo kubectl get cluster --all-namespaces | grep -q "Provisioned"; do echo "Waiting for Kubernetes control plane to be in Provisioned phase..." && sleep 20 ; done
