@@ -227,17 +227,28 @@ $string = Get-Content "$CentOSIP"
 $string.split('{')[-1] | Set-Content $CentOSIP
 $CentOSVmIp = Get-Content "$CentOSIP"
 
+# Check if Service Principal has 'write' permissions to target Resource Group
+$spName = Invoke-Command -Session $Server01 -ScriptBlock {$(Get-AzADUser -SignedIn ).UserPrincipalName}
+$roleWritePermissions = Invoke-Command -Session $Server01 -ScriptBlock {Get-AzRoleAssignment -Scope "/subscriptions/${using:env:subscriptionId}/resourcegroups/${using:env:resourceGroup}/providers/Microsoft.Authorization/roleAssignments/write" -WarningAction SilentlyContinue}
+$hasPermission = $roleWritePermissions | Where-Object {$_.SignInName -eq $spName}
+
 # Copying the Azure Arc Connected Agent to nested VMs
 Write-Output "Copying the Azure Arc onboarding script to the nested VMs"
 (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
 (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 (Get-Content -path "$agentScript\installArcAgentCentOS.sh" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedCentOS.sh"
-(Get-Content -path "$agentScript\installArcAgentSQL.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$myResourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$logAnalyticsWorkspaceName',"'$env:workspaceName'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+
+# Create appropriate onboard script to SQL VM depending on whether or not the Service Principal has permission to peroperly onboard it to Azure Arc
+if(-not $hasPermission) {
+    (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$resourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+} else {
+    (Get-Content -path "$agentScript\installArcAgentSQL.ps1" -Raw) -replace '\$spnClientId',"'$env:spnClientId'" -replace '\$spnClientSecret',"'$env:spnClientSecret'" -replace '\$myResourceGroup',"'$env:resourceGroup'" -replace '\$spnTenantId',"'$env:spnTenantId'" -replace '\$azureLocation',"'$env:azureLocation'" -replace '\$logAnalyticsWorkspaceName',"'$env:workspaceName'" -replace '\$subscriptionId',"'$env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
+}
 
 Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\ArcBox\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-Win2K22 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\ArcBox\installArcAgent.ps1 -CreateFullPath -FileSource Host
-Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\ArcBox\installArcAgent.ps1 -CreateFullPath -FileSource Host
-# Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath C:\ArcBox\installArcAgentSQL.ps1 -CreateFullPath -FileSource Host
+Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath C:\ArcBox\installArcAgentSQL.ps1 -CreateFullPath -FileSource Host
+
 Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedUbuntu.sh" $nestedLinuxUsername@"$UbuntuVmIp":/home/"$nestedLinuxUsername"
 Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedCentOS.sh" $nestedLinuxUsername@"$CentOSVmIp":/home/"$nestedLinuxUsername"
 
@@ -249,8 +260,7 @@ $cred = new-object -typename System.Management.Automation.PSCredential -argument
 
 Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
 Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
-# Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgentSQL.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgentSQL.ps1 } -Credential $cred
 
 Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 # Converting Linux credentials to secure string  
@@ -276,36 +286,39 @@ if ($env:flavor -eq "ITPro") {
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-# Replace variables in Arc-enabled SQL onboarding scripts
-$sqlServerName = "ArcBox-SQL"
+# Prepare ArcBox-SQL onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
+if(-not $hasPermission) {
+    # Replace variables in Arc-enabled SQL onboarding scripts
+    $sqlServerName = "ArcBox-SQL"
 
-(Get-Content -path "$ArcBoxDir\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<location>',"$env:azureLocation" | Set-Content -Path "$ArcBoxDir\ArcSQL.ps1"
-(Get-Content -path "$ArcBoxDir\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$ArcBoxDir\ArcSQLOnboard.ps1"
+    (Get-Content -path "$ArcBoxDir\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<location>',"$env:azureLocation" | Set-Content -Path "$ArcBoxDir\ArcSQL.ps1"
+    (Get-Content -path "$ArcBoxDir\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$ArcBoxDir\ArcSQLOnboard.ps1"
 
-# Set Edge as the Default Browser
-& SetDefaultBrowser.exe HKLM "Microsoft Edge"
+    # Set Edge as the Default Browser
+    & SetDefaultBrowser.exe HKLM "Microsoft Edge"
 
-# Disable Edge 'First Run' Setup
-$registryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
-$registryName  = 'HideFirstRunExperience'
-$registryValue = '0x00000001'
+    # Disable Edge 'First Run' Setup
+    $registryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+    $registryName  = 'HideFirstRunExperience'
+    $registryValue = '0x00000001'
 
-If (-NOT (Test-Path $registryPath)) {
-    New-Item -Path $registryPath -Force | Out-Null
+    If (-NOT (Test-Path $registryPath)) {
+        New-Item -Path $registryPath -Force | Out-Null
+    }
+
+    New-ItemProperty -Path $registryPath -Name $registryName -Value $registryValue -PropertyType DWORD -Force
+
+    # Creating Arc-enabled SQL Server onboarding desktop shortcut
+    $sourceFileLocation = "${ArcBoxDir}\ArcSQLOnboard.ps1"
+    $shortcutLocation = "$env:Public\Desktop\Onboard SQL Server.lnk"
+    $wScriptShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+    $shortcut.TargetPath = "powershell.exe"
+    $shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
+    $shortcut.IconLocation="${ArcBoxDir}\ArcSQLIcon.ico, 0"
+    $shortcut.WindowStyle = 3
+    $shortcut.Save()
 }
-
-New-ItemProperty -Path $registryPath -Name $registryName -Value $registryValue -PropertyType DWORD -Force
-
-# Creating Arc-enabled SQL Server onboarding desktop shortcut
-$sourceFileLocation = "${ArcBoxDir}\ArcSQLOnboard.ps1"
-$shortcutLocation = "$env:Public\Desktop\Onboard SQL Server.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "powershell.exe"
-$shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
-$shortcut.IconLocation="${ArcBoxDir}\ArcSQLIcon.ico, 0"
-$shortcut.WindowStyle = 3
-$shortcut.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
 if ($env:flavor -eq "ITPro") {
