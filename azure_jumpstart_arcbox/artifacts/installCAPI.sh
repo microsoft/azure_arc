@@ -137,7 +137,7 @@ echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
 echo ""
 
-svn export https://github.com/microsoft/azure_arc/branches/capi_kustomize/azure_jumpstart_arcbox/artifacts/capi_kustomize
+sudo svn export https://github.com/microsoft/azure_arc/branches/capi_kustomize/azure_jumpstart_arcbox/artifacts/capi_kustomize
 kubectl kustomize capi_kustomize/ > arcbox.yaml
 clusterctl generate yaml --from arcbox.yaml > template.yaml
 
@@ -154,16 +154,16 @@ clusterctl generate yaml --from arcbox.yaml > template.yaml
 # Building Microsoft Defender for Cloud plumbing for Cluster API
 curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
-cat <<EOF | sudo kubectl apply -f -
-apiVersion: v1
-kind: Secret
-metadata:
-  name: audit
-type: Opaque
-data:
-  audit.yaml: $(cat "audit.yaml" | base64 -w0)
-  username: $(echo -n "jumpstart" | base64 -w0)
-EOF
+# cat <<EOF | sudo kubectl apply -f -
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: audit
+# type: Opaque
+# data:
+#   audit.yaml: $(cat "audit.yaml" | base64 -w0)
+#   username: $(echo -n "jumpstart" | base64 -w0)
+# EOF
 
 # line=$(expr $(grep -n -B 1 "extraArgs" $CLUSTER_NAME.yaml | grep "apiServer" | cut -f1 -d-) + 5)
 # sed -i -e "$line"' i\          readOnly: true' $CLUSTER_NAME.yaml
