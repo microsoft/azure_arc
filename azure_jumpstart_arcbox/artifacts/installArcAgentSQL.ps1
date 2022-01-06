@@ -198,7 +198,7 @@ while(!$currentRoleAssignment -and $count -le $retryCount)
 {
     Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
     $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-    sleep $waitTimeInSeconds
+    Start-Sleep $waitTimeInSeconds
     $count++
 }
 
