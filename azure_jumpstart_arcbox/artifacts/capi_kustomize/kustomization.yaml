@@ -5,3 +5,4 @@ resources:
 patchesStrategicMerge:
 - patches/vnet.yaml
 - patches/apiServer.yaml
+- patches/AzureCluster.yaml
