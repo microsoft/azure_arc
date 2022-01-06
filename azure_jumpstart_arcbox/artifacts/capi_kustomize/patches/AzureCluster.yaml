@@ -4,4 +4,26 @@ metadata:
   name: ${CLUSTER_NAME}
   namespace: default
 spec:
-  resourceGroup: ${AZURE_RESOURCE_GROUP}
+  networkSpec:
+    vnet:
+      name: ${AZURE_VNET_NAME:=${CLUSTER_NAME}-vnet}
+      cidrBlocks: 
+        - 10.0.0.0/16
+    subnets:
+      - name: control-plane-subnet
+        role: control-plane
+        cidrBlocks: 
+          - 10.0.1.0/24
+        securityGroup:
+          name: ${CLUSTER_NAME}-cp-nsg
+          securityRules:
+            - name: "allow_apiserver"
+              description: "Allow K8s API Server"
+              direction: "Inbound"
+              priority: 2201
+              protocol: "*"
+              destination: "*"
+              destinationPorts: "6443"
+              source: "*"
+              sourcePorts: "*"
+  resourceGroup: ${AZURE_RESOURCE_GROUP}  
