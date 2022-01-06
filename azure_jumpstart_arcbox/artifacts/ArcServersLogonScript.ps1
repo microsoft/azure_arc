@@ -228,8 +228,8 @@ $string.split('{')[-1] | Set-Content $CentOSIP
 $CentOSVmIp = Get-Content "$CentOSIP"
 
 # Check if Service Principal has 'write' permissions to target Resource Group
-$spName = Invoke-Command -Session $Server01 -ScriptBlock {$(Get-AzADUser -SignedIn ).UserPrincipalName}
-$roleWritePermissions = Invoke-Command -Session $Server01 -ScriptBlock {Get-AzRoleAssignment -Scope "/subscriptions/${using:env:subscriptionId}/resourcegroups/${using:env:resourceGroup}/providers/Microsoft.Authorization/roleAssignments/write" -WarningAction SilentlyContinue}
+$spName = $(Get-AzADUser -SignedIn ).UserPrincipalName
+$roleWritePermissions = Get-AzRoleAssignment -Scope "/subscriptions/${env:subscriptionId}/resourcegroups/${env:resourceGroup}/providers/Microsoft.Authorization/roleAssignments/write" -WarningAction SilentlyContinue
 $hasPermission = $roleWritePermissions | Where-Object {$_.SignInName -eq $spName}
 
 # Copying the Azure Arc Connected Agent to nested VMs
