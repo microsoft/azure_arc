@@ -4,5 +4,5 @@ resources:
   - https://github.com/kubernetes-sigs/cluster-api-provider-azure/releases/download/v1.1.0/cluster-template.yaml
 patchesStrategicMerge:
 # - patches/vnet.yaml
-- patches/apiServer.yaml
+# - patches/apiServer.yaml
 - patches/AzureCluster.yaml
