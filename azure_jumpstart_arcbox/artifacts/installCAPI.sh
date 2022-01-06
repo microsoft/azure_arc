@@ -152,7 +152,7 @@ clusterctl generate yaml --from arcbox.yaml > template.yaml
 #   > $CLUSTER_NAME.yaml
 
 # Building Microsoft Defender for Cloud plumbing for Cluster API
-curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+curl -o audit-policy.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
 cat <<EOF | sudo kubectl apply -f -
 apiVersion: v1
@@ -161,7 +161,7 @@ metadata:
   name: audit
 type: Opaque
 data:
-  audit.yaml: $(cat "audit.yaml" | base64 -w0)
+  audit-policy.yaml: $(cat "audit-policy.yaml" | base64 -w0)
   username: $(echo -n "jumpstart" | base64 -w0)
 EOF
 
@@ -254,7 +254,7 @@ sudo -u $adminUsername az connectedk8s connect --name ArcBox-CAPI-Data --resourc
 
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name ArcBox-CAPI-Data --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
-# sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name ArcBox-CAPI-Data --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
+sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name ArcBox-CAPI-Data --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # Enabling Azure Policy for Kubernetes on the cluster
 sudo -u $adminUsername az k8s-extension create --cluster-type connectedClusters --cluster-name ArcBox-CAPI-Data --resource-group $AZURE_RESOURCE_GROUP --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
