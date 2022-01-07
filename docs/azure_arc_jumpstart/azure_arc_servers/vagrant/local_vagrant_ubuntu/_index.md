@@ -67,6 +67,23 @@ The following README will guide you on how to deploy a local **Ubuntu** virtual 
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
+* Azure Arc-enabled servers depends on the following Azure resource providers in your subscription in order to use this service. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  * Microsoft.HybridCompute
+  * Microsoft.GuestConfiguration
+
+      ```shell
+      az provider register --namespace 'Microsoft.HybridCompute'
+      az provider register --namespace 'Microsoft.GuestConfiguration'
+      ```
+
+      You can monitor the registration process with the following commands:
+
+      ```shell
+      az provider show --namespace 'Microsoft.HybridCompute'
+      az provider show --namespace 'Microsoft.GuestConfiguration'
+      ```
+
 * The Vagrantfile executes a script on the VM OS to install all the needed artifacts as well to inject environment variables. Edit the [*scripts/vars.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/local/vagrant/ubuntu/scripts/vars.sh) shell script to match the Azure service principal you've just created.
 
   * subscriptionId=Your Azure subscription ID

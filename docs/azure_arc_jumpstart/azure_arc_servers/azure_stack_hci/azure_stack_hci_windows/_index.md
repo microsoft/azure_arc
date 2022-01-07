@@ -27,6 +27,9 @@ The commands below and the Powershell script described in this guide should be r
   ```powershell
   Register-AzResourceProvider -ProviderNamespace Microsoft.HybridCompute
   Get-AzResourceProvider -ListAvailable | Select-Object ProviderNamespace, RegistrationState | Select-String  -Pattern "Microsoft.HybridCompute"
+
+  Register-AzResourceProvider -ProviderNamespace Microsoft.GuestConfiguration
+  Get-AzResourceProvider -ListAvailable | Select-Object ProviderNamespace, RegistrationState | Select-String  -Pattern "Microsoft.GuestConfiguration"
   ```
 
 * Create Azure service principal (SP)
