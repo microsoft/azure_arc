@@ -33,4 +33,4 @@ spec:
         - containerPort: 8080
         env:
         - name: MESSAGE
-          value: Hello Arc Application on Kubernetes!
+          value: This is an Azure Arc GitOps Demo!
