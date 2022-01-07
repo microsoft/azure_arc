@@ -18,13 +18,13 @@ However, **for demo purposes only**, the below guide will allow you to use and o
 
 ## Prerequisites
 
-* Clone the Azure Arc Jumpstart repository
+* Clone the Azure Arc Jumpstart repository
 
     ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -60,6 +60,23 @@ However, **for demo purposes only**, the below guide will allow you to use and o
     ```
 
     > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+
+* Azure Arc-enabled servers depends on the following Azure resource providers in your subscription in order to use this service. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  * Microsoft.HybridCompute
+  * Microsoft.GuestConfiguration
+
+      ```shell
+      az provider register --namespace 'Microsoft.HybridCompute'
+      az provider register --namespace 'Microsoft.GuestConfiguration'
+      ```
+
+      You can monitor the registration process with the following commands:
+
+      ```shell
+      az provider show --namespace 'Microsoft.HybridCompute'
+      az provider show --namespace 'Microsoft.GuestConfiguration'
+      ```
 
 ## Automation Flow
 

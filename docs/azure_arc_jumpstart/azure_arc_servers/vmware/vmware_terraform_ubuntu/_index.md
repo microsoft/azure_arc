@@ -12,13 +12,13 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ## Prerequisites
 
-* Clone the Azure Arc Jumpstart repository
+* Clone the Azure Arc Jumpstart repository
 
     ```shell
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -32,7 +32,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     To connect the VMware vSphere virtual machine to Azure Arc, an Azure service principal assigned with the "Contributor" role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-    ```bash
+    ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
     ```
@@ -56,6 +56,23 @@ The following README will guide you on how to use the provided [Terraform](https
     ```
 
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
+
+* Azure Arc-enabled servers depends on the following Azure resource providers in your subscription in order to use this service. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  * Microsoft.HybridCompute
+  * Microsoft.GuestConfiguration
+
+      ```shell
+      az provider register --namespace 'Microsoft.HybridCompute'
+      az provider register --namespace 'Microsoft.GuestConfiguration'
+      ```
+
+      You can monitor the registration process with the following commands:
+
+      ```shell
+      az provider show --namespace 'Microsoft.HybridCompute'
+      az provider show --namespace 'Microsoft.GuestConfiguration'
+      ```
 
 ### Preparing an Ubuntu Server VMware vSphere VM Template
 
