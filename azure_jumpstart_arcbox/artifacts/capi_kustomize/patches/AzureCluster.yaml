@@ -38,26 +38,5 @@ spec:
       - name: node-subnet
         role: node
         cidrBlocks: 
-          - 10.0.2.0/24
-        securityGroup:
-          name: ${CLUSTER_NAME}-node-nsg
-          securityRules:
-            - name: "allow_apiserver"
-              description: "Allow K8s API Server"
-              direction: "Inbound"
-              priority: 3201
-              protocol: "*"
-              destination: "*"
-              destinationPorts: "6443"
-              source: "*"
-              sourcePorts: "*"
-            - name: "allow_apiserver_443"
-              description: "Allow K8s API Server 443"
-              direction: "Inbound"
-              priority: 3202
-              protocol: "*"
-              destination: "*"
-              destinationPorts: "443"
-              source: "*"
-              sourcePorts: "*"          
+          - 10.0.2.0/24       
   resourceGroup: ${AZURE_RESOURCE_GROUP}
