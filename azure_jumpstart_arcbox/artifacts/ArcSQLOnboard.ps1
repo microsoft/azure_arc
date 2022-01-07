@@ -119,11 +119,9 @@ Write-Host "Login Success!"
 
 # Verify user permissions
 
-$user = Invoke-Command -Session $Server01 -ScriptBlock {$(Get-AzADUser -SignedIn ).UserPrincipalName}
-
+$userObjectId = Invoke-Command -Session $Server01 -ScriptBlock {$(Get-AzADUser -SignedIn).Id}
 $roleWritePermissions = Invoke-Command -Session $Server01 -ScriptBlock {Get-AzRoleAssignment -Scope "/subscriptions/${using:subId}/resourcegroups/${using:resourceGroup}/providers/Microsoft.Authorization/roleAssignments/write" -WarningAction SilentlyContinue}
-
-$hasPermission = $roleWritePermissions | Where-Object {$_.SignInName -eq $user}
+$hasPermission = $roleWritePermissions | Where-Object {$_.ObjectId -eq $userObjectId}
 
 if(-not $hasPermission) {
   $permissionFailMsg = "User ($user) missing 'write' permissions to Resource Group '${resourceGroup}'. Please see the log for additional details."
