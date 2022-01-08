@@ -118,13 +118,15 @@ if ((Get-Job -Id $loginJobId -IncludeChildJob | Where-Object {$_.Error} | Select
 Write-Host "Login Success!"
 
 # Verify user permissions
-
+$userName = Invoke-Command -Session $Server01 -ScriptBlock {$(Get-AzADUser -SignedIn).DisplayName}
 $userObjectId = Invoke-Command -Session $Server01 -ScriptBlock {$(Get-AzADUser -SignedIn).Id}
-$roleWritePermissions = Invoke-Command -Session $Server01 -ScriptBlock {Get-AzRoleAssignment -Scope "/subscriptions/${using:subId}/resourcegroups/${using:resourceGroup}/providers/Microsoft.Authorization/roleAssignments/write" -WarningAction SilentlyContinue}
-$hasPermission = $roleWritePermissions | Where-Object {$_.ObjectId -eq $userObjectId}
+$roleWritePermissions = Invoke-Command -Session $Server01 -ScriptBlock {Get-AzRoleAssignment -ResourceGroupName $using:resourceGroup -WarningAction SilentlyContinue}
+$actionList = @("*", "Microsoft.Authorization/*/Write")
+$roleDefId = Invoke-Command -Session $Server01 -ScriptBlock {@(Get-AzRoleDefinition | Where-Object { (Compare-Object $using:actionList $_.Actions -IncludeEqual -ExcludeDifferent) -and -not (Compare-Object $using:actionList $_.NotActions -IncludeEqual -ExcludeDifferent) } | Select-Object -ExpandProperty Id)}
+$hasPermission = @($roleWritePermissions | Where-Object { $_.ObjectId -eq $userObjectId } | Where-Object { $roleDefId -contains $_.RoleDefinitionId })
 
 if(-not $hasPermission) {
-  $permissionFailMsg = "User ($user) missing 'write' permissions to Resource Group '${resourceGroup}'. Please see the log for additional details."
+  $permissionFailMsg = "User ($userName) missing 'write' permissions to Resource Group '${resourceGroup}'. Please see the log for additional details."
 
   Write-Host $permissionFailMsg
   Show-Message 'Arc-enabled SQL Server' $permissionFailMsg 'Warning' 'Ok'
@@ -133,7 +135,7 @@ if(-not $hasPermission) {
   throw [System.Exception] "Invalid user permissions on Resource Group!"
 }
 
-Write-Host "User ($user) has 'write' permissions to Resource Group '${resourceGroup}'!"
+Write-Host "User ($userName) has 'write' permissions to Resource Group '${resourceGroup}'!"
 
 # Onboard Arc-enabled SQL Server
 
@@ -166,5 +168,8 @@ $onboardSuccessMsg = "SQL Server has been successfully onboaded into Azure Arc! 
 
 Write-Host "SQL Server Onboarded!"
 Show-Message 'Arc-enabled SQL Server' $onboardSuccessMsg 'None' 'Ok'
+
+$shortcutLink = "$env:Public\Desktop\Onboard SQL Server.lnk"
+Remove-Item $shortcutLink –Force
 
 Stop-Transcript
