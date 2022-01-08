@@ -49,5 +49,5 @@ az k8s-configuration flux create \
 --cluster-type connectedClusters \
 --scope cluster \
 --url $appClonedRepo \
---branch master --sync-interval 3s \
+--branch main --sync-interval 3s \
 --kustomization name=app path=./artifacts/hello-arc/yaml
