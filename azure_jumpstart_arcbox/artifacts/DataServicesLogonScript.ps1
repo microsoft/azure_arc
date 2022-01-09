@@ -32,10 +32,11 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Register Azure providers
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
+az provider register --namespace 'Microsoft.Kubernetes' --wait
+az provider register --namespace 'Microsoft.KubernetesConfiguration' --wait
+az provider register --namespace 'Microsoft.ExtendedLocation' --wait
+az provider register --namespace 'Microsoft.AzureArcData' --wait
+az provider register --namespace 'Microsoft.PolicyInsights' --wait
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
@@ -82,6 +83,9 @@ Start-Sleep -Seconds 20
 az customlocation create --name 'arcbox-cl' --resource-group $env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config"
 
 $workspaceResourceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+
+# Configuring Azure Policy for Kubernetes on the cluster
+az k8s-extension create --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "`n"
@@ -131,6 +135,14 @@ Write-Host "`n"
 & "C:\ArcBox\DeploySQLMI.ps1"
 & "C:\ArcBox\DeployPostgreSQL.ps1"
 
+# Enabling data controller auto metrics & logs upload to log analytics
+Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
+Write-Host "`n"
+$Env:WORKSPACE_ID=$(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName  --query primarySharedKey -o tsv)
+az arcdata dc update --name jumpstart-dc --resource-group $env:resourceGroup --auto-upload-logs true
+az arcdata dc update --name jumpstart-dc --resource-group $env:resourceGroup --auto-upload-metrics true
+
 # Replacing Azure Data Studio settings template file
 Write-Host "Replacing Azure Data Studio settings template file"
 New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
@@ -157,9 +169,9 @@ $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 kubectx
 
 # Sending deployement status message to Azure storage account queue
-if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
-    & "C:\ArcBox\DeploymentStatus.ps1"
-}
+# if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
+#     & "C:\ArcBox\DeploymentStatus.ps1"
+# }
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services 
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
