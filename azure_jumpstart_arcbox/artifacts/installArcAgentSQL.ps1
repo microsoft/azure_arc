@@ -315,7 +315,6 @@ if($null -eq $spID) {
     return
 }
 
-<<<<<<< HEAD
 $currentRoleAssignment = Get-AzSPNRoleAssignment -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ObjectId $spID -ResourceGroupName $resourceGroup
 
 $retryCount = 6
@@ -335,26 +334,6 @@ if(!$currentRoleAssignment)
     Write-Verbose "Unable to assign Azure Connected SQL Server Onboarding role to Arc managed Identity. Skipping role assignment."
     return
 }
-=======
-$currentRoleAssignment = $null
-$retryCount = 10
-$count = 0
-$waitTimeInSeconds = 10
-# while(!$currentRoleAssignment -and $count -le $retryCount)
-# {
-#     Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
-#     $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-#     sleep $waitTimeInSeconds
-#     $count++
-# }
-Write-Host "Arc machine managed Identity requires Azure Connected SQL Server Onboarding role. Assigning it now."
-while($count -le $retryCount)
-{
-    New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-    sleep $waitTimeInSeconds
-    $count++
-}
->>>>>>> arcbox_flavors
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
@@ -385,12 +364,7 @@ $workspaceKey = $(Get-AzOperationalInsightsWorkspaceSharedKey -Name $workspaceNa
 
 $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
-<<<<<<< HEAD
 New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
-=======
-New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $env:computername -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
-Start-Sleep -Seconds 60
->>>>>>> arcbox_flavors
 
 $nestedWindowsUsername = "Administrator"
 $nestedWindowsPassword = "ArcDemo123!!"
