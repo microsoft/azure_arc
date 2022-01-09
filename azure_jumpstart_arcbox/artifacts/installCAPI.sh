@@ -17,6 +17,7 @@ echo $SPN_TENANT_ID:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
 echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
+echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
 sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
@@ -24,12 +25,21 @@ sed -i '5s/^/export SPN_TENANT_ID=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
+sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
 
-# Installing Azure CLI
+# Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
+sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
+while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI.log; done &
+
+# Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+sudo -u $adminUsername az extension add --name connectedk8s
+sudo -u $adminUsername az extension add --name k8s-configuration
+sudo -u $adminUsername az extension add --name k8s-extension
 
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
@@ -52,9 +62,9 @@ sudo snap install kubectl --classic
 # Set CAPI deployment environment variables
 export CLUSTERCTL_VERSION="1.0.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.0.1" # Do not change!
+export CAPI_PROVIDER_VERSION="1.1.0" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.22.4" # Do not change!
+export KUBERNETES_VERSION="1.22.5" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
@@ -108,7 +118,7 @@ sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >
 sudo kubectl get nodes
 echo ""
 
-# Create a secret to include the password of the Service Principal identity created in Azure
+# Creating a secret to include the password of the Service Principal identity created in Azure
 # This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
 kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
@@ -222,9 +232,26 @@ echo ""
 # CAPI workload cluster kubeconfig housekeeping
 cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig ~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 cp /var/lib/waagent/custom-script/download/0/$CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
-export KUBECONFIG=~/.kube/config.arcbox-capi-data
+export KUBECONFIG=~/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
 sudo service sshd restart
+
+# Onboarding the cluster to Azure Arc
+workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $resourceGroup --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+sudo -u $adminUsername az connectedk8s connect --name ArcBox-CAPI-Data --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox' --kube-config /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME --kube-context 'arcbox-capi-data-admin@arcbox-capi-data'
+
+# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+# sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
+
+# Enabling Azure Policy for Kubernetes on the cluster
+sudo -u $adminUsername az k8s-extension create --cluster-type connectedClusters --cluster-name ArcBox-CAPI-Data --resource-group $resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy
+
+# Creating Storage Class with azure-managed-disk for the CAPI cluster
+sudo kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml --kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
+
+# Renaming CAPI cluster context name 
+sudo kubectl config rename-context "arcbox-capi-data-admin@arcbox-capi-data" "arcbox-capi" --kubeconfig /home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME
 
 # Copying workload CAPI kubeconfig file to staging storage account
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
@@ -234,3 +261,7 @@ localPath="/home/${adminUsername}/.kube/config.$CAPI_WORKLOAD_CLUSTER_NAME"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
 sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
+
+# Uploading this script log to staging storage for ease of troubleshooting
+log="/home/${adminUsername}/jumpstart_logs/installCAPI.log"
+sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $log
