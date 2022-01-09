@@ -4,7 +4,10 @@ param (
     [string]$servicePrincipalTenantId
 )
 
-Start-Transcript -Path C:\ArcBox\installArcAgentSQL.log
+$ArcBoxLogsDir = "C:\ArcBox\Logs"
+
+Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
+
 $ErrorActionPreference = 'SilentlyContinue'
 
 # These settings will be replaced by the portal when the script is generated
@@ -323,18 +326,26 @@ $waitTimeInSeconds = 10
 
 while(!$currentRoleAssignment -and $count -le $retryCount)
 {
+<<<<<<< HEAD
     Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
     $currentRoleAssignment = New-AzSPNRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+=======
+    New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+>>>>>>> arcbox_flavors
     Start-Sleep $waitTimeInSeconds
     $count++
 }
 
+<<<<<<< HEAD
 if(!$currentRoleAssignment)
 {
     Write-Verbose "Unable to assign Azure Connected SQL Server Onboarding role to Arc managed Identity. Skipping role assignment."
     return
 }
 
+=======
+Write-Host "`n"
+>>>>>>> arcbox_flavors
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
 $settings = '{ "SqlManagement" : { "IsEnabled" : true }}'

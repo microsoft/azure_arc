@@ -1,7 +1,7 @@
-@description('IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address.')
+@description('IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address')
 param myIpAddress string
 
-@description('RSA public key used for securing SSH access to ArcBox resources.')
+@description('RSA public key used for securing SSH access to ArcBox resources')
 @secure()
 param sshRSAPublicKey string
 
@@ -18,7 +18,7 @@ param spnTenantId string
 @description('Username for Windows account')
 param windowsAdminUsername string
 
-@description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.')
+@description('Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long')
 @minLength(12)
 @maxLength(123)
 @secure()
@@ -46,6 +46,7 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    logAnalyticsWorkspace: logAnalyticsWorkspaceName
     artifactsBaseUrl: artifactsBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
