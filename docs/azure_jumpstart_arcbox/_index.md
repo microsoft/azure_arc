@@ -208,7 +208,8 @@ ArcBox must be deployed to one of the following regions. Deploying ArcBox outsid
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure Portal, CLI or similar) or from inside the ArcBox-Client virtual machine. When remoted into the client VM, here are some things to try:
 
 * Open Hyper-V and access the Azure Arc-enabled servers
-  * Username: arcdemo
+  * Username (for Windows servers): Administrator
+  * Username (for Linux servers): arcdemo
   * Password: ArcDemo123!!
 
   ![Screenshot showing ArcBox Client VM with Hyper-V](./hypervterminal.png)
