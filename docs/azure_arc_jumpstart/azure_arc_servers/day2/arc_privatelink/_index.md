@@ -112,7 +112,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
         > **Note: The [_install_arc_agent.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
 
-5. User uses Azure Bastion to connect to Linux VM which will start the *install_arc_agent.sh* script execution and will onboard the VM to Azure Arc.
+5. User uses Azure Bastion to connect to Linux VM which will start the _install_arc_agent.sh_ script execution and will onboard the VM to Azure Arc.
 
 6. User tests private connectivity to Azure SQL server from the Azure Linux Virtual Machine.
 
