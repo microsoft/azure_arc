@@ -21,7 +21,7 @@ In this guide, you will emulate a hybrid environment connected to Azure over a V
 
   ![Deployment Overview](./01.png)
 
-Once everything is deployed you will be able to access the Azure SQL private IP address from the on-premises Linux machine, traffic will go over the VPN connection and them kept within the Azure VNET via Private Link to access the database service.
+Once everything is deployed, you will be able to access the Azure SQL private IP address from the "on-premises" Linux machine, traffic will go over the VPN connection and be kept within the Azure VNET via Private Link to access the database service.
 
 ## Prerequisites
 
