@@ -8,20 +8,20 @@ description: >
 
 ## Use Azure Private Link to securrely connect networks to Azure Arc
 
-The following README will guide you on how to use [Azure Private Link](https://docs.microsoft.com/en-us/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure PaaS services. [This feature](https://docs.microsoft.com/en-us/azure/azure-arc/servers/private-link-security) not only allows you to link your Azure PaaS services to your virtual network using private endpoints but also enables you to connect your on-premises or multi-cloud resources with Azure Arc and ensure that all traffic is being send over a VPN or ExpressRoute connection.
+The following README will guide you on how to use [Azure Private Link](https://docs.microsoft.com/en-us/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure PaaS services. [This feature](https://docs.microsoft.com/en-us/azure/azure-arc/servers/private-link-security) not only allows you to link your Azure PaaS services to your virtual network using private endpoints but also enables you to connect your on-premises or multi-cloud resources with Azure Arc and ensure that all traffic is being sent over a VPN or ExpressRoute connection.
 
 In this guide, you will emulate a hybrid environment connected to Azure over a VPN, hybrid resources will be Arc-enabled and Azure Private Link will be used to connect to an Azure PaaS service over a private connection. To complete this process you will:
 
-* Create two separate resource groups in different Azure regions:
+- Create two separate resource groups in different Azure regions:
 
-  * On-premises resource group: will simulate a private on-premises environment with a Linux virtual machine, this VM does not have a public IP address assigned to it so Azure Bastion is deployed to have access to the operating system. The Linux virtual machine is Arc-enabled by installing the Azure Arc connected machine agent.
+  * "On-premises" resource group: will simulate a private on-premises environment with a Linux virtual machine, this VM does not have a public IP address assigned to it so Azure Bastion is deployed to have access to the operating system. The Linux virtual machine is Arc-enabled by installing the Azure Arc-connected machine agent.
   * Azure resource group: in this resource group you will deploy all Azure PaaS resources in this case Azure DNS and Azure SQL, to connect privately to them Azure Private Link is also deployed.
 
 * Both resource groups have their own virtual networks and address spaces, however they are connected via Azure VPN gateways to set up a hybrid private connection.
 
   ![Deployment Overview](./01.png)
 
-Once everything is deployed you will be able to access the Azure SQL private IP address from the on-premises Linux machine, traffic will go over the VPN connection and them kept within the Azure VNET via Private Link to access the database service.
+Once everything is deployed, you will be able to access the Azure SQL private IP address from the "on-premises" Linux machine, traffic will go over the VPN connection and be kept within the Azure VNET via Private Link to access the database service.
 
 ## Prerequisites
 
@@ -59,6 +59,22 @@ Once everything is deployed you will be able to access the Azure SQL private IP 
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
+- Azure Arc-enabled servers depends on the following Azure resource providers in your subscription in order to use this service. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+
+  - Microsoft.HybridCompute
+  - Microsoft.GuestConfiguration
+
+      ```shell
+      az provider register --namespace 'Microsoft.HybridCompute'
+      az provider register --namespace 'Microsoft.GuestConfiguration'
+      ```
+
+      You can monitor the registration process with the following commands:
+
+      ```shell
+      az provider show --namespace 'Microsoft.HybridCompute'
+      az provider show --namespace 'Microsoft.GuestConfiguration'
+      ```
 
   > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
@@ -72,7 +88,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Azure Resource Group
     * On-premises Resource Group
 
-3. User runs the ARM template for the resources in the Azure Resource Group. The ARM template will create
+3. User deploys the ARM template for the resources in the Azure Resource Group. The ARM template will create:
 
     * Azure SQL server and a SQL database
     * Azure Private Link
@@ -80,22 +96,22 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Azure VPN Gateway and its public IP address
     * Azure VNET
 
-4. User runs the ARM template for the resources in the On-premises resource group. The ARM template will create:
+4. User deploys the ARM template for the resources in the On-premises resource group. The ARM template will create: 
 
     * Azure VNET
     * Azure Bastion
     * Azure VPN Gateway and its public IP address
-    * Azure Linux Virtual Machine with a custom script extension that will run the [*install_arc_agent.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script to Arc-enable the Azure VM.
+    * Azure Linux Virtual Machine with a custom script extension that will run the [_install_arc_agent.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script to Arc-enable the Azure VM.
 
-        > **Note: The [*install_arc_agent.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
+        > **Note: The [_install_arc_agent.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
 
-5. User uses Azure Bastion to connect to Linux VM which will start the *install_arc_agent.sh* script execution and will onboard the VM to Azure Arc.
+5. User uses Azure Bastion to connect to Linux VM which will start the _install_arc_agent.sh_ script execution and will onboard the VM to Azure Arc.
 
 6. User tests private connectivity to Azure SQL server from the Azure Linux Virtual Machine.
 
 ## Deployment
 
-As mentioned, this deployment will leverage ARM templates. You will deploy an ARM template per resource group that are responsible for creating all the Azure resources as well as the "on-premises" resources that will be onboarded to Azure Arc.
+As mentioned, this deployment will leverage ARM templates. You will deploy an ARM template per resource group that is responsible for creating all the Azure resources as well as the "on-premises" resources that will be onboarded to Azure Arc.
 
 * Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command.
 
