@@ -75,23 +75,16 @@ For you to get familiar with the automation and deployment flow, below is an exp
 3. User runs the ARM template for the resources in the Azure Resource Group. The ARM template will create
 
     * Azure SQL server and a SQL database
-
     * Azure Private Link
-
     * Azure Private DNS zone
-
     * Azure VPN Gateway and its public IP address
-
     * Azure VNET
 
-4. User runs the ARM template for the resources in the On-premises resource group. The ARM template will create: 
+4. User runs the ARM template for the resources in the On-premises resource group. The ARM template will create:
 
     * Azure VNET
-
     * Azure Bastion
-
     * Azure VPN Gateway and its public IP address
-
     * Azure Linux Virtual Machine with a custom script extension that will run the [*install_arc_agent.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script to Arc-enable the Azure VM.
 
         > **Note: The [*install_arc_agent.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
