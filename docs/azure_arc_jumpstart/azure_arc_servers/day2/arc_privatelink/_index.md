@@ -118,7 +118,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
-As mentioned, this deployment will leverage ARM templates. You will deploy an ARM template per resource group that are responsible for creating all the Azure resources as well as the "on-premises" resources that will be onboarded to Azure Arc.
+As mentioned, this deployment will leverage ARM templates. You will deploy an ARM template per resource group that is responsible for creating all the Azure resources as well as the "on-premises" resources that will be onboarded to Azure Arc.
 
 * Before deploying the ARM template, login to Azure using AZ CLI with the ```az login``` command.
 
