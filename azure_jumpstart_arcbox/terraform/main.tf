@@ -207,6 +207,7 @@ module "capi_vm" {
   spn_tenant_id        = var.spn_tenant_id
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
+  workspace_name       = var.workspace_name
 
   depends_on = [
     azurerm_resource_group.rg,
