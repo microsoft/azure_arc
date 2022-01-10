@@ -88,7 +88,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     * Azure Resource Group
     * On-premises Resource Group
 
-3. User runs the ARM template for the resources in the Azure Resource Group. The ARM template will create
+3. User deploys the ARM template for the resources in the Azure Resource Group. The ARM template will create:
 
     * Azure SQL server and a SQL database
 
