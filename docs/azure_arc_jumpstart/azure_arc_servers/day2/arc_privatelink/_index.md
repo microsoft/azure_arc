@@ -8,7 +8,7 @@ description: >
 
 ## Use Azure Private Link to securrely connect networks to Azure Arc
 
-The following README will guide you on how to use [Azure Private Link](https://docs.microsoft.com/en-us/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure PaaS services. [This feature](https://docs.microsoft.com/en-us/azure/azure-arc/servers/private-link-security) not only allows you to link your Azure PaaS services to your virtual network using private endpoints but also enables you to connect your on-premises or multi-cloud resources with Azure Arc and ensure that all traffic is being send over a VPN or ExpressRoute connection.
+The following README will guide you on how to use [Azure Private Link](https://docs.microsoft.com/en-us/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure PaaS services. [This feature](https://docs.microsoft.com/en-us/azure/azure-arc/servers/private-link-security) not only allows you to link your Azure PaaS services to your virtual network using private endpoints but also enables you to connect your on-premises or multi-cloud resources with Azure Arc and ensure that all traffic is being sent over a VPN or ExpressRoute connection.
 
 In this guide, you will emulate a hybrid environment connected to Azure over a VPN, hybrid resources will be Arc-enabled and Azure Private Link will be used to connect to an Azure PaaS service over a private connection. To complete this process you will:
 
