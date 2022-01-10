@@ -288,8 +288,8 @@ if(-not $hasPermission) {
     # Replace variables in Arc-enabled SQL onboarding scripts
     $sqlServerName = "ArcBox-SQL"
 
-    (Get-Content -path "$ArcBoxDir\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<location>',"$env:azureLocation" | Set-Content -Path "$ArcBoxDir\ArcSQL.ps1"
-    (Get-Content -path "$ArcBoxDir\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$ArcBoxDir\ArcSQLOnboard.ps1"
+    (Get-Content -path "$Env:ArcBoxDir\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<location>',"$env:azureLocation" | Set-Content -Path "$Env:ArcBoxDir\ArcSQL.ps1"
+    (Get-Content -path "$Env:ArcBoxDir\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$Env:ArcBoxDir\ArcSQLOnboard.ps1"
 
     # Set Edge as the Default Browser
     & SetDefaultBrowser.exe HKLM "Microsoft Edge"
@@ -306,13 +306,13 @@ if(-not $hasPermission) {
     New-ItemProperty -Path $registryPath -Name $registryName -Value $registryValue -PropertyType DWORD -Force
 
     # Creating Arc-enabled SQL Server onboarding desktop shortcut
-    $sourceFileLocation = "${ArcBoxDir}\ArcSQLOnboard.ps1"
+    $sourceFileLocation = "${Env:ArcBoxDir}\ArcSQLOnboard.ps1"
     $shortcutLocation = "$env:Public\Desktop\Onboard SQL Server.lnk"
     $wScriptShell = New-Object -ComObject WScript.Shell
     $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
     $shortcut.TargetPath = "powershell.exe"
     $shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
-    $shortcut.IconLocation="${ArcBoxDir}\ArcSQLIcon.ico, 0"
+    $shortcut.IconLocation="${Env:ArcBoxDir}\ArcSQLIcon.ico, 0"
     $shortcut.WindowStyle = 3
     $shortcut.Save()
 }
