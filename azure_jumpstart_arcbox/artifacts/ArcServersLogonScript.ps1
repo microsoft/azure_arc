@@ -256,6 +256,7 @@ $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -Timeout 120 -WarningAction SilentlyContinue | Out-Null
 
 # Onboarding nested CentOS server VM
+Start-Sleep -Seconds 60
 $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force -WarningAction SilentlyContinue #Connect Over SSH
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 120 -WarningAction SilentlyContinue | Out-Null
