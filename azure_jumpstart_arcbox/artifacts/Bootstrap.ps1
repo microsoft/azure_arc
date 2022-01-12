@@ -128,8 +128,8 @@ workflow ClientTools_01
 
             Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQL.ps1") -OutFile "C:\ArcBox\ArcSQL.ps1"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLIcon.ico") -OutFile "C:\ArcBox\ArcSQLIcon.ico"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLOnboard.ps1") -OutFile "C:\ArcBox\ArcSQLOnboard.ps1"
-            
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile "C:\ArcBox\ArcSQLManualOnboarding.ps1"
+
             # Workbook template
             if ($flavor -eq "ITPro") {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookITPro.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json

@@ -306,7 +306,7 @@ if(-not $hasPermission) {
     New-ItemProperty -Path $registryPath -Name $registryName -Value $registryValue -PropertyType DWORD -Force
 
     # Creating Arc-enabled SQL Server onboarding desktop shortcut
-    $sourceFileLocation = "${Env:ArcBoxDir}\ArcSQLOnboard.ps1"
+    $sourceFileLocation = "${Env:ArcBoxDir}\ArcSQLManualOnboarding.ps1"
     $shortcutLocation = "$env:Public\Desktop\Onboard SQL Server.lnk"
     $wScriptShell = New-Object -ComObject WScript.Shell
     $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
