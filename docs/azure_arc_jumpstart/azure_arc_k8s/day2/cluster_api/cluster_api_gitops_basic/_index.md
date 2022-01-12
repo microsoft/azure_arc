@@ -113,7 +113,7 @@ With Cluster-level GitOps config, the goal is to have "horizontal components" or
 
 ### Namespace-level Config
 
-With Namespace-level GitOps config, the goal is to have Kubernetes resources deployed only in the namespace selected. The most obvious use-case here is simply your application and it's respective pods, services, ingress routes, etc. In the next section will have the "Hello Arc" application deployed on a dedicated namespace.
+With Namespace-level GitOps config, the goal is to have Kubernetes resources deployed only in the namespace selected. The most obvious use-case here is simply your application and its respective pods, services, ingress routes, etc. In the next section, will have the "Hello Arc" application deployed on a dedicated namespace.
 
 - Edit the environment variables [in the script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/gitops/basic/az_k8sconfig_capi.sh) to match your environment parameters followed by running the _`. ./az_k8sconfig_capi.sh`_ command.
 
