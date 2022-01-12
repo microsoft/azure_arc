@@ -95,7 +95,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
     - Azure Private Link
     - Azure Private DNS zone
     - Azure VPN Gateway and its public IP address
-    * Azure VNET
+    - Azure VNET
 
 4. User deploys the ARM template for the resources in the On-premises resource group. The ARM template will create:
 
@@ -242,3 +242,4 @@ To delete the entire deployment, simply delete both resources groups from the Az
   ![Delete Azure's resource group](./13.png)
 
   ![Delete Onpremises resource group](./14.png)
+  

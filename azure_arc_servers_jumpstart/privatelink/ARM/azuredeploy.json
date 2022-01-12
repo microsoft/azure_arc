@@ -1,0 +1,311 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "type": "string",
+            "defaultValue": "ArcDemo-VM",
+            "metadata": {
+                "description": "Name of the Virtual Machine that will be onboarded to Arc."
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D4s_v4",
+            "metadata": {
+                "description": "Size of the Arc-enabled virtual machine."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "arcadmin",
+            "metadata": {
+                "description": "Admin username for the Arc-enabled virtual machine."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "SSH key or password for the Arc-enabled virtual Machine. SSH key is recommended for Linux."
+            }
+        },
+        "onPremVNetName": {
+            "type": "string",
+            "defaultValue": "OnPrem-NET",
+            "metadata": {
+                "description": "Name of the vNET for the on-premises environment."
+            }
+        },
+        "onPremVNetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.0.0/24",
+            "metadata": {
+                "description": "CIDR prefix for the on-premises vNET."
+            }
+        },
+        "onPremGatewaySubnetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.0.0/26",
+            "metadata": {
+                "description": "CIDR prefix for the on-premises Gateway subnet."
+            }
+        },
+        "onPremBastionSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.0.64/26",
+            "metadata": {
+                "description": "CIDR prefix for the on-premises Bastion subnet."
+            }
+        },
+        "onPremSubnetName": {
+            "type": "string",
+            "defaultValue": "default",
+            "metadata": {
+                "description": "Name of the subnet for the on-premises resources."
+            }
+        },
+        "onPremSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.0.128/26",
+            "metadata": {
+                "description": "CIDR prefix for the on-premises resources subnet."
+            }
+        },
+        "onPremGatewayName": {
+            "type": "string",
+            "defaultValue": "OnPremGateway",
+            "metadata": {
+                "description": "The name of the Virtual Network Gateway 'on-premises'."
+            }
+        },
+        "onPremBastionName": {
+            "type": "string",
+            "defaultValue": "OnPremBastion",
+            "metadata": {
+                "description": "The name of the Bastion host that will simulate secure access to the on-premises environment."
+            }
+        }
+    },
+    "variables": {
+        "networkInterfaceName": "[concat(parameters('vmName'), '-NIC')]",
+        "nsgName": "[concat(parameters('vmName'), '-NSG')]",
+        "gatewayPublicIPName": "[concat(parameters('onPremGatewayName'), '-PIP')]",
+        "bastionPublicIPName": "[concat(parameters('onPremBastionName'), '-PIP')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-05-01",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('gatewayPublicIPName')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('bastionPublicIPName')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('onPremVNetName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('onPremVNetPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('onPremGatewaySubnetPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('onPremBastionSubnetPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "[parameters('onPremSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('onPremSubnetPrefix')]",
+                            "privateEndpointNetworkPolicies": "Disabled"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-06-01",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('nsgName')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow_RDP",
+                        "properties": {
+                            "description": "Allow RDP access to Windows VM's",
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-06-01",
+            "location": "[resourceGroup().location]",
+            "name": "[variables('networkInterfaceName')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('onPremVNetName'), parameters('onPremSubnetName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('onPremVNetName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
+            ]
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "name": "[parameters('onPremGatewayName')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('onPremVNetName'), 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gatewayPublicIPName'))]"
+                            }
+                        },
+                        "name": "default"
+                    }
+                ],
+                "sku": {
+                    "name": "Basic",
+                    "tier": "Basic"
+                },
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('gatewayPublicIPName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('onPremVNetName'))]"
+            ]
+        },
+        {
+            "apiVersion": "2020-11-01",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Network/bastionHosts",
+            "name": "[parameters('onPremBastionName')]",
+            "sku": {
+                "name": "Basic"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('onPremVNetName'))]"
+            ],
+            "properties": {
+                "enableIpConnect": "false",
+                "enableTunneling": "false",
+                "ipConfigurations": [
+                    {
+                        "name": "IpConf",
+                        "properties": {
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('onPremVNetName'),'AzureBastionSubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIPName'))]"
+                            }
+                        }
+                    }
+                ],
+                "scaleUnits": 2
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "name": "[parameters('vmName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[take(parameters('vmName'), 15)]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2019-datacenter-gensecond",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+            ]
+        }
+    ],
+    "outputs": {}
+}
