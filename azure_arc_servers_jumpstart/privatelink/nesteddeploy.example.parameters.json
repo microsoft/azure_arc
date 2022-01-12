@@ -1,0 +1,75 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "azureRgName": {
+            "value": "Arc-Azure-PL-demo"
+        },
+        "onPremRgName": {
+            "value": "Arc-Onpremise-PL-Demo"
+        },
+        "sqlAdminLogin": {
+            "value": "arcdemo"
+        },
+        "sqlAdminPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "cloudVNetName": {
+            "value": "Cloud-VNET"
+        },
+        "cloudVNetPrefix": {
+            "value": "172.16.0.0/24"
+        },
+        "cloudSubnetName": {
+            "value": "cloud-subnet"
+        },
+        "cloudGatewaySubnetPrefix": {
+            "value": "172.16.0.0/26"
+        },
+        "cloudSubnetPrefix": {
+            "value": "172.16.0.64/26"
+        },
+        "cloudGatewayName": {
+            "value": "AzureGw"
+        },
+        "vmName": {
+            "value": "ArcDemo-VM"
+        },
+        "vmSize": {
+            "value": "Standard_D4s_v4"
+        },
+        "adminUsername": {
+            "value": "arcdemo"
+        },
+        "adminPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "onPremVNetName": {
+            "value": "OnPremise-VNET"
+        },
+        "onPremVNetPrefix": {
+            "value": "192.168.0.0/24"
+        },
+        "onPremGatewaySubnetPrefix": {
+            "value": "192.168.0.0/26"
+        },
+        "onPremBastionSubnetPrefix": {
+            "value": "192.168.0.64/26"
+        },
+        "onPremSubnetName": {
+            "value": "Onpremise-Subnet"
+        },
+        "onPremSubnetPrefix": {
+            "value": "192.168.0.128/26"
+        },
+        "onPremGatewayName": {
+            "value": "OnPremiseGw"
+        },
+        "onPremBastionName": {
+            "value": "OnPremBastion"
+        },
+        "sharedKey": {
+            "value": "ArcPassword123!!"
+        }
+    }
+}

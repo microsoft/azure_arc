@@ -1,0 +1,102 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "gatewaySubnetPrefix1": {
+            "value": "192.168.100.16/28"
+        },
+        "location1": {
+            "value": "northeurope"
+        },
+        "virtualNetworkName1": {
+            "value": "Vnet1"
+        },
+        "gatewayName1": {
+            "value": "Vnet1Gw"
+        },
+        "addressPrefix1": {
+            "value": "192.168.100.0/24"
+        },
+        "subnet1Name1": {
+            "value": "PLSubnet"
+        },
+        "subnet1Prefix1": {
+            "value": "192.168.100.0/28"
+        },
+        "sqlAdministratorLogin": {
+            "value": "arcdemo"
+        },
+        "sqlAdministratorLoginPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "azure_rg": {
+            "value": "Arc-Azure-PL-Demo"
+        },
+        "location2": {
+            "value": "westeurope"
+        },
+        "virtualNetworkName2": {
+            "value": "Vnet2"
+        },
+        "gatewayName2": {
+            "value": "Vnet2Gw"
+        },
+        "addressPrefix2": {
+            "value": "192.168.101.0/24"
+        },
+        "subnet1Prefix2": {
+            "value": "192.168.101.0/28"
+        },
+        "gatewaySubnetPrefix2": {
+            "value": "192.168.101.16/28"
+        },
+        "addressPrefixBastion": {
+            "value": "192.168.101.32/28"
+        },
+        "sharedKey": {
+            "value": "ArcPassword123!!"
+        },
+        "vmSize": {
+            "value": "Standard_D4s_v3"
+        },
+        "vmName": {
+            "value": "Arc-Linux-Demo"
+        },
+        "adminUsername": {
+            "value": "arcdemo"
+        },
+        "adminPasswordOrKey": {
+            "value": "ArcPassword123!!"
+        },
+        "subscriptionID": {
+            "value": "5af250db-aef1-46f9-8296-7a373a4b2801"
+        },
+        "servicePrincipalClient": {
+            "value": "c4d061d5-a7f5-4eef-8e6f-de5a1e4fe044"
+        },
+        "servicePrincipalClientSecret": {
+            "value": "HTer4U~-DKLW4-VArn5okMw~xjODnn~oce"
+        },
+        "tenantID": {
+            "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+        },
+        "bastionHostName": {
+            "value": "Arc-Bastion"
+        },
+        "authenticationType": {
+            "value": "password"
+        },
+        "ubuntuOSVersion": {
+            "value": "18.04-LTS"
+        },
+        "NetworkSecurityGroupName": {
+            "value": "Arc-Linux-Demo-NSG"
+        },
+        "githubAccount": {
+            "value": "lanicolas"
+        },
+        "githubBranch": {
+            "value": "privatelink"
+        }
+    }
+}
