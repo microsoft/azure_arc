@@ -4,6 +4,8 @@
     [string]$sqlServerName = "<sqlServerName>"
 )
 
+$host.ui.RawUI.WindowTitle = “Onboarding...”
+
 Add-Type -AssemblyName PresentationCore, PresentationFramework
 
 $WarningPreference = 'SilentlyContinue'
