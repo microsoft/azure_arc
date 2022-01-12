@@ -7,10 +7,6 @@ sudo firewall-cmd --permanent --direct --add-rule ipv4 filter OUTPUT 0 -d 169.25
 sudo firewall-cmd --permanent --zone=public --set-target=ACCEPT
 sudo firewall-cmd --reload
 
-# Install python3 (needed for later install of OMS agent)
-# yum update -y
-# yum install -y python3
-
 # Download the installation package
 wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh # 2>/dev/null
 
