@@ -1,6 +1,6 @@
 ---
 type: docs
-title: "Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster"
+title: "Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster (flux v2)"
 linkTitle: "Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster"
 weight: 4
 description: >
