@@ -6,7 +6,7 @@ weight: 4
 description: >
 ---
 
-## Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster
+## Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster (flux v2)
 
 The following README will guide you on how to create GitOps configuration on a Cluster API which is projected as an Azure Arc-connected cluster resource.
 
