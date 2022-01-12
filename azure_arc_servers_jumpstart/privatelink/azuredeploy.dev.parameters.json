@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "azureRgName": {
+            "value": "Azure-RG"
+        },
+        "onPremRgName": {
+            "value": "OnPrem-RG"
+        },
+        "sqlAdminPassword": {
+            "value": "us3r@$$ign3dp@$$"
+        },
+        "adminPassword": {
+            "value": "us3r@$$ign3dp@$$"
+        },
+        "githubAccount": {
+            "value": "DCMattyG"
+        },
+        "githubBranch": {
+            "value": "privatelink"
+        },
+        "sharedKey": {
+            "value": "P@$$w0rd"
+        }
+    }
+}
