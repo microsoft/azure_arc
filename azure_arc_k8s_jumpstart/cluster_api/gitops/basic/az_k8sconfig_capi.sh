@@ -23,6 +23,7 @@ echo "Installing Azure CLI"
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 # Installing required Azure Arc CLI extensions
+# Installing required Azure Arc CLI extensions
 az extension add --name connectedk8s
 az extension add --name k8s-configuration
 

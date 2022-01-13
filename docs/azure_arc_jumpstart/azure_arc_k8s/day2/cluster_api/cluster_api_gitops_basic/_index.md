@@ -1,18 +1,18 @@
 ---
 type: docs
-title: "Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster"
-linkTitle: "Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster"
+title: "Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster (flux v2)"
+linkTitle: "Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster (flux v2)"
 weight: 4
 description: >
 ---
 
-## Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster
+## Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster (flux v2)
 
 The following README will guide you on how to create GitOps configuration on a Cluster API which is projected as an Azure Arc-connected cluster resource.
 
 In this guide, you will deploy & attach GitOps configuration to your cluster which will also include deploying an "Hello World" Azure Arc web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a popular open-source tool set. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories), and automating updates to configuration when there is new code to deploy.
+GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a popular open-source toolset. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy.
 
 > **Note: This guide assumes you already deployed a Cluster API and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using a [Shell script](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/cluster_api/capi_azure/).**
 
@@ -109,11 +109,11 @@ To create the GitOps Configuration, we will use the _k8s-configuration flux crea
 
 ### Cluster-level Config
 
-With Cluster-level GitOps config, the goal is to have an "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Meshes, Security products, Monitoring solutions, etc. A very popular example will also be Ingress Controller which is exactly the nginx-ingress controller we will deploy in the next section.
+With Cluster-level GitOps config, the goal is to have "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Mesh, security products, monitoring solutions, etc. A very popular example will also be ingress controllers, which is exactly the Nginx ingress controller we will deploy in the next section.
 
 ### Namespace-level Config
 
-With Namespace-level GitOps config, the goal is to have Kubernetes resources deployed only in the namespace selected. The most obvious use-case here is simply your application and it's respective pods, services, ingress routes, etc. In the next section will have the "Hello Arc" application deployed on a dedicated namespace.
+With Namespace-level GitOps config, the goal is to have Kubernetes resources deployed only in the namespace selected. The most obvious use-case here is simply your application and its respective pods, services, ingress routes, etc. In the next section, will have the "Hello Arc" application deployed on a dedicated namespace.
 
 - Edit the environment variables [in the script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/gitops/basic/az_k8sconfig_capi.sh) to match your environment parameters followed by running the _`. ./az_k8sconfig_capi.sh`_ command.
 
