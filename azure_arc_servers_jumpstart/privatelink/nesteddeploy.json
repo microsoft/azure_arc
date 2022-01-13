@@ -167,24 +167,9 @@
             "metadata": {
                 "description": "Shared secret key for the vNET-to-vNET connection between Virtual Network Gateways."
             }
-        },
-        "githubAccount": {
-            "type": "string",
-            "defaultValue": "microsoft",
-            "metadata": {
-                "description": "GitHub Account (for testing purposes)"
-            }
-        },
-        "githubBranch": {
-            "type": "string",
-            "defaultValue": "main",
-            "metadata": {
-                "description": "GitHub Branch (for testing purposes)"
-            }
         }
     },
     "variables": {
-        "scenarioUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_servers_jumpstart/privatelink/')]"
     },
     "resources": [
         {
@@ -523,9 +508,6 @@
                     "vmName": {
                         "value": "[parameters('vmName')]"
                     },
-                    "scenarioUrl": {
-                        "value": "[variables('scenarioUrl')]"
-                    },
                     "azureRgName": {
                         "value": "[parameters('azureRgName')]"
                     },
@@ -538,9 +520,6 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "vmName": {
-                            "type": "string"
-                        },
-                        "scenarioUrl": {
                             "type": "string"
                         },
                         "azureRgName": {
@@ -564,7 +543,7 @@
                                 "autoUpgradeMinorVersion": true,
                                 "settings": {
                                     "fileUris": [
-                                        "[uri(parameters('scenarioUrl'), 'artifacts/installArcAgent.ps1')]"
+                                        "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1"
                                     ],
                                     "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File installArcAgent.ps1', ' -Token ', parameters('token'), ' -Location ', resourceGroup().location, ' -SubscriptionId ', subscription().subscriptionId, ' -ResourceGroup ', parameters('azureRgName'))]"
                                 }
