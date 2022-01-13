@@ -126,9 +126,9 @@ workflow ClientTools_01
             Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile "C:\ArcBox\DeploymentStatus.ps1"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
 
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQL.ps1") -OutFile "C:\ArcBox\ArcSQL.ps1"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLIcon.ico") -OutFile "C:\ArcBox\ArcSQLIcon.ico"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile "C:\ArcBox\ArcSQLManualOnboarding.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile "C:\ArcBox\installArcAgentSQLUser.ps1"
 
             # Workbook template
             if ($flavor -eq "ITPro") {
@@ -142,7 +142,7 @@ workflow ClientTools_01
             if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile $Env:ArcBoxDir\ArcServersLogonScript.ps1
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgent.ps1
-                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQL.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentSQL.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLSP.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentSQLSP.ps1
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentUbuntu.sh") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentUbuntu.sh
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentCentOS.sh") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentCentOS.sh
             }
