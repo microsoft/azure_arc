@@ -288,8 +288,8 @@ if(-not $hasPermission) {
     # Replace variables in Arc-enabled SQL onboarding scripts
     $sqlServerName = "ArcBox-SQL"
 
-    (Get-Content -path "$Env:ArcBoxDir\ArcSQL.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<location>',"$env:azureLocation" | Set-Content -Path "$Env:ArcBoxDir\ArcSQL.ps1"
-    (Get-Content -path "$Env:ArcBoxDir\ArcSQLOnboard.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$Env:ArcBoxDir\ArcSQLOnboard.ps1"
+    (Get-Content -path "$Env:ArcBoxDir\installArcAgentSQLUser.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<location>',"$env:azureLocation" | Set-Content -Path "$Env:ArcBoxDir\installArcAgentSQLUser.ps1"
+    (Get-Content -path "$Env:ArcBoxDir\ArcSQLManualOnboarding.ps1" -Raw) -replace '<subscriptionId>',"$env:subscriptionId" -replace '<resourceGroup>',"$env:resourceGroup" -replace '<sqlServerName>',"$sqlServerName" | Set-Content -Path "$Env:ArcBoxDir\ArcSQLManualOnboarding.ps1"
 
     # Set Edge as the Default Browser
     & SetDefaultBrowser.exe HKLM "Microsoft Edge"
