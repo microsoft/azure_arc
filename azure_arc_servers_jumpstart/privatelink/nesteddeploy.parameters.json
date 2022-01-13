@@ -91,12 +91,6 @@
         },
         "NetworkSecurityGroupName": {
             "value": "Arc-Linux-Demo-NSG"
-        },
-        "githubAccount": {
-            "value": "lanicolas"
-        },
-        "githubBranch": {
-            "value": "privatelink"
         }
     }
 }
