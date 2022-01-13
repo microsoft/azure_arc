@@ -2,95 +2,74 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "gatewaySubnetPrefix1": {
-            "value": "192.168.100.16/28"
+        "azureRgName": {
+            "value": "<Cloud¡s resource group name>"
         },
-        "location1": {
-            "value": "northeurope"
+        "onPremRgName": {
+            "value": "<Onpremise resource group name>"
         },
-        "virtualNetworkName1": {
-            "value": "Vnet1"
+        "sqlAdminLogin": {
+            "value": "<SQL admin username>"
         },
-        "gatewayName1": {
-            "value": "Vnet1Gw"
+        "sqlAdminPassword": {
+            "value": "<SQL admin password>"
         },
-        "addressPrefix1": {
-            "value": "192.168.100.0/24"
+        "cloudVNetName": {
+            "value": "<Cloud VNET Name> "
         },
-        "subnet1Name1": {
-            "value": "PLSubnet"
+        "cloudVNetPrefix": {
+            "value": "<Cloud VNET IP CIDR>"
         },
-        "subnet1Prefix1": {
-            "value": "192.168.100.0/28"
+        "cloudSubnetName": {
+            "value": "<Cloud subnet name>"
         },
-        "sqlAdministratorLogin": {
-            "value": "arcdemo"
+        "cloudGatewaySubnetPrefix": {
+            "value": "<Cloud Gw subnet IP CIDR>"
         },
-        "sqlAdministratorLoginPassword": {
-            "value": "ArcPassword123!!"
+        "cloudSubnetPrefix": {
+            "value": "<Cloud subnet IP CIDR>"
         },
-        "azure_rg": {
-            "value": "Arc-Azure-PL-Demo"
-        },
-        "location2": {
-            "value": "westeurope"
-        },
-        "virtualNetworkName2": {
-            "value": "Vnet2"
-        },
-        "gatewayName2": {
-            "value": "Vnet2Gw"
-        },
-        "addressPrefix2": {
-            "value": "192.168.101.0/24"
-        },
-        "subnet1Prefix2": {
-            "value": "192.168.101.0/28"
-        },
-        "gatewaySubnetPrefix2": {
-            "value": "192.168.101.16/28"
-        },
-        "addressPrefixBastion": {
-            "value": "192.168.101.32/28"
-        },
-        "sharedKey": {
-            "value": "ArcPassword123!!"
-        },
-        "vmSize": {
-            "value": "Standard_D4s_v3"
+        "cloudGatewayName": {
+            "value": "<Cloud VPN Gw name>"
         },
         "vmName": {
-            "value": "Arc-Linux-Demo"
+            "value": "<Windows Azure VM Name>"
+        },
+        "vmSize": {
+            "value": "<Windows Azure VM size>"
         },
         "adminUsername": {
-            "value": "arcdemo"
+            "value": "<Azure VM admin username>"
         },
-        "adminPasswordOrKey": {
-            "value": "ArcPassword123!!"
+        "adminPassword": {
+            "value": "<Azure VM admin password>"
         },
-        "subscriptionID": {
-            "value": "5af250db-aef1-46f9-8296-7a373a4b2801"
+        "onPremVNetName": {
+            "value": "<Onpremise VNET Name>"
         },
-        "servicePrincipalClient": {
-            "value": "c4d061d5-a7f5-4eef-8e6f-de5a1e4fe044"
+        "onPremVNetPrefix": {
+            "value": "<Onpremise VNET IP CIDR>"
         },
-        "servicePrincipalClientSecret": {
-            "value": "HTer4U~-DKLW4-VArn5okMw~xjODnn~oce"
+        "onPremGatewaySubnetPrefix": {
+            "value": "<Onpremise GW subnet IP CIDR>"
         },
-        "tenantID": {
-            "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+        "onPremBastionSubnetPrefix": {
+            "value": "<Onpremise Azure Bastion subnet IP CIDR>"
         },
-        "bastionHostName": {
-            "value": "Arc-Bastion"
+        "onPremSubnetName": {
+            "value": "<Onpremise subnet name>"
         },
-        "authenticationType": {
-            "value": "password"
+        "onPremSubnetPrefix": {
+            "value": "<Onpremise subnet IP CIDR>"
         },
-        "ubuntuOSVersion": {
-            "value": "18.04-LTS"
+        "onPremGatewayName": {
+            "value": "<Onpremise VPN Gw name>"
         },
-        "NetworkSecurityGroupName": {
-            "value": "Arc-Linux-Demo-NSG"
+        "onPremBastionName": {
+            "value": "<Onpremise Azure Bastion Name>"
+        },
+        "sharedKey": {
+            "value": "<VPN shared Key>"
         }
     }
 }
