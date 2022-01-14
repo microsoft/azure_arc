@@ -301,7 +301,7 @@ if(-not $hasPermission) {
     $savePasswordRegistryName = 'PasswordManagerEnabled'
     $savePasswordRegistryValue = '0x00000000'
 
-    If (-NOT (Test-Path $edgePolicRegistryPath)) {
+    If (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
         New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
     }
 
