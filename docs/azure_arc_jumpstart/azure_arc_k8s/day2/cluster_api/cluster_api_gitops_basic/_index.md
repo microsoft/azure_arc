@@ -117,7 +117,11 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 - Edit the environment variables [in the script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/gitops/basic/az_k8sconfig_capi.sh) to match your environment parameters followed by running the _`. ./az_k8sconfig_capi.sh`_ command.
 
-    ![Screenshot parameter examples](./05.png)
+    ![Screenshot parameter](./05.png)
+
+    For example:
+
+    ![Screenshot parameter examples](./06.png)
 
     > **Note: The extra dot is due to the shell script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
@@ -133,11 +137,11 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 - Once the script will complete it's run, you will have the GitOps configuration create all the resources deployed in your Kubernetes cluster. Note that it takes a few min for the configuration change status from "Pending" to Install.
 
-    ![Flux extension](./06.png)
-
-    ![New GitOps configuration](./07.png)
+    ![Flux extension](./07.png)
 
     ![New GitOps configuration](./08.png)
+
+    ![New GitOps configuration](./09.png)
 
 ## The "Hello Arc" Application & Components
 
@@ -149,7 +153,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
     kubectl get pods -n flux-system 
     ```
 
-    ![kubectl get pods -n flux-system ](./09.png)
+    ![kubectl get pods -n flux-system ](./10.png)
 
 - Show 3 replicas of the "Hello Arc" application and the NGINX controller.
 
@@ -157,7 +161,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
     kubectl get pods -n hello-arc
     ```
 
-    ![kubectl get pods -n hello-arc](./10.png)
+    ![kubectl get pods -n hello-arc](./11.png)
 
 - Show NGINX controller Kubernetes Service (Type _LoadBalancer_).
 
@@ -165,7 +169,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
     kubectl get svc -n hello-arc
     ```
 
-    ![kubectl get svc -n hello-arc](./11.png)
+    ![kubectl get svc -n hello-arc](./12.png)
 
 - Show NGINX rule which will route the traffic to the "Hello Arc" application from outside the cluster.
 
@@ -173,7 +177,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
     kubectl get ing -n hello-arc
     ```
 
-    ![kubectl get ing -n hello-arc](./12.png)
+    ![kubectl get ing -n hello-arc](./13.png)
 
 - The GitOps flow works as follow:
 
@@ -191,28 +195,28 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
       kubectl get pods -n hello-arc -w
       ```
   
-    ![kubectl get pods -n hello-arc -w](./13.png)
+    ![kubectl get pods -n hello-arc -w](./14.png)
 
-  - In **Your fork** of the "Azure Arc Jumpstart" repository, open the *hello_arc.yaml* file (/azure_arc/tree/main/artifacts/hello-arc/yaml/hello_arc.yaml).
+  - In **Your fork** of the "Azure Arc Jumpstart" repository, open the *hello_arc.yaml* file (/azure_arc/artifacts/hello-arc/yaml/hello_arc.yaml).
 
   - The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n hello-arc``` command.
 
-    ![kubectl get svc -n hello-arc](./14.png)
+    ![kubectl get svc -n hello-arc](./15.png)
 
   - End result should look like that:
 
-    ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./15.png)
+    ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./16.png)
 
 - As mentioned in the prerequisites section, it is optional but highly recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
 
-    ![Tab Auto Refresh](./16.png)
+    ![Tab Auto Refresh](./17.png)
 
 - In the repository window showing the _hello_arc.yaml_ file, change the text under the "MESSAGE" section commit the change. Alternatively, you can open your cloned repository in your IDE, make the change, commit and push it.
 
-    ![Making a change to the replica count and the "MESSAGE" section](./17.png)
-
     ![Making a change to the replica count and the "MESSAGE" section](./18.png)
+
+    ![Making a change to the replica count and the "MESSAGE" section](./19.png)
 
 - Upon committing the changes, notice how the Kubernetes Pod rolling upgrade will start. Once the Pod is up & running, the new "Hello Arc" application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
 
-    ![New side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./19.png)
+    ![New side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./20.png)
