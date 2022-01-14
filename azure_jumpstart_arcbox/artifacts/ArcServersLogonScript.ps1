@@ -295,15 +295,18 @@ if(-not $hasPermission) {
     & SetDefaultBrowser.exe HKLM "Microsoft Edge"
 
     # Disable Edge 'First Run' Setup
-    $registryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
-    $registryName  = 'HideFirstRunExperience'
-    $registryValue = '0x00000001'
+    $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+    $firstRunRegistryName  = 'HideFirstRunExperience'
+    $firstRunRegistryValue = '0x00000001'
+    $savePasswordRegistryName = 'PasswordManagerEnabled'
+    $savePasswordRegistryValue = '0x00000000'
 
-    If (-NOT (Test-Path $registryPath)) {
-        New-Item -Path $registryPath -Force | Out-Null
+    If (-NOT (Test-Path $edgePolicRegistryPath)) {
+        New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
     }
 
-    New-ItemProperty -Path $registryPath -Name $registryName -Value $registryValue -PropertyType DWORD -Force
+    New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
+    New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
 
     # Creating Arc-enabled SQL Server onboarding desktop shortcut
     $sourceFileLocation = "${Env:ArcBoxDir}\ArcSQLManualOnboarding.ps1"
