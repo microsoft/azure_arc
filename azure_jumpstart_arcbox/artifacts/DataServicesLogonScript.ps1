@@ -68,7 +68,16 @@ $connectedClusterName="ArcBox-CAPI-Data"
 az connectedk8s connect --name $connectedClusterName --resource-group $env:resourceGroup --location $env:azureLocation --tags 'Project=jumpstart_arcbox'
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper --version 1.1.18031001
+az k8s-extension create --name arc-data-services `
+                        --extension-type microsoft.arcdataservices `
+                        --cluster-type connectedClusters `
+                        --cluster-name $connectedClusterName `
+                        --resource-group $env:resourceGroup `
+                        --auto-upgrade false `
+                        --scope cluster `
+                        --release-namespace arc `
+                        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper `
+                        --version 1.1.18031001
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
