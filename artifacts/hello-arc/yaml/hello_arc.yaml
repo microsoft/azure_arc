@@ -33,4 +33,4 @@ spec:
         - containerPort: 8080
         env:
         - name: MESSAGE
-          value: Hello Healthcare Industry Hybrid Cloud Partners!
+          value: Azure Arc is Awesome!
