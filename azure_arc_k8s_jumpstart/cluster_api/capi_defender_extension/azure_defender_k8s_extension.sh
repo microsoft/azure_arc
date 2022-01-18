@@ -8,7 +8,7 @@ export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export arcClusterName='<Azure Arc Cluster Name>'
-export k8sExtensionName='<Azure Defender Extension Name' #default: 'microsoft.azuredefender.kubernetes'
+export k8sExtensionName='<Azure Defender Extension Name>' #default: 'microsoft.azuredefender.kubernetes'
 
 # Installing Helm 3
 echo "Installing Helm 3"
