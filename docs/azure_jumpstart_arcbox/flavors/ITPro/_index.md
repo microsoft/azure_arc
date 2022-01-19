@@ -78,30 +78,32 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple RBAC roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
-  - "User Access Administrator" - Required for onboarding the Azure Arc-enabled SQL server resource
   - "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
   - "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
   - "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
+  - **(optional)** "User Access Administrator" - Required for automatically onboarding the Azure Arc-enabled SQL server resource
+
+    > **Note: In the event a Service Principal with Owner cannot be created, the SQL server can be onboarded to Azure Arc post deployment by following the [Azure Arc-enabled SQL Server onboarding](#azure-arc-enabled-sql-server-onboarding) steps below.**
 
     To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
     ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "User Access Administrator"
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "User Access Administrator"
     ```
 
     For example:
 
     ```shell
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "User Access Administrator"
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin"
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader"
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Monitoring Metrics Publisher"
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "User Access Administrator"
     ```
 
     Output should look like this:
