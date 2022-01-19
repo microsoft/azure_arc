@@ -15,17 +15,19 @@ echo $SPN_CLIENT_ID:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $SPN_CLIENT_SECRET:$3 | awk '{print substr($1,2); }' >> vars.sh
 echo $SPN_TENANT_ID:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
-echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
-echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
+echo $resourceGroup:$6 | awk '{print substr($1,2); }' >> vars.sh
+echo $location:$7 | awk '{print substr($1,2); }' >> vars.sh
+echo $stagingStorageAccountName:$8 | awk '{print substr($1,2); }' >> vars.sh
+echo $logAnalyticsWorkspace:$9 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
 sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
 sed -i '5s/^/export SPN_TENANT_ID=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
-sed -i '7s/^/export location=/' vars.sh
-sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
-sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
+sed -i '7s/^/export resourceGroup=/' vars.sh
+sed -i '8s/^/export location=/' vars.sh
+sed -i '9s/^/export stagingStorageAccountName=/' vars.sh
+sed -i '10s/^/export logAnalyticsWorkspace=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
@@ -44,7 +46,7 @@ sudo -u $adminUsername az extension add --name k8s-extension
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
-resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$stagingStorageAccountName']".[resourceGroup] --resource-type "Microsoft.Storage/storageAccounts" -o tsv)
+# resourceGroup=$(sudo -u $adminUsername az resource list --query "[?name=='$stagingStorageAccountName']".[resourceGroup] --resource-type "Microsoft.Storage/storageAccounts" -o tsv)
 az -v
 echo ""
 

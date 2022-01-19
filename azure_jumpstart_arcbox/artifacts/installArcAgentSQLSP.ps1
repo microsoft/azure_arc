@@ -35,6 +35,134 @@ $azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Fo
 $psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
 
+function Get-AzSPNRoleAssignment {
+    param(
+        [Parameter(Mandatory=$false)]
+        [string]$RoleDefinitionName,
+
+        [Parameter(Mandatory=$false)]
+        [string]$ObjectId,
+
+        [Parameter(Mandatory=$false)]
+        [string]$SubscriptionName,
+
+        [Parameter(Mandatory=$false)]
+        [string]$ResourceGroupName
+    )
+
+    if(-not $SubscriptionName) {
+        $SubscriptionName = (Get-AzContext).Subscription.Id
+    }
+
+    if($ResourceGroupName) {
+        try {
+            Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction Stop | Out-Null
+        } catch {
+            throw [System.Exception]::new("Invalid ResourceGroupName", $PSItem.Exception)
+        }
+
+        $scope = "/subscriptions/$SubscriptionName/resourceGroups/$ResourceGroupName"
+    } else {
+        $scope = "/subscriptions/$SubscriptionName"
+    }
+
+    $restResponse = Invoke-AzRestMethod -Path "$scope/providers/Microsoft.Authorization/roleAssignments?api-version=2015-07-01" -Method GET
+
+    if($restResponse.StatusCode -eq 200) {
+        $roleAssignments = ($restResponse.Content | ConvertFrom-Json).value
+    } else {
+        $errorDetails = ($restResponse.Content | ConvertFrom-Json).error
+        throw [System.Exception]::new($errorDetails.code, $errorDetails.message)
+    }
+
+    if($RoleDefinitionName -and $ObjectId) {
+        if($RoleDefinitionName -ne "write") {
+            $roleDefId = @((Get-AzRoleDefinition -Name $RoleDefinitionName).Id)
+        } else {
+            $actionList = @("*", "Microsoft.Authorization/*/Write")
+            $roleDefId = @(Get-AzRoleDefinition | Where-Object { (Compare-Object $actionList $_.Actions -IncludeEqual -ExcludeDifferent) -and -not (Compare-Object $actionList $_.NotActions -IncludeEqual -ExcludeDifferent) } | Select-Object -ExpandProperty Id)
+        }
+
+        $spnRoleAssignments = @($roleAssignments | Where-Object { $_.properties.principalId -eq $ObjectId } | Select-Object -ExpandProperty properties | Where-Object { $roleDefId -contains ($_.roleDefinitionId -replace ".+(?=/)/") })
+    } elseif ($ObjectId) {
+        $spnRoleAssignments = @($roleAssignments | Where-Object { $_.properties.principalId -eq $ObjectId } | Select-Object -ExpandProperty properties)
+    } else {
+        $spnRoleAssignments = @($roleAssignments | Select-Object -ExpandProperty properties)
+    }
+
+    return $spnRoleAssignments
+}
+
+function New-AzSPNRoleAssignment {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$RoleDefinitionName,
+
+        [Parameter(Mandatory=$true)]
+        [string]$ObjectId,
+
+        [Parameter(Mandatory=$false)]
+        [string]$SubscriptionName,
+
+        [Parameter(Mandatory=$false)]
+        [string]$ResourceGroupName
+    )
+    
+    if(-not $SubscriptionName) {
+        $SubscriptionName = (Get-AzContext).Subscription.Id
+    }
+
+    if($ResourceGroupName) {
+        try {
+            Get-AzResourceGroup -Name $ResourceGroupName -ErrorAction Stop | Out-Null
+        } catch {
+            throw [System.Exception]::new("Invalid ResourceGroupName", $PSItem.Exception)
+        }
+
+        $scope = "/subscriptions/$SubscriptionName/resourceGroups/$ResourceGroupName"
+    } else {
+        $scope = "/subscriptions/$SubscriptionName"
+    }
+
+    $roleDefId = (Get-AzRoleDefinition -Name $RoleDefinitionName).Id
+
+    if(-not $roleDefId) {
+        throw [System.Exception]::new("Invalid RoleDefinitionName", "No role definitions were found with those conditions")
+    }
+
+    $payload = @{
+        properties = @{
+            roleDefinitionId = "$scope/providers/Microsoft.Authorization/roleDefinitions/$roleDefId"
+            principalId      = $ObjectId
+            scope            = $scope
+        }
+    }
+
+    $patchParams = @{
+        ResourceProviderName = 'Microsoft.Authorization'
+        ResourceType = 'roleAssignments'
+        ApiVersion = '2015-07-01'
+        Payload = $payload | ConvertTo-Json
+        Method = 'PUT'
+        Name = $(New-Guid).guid
+    }
+
+    if($ResourceGroupName) {
+        $patchParams.Add("ResourceGroupName", $ResourceGroupName)
+    }
+
+    $restResponse = Invoke-AzRestMethod @patchParams
+
+    if($restResponse.StatusCode -eq 201) {
+        return ($result.Content | ConvertFrom-Json | Select-Object -ExpandProperty properties)
+    } elseif ($restResponse.StatusCode -eq 409) {
+        return Get-AzSPNRoleAssignment -ObjectId $ObjectId -RoleDefinitionName $RoleDefinitionName -SubscriptionName $SubscriptionName -ResourceGroupName $ResourceGroupName
+    } else {
+        $errorDetails = ($restResponse.Content | ConvertFrom-Json).error
+        throw [System.Exception]::new($errorDetails.code, $errorDetails.message)
+    }
+}
+
 function Install-PowershellModule() {
     # Ask for user confirmation if running manually
     #
@@ -73,96 +201,6 @@ function Install-PowershellModule() {
     Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force
 }
 
-function registerArcForServers() {
-    # Download the package
-    #
-    $ProgressPreference = "SilentlyContinue"; 
-    Invoke-WebRequest -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi
-    
-    # Install the package
-    #
-    Write-Host "Installing the Azure Arc for Servers package"
-    $params = @("/i", "AzureConnectedMachineAgent.msi", "/l*v", "installationlog.txt", "/qn")
-    
-    $install_success = (Start-Process -FilePath msiexec.exe -ArgumentList $params -Wait -Passthru).ExitCode
-    if ($install_success -ne 0) {
-        Write-Error -Message "Azure Arc for Servers package installation failed."
-        return
-    }
-
-    if ($proxy) {
-        # Set the proxy environment variable. Note that authenticated proxies are not supported for Public Preview.
-        [System.Environment]::SetEnvironmentVariable("https_proxy", $proxy, "Machine")
-        $env:https_proxy = [System.Environment]::GetEnvironmentVariable("https_proxy", "Machine")
-        
-        # The agent service needs to be restarted after the proxy environment variable is set in order for the changes to take effect.
-        Restart-Service -Name himds
-    }
-
-    Write-Host "Connecting Azure Connected Machine Agent"
-    $context = Get-AzContext
-    $params = @("connect", "--resource-group", $resourceGroup, "--location", $location, "--subscription-id", $subId, "--tenant-id", $context.Tenant, "--tags", $resourceTags, "--correlation-id", "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a")
-
-    if ($unattended) {
-        $password = $servicePrincipalSecret
-        if ($servicePrincipalSecret -is [SecureString]) {
-            $cred = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalAppId, $servicePrincipalSecret)
-            $password = $cred.GetNetworkCredential().Password
-        } 
-        $params += "--service-principal-id"
-        $params += $servicePrincipalAppId
-        $params += "--service-principal-secret"
-        $params += $password
-    }
-    elseif (Get-InstalledModule -Name Az.Accounts -MinimumVersion 2.2) {
-        # New versions of Az.Account support getting access tokens
-        #
-        $token = Get-AzAccessToken
-        $params += "--access-token"
-        $params += $token.Token
-    }
-
-    & "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" $params
-
-    if ($LastExitCode -ne 0) {
-        Write-Error -Message "Failure when connecting Azure Connected Machine Agent."
-        return
-    }
-}
-
-function checkResourceCreation($newResource, $instProp, $name) {
-    if ($null -eq $newResource) {
-        Write-Host ("Failed to create resource: {0}" -f $name)
-        return
-    }
-    else {
-        Write-Host ("SQL Server - Azure Arc resource: {0} created" -f $resource_name)
-    }
-    $errors = New-Object System.Collections.ArrayList
-    foreach ($key in $instProp.Keys) {
-        # check that key exists in created resource
-        if (Get-Member -inputobject $newResource.Properties -name $key -Membertype Properties) {
-            $expectedvalue = $instProp[$key]
-            $foundValue = ($newResource.Properties).$key
-            if ($expectedvalue -ne $foundValue) {
-                $errors.Add("Property {0} has value of {1}, but expected {2}" -f $key, $foundValue, $expectedvalue) > $null
-            }
-        }
-        else {
-            $errors.Add("Property {0} expected, but not present in Azure Resource" -f $key) > $null
-        }
-    }
-    if ($errors.Count -ne 0) {
-        Write-Host ("Errors found when creating resource: {0}" -f $newResource.Name)
-        foreach ($e in $errors) {
-            Write-Warning $e
-        }
-    }
-    else {
-        $newResource
-    }
-}
-
 # Confirm that Azure powershell module is installed, and install if not present
 #
 if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
@@ -176,7 +214,6 @@ else
 {
     Write-Verbose "Az already installed. Skipping installation."
 }
-
 
 if (-Not (Get-InstalledModule -Name Az.ConnectedMachine  -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Az.connectedMachine module."
@@ -236,6 +273,18 @@ if (-Not (Set-AzContext -Subscription $subId -ErrorAction SilentlyContinue)) {
     return
 }
 
+$spnObjectId = $(Get-AzADServicePrincipal -ApplicationId $(Get-AzContext).Account.Id).Id
+$roleWritePermissions = Get-AzSPNRoleAssignment -RoleDefinitionName "write" -ObjectId $spnObjectId -ResourceGroupName $resourceGroup
+
+if(!$roleWritePermissions)
+{
+    Write-Warning "User does not have permissions to assign roles. This is pre-requisite to on board SQL Server - Azure Arc resources."
+    return
+}
+
+# Check if machine is registered with Azure Arc for Servers
+# Register machine if necessary
+#
 $arcResource = Get-AzConnectedMachine -ResourceGroupName $resourceGroup -Name $arcMachineName -ErrorAction SilentlyContinue
 
 if ($null -eq $arcResource) {
@@ -264,37 +313,36 @@ Write-Verbose "Getting managed Identity ID of $arcMachineName."
 
 $spID = $arcResource.IdentityPrincipalId
 
-
 if($null -eq $spID) {
     Write-Warning -Message "Failed to get $arcMacineName Identity Id. Please check if Arc machine exist and rerun this step."
     return
 }
 
-$currentRoleAssignment = $null
-$retryCount = 10
+$currentRoleAssignment = Get-AzSPNRoleAssignment -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ObjectId $spID -ResourceGroupName $resourceGroup
+
+$retryCount = 6
 $count = 0
 $waitTimeInSeconds = 10
-# while(!$currentRoleAssignment -and $count -le $retryCount)
-# {
-#     Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
-#     $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
-#     sleep $waitTimeInSeconds
-#     $count++
-# }
-Write-Host "Arc machine managed Identity requires Azure Connected SQL Server Onboarding role. Assigning it now."
-while($count -le $retryCount)
+
+while(!$currentRoleAssignment -and $count -le $retryCount)
 {
-    New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+    Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
+    $currentRoleAssignment = New-AzSPNRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
     Start-Sleep $waitTimeInSeconds
     $count++
 }
 
-Write-Host "`n"
+if(!$currentRoleAssignment)
+{
+    Write-Verbose "Unable to assign Azure Connected SQL Server Onboarding role to Arc managed Identity. Skipping role assignment."
+    return
+}
+
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
-$Settings = '{ "SqlManagement" : { "IsEnabled" : true }}'
+$settings = '{ "SqlManagement" : { "IsEnabled" : true }}'
 
-$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.AzureData" -Settings $Settings -ExtensionType "WindowsAgent.SqlServer" -Tag $resourceTags
+$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.AzureData" -Settings $settings -ExtensionType "WindowsAgent.SqlServer" -Tag $resourceTags
 
 if($result.ProvisioningState -eq "Failed")
 {
@@ -308,20 +356,18 @@ Write-Host "SQL Server - Azure Arc resources should show up in resource group in
 Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
 
 Write-Host "Enabling Log Analytics Solutions"
-$Solutions = "Security", "Updates", "SQLAssessment"
-foreach ($solution in $Solutions) {
+$solutions = "Security", "Updates", "SQLAssessment"
+foreach ($solution in $solutions) {
     Set-AzOperationalInsightsIntelligencePack -ResourceGroupName $resourceGroup -WorkspaceName $workspaceName -IntelligencePackName $solution -Enabled $true -Verbose
 }
 
 # Get the workspace ID and Key
-az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
-$workspaceId = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName --query primarySharedKey -o tsv)
+$workspaceId = $(Get-AzOperationalInsightsWorkspace -Name $workspaceName -ResourceGroupName $resourceGroup).CustomerId.Guid
+$workspaceKey = $(Get-AzOperationalInsightsWorkspaceSharedKey -Name $workspaceName -ResourceGroupName $resourceGroup).PrimarySharedKey
 
 $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
-New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $env:computername -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
-Start-Sleep -Seconds 60
+New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
 
 $nestedWindowsUsername = "Administrator"
 $nestedWindowsPassword = "ArcDemo123!!"
@@ -332,7 +378,7 @@ Expand-Archive "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPa
 $env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
 Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
 $SecureString = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
-Add-SQLAssessmentTask -SQLServerName $env:computername -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
+Add-SQLAssessmentTask -SQLServerName $env:COMPUTERNAME -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
 
 $name = "Recurring HealthService Restart"
 $repeat = (New-TimeSpan -Minutes 10)
