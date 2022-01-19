@@ -174,7 +174,7 @@ resource vmInstallscriptCAPI 'Microsoft.Compute/virtualMachines/extensions@2021-
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
+      commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${resourceGroup().name} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
       fileUris: [
         '${artifactsBaseUrl}artifacts/installCAPI.sh'
       ]
