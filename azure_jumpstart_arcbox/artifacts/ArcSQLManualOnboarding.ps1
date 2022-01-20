@@ -117,6 +117,7 @@ if ((Get-Job -Id $loginJobId -IncludeChildJob | Where-Object {$_.Error} | Select
   throw [System.Exception] "Login Failed!"
 }
 
+Stop-Process -Id $edge.Id
 Write-Host "Login Success!"
 
 # Verify user permissions
