@@ -114,10 +114,11 @@ if ((Get-Job -Id $loginJobId -IncludeChildJob | Where-Object {$_.Error} | Select
   Show-Message 'Arc-enabled SQL Server' $loginFailMsg 'Warning' 'Ok'
   Stop-Transcript
 
+  Stop-Process -Id $edge.Id -ErrorAction SilentlyContinue
   throw [System.Exception] "Login Failed!"
 }
 
-Stop-Process -Id $edge.Id
+Stop-Process -Id $edge.Id -ErrorAction SilentlyContinue
 Write-Host "Login Success!"
 
 # Verify user permissions
