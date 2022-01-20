@@ -224,12 +224,7 @@ $string.split('{')[-1] | Set-Content $CentOSIP
 $CentOSVmIp = Get-Content "$CentOSIP"
 
 # Check if Service Principal has 'write' permissions to target Resource Group
-# $roles = az role definition list --query "[*].{roleName: roleName, actions: permissions[].actions[], notActions: permissions[].notActions[]} | [?contains(actions, '*') || contains(actions, 'Microsoft.Authorization/*')] | [?!contains(notActions, 'Microsoft.Authorization/*/Write')].roleName" | ConvertFrom-Json
-# $spnObjectId = az ad sp show --id $env:spnClientID --query objectId -o tsv
-# $roleWritePermissions = az role assignment list --include-inherited --include-groups --scope "/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}" | ConvertFrom-Json
-# $hasPermission = $roleWritePermissions | Where-Object {($_.principalId -eq $spnObjectId)  -and ($_.roleDefinitionName -in $roles)}
 $requiredActions = @('*', 'Microsoft.Authorization/roleAssignments/write', 'Microsoft.Authorization/*', 'Microsoft.Authorization/*/write')
-# $notActions = @('Microsoft.Authorization/roleAssignments/write', 'Microsoft.Authorization/*', 'Microsoft.Authorization/*/write')
 
 $roleDefinitions = az role definition list --out json | ConvertFrom-Json
 $spnObjectId = az ad sp show --id $env:spnClientID --query objectId -o tsv
