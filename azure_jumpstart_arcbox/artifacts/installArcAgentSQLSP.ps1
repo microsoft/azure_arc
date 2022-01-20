@@ -79,7 +79,7 @@ function Get-AzSPNRoleAssignment {
         if($RoleDefinitionName -ne "write") {
             $roleDefId = @((Get-AzRoleDefinition -Name $RoleDefinitionName).Id)
         } else {
-            $actionList = @("*", "Microsoft.Authorization/*/Write")
+            $actionList = @('*', 'Microsoft.Authorization/roleAssignments/write', 'Microsoft.Authorization/*', 'Microsoft.Authorization/*/write')
             $roleDefId = @(Get-AzRoleDefinition | Where-Object { (Compare-Object $actionList $_.Actions -IncludeEqual -ExcludeDifferent) -and -not (Compare-Object $actionList $_.NotActions -IncludeEqual -ExcludeDifferent) } | Select-Object -ExpandProperty Id)
         }
 
