@@ -14,17 +14,17 @@ The following README will guide you on how to create a Windows Server 2019 VMwar
 
 > **Note: This guide assumes that you have some VMware vSphere familiarity and you have knowledge on how to install Windows Server. It is also does not designed to go over either VMware and/or Windows best-practices.**
 
-* [Download the latest Windows Server ISO file](https://www.microsoft.com/en-us/windows-server/trial)
+- [Download the latest Windows Server ISO file](https://www.microsoft.com/en-us/windows-server/trial)
 
-* VMware vSphere 6.5 and above
+- VMware vSphere 6.5 and above
 
-* Although it can be used locally, for faster deployment, it is recommended to upload the file to a vSphere datastore or to vCenter Content Library.
+- Although it can be used locally, for faster deployment, it is recommended to upload the file to a vSphere datastore or to vCenter Content Library.
 
 ## Creating Windows Server 2019 VM Template
 
 ### Deploying & Installing Windows Server
 
-* Deploy new virtual machine
+- Deploy new virtual machine
 
     ![Create new VMware vSphere VM](./01.png)
 
@@ -38,17 +38,17 @@ The following README will guide you on how to create a Windows Server 2019 VMwar
 
     ![Create new VMware vSphere VM](./06.png)
 
-* Make sure to select *Microsoft Windows Server 2016 or later (64-bit)* as the Guest OS.
+- Make sure to select _Microsoft Windows Server 2016 or later (64-bit)_ as the Guest OS.
 
     ![Windows Server Guest OS](./07.png)
 
-* Point to the Windows Server ISO file location.
+- Point to the Windows Server ISO file location.
 
     ![Create new VMware vSphere VM](./08.png)
 
     ![Create new VMware vSphere VM](./09.png)
 
-* Power-on the VM and start the Windows Server installation.
+- Power-on the VM and start the Windows Server installation.
 
     ![Power-on the VM](./10.png)
 
@@ -68,7 +68,7 @@ The following README will guide you on how to create a Windows Server 2019 VMwar
 
 Before converting the VM to a template, few actions needs to be taken.
 
-* Install VMware Tools & Restart
+- Install VMware Tools & Restart
 
     ![Install VMware Tools](./17.png)
 
@@ -88,25 +88,25 @@ Before converting the VM to a template, few actions needs to be taken.
 
     ![Install VMware Tools](./25.png)
 
-* Perform Windows Updates
+- Perform Windows Updates
 
-* Change PowerShell Execution Policy to "bypass" by running the ```Set-ExecutionPolicy -ExecutionPolicy Bypass``` command in PowerShell (can be later tuned on via Group Policy or a PowerShell script).
+- Change PowerShell Execution Policy to "bypass" by running the ```Set-ExecutionPolicy -ExecutionPolicy Bypass``` command in PowerShell (can be later tuned on via Group Policy or a PowerShell script).
 
-* Allow WinRM communication to the OS buy running the [*allow_winrm*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/vmware/winsrv/terraform/scripts/allow_winrm.ps1) PowerShell script.
+- Allow WinRM communication to the OS buy running the [_allow_winrm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/vmware/winsrv/terraform/scripts/allow_winrm.ps1) PowerShell script.
 
-* None of the below are mandatory but should be considered for a Windows Template:
+- None of the below are mandatory but should be considered for a Windows Template:
 
-  * Disabling User Account Control (can be later tuned on via Group Policy or a PowerShell script)
-  * Turn off Windows Defender FW (can be later tuned on via Group Policy or a PowerShell script)
-  * Disabling Internet Explorer Enhanced Security Configuration (ESC) (can be later tuned on via Group Policy or a PowerShell script)
-  * Enable Remote Desktop
-  * In PowerShell, install [Chocolaty](https://chocolatey.org/install)
+  - Disabling User Account Control (can be later tuned on via Group Policy or a PowerShell script)
+  - Turn off Windows Defender FW (can be later tuned on via Group Policy or a PowerShell script)
+  - Disabling Internet Explorer Enhanced Security Configuration (ESC) (can be later tuned on via Group Policy or a PowerShell script)
+  - Enable Remote Desktop
+  - In PowerShell, install [Chocolaty](https://chocolatey.org/install)
 
     ```powershell
     Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
     ```
 
-  * Install all baseline apps you may want to include in your template.
+  - Install all baseline apps you may want to include in your template.
 
 ### Convert to Template
 

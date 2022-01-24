@@ -14,17 +14,17 @@ The following README will guide you on how to create an Ubuntu Server 18.04 VMwa
 
 > **Note: This guide assumes that you have some VMware vSphere familiarity. It is also does not designed to go over either VMware and/or Ubuntu best-practices.**
 
-* [Download the latest Ubuntu Server 18.04 ISO file](https://releases.ubuntu.com/18.04/)
+- [Download the latest Ubuntu Server 18.04 ISO file](https://releases.ubuntu.com/18.04/)
 
-* VMware vSphere 6.5 and above
+- VMware vSphere 6.5 and above
 
-* Although it can be used locally, for faster deployment, it is recommended to upload the file to a vSphere datastore or to vCenter Content Library.
+- Although it can be used locally, for faster deployment, it is recommended to upload the file to a vSphere datastore or to vCenter Content Library.
 
 ## Creating Ubuntu 18.04 VM Template
 
 ### Deploying & Installing Ubuntu
 
-* Deploy new virtual machine
+- Deploy new virtual machine
 
     ![Create new VMware vSphere VM](./01.png)
 
@@ -38,20 +38,20 @@ The following README will guide you on how to create an Ubuntu Server 18.04 VMwa
 
     ![Create new VMware vSphere VM](./06.png)
 
-* Make sure to select *Ubuntu Linux (64-bit)* as the Guest OS.
+- Make sure to select _Ubuntu Linux (64-bit)_ as the Guest OS.
 
     ![Ubuntu Linux (64-bit) Guest OS](./07.png)
 
-* Point to the Ubuntu Server ISO file location.
+- Point to the Ubuntu Server ISO file location.
 
     ![Create new VMware vSphere VM](./08.png)
 
     ![Create new VMware vSphere VM](./09.png)
 
-* Power-on the VM and start the Ubuntu installation. No specific instructions here but:
+- Power-on the VM and start the Ubuntu installation. No specific instructions here but:
 
-  * (Optional) Consider using static IP
-  * Install OpenSSH server
+  - (Optional) Consider using static IP
+  - Install OpenSSH server
 
     ![Power-on the VM](./10.png)
 
@@ -99,14 +99,14 @@ The following README will guide you on how to create an Ubuntu Server 18.04 VMwa
 
 Before converting the VM to a template, few actions are needed.
 
-* It's better to have your OS packages up-to-date
+- It's better to have your OS packages up-to-date
 
     ```shell
     sudo apt-get update
     sudo apt-get upgrade -y
     ```
 
-* Prevent cloudconfig from preserving the original hostname and reset the hostname
+- Prevent cloudconfig from preserving the original hostname and reset the hostname
 
     ```shell
     sudo sed -i 's/preserve_hostname: false/preserve_hostname: true/g' /etc/cloud/cloud.cfg
@@ -114,13 +114,13 @@ Before converting the VM to a template, few actions are needed.
     sudo hostnamectl set-hostname localhost
     ```
 
-* Remove the current network configuration
+- Remove the current network configuration
 
     ```shell
     sudo rm /etc/netplan/50-cloud-init.yaml
     ```
 
-* Clean shell history and shutdown the VM
+- Clean shell history and shutdown the VM
 
     ```shell
     cat /dev/null > ~/.bash_history && history -c

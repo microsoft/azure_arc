@@ -245,7 +245,7 @@ Open the [data services operations page](https://azurearcjumpstart.io/azure_jump
 
 ### Included tools
 
-The following tools are including on the ArcBox-Client VM.
+The following tools are included on the ArcBox-Client VM.
 
 * Azure Data Studio with Arc and PostgreSQL extensions
 * kubectl, kubectx, helm

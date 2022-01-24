@@ -76,7 +76,7 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
 
 ## Automation Flow
 
-The automation for this scenario include 3 PowerShell scripts executed in the following order:
+The automation for this scenario includes 3 PowerShell scripts executed in the following order:
 
 1. [*ClientTools.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/ClientTools.ps1) - Executed at ARM Template deployment time as a CustomScriptExtension. This script has two main functionalities:
 
