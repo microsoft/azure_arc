@@ -17,7 +17,7 @@ In this guide, you will emulate a hybrid environment connected to Azure over a V
   - "On-premises" resource group: will simulate a private on-premises environment with a Linux virtual machine. This VM does will not have a public IP address assigned to it so [Azure Bastion](https://docs.microsoft.com/en-us/azure/bastion/bastion-overview) is deployed to have access to the operating system. The Linux virtual machine is an Azure Arc-enabled server by installing the Azure Arc-connected machine agent.
   - Azure resource group: in this resource group, you will be deploying all Azure PaaS resources, in this case, [Azure DNS](https://docs.microsoft.com/en-us/azure/dns/dns-overview) and [Azure SQL](https://docs.microsoft.com/en-us/azure/azure-sql/database/sql-database-paas-overview). In order to establish a private connection to these Azure services, Azure Private Link will be deployed as well.
 
-- Both resource groups have their own virtual networks and address spaces, however they are connected via Azure VPN gateways to set up a hybrid private connection.
+- Both resource groups have their own virtual networks and address spaces, however, they are connected via Azure VPN gateways to set up a hybrid private connection.
 
   ![Deployment Overview](./01.png)
 
