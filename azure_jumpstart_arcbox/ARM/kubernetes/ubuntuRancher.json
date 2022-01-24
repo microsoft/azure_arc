@@ -10,35 +10,35 @@
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "ArcBox-Client",
+            "defaultValue": "ArcBox-K3s",
             "metadata": {
-                "description": "The name of your Virtual Machine"
+                "description": "The name of you Virtual Machine"
             }
         },
-        "windowsAdminUsername": {
+        "adminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
             "metadata": {
                 "description": "Username for the Virtual Machine"
             }
         },
-        "windowsAdminPassword": {
+        "sshRSAPublicKey": {
             "type": "securestring",
-            "minLength": 12,
-            "maxLength": 123,
-            "defaultValue": "ArcPassword123!!",
             "metadata": {
-                "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
+                "description": "SSH Key for the Virtual Machine. SSH key is recommended over password"
             }
         },
-        "windowsOSVersion": {
+        "ubuntuOSVersion": {
             "type": "string",
-            "defaultValue": "2022-datacenter-g2",
+            "defaultValue": "18.04-LTS",
+            "allowedValues": [
+                "18.04-LTS"
+            ],
             "metadata": {
-                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
             }
         },
-        "location": {
+        "azureLocation": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
@@ -47,16 +47,16 @@
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_D16s_v3",
+            "defaultValue": "Standard_D4s_v3",
             "metadata": {
                 "description": "The size of the VM"
             }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "ArcBox-Vnet",
+            "defaultValue": "ArcBox-VNet",
             "metadata": {
-                "description": "Name of the VNET"
+                "description": "Name of the VNet"
             }
         },
         "subnetName": {
@@ -68,7 +68,7 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "ArcBox-NSG",
+            "defaultValue": "ArcBox-K3s-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
@@ -82,79 +82,19 @@
         "spnClientId": {
             "type": "string",
             "metadata": {
-                "description": "Client id of the service principal"
+                "description": "Azure service principal client id"
             }
         },
         "spnClientSecret": {
             "type": "securestring",
             "metadata": {
-                "description": "Client secret of the service principal"
+                "description": "Azure service principal client secret"
             }
-        },
-        "spnAuthority": {
-            "type": "string",
-            "defaultValue": "https://login.microsoftonline.com"
         },
         "spnTenantId": {
             "type": "string",
             "metadata": {
-                "description": "Tenant id of the service principal"
-            }
-        },
-        "azdataUsername": {
-            "type": "string",
-            "defaultValue": "arcdemo"
-        },
-        "azdataPassword": {
-            "type": "securestring",
-            "defaultValue": "ArcPassword123!!"
-        },
-        "acceptEula": {
-            "type": "string",
-            "defaultValue": "yes"
-        },
-        "registryUsername": {
-            "type": "string",
-            "defaultValue": "registryUser"
-        },
-        "registryPassword": {
-            "type": "securestring",
-            "defaultValue": "registrySecret"
-        },
-        "arcDcName": {
-            "type": "string",
-            "defaultValue": "arcdatactrl"
-        },
-        "mssqlmiName": {
-            "type": "string",
-            "defaultValue": "arcsqlmidemo"
-        },
-        "postgresName": {
-            "type": "string",
-            "defaultValue": "arcpg",
-            "metadata": {
-                "description": "Name of PostgreSQL server group"
-            }
-        },
-        "postgresWorkerNodeCount": {
-            "type": "int",
-            "defaultValue": 3,
-            "metadata": {
-                "description": "Number of PostgreSQL Hyperscale worker nodes"
-            }
-        },
-        "postgresDatasize": {
-            "type": "int",
-            "defaultValue": 1024,
-            "metadata": {
-                "description": "Size of data volumes in MB"
-            }
-        },
-        "postgresServiceType": {
-            "type": "string",
-            "defaultValue": "LoadBalancer",
-            "metadata": {
-                "description": "Choose how PostgreSQL service is accessed through Kubernetes networking interface"
+                "description": "Azure AD tenant id for your service principal"
             }
         },
         "stagingStorageAccountName": {
@@ -163,16 +103,16 @@
                 "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
             }
         },
-        "workspaceName": {
+        "logAnalyticsWorkspace": {
             "type": "string",
             "metadata": {
-                "description": "Name for the environment Azure Log Analytics workspace"
+                "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
         },
         "templateBaseUrl": {
             "type": "string",
             "metadata": {
-                "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
+                "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template"
             }
         }
     },
@@ -188,7 +128,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-10-01",
             "name": "[variables('networkInterfaceName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
@@ -217,11 +157,11 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-02-01",
             "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('azureLocation')]",
             "properties": {
                 "securityRules": [
                     {
-                        "name": "allow_RDP_3389",
+                        "name": "allow_SSH",
                         "properties": {
                             "priority": 1001,
                             "protocol": "TCP",
@@ -230,7 +170,85 @@
                             "sourceAddressPrefix": "[parameters('myIpAddress')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
-                            "destinationPortRange": "3389"
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_6443",
+                        "properties": {
+                            "priority": 1002,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "6443"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_80",
+                        "properties": {
+                            "priority": 1003,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_8080",
+                        "properties": {
+                            "priority": 1004,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "8080"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_443",
+                        "properties": {
+                            "priority": 1005,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "443"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_kubelet",
+                        "properties": {
+                            "priority": 1006,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "10250"
+                        }
+                    },
+                    {
+                        "name": "allow_traefik_lb_external",
+                        "properties": {
+                            "priority": 1007,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "32323"
                         }
                     }
                 ]
@@ -240,7 +258,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "name": "[variables('publicIpAddressName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('azureLocation')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
                 "publicIPAddressVersion": "IPv4",
@@ -255,14 +273,14 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-03-01",
             "name": "[variables('vmName')]",
-            "location": "[parameters('location')]",
+            "location": "[parameters('azureLocation')]",
             "tags": "[parameters('resourceTags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
+                    "vmSize": "[parameters('VmSize')]"
                 },
                 "storageProfile": {
                     "osDisk": {
@@ -271,13 +289,12 @@
                         "createOption": "fromImage",
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]"
-                        },
-                        "diskSizeGB": 1024
+                        }
                     },
                     "imageReference": {
-                        "publisher": "MicrosoftWindowsServer",
-                        "offer": "WindowsServer",
-                        "sku": "[parameters('windowsOSVersion')]",
+                        "publisher": "Canonical",
+                        "offer": "UbuntuServer",
+                        "sku": "[parameters('ubuntuOSVersion')]",
                         "version": "latest"
                     }
                 },
@@ -290,49 +307,41 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('vmName')]",
-                    "adminUsername": "[parameters('windowsAdminUsername')]",
-                    "adminPassword": "[parameters('windowsAdminPassword')]",
-                    "windowsConfiguration": {
-                        "provisionVMAgent": true,
-                        "enableAutomaticUpdates": false
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('sshRSAPublicKey')]"
+                                }
+                            ]
+                        }
                     }
                 }
             }
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/Bootstrap')]",
+            "name": "[concat(variables('vmName'),'/installscript_k3s')]",
             "apiVersion": "2019-07-01",
-            "location": "[parameters('location')]",
+            "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
-            "tags": {
-                "displayName": "config-choco"
-            },
             "properties": {
-                "publisher": "Microsoft.Compute",
-                "type": "CustomScriptExtension",
-                "typeHandlerVersion": "1.10",
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "fileUris": [
-                        "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
-                    ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -registryUsername ', parameters('registryUsername'), ' -registryPassword ', parameters('registryPassword'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -mssqlmiName ', parameters('mssqlmiName'), ' -POSTGRES_NAME ', parameters('postgresName'), ' -POSTGRES_WORKER_NODE_COUNT ', parameters('postgresWorkerNodeCount'), ' -POSTGRES_DATASIZE ', parameters('postgresDatasize'), ' -POSTGRES_SERVICE_TYPE ', parameters('postgresServiceType'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash installK3s.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspace'))]",
+                    "fileUris": [ "[concat(parameters('templateBaseUrl'), 'artifacts/installK3s.sh')]" ]
                 }
             }
         }
-    ],
-
-    "outputs": {
-        "adminUsername": {
-            "type": "string",
-            "value": "[parameters('windowsAdminUsername')]"
-        },
-        "publicIP": {
-            "type": "string",
-            "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
-        }
-    }
+    ]
 }
