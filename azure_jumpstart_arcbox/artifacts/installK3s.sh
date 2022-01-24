@@ -48,7 +48,7 @@ chown -R $adminUsername /home/${adminUsername}/.kube/
 chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 # Installing Helm 3
-sudo snap install helm --channel=3.6/stable --classic # pinning 3.6 due to breaking changes in aak8s onboarding with 3.7
+sudo snap install helm --classic # pinning 3.6 due to breaking changes in aak8s onboarding with 3.7
 
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
