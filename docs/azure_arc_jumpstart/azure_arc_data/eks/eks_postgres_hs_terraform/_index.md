@@ -38,7 +38,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * [Install AWS IAM Authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -48,34 +48,56 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * [Install Terraform >=1.0](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure service principal (SP)
+* Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
 
-  To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+  * "Contributor" - Required for provisioning Azure resources
+  * "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
+  * "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
+  * "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
 
-  ```shell
-  az login
-  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
-  ```
+    To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
-  For example:
+    ```shell
+    az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher"
+    ```
 
-  ```shell
-  az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
-  ```
+    For example:
 
-  Output should look like this
+    ```shell
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher"
+    ```
 
-  ```json
-  {
-  "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "displayName": "AzureArcData",
-  "name": "http://AzureArcData",
-  "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  }
-  ```
+    Output should look like this:
+
+    ```json
+    {
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "displayName": "AzureArcData",
+    "name": "http://AzureArcData",
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+    ```
 
   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
+
+* Follow the steps [here](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/custom-locations#enable-custom-locations-on-cluster) or run the command below to retrieve your AAD Tenant Specific ObjectID for the "Custom Locations RP" Enterprise Application needed to onboard Custom Locations on EKS:
+  
+  ```shell
+  # Note that the APPLICATION ID: bc313c14-388c-4e7d-a58e-70017303ee3b is constant across all tenants
+  az ad sp show --id 'bc313c14-388c-4e7d-a58e-70017303ee3b' --query objectId -o tsv
+
+  # 51dfe1e8-70c6-4de5-a08e-e18aff23d815 <-- This is the OBJECT ID specific to Microsoft's AAD Tenant
+  # This output will be different for your tenant - use this
+
+  ```
 
 ## Create a new AWS IAM Role & Key
 
@@ -188,6 +210,7 @@ As mentioned, the Terraform plan will deploy an EKS cluster, the Azure Arc Data 
   * *export TF_VAR_SPN_CLIENT_ID*='Your Azure service principal name'
   * *export TF_VAR_SPN_CLIENT_SECRET*='Your Azure service principal password'
   * *export TF_VAR_SPN_TENANT_ID*='Your Azure tenant ID'
+  * *export TF_VAR_CUSTOM_LOCATION_OID*='Your AAD tenant specific Custom Locations RP Object ID'
   * *export TF_VAR_SPN_AUTHORITY*=*https://login.microsoftonline.com* **Do not change**
   * *export TF_VAR_deploy_SQLMI*=*'Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we set to false’
   * *export TF_VAR_deploy_PostgreSQL*=*'Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this scenario we set to true'
@@ -299,8 +322,4 @@ To completely delete the environment, follow the below steps.
 
   ![Delete Elastic Block Stores](./39.png)
 
-## Known Issues
-
-* Webhook pods go into error state, even after Data Controller/SQL MI/Postgres pods are up, caused by a known Helm-related backend issue that is being worked on. These errors can be safely ignored and do not impact the functionality of Azure Arc-enabled data services and the Jumpstart automation.
-
-    ![webhook known issue](https://raw.githubusercontent.com/microsoft/azure_arc/main/docs/known_issues/webhook_issue.png)
+<!-- ## Known Issues -->

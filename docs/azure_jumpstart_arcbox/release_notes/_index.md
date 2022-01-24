@@ -9,6 +9,12 @@ toc_hide: true
 
 Release notes will be released on the first week of each month and will cover the previous month.
 
+## October 2021
+
+* Update required Azure CLI version to 2.25.0 or higher
+* Fix missing dependencies in ARM templates
+* Documentation revisions
+
 ## September 2021
 
 * Switch inbound SQL MI port from 1433 to 11433

@@ -27,7 +27,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Install AWS IAM Authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -129,9 +129,9 @@ The following README will guide you on how to use the provided [Terraform](https
   * Set your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key.
 
       ```shell
-      export AWS_ACCESS_KEY_ID="an access key"
-      export AWS_SECRET_ACCESS_KEY="a secret key"
-      export AWS_DEFAULT_REGION="us-west-2"
+      export TF_VAR_AWS_ACCESS_KEY_ID="an access key"
+      export TF_VAR_AWS_SECRET_ACCESS_KEY="a secret key"
+      export TF_VAR_AWS_DEFAULT_REGION="us-west-2"
       ```
 
 ## Deployment
