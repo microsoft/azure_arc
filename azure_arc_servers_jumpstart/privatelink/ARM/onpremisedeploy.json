@@ -31,16 +31,16 @@
         },
         "onPremVNetName": {
             "type": "string",
-            "defaultValue": "OnPrem-NET",
+            "defaultValue": "OnPrem-VNET",
             "metadata": {
-                "description": "Name of the vNET for the on-premises environment."
+                "description": "Name of the VNET for the on-premises environment."
             }
         },
         "onPremVNetPrefix": {
             "type": "string",
             "defaultValue": "192.168.0.0/24",
             "metadata": {
-                "description": "CIDR prefix for the on-premises vNET."
+                "description": "CIDR prefix for the on-premises VNET."
             }
         },
         "onPremGatewaySubnetPrefix": {
