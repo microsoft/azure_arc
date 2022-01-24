@@ -83,7 +83,7 @@ Once everything is deployed, you will be able to access the Azure SQL private IP
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-1. User is editing the ARM templates parameters file (1-time edit). These parameters values are being used throughout the deployment. Two separate files are provided, one per resource group.
+1. User is editing the ARM templates parameters file (1-time edit). These parameter values are being used throughout the deployment. Two separate files are provided, one per resource group.
 
 2. User creates two resource groups in two different regions:
     - Azure Resource Group
