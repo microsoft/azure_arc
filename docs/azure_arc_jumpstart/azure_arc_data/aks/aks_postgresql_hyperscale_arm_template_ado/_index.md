@@ -24,7 +24,7 @@ By the end of this guide, you will have an Azure DevOps Release pipeline to depl
 
   * (Optional) [Create new Azure DevOps project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops&tabs=preview-page).
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -120,8 +120,6 @@ In this scenario, you will create a new Release pipeline to deploy the environme
   * The deployment ARM template requires you provide parameters values. Click on the _Edit Override template parameters_ to add your parameters values.
 
     ![Screenshot of ARM template config](./11.jpg)
-
-  > **Known issue: Currently, Azure Arc-enabled data services running on AKS with a [Kubernetes version >=1.19.x is not supported](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes#known-issues). This is due to data services cannot be deployed on AKS cluster with availability zones enabled.**
 
   * *clusterName* - AKS cluster name
   * *dnsPrefix* - AKS unique DNS prefix

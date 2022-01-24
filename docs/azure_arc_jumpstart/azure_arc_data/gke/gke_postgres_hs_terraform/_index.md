@@ -56,32 +56,43 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
 
 * [Install Terraform 1.0 or higher](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
-* Create Azure service principal (SP)
+* Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
 
-  To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure CloudShell](https://shell.azure.com/))
+  * "Contributor" - Required for provisioning Azure resources
+  * "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
+  * "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
+  * "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
 
-  ```shell
-  az login
-  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
-  ```
+    To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
-  For example:
+    ```shell
+    az login
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher"
+    ```
 
-  ```shell
-  az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
-  ```
+    For example:
 
-  Output should look like this:
+    ```shell
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader"
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher"
+    ```
 
-  ```json
-  {
-  "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "displayName": "AzureArcData",
-  "name": "http://AzureArcData",
-  "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  }
-  ```
+    Output should look like this:
+
+    ```json
+    {
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "displayName": "AzureArcData",
+    "name": "http://AzureArcData",
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+    ```
 
   > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
@@ -313,8 +324,4 @@ To completely delete the environment, follow the below steps.
 
   ![terraform destroy](./50.png)
 
-## Known Issues
-
-* Webhook pods go into error state, even after Data Controller/SQL MI/Postgres pods are up, caused by a known Helm-related backend issue that is being worked on. These errors can be safely ignored and do not impact the functionality of Azure Arc-enabled data services and the Jumpstart automation.
-
-    ![webhook known issue](https://raw.githubusercontent.com/microsoft/azure_arc/main/docs/known_issues/webhook_issue.png)
+<!-- ## Known Issues -->

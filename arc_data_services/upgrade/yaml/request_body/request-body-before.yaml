@@ -1,0 +1,74 @@
+"extendedLocation": {
+    "name": "/subscriptions/<sub ID>/resourceGroups/<resource group>/providers/microsoft.extendedlocation/customlocations/<custom location>",
+    "type": "CustomLocation"
+  },
+  "location": "<location>"
+  "properties": {
+    "uploadServicePrincipal": {
+      "clientId": "<ID>",
+      "tenantId": "<ID>",
+      "clientSecret": "<secret>",
+      "authority": "https://login.microsoftonline.com"
+    },
+    "logAnalyticsWorkspaceConfig": {
+      "workspaceId": "<ID>",
+      "primaryKey": "<key>"
+    },
+    "infrastructure": "onpremises",
+    "k8sRaw": {
+      "spec": {
+        "credentials": {
+          "controllerAdmin": "<username>",
+          "dockerRegistry": "<registry>", // textbox
+          "domainServiceAccount": "<username>",
+          "serviceAccount": "sa-arc-controller"
+        },
+        "docker": {
+          "imagePullPolicy": "Always",
+          "imageTag": "v1.0.0_2021-07-30",
+          "registry": "<registry>",
+          "repository": "<repository>"
+        },
+        "security": {
+         "allowDumps": false,
+         "allowNodeMetricsCollection": true,
+         "allowPodMetricsCollection": true
+        },
+        "services": [
+          {
+            "name": "controller",
+            "port": 30080,
+            "serviceType": "NodePort" // textbox
+          }
+        ],
+        "settings": {
+          "ElasticSearch": {
+            "vm.max_map_count": "-1"
+          },
+          "azure": {
+            "connectionMode": "direct",
+            "location": "<location>",
+            "resourceGroup": "<resource group>",
+            "subscription": "<sub ID>"
+          },
+          "controller": {
+            "displayName": "<name>",
+            "logs.rotation.days": "7",
+            "logs.rotation.size": "5000"
+          }
+        },
+        "storage": {
+          "data": {
+            "accessMode": "ReadWriteOnce",
+            "className": "local-storage", // textbox 
+            "size": "15Gi"
+          },
+          "logs": {
+            "accessMode": "ReadWriteOnce",
+            "className": "local-storage", // textbox
+            "size": "10Gi"
+          }
+        }
+      }
+    }
+  }
