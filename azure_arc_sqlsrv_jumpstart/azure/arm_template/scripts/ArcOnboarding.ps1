@@ -330,7 +330,7 @@ $WorkspaceName = "log-analytics-" + (Get-Random -Maximum 99999)
 Get-AzResourceGroup -Name $env:resourceGroup -ErrorAction Stop -Verbose
 
 # Create the workspace
-New-AzOperationalInsightsWorkspace -Location $env:location -Name $WorkspaceName -Sku Standard -ResourceGroupName $env:resourceGroup -Verbose
+New-AzOperationalInsightsWorkspace -Location $env:location -Name $WorkspaceName -Sku PerNode -ResourceGroupName $env:resourceGroup -Verbose
 
 Write-Host "Enabling Log Analytics Solutions"
 $Solutions = "Security", "Updates", "SQLAssessment"

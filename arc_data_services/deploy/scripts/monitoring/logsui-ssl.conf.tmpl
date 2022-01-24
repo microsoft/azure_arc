@@ -1,0 +1,27 @@
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+subj = req_subj
+
+[req_subj]
+CN = logsui-svc
+O = logsui-svc
+C = US
+
+[req_distinguished_name]
+C = US
+ST = WI
+L = SomeCity
+O = company
+OU = division
+CN = logsui-svc
+
+[v3_req]
+keyUsage = digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = logsui-external-svc.${NAMESPACE}.svc.cluster.local
+DNS.2 = logsui-svc
