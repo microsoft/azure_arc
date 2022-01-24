@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\Temp\SQLMIEndpoints.log
+Start-Transcript -Path C:\Temp\SQLMIEndpointsLog.log
 
 # Creating SQLMI Endpoints file 
 New-Item -Path "C:\Temp\" -Name "SQLMIEndpoints.txt" -ItemType "file" 
@@ -7,12 +7,15 @@ $Endpoints = "C:\Temp\SQLMIEndpoints.txt"
 # Retrieving SQL MI connection endpoints
 Add-Content $Endpoints "Primary SQL Managed Instance external endpoint:"
 $primaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
-$primaryEndpoint = $primaryEndpoint.Substring(0, $primaryEndpoint.IndexOf(',')) | Add-Content $Endpoints
+$primaryEndpoint = $primaryEndpoint.Substring(0, $primaryEndpoint.IndexOf(',')) + ",11433" | Add-Content $Endpoints
 Add-Content $Endpoints ""
 
-Add-Content $Endpoints "Secondary SQL Managed Instance external endpoint:"
-$secondaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.secondaryEndpoint}'
-$secondaryEndpoint = $secondaryEndpoint.Substring(0, $secondaryEndpoint.IndexOf(',')) | Add-Content $Endpoints
+if ( $env:SQLMIHA -eq $true )
+{
+    Add-Content $Endpoints "Secondary SQL Managed Instance external endpoint:"
+    $secondaryEndpoint = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.secondaryEndpoint}'
+    $secondaryEndpoint = $secondaryEndpoint.Substring(0, $secondaryEndpoint.IndexOf(',')) + ",11433" | Add-Content $Endpoints
+}
 
 # Retrieving SQL MI connection username and password
 Add-Content $Endpoints ""

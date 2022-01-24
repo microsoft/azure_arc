@@ -1,0 +1,79 @@
+{
+  "extendedLocation": {
+    "name": "/subscriptions/<sub ID>/resourceGroups/<resource group>/providers/microsoft.extendedlocation/customlocations/<custom location>",
+    "type": "CustomLocation"
+  },
+  "location": "<location>",
+  "properties": {
+    "metricsDashboardCredential": {
+      "username": "<username>",
+      "password": "<password>"
+    },
+    "logsDashboardCredential": {
+      "username": "<username>",
+      "password": "<password>"
+    },
+    "logAnalyticsWorkspaceConfig": {
+      "workspaceId": "<ID>",
+      "primaryKey": "<key>"
+    },
+    "infrastructure": "onpremises",
+    "k8sRaw": {
+      "spec": {
+        "credentials": {
+          "dockerRegistry": "<registry>",
+          "domainServiceAccount": "<username>",
+          "serviceAccount": "sa-arc-controller"
+        },
+        "docker": {
+          "imagePullPolicy": "Always",
+          "imageTag": "v1.1.0_2021-11-02",
+          "registry": "<registry>",
+          "repository": "<repository>"
+        },
+        "security": {
+          "allowDumps": false,
+          "allowNodeMetricsCollection": true,
+          "allowPodMetricsCollection": true
+        },
+        "services": [
+          {
+            "name": "controller",
+            "port": 30080,
+            "serviceType": "NodePort"
+          }
+        ],
+        "settings": {
+          "ElasticSearch": {
+            "vm.max_map_count": "-1"
+          },
+          "azure": {
+            "connectionMode": "direct",
+            "location": "<location>",
+            "resourceGroup": "<resource group>",
+            "subscription": "<sub ID>",
+            "autoUploadMetrics": "true",
+            "autoUploadLogs": "true"
+          },
+          "controller": {
+            "displayName": "<name>",
+            "logs.rotation.days": "7",
+            "logs.rotation.size": "5000"
+          }
+        },
+        "storage": {
+          "data": {
+            "accessMode": "ReadWriteOnce",
+            "className": "local-storage",
+            "size": "15Gi"
+          },
+          "logs": {
+            "accessMode": "ReadWriteOnce",
+            "className": "local-storage",
+            "size": "10Gi"
+          }
+        }
+      }
+    }
+  }
+}

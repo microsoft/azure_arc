@@ -6,6 +6,7 @@ metadata:
     kubernetes.io/cluster-service: "true"
 provisioner: kubernetes.io/azure-disk
 parameters:
+  kind: Managed
   storageaccounttype: Premium_LRS
   cachingmode: ReadOnly 
 volumeBindingMode: WaitForFirstConsumer
