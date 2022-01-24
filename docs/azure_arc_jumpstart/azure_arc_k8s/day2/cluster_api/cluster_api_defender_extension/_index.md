@@ -107,7 +107,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
 ![Screenshot extension deployment security tab](./04.png)
 
-* Also verify under the Extensions section of the Azure Arc-enabled Kubernetes cluster that the Defender extension is correctly installed.
+* Also verify under the Extensions section of the Azure Arc-enabled Kubernetes cluster that the Microsoft Defender extension is correctly installed.
 
 ![Screenshot extension deployment](./05.png)
 
