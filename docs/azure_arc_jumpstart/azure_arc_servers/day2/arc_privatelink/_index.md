@@ -187,7 +187,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy an AR
 
     ![Resources created on Onpremises's resource group](./03.png)
 
-- Once deployed, connect to the Linux virtual machine using Azure Bastion. Once you login, the *install_arc_agent.sh* script execution will start and will onboard the VM to Azure Arc.
+- Once deployed, connect to the Linux virtual machine using Azure Bastion. Once you log in, the _install_arc_agent.sh_ script execution will start and will onboard the VM to Azure Arc.
 
     ![Connect with Azure Bastion 01](./04.png)
 
