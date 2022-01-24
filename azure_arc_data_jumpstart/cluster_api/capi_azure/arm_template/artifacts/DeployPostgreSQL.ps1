@@ -65,6 +65,11 @@ $pgWorkerPodName = "jumpstartpsw0-0"
 
 Start-Sleep -Seconds 60
 
+# Update Service Port from 5432 to Non-Standard
+$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-pgsql\",\"port\":15432,\"targetPort\":5432}]}}'
+kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
+Start-Sleep -Seconds 60
+
 # Downloading demo database and restoring onto Postgres
 Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
 kubectl exec $pgCoordinatorPodName -n arc -c postgres -- /bin/bash -c "curl -o /tmp/AdventureWorks2019.sql 'https://jumpstart.blob.core.windows.net/jumpstartbaks/AdventureWorks2019.sql?sp=r&st=2021-09-08T21:04:16Z&se=2030-09-09T05:04:16Z&spr=https&sv=2020-08-04&sr=b&sig=MJHGMyjV5Dh5gqyvfuWRSsCb4IMNfjnkM%2B05F%2F3mBm8%3D'" 2>&1 | Out-Null

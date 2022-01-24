@@ -19,7 +19,7 @@ az account set --subscription $subscriptionId
 az config set extension.use_dynamic_install=yes_without_prompt
 
 #Get AKS on Azure Stack HCI cluster credentials
-Get-AksHciCredential -Name $ClusterName -Confirm:$false
+Get-AksHciCredential -Name $clusterName -Confirm:$false
 
 # Create a namespace for your ingress resources
 kubectl create ns cluster-mgmt
@@ -35,12 +35,13 @@ helm repo update
 # Use Helm to deploy an NGINX ingress controller
 helm install nginx ingress-nginx/ingress-nginx -n cluster-mgmt
 
+kubectl create ns hello-arc
+
 az k8s-configuration create `
---name hello-arc `
---cluster-name $clusterName --resource-group $resourceGroup `
---operator-instance-name hello-arc --operator-namespace prod `
---enable-helm-operator `
---helm-operator-params='--set helm.versions=v3' `
+--cluster-name $clusterName `
+--resource-group $resourceGroup `
+--name cluster-config `
+--operator-instance-name cluster-config --operator-namespace cluster-config `
 --repository-url $appClonedRepo `
---scope namespace --cluster-type connectedClusters `
---operator-params="--git-poll-interval 3s --git-readonly --git-path=releases/prod"
+--scope cluster --cluster-type connectedClusters `
+--operator-params="--git-poll-interval 3s --git-readonly"
