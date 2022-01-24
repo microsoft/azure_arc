@@ -20,7 +20,9 @@ param (
     [string]$POSTGRES_SERVICE_TYPE,
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
-    [string]$templateBaseUrl
+    [string]$templateBaseUrl,
+    [string]$flavor,
+    [string]$automationTriggerAtLogon
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -49,19 +51,23 @@ param (
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('flavor', $flavor,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon,[System.EnvironmentVariableTarget]::Machine)
 
-# Create path
-Write-Output "Create ArcBox path"
-$ArcBoxDir = "C:\ArcBox"
-$vmDir = "C:\ArcBox\Virtual Machines"
-$agentScript = "C:\ArcBox\agentScript"
-$tempDir = "C:\Temp"
-New-Item -Path $ArcBoxDir -ItemType directory -Force
-New-Item -Path $vmDir -ItemType directory -Force
-New-Item -Path $tempDir -ItemType directory -Force
-New-Item -Path $agentScript -ItemType directory -Force
+# Creating ArcBox path
+Write-Output "Creating ArcBox path"
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+$Env:ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
+$Env:agentScript = "C:\ArcBox\agentScript"
+$Env:tempDir = "C:\Temp"
+New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxVMDir -ItemType directory -Force
+New-Item -Path $Env:tempDir -ItemType directory -Force
+New-Item -Path $Env:agentScript -ItemType directory -Force
 
-Start-Transcript "C:\ArcBox\Bootstrap.log"
+Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -82,95 +88,117 @@ workflow ClientTools_01
         {
             param(
                 [Parameter (Mandatory = $true)]
-                [string]$templateBaseUrl
+                [string]$templateBaseUrl,
+                [Parameter (Mandatory = $true)]
+                [string]$flavor
             )
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk'
-            #Run commands in parallel.
-            Parallel 
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk,setdefaultbrowser'
+            InlineScript {
+                param (
+                    [string]$chocolateyAppList
+                )
+                if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
                 {
-                    InlineScript {
-                        param (
-                            [string]$chocolateyAppList
-                        )
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
-                        {
-                            try{
-                                choco config get cacheLocation
-                            }catch{
-                                Write-Output "Chocolatey not detected, trying to install now"
-                                iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-                            }
-                        }
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-                            Write-Host "Chocolatey Apps Specified"  
-                            
-                            $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
-                        
-                            foreach ($app in $appsToInstall)
-                            {
-                                Write-Host "Installing $app"
-                                & choco install $app /y -Force| Write-Output
-                            }
-                        }                        
+                    try{
+                        choco config get cacheLocation
+                    }catch{
+                        Write-Output "Chocolatey not detected, trying to install now"
+                        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
                     }
-                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\ArcBox\azuredatastudio.zip"
-                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\ArcBox\AZDataCLI.msi"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\ArcBox\settingsTemplate.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile "C:\ArcBox\ArcServersLogonScript.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "C:\ArcBox\DataServicesLogonScript.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "C:\ArcBox\MonitorWorkbookLogonScript.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgent.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQL.ps1") -OutFile "C:\ArcBox\agentScript\installArcAgentSQL.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.sh") -OutFile "C:\ArcBox\agentScript\installArcAgent.sh"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/capiStorageClass.yaml") -OutFile "C:\ArcBox\capiStorageClass.yaml"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\ArcBox\DeployPostgreSQL.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\ArcBox\DeploySQLMI.ps1"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "C:\ArcBox\dataController.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "C:\ArcBox\dataController.parameters.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\ArcBox\postgreSQL.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\ArcBox\postgreSQL.parameters.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.json") -OutFile "C:\ArcBox\sqlmi.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile "C:\ArcBox\sqlmi.parameters.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\ArcBox\SQLMIEndpoints.ps1"
-                    Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\ArcBox\SqlQueryStress.zip"                    
-                    Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
                 }
-        }
+                if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
+                    Write-Host "Chocolatey Apps Specified"  
+                    
+                    $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+                
+                    foreach ($app in $appsToInstall)
+                    {
+                        Write-Host "Installing $app"
+                        & choco install $app /y -Force| Write-Output
+                    }
+                }                        
+            }
 
-ClientTools_01 -templateBaseUrl $templateBaseUrl | Format-Table
+            # All flavors
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "C:\ArcBox\MonitorWorkbookLogonScript.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile "C:\ArcBox\DeploymentStatus.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
 
-workflow ClientTools_02
-        {
-            #Run commands in parallel.
-            Parallel
-            {
-                InlineScript {
-                    Expand-Archive C:\ArcBox\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    Start-Process msiexec.exe -Wait -ArgumentList '/I C:\ArcBox\AZDataCLI.msi /quiet'
-                }
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLIcon.ico") -OutFile "C:\ArcBox\ArcSQLIcon.ico"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile "C:\ArcBox\ArcSQLManualOnboarding.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile "C:\ArcBox\installArcAgentSQLUser.ps1"
+
+            # Workbook template
+            if ($flavor -eq "ITPro") {
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookITPro.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
+            }
+            else {
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookFull.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
+            }
+
+            # ITPro
+            if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcServersLogonScript.ps1") -OutFile $Env:ArcBoxDir\ArcServersLogonScript.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgent.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgent.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLSP.ps1") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentSQLSP.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentUbuntu.sh") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentUbuntu.sh
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentCentOS.sh") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentCentOS.sh
+            }
+
+            # Developers
+            if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+                Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile $Env:ArcBoxDir\azuredatastudio.zip
+                Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:ArcBoxDir\AZDataCLI.msi
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:ArcBoxDir\settingsTemplate.json
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile $Env:ArcBoxDir\DataServicesLogonScript.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile $Env:ArcBoxDir\DeployPostgreSQL.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile $Env:ArcBoxDir\DeploySQLMI.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile $Env:ArcBoxDir\dataController.json
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:ArcBoxDir\dataController.parameters.json
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile $Env:ArcBoxDir\postgreSQL.json
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile $Env:ArcBoxDir\postgreSQL.parameters.json
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.json") -OutFile $Env:ArcBoxDir\sqlmi.json
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile $Env:ArcBoxDir\sqlmi.parameters.json
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile $Env:ArcBoxDir\SQLMIEndpoints.ps1
+                Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile $Env:ArcBoxDir\SqlQueryStress.zip
             }
         }
-        
-ClientTools_02 | Format-Table 
 
+ClientTools_01 -templateBaseUrl $templateBaseUrl -flavor $flavor | Format-Table
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-# Creating scheduled task for ArcServersLogonScript.ps1
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\ArcServersLogonScript.ps1'
-Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+workflow ClientTools_02
+{
+    InlineScript {
+        Expand-Archive $Env:ArcBoxDir\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
+        Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\AZDataCLI.msi /quiet"
+    }
+}
+        
+if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+    ClientTools_02 | Format-Table 
+}
 
-# Creating scheduled task for DataServicesLogonScript.ps1
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\DataServicesLogonScript.ps1'
-Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
+    # Creating scheduled task for ArcServersLogonScript.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\ArcServersLogonScript.ps1
+    Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+}
+
+if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+    # Creating scheduled task for DataServicesLogonScript.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn 
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
+    Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+}
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\ArcBox\MonitorWorkbookLogonScript.ps1'
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
 Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
