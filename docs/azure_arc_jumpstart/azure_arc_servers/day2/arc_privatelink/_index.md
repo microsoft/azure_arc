@@ -203,7 +203,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy an AR
 
 ## Connectivity test
 
-- Now that all resources are deployed in both resources groups, you can verify that there is a private connection from the Azure Arc-enabled server to the Azure SQL database, this connection will go through the VPN gateways that connect the two VNETs and the traffic will continue over the Microsoft's network to reach the PaaS service on its private IP address since Azure Private link has been enabled.
+- Now that all resources are deployed in both resources groups, you can verify that there is a private connection from the Azure Arc-enabled server to the Azure SQL database, this connection will go through the VPN gateways that connect the two VNETs and the network traffic will continue over the Microsoft's network to reach the PaaS service on its private IP address since Azure Private link has been enabled.
 
 - To perform the test you will need the database's private IP address, navigate to the Azure's resource group in the Azure Portal as described below:
 
