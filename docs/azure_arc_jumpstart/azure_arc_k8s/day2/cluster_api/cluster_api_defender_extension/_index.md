@@ -85,7 +85,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Microsoft Defender for Containers extension on your Azure Arc-enabled Kubernetes cluster.
 
-* Before integrating the cluster with Microsoft Defender for Cloud, click on the "Security (preview)" blade for the connected Arc cluster to show how the cluster is not currently being assessed by Microsoft Defender for Cloud.
+* Before integrating the cluster with Microsoft Defender for Cloud, click on the "Security (preview)" blade for the connected Azure Arc cluster to show how the cluster is not currently being assessed by Microsoft Defender for Cloud.
 
     ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./01.png)
 
