@@ -81,7 +81,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 * User is simulating a security alert on the Kubernetes cluster that will cause Microsoft Defender for Cloud to detect this activity and trigger a security alert.
 
-## Create Defender extensions instance
+## Create Microsoft Defender for Containers extensions instance
 
 To create a new extension Instance, we will use the _k8s-extension create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to deploy the Microsoft Defender for Containers extension on your Azure Arc-enabled Kubernetes cluster.
 
