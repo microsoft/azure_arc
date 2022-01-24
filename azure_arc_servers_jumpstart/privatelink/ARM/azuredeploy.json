@@ -19,7 +19,7 @@
             "type": "string",
             "defaultValue": "Azure-NET",
             "metadata": {
-                "description": "Name of the vNET for the cloud environment."
+                "description": "Name of the VNET for the cloud environment."
             }
         },
         "cloudVNetPrefix": {
