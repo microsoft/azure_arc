@@ -198,6 +198,7 @@ resource "local_file" "azure_arc" {
     spnClientId            = var.SPN_CLIENT_ID
     spnClientSecret        = var.SPN_CLIENT_SECRET
     spnTenantId            = var.SPN_TENANT_ID
+    customLocationOid      = var.CUSTOM_LOCATION_OID
     spnAuthority           = var.SPN_AUTHORITY
     AZDATA_USERNAME        = var.AZDATA_USERNAME
     AZDATA_PASSWORD        = var.AZDATA_PASSWORD
