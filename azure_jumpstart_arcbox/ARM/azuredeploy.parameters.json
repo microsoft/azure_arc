@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sshRSAPublicKey": {
+            "value": "<your RSA public key>"
+        },
+        "spnClientId": {
+            "value": "<your service principal client id>"
+        },
+        "spnClientSecret": {
+            "value": "<your service principal secret>"
+        },
+        "spnTenantId": {
+            "value": "<your spn tenant id>"
+        },
+        "windowsAdminUsername": {
+            "value": "arcdemo"
+        },
+        "windowsAdminPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "myIpAddress": {
+            "value": "<your IP address>"
+        },
+        "logAnalyticsWorkspaceName": {
+            "value": "<your unique Log Analytics workspace name>"
+        },
+        "flavor": {
+            "value": "Full"
+        }
+    }
+}

@@ -4,15 +4,19 @@ param (
     [string]$servicePrincipalTenantId
 )
 
-Start-Transcript -Path C:\Temp\installArcAgentSQL.log
+$ArcBoxLogsDir = "C:\ArcBox\Logs"
+
+Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
+
 $ErrorActionPreference = 'SilentlyContinue'
 
 # These settings will be replaced by the portal when the script is generated
 $subId = $subscriptionId
 $resourceGroup = $myResourceGroup
-$location = $Azurelocation
+$location = $azureLocation
 $proxy=""
 $resourceTags= @{"Project"="jumpstart_arcbox"}
+$arcMachineName = "ArcBox-SQL"
 $workspaceName = $logAnalyticsWorkspaceName
 
 # These optional variables can be replaced with valid service principal details
@@ -25,13 +29,49 @@ $servicePrincipalAppId = $spnClientId
 $servicePrincipalTenantId = $spnTenantId
 $servicePrincipalSecret = $spnClientSecret
 
+$unattended = $servicePrincipalAppId -And $servicePrincipalTenantId -And $servicePrincipalSecret
+
 $azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
 
-# Register-AzResourceProvider -ProviderNamespace Microsoft.AzureData
+function Install-PowershellModule() {
+    # Ask for user confirmation if running manually
+    #
+    if ( ! $unattended) {
+        $title = 'Confirm Dependency Installation'
+        $question = 'The Azure PowerShell Module is required in order to register SQL Server - Azure Arc resources. Would you like to install it now?'
+        $choices = '&Yes', '&No'
 
-$unattended = $servicePrincipalAppId -And $servicePrincipalTenantId -And $servicePrincipalSecret
+        $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+        if ($decision -eq 1) {
+            Write-Warning "Azure module install declined."
+            return
+        }
+    }
+    # Check if requirements are met for Powershell module install
+    #
+    $version = $PSVersionTable.PSVersion
+    if ([version]$version -lt [version]"5.1") {
+        Write-Warning -Category NotInstalled -Message "Could not install Az module: Az module requires Powershell version 5.1.* or above."
+        return
+    }
+    if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
+        if ([version]$version -lt [version]"6.2.4") {
+            Write-Warning -Category NotInstalled -Message ("Could not install Az module: Powershell $version does not support having both the AzureRM and Az modules installed. " +
+                "If you need to keep AzureRM available on your system, install the Az module for PowerShell 6.2.4 or later. " +
+                "For more information, see: https://docs.microsoft.com/en-us/powershell/azure/migrate-from-azurerm-to-az")
+            return
+        }
+
+        Write-Warning -Message "The Az module will be installed alongside the existing AzureRM module."
+    }
+
+    Write-Verbose "Installing Az module for PowerShell"
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+    Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force
+}
 
 function registerArcForServers() {
     # Download the package
@@ -123,58 +163,48 @@ function checkResourceCreation($newResource, $instProp, $name) {
     }
 }
 
-function installPowershellModule() {
-    # Ask for user confirmation if running manually
-    #
-    if ( ! $unattended) {
-        $title = 'Confirm Dependency Installation'
-        $question = 'The Azure PowerShell Module is required in order to register SQL Server - Azure Arc resources. Would you like to install it now?'
-        $choices = '&Yes', '&No'
-
-        $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
-        if ($decision -eq 1) {
-            Write-Warning "Azure module install declined."
-            return
-        }
-    }
-    # Check if requirements are met for Powershell module install
-    #
-    $version = $PSVersionTable.PSVersion
-    if ([version]$version -lt [version]"5.1") {
-        Write-Error "Could not install Az module: Az module requires Powershell version 5.1.* or above."
-        return
-    }
-    if ($PSVersionTable.PSEdition -eq 'Desktop' -and (Get-Module -Name AzureRM -ListAvailable)) {
-        if ([version]$version -lt [version]"6.2.4") {
-            Write-Error -Message ("Could not install Az module: Powershell $version does not support having both the AzureRM and Az modules installed. " + 
-                "If you need to keep AzureRM available on your system, install the Az module for PowerShell 6.2.4 or later. " +
-                "For more information, see: https://docs.microsoft.com/en-us/powershell/azure/migrate-from-azurerm-to-az")
-            return
-        }
-            
-        Write-Warning -Message "The Az module will be installed alongside the existing AzureRM module."
-    }
-
-    Write-Host "Installing Az module for PowerShell"
-    Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force
-}
-
 # Confirm that Azure powershell module is installed, and install if not present
 #
-if (-Not (Get-Module -ListAvailable -Name Az.Resources, Az.Accounts -ErrorAction SilentlyContinue)) {
-    installPowershellModule
-    if (-Not (Get-Module -ListAvailable -Name Az.Resources, Az.Accounts)) {
-        Write-Error -Category NotInstalled -Message "Failed to install Azure Powershell Module. Please confirm that Az module is installed before continuing."
+if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
+    Install-PowershellModule
+    if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
+        Write-Warning -Category NotInstalled -Message "Failed to install Azure Powershell Module. Please confirm that Az module is installed before continuing."
         return
     }
+}
+else
+{
+    Write-Verbose "Az already installed. Skipping installation."
+}
+
+
+if (-Not (Get-InstalledModule -Name Az.ConnectedMachine  -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing Az.connectedMachine module."
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Find-Module -Name Az.ConnectedMachine | Install-Module  -Force
+}
+else
+{
+    Write-Verbose "Az.ConnectedMachine already installed. Skipping installation."
+}
+
+if (-Not (Get-InstalledModule -Name Az.Resources  -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing Az.Resources module."
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Find-Module -Name Az.Resources | Install-Module  -Force
+}
+else
+{
+    Write-Verbose "Az.Resources already installed. Skipping installation."
 }
 
 # For manual Azure Arc registration, an access token prevents a duplicate Azure login
 # Getting an access token is only supported in Az.Accounts 2.2 or up
 #
-if (-Not (Get-InstalledModule -Name Az.Accounts -MinimumVersion 2.2) -and -Not $unattended) {
-    Write-Warning "For the best user experience, we recommend updating the Az.Accounts module"
-    Update-Module -Name Az.Accounts -Confirm
+if (-Not (Get-InstalledModule -Name Az.Accounts -MinimumVersion 2.2  -ErrorAction SilentlyContinue) -and -Not $unattended) {
+    Write-Warning "For the best user experience, we recommend updating the Az.Accounts module. Please confirm installation."
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Install-Module -Name Az.Accounts -MinimumVersion 2.2 -Confirm -Force
 }
 
 # Confirm that user is signed in to Azure powershell module
@@ -186,171 +216,93 @@ if (!$context) {
         if ($servicePrincipalSecret -is [String]) {
             Write-Warning -Message "Saving a plaintext password presents a security risk. Consider storing your password in a secure file."
             $securePassword = ConvertTo-SecureString -String $servicePrincipalSecret -AsPlainText -Force
-        } 
+        }
         $pscredential = New-Object -TypeName System.Management.Automation.PSCredential($servicePrincipalAppId, $securePassword)
         Connect-AzAccount -ServicePrincipal -Credential $pscredential -Tenant $servicePrincipalTenantId
     }
     else {
+        Write-Host "Please connect your Azure account."
         Connect-AzAccount -UseDeviceAuthentication
     }
     $context = Get-AzContext
     if (!$context) {
-        Write-Error -Category AuthenticationError -Message "Please connect your Azure account with `"Connect-AzAccount`" before continuing."
-            return
-       }
+        Write-Warning -Category AuthenticationError -Message "Please connect your Azure account with `"Connect-AzAccount`" before continuing."
+        return
+    }
 }
-Set-AzContext -Subscription $subId
 
-# Check if machine is registered with Azure Arc for Servers
-# Register machine if necessary
-#
-$arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
+if (-Not (Set-AzContext -Subscription $subId -ErrorAction SilentlyContinue)) {
+    Write-Warning "Unable to set context to $subId. It is possible that given subscription not found in logged in context."
+    return
+}
+
+$arcResource = Get-AzConnectedMachine -ResourceGroupName $resourceGroup -Name $arcMachineName -ErrorAction SilentlyContinue
+
 if ($null -eq $arcResource) {
     Write-Host "Arc for Servers resource not found. Registering the current machine now."
-
-    registerArcForServers
-
-    $timeout = New-TimeSpan -Seconds 30
-    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-    do {
-        $arcResource = Get-AzResource -ResourceType Microsoft.HybridCompute/machines -Name $env:computername
-        start-sleep -seconds 10
-    } while ($null -eq $arcResource -and $stopwatch.elapsed -lt $timeout)
-
-    if ($null -eq $arcResource) {
-        Write-Error -Message "Failed to find Arc for Servers resource, registration failed."
-        return
+    $params = @{
+        ResourceGroupName=$resourceGroup
+        Name=$arcMachineName
+        Location=$location
     }
+    if ($proxy) {
+        $params['Proxy'] = $proxy
+    }
+
+    Connect-AzConnectedMachine @params -ErrorAction SilentlyContinue
 }
 
-# Iterate over SQL Instances
-if (Test-Path 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server') {
-    $inst = (get-itemproperty 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server').InstalledInstances
-    if ($inst.Count -eq 0) {
-        Write-Error -Category NotInstalled -Message "SQL Server is not installed on this machine."
-        return
-    }
-    foreach ($i in $inst) {
-        # Read registry data
-        #
-        $p = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL').$i
-        $setupValues = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\$p\Setup")
-        $instEdition = ($setupValues.Edition -split ' ')[0]
-        $portInfo = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\$p\MSSQLServer\SuperSocketNetLib\Tcp\IPAll")
-        $currentVersion = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\$p\MSSQLServer\CurrentVersion")
+$arcResource = Get-AzConnectedMachine -ResourceGroupName $resourceGroup -Name $arcMachineName -ErrorAction SilentlyContinue
 
-        switch -wildcard ($setupValues.Version) {
-            "15*" { $versionname = "SQL Server 2019"; }
-            "14*" { $versionname = "SQL Server 2017"; }
-            "13*" { $versionname = "SQL Server 2016"; }
-            "12*" { $versionname = "SQL Server 2014"; }
-            "11*" { $versionname = "SQL Server 2012"; }
-            "10.5*" { $versionname = "SQL Server 2008 R2"; }
-            "10.4*" { $versionname = "SQL Server 2008"; }
-            "10.3*" { $versionname = "SQL Server 2008"; }
-            "10.2*" { $versionname = "SQL Server 2008"; }
-            "10.1*" { $versionname = "SQL Server 2008"; }
-            "10.0*" { $versionname = "SQL Server 2008"; }
-            "9*" { $versionname = "SQL Server 2005"; }
-            "8*" { $versionname = "SQL Server 2000"; }
-            default { $versionname = $setupValues.Version; }
-    }
-
-        # Populate instance properties
-        #
-    $instProp = @{
-        version             = $versionname
-            edition             = $instEdition
-            containerResourceId = $arcResource.ResourceId
-            status              = 'Connected'
-            patchLevel          = $setupValues.PatchLevel
-            instanceName        = $i
-            collation           = $setupValues.Collation
-            currentVersion      = $currentVersion.CurrentVersion
-    }
-    if ($null -ne $setupValues.ProductID) {
-        $instProp["productId"] = $setupValues.ProductID
-    }
-    if ("" -ne $portInfo.TcpPort) {
-        $instProp["tcpStaticPorts"] = $portInfo.TcpPort
-    }
-    if ("" -ne $portInfo.TcpDynamicPorts) {
-        $instProp["tcpDynamicPorts"] = $portInfo.TcpDynamicPorts
-    }
-            
-        # Locate the error log
-        # Retry finding the error log for up to3 seconds, in case the error log is unavailable
-        #
-    $errorLogPath = (Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\$p\Setup").SQLPath
-
-    $timeout = New-TimeSpan -Seconds 3
-    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-    do {
-        $metadata_files = Select-String -Path "$errorLogPath\Log\ERRORLOG*" -Pattern "SQL Server is starting" -List
-    } while ($metadata_files.count -eq 0 -and $stopwatch.elapsed -lt $timeout)
-
-    if ($metadata_files.count -gt 0) {
-        $error_log = ($metadata_files | ForEach-Object -Process { Get-item $_.Path } | Sort-Object LastWriteTime -Descending)[0]
-        $licensing_info_line = Select-String -Path $error_log.FullName -Pattern "SQL Server licensing" -List
-
-        if ( $null -ne $licensing_info_line ) {
-
-            ((Select-String -Path $error_log.FullName -Pattern "SQL Server licensing" -List).Line -split ';')[1] -match "(?<vCores>\d)"
-
-            if ($Matches.ContainsKey("vCores")) {
-                $instProp.Add("vCore", $Matches.vCores)
-            }
-        }
-    }
-        else {
-        Write-Warning -Message "Could not locate SQL Server startup errorlog at $errorLogPath\Log. The vCore property will not be present in the registered resource."
-    }
-
-    $resource_name = hostname
-    if ($i -ne "MSSQLSERVER") {
-        $resource_name = '{0}_{1}' -f $env:computername, $i
-    }
-
-        # Create resource
-        #
-    $newResource = New-AzResource -Location $location -Properties $instProp -ResourceName $resource_name -Tags $resourceTags -ResourceType Microsoft.AzureArcData/sqlServerInstances -ResourceGroupName $resourceGroup -Force
-    checkResourceCreation -newResource $newResource -instProp $instProp -name $resource_name
-}
-}
-else {
-    Write-Error -Category NotInstalled -Message "SQL Server is not installed on this machine."
+if (!$arcResource) {
+    Write-Warning -Message "Failed to register machine with Azure Arc for Servers. Exiting."
+    return
 }
 
-az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
-New-ItemProperty "HKLM:\SOFTWARE\Microsoft\Fusion" -Name "EnableLog" -Value 1 -PropertyType "DWord"
+Start-Sleep -Seconds 60
+Write-Verbose "Getting managed Identity ID of $arcMachineName."
 
-If(-not(Get-InstalledModule SQLServer -ErrorAction silentlycontinue)){
-    Install-Module SQLServer -Confirm:$False -Force
+$spID = $arcResource.IdentityPrincipalId
+
+
+if($null -eq $spID) {
+    Write-Warning -Message "Failed to get $arcMacineName Identity Id. Please check if Arc machine exist and rerun this step."
+    return
 }
 
-Write-Host "Enable SQL TCP"
-$env:PSModulePath = $env:PSModulePath + ";C:\Program Files (x86)\Microsoft SQL Server\150\Tools\PowerShell\Modules"
-Import-Module -Name "sqlps"
-$smo = 'Microsoft.SqlServer.Management.Smo.'  
-$wmi = new-object ($smo + 'Wmi.ManagedComputer').  
-# List the object properties, including the instance names.  
-$Wmi
+$currentRoleAssignment = $null
+$retryCount = 10
+$count = 0
+$waitTimeInSeconds = 10
+# while(!$currentRoleAssignment -and $count -le $retryCount)
+# {
+#     Write-Host "Arc machine managed Identity does not have Azure Connected SQL Server Onboarding role. Assigning it now."
+#     $currentRoleAssignment = New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+#     sleep $waitTimeInSeconds
+#     $count++
+# }
+Write-Host "Arc machine managed Identity requires Azure Connected SQL Server Onboarding role. Assigning it now."
+while($count -le $retryCount)
+{
+    New-AzRoleAssignment -ObjectId $spID -RoleDefinitionName "Azure Connected SQL Server Onboarding" -ResourceGroupName $resourceGroup -ErrorAction SilentlyContinue
+    Start-Sleep $waitTimeInSeconds
+    $count++
+}
 
-# Enable the TCP protocol on the default instance.  
-$uri = "ManagedComputer[@Name='" + (get-item env:\computername).Value + "']/ServerInstance[@Name='MSSQLSERVER']/ServerProtocol[@Name='Tcp']" 
-$Tcp = $wmi.GetSmoObject($uri)  
-$Tcp.IsEnabled = $true  
-$Tcp.Alter()  
-$Tcp
+Write-Host "`n"
+Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
-# Enable the named pipes protocol for the default instance.  
-$uri = "ManagedComputer[@Name='" + (get-item env:\computername).Value + "']/ServerInstance[@Name='MSSQLSERVER']/ServerProtocol[@Name='Np']"  
-$Np = $wmi.GetSmoObject($uri)  
-$Np.IsEnabled = $true  
-$Np.Alter()  
-$Np
+$Settings = '{ "SqlManagement" : { "IsEnabled" : true }}'
 
-Restart-Service -Name 'MSSQLSERVER' -Force
+$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.AzureData" -Settings $Settings -ExtensionType "WindowsAgent.SqlServer" -Tag $resourceTags
+
+if($result.ProvisioningState -eq "Failed")
+{
+    Write-Warning "Extension Installation Failed. Arc enabled SQL server instances will not be created. Please find more information below."
+    $result
+}
+
+Write-Host "SQL Server - Azure Arc resources should show up in resource group in less than 1 minute."
 
 # Get the resource group
 Get-AzResourceGroup -Name $resourceGroup -ErrorAction Stop -Verbose
@@ -362,12 +314,14 @@ foreach ($solution in $Solutions) {
 }
 
 # Get the workspace ID and Key
+az login --service-principal --username $servicePrincipalAppId --password $servicePrincipalSecret --tenant $servicePrincipalTenantId
 $workspaceId = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName --query primarySharedKey -o tsv)
 
 $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
 New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $env:computername -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -TypeHandlerVersion "1.0.18040.2" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
+Start-Sleep -Seconds 60
 
 $nestedWindowsUsername = "Administrator"
 $nestedWindowsPassword = "ArcDemo123!!"

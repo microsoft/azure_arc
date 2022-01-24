@@ -1,0 +1,7 @@
+To upload the log bundle zip file for support review, use the below command:
+
+azcopy copy "C:\ArcBox\Logs\<Logs Bundle zip file name>.zip" "https://jumpstartsupport.file.core.windows.net/supportlogs/logbundles/?sv=2020-08-04&ss=f&srt=o&sp=rw&se=2022-01-03T22:22:36Z&st=2022-01-03T14:22:36Z&spr=https&sig=2tBLlg9D%2BxEChrbdlkXqLIdn4rRNCf37mB%2FSsU5eJDM%3D" --recursive
+
+For example:
+
+azcopy copy "C:\ArcBox\Logs\LogsBundle-kavpug.zip" "https://jumpstartsupport.file.core.windows.net/supportlogs/logbundles/?sv=2020-08-04&ss=f&srt=o&sp=rw&se=2022-01-03T22:22:36Z&st=2022-01-03T14:22:36Z&spr=https&sig=2tBLlg9D%2BxEChrbdlkXqLIdn4rRNCf37mB%2FSsU5eJDM%3D" --recursive
