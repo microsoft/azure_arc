@@ -3,7 +3,7 @@ kind: ServiceAccount
 metadata:
   name: sa-arc-controller
 ---
-apiVersion: arcdata.microsoft.com/v1
+apiVersion: arcdata.microsoft.com/v2
 kind: DataController
 metadata:
   generation: 1
@@ -15,7 +15,7 @@ spec:
     serviceAccount: sa-arc-controller
   docker:
     imagePullPolicy: Always
-    imageTag: v1.0.0_2021-07-30
+    imageTag: v1.2.0_2021-12-15
     registry: mcr.microsoft.com
     repository: arcdata
   infrastructure: other #Must be a value in the array [alibaba, aws, azure, gcp, onpremises, other]
