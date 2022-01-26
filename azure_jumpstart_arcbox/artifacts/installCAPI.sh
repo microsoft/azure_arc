@@ -8,6 +8,9 @@ sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/s
 sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
+# Creating login welcome message
+sudo curl -o /etc/profile.d/welcomeCAPI.sh https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/welcomeCAPI.sh
+
 # Injecting environment variables
 echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
