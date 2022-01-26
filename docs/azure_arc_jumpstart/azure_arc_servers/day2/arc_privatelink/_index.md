@@ -24,6 +24,7 @@ In this guide, you will emulate a hybrid environment connected to Azure over a V
 Once everything is deployed, you will be able to access the Azure SQL private IP address from the "on-premises" Windows machine while network traffic will go over the VPN connection and be kept within the Azure VNET via Private Link to access the database service.
 
   > **Note: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
+  > **Note: The below scenario assumes the on-premises VM has outbound internet connectivity for the deployment of the Azure Arc connected machine agent, for internet disconnected environments you will need to adjust the automation to retrieve the agent's software from locally accessible storage**
 
 ## Prerequisites
 
