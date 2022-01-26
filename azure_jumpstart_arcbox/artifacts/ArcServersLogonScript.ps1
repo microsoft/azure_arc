@@ -127,8 +127,8 @@ New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.
 Write-Output "Enable Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
-$sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
-$sas = "?sv=2020-08-04&ss=bfqt&srt=sco&sp=rltfx&se=2023-08-01T21:00:19Z&st=2021-08-03T13:00:19Z&spr=https&sig=rNETdxn1Zvm4IA7NT4bEY%2BDQwp0TQPX0GYTB5AECAgY%3D"
+$sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
+$sas = "?sp=r&st=2022-01-26T15:15:45Z&se=2025-01-26T23:15:45Z&spr=https&sv=2020-08-04&sr=c&sig=FaxHTTvWZwwnO8xE%2FluiitKADUTCnO6EY3TwBsQ7ZG4%3D"
 $Env:AZCOPY_BUFFER_GB=4
 if ($env:flavor -eq "Full") {
     # The "Full" ArcBox flavor has an azcopy network throughput capping
