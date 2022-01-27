@@ -17,21 +17,11 @@ As part of ArcBox, an Azure Monitor workbook is deployed to provide a single pan
 
 The Jumpstart ArcBox workbook is automatically deployed for you as part of ArcBox's advanced automation. To access the Jumpstart ArcBox workbook use the Azure portal to follow the next steps.
 
-- Navigate to your ArcBox resource group and search for your Log Analytics workspace, you can do so by using the filter "Type" and searching for "Log Analytics workspace".
+- From the ArcBox resource group, select the Azure Workbook, then click "Open Workbook"
 
-![Search Log Analytics workspace](./search_workspace.png)
+![Workbook Gallery](./azure_workbook.png)
 
-- After you apply the filter in the ArcBox resource group you will get the Log Analytics workspace resource.
-
-![Log Analytics workspace in resource group](./workspace_in_rg.png)
-
-- Access the Log Analytics workspace by clicking on its name and under "General" select "Workbooks".
-
-![General workbooks](./general_workbooks.png)
-
-- In the Workbooks Gallery select the "ArcBox Workbook".
-
-![Workbook Gallery](./workbooks_access.png)
+![Workbook Gallery](./open_workbook.png)
 
 - The Jumpstart ArcBox Workbook will be displayed.
 
