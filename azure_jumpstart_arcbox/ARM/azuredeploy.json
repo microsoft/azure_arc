@@ -51,15 +51,23 @@
       "metadata": {
         "description": "Name for your log analytics workspace"
       }
+    },
+    "flavor": {
+      "type": "string",
+      "metadata": {
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+      },
+      "allowedValues": [ "Full", "ITPro" ],
+      "defaultValue": "Full"
     }
   },
   "variables": {
     "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/",
-    "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuRancher.json')]",
-    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'kubernetes/ubuntuCapi.json')]",
-    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm/clientVm.json')]",
-    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'mgmt/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmt/mgmtStagingStorage.json')]"
+    "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuRancher.json')]",
+    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
+    "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]"
   },
   "resources": [
     {
@@ -67,6 +75,7 @@
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
+      "condition": "[equals(parameters('flavor'),'Full')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -92,6 +101,9 @@
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
+          "logAnalyticsWorkspace": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },          
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           }
@@ -103,6 +115,7 @@
       "apiVersion": "2019-10-01",
       "name": "ubuntuRancherDeployment",
       "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
+      "condition": "[equals(parameters('flavor'),'Full')]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -130,7 +143,7 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },   
+          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           }
@@ -141,7 +154,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "ubuntuRancherDeployment" ],
+      "dependsOn": [ "mgmtArtifactsAndPolicyDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -169,12 +182,15 @@
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },          
+          },
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
           }
         }
       }
@@ -207,6 +223,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
           }
         }
       }
