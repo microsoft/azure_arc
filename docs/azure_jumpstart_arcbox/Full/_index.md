@@ -37,7 +37,7 @@ ArcBox deploys one single-node Rancher K3s cluster running on an Azure virtual m
 
 ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster with the Azure CAPZ provider, and a workload cluster is deployed onto the management cluster. The Azure Arc-enabled data services and data controller are deployed onto this workload cluster via a PowerShell script that runs when first logging into _ArcBox-Client_ virtual machine.
 
-<img src="./dataservices2.png" width="250" alt="Data services diagram">
+<img src="./dataservices2.png" width="400" alt="Data services diagram">
 
 ### Hybrid Unified Operations
 
