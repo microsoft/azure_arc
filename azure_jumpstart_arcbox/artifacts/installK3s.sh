@@ -9,7 +9,7 @@ sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --d
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 # Creating login welcome message
-sudo curl -o /etc/profile.d/welcomeK3s.sh https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_flavors/azure_jumpstart_arcbox/artifacts/welcomeK3s.sh
+sudo curl -o /etc/profile.d/welcomeK3s.sh https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/welcomeK3s.sh
 
 # Injecting environment variables
 echo '#!/bin/bash' >> vars.sh
