@@ -79,7 +79,7 @@ az k8s-extension create --name arc-data-services `
                         --auto-upgrade false `
                         --scope cluster `
                         --release-namespace arc `
-                        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper `
+                        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
                         
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
