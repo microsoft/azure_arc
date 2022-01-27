@@ -128,7 +128,7 @@ Write-Output "Enable Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
 $sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
-$sas = "?sp=r&st=2022-01-26T15:15:45Z&se=2025-01-26T23:15:45Z&spr=https&sv=2020-08-04&sr=c&sig=FaxHTTvWZwwnO8xE%2FluiitKADUTCnO6EY3TwBsQ7ZG4%3D"
+$sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
 $Env:AZCOPY_BUFFER_GB=4
 if ($env:flavor -eq "Full") {
     # The "Full" ArcBox flavor has an azcopy network throughput capping
