@@ -51,7 +51,7 @@ When you click 'OK', you will be redirected to the Micorsoft Device Authenticati
 To continue, you must be an Owner or User Access Administrator at the Subscription or Resource Group level.
 "@
 
-$continue = Show-Message 'Arc-enabled SQL Server' $startMsg 'Asterisk' 'OkCancel'
+$continue = Show-Message 'Azure Arc-enabled SQL Server' $startMsg 'Asterisk' 'OkCancel'
 
 if ($continue -eq 'Cancel') { throw [System.Exception] "Script cancelled by user" }
 
@@ -73,7 +73,7 @@ Write-Host "Logging into ${sqlServerName} and installing Azure PowerShell (this 
 Invoke-Command -Session $Server01 -ScriptBlock {Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force}
 Invoke-Command -Session $Server01 -ScriptBlock {Install-Module -Name Az -AllowClobber -Scope CurrentUser -Repository PSGallery -WarningAction SilentlyContinue -Force}
 
-Write-Host "Copying Arc-enabled SQL onboarding script to ${sqlServerName}.."
+Write-Host "Copying Azure Arc-enabled SQL onboarding script to ${sqlServerName}.."
 
 Copy-Item –Path $scriptLocation\installArcAgentSQLUser.ps1 –Destination $scriptLocation –ToSession $Server01 -Force
 
@@ -111,7 +111,7 @@ if ((Get-Job -Id $loginJobId -IncludeChildJob | Where-Object {$_.Error} | Select
   $loginFailMsg = "Login failed, please see the log for additional details."
 
   Write-Host $loginFailMsg
-  Show-Message 'Arc-enabled SQL Server' $loginFailMsg 'Warning' 'Ok'
+  Show-Message 'Azure Arc-enabled SQL Server' $loginFailMsg 'Warning' 'Ok'
   Stop-Transcript
 
   Stop-Process -Id $edge.Id -ErrorAction SilentlyContinue
@@ -133,7 +133,7 @@ if(-not $hasPermission) {
   $permissionFailMsg = "User ($userName) missing 'write' permissions to Resource Group '${resourceGroup}'. Please see the log for additional details."
 
   Write-Host $permissionFailMsg
-  Show-Message 'Arc-enabled SQL Server' $permissionFailMsg 'Warning' 'Ok'
+  Show-Message 'Azure Arc-enabled SQL Server' $permissionFailMsg 'Warning' 'Ok'
   Stop-Transcript
 
   throw [System.Exception] "Invalid user permissions on Resource Group!"
@@ -141,7 +141,7 @@ if(-not $hasPermission) {
 
 Write-Host "User ($userName) has 'write' permissions to Resource Group '${resourceGroup}'!"
 
-# Onboard Arc-enabled SQL Server
+# Onboard Azure Arc-enabled SQL Server
 
 $sqlJob = Invoke-Command -Session $Server01 -FilePath $scriptLocation\installArcAgentSQLUser.ps1 -AsJob
 
@@ -162,7 +162,7 @@ if ((Get-Job -Id $sqlJobId -IncludeChildJob | Where-Object {$_.Error} | Select-O
   $onboardFailMsg = "SQL Server Onboading failed, please see the log for additional details."
 
   Write-Host $onboardFailMsg
-  Show-Message 'Arc-enabled SQL Server' $onboardFailMsg 'Warning' 'Ok'
+  Show-Message 'Azure Arc-enabled SQL Server' $onboardFailMsg 'Warning' 'Ok'
   Stop-Transcript
 
   throw [System.Exception] "Login Failed!"
@@ -171,7 +171,7 @@ if ((Get-Job -Id $sqlJobId -IncludeChildJob | Where-Object {$_.Error} | Select-O
 $onboardSuccessMsg = "SQL Server has been successfully onboaded into Azure Arc! The server should be visible in the Arc blade of the Azure portal in the next few minutes."
 
 Write-Host "SQL Server Onboarded!"
-Show-Message 'Arc-enabled SQL Server' $onboardSuccessMsg 'None' 'Ok'
+Show-Message 'Azure Arc-enabled SQL Server' $onboardSuccessMsg 'None' 'Ok'
 
 $shortcutLink = "$env:Public\Desktop\Onboard SQL Server.lnk"
 Remove-Item $shortcutLink –Force
