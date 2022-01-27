@@ -273,7 +273,7 @@ ArcBox must be deployed to one of the following regions. **Deploying ArcBox outs
   spn_client_id     = "1414133c-9786-53a4-b231-f87c143ebdb1"
   spn_client_secret = "fakeSecretValue123458125712ahjeacjh"
   spn_tenant_id     = "33572583-d294-5b56-c4e6-dcf9a297ec17"
-  user_ip_address   = "24.17.99.79"
+  user_ip_address   = "99.88.99.88"
   client_admin_ssh  = "C:/Temp/rsa.pub"
   deployment_flavor = "Full"
   ```
