@@ -29,7 +29,7 @@ ArcBox includes five Azure Arc-enabled server resources that are hosted using ne
 
 ### Azure Arc-enabled Kubernetes
 
-![ArcBox Kubernetes diagram](./k8s.png)
+<img src="./k8s.png" width="250" alt="K8s diagram">
 
 ArcBox deploys one single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource (_ArcBox-K3s_).
 
@@ -37,7 +37,7 @@ ArcBox deploys one single-node Rancher K3s cluster running on an Azure virtual m
 
 ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster with the Azure CAPZ provider, and a workload cluster is deployed onto the management cluster. The Azure Arc-enabled data services and data controller are deployed onto this workload cluster via a PowerShell script that runs when first logging into _ArcBox-Client_ virtual machine.
 
-![ArcBox data services diagram](./dataservices2.png)
+<img src="./dataservices2.png" width="250" alt="Data services diagram">
 
 ### Hybrid Unified Operations
 
