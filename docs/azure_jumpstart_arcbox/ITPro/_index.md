@@ -296,7 +296,7 @@ ArcBox must be deployed to one of the following regions. **Deploying ArcBox outs
 
   ![Screenshot showing az deployment group create](./deployedresources.png)
 
-  > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (14 total)**
+  > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (14 total)**
 
 - Open a remote desktop connection into _ArcBox-Client_. Upon logging in, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
 
