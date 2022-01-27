@@ -50,4 +50,4 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-infra.out
+*.out
