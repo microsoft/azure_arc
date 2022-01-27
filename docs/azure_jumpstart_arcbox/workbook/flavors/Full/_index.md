@@ -168,15 +168,11 @@ From within the Agent Monitoring section you will get several tabs:
 
   - _Log Analytics Agent installation status_ shows the Log Analytics Agent installation status as reported by Microsoft Defender for Cloud.
 
-     ![Log Analytics Agent installation status](./agentmgmt_overviewstatus.png)
-
   - _Log Analytics Agent reporting status_ shows the current Log Analytics Agent reporting status of the Azure Arc-enabled servers. Machines that are sending current heartbeat information within the last 15 minutes are considered as currently reporting.
-
-     ![Log Analytics Agent reporting status](./agentmgmt_overviewsreport.png)
 
   - _Microsoft Defender for Cloud coverage_ shows the status of Microsoft Defender for Cloud for Servers across all servers that are protected by Microsoft Defender for Cloud.
 
-     ![Microsoft Defender for Cloud coverage](./agentmgmt_overviewscoverage.png)
+      ![Log Analytics Agent installation status](./agentmgmt_overviewstatus.png)
 
 - _Machines not reporting to Log Analytics workspace_ - this has four lists of machines that are not sending heartbeats to the Log Analytics workspace in different periods of time: 15 minutes, 24 hours, 48 hours and 7 days. Please not that there are no machines listed on the image as all of them are properly sending heartbeats to the workspace.
 
