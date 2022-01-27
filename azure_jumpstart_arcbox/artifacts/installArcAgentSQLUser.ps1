@@ -141,7 +141,7 @@ if(!$roleWritePermissions)
 }
 
 
-# Check if machine is registered with Azure Arc for Servers
+# Check if the machine is registered with Azure Arc-enabled servers
 # Register machine if necessary
 #
 $arcResource = Get-AzConnectedMachine -ResourceGroupName $resourceGroup -Name $arcMachineName -ErrorAction SilentlyContinue
