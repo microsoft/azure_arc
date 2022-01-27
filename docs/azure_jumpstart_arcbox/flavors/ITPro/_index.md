@@ -11,6 +11,15 @@ ArcBox for IT Pros is a special "flavor" of ArcBox that is intended for users wh
 
 ![ArcBox architecture diagram](./arch_itpro.png)
 
+### Use cases
+
+- Sandbox environment for getting hands-on with Azure Arc technologies
+- Accelerator for Proof-of-concepts or pilots
+- Training tool for Azure Arc skills development
+- Demo environment for customer presentations or events
+- Rapid integration testing platform
+- Infrastructure-as-code and automation template library for building hybrid cloud management solutions
+
 ## Azure Arc capabilities available in ArcBox for IT Pros
 
 ### Azure Arc-enabled servers
@@ -27,7 +36,7 @@ ArcBox deploys several management and operations services that work with ArcBox'
 
 ## ArcBox Azure Consumption Costs
 
-ArcBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxillary services. These services generate approximately $20-30 USD per day. Note that Azure consumption costs vary depending the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Users may review cost analysis of ArcBox by using [Azure Cost Analysis](https://docs.microsoft.com/en-us/azure/cost-management-billing/costs/quick-acm-cost-analysis).
+ArcBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxillary services. Note that Azure consumption costs vary depending the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Users may review cost analysis of ArcBox by using [Azure Cost Analysis](https://docs.microsoft.com/en-us/azure/cost-management-billing/costs/quick-acm-cost-analysis).
 
 ## Deployment Options and Automation Flow
 
@@ -83,7 +92,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az provider register --namespace Microsoft.AzureArcData --wait
   ```
 
-- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple RBAC roles is required:
+- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access controls (RBAC) roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
   - **(optional)** "User Access Administrator" - Required for automatically onboarding the Azure Arc-enabled SQL Server resource
@@ -242,7 +251,7 @@ ArcBox must be deployed to one of the following regions. **Deploying ArcBox outs
   spn_client_id     = "1414133c-9786-53a4-b231-f87c143ebdb1"
   spn_client_secret = "fakeSecretValue123458125712ahjeacjh"
   spn_tenant_id     = "33572583-d294-5b56-c4e6-dcf9a297ec17"
-  user_ip_address   = "24.17.99.79"
+  user_ip_address   = "99.88.99.88"
   client_admin_ssh  = "C:/Temp/rsa.pub"
   deployment_flavor = "ITPro"
   ```

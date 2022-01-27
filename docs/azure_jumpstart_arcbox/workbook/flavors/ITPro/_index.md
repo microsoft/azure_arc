@@ -17,21 +17,11 @@ As part of ArcBox for IT Pros, an Azure Monitor workbook is deployed to provide 
 
 The Jumpstart ArcBox workbook is automatically deployed for you as part of ArcBox's advanced automation. To access the Jumpstart ArcBox workbook use the Azure Portal to follow the next steps.
 
-- Navigate to your ArcBox resource group and search for your Log Analytics workspace, you can do so by using the filter "Type" and searching for "Log Analytics workspace".
+- From the ArcBox resource group, select the Azure Workbook, then click "Open Workbook"
 
-![Search Log Analytics workspace](./search_workspace.png)
+![Workbook Gallery](./azure_workbook.png)
 
-- After you apply the filter in the ArcBox resource group you will get the Log Analytics workspace resource.
-
-![Log Analytics workspace in resource group](./workspace_in_rg.png)
-
-- Access the Log Analytics workspace by clicking on its name and under "General" select "Workbooks".
-
-![General workbooks](./general_workbooks.png)
-
-- In the Workbooks Gallery select the "ArcBox for IT Pros Workbook".
-
-![Workbook Gallery](./workbooks_access.png)
+![Workbook Gallery](./open_workbook.png)
 
 - The Jumpstart ArcBox for IT Pros Workbook will be displayed.
 
@@ -83,39 +73,27 @@ The "Monitoring" tab of the Jumpstart Workbook shows metrics and alerts for ArcB
 
    ![Monitoring Azure Arc enabled server Metrics](./monitoring_arc_servers.png)
 
-### Security
+### Microsoft Defender for Cloud
 
-Azure Security Center can monitor the security posture of your hybrid and multi-cloud deployments that have been onboarded onto Azure Arc. Once those deployments are registered in Azure, you can take care of the security baseline and audit, apply, or automate requirements from recommended security controls as well as identify and provide mitigation guidance for security-related business risks.
+Microsoft Defender for Cloud can monitor the security posture of your hybrid and multi-cloud deployments that have been onboarded onto Azure Arc. Once those deployments are registered in Azure, you can take care of the security baseline and audit, apply, or automate requirements from recommended security controls as well as identify and provide mitigation guidance for security-related business risks.
 
-The "Security" tab of the Jumpstart Workbook shows insights from Azure Security Center assessments. To be able to use this report, you will need to configure "continuous export" capability to export Azure Security Center's data to ArcBox's Log Analytics workspace:
+The "Security" tab of the Jumpstart Workbook shows insights from Microsoft Defender for Cloud assessments. To be able to use this report, you will need to configure "continuous export" capability to export Microsoft Defender for Cloud's data to ArcBox's Log Analytics workspace:
 
-- From Security Center's sidebar, select Pricing & settings.
+- From Microsoft Defender for Cloud's sidebar, select Environment Settings.
 
-   ![Security Center Configuration](./security_center_config_1.png)
+   ![Microsoft Defender for Cloud Configuration](./security_center_config_1.png)
 
 - Select the specific subscription for which you want to configure the data export.
 
-   ![Security Center Configuration](./security_center_config_2.png)
+   ![Microsoft Defender for Cloud Configuration](./security_center_config_2.png)
 
-- From the sidebar of the settings page for that subscription, select Continuous Export.
+- From the sidebar of the settings page for that subscription, select Continuous Export, set the export target to the Log Analytics workspace, and set the data types to Security recommendations and Secure Score (Preview) and leave the export frequency at the default values.
 
-   ![Security Center Configuration](./security_center_config_3.png)
-
-- Set the export target to the Log Analytics workspace.
-
-   ![Security Center Configuration](./security_center_config_4.png)
-
-- Select the following data types: Security recommendations and Secure Score (Preview).
-
-   ![Security Center Configuration](./security_center_config_5.png)
-
-- From the export frequency options, select Streaming, and Snapshots.
-
-   ![Security Center Configuration](./security_center_config_6.png)
+   ![Microsoft Defender for Cloud Configuration](./security_center_config_3.png)
 
 - Make sure to select ArcBox's subscription, resource group, and Log Analytics workspace as the export target. Select Save.
 
-   ![Security Center Configuration](./security_center_config_7.png)
+   ![Microsoft Defender for Cloud Configuration](./security_center_config_4.png)
 
 Once configured, the report will provide an overview of the secure score, you can filter information by using the parameters section:
 
@@ -159,7 +137,7 @@ From within the Agent Monitoring section you will get several tabs:
 
 - _Overview_ - with three visualizations:
 
-  - _Log Analytics Agent installation status_ shows the Log Analytics Agent installation status as reported by Azure Security Center.
+  - _Log Analytics Agent installation status_ shows the Log Analytics Agent installation status as reported by Microsoft Defender for Cloud.
 
      ![Log Analytics Agent installation status](./agentmgmt_overviewstatus.png)
 
@@ -167,7 +145,7 @@ From within the Agent Monitoring section you will get several tabs:
 
      ![Log Analytics Agent reporting status](./agentmgmt_overviewsreport.png)
 
-  - _Azure Defender coverage_ shows the status of Azure Defender for Servers across all servers that are protected by Azure Security Center.
+  - _Azure Defender coverage_ shows the status of Azure Defender for Servers across all servers that are protected by Microsoft Defender for Cloud.
 
      ![Azure Defender coverage](./agentmgmt_overviewscoverage.png)
 
