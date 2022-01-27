@@ -44,7 +44,7 @@ Start-Transcript -Path "${logLocation}\ArcSQLServer.log"
 # Inform user of onboarding process and ask to proceed
 
 $startMsg = @"
-This script will onboard the VM 'ArcBox-SQL' as an Arc-enabled SQL Server.
+This script will onboard the VM 'ArcBox-SQL' as an Azure Arc-enabled SQL Server.
 
 When you click 'OK', you will be redirected to the Micorsoft Device Authentication website. The code will be copied to the clipboard, so simply paste it in and complete the Microsoft authentication process.
 

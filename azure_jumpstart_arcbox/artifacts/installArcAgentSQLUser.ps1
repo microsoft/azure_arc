@@ -141,7 +141,7 @@ if(!$roleWritePermissions)
 }
 
 
-# Check if machine is registered with Azure Arc for Servers
+# Check if the machine is registered with Azure Arc-enabled servers
 # Register machine if necessary
 #
 $arcResource = Get-AzConnectedMachine -ResourceGroupName $resourceGroup -Name $arcMachineName -ErrorAction SilentlyContinue
@@ -163,7 +163,7 @@ if ($null -eq $arcResource) {
 $arcResource = Get-AzConnectedMachine -ResourceGroupName $resourceGroup -Name $arcMachineName -ErrorAction SilentlyContinue
 
 if (!$arcResource) {
-    Write-Warning -Message "Failed to register machine with Azure Arc for Servers. Exiting."
+    Write-Warning -Message "Failed to register the machine with Azure Arc-enabled servers. Exiting."
     return
 }
 
