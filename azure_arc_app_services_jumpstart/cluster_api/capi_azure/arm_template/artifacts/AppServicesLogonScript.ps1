@@ -84,7 +84,7 @@ $env:KUBECONTEXT = kubectl config current-context
 $env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
 
 # Create Kubernetes - Azure Arc Cluster
-az connectedk8s connect --name $connectedClusterName `
+az connectedk8s connect --name $env:clusterName `
                         --resource-group $env:resourceGroup `
                         --location $env:azureLocation `
                         --tags 'Project=jumpstart_azure_arc_app_services' `
