@@ -198,7 +198,7 @@ ArcBox must be deployed to one of the following regions. **Deploying ArcBox outs
   - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "Full" to specify that you want to deploy the full version of ArcBox
 
-    ![Screenshot showing example parameters](./parameters.png)
+  ![Screenshot showing example parameters](./parameters.png)
 
 - Now you will deploy the ARM template. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox) and run the below command:
 
