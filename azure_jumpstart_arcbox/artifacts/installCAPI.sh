@@ -65,7 +65,7 @@ sudo usermod -aG docker $adminUsername
 sudo snap install kubectl --classic
 
 # Set CAPI deployment environment variables
-export CLUSTERCTL_VERSION="1.0.2" # Do not change!
+export CLUSTERCTL_VERSION="1.1.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.1.0" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
