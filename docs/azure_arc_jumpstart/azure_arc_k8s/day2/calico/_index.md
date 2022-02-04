@@ -44,7 +44,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
     az provider register --namespace 'Microsoft.PolicyInsights'
     ```
 
-    Azure PowerShell:
+    PowerShell:
 
     ```powershell
     Register-AzResourceProvider -ProviderNamespace 'Microsoft.PolicyInsights'
