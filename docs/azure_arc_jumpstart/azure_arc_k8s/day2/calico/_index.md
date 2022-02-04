@@ -67,7 +67,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
     ![AzResourceProvider Bash](./04.png)
 
 
-* Azure Policy installed in Arc Connected Cluster
+* Azure Policy installed in Azure Arc-Connected Cluster
 
  > by running the the ```kubectl get pods -n gatekeeper-system ``` command, you will notice all pods have been deployed.
 
