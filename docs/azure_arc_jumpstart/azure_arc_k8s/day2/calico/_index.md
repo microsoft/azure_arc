@@ -34,7 +34,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
 
     ![Existing GKE Azure Arc connected cluster](./arcdemo-gke.png)
 
-* Before installing the Azure Policy Add-on or enabling any of the service features, your subscription must enable the Microsoft.PolicyInsights resource provider and create a role assignment for the cluster service principal. To do that, open [Azure Cloud Shell](https://shell.azure.com/) and run either the Azure CLI or Azure PowerShell command.
+* Before installing the Azure Policy Add-on or enabling any of the service features, your subscription must enable the _Microsoft.PolicyInsights_ resource provider and create a role assignment for the cluster service principal. To do that, open [Azure Cloud Shell](https://shell.azure.com/) and run either the Azure CLI or PowerShell command.
 
     ![Open Azure Cloud Shell](./03.png)
 
