@@ -50,7 +50,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
     Register-AzResourceProvider -ProviderNamespace 'Microsoft.PolicyInsights'
     ```
 
-    To verify successful registration, run either the below Azure CLI or Azure PowerShell command.
+    To verify successful registration, run either the below Azure CLI or PowerShell command.
 
     Azure CLI:
 
