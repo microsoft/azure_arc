@@ -74,7 +74,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
 ![Showing pods deployment](./05.png)
 
 
-## Deploy a customized Azure policy to verify if calicocloud/calico enterprise components enabled in your Azure Arc Kubernetes cluster.
+## Deploy a customized Azure policy to verify if calicocloud/calico enterprise components are enabled in your Azure Arc-enabled Kubernetes cluster.
 
 * In the Search bar, look for *Policy* and click on *Definitions* which will show you all of the available Azure policies.
 
