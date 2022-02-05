@@ -82,7 +82,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
 
     ![Searching for Azure Policy definitions](./07.png)
 
-* Click on *+ Policy definition* to add a new policy. 
+* Click on _+ Policy definition_ to add a new policy. 
 
     ![Create a Azure policy for Kubernetes cluster](./08.png)
 
