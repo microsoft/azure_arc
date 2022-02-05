@@ -76,7 +76,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
 
 ## Deploy a customized Azure policy to verify if Calico Cloud or Calico Enterprise components are enabled in your Azure Arc-enabled Kubernetes cluster.
 
-* In the Search bar, look for *Policy* and click on *Definitions* which will show you all of the available Azure policies.
+* In the Azure portal Search bar, look for _Policy_ and click on _Definitions_ which will show you all of the available Azure policies.
 
     ![Searching for Azure Policy definitions](./06.png)
 
