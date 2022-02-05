@@ -86,9 +86,11 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
 
     ![Create a Azure policy for Kubernetes cluster](./08.png)
 
+* In the below example, the _Definition location_ of the policy represents the Azure subscription. Also, make sure _Category_ is set to _Kubernetes_. We will use `audit` as the default effect for this policy. 
+
     ![Create a Azure policy for Kubernetes cluster](./09.png)
 
-* In the above example, the _Definition location_ of the policy represents the Azure subscription. Also, make sure _Category_ is set to _Kubernetes_. We will use `audit` as the default effect for this policy. 
+
 
   You can either copy the `calicoapipolicy.json` file located in this folder into `POLICY RULE` or create a policy directly with azure cli with below command.
 
