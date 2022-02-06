@@ -35,9 +35,9 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
 
 * As mentioned, this guide starts at the point where you already have a connected EKS/GKE cluster to Azure Arc.
 
-    ![Existing EKS Azure Arc connected cluster](./arcdemo-eks.png)
+    ![Existing EKS Azure Arc connected cluster](./01.png)
 
-    ![Existing GKE Azure Arc connected cluster](./arcdemo-gke.png)
+    ![Existing GKE Azure Arc connected cluster](./02.png)
 
 * Before installing the Azure Policy Add-on or enabling any of the service features, your subscription must enable the _Microsoft.PolicyInsights_ resource provider and create a role assignment for the cluster service principal. To do that, open [Azure Cloud Shell](https://shell.azure.com/) and run either the Azure CLI or PowerShell command.
 
@@ -99,7 +99,6 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
 * Click this policy, and assign it to your Azure resource group which includes the Azure Arc-enabled Kubernetes clusters. Alternatively, you can assign the policy to entre Azure subscription.
   
   ![Assign Azure policy ](./11.png) 
-
 
 * After the assignment, the policy task will start the evaluation against arc enabled cluster under your resource group. If you have 2 clusters installed calicocloud/calico enterprise, it will show as  "compliant" with `2 out of 2 ` (The gatekeeper will look for deployment with label 'apiserver' as audit labellist). To check this, go back to the main Policy page in the Azure portal.
 
