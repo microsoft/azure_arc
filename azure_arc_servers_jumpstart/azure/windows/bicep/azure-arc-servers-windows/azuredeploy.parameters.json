@@ -1,0 +1,32 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmSize": {
+            "value": "Standard_B2s"
+        },
+        "vmName":{
+            "value": "YOUR-VM-NAME"
+        },
+        "adminUsername": {
+          "value": "YOUR-VM-ADMIN-USERNAME"
+        },
+        "adminPassword": {
+            "value": "YOUR-VM-ADMIN-USERNAME-PASSWORD"
+        },      
+        "appId": {
+            "value": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX"
+        },
+        "password": {
+            "value": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX"
+        },
+        "tenantId": {
+            "value": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX"
+        },
+        "subscriptionId": {
+            "value": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX"
+        },"resourceGroup": {
+            "value": "YOUR-RESOURCE-GROUP-NAME" 
+        }
+      }
+  }
