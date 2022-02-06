@@ -96,10 +96,10 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
     ![Find the pod label policy for Kubernetes cluster](./09.png)
     ![BuiltIn label policy for Kubernetes cluster](./10.png)
 
-* Click this policy, and assign it to your resource group which include the arc clusters. Alternatively, you can assign the policy to entre Azure subscription.
+* Click this policy, and assign it to your Azure resource group which includes the Azure Arc-enabled Kubernetes clusters. Alternatively, you can assign the policy to entre Azure subscription.
   
   ![Assign Azure policy ](./11.png) 
-  
+
 
 * After the assignment, the policy task will start the evaluation against arc enabled cluster under your resource group. If you have 2 clusters installed calicocloud/calico enterprise, it will show as  "compliant" with `2 out of 2 ` (The gatekeeper will look for deployment with label 'apiserver' as audit labellist). To check this, go back to the main Policy page in the Azure portal.
 
