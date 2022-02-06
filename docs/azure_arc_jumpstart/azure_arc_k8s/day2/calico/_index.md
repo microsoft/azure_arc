@@ -92,7 +92,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
 
 
 
-  You can either copy the `calicoapipolicy.json` file located in this folder into `POLICY RULE` or create a policy directly with azure cli with below command.
+  You can either copy the `calicoapipolicy.json` file located in this folder into `POLICY RULE` or create a policy directly with Azure CLI with the below command.
 
   ```shell
   az policy definition create --name 'arcdemo-calicoapi-policy' --display-name 'Audit Calico api server' --description 'This policy audit that if calicocloud/calico enterprise components exist' --rules 'calicoapipolicy.json' --mode All
