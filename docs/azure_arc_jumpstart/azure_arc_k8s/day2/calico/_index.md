@@ -6,9 +6,14 @@ weight: 4
 description: >
 ---
 
-## Use the Azure Policy Add-on with a custom Azure Policy to verify the calicocloud/calico enterprise components
+## Use the Azure Policy on a Azure-Arc enabled Kubernetes cluster for applying ingress/egress rules. 
 
-The following README will guide you on how to use a custom Azure Policy [Azure Policy for Kubernetes](https://docs.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes#:~:text=Azure%20Policy%20extends%20Gatekeeper%20v3,Kubernetes%20clusters%20from%20one%20place.) on an Azure Arc-connected Kubernetes cluster to verify whether [Calico network policy](https://projectcalico.docs.tigera.io/about/about-network-policy) is enabled or not.
+Calico Network Policy uses labels to select pods in Kubernetes for applying ingress/egress rules. 
+In this scenario, we will be using Azure Policy on an Azure-Arc enabled Kubernetes cluster to check whether the “fw-zone” label is present on pods in the “storefront” namespace.
+The policy will be set to “Audit” mode to check the configuration of existing clusters (it can also be set to “Deny” mode to avoid any future misconfigurations)
+
+
+The following README will guide you on how to use a Azure Policy [Azure Policy for Kubernetes](https://docs.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes#:~:text=Azure%20Policy%20extends%20Gatekeeper%20v3,Kubernetes%20clusters%20from%20one%20place.) on an Azure Arc-connected Kubernetes cluster to audit/enforce label for pods as [network policy](https://projectcalico.docs.tigera.io/about/about-network-policy) are applied to pods using label selectors.
 
 > **Note: This guide assumes you already deployed an Amazon Elastic Kubernetes Service (EKS) or Google Kubernetes Engine (GKE) cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these couple of Jumpstart scenarios:
 - [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
@@ -74,7 +79,7 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
 ![Showing pods deployment](./05.png)
 
 
-## Deploy a customized Azure policy to verify if Calico Cloud or Calico Enterprise components are enabled in your Azure Arc-enabled Kubernetes cluster.
+## Deploy a Azure policy to verify if “fw-zone” label exist in each pods. 
 
 * In the Azure portal Search bar, look for _Policy_ and click on _Definitions_ which will show you all of the available Azure policies.
 
@@ -82,30 +87,18 @@ The following README will guide you on how to use a custom Azure Policy [Azure P
 
     ![Searching for Azure Policy definitions](./07.png)
 
-* Click on _+ Policy definition_ to add a new policy. 
+* Click on _Category_ to search a build-in policy. 
 
-    ![Create a Azure policy for Kubernetes cluster](./08.png)
+    ![Choose policy category](./08.png)
 
-* In the below example, the _Definition location_ of the policy represents the Azure subscription. Also, make sure _Category_ is set to _Kubernetes_. We will use `audit` as the default effect for this policy. 
+* In the below example, make sure _Category_ is set to _Kubernetes_ only, and type `label` in _Search_, you will find `Kubernetes cluster pods should use specified labels` in _BuiltIn_ Type.
 
-    ![Create a Azure policy for Kubernetes cluster](./09.png)
+    ![Find the pod label policy for Kubernetes cluster](./09.png)
+    ![BuiltIn label policy for Kubernetes cluster](./10.png)
 
-
-
-  You can either copy the `calicoapipolicy.json` file located in this folder into `POLICY RULE` or create a policy directly with Azure CLI with the below command.
-
-  ```shell
-  az policy definition create --name 'arcdemo-calicoapi-policy' --display-name 'Audit Calico api server' --description 'This policy audit that if calicocloud/calico enterprise components exist' --rules 'calicoapipolicy.json' --mode All
-  ```
-
-* Once the policy is been created, you should be able to find it in *Policy | Definitions* 
+* Click this policy, and assign it to your resource group which include the arc clusters. Alternatively, you can assign the policy to entre Azure subscription.
   
-  ![Calico Azure policy ](./10.png) need change
-    
-
-* Click the policy you created, and assign it to your resource group which include the arc clusters. Alternatively, you can assign the policy to entre Azure subscription.
-  
-  ![Assign Calico Azure policy ](./11.png) need change
+  ![Assign Azure policy ](./11.png) 
   
 
 * After the assignment, the policy task will start the evaluation against arc enabled cluster under your resource group. If you have 2 clusters installed calicocloud/calico enterprise, it will show as  "compliant" with `2 out of 2 ` (The gatekeeper will look for deployment with label 'apiserver' as audit labellist). To check this, go back to the main Policy page in the Azure portal.
