@@ -1,0 +1,39 @@
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AzureCluster
+metadata:
+  name: ${CLUSTER_NAME}
+  namespace: default
+spec:
+  identityRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AzureClusterIdentity
+    name: ${CLUSTER_IDENTITY_NAME}
+  location: ${AZURE_LOCATION}
+  networkSpec:
+    vnet:
+      name: ${AZURE_VNET_NAME:=${CLUSTER_NAME}-vnet}
+      cidrBlocks: 
+        - 10.0.0.0/16
+    subnets:
+    - name: control-plane-subnet
+      role: control-plane
+      cidrBlocks: 
+        - 10.0.1.0/24      
+      securityGroup:
+        name: ${CLUSTER_NAME}-cp-nsg
+        securityRules:
+          - name: "allow_apiserver"
+            description: "Allow K8s API Server"
+            direction: "Inbound"
+            priority: 2201
+            protocol: "*"
+            destination: "*"
+            destinationPorts: "6443"
+            source: "*"
+            sourcePorts: "*"      
+    - name: node-subnet
+      role: node
+      cidrBlocks: 
+        - 10.0.2.0/24        
+  resourceGroup: ${AZURE_RESOURCE_GROUP:=${CLUSTER_NAME}}
+  subscriptionID: ${AZURE_SUBSCRIPTION_ID}
