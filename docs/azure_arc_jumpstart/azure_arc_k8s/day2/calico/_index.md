@@ -80,9 +80,9 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
 
 * Azure Policy installed in Azure Arc-Connected Cluster
 
- > by running the the ```kubectl get pods -n gatekeeper-system ``` command, you will notice all pods have been deployed.
+  > by running the the ```kubectl get pods -n gatekeeper-system ``` command, you will notice all pods have been deployed.
 
-![Showing pods deployment](./05.png)
+  ![Showing pods deployment](./05.png)
 
 
 * Deploy a demo application and calico network policy in your Azure Arc-Connected Cluster.
