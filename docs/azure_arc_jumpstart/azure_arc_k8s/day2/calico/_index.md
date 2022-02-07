@@ -1,18 +1,20 @@
 ---
 type: docs
-title: "Use the Azure Policy Add-on to audit Calicocloud / calico enterprise"
-linkTitle: "Use the Azure Policy Add-on to create a custom Azure Policy for auditing calicocloud/calico enterprise components"
+title: "Use the Azure Policy Add-on to audit pods' labels for network policy"
+linkTitle: "Use the Azure Policy Add-on to create a BuiltIn Azure Policy for auditing pods' labels for network policy enforcement"
 weight: 4
 description: >
 ---
 
 ## Use the Azure Policy on a Azure-Arc enabled Kubernetes cluster for applying ingress/egress rules. 
 
-> **Note: This guide assumes you already deployed Calico network policy in your cluster. If you haven't, 
+> **Note: This guide assumes you already deployed Calico network policy in your cluster. If you haven't, you can use our installation for Calico open source or Calico Cloud:
+- [Deploy Calico open source in your managed public cluster](https://projectcalico.docs.tigera.io/getting-started/kubernetes/managed-public-cloud/)
+- [Deploy Calico Cloud in your managed public cluster](https://projectcalico.docs.tigera.io/calico-enterprise/)
 
 
 Calico Network Policy uses labels to select pods in Kubernetes for applying ingress/egress rules. 
-In this scenario, we will be using Azure Policy on an Azure-Arc enabled Kubernetes cluster to check whether the “fw-zone” label is present on pods in the “storefront” namespace.
+In this scenario, we will be using Azure Policy on an Azure-Arc enabled Kubernetes cluster to check whether the “fw-zone” label is present on pods in the “storefront” namespace, and how pods' labels impact network policy enforcement.
 The policy will be set to “Audit” mode to check the configuration of existing clusters (it can also be set to “Deny” mode to avoid any future misconfigurations)
 
 
@@ -21,7 +23,6 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
 > **Note: This guide assumes you already deployed an Amazon Elastic Kubernetes Service (EKS) or Google Kubernetes Engine (GKE) cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these couple of Jumpstart scenarios:
 - [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
 - [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).**
-
 
 
 ## Prerequisites
@@ -141,11 +142,12 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
   > We will deploy a centos and a nginx pod to create `non-compliance` resources by running the commands below. As mentioned before, the policy effect is `audit` instead of `deny` which will allow pod creating without `fw-zone` label.
 
   ```shell
-  kubectl run centos --image=centos -n storefront --restart=Never -- /bin/sh -c "sleep 3600"
+  kubectl run centos --image=centos -n storefront --restart=Never -- /bin/sh -c "sleep 24h"
   ```
 
   ```shell
   kubectl run nginx --image=nginx -n storefront
+  kubectl -n storefront expose pod nginx --port=80
   ```
   
   ![Compliance result](./15.png)
@@ -155,7 +157,18 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
 
 * Test the network policy enforcement by changing labels in `centos` and `nginx` pods. 
 
+  > The firewall policy only allow `trusted` zone connect to `restricted` zone, and will deny the traffic from `dmz` zone. We will label the nginx pod with `restricted` zone, and test connectivity while changing centos pod label with `trusted` and `dmz` zone. 
 
+  ```shell
+  kubectl -n storefront label pod nginx fw-zone=restricted
+  kubectl -n storefront label pod centos fw-zone=trusted
+  ```
+
+  ```shell
+  kubectl -n storefront exec -t centos -- sh -c 'curl -m3 -sI http://nginx 2>/dev/null | grep -i http'
+  ```
+
+  ![test result](./22.png)
 
 
 
@@ -169,6 +182,7 @@ Complete the following steps to clean up your environment.
     ![Disable Azure Policy addon](./19.png)
 
 
-* Delete the cluster as described in the [Terraform teardown instructions for eks](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/) or [Terraform teardown instructions for gke](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/) .
-
+* You can use these below Jumpstart scenarios for deleting the clusters as described:
+- [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
+- [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
 
