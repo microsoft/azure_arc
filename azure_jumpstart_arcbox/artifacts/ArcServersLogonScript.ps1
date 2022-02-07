@@ -276,13 +276,6 @@ $SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
 Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 500 -WarningAction SilentlyContinue | Out-Null
 
-# Sending deployement status message to Azure storage account queue
-# if ($env:flavor -eq "ITPro") {
-#     # Sleeping for allowing Azure Resource Manager API updates
-#     Start-Sleep -Seconds 30
-#     & "C:\ArcBox\DeploymentStatus.ps1"
-# }
-
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
@@ -327,27 +320,6 @@ if(-not $hasPermission) {
     $shortcut.Save()
 }
 
-# Changing to Jumpstart ArcBox wallpaper
-if ($env:flavor -eq "Full" -or "ITPro") {
-$imgPath="$Env:ArcBoxDir\wallpaper.png"
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-     public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-         
-         public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
-         }
-    }
- } 
-'@
-
-add-type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
-}
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 

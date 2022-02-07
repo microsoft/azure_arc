@@ -41,7 +41,7 @@ az -v
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
-$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arcbox-capi-data"
+$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
@@ -71,16 +71,8 @@ Write-Host "Installing the Azure Arc-enabled data services cluster extension"
 Write-Host "`n"
 $connectedClusterName="ArcBox-CAPI-Data"
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-az k8s-extension create --name arc-data-services `
-                        --extension-type microsoft.arcdataservices `
-                        --cluster-type connectedClusters `
-                        --cluster-name $connectedClusterName `
-                        --resource-group $env:resourceGroup `
-                        --auto-upgrade false `
-                        --scope cluster `
-                        --release-namespace arc `
-                        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
-                        
+az k8s-extension create --name arc-data-services --extension-type microsoft.arcdataservices --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $env:resourceGroup --auto-upgrade false --scope cluster --release-namespace arc --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
     Start-Sleep -Seconds 20
@@ -142,14 +134,6 @@ $Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys -
 az arcdata dc update --name arcbox-dc --resource-group $env:resourceGroup --auto-upload-logs true
 az arcdata dc update --name arcbox-dc --resource-group $env:resourceGroup --auto-upload-metrics true
 
-# Enabling data controller auto metrics & logs upload to log analytics
-Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
-Write-Host "`n"
-$Env:WORKSPACE_ID=$(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName  --query primarySharedKey -o tsv)
-az arcdata dc update --name jumpstart-dc --resource-group $env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name jumpstart-dc --resource-group $env:resourceGroup --auto-upload-metrics true
-
 # Replacing Azure Data Studio settings template file
 Write-Host "`n"
 Write-Host "Replacing Azure Data Studio settings template file"
@@ -182,11 +166,6 @@ $env:KUBECONFIG="C:\users\$env:USERNAME\.kube\config"
 kubectx
 Write-Host "`n"
 
-# Sending deployement status message to Azure storage account queue
-# if ($env:flavor -eq "Full" -Or $env:flavor -eq "Developer") {
-#     & "$Env:ArcBoxDir\DeploymentStatus.ps1"
-# }
-
 # Creating desktop url shortcuts for built-in Grafana and Kibana services 
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 $GrafanaURL = "https://"+$GrafanaURL+":3000"
@@ -203,6 +182,28 @@ $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
 Stop-Process -Id $kubectlMonShell.Id
+
+# Changing to Jumpstart ArcBox wallpaper
+if ($env:flavor -eq "Full" -or "ITPro") {
+$imgPath="$Env:ArcBoxDir\wallpaper.png"
+$code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
+    
+     public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+         
+         public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+         }
+    }
+ } 
+'@
+
+add-type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
+}
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
