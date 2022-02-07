@@ -179,8 +179,11 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
 Complete the following steps to clean up your environment.
 
 * From each Azure Arc-enabled cluster under your resource group, click _Azure Policy_ page, disable the extension of Azure policy under `Onboard to Azure Policy for Azure Arc enabled Kubernetes cluster`
+
     ![Disable Azure Policy addon](./17.png)
+
     ![Disable Azure Policy addon](./18.png)
+    
     ![Disable Azure Policy addon](./19.png)
 
 
