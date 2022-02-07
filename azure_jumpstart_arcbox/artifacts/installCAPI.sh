@@ -23,6 +23,7 @@ echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $capiArcDataClusterName:$9 | awk '{print substr($1,2); }' >> vars.sh
+echo $templateBaseUrl:$10 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
 sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
@@ -32,6 +33,7 @@ sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 sed -i '10s/^/export capiArcDataClusterName=/' vars.sh
+sed -i '11s/^/export templateBaseUrl=/' vars.sh
 
 chmod +x vars.sh
 . ./vars.sh
@@ -216,7 +218,7 @@ sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluste
 echo ""
 sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 echo ""
-sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --debug
+# sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --debug
 
 
 # Creating Storage Class with azure-managed-disk for the CAPI cluster
