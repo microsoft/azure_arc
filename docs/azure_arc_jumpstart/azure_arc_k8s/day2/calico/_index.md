@@ -116,13 +116,14 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
 * In the below example, make sure _Category_ is set to _Kubernetes_ only, and type `label` in _Search_, you will find `Kubernetes cluster pods should use specified labels` in _BuiltIn_ Type.
 
     ![Find the pod label policy for Kubernetes cluster](./09.png)
+
     ![BuiltIn label policy for Kubernetes cluster](./10.png)
 
 * Click this policy, and assign it to your Azure resource group which includes the Azure Arc-enabled Kubernetes clusters. Alternatively, you can assign the policy to entre Azure subscription.
   
   ![Assign Azure policy ](./11.png) 
 
-* Rename the assignment for distigushing purpose, such as `storefront namespace pods should fw-zone labels for calico networkpolicy enforcement`.
+* Rename the assignment for distigushing purpose, such as `storefront namespace pods should use fw-zone labels for calico networkpolicy enforcement`.
 
   ![Assignment name](./12.png)
 
@@ -135,6 +136,7 @@ The following README will guide you on how to use a Azure Policy [Azure Policy f
   ![Compliance list](./14.png)
 
 > **Note: The process of evaluation against the cluster can take 30min, you will see 0 out of 0 in `Resource compliance` as it hasn't started yet.**
+
 
 
 * After the evaluation, the policy will inform you the result and also provide the details if there is any `non-compliance` resource.  
