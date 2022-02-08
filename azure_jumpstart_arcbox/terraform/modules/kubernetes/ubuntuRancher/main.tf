@@ -18,8 +18,8 @@ variable "vm_size" {
 variable "os_sku" {
   type        = string
   description = "The Linux version for the capi VM."
-  default     = "18.04-LTS"
-  ### Add limit list, currently only 18.04-LTS ###
+  default     = "20_04-lts-gen2"
+  ### Add limit list, currently only 20.04-LTS ###
 }
 
 variable "admin_username" {
@@ -188,7 +188,7 @@ resource "azurerm_virtual_machine" "client" {
 
   storage_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
+    offer     = "0001-com-ubuntu-server-focal"
     sku       = var.os_sku
     version   = "latest"
   }
