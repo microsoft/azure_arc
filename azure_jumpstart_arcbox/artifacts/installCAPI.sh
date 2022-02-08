@@ -23,7 +23,6 @@ echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $capiArcDataClusterName:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $templateBaseUrl:${10} | sed 's/.$//'
 echo $templateBaseUrl:${10} | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
@@ -150,10 +149,10 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
-sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs $templateBaseUrlartifacts/artifacts/capz_kustomize/patches/AzureCluster.yaml
-sudo curl -o capz_kustomize/patches/Cluster.yaml $templateBaseUrlartifacts/artifacts/capz_kustomize/patches/Cluster.yaml
-sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml $templateBaseUrlartifacts/artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
-sudo curl -o capz_kustomize/kustomization.yaml $templateBaseUrlartifacts/artifacts/capz_kustomize/kustomization.yaml
+sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}artifacts/artifacts/capz_kustomize/patches/AzureCluster.yaml
+sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/artifacts/capz_kustomize/patches/Cluster.yaml
+sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
+sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/artifacts/capz_kustomize/kustomization.yaml
 kubectl kustomize capz_kustomize/ > jumpstart.yaml
 clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
