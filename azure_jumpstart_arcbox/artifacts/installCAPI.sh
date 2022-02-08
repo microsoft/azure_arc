@@ -149,10 +149,10 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
-sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}artifacts/artifacts/capz_kustomize/patches/AzureCluster.yaml
-sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/artifacts/capz_kustomize/patches/Cluster.yaml
-sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
-sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/artifacts/capz_kustomize/kustomization.yaml
+sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}/artifacts/capz_kustomize/patches/AzureCluster.yaml
+sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
+sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}/artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
+sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}/artifacts/capz_kustomize/kustomization.yaml
 kubectl kustomize capz_kustomize/ > jumpstart.yaml
 clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
