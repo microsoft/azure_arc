@@ -174,7 +174,7 @@
                     {
                         "name": "[parameters('privateEndpoints_name')]",
                         "properties": {
-                            "privateLinkServiceId": "[parameters('privateLinkScopes_name')]",
+                            "privateLinkServiceId": "[resourceId('Microsoft.HybridCompute/privateLinkScopes', parameters('privateLinkScopes_name'))]",
                             "groupIds": [
                                 "hybridcompute"
                             ]
