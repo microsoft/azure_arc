@@ -13,9 +13,9 @@ param sshRSAPublicKey string
 
 @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version')
 @allowed([
-  '18.04-LTS'
+  '20_04-lts-gen2'
 ])
-param ubuntuOSVersion string = '18.04-LTS'
+param ubuntuOSVersion string = '20_04-lts-gen2'
 
 @description('Location for all resources.')
 param azureLocation string = resourceGroup().location
@@ -211,7 +211,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
       }
       imageReference: {
         publisher: 'Canonical'
-        offer: 'UbuntuServer'
+        offer: '0001-com-ubuntu-server-focal'
         sku: ubuntuOSVersion
         version: 'latest'
       }
