@@ -13,6 +13,7 @@ sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 sudo curl -o /etc/profile.d/welcomeCAPI.sh https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/welcomeCAPI.sh
 
 # Injecting environment variables from Azure deployment
+echo $templateBaseUrl | sed 's/.$//'
 echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
 echo $SPN_CLIENT_ID:$2 | awk '{print substr($1,2); }' >> vars.sh
@@ -23,7 +24,7 @@ echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
 echo $capiArcDataClusterName:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $templateBaseUrl:$10 | awk '{print substr($1,2); }' >> vars.sh
+echo $templateBaseUrl:${10} | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
 sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
@@ -75,7 +76,7 @@ export CLUSTERCTL_VERSION="1.1.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.1.1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.22.5" # Do not change!
+export KUBERNETES_VERSION="1.22.6" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
@@ -107,7 +108,7 @@ sudo k3sup install --local --context arcboxcapimgmt --k3s-extra-args '--no-deplo
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo cp kubeconfig ~/.kube/config
 sudo cp kubeconfig /home/${adminUsername}/.kube/config
-sudo cp kubeconfig /home/${adminUsername}/.kube/config-mgmt
+sudo cp /var/lib/waagent/custom-script/download/0/kubeconfig /home/${adminUsername}/.kube/config-mgmt
 sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/cache/
@@ -149,10 +150,10 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
-sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs https://raw.githubusercontent.com/likamrat/azure_arc/arcbox_optimizations/azure_jumpstart_arcbox/artifacts/capz_kustomize/patches/AzureCluster.yaml
-sudo curl -o capz_kustomize/patches/Cluster.yaml https://raw.githubusercontent.com/likamrat/azure_arc/arcbox_optimizations/azure_jumpstart_arcbox/artifacts/capz_kustomize/patches/Cluster.yaml
-sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml https://raw.githubusercontent.com/likamrat/azure_arc/arcbox_optimizations/azure_jumpstart_arcbox/artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
-sudo curl -o capz_kustomize/kustomization.yaml https://raw.githubusercontent.com/likamrat/azure_arc/arcbox_optimizations/azure_jumpstart_arcbox/artifacts/capz_kustomize/kustomization.yaml
+sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs $templateBaseUrlartifacts/artifacts/capz_kustomize/patches/AzureCluster.yaml
+sudo curl -o capz_kustomize/patches/Cluster.yaml $templateBaseUrlartifacts/artifacts/capz_kustomize/patches/Cluster.yaml
+sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml $templateBaseUrlartifacts/artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
+sudo curl -o capz_kustomize/kustomization.yaml $templateBaseUrlartifacts/artifacts/capz_kustomize/kustomization.yaml
 kubectl kustomize capz_kustomize/ > jumpstart.yaml
 clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
