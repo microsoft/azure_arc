@@ -30,9 +30,9 @@
         },
         "ubuntuOSVersion": {
             "type": "string",
-            "defaultValue": "18.04-LTS",
+            "defaultValue": "20.04-LTS",
             "allowedValues": [
-                "18.04-LTS"
+                "20.04-LTS"
             ],
             "metadata": {
                 "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
