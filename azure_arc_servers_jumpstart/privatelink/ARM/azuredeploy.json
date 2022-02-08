@@ -188,19 +188,7 @@
                 "customDnsConfigs": []
             }
         },
-            {
-                "type": "Microsoft.HybridCompute/privateLinkScopes/privateEndpointConnections",
-                "apiVersion": "2021-06-10-preview",
-                "name": "[concat(parameters('privateLinkScopes_name'), parameters('privateEndpoints_name'))]",
-                "dependsOn": [
-                    "[resourceId('Microsoft.HybridCompute/privateLinkScopes', parameters('privateLinkScopes_name'))]"
-                ],
-                "properties": {
-                    "privateEndpoint": {
-                        "id": "[variables('privateEndpoints_externalid')]"
-                    }
-                }
-            },
+
              {
             "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
             "apiVersion": "2020-11-01",
