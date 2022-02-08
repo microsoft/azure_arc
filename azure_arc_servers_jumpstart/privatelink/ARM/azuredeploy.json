@@ -183,7 +183,7 @@
                 ],
                 "manualPrivateLinkServiceConnections": [],
                 "subnet": {
-                    "id": "[concat(parameters('cloudVNetName'), '/subnets/', parameters('cloudSubnetName'))]"
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('cloudVNetName'), parameters('cloudSubnetName'))]"
                 },
                 "customDnsConfigs": []
             }
