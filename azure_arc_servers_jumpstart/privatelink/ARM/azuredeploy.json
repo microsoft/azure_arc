@@ -58,7 +58,10 @@
         "roleAssignmentName": "[guid(resourceGroup().id)]",
         "gatewayPublicIPName": "[concat(parameters('cloudGatewayName'), '-PIP')]",
         "contributorRole": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-        "privateEndpoints_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateEndpoints/', parameters('privateEndpoints_name'))]"
+        "privateEndpoints_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateEndpoints/', parameters('privateEndpoints_name'))]",
+        "his_arc_azure_com_externalid":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateDnsZones/privatelink.his.arc.azure.com')]",
+        "guestconfiguration_azure_com_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateDnsZones/privatelink.guestconfiguration.azure.com')]",
+        "azure_com_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateDnsZones/privatelink.dp.kubernetesconfiguration.azure.com')]"
     },
     "resources": [
         {
@@ -152,7 +155,7 @@
                 "[resourceId('Microsoft.Network/virtualNetworks/', parameters('cloudVNetName'))]"
             ]
         },
-          {
+        {
             "type": "Microsoft.HybridCompute/privateLinkScopes",
             "apiVersion": "2021-06-10-preview",
             "name": "[parameters('privateLinkScopes_name')]",
@@ -162,20 +165,79 @@
             }
         },
         {
-            "type": "Microsoft.HybridCompute/privateLinkScopes/privateEndpointConnections",
-            "apiVersion": "2021-06-10-preview",
-            "name": "[concat(parameters('privateLinkScopes_name'), '/arc-pe-demo.40560d55-2573-4920-8181-8e355c6fd539')]",
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2020-11-01",
+            "name": "[parameters('privateEndpoints_name')]",
+            "location": "westeurope",
+            "properties": {
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[parameters('privateEndpoints_name')]",
+                        "properties": {
+                            "privateLinkServiceId": "[parameters('privateLinkScopes_name')]",
+                            "groupIds": [
+                                "hybridcompute"
+                            ],
+                            "privateLinkServiceConnectionState": {
+                                "status": "Approved",
+                                "description": "Auto-approved",
+                                "actionsRequired": "None"
+                            }
+                        }
+                    }
+                ],
+                "manualPrivateLinkServiceConnections": [],
+                "subnet": {
+                    "id": "[concat(parameters('cloudVNetName'), '/subnets/', parameters('cloudSubnetName'))]"
+                },
+                "customDnsConfigs": []
+            }
+        },
+            {
+                "type": "Microsoft.HybridCompute/privateLinkScopes/privateEndpointConnections",
+                "apiVersion": "2021-06-10-preview",
+                "name": "[concat(parameters('privateLinkScopes_name'), parameters('privateEndpoints_name'))]",
+                "dependsOn": [
+                    "[resourceId('Microsoft.HybridCompute/privateLinkScopes', parameters('privateLinkScopes_name'))]"
+                ],
+                "properties": {
+                    "privateEndpoint": {
+                        "id": "[variables('privateEndpoints_externalid')]"
+                    },
+                    "privateLinkServiceConnectionState": {
+                        "status": "Approved",
+                        "description": "Auto-approved"
+                    }
+                }
+            },
+             {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('privateEndpoints_name'), '/default')]",
             "dependsOn": [
-                "[resourceId('Microsoft.HybridCompute/privateLinkScopes', parameters('privateLinkScopes_name'))]"
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_name'))]"
             ],
             "properties": {
-                "privateEndpoint": {
-                    "id": "[variables('privateEndpoints_externalid')]"
-                },
-                "privateLinkServiceConnectionState": {
-                    "status": "Approved",
-                    "description": "Auto-approved"
-                }
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "privatelink-his-arc-azure-com",
+                        "properties": {
+                            "privateDnsZoneId": "[variables('his_arc_azure_com_externalid')]"
+                        }
+                    },
+                    {
+                        "name": "privatelink-guestconfiguration-azure-com",
+                        "properties": {
+                            "privateDnsZoneId": "[variables('guestconfiguration_azure_com_externalid')]"
+                        }
+                    },
+                    {
+                        "name": "privatelink-dp-kubernetesconfiguration-azure-com",
+                        "properties": {
+                            "privateDnsZoneId": "[variables('azure_com_externalid')]"
+                        }
+                    }
+                ]
             }
         }
     ],
