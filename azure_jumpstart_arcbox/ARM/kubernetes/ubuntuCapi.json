@@ -222,7 +222,7 @@
                     },
                     "imageReference": {
                         "publisher": "Canonical",
-                        "offer": "UbuntuServer",
+                        "offer": "0001-com-ubuntu-server-focal",
                         "sku": "[parameters('ubuntuOSVersion')]",
                         "version": "latest"
                     }
