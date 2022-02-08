@@ -177,12 +177,7 @@
                             "privateLinkServiceId": "[parameters('privateLinkScopes_name')]",
                             "groupIds": [
                                 "hybridcompute"
-                            ],
-                            "privateLinkServiceConnectionState": {
-                                "status": "Approved",
-                                "description": "Auto-approved",
-                                "actionsRequired": "None"
-                            }
+                            ]
                         }
                     }
                 ],
@@ -203,10 +198,6 @@
                 "properties": {
                     "privateEndpoint": {
                         "id": "[variables('privateEndpoints_externalid')]"
-                    },
-                    "privateLinkServiceConnectionState": {
-                        "status": "Approved",
-                        "description": "Auto-approved"
                     }
                 }
             },
