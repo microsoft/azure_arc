@@ -110,7 +110,6 @@ sudo cp kubeconfig /home/${adminUsername}/.kube/config
 sudo cp /var/lib/waagent/custom-script/download/0/kubeconfig /home/${adminUsername}/.kube/config-mgmt
 sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
-sudo chown -R $adminUsername /home/${adminUsername}/.kube/cache/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 export KUBECONFIG=/var/lib/waagent/custom-script/download/0/kubeconfig
@@ -149,16 +148,17 @@ echo ""
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
-sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}/artifacts/capz_kustomize/patches/AzureCluster.yaml
+sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}artifacts/capz_kustomize/patches/AzureCluster.yaml
 sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
-sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}/artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
-sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}/artifacts/capz_kustomize/kustomization.yaml
+sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
+sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
 kubectl kustomize capz_kustomize/ > jumpstart.yaml
 clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
 # Creating Microsoft Defender for Cloud audit secret
 echo ""
 echo "Creating Microsoft Defender for Cloud audit secret"
+echo ""
 curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
 
 cat <<EOF | kubectl apply -f -
@@ -238,7 +238,6 @@ export localPath="/home/${adminUsername}/.kube/config"
 storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
 sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
 sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
-# sudo -u $adminUsername rm $localPath
 
 # Uploading this script log to staging storage for ease of troubleshooting
 echo ""
