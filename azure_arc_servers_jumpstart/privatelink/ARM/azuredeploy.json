@@ -58,7 +58,7 @@
         "roleAssignmentName": "[guid(resourceGroup().id)]",
         "gatewayPublicIPName": "[concat(parameters('cloudGatewayName'), '-PIP')]",
         "contributorRole": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-        "privateEndpoints_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().resourceGroupName, '/providers/Microsoft.Network/privateEndpoints/', parameters('privateEndpoints_name'))]"
+        "privateEndpoints_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateEndpoints/', parameters('privateEndpoints_name'))]"
     },
     "resources": [
         {
