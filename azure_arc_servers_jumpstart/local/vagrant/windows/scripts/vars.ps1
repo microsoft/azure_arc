@@ -1,4 +1,3 @@
-
 # <--- Change the following environment variables according to your Azure service principal name --->
 
 $env:subscriptionId=<Your Azure subscription ID>

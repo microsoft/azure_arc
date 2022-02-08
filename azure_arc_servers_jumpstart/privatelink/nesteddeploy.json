@@ -23,17 +23,18 @@
                 "description": "Name for the Resource Group which will imitate an on-premises environment."
             }
         },
-        "sqlAdminLogin": {
-            "type": "string",
-            "defaultValue": "sqladmin",
+        "privateLinkScopes_name": {
+            "defaultValue": "Arc-PL-demo",
+            "type": "String",
             "metadata": {
-                "description": "Admin login for the SQL Server."
+                "description": "Name for Azure Arc private Link Scope"
             }
         },
-        "sqlAdminPassword": {
-            "type": "string",
+        "privateEndpoints_name": {
+            "defaultValue": "Arc-PE-demo",
+            "type": "String",
             "metadata": {
-                "description": "Password for the SQL Server."
+                "description": "Name for Azure Arc private Link Endpoint"
             }
         },
         "cloudVNetName": {
@@ -203,11 +204,11 @@
                 },
                 "mode": "Incremental",
                 "parameters": {
-                    "sqlAdminLogin": {
-                        "value": "[parameters('sqlAdminLogin')]"
+                    "privateLinkScopes_name": {
+                        "value": "[parameters('privateLinkScopes_name')]"
                     },
-                    "sqlAdminPassword": {
-                        "value": "[parameters('sqlAdminPassword')]"
+                    "privateEndpoints_name": {
+                         "value": "[parameters('privateEndpoints_name')]"
                     },
                     "cloudVNetName": {
                         "value": "[parameters('cloudVNetName')]"

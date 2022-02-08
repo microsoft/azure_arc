@@ -63,10 +63,11 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     - Azure resource group:
         - Azure SQL server and a SQL database
-        - Azure Private Link
+        - Azure Private Link Endpoint for SQL DB
         - Azure Private DNS zone
         - Azure VPN Gateway and its public IP address
-        - Azure VNET
+        - Two Azure VNETs
+        - Azure Private Link Endpoint for Azure-Arc enabled server
 
     - On-premises resource group:
         - Azure VNET
@@ -76,7 +77,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
         > **Note: The [_install_arc_agent.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
 
-3. User tests private connectivity to Azure SQL server from the Azure Windows Virtual Machine.
+3. User tests private connectivity to Azure SQL server from the Azure Windows Virtual Machine over Azure Private Link Endpoints.
 
 ## Deployment
 
