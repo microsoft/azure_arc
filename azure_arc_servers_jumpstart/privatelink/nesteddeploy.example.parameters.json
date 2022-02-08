@@ -8,12 +8,6 @@
         "onPremRgName": {
             "value": "Arc-Onpremise-PL-Demo"
         },
-        "sqlAdminLogin": {
-            "value": "arcdemo"
-        },
-        "sqlAdminPassword": {
-            "value": "ArcPassword123!!"
-        },
         "cloudVNetName": {
             "value": "Cloud-VNET"
         },
@@ -31,6 +25,12 @@
         },
         "cloudGatewayName": {
             "value": "AzureGw"
+        },
+        "privateLinkScopes_name": {
+            "value": "Arc-PL-demo"
+        },
+        "privateEndpoints_name": {
+            "value": "Arc-PE-demo"
         },
         "vmName": {
             "value": "ArcDemo-VM"

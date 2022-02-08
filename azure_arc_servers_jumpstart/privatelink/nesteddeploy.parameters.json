@@ -8,12 +8,6 @@
         "onPremRgName": {
             "value": "<Onpremise resource group name>"
         },
-        "sqlAdminLogin": {
-            "value": "<SQL admin username>"
-        },
-        "sqlAdminPassword": {
-            "value": "<SQL admin password>"
-        },
         "cloudVNetName": {
             "value": "<Cloud VNET Name> "
         },

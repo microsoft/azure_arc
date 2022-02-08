@@ -2,19 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "sqlAdminLogin": {
-            "type": "string",
-            "defaultValue": "sqladmin",
-            "metadata": {
-                "description": "Admin login for the SQL Server."
-            }
-        },
-        "sqlAdminPassword": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Password for the SQL Server."
-            }
-        },
         "cloudVNetName": {
             "type": "string",
             "defaultValue": "Azure-VNET",
@@ -56,18 +43,22 @@
             "metadata": {
                 "description": "The name of the Virtual Network Gateway in 'Azure'."
             }
+        },
+        "privateLinkScopes_name": {
+            "defaultValue": "Arc-PL-demo",
+            "type": "String"
+        },
+        "privateEndpoints_name": {
+            "defaultValue": "arc-pe-demo",
+            "type": "String"
         }
     },
     "variables": {
-        "sqlServerName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
-        "sqlDatabaseName": "[concat(variables('sqlServerName'),'/arc-db')]",
-        "privateEndpointName": "sqlPrivateEndpoint",
-        "privateDNSZoneName": "[concat('privatelink', environment().suffixes.sqlServerHostname)]",
-        "privateEndpointDNSGroupName": "[concat(variables('privateEndpointName'),'/arcdnsgroupname')]",
         "identityName": "deploy-identity",
         "roleAssignmentName": "[guid(resourceGroup().id)]",
         "gatewayPublicIPName": "[concat(parameters('cloudGatewayName'), '-PIP')]",
-        "contributorRole": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]"
+        "contributorRole": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "privateEndpoints_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().resourceGroupName, '/providers/Microsoft.Network/privateEndpoints/', parameters('privateEndpoints_name'))]"
     },
     "resources": [
         {
@@ -161,111 +152,31 @@
                 "[resourceId('Microsoft.Network/virtualNetworks/', parameters('cloudVNetName'))]"
             ]
         },
-        {
-            "type": "Microsoft.Sql/servers",
-            "apiVersion": "2020-02-02-preview",
-            "name": "[variables('sqlServerName')]",
-            "location": "[resourceGroup().location]",
-            "kind": "v12.0",
+          {
+            "type": "Microsoft.HybridCompute/privateLinkScopes",
+            "apiVersion": "2021-06-10-preview",
+            "name": "[parameters('privateLinkScopes_name')]",
+            "location": "westeurope",
             "properties": {
-                "administratorLogin": "[parameters('sqlAdminLogin')]",
-                "administratorLoginPassword": "[parameters('sqlAdminPassword')]",
-                "version": "12.0",
                 "publicNetworkAccess": "Disabled"
             }
         },
         {
-            "type": "Microsoft.Sql/servers/databases",
-            "apiVersion": "2020-02-02-preview",
-            "name": "[variables('sqlDatabaseName')]",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "Basic",
-                "tier": "Basic",
-                "capacity": 5
-            },
-            "properties": {
-                "collation": "SQL_Latin1_General_CP1_CI_AS",
-                "edition": "Basic",
-                "maxSizeBytes": 104857600,
-                "requestedServiceObjectiveName": "Basic",
-                "sampleName": "AdventureWorksLT"
-            },
+            "type": "Microsoft.HybridCompute/privateLinkScopes/privateEndpointConnections",
+            "apiVersion": "2021-06-10-preview",
+            "name": "[concat(parameters('privateLinkScopes_name'), '/arc-pe-demo.40560d55-2573-4920-8181-8e355c6fd539')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Network/privateEndpoints",
-            "apiVersion": "2020-06-01",
-            "name": "[variables('privateEndpointName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "subnet": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('cloudVNetName'), parameters('cloudSubnetName'))]"
-                },
-                "privateLinkServiceConnections": [
-                    {
-                        "name": "[variables('privateEndpointName')]",
-                        "properties": {
-                            "privateLinkServiceId": "[resourceId('Microsoft.Sql/servers',variables('sqlServerName'))]",
-                            "groupIds": [
-                                "sqlServer"
-                            ]
-                        }
-                    }
-                ]
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('cloudVNetName'))]",
-                "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Network/privateDnsZones",
-            "apiVersion": "2020-01-01",
-            "name": "[variables('privateDNSZoneName')]",
-            "location": "global",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('cloudVNetName'))]"
+                "[resourceId('Microsoft.HybridCompute/privateLinkScopes', parameters('privateLinkScopes_name'))]"
             ],
-            "properties": ""
-        },
-        {
-            "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
-            "apiVersion": "2020-01-01",
-            "name": "[concat(variables('privateDNSZoneName'), '/', variables('privateDNSZoneName'), '-link')]",
-            "location": "global",
             "properties": {
-                "registrationEnabled": false,
-                "virtualNetwork": {
-                    "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('cloudVNetName'))]"
+                "privateEndpoint": {
+                    "id": "[variables('privateEndpoints_externalid')]"
+                },
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Auto-approved"
                 }
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDNSZoneName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('cloudVNetName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-            "apiVersion": "2020-06-01",
-            "name": "[variables('privateEndpointDNSGroupName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "privateDnsZoneConfigs": [
-                    {
-                        "name": "config1",
-                        "properties": {
-                            "privateDnsZoneId": "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDNSZoneName'))]"
-                        }
-                    }
-                ]
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/privateDnsZones', variables('privateDNSZoneName'))]",
-                "[resourceId('Microsoft.Network/privateEndpoints', variables('privateEndpointName'))]"
-            ]
+            }
         }
     ],
     "outputs": {
