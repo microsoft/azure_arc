@@ -8,6 +8,12 @@ variable "vm_name" {
   description = "The name of the capi virtual machine"
 }
 
+variable "capiArcDataClusterName" {
+  type        = string
+  description = "The name of the capi virtual machine"
+  default     = "ArcBox-CAPI-MGMT"
+}
+
 variable "vm_size" {
   type        = string
   description = "The size of the capi virtual machine"
@@ -185,7 +191,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${var.template_base_url}artifacts/installCAPI.sh"
       ],
-      "commandToExecute": "bash installCAPI.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name}"
+      "commandToExecute": "bash installCAPI.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name} ${var.capiArcDataClusterName}"
     }
 PROTECTED_SETTINGS
 }

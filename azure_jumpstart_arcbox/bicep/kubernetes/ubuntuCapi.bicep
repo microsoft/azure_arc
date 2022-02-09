@@ -4,6 +4,9 @@ param myIpAddress string
 @description('The name of you Virtual Machine')
 param vmName string = 'ArcBox-CAPI-MGMT'
 
+@description('The name of you Virtual Machine')
+param capiArcDataClusterName string = 'ArcBox-CAPI-MGMT'
+
 @description('Username for the Virtual Machine')
 param adminUsername string = 'arcdemo'
 
@@ -174,7 +177,7 @@ resource vmInstallscriptCAPI 'Microsoft.Compute/virtualMachines/extensions@2021-
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${resourceGroup().name} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
+      commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${resourceGroup().name} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${capiArcDataClusterName}'
       fileUris: [
         '${artifactsBaseUrl}artifacts/installCAPI.sh'
       ]
