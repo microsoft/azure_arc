@@ -205,6 +205,14 @@ clusterctl get kubeconfig $CLUSTER_NAME > /home/${adminUsername}/.kube/config
 
 sudo service sshd restart
 
+# Creating Storage Class with azure-managed-disk for the CAPI cluster
+echo ""
+sudo -u $adminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml
+
+# Renaming CAPI cluster context name 
+echo ""
+sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUSTER_NAME" "arcbox-capi"
+
 # Onboarding the cluster to Azure Arc
 echo ""
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $AZURE_RESOURCE_GROUP --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
@@ -219,15 +227,6 @@ echo ""
 sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 echo ""
 sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --debug
-
-
-# Creating Storage Class with azure-managed-disk for the CAPI cluster
-echo ""
-sudo -u $adminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml
-
-# Renaming CAPI cluster context name 
-echo ""
-sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUSTER_NAME" "arcbox-capi"
 
 # Copying workload CAPI kubeconfig file to staging storage account
 echo ""
