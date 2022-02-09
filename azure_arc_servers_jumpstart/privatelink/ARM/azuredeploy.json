@@ -168,6 +168,9 @@
             "apiVersion": "2020-11-01",
             "name": "[parameters('privateEndpoints_name')]",
             "location": "westeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('cloudVNetName'))]"
+            ],
             "properties": {
                 "privateLinkServiceConnections": [
                     {
