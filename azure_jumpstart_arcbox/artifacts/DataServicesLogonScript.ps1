@@ -1,5 +1,6 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+$connectedClusterName=$Env:capiArcDataClusterName
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataServicesLogonScript.log
 
@@ -67,15 +68,9 @@ Write-Host "`n"
 azdata --version
 
 # Installing the Azure Arc-enabled data services cluster extension
+Write-Host "`n"
 Write-Host "Installing the Azure Arc-enabled data services cluster extension"
 Write-Host "`n"
-$connectedClusterName=$Env:capiArcDataClusterName
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-
-# Installing the Azure Arc-enabled data services cluster extension
-Write-Host "Installing the Azure Arc-enabled data services cluster extension"
-Write-Host "`n"
-$connectedClusterName="ArcBox-CAPI-Data"
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
