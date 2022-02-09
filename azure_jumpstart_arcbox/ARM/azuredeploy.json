@@ -62,7 +62,7 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/likamrat/azure_arc/arcbox_optimizations/azure_jumpstart_arcbox/",
+    "templateBaseUrl": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/",
     "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuRancher.json')]",
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
