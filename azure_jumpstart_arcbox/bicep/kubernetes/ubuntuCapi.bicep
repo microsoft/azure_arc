@@ -52,7 +52,7 @@ param stagingStorageAccountName string
 param logAnalyticsWorkspace string
 
 @description('The base URL used for accessing artifacts and automation artifacts')
-param artifactsBaseUrl string
+param templateBaseUrl string
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -177,9 +177,9 @@ resource vmInstallscriptCAPI 'Microsoft.Compute/virtualMachines/extensions@2021-
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${resourceGroup().name} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${capiArcDataClusterName}'
+      commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${resourceGroup().name} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${capiArcDataClusterName} $'
       fileUris: [
-        '${artifactsBaseUrl}artifacts/installCAPI.sh'
+        '${templateBaseUrl}artifacts/installCAPI.sh'
       ]
     }
   }

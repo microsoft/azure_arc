@@ -49,7 +49,7 @@ param stagingStorageAccountName string
 param logAnalyticsWorkspace string
 
 @description('The base URL used for accessing artifacts and automation artifacts')
-param artifactsBaseUrl string
+param templateBaseUrl string
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -254,7 +254,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2021-0
     protectedSettings: {
       commandToExecute: 'bash installK3s.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
       fileUris: [
-        '${artifactsBaseUrl}artifacts/installK3s.sh'
+        '${templateBaseUrl}artifacts/installK3s.sh'
       ]
     }
   }
