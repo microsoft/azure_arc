@@ -35,7 +35,7 @@ param logAnalyticsWorkspaceName string
 param flavor string = 'Full'
 
 @description('The path to the public repository where the ArcBox artifacts folder is located')
-param artifactsBaseUrl string = 'https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/'
+param templateBaseUrl string = 'https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/'
 
 module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full') {
   name: 'ubuntuCAPIDeployment'
@@ -47,7 +47,7 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
-    artifactsBaseUrl: artifactsBaseUrl
+    templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
 }
@@ -62,7 +62,7 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
     spnTenantId: spnTenantId
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
-    artifactsBaseUrl: artifactsBaseUrl
+    templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
 }
@@ -78,7 +78,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     myIpAddress: myIpAddress
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
-    artifactsBaseUrl: artifactsBaseUrl
+    templateBaseUrl: templateBaseUrl
     flavor: flavor
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
   }
