@@ -121,7 +121,7 @@ Restart-Service dhcpserver
 # Create the NAT network
 Write-Output "Create internal NAT"
 $natName = "InternalNat"
-New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.0.0/16
+New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.0.0/24
 
 # Create an internal switch with NAT
 Write-Output "Create internal switch"
