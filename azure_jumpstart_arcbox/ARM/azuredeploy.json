@@ -59,10 +59,24 @@
       },
       "allowedValues": [ "Full", "ITPro" ],
       "defaultValue": "Full"
+    },
+    "githubAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub account"
+      },
+      "defaultValue": "microsoft"
+    },
+    "githubBranch": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub branch"
+      },
+      "defaultValue": "main"
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/likamrat/azure_arc/main/azure_jumpstart_arcbox/",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_jumpstart_arcbox/')]",
     "rancherTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuRancher.json')]",
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",

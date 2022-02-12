@@ -34,8 +34,13 @@ param logAnalyticsWorkspaceName string
 ])
 param flavor string = 'Full'
 
-@description('The path to the public repository where the ArcBox artifacts folder is located')
-param templateBaseUrl string = 'https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/'
+@description('Target GitHub account')
+param githubAccount string = 'microsoft'
+
+@description('Target GitHub branch')
+param githubBranch string = 'main'
+
+var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
 module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full') {
   name: 'ubuntuCAPIDeployment'

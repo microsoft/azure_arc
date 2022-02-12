@@ -17,14 +17,18 @@ variable "vm_size" {
 
 variable "os_sku" {
   type        = string
-  description = "The Linux version for the capi VM."
+  description = "The Linux version for the Rancher VM."
   default     = "20_04-lts-gen2"
-  ### Add limit list, currently only 20.04-LTS ###
+
+  validation {
+    condition     = contains(["20_04-lts-gen2"], var.os_sku)
+    error_message = "Valid options for OS Sku: '20_04-lts-gen2'."
+  }
 }
 
 variable "admin_username" {
   type        = string
-  description = "Username for the Linux capi virtual machine."
+  description = "Username for the Linux Rancher virtual machine."
 }
 
 variable "admin_ssh_key" {
