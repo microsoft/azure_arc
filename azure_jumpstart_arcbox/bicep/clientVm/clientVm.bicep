@@ -4,8 +4,8 @@ param myIpAddress string
 @description('The name of your Virtual Machine')
 param vmName string = 'ArcBox-Client'
 
-@description('The name of your Virtual Machine')
-param capiArcDataClusterName string = 'arcbox-capi-data'
+@description('The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster')
+param capiArcDataClusterName string = 'ArcBox-CAPI-Data'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
