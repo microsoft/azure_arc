@@ -110,18 +110,12 @@ Set-DhcpServerv4OptionValue -ComputerName localhost `
                             -DnsDomain $dnsClient.ConnectionSpecificSuffix `
                             -DnsServer 168.63.129.16 `
                             -Router 10.10.1.1
-
-# Add-DhcpServerv4ExclusionRange -ScopeID 10.10.1.0 -StartRange 10.10.1.101 -EndRange 10.10.1.120
-# Set-DhcpServerv4OptionValue -OptionID 3 -Value 10.10.1.1 -ScopeID 10.10.1.0
-# Set-DhcpServerv4Scope -ScopeId 10.10.1.0 -LeaseDuration 1.00:00:00
-# Set-DhcpServerv4OptionValue -ComputerName localhost -ScopeId 10.10.1.0 -DnsServer 8.8.8.8
-
 Restart-Service dhcpserver
 
 # Create the NAT network
 Write-Output "Create internal NAT"
 $natName = "InternalNat"
-New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.0.0/24
+New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
 
 # Create an internal switch with NAT
 Write-Output "Create internal switch"
