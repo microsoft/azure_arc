@@ -100,12 +100,22 @@ az provider register --namespace Microsoft.AzureArcData --wait
 # Install and configure DHCP service (used by Hyper-V nested VMs)
 Write-Output "Configure DHCP service"
 $dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
-Add-DhcpServerv4Scope -Name "ArcBox" -StartRange 10.10.1.1 -EndRange 10.10.1.254 -SubnetMask 255.0.0.0 -State Active
-Add-DhcpServerv4ExclusionRange -ScopeID 10.10.1.0 -StartRange 10.10.1.101 -EndRange 10.10.1.120
-Set-DhcpServerv4OptionValue -DnsDomain $dnsClient.ConnectionSpecificSuffix -DnsServer 168.63.129.16
-Set-DhcpServerv4OptionValue -OptionID 3 -Value 10.10.1.1 -ScopeID 10.10.1.0
-Set-DhcpServerv4Scope -ScopeId 10.10.1.0 -LeaseDuration 1.00:00:00
-Set-DhcpServerv4OptionValue -ComputerName localhost -ScopeId 10.10.10.0 -DnsServer 8.8.8.8
+Add-DhcpServerv4Scope -Name "ArcBox" `
+                      -StartRange 10.10.1.100 `
+                      -EndRange 10.10.1.200 `
+                      -SubnetMask 255.255.255.0 `
+                      -LeaseDuration 1.00:00:00 `
+                      -State Active
+Set-DhcpServerv4OptionValue -ComputerName localhost `
+                            -DnsDomain $dnsClient.ConnectionSpecificSuffix `
+                            -DnsServer 168.63.129.16 `
+                            -Router 10.10.1.1
+
+# Add-DhcpServerv4ExclusionRange -ScopeID 10.10.1.0 -StartRange 10.10.1.101 -EndRange 10.10.1.120
+# Set-DhcpServerv4OptionValue -OptionID 3 -Value 10.10.1.1 -ScopeID 10.10.1.0
+# Set-DhcpServerv4Scope -ScopeId 10.10.1.0 -LeaseDuration 1.00:00:00
+# Set-DhcpServerv4OptionValue -ComputerName localhost -ScopeId 10.10.1.0 -DnsServer 8.8.8.8
+
 Restart-Service dhcpserver
 
 # Create the NAT network
