@@ -193,7 +193,7 @@ $Favorite.Save()
 Stop-Process -Id $kubectlMonShell.Id
 
 # Changing to Jumpstart ArcBox wallpaper
-if ($Env:flavor -eq "Full" -or "ITPro") {
+if ($Env:flavor -eq "Full") {
 $imgPath="$Env:ArcBoxDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 

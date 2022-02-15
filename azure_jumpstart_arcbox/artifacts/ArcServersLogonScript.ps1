@@ -336,3 +336,20 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Write-Host "Creating deployment logs bundle"
     7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
 }'
+
+if ($Env:flavor -eq "ITPro") {
+    $imgPath="$Env:ArcBoxDir\wallpaper.png"
+    $code = @' 
+    using System.Runtime.InteropServices; 
+    namespace Win32{ 
+        
+         public class Wallpaper{ 
+            [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+             static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+             
+             public static void SetWallpaper(string thePath){ 
+                SystemParametersInfo(20,0,thePath,3); 
+             }
+        }
+     } 
+'@
