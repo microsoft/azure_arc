@@ -324,6 +324,28 @@ if(-not $hasPermission) {
     $shortcut.Save()
 }
 
+# Changing to Jumpstart ArcBox wallpaper
+$code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
+    
+    public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+            
+            public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+            }
+        }
+    } 
+'@
+
+if ($Env:flavor -eq "ITPro") {
+    $imgPath="$Env:ArcBoxDir\wallpaper.png"
+    Add-Type $code 
+    [Win32.Wallpaper]::SetWallpaper($imgPath)
+}
+
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 
@@ -336,20 +358,3 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Write-Host "Creating deployment logs bundle"
     7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
 }'
-
-if ($Env:flavor -eq "ITPro") {
-    $imgPath="$Env:ArcBoxDir\wallpaper.png"
-    $code = @' 
-    using System.Runtime.InteropServices; 
-    namespace Win32{ 
-        
-         public class Wallpaper{ 
-            [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-             static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-             
-             public static void SetWallpaper(string thePath){ 
-                SystemParametersInfo(20,0,thePath,3); 
-             }
-        }
-     } 
-'@

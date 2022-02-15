@@ -193,8 +193,6 @@ $Favorite.Save()
 Stop-Process -Id $kubectlMonShell.Id
 
 # Changing to Jumpstart ArcBox wallpaper
-if ($Env:flavor -eq "Full") {
-$imgPath="$Env:ArcBoxDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
@@ -210,8 +208,10 @@ namespace Win32{
  } 
 '@
 
-add-type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
+if ($Env:flavor -eq "Full") {
+    $imgPath="$Env:ArcBoxDir\wallpaper.png"
+    Add-Type $code 
+    [Win32.Wallpaper]::SetWallpaper($imgPath)
 }
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
