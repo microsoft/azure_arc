@@ -256,7 +256,9 @@ namespace Win32{
     } 
 '@
 
-if ($Env:flavor -eq "ITPro") {
+$DataServicesLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "DataServicesLogonScript.ps1" }
+
+if(-not $DataServicesLogonScript) {
     $imgPath="$Env:ArcBoxDir\wallpaper.png"
     Add-Type $code 
     [Win32.Wallpaper]::SetWallpaper($imgPath)
