@@ -208,7 +208,9 @@ namespace Win32{
  } 
 '@
 
-if ($Env:flavor -eq "Full") {
+$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
+
+if(-not $ArcServersLogonScript) {
     $imgPath="$Env:ArcBoxDir\wallpaper.png"
     Add-Type $code 
     [Win32.Wallpaper]::SetWallpaper($imgPath)
