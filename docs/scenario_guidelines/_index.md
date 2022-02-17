@@ -19,7 +19,7 @@ In this document, our goal is to provide you with as many details as possible fo
 
 The Jumpstart project is a mix of various automation, code styles, and high-quality documentation and requires development effort.
 
-Before a scenario is getting published, it will go through a code review process by one of the project maintainers. We want your scenario to be successful and widely adopted and to meet the highest standards possible and we are here to help get there!
+Before a scenario is published, it will go through a code review process by one of the project maintainers. We want your scenario to be successful and widely adopted and to meet the highest standards possible and we are here to help get there!
 
 ## Pull requests and issues
 
