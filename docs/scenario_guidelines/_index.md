@@ -80,7 +80,7 @@ Every Jumpstart scenario should have a "Prerequisites" section as the first sect
 
 * We would love for you to use good judgment and if the scenario's reviewer will find that a certain prerequisite should be automated he will point that out as part of the pull request code review.
 
-* As mentioned at the beginning of this guidelines readme, to avoid a situation you will need to refactor code or make unforced changes, it is highly recommended for you to use existing scenarios as a reference and work from there.
+* As mentioned at the beginning of this guidelines readme, to avoid a situation where you will need to refactor code or make unforced changes, it is highly recommended for you to use existing scenarios as a reference and work from there.
 
 ## Markdown linting and style
 
