@@ -143,7 +143,6 @@
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                //"[if(equals(variables('deployBastion'),'No'),resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName')),'')]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"

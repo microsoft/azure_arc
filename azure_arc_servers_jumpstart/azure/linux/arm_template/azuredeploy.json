@@ -13,7 +13,7 @@
       "type": "string",
       "defaultValue": "Standard_D4s_v3",
       "metadata": {
-          "description": "The size of the VM"
+        "description": "The size of the VM"
       }
     },
     "adminUsername": {
@@ -66,6 +66,20 @@
         "description": "Azure region location for all resources."
       }
     },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "allowedValues": [ "Yes", "No" ]
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Win-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
+      }
+    },
     "virtualNetworkName": {
       "type": "string",
       "defaultValue": "Arc-Demo-Linux-VNET",
@@ -86,45 +100,56 @@
       "metadata": {
         "description": "Name of the Network Security Group"
       }
-    }, 
+    },
     "subscriptionID": {
       "type": "string",
       "metadata": {
         "description": "Subscription ID"
       }
-    }, 
+    },
     "servicePrincipalClient": {
       "type": "string",
       "metadata": {
         "description": "Azure service principal name"
       }
-    }, 
+    },
     "servicePrincipalClientSecret": {
       "type": "string",
       "metadata": {
         "description": "Azure service principal password"
       }
-    }, 
+    },
     "resourceGroup": {
       "type": "string",
       "metadata": {
         "description": "Azure resource group where all resource to be deployed"
       }
-    }, 
+    },
     "tenantID": {
       "type": "string",
       "metadata": {
         "description": "Azure tenant ID"
       }
-    }    
+    }
   },
   "variables": {
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
     "osDiskType": "Standard_LRS",
     "subnetAddressPrefix": "10.1.0.0/24",
     "addressPrefix": "10.1.0.0/16",
+    "bastionName": "[concat(parameters('bastionHostName'))]",
+    "deployBastion": "[concat(parameters('deployBastion'))]",
+    "bastionSubnetIpPrefix": "10.1.1.0/27",
+    "PublicIPNoBastion": {
+      "id": "resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))"
+    },
+    "NsgbNoBastion": {
+      "id": "resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))"
+    },
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
       "ssh": {
@@ -157,21 +182,18 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              }
+              "publicIpAddress": "[if(equals(variables('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ],
-        "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
-        }
+        "networkSecurityGroup": "[if(equals(variables('deployBastion'),'No'),variables('NsgbNoBastion'),json('null'))]"
       }
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2020-06-01",
       "name": "[parameters('networkSecurityGroupName')]",
+      "condition": "[equals(variables('deployBastion'),'No')]",
       "location": "[parameters('location')]",
       "properties": {
         "securityRules": [
@@ -210,7 +232,13 @@
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
-          }
+          },
+          {
+                        "name" : "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('bastionSubnetIpPrefix')]"
+                        }
+                     }
         ]
       }
     },
@@ -220,8 +248,7 @@
       "name": "[variables('publicIpAddressName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "Basic",
-        "tier": "Regional"
+        "name": "[if(equals(variables('deployBastion'),'No'),'Basic','Standard')]"
       },
       "properties": {
         "publicIpAllocationMethod": "Static",
@@ -280,7 +307,7 @@
       "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
-      ],    
+      ],
       "properties": {
         "publisher": "Microsoft.Azure.Extensions",
         "type": "CustomScript",
@@ -290,10 +317,37 @@
           "fileUris": [
             "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh"
           ],
-          "commandToExecute": "[concat('./install_arc_agent.sh ', parameters('adminUsername'), ' ', parameters ('subscriptionID'), ' ', parameters('servicePrincipalClient'), ' ', parameters('servicePrincipalClientSecret'), ' ', parameters('tenantId'), ' ', parameters('resourceGroup'), ' ', parameters('location'), ' ', parameters('vmName') )]" 
-        }            
+          "commandToExecute": "[concat('./install_arc_agent.sh ', parameters('adminUsername'), ' ', parameters ('subscriptionID'), ' ', parameters('servicePrincipalClient'), ' ', parameters('servicePrincipalClientSecret'), ' ', parameters('tenantId'), ' ', parameters('resourceGroup'), ' ', parameters('location'), ' ', parameters('vmName') )]"
+        }
       }
-    }
+    },
+    {
+            "type": "Microsoft.Network/bastionHosts",
+            "condition": "[equals(variables('deployBastion'),'Yes')]",
+            "name": "[variables('bastionName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2020-11-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "IpConf",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('bastionSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            }
+                        }
+                     }
+                ]
+            }
+        }
   ],
   "outputs": {
     "adminUsername": {
