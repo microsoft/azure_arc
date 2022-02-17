@@ -12,19 +12,23 @@ variable "vm_name" {
 variable "vm_size" {
   type        = string
   description = "The size of the capi virtual machine."
-  default     = "Standard_D4s_v3"
+  default     = "Standard_D4s_v4"
 }
 
 variable "os_sku" {
   type        = string
-  description = "The Linux version for the capi VM."
-  default     = "18.04-LTS"
-  ### Add limit list, currently only 18.04-LTS ###
+  description = "The Linux version for the Rancher VM."
+  default     = "20_04-lts-gen2"
+
+  validation {
+    condition     = contains(["20_04-lts-gen2"], var.os_sku)
+    error_message = "Valid options for OS Sku: '20_04-lts-gen2'."
+  }
 }
 
 variable "admin_username" {
   type        = string
-  description = "Username for the Linux capi virtual machine."
+  description = "Username for the Linux Rancher virtual machine."
 }
 
 variable "admin_ssh_key" {
@@ -188,7 +192,7 @@ resource "azurerm_virtual_machine" "client" {
 
   storage_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
+    offer     = "0001-com-ubuntu-server-focal"
     sku       = var.os_sku
     version   = "latest"
   }
