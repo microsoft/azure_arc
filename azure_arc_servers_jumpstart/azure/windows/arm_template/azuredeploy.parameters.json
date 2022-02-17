@@ -2,35 +2,41 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-      "vmSize": {
-          "value": "<VM size>"
-      },
-      "vmName":{
-          "value": "<VM Name>"
-      },
-      "adminUsername": {
-        "value": "<Windows VM admin username>"
-      },
-      "adminPassword": {
-          "value": "<Windows VM admin password>"
-      },
-      "resourceGroup": {
-        "value": "<Azure resource group where all resource to be deployed>"
-      },      
-      "appId": {
-          "value": "<Azure service principal name>"
-      },
-      "password": {
-          "value": "<Azure service principal password>"
-      },
-      "tenantId": {
-          "value": "<Azure tenant ID>"
-      },
-      "subscriptionId": {
-          "value": "<Azure subscription ID>"
-      },
-      "location": {
-          "value": "<Azure region>"
-      }
+    "vmSize": {
+      "value": "<VM size>"
+    },
+    "vmName": {
+      "value": "<VM Name>"
+    },
+    "adminUsername": {
+      "value": "<Windows VM admin username>"
+    },
+    "adminPassword": {
+      "value": "<Windows VM admin password>"
+    },
+    "resourceGroup": {
+      "value": "<Azure resource group where all resource to be deployed>"
+    },
+    "appId": {
+      "value": "<Azure service principal name>"
+    },
+    "password": {
+      "value": "<Azure service principal password>"
+    },
+    "tenantId": {
+      "value": "<Azure tenant ID>"
+    },
+    "subscriptionId": {
+      "value": "<Azure subscription ID>"
+    },
+    "location": {
+      "value": "<Azure region>"
+    },
+    "deployBastion": {
+        "value": "<Yes | No"
+    },
+    "bastionHostName": {
+      "value": "<Azure Bastion Host name>"
     }
+  }
 }
