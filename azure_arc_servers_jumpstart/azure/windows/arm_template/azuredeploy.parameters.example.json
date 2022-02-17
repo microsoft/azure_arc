@@ -18,16 +18,16 @@
       "value": "Arc-Servers-Win-Demo"
     },
     "appId": {
-      "value": "15015a4d-01d7-48c6-aeeb-05e736132e39"
+      "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
     },
     "password": {
-      "value": "8817Q~vWv.SBxTEgw-REysKW9aHLL7_ipd2tB"
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
     },
     "tenantId": {
-      "value": "030607a1-e6bb-4aef-ae83-170101641ee9"
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
     },
     "subscriptionId": {
-      "value": "9b65ec1f-c8e3-4ec5-a482-56784190935b"
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
     },
     "location": {
       "value": "eastus"
@@ -36,7 +36,7 @@
         "value": "Yes"
     },
     "bastionHostName": {
-      "value": "Arc-Win-Deno-Bastion"
+      "value": "Arc-Win-Demo-Bastion"
     }
   }
 }
