@@ -146,7 +146,7 @@ $UbuntuVmIp = Get-VM -Name ArcBox-Ubuntu | Select-Object -ExpandProperty Network
 # Getting the CentOS nested VM IP address
 $CentOSVmIp = Get-VM -Name ArcBox-CentOS | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
 
-# Check if Service Principal has 'write' permissions to target Resource Group
+# Check if Service Principal has 'Microsoft.Authorization/roleAssignments/write' permissions to target Resource Group
 $requiredActions = @('*', 'Microsoft.Authorization/roleAssignments/write', 'Microsoft.Authorization/*', 'Microsoft.Authorization/*/write')
 
 $roleDefinitions = az role definition list --out json | ConvertFrom-Json
