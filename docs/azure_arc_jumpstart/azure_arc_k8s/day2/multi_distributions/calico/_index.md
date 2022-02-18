@@ -8,7 +8,7 @@ description: >
 
 ## Use Azure Policy on a Azure-Arc enabled Kubernetes cluster for applying ingress/egress rules with Calico network policy
 
- > **Disclaimer: This scenario was contributed by the Platform9 team as part of the "Jumpstart Friends" program**
+ > **Disclaimer: This scenario was contributed by the Tigera Project Calico team as part of the "Jumpstart Friends" program**
 
 <p align="center"><img src="/img/jumpstart_friends_logo.png" alt="jumpstart-friends-logo" width="250"></p>
 
