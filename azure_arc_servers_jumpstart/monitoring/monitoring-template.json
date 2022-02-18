@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "workspaceName": {
@@ -1591,6 +1591,60 @@
                         "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
                     }
                 ]
+            }
+        },
+        {
+            "type": "microsoft.insights/scheduledqueryrules",
+            "apiVersion": "2021-08-01",
+            "name": "Unexpected System Shutdown",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "displayName": "Unexpected System Shutdown",
+                "description": "Monitor Alert for Unexpected System Shutdown",
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "targetResourceTypes": [
+                    "Microsoft.OperationalInsights/workspaces"
+                ],
+                "windowSize": "[variables('windowSize')]", 
+                "criteria": {
+                    "allOf": [
+                        {
+                            "query": "Event | where (EventID == 6008 and Source ==\"EventLog\") or (EventID == 1074 and Source == \"User32\" and (RenderedDescription has \"shutdown\" or RenderedDescription has \"power off\")) \n",
+                            "timeAggregation": "Count",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "resourceIdColumn": "_ResourceId",
+                            "operator": "GreaterThan",
+                            "threshold": "0",
+                            "failingPeriods": {
+                                "numberOfEvaluationPeriods": "1",
+                                "minFailingPeriodsToAlert": "1"
+                            }
+                        }
+                    ]
+                },
+                "autoMitigate": false,
+                "actions": {
+                    "actionGroups": [
+                        "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    ]
+                }
             }
         }
     ]
