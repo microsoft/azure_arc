@@ -123,25 +123,19 @@ $nestedWindowsPassword = "ArcDemo123!!"
 $nestedLinuxUsername = "arcdemo"
 $nestedLinuxPassword = "ArcDemo123!!"
 
+# Create Windows credential object
+$secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
+$winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
+
+# Create Linux credential object
+$secLinuxPassword = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
+$linCreds = New-Object System.Management.Automation.PSCredential ($nestedLinuxUsername, $secLinuxPassword)
+
 # Getting the Ubuntu nested VM IP address
-Get-VM -Name ArcBox-Ubuntu | Select-Object -ExpandProperty NetworkAdapters | Select-Object IPAddresses | Format-List | Out-File "$agentScript\Ubuntu-IP.txt"
-$UbuntuIP = "$agentScript\Ubuntu-IP.txt"
-(Get-Content $UbuntuIP | Select-Object -Skip 2) | Set-Content $UbuntuIP
-$string = Get-Content "$UbuntuIP"
-$string.split(',')[0] | Set-Content $UbuntuIP
-$string = Get-Content "$UbuntuIP"
-$string.split('{')[-1] | Set-Content $UbuntuIP
-$UbuntuVmIp = Get-Content "$UbuntuIP"
+$UbuntuVmIp = Get-VM -Name ArcBox-Ubuntu | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
 
 # Getting the CentOS nested VM IP address
-Get-VM -Name ArcBox-CentOS | Select-Object -ExpandProperty NetworkAdapters | Select-Object IPAddresses | Format-List | Out-File "$agentScript\CentOS-IP.txt"
-$CentOSIP = "$agentScript\CentOS-IP.txt"
-(Get-Content $CentOSIP | Select-Object -Skip 2) | Set-Content $CentOSIP
-$string = Get-Content "$CentOSIP"
-$string.split(',')[0] | Set-Content $CentOSIP
-$string = Get-Content "$CentOSIP"
-$string.split('{')[-1] | Set-Content $CentOSIP
-$CentOSVmIp = Get-Content "$CentOSIP"
+$CentOSVmIp = Get-VM -Name ArcBox-CentOS | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
 
 # Check if Service Principal has 'write' permissions to target Resource Group
 $requiredActions = @('*', 'Microsoft.Authorization/roleAssignments/write', 'Microsoft.Authorization/*', 'Microsoft.Authorization/*/write')
@@ -153,7 +147,7 @@ $authorizedRoles = $roleDefinitions | ForEach-Object { $_ | Where-Object { (Comp
 $hasPermission = $rolePermissions | Where-Object {($_.principalId -eq $spnObjectId) -and ($_.roleDefinitionName -in $authorizedRoles)}
 
 # Copying the Azure Arc Connected Agent to nested VMs
-Write-Output "Copying the Azure Arc onboarding script to the nested VMs"
+Write-Output "Replacing values within Arc Agent install scripts..."
 (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
 (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 (Get-Content -path "$agentScript\installArcAgentCentOS.sh" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedCentOS.sh"
@@ -165,36 +159,34 @@ if(-not $hasPermission) {
     (Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$myResourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" -replace '\$logAnalyticsWorkspaceName',"'$Env:workspaceName'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
 }
 
+# Copy installtion script to nested Windows VMs
+Write-Output "Transferring installation script to nested Windows VMs..."
 Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\ArcBox\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-Win2K22 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\ArcBox\installArcAgent.ps1 -CreateFullPath -FileSource Host
 Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1" -DestinationPath C:\ArcBox\installArcAgentSQL.ps1 -CreateFullPath -FileSource Host
 
-Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedUbuntu.sh" $nestedLinuxUsername@"$UbuntuVmIp":/home/"$nestedLinuxUsername"
-Write-Output y | pscp -P 22 -pw $nestedLinuxPassword "$agentScript\installArcAgentModifiedCentOS.sh" $nestedLinuxUsername@"$CentOSVmIp":/home/"$nestedLinuxUsername"
+# Copy installtion script to nested Linux VMs
+Write-Output "Transferring installation script to nested Linux VMs..."
+Set-SCPItem -ComputerName $UbuntuVmIp -Credential $linCredObject -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
+Set-SCPItem -ComputerName $CentOSVmIp -Credential $linCredObject -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedCentOS.sh" -Force
 
 # Onboarding the nested VMs as Azure Arc-enabled servers
 Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
-$secstr = New-Object -TypeName System.Security.SecureString
-$nestedWindowsPassword.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $nestedWindowsUsername, $secstr
 
-Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
-Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $cred
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgentSQL.ps1 } -Credential $cred
+Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $winCreds
+Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { powershell -File C:\ArcBox\installArcAgent.ps1 } -Credential $winCreds
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { powershell -File C:\ArcBox\installArcAgentSQL.ps1 } -Credential $winCreds
 
 Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
-# Converting Linux credentials to secure string  
-$secpasswd = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
-$Credentials = New-Object System.Management.Automation.PSCredential($nestedLinuxUsername, $secpasswd)
 
-$SessionID = New-SSHSession -ComputerName $UbuntuVmIp -Credential $Credentials -Force -WarningAction SilentlyContinue # Connect Over SSH
+$ubuntuSession = New-SSHSession -ComputerName $UbuntuVmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
-Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -Timeout 120 -WarningAction SilentlyContinue | Out-Null
+$(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 60 -WarningAction SilentlyContinue).Output
 
 # Onboarding nested CentOS server VM
-$SessionID = New-SSHSession -ComputerName $CentOSVmIp -Credential $Credentials -Force -WarningAction SilentlyContinue # Connect Over SSH
+$centosSession = New-SSHSession -ComputerName $CentOSVmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
-Invoke-SSHCommand -Index $sessionid.sessionid -Command $Command -TimeOut 500 -WarningAction SilentlyContinue | Out-Null
+$(Invoke-SSHCommand -SSHSession $centosSession -Command $Command -TimeOut 60 -WarningAction SilentlyContinue).Output
 
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
