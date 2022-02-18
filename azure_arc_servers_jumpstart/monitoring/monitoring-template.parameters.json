@@ -4,6 +4,9 @@
     "parameters": {
         "workspaceName": {
             "value": "la-arc-servers" // Name for your Log Analytics workspace
+        },
+        "emailAddress": {
+            "value": "alex@mail.com" // Just one email account
         }
     }
 }
