@@ -35,6 +35,9 @@
           }
         }
     },
+    "variables": {
+        "intervalSeconds": 60
+    },
     "resources": [
         {
             "apiVersion": "2020-08-01",
@@ -52,6 +55,456 @@
                 }
             },
             "resources": []
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2020-08-01",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsEventsSystem')]",
+            "kind": "WindowsEvent",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "eventLogName": "System",
+                "eventTypes": [
+                    {
+                        "eventType": "Error"
+                    },
+                    {
+                        "eventType": "Warning"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2020-08-01",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsEventsApplication')]",
+            "kind": "WindowsEvent",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "eventLogName": "Application",
+                "eventTypes": [
+                    {
+                        "eventType": "Error"
+                    },
+                    {
+                        "eventType": "Warning"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfProcessorPercentage')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Processor",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "% Processor Time"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfProcessPercentage')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Process",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "% Processor Time"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskFreeSpace')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "% Processor Time"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskAvgDiskSecRead')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Avg. Disk sec/Read"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskAvgDiskSecWrite')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Avg. Disk sec/Write"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskCurrentDiskQueueLength')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Current Disk Queue Length"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskDiskReadsSec')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Disk Reads/sec"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskTransfersSec')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Disk Transfers/sec"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskWritesSec')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Disk Writes/sec"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogiDiskFreeMegabytes')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "LogicalDisk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Free Megabytes"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfMemoryCommittedBytesInUse')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "% Committed Bytes In Use"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfMemoryAvailableMBytes')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Available MBytes"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfNetworkAdapterBytesReceivedSec')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Bytes Received/sec"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfNetworkAdapterBytesSentSec')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Bytes Sent/sec"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfNetworkAdapterBytesTotatSec')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Network Adapter",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Bytes Total/sec"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfSystemProcessorQueueLength')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "System",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Processor Queue Length"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'LinuxPerformanceLogicalDisk')]",
+            "kind": "LinuxPerformanceObject",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Logical Disk",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "performanceCounters": [
+                    {
+                        "counterName": "% Used Inodes"
+                    },
+                    {
+                        "counterName": "Free Megabytes"
+                    },
+                    {
+                        "counterName": "% Used Space"
+                    },
+                    {
+                        "counterName": "Disk Transfers/sec"
+                    },
+                    {
+                        "counterName": "Disk Reads/sec"
+                    },
+                    {
+                        "counterName": "Disk Writes/sec"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'LinuxPerformanceMemory')]",
+            "kind": "LinuxPerformanceObject",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "performanceCounters": [
+                    {
+                        "counterName": "% Used Memory"
+                    },
+                    {
+                        "counterName": "% Used Swap Space"
+                    },
+                    {
+                        "counterName": "Available MBytes Memory"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'LinuxPerformanceNetwork')]",
+            "kind": "LinuxPerformanceObject",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Network",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "performanceCounters": [
+                    {
+                        "counterName": "Total Bytes Received"
+                    },
+                    {
+                        "counterName": "Total Bytes Transmitted"
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'LinuxPerformanceProcessor')]",
+            "kind": "LinuxPerformanceObject",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "objectName": "Processor",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "performanceCounters": [
+                    {
+                        "counterName": "% Privileged Time"
+                    },
+                    {
+                        "counterName": "% Processor Time"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2020-08-01",
+            "name": "[concat(parameters('workspaceName'), '/', 'SyslogKern')]",
+            "kind": "LinuxSyslog",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "syslogName": "kern",
+                "syslogSeverities": [
+                    {
+                        "severity": "emerg"
+                    },
+                    {
+                        "severity": "alert"
+                    },
+                    {
+                        "severity": "crit"
+                    },
+                    {
+                        "severity": "err"
+                    },
+                    {
+                        "severity": "warning"
+                    },
+                    {
+                        "severity": "notice"
+                    },
+                    {
+                        "severity": "info"
+                    },
+                    {
+                        "severity": "debug"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "apiVersion": "2020-08-01",
+            "name": "[concat(parameters('workspaceName'), '/', 'SyslogDaemon')]",
+            "kind": "LinuxSyslog",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "syslogName": "daemon",
+                "syslogSeverities": [
+                    {
+                        "severity": "emerg"
+                    },
+                    {
+                        "severity": "alert"
+                    },
+                    {
+                        "severity": "crit"
+                    },
+                    {
+                        "severity": "err"
+                    },
+                    {
+                        "severity": "warning"
+                    }
+                ]
+            }
         }
     ]
   }
