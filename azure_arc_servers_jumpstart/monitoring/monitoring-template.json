@@ -33,6 +33,27 @@
           "metadata": {
             "description": "Number of days to retain data."
           }
+        },
+        "actionGroupName": {
+            "type": "string",
+            "defaultValue": "ag-arc-servers",
+            "metadata": {
+                "description": "Unique name within the resource group for the Action group."
+            }
+        },
+        "actionGroupShortName": {
+            "type": "string",
+            "defaultValue": "agarcservers",
+            "metadata": {
+                "description": "Short name up to 12 characters for the Action group."
+            }
+        },
+        "emailAddress": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Short name up to 12 characters for the Action group."
+            }
         }
     },
     "variables": {
@@ -523,6 +544,23 @@
                 "product": "[concat('OMSGallery/', 'VMInsights')]",
                 "promotionCode": "",
                 "publisher": "Microsoft"
+            }
+        },
+        {
+            "type": "Microsoft.Insights/actionGroups",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('actionGroupName')]",
+            "location": "Global",
+            "properties": {
+                "groupShortName": "[parameters('actionGroupShortName')]",
+                "enabled": true,
+                "emailReceivers": [
+                    {
+                        "name": "ArcServersEmail",
+                        "emailAddress": "[parameters('emailAddress')]",
+                        "useCommonAlertSchema": true
+                    }
+                ]
             }
         }
     ]
