@@ -36,7 +36,8 @@
         }
     },
     "variables": {
-        "intervalSeconds": 60
+        "intervalSeconds": 60,
+        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
     },
     "resources": [
         {
@@ -504,6 +505,24 @@
                         "severity": "warning"
                     }
                 ]
+            }
+        },
+        {
+            "apiVersion": "2015-11-01-preview",
+            "type": "Microsoft.OperationsManagement/solutions",
+            "location": "[parameters('location')]",
+            "name": "[concat('VMInsights', '(', split(variables('workspaceResourceId'),'/')[8], ')')]",
+            "dependsOn": [
+                "[parameters('workspaceName')]"
+              ],
+            "properties": {
+                "workspaceResourceId": "[variables('workspaceResourceId')]"
+            },
+            "plan": {
+                "name": "[concat('VMInsights', '(', split(variables('workspaceResourceId'),'/')[8], ')')]",
+                "product": "[concat('OMSGallery/', 'VMInsights')]",
+                "promotionCode": "",
+                "publisher": "Microsoft"
             }
         }
     ]
