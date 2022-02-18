@@ -58,7 +58,11 @@
     },
     "variables": {
         "intervalSeconds": 60,
-        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+        "alertsSeverity": 2,
+        "windowSize": "PT5M",
+        "evaluationFrequency": "PT5M",
+        "convertRuleTag": "hidden-link:"
     },
     "resources": [
         {
@@ -84,7 +88,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsEventsSystem')]",
             "kind": "WindowsEvent",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "eventLogName": "System",
@@ -104,7 +108,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsEventsApplication')]",
             "kind": "WindowsEvent",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "eventLogName": "Application",
@@ -124,7 +128,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfProcessorPercentage')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Processor",
@@ -139,7 +143,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfProcessPercentage')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Process",
@@ -154,7 +158,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskFreeSpace')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "LogicalDisk",
@@ -169,7 +173,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskAvgDiskSecRead')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "LogicalDisk",
@@ -184,7 +188,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskAvgDiskSecWrite')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "LogicalDisk",
@@ -199,7 +203,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskCurrentDiskQueueLength')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "LogicalDisk",
@@ -214,7 +218,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskDiskReadsSec')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "LogicalDisk",
@@ -229,7 +233,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskTransfersSec')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "LogicalDisk",
@@ -244,7 +248,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogicDiskWritesSec')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "LogicalDisk",
@@ -259,7 +263,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfLogiDiskFreeMegabytes')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "LogicalDisk",
@@ -274,7 +278,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfMemoryCommittedBytesInUse')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Memory",
@@ -289,7 +293,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfMemoryAvailableMBytes')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Memory",
@@ -304,7 +308,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfNetworkAdapterBytesReceivedSec')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Network Adapter",
@@ -319,7 +323,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfNetworkAdapterBytesSentSec')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Network Adapter",
@@ -334,7 +338,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfNetworkAdapterBytesTotatSec')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Network Adapter",
@@ -349,7 +353,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfSystemProcessorQueueLength')]",
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "System",
@@ -364,7 +368,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'LinuxPerformanceLogicalDisk')]",
             "kind": "LinuxPerformanceObject",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Logical Disk",
@@ -398,7 +402,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'LinuxPerformanceMemory')]",
             "kind": "LinuxPerformanceObject",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Memory",
@@ -423,7 +427,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'LinuxPerformanceNetwork')]",
             "kind": "LinuxPerformanceObject",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Network",
@@ -445,7 +449,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'LinuxPerformanceProcessor')]",
             "kind": "LinuxPerformanceObject",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "objectName": "Processor",
@@ -467,7 +471,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'SyslogKern')]",
             "kind": "LinuxSyslog",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "syslogName": "kern",
@@ -505,7 +509,7 @@
             "name": "[concat(parameters('workspaceName'), '/', 'SyslogDaemon')]",
             "kind": "LinuxSyslog",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "syslogName": "daemon",
@@ -534,7 +538,7 @@
             "location": "[parameters('location')]",
             "name": "[concat('VMInsights', '(', split(variables('workspaceResourceId'),'/')[8], ')')]",
             "dependsOn": [
-                "[parameters('workspaceName')]"
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
               ],
             "properties": {
                 "workspaceResourceId": "[variables('workspaceResourceId')]"
@@ -559,6 +563,1032 @@
                         "name": "ArcServersEmail",
                         "emailAddress": "[parameters('emailAddress')]",
                         "useCommonAlertSchema": true
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "Processor Time Percent",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "Processor Time Percent",
+                "description": "Monitor Alert for Processor Time Percent",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_% Processor Time",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "Processor"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "Processor Time Percent",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','Processor Time Percent')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for Processor Time Percent",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "80",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_% Processor Time",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "Processor"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "Memory Available MBytes",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "Memory Available MBytes",
+                "description": "Monitor alert for Memory Available MBytes",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_Available MBytes",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "Memory"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "Memory Available MBytes",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','Memory Available MBytes')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor alert for Memory Available MBytes",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "1500",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_Available MBytes",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "Memory"
+                                    ]
+                                }
+                            ],
+                            "operator": "LessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "Memory Commited Bytes in use Percent",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "Memory Commited Bytes in use Percent",
+                "description": "Monitor Alert for Memory Commited Bytes in use Percent",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_% Committed Bytes In Use",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "Memory"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "Memory Commited Bytes in use Percent",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','Memory Commited Bytes in use Percent')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for Memory Commited Bytes in use Percent",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "80",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_% Committed Bytes In Use",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "Memory"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "Memory Pages per Sec",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "Memory Pages per Sec",
+                "description": "Monitor Alert for Memory Pages per Sec",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_Pages/sec",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "Memory"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "Memory Pages per Sec",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','Memory Pages per Sec')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for Memory Pages per Sec",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "5000",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_Pages/sec",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "Memory"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "LogicalDisk Avg. Disk sec per Read",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "LogicalDisk Avg. Disk sec per Read",
+                "description": "Monitor Alert for LogicalDisk Avg. Disk sec per Read",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_Avg. Disk sec/Read",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "LogicalDisk Avg. Disk sec per Read",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','LogicalDisk Avg. Disk sec per Read')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for LogicalDisk Avg. Disk sec per Read",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "0.04",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_Avg. Disk sec/Read",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "LogicalDisk Avg. Disk sec per Write",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "LogicalDisk Avg. Disk sec per Write",
+                "description": "Monitor Alert for LogicalDisk Avg. Disk sec per Write",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_Avg. Disk sec/Write",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "LogicalDisk Avg. Disk sec per Write",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','LogicalDisk Avg. Disk sec per Write')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for LogicalDisk Avg. Disk sec per Write",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "0.04",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_Avg. Disk sec/Write",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "LogicalDisk Current Queue Length",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "LogicalDisk Current Queue Length",
+                "description": "Monitor Alert for LogicalDisk Current Queue Length",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_Current Disk Queue Length",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "LogicalDisk Current Queue Length",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','LogicalDisk Current Queue Length')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for LogicalDisk Current Queue Length",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "32",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_Current Disk Queue Length",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "LogicalDisk Free Space Percent",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "LogicalDisk Free Space Percent",
+                "description": "Monitor Alert for LogicalDisk Free Space Percent",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_% Free Space",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "LogicalDisk Free Space Percent",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','LogicalDisk Free Space Percent')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for LogicalDisk Free Space Percent",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "10",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_% Free Space",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ],
+                            "operator": "LessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "LogicalDisk Idle Time Percent",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "LogicalDisk Idle Time Percent",
+                "description": "Monitor Alert for LogicalDisk Idle Time Percent",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Average_% Idle Time",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "LogicalDisk Idle Time Percent",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules', 'LogicalDisk Idle Time Percent')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for LogicalDisk Idle Time Percent",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "20",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Average_% Idle Time",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                },
+                                {
+                                    "name": "ObjectName",
+                                    "operator": "Include",
+                                    "values": [
+                                        "LogicalDisk"
+                                    ]
+                                }
+                            ],
+                            "operator": "LessThan",
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Insights/scheduledQueryRules",
+            "apiVersion": "2021-02-01-preview",
+            "name": "Heartbeat Missed",
+            "location": "[parameters('location')]",
+            "tags": {
+                "[concat(variables('convertRuleTag'),resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName')))]": "Resource"
+            },
+            "kind": "LogToMetric",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+              ],
+            "properties": {
+                "displayName": "Heartbeat Missed",
+                "description": "Monitor Alert for Heartbeat Missed",
+                "enabled": "true",
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "criteria": {
+                    "allOf": [
+                        {
+                            "metricName": "Heartbeat",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "Heartbeat Missed",
+            "location": "global",
+            "tags": {},
+            "dependsOn": [
+                "[resourceId('Microsoft.Insights/scheduledQueryRules','Heartbeat Missed')]",
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+            ],
+            "properties": {
+                "severity": "[variables('alertsSeverity')]",
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.operationalinsights/workspaces',parameters('workspaceName'))]"
+                ],
+                "description": "Monitor Alert for Heartbeat Missed",
+                "evaluationFrequency": "[variables('evaluationFrequency')]",
+                "windowSize": "[variables('windowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "0",
+                            "name": "Metric1",
+                            "metricNamespace": "Microsoft.OperationalInsights/workspaces",
+                            "metricName": "Heartbeat",
+                            "dimensions": [
+                                {
+                                    "name": "Computer",
+                                    "operator": "Include",
+                                    "values": [
+                                        "*"
+                                    ]
+                                }
+                            ],
+                            "operator": "LessThanOrEqual",
+                            "timeAggregation": "Total",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.OperationalInsights/workspaces",
+                "targetResourceRegion": "[parameters('location')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
                     }
                 ]
             }
