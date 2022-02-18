@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "workspaceName": {
-            "value": "la-arc-servers" // Name for your Log Analytics workspace
+            "value": "<name of your your Log Analytics workspace" // Name for your Log Analytics workspace
         }
     }
 }
