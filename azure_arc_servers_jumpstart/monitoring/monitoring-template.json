@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the workspace."
+            }
+        },
+        "sku": {
+            "type": "string",
+            "allowedValues": [
+                "pergb2018"
+            ],
+            "defaultValue": "pergb2018",
+            "metadata": {
+                "description": "Pricing tier: PerGB2018 or legacy tiers (Free, Standalone, PerNode, Standard or Premium) which are not available to all customers."
+            }
+        },
+        "location": {
+          "type": "string",
+          "defaultValue": "[resourceGroup().location]",
+          "metadata": {
+            "description": "Specifies the location in which to create the workspace."
+          }
+        },
+        "dataRetention": {
+          "type": "int",
+          "defaultValue": 30,
+          "minValue": 7,
+          "maxValue": 730,
+          "metadata": {
+            "description": "Number of days to retain data."
+          }
+        }
+    },
+    "resources": [
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "name": "[parameters('workspaceName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "sku": {
+                    "Name": "[parameters('sku')]"
+                },
+                "retentionInDays": "[parameters('dataRetention')]",
+                "features": {
+                    "searchVersion": 1,
+                    "legacy": 0
+                }
+            },
+            "resources": []
+        }
+    ]
+  }
