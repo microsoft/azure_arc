@@ -1,0 +1,212 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: default.allow-kube-dns
+spec:
+  tier: default
+  order: 0
+  selector: all()
+  egress:
+  - action: Allow
+    protocol: UDP
+    source: {}
+    destination:
+      selector: k8s-app == "kube-dns"
+      namespaceSelector: projectcalico.org/name == "kube-system"
+      ports:
+      - '53'
+  types:
+    - Egress
+
+---
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: default.restricted
+  namespace: storefront
+spec:
+  tier: default
+  order: 20
+  selector: fw-zone == "restricted"
+  ingress:
+    - action: Allow
+      source:
+        selector: fw-zone == "trusted"
+      destination: {}
+    - action: Allow
+      source:
+        selector: fw-zone == "restricted"
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
+---
+apiVersion: projectcalico.org/v3
+kind: StagedNetworkPolicy
+metadata:
+  name: default.restricted
+  namespace: storefront
+spec:
+  tier: default
+  order: 20
+  selector: fw-zone == "restricted"
+  ingress:
+    - action: Allow
+      source:
+        selector: fw-zone == "trusted"
+      destination: {}
+    - action: Allow
+      source:
+        selector: fw-zone == "restricted"
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
+---
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: default.dmz
+  namespace: storefront
+spec:
+  tier: default
+  order: 0
+  selector: fw-zone == "dmz"
+  ingress:
+    - action: Allow
+      source:
+        nets:
+          - 18.0.0.0/16
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "trusted"||app == "logging"
+    - action: Deny
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
+---
+apiVersion: projectcalico.org/v3
+kind: StagedNetworkPolicy
+metadata:
+  name: default.dmz
+  namespace: storefront
+spec:
+  tier: default
+  order: 0
+  selector: fw-zone == "dmz"
+  ingress:
+    - action: Allow
+      source:
+        nets:
+          - 18.0.0.0/16
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "trusted"||app == "logging"
+    - action: Deny
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
+---
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: default.trusted
+  namespace: storefront
+spec:
+  tier: default
+  order: 10
+  selector: fw-zone == "trusted"
+  ingress:
+    - action: Allow
+      source:
+        selector: fw-zone == "dmz"
+      destination: {}
+    - action: Allow
+      source:
+        selector: fw-zone == "trusted"
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "trusted"
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "restricted"
+    - action: Deny
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
+---
+apiVersion: projectcalico.org/v3
+kind: StagedNetworkPolicy
+metadata:
+  name: default.trusted
+  namespace: storefront
+spec:
+  tier: default
+  order: 10
+  selector: fw-zone == "trusted"
+  ingress:
+    - action: Allow
+      source:
+        selector: fw-zone == "dmz"
+      destination: {}
+    - action: Allow
+      source:
+        selector: fw-zone == "trusted"
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "trusted"
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "restricted"
+    - action: Deny
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
