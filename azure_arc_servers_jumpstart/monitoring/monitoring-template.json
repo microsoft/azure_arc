@@ -9,20 +9,20 @@
             }
         },
         "location": {
-          "type": "string",
-          "defaultValue": "[resourceGroup().location]",
-          "metadata": {
-            "description": "Specifies the location in which to create the workspace."
-          }
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Specifies the location in which to create the workspace."
+            }
         },
         "dataRetention": {
-          "type": "int",
-          "defaultValue": 30,
-          "minValue": 7,
-          "maxValue": 730,
-          "metadata": {
-            "description": "Number of days to retain data."
-          }
+            "type": "int",
+            "defaultValue": 30,
+            "minValue": 7,
+            "maxValue": 730,
+            "metadata": {
+                "description": "Number of days to retain data."
+            }
         },
         "emailAddress": {
             "type": "string",
@@ -40,6 +40,11 @@
         "windowSize": "PT5M",
         "evaluationFrequency": "PT5M",
         "convertRuleTag": "hidden-link:",
+        "singlequote": "'",
+        "azureDashboardName": "Azure Arc-enabled servers",
+        "windowsEventsWorkbookName": "Windows Event Logs",
+        "osPerformanceWorkbookName": "OS Performance and Capacity",
+        "alertsConsoleWorkbookName": "Azure Monitor Alerts",
         "windowsEventsWorkbookContent": {
             "version": "Notebook/1.0",
             "items": [
@@ -2325,7 +2330,7 @@
             "kind": "WindowsEvent",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "eventLogName": "System",
                 "eventTypes": [
@@ -2345,7 +2350,7 @@
             "kind": "WindowsEvent",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "eventLogName": "Application",
                 "eventTypes": [
@@ -2365,7 +2370,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Processor",
                 "instanceName": "*",
@@ -2380,7 +2385,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Process",
                 "instanceName": "*",
@@ -2395,7 +2400,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
@@ -2410,7 +2415,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
@@ -2425,7 +2430,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
@@ -2440,7 +2445,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
@@ -2455,7 +2460,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
@@ -2470,7 +2475,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
@@ -2485,7 +2490,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
@@ -2500,7 +2505,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
@@ -2515,7 +2520,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Memory",
                 "instanceName": "*",
@@ -2530,7 +2535,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Memory",
                 "instanceName": "*",
@@ -2545,7 +2550,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Network Adapter",
                 "instanceName": "*",
@@ -2560,7 +2565,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Network Adapter",
                 "instanceName": "*",
@@ -2575,7 +2580,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Network Adapter",
                 "instanceName": "*",
@@ -2590,7 +2595,7 @@
             "kind": "WindowsPerformanceCounter",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "System",
                 "instanceName": "*",
@@ -2605,7 +2610,7 @@
             "kind": "LinuxPerformanceObject",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Logical Disk",
                 "instanceName": "*",
@@ -2639,7 +2644,7 @@
             "kind": "LinuxPerformanceObject",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Memory",
                 "instanceName": "*",
@@ -2664,7 +2669,7 @@
             "kind": "LinuxPerformanceObject",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Network",
                 "instanceName": "*",
@@ -2686,7 +2691,7 @@
             "kind": "LinuxPerformanceObject",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "objectName": "Processor",
                 "instanceName": "*",
@@ -2708,7 +2713,7 @@
             "kind": "LinuxSyslog",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "syslogName": "kern",
                 "syslogSeverities": [
@@ -2746,7 +2751,7 @@
             "kind": "LinuxSyslog",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "syslogName": "daemon",
                 "syslogSeverities": [
@@ -2775,7 +2780,7 @@
             "name": "[concat('VMInsights', '(', split(variables('workspaceResourceId'),'/')[8], ')')]",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "workspaceResourceId": "[variables('workspaceResourceId')]"
             },
@@ -2814,7 +2819,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "Processor Time Percent",
                 "description": "Monitor Alert for Processor Time Percent",
@@ -2918,7 +2923,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "Memory Available MBytes",
                 "description": "Monitor alert for Memory Available MBytes",
@@ -3022,7 +3027,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "Memory Commited Bytes in use Percent",
                 "description": "Monitor Alert for Memory Commited Bytes in use Percent",
@@ -3126,7 +3131,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "Memory Pages per Sec",
                 "description": "Monitor Alert for Memory Pages per Sec",
@@ -3230,7 +3235,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "LogicalDisk Avg. Disk sec per Read",
                 "description": "Monitor Alert for LogicalDisk Avg. Disk sec per Read",
@@ -3334,7 +3339,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "LogicalDisk Avg. Disk sec per Write",
                 "description": "Monitor Alert for LogicalDisk Avg. Disk sec per Write",
@@ -3438,7 +3443,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "LogicalDisk Current Queue Length",
                 "description": "Monitor Alert for LogicalDisk Current Queue Length",
@@ -3542,7 +3547,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "LogicalDisk Free Space Percent",
                 "description": "Monitor Alert for LogicalDisk Free Space Percent",
@@ -3646,7 +3651,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "LogicalDisk Idle Time Percent",
                 "description": "Monitor Alert for LogicalDisk Idle Time Percent",
@@ -3750,7 +3755,7 @@
             "kind": "LogToMetric",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-              ],
+            ],
             "properties": {
                 "displayName": "Heartbeat Missed",
                 "description": "Monitor Alert for Heartbeat Missed",
@@ -3850,7 +3855,7 @@
                 "targetResourceTypes": [
                     "Microsoft.OperationalInsights/workspaces"
                 ],
-                "windowSize": "[variables('windowSize')]", 
+                "windowSize": "[variables('windowSize')]",
                 "criteria": {
                     "allOf": [
                         {
@@ -3884,7 +3889,7 @@
             }
         },
         {
-            "name": "[guid('Windows Event Logs')]",
+            "name": "[guid(variables('windowsEventsWorkbookName'))]",
             "type": "microsoft.insights/workbooks",
             "location": "[parameters('location')]",
             "apiVersion": "2021-03-08",
@@ -3893,7 +3898,7 @@
             ],
             "kind": "shared",
             "properties": {
-                "displayName": "Windows Event Logs",
+                "displayName": "[variables('windowsEventsWorkbookName')]",
                 "serializedData": "[string(variables('windowsEventsWorkbookContent'))]",
                 "version": "1.0",
                 "sourceId": "azure monitor",
@@ -3901,7 +3906,7 @@
             }
         },
         {
-            "name": "[guid('OS Performance and Capacity')]",
+            "name": "[guid(variables('osPerformanceWorkbookName'))]",
             "type": "microsoft.insights/workbooks",
             "location": "[parameters('location')]",
             "apiVersion": "2021-03-08",
@@ -3910,7 +3915,7 @@
             ],
             "kind": "shared",
             "properties": {
-                "displayName": "OS Performance and Capacity",
+                "displayName": "[variables('osPerformanceWorkbookName')]",
                 "serializedData": "[string(variables('osPerformanceWorkbookContent'))]",
                 "version": "1.0",
                 "sourceId": "azure monitor",
@@ -3918,19 +3923,444 @@
             }
         },
         {
-            "name": "[guid('Azure Monitor Alerts')]",
+            "name": "[guid(variables('alertsConsoleWorkbookName'))]",
             "type": "microsoft.insights/workbooks",
             "location": "[parameters('location')]",
             "apiVersion": "2021-03-08",
             "dependsOn": [],
             "kind": "shared",
             "properties": {
-                "displayName": "Azure Monitor Alerts",
+                "displayName": "[variables('alertsConsoleWorkbookName')]",
                 "serializedData": "[string(variables('alertsConsoleWorkbookContent'))]",
                 "version": "1.0",
                 "sourceId": "azure monitor",
                 "category": "workbook"
             }
+        },
+        {
+            "type": "Microsoft.Portal/dashboards",
+            "apiVersion": "2015-08-01-preview",
+            "name": "[guid(variables('azureDashboardName'))]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "hidden-title": "[variables('azureDashboardName')]"
+            },
+            "properties": {
+                "lenses": {
+                    "0": {
+                        "order": 0,
+                        "parts": {
+                            "0": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 0,
+                                    "colSpan": 17,
+                                    "rowSpan": 4
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "ComponentId",
+                                            "value": "azure monitor",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "TimeContext",
+                                            "value": null,
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ResourceIds",
+                                            "value": [
+                                                "azure monitor"
+                                            ],
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ConfigurationId",
+                                            "value": "[resourceId('Microsoft.Insights/workbooks/', guid(variables('osPerformanceWorkbookName')))]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Type",
+                                            "value": "workbook",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "GalleryResourceType",
+                                            "value": "azure monitor",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PinName",
+                                            "value": "[variables('osPerformanceWorkbookName')]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "StepSettings",
+                                            "value": "{\"version\":\"KqlItem/1.0\",\"query\":\"let trend = ( Heartbeat\\r\\n    | make-series InternalTrend=iff(count() > 0, 1, 0) default = 0 on TimeGenerated from {TimeRange:start} to {TimeRange:end} step 15m by Computer\\r\\n    | extend Trend=array_slice(InternalTrend, array_length(InternalTrend) - 30, array_length(InternalTrend)-1)); \\r\\n\\r\\nlet PerfCPU = (Perf\\r\\n    | where ObjectName == \\\"Processor\\\" and CounterName == \\\"% Processor Time\\\" and InstanceName==\\\"_Total\\\"\\r\\n    | summarize AvgCPU=round(avg(CounterValue),2), MaxCPU=round(max(CounterValue),2) by Computer\\r\\n    | extend StatusCPU = case (\\r\\n                  AvgCPU > 80, 2,\\r\\n                  AvgCPU > 50, 1,\\r\\n                  AvgCPU <= 50, 0, -1\\r\\n                )\\r\\n    );\\r\\n\\r\\nlet PerfMemory = (Perf\\r\\n    | where ObjectName == \\\"Memory\\\" and (CounterName == \\\"Available MBytes\\\" or CounterName == \\\"Available MBytes Memory\\\")\\r\\n    | summarize AvgMEM=round(avg(CounterValue),2), MaxMEM=round(max(CounterValue),2) by Computer\\r\\n    | extend StatusMEM = case (\\r\\n                  AvgMEM > 4, 0,\\r\\n                  AvgMEM >= 1, 1,\\r\\n                  AvgMEM < 1, 2, -1\\r\\n            )\\r\\n    );\\r\\n\\r\\nlet PerfDisk = (Perf\\r\\n    | where (ObjectName == \\\"LogicalDisk\\\" or ObjectName == \\\"Logical Disk\\\") and CounterName == \\\"Free Megabytes\\\" and (InstanceName =~ \\\"C:\\\" or InstanceName == \\\"/\\\")\\r\\n    | summarize AvgDisk=round(avg(CounterValue),2), (TimeGenerated,LastDisk)=arg_max(TimeGenerated,round(CounterValue,2)) by Computer\\r\\n    | extend StatusDisk = case (\\r\\n                  AvgDisk < 5000, 2,\\r\\n                  AvgDisk < 30000, 1,\\r\\n                  AvgDisk >= 30000, 0,-1\\r\\n)\\r\\n    | project Computer, AvgDisk , LastDisk ,StatusDisk\\r\\n    );\\r\\nPerfCPU\\r\\n| join (PerfMemory) on Computer\\r\\n| join (PerfDisk) on Computer\\r\\n| join (trend) on Computer\\r\\n| project Computer,StatusCPU, AvgCPU,MaxCPU,StatusMEM,AvgMEM,MaxMEM,StatusDisk,AvgDisk,LastDisk, Trend\\r\\n| sort by Computer \",\"size\":0,\"showAnalytics\":true,\"title\":\"Top servers (data aggregated based on TimeRange)\",\"timeContext\":{\"durationMs\":86400000},\"timeContextFromParameter\":\"TimeRange\",\"exportFieldName\":\"Computer\",\"exportParameterName\":\"Computer\",\"exportDefaultValue\":\"All\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"crossComponentResources\":[\"{Workspace}\"],\"gridSettings\":{\"formatters\":[{\"columnMatch\":\"StatusCPU\",\"formatter\":18,\"formatOptions\":{\"thresholdsOptions\":\"icons\",\"thresholdsGrid\":[{\"operator\":\"==\",\"thresholdValue\":\"0\",\"representation\":\"success\",\"text\":\"{1}\"},{\"operator\":\"==\",\"thresholdValue\":\"1\",\"representation\":\"2\",\"text\":\"{1}\"},{\"operator\":\"==\",\"thresholdValue\":\"2\",\"representation\":\"4\",\"text\":\"{1}\"},{\"operator\":\"Default\",\"thresholdValue\":null,\"representation\":\"Unknown\",\"text\":\"{1}\"}]}},{\"columnMatch\":\"AvgCPU\",\"formatter\":0,\"formatOptions\":{},\"numberFormat\":{\"unit\":1,\"options\":{\"style\":\"decimal\"}}},{\"columnMatch\":\"MaxCPU\",\"formatter\":0,\"formatOptions\":{},\"numberFormat\":{\"unit\":1,\"options\":{\"style\":\"decimal\"}}},{\"columnMatch\":\"StatusMEM\",\"formatter\":18,\"formatOptions\":{\"thresholdsOptions\":\"icons\",\"thresholdsGrid\":[{\"operator\":\"==\",\"thresholdValue\":\"0\",\"representation\":\"success\",\"text\":\"{1}\"},{\"operator\":\"==\",\"thresholdValue\":\"1\",\"representation\":\"2\",\"text\":\"{1}\"},{\"operator\":\"==\",\"thresholdValue\":\"2\",\"representation\":\"critical\",\"text\":\"{1}\"},{\"operator\":\"Default\",\"thresholdValue\":null,\"representation\":\"unknown\",\"text\":\"{1}\"}]}},{\"columnMatch\":\"AvgMEM\",\"formatter\":0,\"formatOptions\":{},\"numberFormat\":{\"unit\":38,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2}}},{\"columnMatch\":\"MaxMEM\",\"formatter\":0,\"formatOptions\":{},\"numberFormat\":{\"unit\":38,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2}}},{\"columnMatch\":\"StatusDisk\",\"formatter\":18,\"formatOptions\":{\"thresholdsOptions\":\"icons\",\"thresholdsGrid\":[{\"operator\":\"==\",\"thresholdValue\":\"0\",\"representation\":\"success\",\"text\":\"{1}\"},{\"operator\":\"==\",\"thresholdValue\":\"1\",\"representation\":\"2\",\"text\":\"{1}\"},{\"operator\":\"==\",\"thresholdValue\":\"2\",\"representation\":\"4\",\"text\":\"{1}\"},{\"operator\":\"Default\",\"thresholdValue\":null,\"representation\":\"success\",\"text\":\"{1}\"}]}},{\"columnMatch\":\"AvgDisk\",\"formatter\":0,\"formatOptions\":{},\"numberFormat\":{\"unit\":38,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2}}},{\"columnMatch\":\"LastDisk\",\"formatter\":0,\"formatOptions\":{},\"numberFormat\":{\"unit\":4,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2}}},{\"columnMatch\":\"Trend\",\"formatter\":10,\"formatOptions\":{\"palette\":\"blue\"}},{\"columnMatch\":\"Max\",\"formatter\":0,\"formatOptions\":{},\"numberFormat\":{\"unit\":0,\"options\":{\"style\":\"decimal\"}}},{\"columnMatch\":\"Average\",\"formatter\":8,\"formatOptions\":{\"palette\":\"yellowOrangeRed\"},\"numberFormat\":{\"unit\":0,\"options\":{\"style\":\"decimal\",\"useGrouping\":false}}},{\"columnMatch\":\"Min\",\"formatter\":8,\"formatOptions\":{\"palette\":\"yellowOrangeRed\",\"aggregation\":\"Min\"},\"numberFormat\":{\"unit\":0,\"options\":{\"style\":\"decimal\"}}}],\"sortBy\":[{\"itemKey\":\"$gen_number_AvgCPU_2\",\"sortOrder\":2}],\"labelSettings\":[{\"columnId\":\"Computer\"},{\"columnId\":\"StatusCPU\",\"label\":\"CPU\"},{\"columnId\":\"AvgCPU\",\"label\":\"CPU (avg)\"},{\"columnId\":\"MaxCPU\",\"label\":\"CPU (max)\"},{\"columnId\":\"StatusMEM\",\"label\":\"Memory\"},{\"columnId\":\"AvgMEM\",\"label\":\"Memory (avg)\"},{\"columnId\":\"MaxMEM\",\"label\":\"Memory (max)\"},{\"columnId\":\"StatusDisk\",\"label\":\"Disk\"},{\"columnId\":\"AvgDisk\",\"label\":\"Disk (avg)\"},{\"columnId\":\"LastDisk\",\"label\":\"Disk (last)\"},{\"columnId\":\"Trend\"}]},\"sortBy\":[{\"itemKey\":\"$gen_number_AvgCPU_2\",\"sortOrder\":2}]}",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ParameterValues",
+                                            "value": {
+                                                "TimeRange": {
+                                                    "type": 4,
+                                                    "value": {
+                                                        "durationMs": 86400000
+                                                    },
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "Last 24 hours",
+                                                    "displayName": "TimeRange",
+                                                    "formattedValue": "Last 24 hours"
+                                                },
+                                                "Workspace": {
+                                                    "type": 5,
+                                                    "value": [
+                                                        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                                                    ],
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+                                                    "displayName": "Workspace",
+                                                    "formattedValue": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                                                },
+                                                "ComputerFilter": {
+                                                    "type": 1,
+                                                    "value": "",
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "<unset>",
+                                                    "displayName": "ComputerFilter",
+                                                    "formattedValue": ""
+                                                },
+                                                "Counter": {
+                                                    "type": 2,
+                                                    "value": "{\"counter\":\"% Free Space\",\"object\":\"LogicalDisk\"}",
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "% Free Space",
+                                                    "displayName": "Counter",
+                                                    "formattedValue": "{\"counter\":\"% Free Space\",\"object\":\"LogicalDisk\"}"
+                                                },
+                                                "Order": {
+                                                    "type": 2,
+                                                    "value": "desc",
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "desc",
+                                                    "displayName": "Order",
+                                                    "formattedValue": "desc"
+                                                }
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Location",
+                                            "value": "[parameters('location')]",
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/AppInsightsExtension/PartType/PinnedNotebookQueryPart"
+                                }
+                            },
+                            "1": {
+                                "position": {
+                                    "x": 0,
+                                    "y": 4,
+                                    "colSpan": 12,
+                                    "rowSpan": 4
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "ComponentId",
+                                            "value": "Azure Monitor",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "TimeContext",
+                                            "value": null,
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ResourceIds",
+                                            "value": [
+                                                "Azure Monitor"
+                                            ],
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ConfigurationId",
+                                            "value": "[resourceId('Microsoft.Insights/workbooks/', guid(variables('alertsConsoleWorkbookName')))]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Type",
+                                            "value": "workbook",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "GalleryResourceType",
+                                            "value": "Azure Monitor",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PinName",
+                                            "value": "[variables('alertsConsoleWorkbookName')]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "StepSettings",
+                                            "value": "{\"version\":\"KqlItem/1.0\",\"query\":\"AlertsManagementResources \\r\\n| where type =~ 'microsoft.alertsmanagement/alerts'\\r\\n| where properties.essentials.startDateTime {timeRange}  \\r\\n| where properties.essentials.actionStatus.isSuppressed == false\\r\\n| extend Severity=tostring(properties.essentials.severity)\\r\\n| extend State=tostring(properties.essentials.alertState)\\r\\n| extend comp = properties.context.context.condition.allOf[0].dimensions\\r\\n| mvexpand comp\\r\\n| where comp.name == 'Computer' or comp.name == 'TestConfigurationName' or isnull(comp)\\r\\n| where \\\"*\\\" in ({State}) or State in ({State})\\r\\n| where \\\"*\\\" in ({ResourceTypes}) or properties.essentials.targetResourceType in~ ({ResourceTypes})\\r\\n| where \\\"*\\\" in ({ResourceGroups}) or properties.essentials.targetResourceGroup in~ ({ResourceGroups})\\r\\n| where \\\"*\\\" in ({Resources}) or properties.essentials.targetResource in~ ({Resources})\\r\\n| project AlertId=id, StartTime=todatetime(tostring(properties.essentials.startDateTime)), Name=name, Severity, State=tostring(properties.essentials.alertState), MonitorCondition=tostring(properties.essentials.monitorCondition), SignalType=tostring(properties.essentials.signalType), TargetResource = split(comp.value, '.')[0]\\r\\n| order by StartTime desc\\r\\n\",\"size\":0,\"title\":\"Azure Monitor alerts\",\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"{Subscription}\"],\"gridSettings\":{\"formatters\":[{\"columnMatch\":\"AlertId\",\"formatter\":5},{\"columnMatch\":\"StartTime\",\"formatter\":6},{\"columnMatch\":\"Name\",\"formatter\":1,\"formatOptions\":{\"linkTarget\":\"OpenBlade\",\"linkIsContextBlade\":true,\"bladeOpenContext\":{\"bladeName\":\"AlertDetailsTemplateBlade\",\"extensionName\":\"Microsoft_Azure_Monitoring\",\"bladeParameters\":[{\"name\":\"alertId\",\"source\":\"column\",\"value\":\"AlertId\"},{\"name\":\"alertName\",\"source\":\"column\",\"value\":\"Name\"},{\"name\":\"invokedFrom\",\"source\":\"static\",\"value\":\"Workbooks\"}]}},\"tooltipFormat\":{\"tooltip\":\"View alert details\"}},{\"columnMatch\":\"Severity\",\"formatter\":11},{\"columnMatch\":\"State\",\"formatter\":1},{\"columnMatch\":\"MonitorCondition\",\"formatter\":18,\"formatOptions\":{\"thresholdsOptions\":\"icons\",\"thresholdsGrid\":[{\"operator\":\"==\",\"thresholdValue\":\"Fired\",\"representation\":\"Fired\",\"text\":\"{0}{1}\"},{\"operator\":\"==\",\"thresholdValue\":\"Resolved\",\"representation\":\"Resolved\",\"text\":\"{0}{1}\"},{\"operator\":\"Default\",\"thresholdValue\":null,\"representation\":\"success\",\"text\":\"{0}{1}\"}]}},{\"columnMatch\":\"TargetResource\",\"formatter\":13,\"formatOptions\":{\"linkTarget\":null,\"showIcon\":true}},{\"columnMatch\":\"ResourceType\",\"formatter\":16,\"formatOptions\":{\"showIcon\":true}},{\"columnMatch\":\"Resource Type\",\"formatter\":11},{\"columnMatch\":\"essentials\",\"formatter\":5}]}}",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ParameterValues",
+                                            "value": {
+                                                "Subscription": {
+                                                    "type": 6,
+                                                    "value": [
+                                                        "[subscription().id]"
+                                                    ],
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "[subscription().displayName]",
+                                                    "displayName": "Subscriptions",
+                                                    "formattedValue": "[concat(variables('singlequote'), subscription().id, variables('singlequote'))]"
+                                                },
+                                                "ResourceGroups": {
+                                                    "type": 2,
+                                                    "value": [
+                                                        "[resourceGroup().name]"
+                                                    ],
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "[resourceGroup().name]",
+                                                    "displayName": "Resource groups",
+                                                    "formattedValue": "[concat(variables('singlequote'), resourceGroup().name, variables('singlequote'))]"
+                                                },
+                                                "ResourceTypes": {
+                                                    "type": 7,
+                                                    "value": [
+                                                        "*"
+                                                    ],
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "All",
+                                                    "displayName": "Resource types",
+                                                    "specialValue": [
+                                                        "value::all"
+                                                    ],
+                                                    "formattedValue": "'*'"
+                                                },
+                                                "Resources": {
+                                                    "type": 5,
+                                                    "value": [
+                                                        "*"
+                                                    ],
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "All",
+                                                    "displayName": "Resources",
+                                                    "specialValue": [
+                                                        "value::all"
+                                                    ],
+                                                    "formattedValue": "'*'"
+                                                },
+                                                "timeRange": {
+                                                    "type": 4,
+                                                    "value": {
+                                                        "durationMs": 2592000000
+                                                    },
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "Last 30 days",
+                                                    "displayName": "Time Range",
+                                                    "formattedValue": "Last 30 days"
+                                                },
+                                                "State": {
+                                                    "type": 2,
+                                                    "value": [
+                                                        "*"
+                                                    ],
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "All",
+                                                    "displayName": "State",
+                                                    "specialValue": [
+                                                        "value::all"
+                                                    ],
+                                                    "formattedValue": "'*'"
+                                                }
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Location",
+                                            "value": "[parameters('location')]",
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/AppInsightsExtension/PartType/PinnedNotebookQueryPart"
+                                }
+                            },
+                            "2": {
+                                "position": {
+                                    "x": 12,
+                                    "y": 4,
+                                    "colSpan": 5,
+                                    "rowSpan": 4
+                                },
+                                "metadata": {
+                                    "inputs": [
+                                        {
+                                            "name": "ComponentId",
+                                            "value": "Azure Monitor",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "TimeContext",
+                                            "value": null,
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ResourceIds",
+                                            "value": [
+                                                "Azure Monitor"
+                                            ],
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ConfigurationId",
+                                            "value": "[resourceId('Microsoft.Insights/workbooks/', guid(variables('windowsEventsWorkbookName')))]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Type",
+                                            "value": "workbook",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "GalleryResourceType",
+                                            "value": "Azure Monitor",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "PinName",
+                                            "value": "[variables('windowsEventsWorkbookName')]",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "StepSettings",
+                                            "value": "{\"version\":\"KqlItem/1.0\",\"query\":\"Event\\r\\n|  where EventLog in (\\\"System\\\",\\\"Application\\\",\\\"Operations Manager\\\")\\r\\n| project EventLog,EventLevelName\\r\\n| evaluate pivot(EventLevelName)\",\"size\":1,\"showAnalytics\":true,\"title\":\"Windows Events - Summary\",\"timeContext\":{\"durationMs\":0},\"timeContextFromParameter\":\"TimeRange\",\"exportFieldName\":\"EventLog\",\"exportParameterName\":\"EventLog\",\"queryType\":0,\"resourceType\":\"microsoft.operationalinsights/workspaces\",\"crossComponentResources\":[\"{Workspace}\"],\"gridSettings\":{\"formatters\":[{\"columnMatch\":\"Information\",\"formatter\":18,\"formatOptions\":{\"showIcon\":true,\"thresholdsOptions\":\"icons\",\"thresholdsGrid\":[{\"operator\":\"Default\",\"thresholdValue\":null,\"representation\":\"info\",\"text\":\"{0}{1}\"}],\"aggregation\":\"Unique\"},\"numberFormat\":{\"unit\":0,\"options\":{\"style\":\"decimal\"}}},{\"columnMatch\":\"Warning\",\"formatter\":18,\"formatOptions\":{\"showIcon\":true,\"thresholdsOptions\":\"icons\",\"thresholdsGrid\":[{\"operator\":\"Default\",\"thresholdValue\":null,\"representation\":\"warning\",\"text\":\"{0}{1}\"}],\"aggregation\":\"Unique\"},\"numberFormat\":{\"unit\":0,\"options\":{\"style\":\"decimal\"}}},{\"columnMatch\":\"Error\",\"formatter\":18,\"formatOptions\":{\"showIcon\":true,\"thresholdsOptions\":\"icons\",\"thresholdsGrid\":[{\"operator\":\"Default\",\"thresholdValue\":null,\"representation\":\"3\",\"text\":\"{0}{1}\"}],\"aggregation\":\"Unique\"},\"numberFormat\":{\"unit\":0,\"options\":{\"style\":\"decimal\"}}}]}}",
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "ParameterValues",
+                                            "value": {
+                                                "TimeRange": {
+                                                    "type": 4,
+                                                    "value": {
+                                                        "durationMs": 604800000
+                                                    },
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "Last 7 days",
+                                                    "displayName": "TimeRange",
+                                                    "formattedValue": "Last 7 days"
+                                                },
+                                                "Workspace": {
+                                                    "type": 5,
+                                                    "value": [
+                                                        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                                                    ],
+                                                    "isPending": false,
+                                                    "isWaiting": false,
+                                                    "isFailed": false,
+                                                    "isGlobal": false,
+                                                    "labelValue": "[parameters('workspaceName')]",
+                                                    "displayName": "Workspace",
+                                                    "formattedValue": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                                                }
+                                            },
+                                            "isOptional": true
+                                        },
+                                        {
+                                            "name": "Location",
+                                            "value": "[parameters('location')]",
+                                            "isOptional": true
+                                        }
+                                    ],
+                                    "type": "Extension/AppInsightsExtension/PartType/PinnedNotebookQueryPart"
+                                }
+                            }
+                        }
+                    }
+                },
+                "metadata": {
+                    "model": {
+                        "timeRange": {
+                            "value": {
+                                "relative": {
+                                    "duration": 24,
+                                    "timeUnit": 1
+                                }
+                            },
+                            "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+                        },
+                        "filterLocale": {
+                            "value": "en-us"
+                        },
+                        "filters": {
+                            "value": {
+                                "MsPortalFx_TimeRange": {
+                                    "model": {
+                                        "format": "utc",
+                                        "granularity": "auto",
+                                        "relative": "24h"
+                                    },
+                                    "displayCache": {
+                                        "name": "UTC Time",
+                                        "value": "Past 24 hours"
+                                    },
+                                    "filteredPartIds": [
+                                        "StartboardPart-PinnedNotebookQueryPart-952cffdb-b288-4824-9872-6327c6028516",
+                                        "StartboardPart-PinnedNotebookQueryPart-952cffdb-b288-4824-9872-6327c6028518",
+                                        "StartboardPart-PinnedNotebookQueryPart-952cffdb-b288-4824-9872-6327c602851a",
+                                        "StartboardPart-PinnedNotebookQueryPart-952cffdb-b288-4824-9872-6327c602851c"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     ]
-  }
+}
