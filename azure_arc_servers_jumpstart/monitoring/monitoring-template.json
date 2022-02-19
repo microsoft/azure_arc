@@ -8,16 +8,6 @@
                 "description": "Name of the workspace."
             }
         },
-        "sku": {
-            "type": "string",
-            "allowedValues": [
-                "pergb2018"
-            ],
-            "defaultValue": "pergb2018",
-            "metadata": {
-                "description": "Pricing tier: PerGB2018 or legacy tiers (Free, Standalone, PerNode, Standard or Premium) which are not available to all customers."
-            }
-        },
         "location": {
           "type": "string",
           "defaultValue": "[resourceGroup().location]",
@@ -34,20 +24,6 @@
             "description": "Number of days to retain data."
           }
         },
-        "actionGroupName": {
-            "type": "string",
-            "defaultValue": "ag-arc-servers",
-            "metadata": {
-                "description": "Unique name within the resource group for the Action group."
-            }
-        },
-        "actionGroupShortName": {
-            "type": "string",
-            "defaultValue": "agarcservers",
-            "metadata": {
-                "description": "Short name up to 12 characters for the Action group."
-            }
-        },
         "emailAddress": {
             "type": "string",
             "defaultValue": "",
@@ -59,6 +35,7 @@
     "variables": {
         "intervalSeconds": 60,
         "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
+        "actionGroupName": "ag-arc-servers",
         "alertsSeverity": 2,
         "windowSize": "PT5M",
         "evaluationFrequency": "PT5M",
@@ -72,7 +49,7 @@
             "location": "[parameters('location')]",
             "properties": {
                 "sku": {
-                    "Name": "[parameters('sku')]"
+                    "Name": "pergb2018"
                 },
                 "retentionInDays": "[parameters('dataRetention')]",
                 "features": {
@@ -553,10 +530,10 @@
         {
             "type": "Microsoft.Insights/actionGroups",
             "apiVersion": "2018-03-01",
-            "name": "[parameters('actionGroupName')]",
+            "name": "[variables('actionGroupName')]",
             "location": "Global",
             "properties": {
-                "groupShortName": "[parameters('actionGroupShortName')]",
+                "groupShortName": "agarcservers",
                 "enabled": true,
                 "emailReceivers": [
                     {
@@ -620,7 +597,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','Processor Time Percent')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -666,7 +643,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -724,7 +701,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','Memory Available MBytes')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -770,7 +747,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -828,7 +805,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','Memory Commited Bytes in use Percent')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -874,7 +851,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -932,7 +909,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','Memory Pages per Sec')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -978,7 +955,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -1036,7 +1013,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','LogicalDisk Avg. Disk sec per Read')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -1082,7 +1059,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -1140,7 +1117,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','LogicalDisk Avg. Disk sec per Write')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -1186,7 +1163,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -1244,7 +1221,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','LogicalDisk Current Queue Length')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -1290,7 +1267,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -1348,7 +1325,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','LogicalDisk Free Space Percent')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -1394,7 +1371,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -1452,7 +1429,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules', 'LogicalDisk Idle Time Percent')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -1498,7 +1475,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -1549,7 +1526,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Insights/scheduledQueryRules','Heartbeat Missed')]",
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "severity": "[variables('alertsSeverity')]",
@@ -1588,7 +1565,7 @@
                 "targetResourceRegion": "[parameters('location')]",
                 "actions": [
                     {
-                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "actionGroupId": "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     }
                 ]
             }
@@ -1600,7 +1577,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]",
-                "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
             ],
             "properties": {
                 "displayName": "Unexpected System Shutdown",
@@ -1642,7 +1619,7 @@
                 "autoMitigate": false,
                 "actions": {
                     "actionGroups": [
-                        "[resourceId('microsoft.insights/actiongroups',parameters('actionGroupName'))]"
+                        "[resourceId('microsoft.insights/actiongroups',variables('actionGroupName'))]"
                     ]
                 }
             }
