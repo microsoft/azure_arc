@@ -41,6 +41,19 @@
         "evaluationFrequency": "PT5M",
         "convertRuleTag": "hidden-link:",
         "singlequote": "'",
+        "LogAnalyticsContributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+        "mmaWindowsPolicyDefinitionID": "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203",
+        "mmaWindowsPolicyAssignmentName": "[guid(variables('mmaWindowsPolicyDefinitionID'), parameters('workspaceName'))]",
+        "mmaWindowsPolicyAssignmentDisplayName": "(jumpstart) Configure Log Analytics extension on Azure Arc enabled Windows servers",
+        "mmaLinuxPolicyDefinitionID": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
+        "mmaLinuxPolicyAssignmentName": "[guid(variables('mmaLinuxPolicyDefinitionID'), parameters('workspaceName'))]",
+        "mmaLinuxPolicyAssignmentDisplayName": "(jumpstart) Configure Log Analytics extension on Azure Arc enabled Linux servers",
+        "depAgentWindowsPolicyDefinitionID": "/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4",
+        "depAgentWindowsPolicyAssignmentName": "[guid(variables('depAgentWindowsPolicyDefinitionID'), parameters('workspaceName'))]",
+        "depAgentWindowsPolicyAssignmentDisplayName": "(jumpstart) Configure Dependency agent on Azure Arc enabled Windows servers",
+        "depAgentLinuxPolicyDefinitionID": "/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43",
+        "depAgentLinuxPolicyAssignmentName": "[guid(variables('depAgentLinuxPolicyDefinitionID'), parameters('workspaceName'))]",
+        "depAgentLinuxPolicyAssignmentDisplayName": "(jumpstart) Configure Dependency agent on Azure Arc enabled Linux servers",
         "azureDashboardName": "Azure Arc-enabled servers",
         "windowsEventsWorkbookName": "Windows Event Logs",
         "osPerformanceWorkbookName": "OS Performance and Capacity",
@@ -3945,6 +3958,9 @@
             "tags": {
                 "hidden-title": "[variables('azureDashboardName')]"
             },
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+            ],
             "properties": {
                 "lenses": {
                     "0": {
@@ -4361,6 +4377,148 @@
                     }
                 }
             }
+        },
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2021-06-01",
+            "name": "[variables('mmaWindowsPolicyAssignmentName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+            ],
+            "properties": {
+                "policyDefinitionId": "[variables('mmaWindowsPolicyDefinitionID')]",
+                "notScopes": [],
+                "description": "",
+                "displayName": "[variables('mmaWindowsPolicyAssignmentDisplayName')]",
+                "enforcementMode": "Default",
+                "metadata": {},
+                "nonComplianceMessages": [],
+                "parameters": {
+                    "logAnalytics": {
+                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[guid(concat(variables('mmaWindowsPolicyAssignmentName'),resourceGroup().id))]",
+            "properties": {
+                "roleDefinitionId": "[variables('LogAnalyticsContributor')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('mmaWindowsPolicyAssignmentName')),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', variables('mmaWindowsPolicyAssignmentName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2021-06-01",
+            "name": "[variables('mmaLinuxPolicyAssignmentName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+            ],
+            "properties": {
+                "policyDefinitionId": "[variables('mmaLinuxPolicyDefinitionID')]",
+                "notScopes": [],
+                "description": "",
+                "displayName": "[variables('mmaLinuxPolicyAssignmentDisplayName')]",
+                "enforcementMode": "Default",
+                "metadata": {},
+                "nonComplianceMessages": [],
+                "parameters": {
+                    "logAnalytics": {
+                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[guid(concat(variables('mmaLinuxPolicyAssignmentName'),resourceGroup().id))]",
+            "properties": {
+                "roleDefinitionId": "[variables('LogAnalyticsContributor')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('mmaLinuxPolicyAssignmentName')),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', variables('mmaLinuxPolicyAssignmentName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2021-06-01",
+            "name": "[variables('depAgentWindowsPolicyAssignmentName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "policyDefinitionId": "[variables('depAgentWindowsPolicyDefinitionID')]",
+                "notScopes": [],
+                "description": "",
+                "displayName": "[variables('depAgentWindowsPolicyAssignmentDisplayName')]",
+                "enforcementMode": "Default",
+                "metadata": {},
+                "nonComplianceMessages": [],
+                "parameters": {}
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[guid(concat(variables('depAgentWindowsPolicyAssignmentName'), resourceGroup().id, variables('LogAnalyticsContributor')))]",
+            "properties": {
+                "roleDefinitionId": "[variables('LogAnalyticsContributor')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('depAgentWindowsPolicyAssignmentName')),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', variables('depAgentWindowsPolicyAssignmentName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2021-06-01",
+            "name": "[variables('depAgentLinuxPolicyAssignmentName')]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "policyDefinitionId": "[variables('depAgentLinuxPolicyDefinitionID')]",
+                "notScopes": [],
+                "description": "",
+                "displayName": "[variables('depAgentLinuxPolicyAssignmentDisplayName')]",
+                "enforcementMode": "Default",
+                "metadata": {},
+                "nonComplianceMessages": [],
+                "parameters": {}
+            }
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[guid(concat(variables('depAgentLinuxPolicyAssignmentName'), resourceGroup().id ,variables('LogAnalyticsContributor')))]",
+            "properties": {
+                "roleDefinitionId": "[variables('LogAnalyticsContributor')]",
+                "principalId": "[reference(resourceId('Microsoft.Authorization/policyAssignments', variables('depAgentLinuxPolicyAssignmentName')),'2019-09-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Authorization/policyAssignments', variables('depAgentLinuxPolicyAssignmentName'))]"
+            ]
         }
     ]
 }
