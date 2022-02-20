@@ -31,6 +31,12 @@
         },
         "location": {
             "value": "eastus"
+        },
+        "deployBastion": {
+            "value": "Yes"
+        },
+        "bastionHostName": {
+          "value": "Arc-SQL-Demo-Bastion"
         }
       }
   }
