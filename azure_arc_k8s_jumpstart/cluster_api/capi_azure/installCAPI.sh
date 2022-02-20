@@ -20,7 +20,7 @@ export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
 export WORKER_MACHINE_COUNT="<Workers node count>" 
 export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
 export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
-export CAPI_WORKLOAD_CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase case variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+export CLUSTER_NAME==$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase case variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 export AZURE_RESOURCE_GROUP="<Azure resource group name>"
 export AZURE_SUBSCRIPTION_ID="<Azure subscription id>"
 export AZURE_TENANT_ID="<Azure tenant id>"
@@ -28,6 +28,8 @@ export AZURE_CLIENT_ID="<Azure SPN application client id>"
 export AZURE_CLIENT_SECRET="<Azure SPN application client secret>"
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="<Control Plane node Azure VM type>" # For example: "Standard_D4s_v4"
 export AZURE_NODE_MACHINE_TYPE="<Worker node Azure VM type>" # For example: "Standard_D8s_v4"
+
+
 
 # Base64 encode the variables - Do not change!
 export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$AZURE_SUBSCRIPTION_ID" | base64 | tr -d '\n')"
@@ -43,6 +45,7 @@ export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
+az config set extension.use_dynamic_install=yes_without_prompt
 sudo -u $USER az extension add --name connectedk8s
 sudo -u $USER az extension add --name k8s-configuration
 sudo -u $USER az extension add --name k8s-extension
@@ -79,21 +82,6 @@ sudo mv ./kind /usr/local/bin/kind
 kind version
 echo ""
 
-# Deploying kind cluster
-mkdir $HOME/.kube
-sudo chown -R $USER $HOME/.kube/
-sudo kind create cluster --name ${CAPI_WORKLOAD_CLUSTER_NAME}-mgmt --kubeconfig $HOME/.kube/config-mgmt
-echo ""
-echo "Making sure kind cluster is ready..."
-echo ""
-sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A --kubeconfig $HOME/.kube/config-mgmt >/dev/null
-sudo kubectl get nodes -o wide --kubeconfig $HOME/.kube/config-mgmt | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
-echo ""
-
-
-sudo kind delete cluster --name arc-capi-dev-mgmt
-sudo rm -rf ~/.kube/
-
 # Installing clusterctl
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
 sudo chmod +x ./clusterctl
@@ -105,14 +93,23 @@ echo ""
 sudo snap install helm --classic
 helm version
 
+# Deploying kind cluster
+mkdir $HOME/.kube
+sudo chown -R $USER $HOME/.kube/
+export KUBECONFIG=${HOME}/.kube/
+sudo kind create cluster --name ${CAPI_WORKLOAD_CLUSTER_NAME}-mgmt
+echo ""
+echo "Making sure kind cluster is ready..."
+echo ""
+kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
+sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+echo ""
+
 # Registering Azure Arc providers
 echo "Registering Azure Arc providers"
-az config set extension.use_dynamic_install=yes_without_prompt
-
 az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
-
 az provider show -n Microsoft.Kubernetes -o table
 az provider show -n Microsoft.KubernetesConfiguration -o table
 az provider show -n Microsoft.ExtendedLocation -o table
@@ -122,32 +119,23 @@ az provider show -n Microsoft.ExtendedLocation -o table
 sudo kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
 # Converting the kind cluster to a Cluster API management cluster
-echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-sudo clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --kubeconfig $HOME/.kube/config-mgmt
+echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
+sudo clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
 echo "Making sure cluster is ready..."
 echo ""
-sudo kubectl wait --for=condition=Available --timeout=90s --all deployments -A --kubeconfig $HOME/.kube/config-mgmt >/dev/null
+sudo kubectl wait --for=condition=Available --timeout=90s --all deployments -A >/dev/null
 echo ""
-
-# Deploy CAPI Workload cluster
-echo "Deploying Kubernetes workload cluster"
-echo ""
-sudo clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
-  --kubernetes-version v$KUBERNETES_VERSION \
-  --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
-  --worker-machine-count=$WORKER_MACHINE_COUNT \
-  --kubeconfig $HOME/.kube/config-mgmt \
-  > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # Creating CAPI Workload cluster yaml manifest
 echo "Deploying Kubernetes workload cluster"
 echo ""
-sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}artifacts/capz_kustomize/patches/AzureCluster.yaml
-sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
-sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
-sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
-sudo kubectl --kubeconfig $HOME/.kube/config-mgmt kustomize capz_kustomize/ > jumpstart.yaml
-sudo clusterctl generate yaml --from jumpstart.yaml > template.yaml
+curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}artifacts/capz_kustomize/patches/AzureCluster.yaml
+curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
+curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
+curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
+sed -i "s/{CLUSTERCTL_VERSION}/$CLUSTERCTL_VERSION/" capz_kustomize/kustomization.yaml
+kubectl kustomize capz_kustomize/ > jumpstart.yaml
+clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
 # Deploying CAPI Workload cluster
 echo ""
