@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://github.com/kubernetes-sigs/cluster-api-provider-azure/releases/download/v1.1.1/cluster-template.yaml
+  - https://github.com/kubernetes-sigs/cluster-api-provider-azure/releases/download/v1.1.2/cluster-template.yaml
 patchesStrategicMerge:
 - patches/Cluster.yaml
 - patches/KubeadmControlPlane.yaml

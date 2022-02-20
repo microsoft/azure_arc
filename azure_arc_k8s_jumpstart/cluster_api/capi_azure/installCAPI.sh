@@ -5,12 +5,13 @@ exec 2>&1
 sudo apt-get update
 
 # Set deployment GitHub repository environment variables
-export githubAccount="microsoft"
-export githubBranch="main"
+export githubAccount="microsoft" # Do not change unless deploying from personal GitHub account
+export githubBranch="main" # Do not change unless deploying from personal GitHub branch
 export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
 # Set deployment environment variables
-export CLUSTERCTL_VERSION="1.1.1" # Do not change!
+export KIND_VERSION="0.11.1" # Do not change!
+export CLUSTERCTL_VERSION="1.1.2" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.1.1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
@@ -47,7 +48,7 @@ sudo -u $USER az extension add --name k8s-configuration
 sudo -u $USER az extension add --name k8s-extension
 
 echo "Log in to Azure"
-sudo -u $USER az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
+sudo -u $USER az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 az -v
 echo ""
 
@@ -61,12 +62,48 @@ sudo apt install snapd
 sudo snap install docker
 sudo groupadd docker
 sudo usermod -aG docker $USER
+sudo docker version
 
 # Installing kubectl
 sudo snap install kubectl --classic
+kubectl version
 
 # Installing kustomize
 sudo snap install kustomize
+kustomize version
+
+# Installing kind
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+sudo chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind
+kind version
+echo ""
+
+# Deploying kind cluster
+mkdir $HOME/.kube
+sudo chown -R $USER $HOME/.kube/
+sudo kind create cluster --name ${CAPI_WORKLOAD_CLUSTER_NAME}-mgmt --kubeconfig $HOME/.kube/config-mgmt
+echo ""
+echo "Making sure kind cluster is ready..."
+echo ""
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A --kubeconfig $HOME/.kube/config-mgmt >/dev/null
+sudo kubectl get nodes -o wide --kubeconfig $HOME/.kube/config-mgmt | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+echo ""
+
+
+sudo kind delete cluster --name arc-capi-dev-mgmt
+sudo rm -rf ~/.kube/
+
+# Installing clusterctl
+curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
+sudo chmod +x ./clusterctl
+sudo mv ./clusterctl /usr/local/bin/clusterctl
+clusterctl version
+
+# Installing Helm 3
+echo ""
+sudo snap install helm --classic
+helm version
 
 # Registering Azure Arc providers
 echo "Registering Azure Arc providers"
@@ -80,35 +117,26 @@ az provider show -n Microsoft.Kubernetes -o table
 az provider show -n Microsoft.KubernetesConfiguration -o table
 az provider show -n Microsoft.ExtendedLocation -o table
 
-# Installing clusterctl
-curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
-sudo chmod +x ./clusterctl
-sudo mv ./clusterctl /usr/local/bin/clusterctl
-clusterctl version
-
-# Installing Helm 3
-echo ""
-sudo snap install helm --classic
-
 # Create a secret to include the password of the Service Principal identity created in Azure
 # This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
-kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
+sudo kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
 
 # Converting the kind cluster to a Cluster API management cluster
 echo "Transforming the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
+sudo clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --kubeconfig $HOME/.kube/config-mgmt
 echo "Making sure cluster is ready..."
 echo ""
-kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
+sudo kubectl wait --for=condition=Available --timeout=90s --all deployments -A --kubeconfig $HOME/.kube/config-mgmt >/dev/null
 echo ""
 
 # Deploy CAPI Workload cluster
 echo "Deploying Kubernetes workload cluster"
 echo ""
-clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
+sudo clusterctl generate cluster $CAPI_WORKLOAD_CLUSTER_NAME \
   --kubernetes-version v$KUBERNETES_VERSION \
   --control-plane-machine-count=$CONTROL_PLANE_MACHINE_COUNT \
   --worker-machine-count=$WORKER_MACHINE_COUNT \
+  --kubeconfig $HOME/.kube/config-mgmt \
   > $CAPI_WORKLOAD_CLUSTER_NAME.yaml
 
 # Creating CAPI Workload cluster yaml manifest
@@ -118,8 +146,8 @@ sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBa
 sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
 sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
 sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
-kubectl kustomize capz_kustomize/ > jumpstart.yaml
-clusterctl generate yaml --from jumpstart.yaml > template.yaml
+sudo kubectl --kubeconfig $HOME/.kube/config-mgmt kustomize capz_kustomize/ > jumpstart.yaml
+sudo clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
 # Deploying CAPI Workload cluster
 echo ""
