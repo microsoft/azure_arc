@@ -130,10 +130,10 @@
         "deployBastion" : "[concat(parameters('deployBastion'))]",
         "bastionSubnetIpPrefix": "10.1.1.0/27",
         "PublicIPNoBastion": {
-            "id": "resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))"
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         },
-        "NsgbNoBastion": {
-            "id": "resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))"
+        "NsgNoBastion": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
         }
     },
     "resources": [
@@ -160,7 +160,7 @@
                         }
                     }
                 ],
-                "networkSecurityGroup": "[if(equals(variables('deployBastion'),'No'),variables('NsgbNoBastion'),json('null'))]"
+                "networkSecurityGroup": "[if(equals(variables('deployBastion'),'No'),variables('NsgNoBastion'),json('null'))]"
             }
         },
         {
