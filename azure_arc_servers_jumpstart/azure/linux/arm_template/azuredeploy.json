@@ -145,10 +145,10 @@
     "deployBastion": "[concat(parameters('deployBastion'))]",
     "bastionSubnetIpPrefix": "10.1.1.0/27",
     "PublicIPNoBastion": {
-      "id": "resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))"
+      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
     },
     "NsgbNoBastion": {
-      "id": "resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))"
+      "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
     },
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
