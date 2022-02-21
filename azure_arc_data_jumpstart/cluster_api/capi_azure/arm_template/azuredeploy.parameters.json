@@ -26,12 +26,6 @@
         "logAnalyticsWorkspaceName": {
             "value": "la-arc-demo"
         },
-        "deployBastion": {
-            "value": "No"
-        },
-        "bastionHostName": {
-            "value": "Arc-Data-Demo-Bastion"
-        },
         "deploySQLMI": {
             "value": true
         },
