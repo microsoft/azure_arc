@@ -107,7 +107,7 @@
     "subnetName": "Arc-Data-CAPI-Subnet",
     "bastionSubnetName": "AzureBastionSubnet",
     "addressPrefix": "172.16.0.0/16",
-    "bastionSubnetIpPrefix": "10.1.1.0/27",
+    "bastionSubnetIpPrefix": "172.16.2.0/27",
     "subnetAddressPrefix": "172.16.1.0/24"
   },
   "resources": [
