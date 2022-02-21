@@ -128,9 +128,6 @@
         "PublicIPNoBastion": {
             "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         },
-        "NsgNoBastion": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
-        },
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "10.1.0.0/24",
@@ -160,14 +157,15 @@
                         }
                     }
                 ],
-                "networkSecurityGroup": "[if(equals(variables('deployBastion'),'No'),variables('NsgNoBastion'),json('null'))]"
+                "networkSecurityGroup": {
+                    "id" : "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+                }
             }
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-02-01",
             "name": "[parameters('networkSecurityGroupName')]",
-            "condition": "[equals(variables('deployBastion'),'No')]",
             "location": "[parameters('location')]",
             "properties": {
                 "securityRules": [
@@ -178,7 +176,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[if(equals(variables('deployBastion'),'Yes'),variables('bastionSubnetIpPrefix'),'*')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
