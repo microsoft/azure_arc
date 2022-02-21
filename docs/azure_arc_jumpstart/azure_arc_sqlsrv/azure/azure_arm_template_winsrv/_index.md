@@ -109,6 +109,12 @@ For you to get familiar with the automation and deployment flow, below is an exp
     2. Set local OS environment variables
 
     3. Generate a local OS logon script named *LogonScript.ps1*. This script will:
+       1. Create the LogonScript.log file.
+       2. Stop and disable the "Windows Azure Guest Agent" service.
+       3. Create a new Windows Firewall rule to block Azure IMDS outbound traffic to the 169.254.169.254 remote address
+       4. Unregister the logon script Windows schedule task so it will not run after first login.
+
+4. User RDP or connect using Azure Bastion to Windows VM which will start the LogonScript script execution and will onboard the VM to Azure Arc.
 
 ## Deployment
 
@@ -150,9 +156,13 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
 ## Windows Login & Post Deployment
 
-* Now that the Windows Server VM has been deployed, it is time to login to it. Using it's public IP, RDP to the VM.
+* Now that the Windows Server VM is created, it is time to login to it. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public Ip.
 
     ![Screenshot showing Overview tab of Azure VM](./03.jpg)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+  
+    ![Screenshot showing Connection tab of Azure VM using Bastion](./04.jpg)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
@@ -160,9 +170,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
     > **Note: The script run time is ~10-15min long**
 
-    ![Screenshot showing PowerShell script executing in VM](./04.jpg)
-
-    ![Screenshot showing showing PowerShell script executing in VM](./05.jpg)
+    ![Screenshot showing PowerShell script executing in VM](./05.jpg)
 
     ![Screenshot showing showing PowerShell script executing in VM](./06.jpg)
 
@@ -180,19 +188,21 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
     ![Screenshot showing showing PowerShell script executing in VM](./13.jpg)
 
-* Upon successful run, in the Azure portal, notice you now have a new Azure Arc-enabled server (with the Microsoft Monitoring agent installed via an extension) and Azure Arc-enabled SQL resources as well as Azure Log Analytics added to the resource group.
+    ![Screenshot showing showing PowerShell script executing in VM](./14.jpg)
 
-    ![Screenshot showing Azure Arc-enabled SQL resources](./14.jpg)
+* Upon successful run, in the Azure portal, notice you now have a new Azure Arc-enabled server (with the Microsoft Monitoring agent installed via an extension) and Azure Arc-enabled SQL resources as well as Azure Log Analytics added to the resource group.
 
     ![Screenshot showing Azure Arc-enabled SQL resources](./15.jpg)
 
     ![Screenshot showing Azure Arc-enabled SQL resources](./16.jpg)
 
+    ![Screenshot showing Azure Arc-enabled SQL resources](./17.jpg)
+
 * Open Microsoft SQL Server Management Studio (a Windows shortcut will be created for you) and validate the *AdventureWorksLT2019* sample database is deployed as well.
 
-    ![Screenshot showing SQL Management Studio](./17.jpg)
-
     ![Screenshot showing SQL Management Studio](./18.jpg)
+
+    ![Screenshot showing SQL Management Studio](./19.jpg)
 
 ## Azure SQL Assessment
 
@@ -204,24 +214,24 @@ Now that you have both the server and SQL projected as Azure Arc resources, the 
 
     Clicking the "Download configuration script" will simply send a REST API call to the Azure portal which will make "Step3" available and will result with a grayed-out "View SQL Assessment Results" button.
 
-    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./19.jpg)
-
     ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./20.jpg)
 
     ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./21.jpg)
 
     ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./22.jpg)
 
+    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./23.jpg)
+
     It might take a bit of time, but after ~45-60min you will notice how the "View SQL Assessment Results" button is available for you to click on. At this point, the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
     Initially, the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
-    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./23.jpg)
-
     ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./24.jpg)
+
+    ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./25.jpg)
 
 ## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
 
-![Screenshot showing Azure Portal delete resource group function](./25.jpg)
+![Screenshot showing Azure Portal delete resource group function](./26.jpg)
