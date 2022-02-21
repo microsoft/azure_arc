@@ -42,7 +42,7 @@
             "value": true
         },
         "templateBaseUrl": {
-            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/"
+            "value": "https://raw.githubusercontent.com/sebassem/azure_arc/arc_data_adding_bastion/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/"
         }
     }
 }
