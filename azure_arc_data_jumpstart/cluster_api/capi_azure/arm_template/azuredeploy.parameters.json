@@ -27,7 +27,7 @@
             "value": "la-arc-demo"
         },
         "deployBastion": {
-            "value": "Yes"
+            "value": "No"
         },
         "bastionHostName": {
             "value": "Arc-Data-Demo-Bastion"

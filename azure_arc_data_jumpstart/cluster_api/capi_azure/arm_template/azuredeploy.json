@@ -180,6 +180,12 @@
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
+          },
+          "bastionSubnetIpPrefix": {
+            "value": "[variables('bastionSubnetIpPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
