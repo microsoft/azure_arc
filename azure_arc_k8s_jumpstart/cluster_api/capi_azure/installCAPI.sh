@@ -1,12 +1,17 @@
 #!/bin/bash
-exec >installCAPI.log
-exec 2>&1
-
-sudo apt-get update
+mkdir ~/jumpstart_logs
+LOG_FILE=~/jumpstart_logs/installCAPI.log
+echo ""
+tput setaf 6;echo "Script log can be found in `tput sitm`${LOG_FILE}`tput ritm`" | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+tput sgr0
+echo ""
+{
+  # Script starts
+  sudo apt-get update
 
 # Set deployment GitHub repository environment variables
-export githubAccount="microsoft" # Do not change unless deploying from personal GitHub account
-export githubBranch="main" # Do not change unless deploying from personal GitHub branch
+export githubAccount="likamrat" # Do not change unless deploying from personal GitHub account
+export githubBranch="capi_refresh" # Do not change unless deploying from personal GitHub branch
 export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
 # Set deployment environment variables
@@ -29,179 +34,219 @@ export AZURE_CLIENT_SECRET="<Azure SPN application client secret>"
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="<Control Plane node Azure VM type>" # For example: "Standard_D4s_v4"
 export AZURE_NODE_MACHINE_TYPE="<Worker node Azure VM type>" # For example: "Standard_D8s_v4"
 
+  # Base64 encode the variables - Do not change!
+  export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$AZURE_SUBSCRIPTION_ID" | base64 | tr -d '\n')"
+  export AZURE_TENANT_ID_B64="$(echo -n "$AZURE_TENANT_ID" | base64 | tr -d '\n')"
+  export AZURE_CLIENT_ID_B64="$(echo -n "$AZURE_CLIENT_ID" | base64 | tr -d '\n')"
+  export AZURE_CLIENT_SECRET_B64="$(echo -n "$AZURE_CLIENT_SECRET" | base64 | tr -d '\n')"
 
+  # Settings needed for AzureClusterIdentity used by the AzureCluster
+  export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
+  export CLUSTER_IDENTITY_NAME="cluster-identity"
+  export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
-# Base64 encode the variables - Do not change!
-export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$AZURE_SUBSCRIPTION_ID" | base64 | tr -d '\n')"
-export AZURE_TENANT_ID_B64="$(echo -n "$AZURE_TENANT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_ID_B64="$(echo -n "$AZURE_CLIENT_ID" | base64 | tr -d '\n')"
-export AZURE_CLIENT_SECRET_B64="$(echo -n "$AZURE_CLIENT_SECRET" | base64 | tr -d '\n')"
+  # Installing Azure CLI & Azure Arc extensions
+  echo ""
+  curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+  echo ""
 
-# Settings needed for AzureClusterIdentity used by the AzureCluster
-export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
-export CLUSTER_IDENTITY_NAME="cluster-identity"
-export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
+  echo ""
+  az config set extension.use_dynamic_install=yes_without_prompt
+  sudo -u $USER az extension add --name connectedk8s
+  sudo -u $USER az extension add --name k8s-configuration
+  sudo -u $USER az extension add --name k8s-extension
+  echo ""
 
-# Installing Azure CLI & Azure Arc extensions
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+  echo "Log in to Azure"
+  sudo -u $USER az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
+  az -v
+  echo ""
 
-az config set extension.use_dynamic_install=yes_without_prompt
-sudo -u $USER az extension add --name connectedk8s
-sudo -u $USER az extension add --name k8s-configuration
-sudo -u $USER az extension add --name k8s-extension
+  # Creating deployment Azure resource group
+  echo ""
+  az group create --name $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION
+  echo ""
 
-echo "Log in to Azure"
-sudo -u $USER az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-az -v
+  # Installing snap
+  echo ""
+  sudo apt install snapd
+  echo ""
+
+  # Installing Docker
+  echo ""
+  sudo snap install docker
+  sudo groupadd docker
+  sudo usermod -aG docker $USER
+  sleep 10
+  sudo docker version
+  echo ""
+
+  # Installing kubectl
+  echo ""
+  sudo snap install kubectl --classic
+  kubectl version
+  echo ""
+
+  # Installing kustomize
+  echo ""
+  sudo snap install kustomize
+  kustomize version
+  echo ""
+
+  # Installing clusterctl
+  echo ""
+  curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
+  sudo chmod +x ./clusterctl
+  sudo mv ./clusterctl /usr/local/bin/clusterctl
+  clusterctl version
+  echo ""
+
+  # Installing Helm 3
+  echo ""
+  sudo snap install helm --classic
+  helm version
+  echo ""
+
+  # Deploying Rancher K3s single node cluster using k3sup
+  echo "Deploying Rancher K3s single node cluster using k3sup"
+  echo ""
+  sudo mkdir $HOME/.kube
+  sudo curl -sLS https://get.k3sup.dev | sh
+  sudo cp k3sup /usr/local/bin/k3sup
+  sudo k3sup install --local --context capimgmt --k3s-extra-args '--no-deploy traefik'
+  sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+  sudo cp kubeconfig $HOME/.kube/config
+  sudo cp kubeconfig $HOME/.kube/config-mgmt
+  sudo chown -R $USER $HOME/.kube/
+  export KUBECONFIG=$HOME/.kube/config
+  kubectl config set-context capimgmt
+
+  # Registering Azure Arc providers
+  echo ""
+  echo "Registering Azure Arc providers"
+  az provider register --namespace Microsoft.Kubernetes --wait
+  az provider register --namespace Microsoft.KubernetesConfiguration --wait
+  az provider register --namespace Microsoft.ExtendedLocation --wait
+  echo ""
+  az provider show -n Microsoft.Kubernetes -o table
+  echo ""  
+  az provider show -n Microsoft.KubernetesConfiguration -o table
+  echo ""  
+  az provider show -n Microsoft.ExtendedLocation -o table
+  echo ""
+
+  # Create a secret to include the password of the Service Principal identity created in Azure
+  # This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
+  echo ""
+  kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
+  echo ""
+
+  echo ""
+  echo "Making sure Rancher K3s cluster is ready..."
+  echo ""
+  kubectl wait --for=condition=Available --timeout=90s --all deployments -A >/dev/null
+  kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+  echo ""
+
+  # Converting the Rancher K3s cluster to a Cluster API management cluster
+  echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
+  clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
+  echo "Making sure cluster is ready..."
+  echo ""
+  kubectl wait --for=condition=Available --timeout=90s --all deployments -A >/dev/null
+  echo ""
+
+  # Creating CAPI Workload cluster yaml manifest
+  echo "Deploying Kubernetes workload cluster"
+  echo ""
+  curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}artifacts/capz_kustomize/patches/AzureCluster.yaml
+  curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
+  curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
+  curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
+  sed -i "s/{CLUSTERCTL_VERSION}/$CLUSTERCTL_VERSION/" capz_kustomize/kustomization.yaml
+  kubectl kustomize capz_kustomize/ > jumpstart.yaml
+  clusterctl generate yaml --from jumpstart.yaml > template.yaml
+  echo ""
+
+  # Creating Microsoft Defender for Cloud audit secret
+  echo ""
+  echo "Creating Microsoft Defender for Cloud audit secret"
+  echo ""
+  curl -o audit.yaml https://raw.githubusercontent.com/Azure/Azure-Security-Center/master/Pricing%20%26%20Settings/Defender%20for%20Kubernetes/audit-policy.yaml
+
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: audit
+type: Opaque
+data:
+  audit.yaml: $(cat "audit.yaml" | base64 -w0)
+  username: $(echo -n "jumpstart" | base64 -w0)
+EOF
+
+  # Deploying CAPI Workload cluster
+  echo ""
+  kubectl apply -f template.yaml
+
+  echo ""
+  until kubectl get cluster --all-namespaces | grep -q "Provisioned"; do echo "Waiting for Kubernetes control plane to be in Provisioned phase..." && sleep 20 ; done
+  echo ""
+  kubectl get cluster --all-namespaces
+  echo ""
+
+  until kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do echo "Waiting for control plane to initialize. This may take a few minutes..." && sleep 20 ; done
+  echo ""
+  kubectl get kubeadmcontrolplane --all-namespaces
+  clusterctl get kubeconfig $CLUSTER_NAME > $CLUSTER_NAME.kubeconfig
+  echo ""
+  kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
+  echo ""
+
+  echo ""
+  CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
+  export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
+  until [[ $(kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
+  echo ""
+  kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
+  echo ""
+  kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+  echo ""
+
+  # Onboarding the cluster as an Azure Arc enabled Kubernetes cluster
+  echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+  echo ""
+  rm -rf ~/.azure/AzureArcCharts
+
+  echo "Checking if you have up-to-date Azure Arc AZ CLI 'connectedk8s' extension..."
+  az extension show --name "connectedk8s" &> extension_output
+  if cat extension_output | grep -q "not installed"; then
+  az extension add --name "connectedk8s"
+  rm extension_output
+  else
+  az extension update --name "connectedk8s"
+  rm extension_output
+  fi
+  echo ""
+
+  echo "Checking if you have up-to-date Azure Arc AZ CLI 'k8s-configuration' extension..."
+  az extension show --name "k8s-configuration" &> extension_output
+  if cat extension_output | grep -q "not installed"; then
+  az extension add --name "k8s-configuration"
+  rm extension_output
+  else
+  az extension update --name "k8s-configuration"
+  rm extension_output
+  fi
+  echo ""
+
+  echo ""
+  az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --kube-config $CLUSTER_NAME.kubeconfig
+  echo ""
+
+} 2>&1 | tee -a $LOG_FILE # Send terminal output to log file
+
 echo ""
-
-# Creating deployment Azure resource group
-az group create --name $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION
-
-# Installing snap
-sudo apt install snapd
-
-# Installing Docker
-sudo snap install docker
-sudo groupadd docker
-sudo usermod -aG docker $USER
-sudo docker version
-
-# Installing kubectl
-sudo snap install kubectl --classic
-kubectl version
-
-# Installing kustomize
-sudo snap install kustomize
-kustomize version
-
-# Installing kind
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-sudo chmod +x ./kind
-sudo mv ./kind /usr/local/bin/kind
-kind version
+tput setaf 6;echo "To check the deployment log, use the `tput sitm`cat ${LOG_FILE}`tput ritm` command." | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
 echo ""
-
-# Installing clusterctl
-curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
-sudo chmod +x ./clusterctl
-sudo mv ./clusterctl /usr/local/bin/clusterctl
-clusterctl version
-
-# Installing Helm 3
-echo ""
-sudo snap install helm --classic
-helm version
-
-# Deploying kind cluster
-mkdir $HOME/.kube
-sudo chown -R $USER $HOME/.kube/
-export KUBECONFIG=${HOME}/.kube/
-sudo kind create cluster --name ${CAPI_WORKLOAD_CLUSTER_NAME}-mgmt
-echo ""
-echo "Making sure kind cluster is ready..."
-echo ""
-kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
-sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
-echo ""
-
-# Registering Azure Arc providers
-echo "Registering Azure Arc providers"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider show -n Microsoft.Kubernetes -o table
-az provider show -n Microsoft.KubernetesConfiguration -o table
-az provider show -n Microsoft.ExtendedLocation -o table
-
-# Create a secret to include the password of the Service Principal identity created in Azure
-# This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
-sudo kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
-
-# Converting the kind cluster to a Cluster API management cluster
-echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-sudo clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
-echo "Making sure cluster is ready..."
-echo ""
-sudo kubectl wait --for=condition=Available --timeout=90s --all deployments -A >/dev/null
-echo ""
-
-# Creating CAPI Workload cluster yaml manifest
-echo "Deploying Kubernetes workload cluster"
-echo ""
-curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBaseUrl}artifacts/capz_kustomize/patches/AzureCluster.yaml
-curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
-curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
-curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
-sed -i "s/{CLUSTERCTL_VERSION}/$CLUSTERCTL_VERSION/" capz_kustomize/kustomization.yaml
-kubectl kustomize capz_kustomize/ > jumpstart.yaml
-clusterctl generate yaml --from jumpstart.yaml > template.yaml
-
-# Deploying CAPI Workload cluster
-echo ""
-sudo kubectl apply -f template.yaml
-
-echo ""
-until sudo kubectl get cluster --all-namespaces | grep -q "Provisioned"; do echo "Waiting for Kubernetes control plane to be in Provisioned phase..." && sleep 20 ; done
-echo ""
-sudo kubectl get cluster --all-namespaces
-
-echo ""
-until sudo kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do echo "Waiting for control plane to initialize. This may take a few minutes..." && sleep 20 ; done
-echo ""
-sudo kubectl get kubeadmcontrolplane --all-namespaces
-clusterctl get kubeconfig $CLUSTER_NAME > $CLUSTER_NAME.kubeconfig
-echo ""
-sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
-
-echo ""
-CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
-export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
-echo ""
-sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
-echo ""
-sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-echo "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-echo ""
-
-rm -rf ~/.azure/AzureArcCharts
-
-echo "Checking if you have up-to-date Azure Arc AZ CLI 'connectedk8s' extension..."
-az extension show --name "connectedk8s" &> extension_output
-if cat extension_output | grep -q "not installed"; then
-az extension add --name "connectedk8s"
-rm extension_output
-else
-az extension update --name "connectedk8s"
-rm extension_output
-fi
-echo ""
-
-echo "Checking if you have up-to-date Azure Arc AZ CLI 'k8s-configuration' extension..."
-az extension show --name "k8s-configuration" &> extension_output
-if cat extension_output | grep -q "not installed"; then
-az extension add --name "k8s-configuration"
-rm extension_output
-else
-az extension update --name "k8s-configuration"
-rm extension_output
-fi
-echo ""
-
-az connectedk8s connect --name $CAPI_WORKLOAD_CLUSTER_NAME --resource-group $CAPI_WORKLOAD_CLUSTER_NAME --location $AZURE_LOCATION --kube-config $CAPI_WORKLOAD_CLUSTER_NAME.kubeconfig
+tput sgr0
