@@ -9,30 +9,30 @@ echo ""
   # Script starts
   sudo apt-get update
 
-# Set deployment GitHub repository environment variables
-export githubAccount="likamrat" # Do not change unless deploying from personal GitHub account
-export githubBranch="capi_refresh" # Do not change unless deploying from personal GitHub branch
-export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
+  # Set deployment GitHub repository environment variables
+  export githubAccount="likamrat" # Do not change unless deploying from personal GitHub account
+  export githubBranch="capi_refresh" # Do not change unless deploying from personal GitHub branch
+  export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
-# Set deployment environment variables
-export KIND_VERSION="0.11.1" # Do not change!
-export CLUSTERCTL_VERSION="1.1.2" # Do not change!
-export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.1.1" # Do not change!
-export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.22.6" # Do not change!
-export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
-export WORKER_MACHINE_COUNT="<Workers node count>" 
-export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
-export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
-export CLUSTER_NAME==$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase case variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
-export AZURE_RESOURCE_GROUP="<Azure resource group name>"
-export AZURE_SUBSCRIPTION_ID="<Azure subscription id>"
-export AZURE_TENANT_ID="<Azure tenant id>"
-export AZURE_CLIENT_ID="<Azure SPN application client id>"
-export AZURE_CLIENT_SECRET="<Azure SPN application client secret>"
-export AZURE_CONTROL_PLANE_MACHINE_TYPE="<Control Plane node Azure VM type>" # For example: "Standard_D4s_v4"
-export AZURE_NODE_MACHINE_TYPE="<Worker node Azure VM type>" # For example: "Standard_D8s_v4"
+  # Set deployment environment variables
+  export KIND_VERSION="0.11.1" # Do not change!
+  export CLUSTERCTL_VERSION="1.1.2" # Do not change!
+  export CAPI_PROVIDER="azure" # Do not change!
+  export CAPI_PROVIDER_VERSION="1.1.1" # Do not change!
+  export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
+  export KUBERNETES_VERSION="1.22.6" # Do not change!
+  export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
+  export WORKER_MACHINE_COUNT="<Workers node count>" 
+  export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
+  export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
+  export CLUSTER_NAME==$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase case variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+  export AZURE_RESOURCE_GROUP="<Azure resource group name>"
+  export AZURE_SUBSCRIPTION_ID="<Azure subscription id>"
+  export AZURE_TENANT_ID="<Azure tenant id>"
+  export AZURE_CLIENT_ID="<Azure SPN application client id>"
+  export AZURE_CLIENT_SECRET="<Azure SPN application client secret>"
+  export AZURE_CONTROL_PLANE_MACHINE_TYPE="<Control Plane node Azure VM type>" # For example: "Standard_D4s_v4"
+  export AZURE_NODE_MACHINE_TYPE="<Worker node Azure VM type>" # For example: "Standard_D8s_v4"
 
   # Base64 encode the variables - Do not change!
   export AZURE_SUBSCRIPTION_ID_B64="$(echo -n "$AZURE_SUBSCRIPTION_ID" | base64 | tr -d '\n')"
