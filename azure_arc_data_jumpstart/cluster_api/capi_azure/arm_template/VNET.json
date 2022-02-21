@@ -25,6 +25,12 @@
       "metadata": {
         "description": "Subnet CIDR"
       }
+    },
+    "bastionSubnetIpPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet prefix"
+      }
     }
   },
   "resources": [
