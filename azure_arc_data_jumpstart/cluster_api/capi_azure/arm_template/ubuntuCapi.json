@@ -103,6 +103,12 @@
                 "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
             }
         },
+        "bastionSubnetIpPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Bastion subnet prefix"
+            }
+        },
         "templateBaseUrl": {
         "type": "string",
         "metadata": {
