@@ -147,9 +147,6 @@
     "PublicIPNoBastion": {
       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
     },
-    "NsgbNoBastion": {
-      "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
-    },
     "linuxConfiguration": {
       "disablePasswordAuthentication": true,
       "ssh": {
@@ -186,14 +183,15 @@
             }
           }
         ],
-        "networkSecurityGroup": "[if(equals(variables('deployBastion'),'No'),variables('NsgbNoBastion'),json('null'))]"
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+        }
       }
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2020-06-01",
       "name": "[parameters('networkSecurityGroupName')]",
-      "condition": "[equals(variables('deployBastion'),'No')]",
       "location": "[parameters('location')]",
       "properties": {
         "securityRules": [
@@ -204,7 +202,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "*",
+              "sourceAddressPrefix": "[if(equals(variables('deployBastion'),'Yes'),variables('bastionSubnetIpPrefix'),'*')]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "22"
@@ -234,11 +232,11 @@
             }
           },
           {
-                        "name" : "AzureBastionSubnet",
-                        "properties": {
-                            "addressPrefix": "[variables('bastionSubnetIpPrefix')]"
-                        }
-                     }
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[variables('bastionSubnetIpPrefix')]"
+            }
+          }
         ]
       }
     },
@@ -322,32 +320,32 @@
       }
     },
     {
-            "type": "Microsoft.Network/bastionHosts",
-            "condition": "[equals(variables('deployBastion'),'Yes')]",
-            "name": "[variables('bastionName')]",
-            "location": "[parameters('location')]",
-            "apiVersion": "2020-11-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+      "type": "Microsoft.Network/bastionHosts",
+      "condition": "[equals(variables('deployBastion'),'Yes')]",
+      "name": "[variables('bastionName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "2020-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
 
-            ],
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
             "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "IpConf",
-                        "properties": {
-                            "subnet": {
-                                "id": "[variables('bastionSubnetRef')]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
-                        }
-                     }
-                ]
+              "subnet": {
+                "id": "[variables('bastionSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              }
             }
-        }
+          }
+        ]
+      }
+    }
   ],
   "outputs": {
     "adminUsername": {
