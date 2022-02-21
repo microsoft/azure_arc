@@ -3,19 +3,25 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "adminUsername": {
-            "value": "<OS Username>"
+            "value": "arcdemo"
         },
         "adminPasswordOrKey": {
-            "value": "<OS Password>"
+            "value": "P@ssw0rd@123456789"
         },
         "appId": {
-            "value": "<Your Azure service principal name>"
+            "value": "15015a4d-01d7-48c6-aeeb-05e736132e39"
         },
         "password": {
-            "value": "<Your Azure service principal password>"
+            "value": "8817Q~vWv.SBxTEgw-REysKW9aHLL7_ipd2tB"
         },
         "tenantId": {
-            "value": "<Your Azure tenant ID>"
-        }                              
+            "value": "030607a1-e6bb-4aef-ae83-170101641ee9"
+        },
+        "deployBastion": {
+            "value": "No"
+        },
+        "bastionHostName": {
+          "value": "Arc-K3s-Demo-Bastion"
+        }
     }
 }
