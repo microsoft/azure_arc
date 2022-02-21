@@ -46,20 +46,6 @@
         "description": "Azure AD tenant id for your service principal"
       }
     },
-    "deployBastion": {
-      "type": "string",
-      "metadata": {
-        "description": "Choice to deploy Bastion to connect to the client VM"
-      },
-      "allowedValues": [ "Yes", "No" ]
-    },
-    "bastionHostName": {
-      "type": "string",
-      "defaultValue": "Arc-Data-Demo-Bastion",
-      "metadata": {
-        "description": "The Azure Bastion host name"
-      }
-    },
     "logAnalyticsWorkspaceName": {
       "type": "string",
       "metadata": {
@@ -79,7 +65,7 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },
+    },    
     "deployPostgreSQL": {
       "type": "bool",
       "defaultValue": false,
@@ -100,14 +86,10 @@
     "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
     "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
-    "bastionName" : "[concat(parameters('bastionHostName'))]",
-    "deployBastion" : "[concat(parameters('deployBastion'))]",
     // Virtual Network configuration
     "virtualNetworkName": "Arc-Data-CAPI-VNet",
     "subnetName": "Arc-Data-CAPI-Subnet",
-    "bastionSubnetName": "AzureBastionSubnet",
     "addressPrefix": "172.16.0.0/16",
-    "bastionSubnetIpPrefix": "172.16.2.0/27",
     "subnetAddressPrefix": "172.16.1.0/24"
   },
   "resources": [
@@ -134,9 +116,6 @@
           },
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
-          },
-          "bastionSubnetIpPrefix": {
-            "value": "[variables('bastionSubnetIpPrefix')]"
           }
         }
       }
@@ -146,7 +125,7 @@
       "comments": "Deploy the CAPI environment",
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
+      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -180,12 +159,6 @@
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
-          },
-          "bastionSubnetIpPrefix": {
-            "value": "[variables('bastionSubnetIpPrefix')]"
-          },
-          "deployBastion": {
-            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -195,7 +168,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
+      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -241,7 +214,7 @@
           },
           "SQLMIHA": {
             "value": "[parameters('SQLMIHA')]"
-          },
+          },          
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
           }
