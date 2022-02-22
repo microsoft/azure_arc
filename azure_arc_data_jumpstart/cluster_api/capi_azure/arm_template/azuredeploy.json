@@ -180,6 +180,9 @@
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
         }
       }
