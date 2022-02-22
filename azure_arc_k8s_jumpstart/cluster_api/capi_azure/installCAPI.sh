@@ -47,6 +47,7 @@ echo ""
 
   # Installing Azure CLI & Azure Arc extensions
   echo ""
+  echo "Installing Azure CLI & Azure Arc extensions"
   curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
   echo ""
 
@@ -64,45 +65,102 @@ echo ""
 
   # Creating deployment Azure resource group
   echo ""
+  echo "Creating deployment Azure resource group"
   az group create --name $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION
   echo ""
 
   # Installing snap
   echo ""
+  echo "Installing snap"  
   sudo apt install snapd
   echo ""
 
-  # Installing Docker
-  echo ""
-  sudo snap install docker
-  sudo groupadd docker
-  sudo usermod -aG docker $USER
-  sleep 10
-  sudo docker version
-  echo ""
+  # Making sure Docker plumping is ready
+  GROUP=docker
+  if [ -x "$(command -v docker)" ]; then
+    tput setaf 6;echo "Docker is already installed. Moving on..."
+    tput sgr0
+    echo ""
+
+  if [ $(getent group $GROUP) ]; then
+    tput setaf 6;echo "group $GROUP exists."
+    tput sgr0
+    echo ""
+  else
+    tput setaf 1;echo "group $GROUP does not exist. Creating..."
+    tput sgr0
+    sudo groupadd $GROUP
+    getent group $GROUP
+    echo ""
+    tput setaf 1;echo "User \`$USER\' does not belong to group \`$GROUP\'. Adding..."
+    tput sgr0
+    sudo usermod -aG $GROUP $USER
+    echo ""
+  fi
+
+  if id -nGz "$USER" | grep -qzxF "$GROUP"
+  then
+    tput setaf 6;echo User \`$USER\' belongs to group \`$GROUP\'
+    tput sgr0
+    echo ""
+  else
+    tput setaf 1;echo "User \`$USER\' does not belong to group \`$GROUP\'. Adding..."
+    tput sgr0
+    sudo usermod -aG $GROUP $USER
+    echo ""
+  fi
+
+  else
+    tput setaf 1;echo "Docker is not installed. Installing..."
+    tput sgr0
+    echo ""
+    sudo snap install docker
+    tput setaf 1;echo "group $GROUP does not exist. Creating..."
+    tput sgr0
+    sudo groupadd $GROUP
+    getent group $GROUP
+    echo ""
+    tput setaf 1;echo "User \`$USER\' does not belong to group \`$GROUP\'. Adding..."
+    tput sgr0
+    sudo usermod -aG $GROUP $USER
+    echo ""
+    while (! sudo docker stats --no-stream > /dev/null 2>&1); do
+      # Docker takes a few seconds to initialize
+      echo "Waiting for Docker to initialize..."
+      sleep 1
+    done
+  fi
 
   # Installing kubectl
   echo ""
-  sudo snap install kubectl --classic
-  kubectl version
+  echo "Installing kubectl"
+  curl -LO https://dl.k8s.io/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl
+  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+  sudo chmod +x kubectl
+  mkdir -p ~/.local/bin/kubectl
+  sudo mv ./kubectl ~/.local/bin/kubectl
+  kubectl version --client
   echo ""
 
   # Installing kustomize
   echo ""
+  echo "Installing kustomize"
   sudo snap install kustomize
   kustomize version
   echo ""
 
   # Installing clusterctl
   echo ""
+  echo "Installing clusterctl"
   curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
   sudo chmod +x ./clusterctl
   sudo mv ./clusterctl /usr/local/bin/clusterctl
   clusterctl version
   echo ""
 
-  # Installing Helm 3
+  # Installing Helm
   echo ""
+  echo "Helm"
   sudo snap install helm --classic
   helm version
   echo ""
@@ -129,23 +187,24 @@ echo ""
   az provider register --namespace Microsoft.ExtendedLocation --wait
   echo ""
   az provider show -n Microsoft.Kubernetes -o table
-  echo ""  
+  echo ""
   az provider show -n Microsoft.KubernetesConfiguration -o table
-  echo ""  
+  echo ""
   az provider show -n Microsoft.ExtendedLocation -o table
-  echo ""
-
-  # Create a secret to include the password of the Service Principal identity created in Azure
-  # This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
-  echo ""
-  kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
   echo ""
 
   echo ""
   echo "Making sure Rancher K3s cluster is ready..."
   echo ""
   kubectl wait --for=condition=Available --timeout=90s --all deployments -A >/dev/null
-  kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+  tput setaf 6;kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+  tput sgr0
+  echo ""
+
+  # Create a secret to include the password of the Service Principal identity created in Azure
+  # This secret will be referenced by the AzureClusterIdentity used by the AzureCluster
+  echo ""
+  kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-literal=clientSecret="${AZURE_CLIENT_SECRET}"
   echo ""
 
   # Converting the Rancher K3s cluster to a Cluster API management cluster
@@ -210,7 +269,8 @@ EOF
   echo ""
   kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
   echo ""
-  kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+  tput setaf 6;kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+  tput sgr0
   echo ""
 
   # Onboarding the cluster as an Azure Arc enabled Kubernetes cluster
