@@ -190,6 +190,7 @@
     "virtualNetworkName": "[concat(parameters('virtualNetworkName'))]",
     "subnetName": "[concat(parameters('subnetName'))]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
+    "bastionSubnetRef": "[concat(parameters('bastionSubnetRef'))]",
     "osDiskType": "Premium_LRS",
     "PublicIPNoBastion": {
       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
@@ -348,7 +349,7 @@
             "name": "IpConf",
             "properties": {
               "subnet": {
-                "id": "[parameters('bastionSubnetRef')]"
+                "id": "[variables('bastionSubnetRef')]"
               },
               "publicIPAddress": {
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
