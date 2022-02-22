@@ -183,6 +183,12 @@
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
           }
         }
       }
