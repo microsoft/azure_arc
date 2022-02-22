@@ -109,6 +109,19 @@
                 "description": "description"
             }
         },
+        "deployBastion": {
+            "type": "string",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            }
+        },
+        "bastionHostName": {
+            "type": "string",
+            "defaultValue": "Arc-Win-Demo-Bastion",
+            "metadata": {
+                "description": "Azure Bastion host name"
+            }
+        },
         "templateBaseUrl": {
             "type": "string",
             "metadata": {
@@ -124,7 +137,10 @@
         "subnetAddressPrefix": "172.16.1.0/24",
         "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
         "addressPrefix": "172.16.0.0/16",
-        "osDiskType": "Premium_LRS"
+        "osDiskType": "Premium_LRS",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
@@ -145,9 +161,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -170,7 +184,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -219,7 +233,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
