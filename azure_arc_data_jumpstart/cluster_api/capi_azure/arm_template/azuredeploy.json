@@ -135,7 +135,7 @@
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
           },
-          "bastionSubnetPrefix": {
+          "bastionSubnetIPPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"
           }
         }
@@ -246,7 +246,7 @@
             "value": "[parameters('bastionHostName')]"
           },
           "bastionSubnetPrefix": {
-           "value": "[variables('bastionSubnetPrefix')]"
+            "value": "[variables('bastionSubnetPrefix')]"
           },
           "bastionSubnetRef": {
             "value": "[variables('bastionSubnetRef')]"

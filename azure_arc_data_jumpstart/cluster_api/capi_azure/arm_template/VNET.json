@@ -26,15 +26,15 @@
         "description": "Subnet CIDR"
       }
     },
-    "bastionSubnetPrefix": {
+    "bastionSubnetIPPrefix": {
       "type": "string",
       "metadata": {
         "description": "Bastion subnet prefix"
       }
     }
   },
-  "variables":{
-    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]"
+  "variables": {
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetIPPrefix'))]"
   },
   "resources": [
     {
