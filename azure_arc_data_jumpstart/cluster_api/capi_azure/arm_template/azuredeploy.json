@@ -247,9 +247,6 @@
           },
           "bastionSubnetRef": {
             "value": "[variables('bastionSubnetRef')]"
-          },
-          "bastionSubnetIpPrefix": {
-            "value": "[variables('bastionSubnetIpPrefix')]"
           }
         }
       }
