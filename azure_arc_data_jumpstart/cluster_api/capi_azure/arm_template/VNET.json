@@ -26,7 +26,7 @@
         "description": "Subnet CIDR"
       }
     },
-    "bastionSubnetIPPrefix": {
+    "bastionSubnetPrefix": {
       "type": "string",
       "metadata": {
         "description": "Bastion subnet prefix"
@@ -34,7 +34,7 @@
     }
   },
   "variables": {
-    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetIPPrefix'))]"
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]"
   },
   "resources": [
     {
