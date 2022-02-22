@@ -156,7 +156,7 @@ $authorizedRoles = $roleDefinitions | ForEach-Object { $_ | Where-Object { (Comp
 $hasPermission = $rolePermissions | Where-Object {($_.principalId -eq $spnObjectId) -and ($_.roleDefinitionName -in $authorizedRoles)}
 
 # Copying the Azure Arc Connected Agent to nested VMs
-Write-Output "Replacing values within Arc Agent install scripts..."
+Write-Output "Replacing values within Azure Arc connected machine agent install scripts..."
 (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
 (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
 (Get-Content -path "$agentScript\installArcAgentCentOS.sh" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedCentOS.sh"
