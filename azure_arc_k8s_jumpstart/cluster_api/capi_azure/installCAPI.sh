@@ -134,11 +134,11 @@ echo ""
   # Installing kubectl
   echo ""
   echo "Installing kubectl"
-  curl -LO https://dl.k8s.io/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl
-  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-  sudo chmod +x kubectl
-  mkdir -p ~/.local/bin/kubectl
-  sudo mv ./kubectl ~/.local/bin/kubectl
+  sudo apt-get install -y apt-transport-https
+  sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  sudo apt-get update
+  sudo apt-get install -y kubectl
   kubectl version --client
   echo ""
 
