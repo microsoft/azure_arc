@@ -187,8 +187,8 @@
           "bastionHostName": {
             "value": "[parameters('bastionHostName')]"
           },
-          "bastionSubnetRef": {
-            "value": "[variables('bastionSubnetRef')]"
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
