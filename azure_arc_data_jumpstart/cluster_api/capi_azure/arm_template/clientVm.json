@@ -170,6 +170,12 @@
         "description": "Bastion subnet reference"
       }
     },
+    "bastionSubnetIpPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Bastion subnet IP prefix"
+      }
+    },
     "templateBaseUrl": {
       "type": "string",
       "metadata": {
