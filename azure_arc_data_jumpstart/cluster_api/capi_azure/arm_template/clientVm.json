@@ -235,7 +235,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),parameters('bastionSubnetIpPrefix'),parameters('myIpAddress'))]",
+              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),parameters('bastionHostName'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"
