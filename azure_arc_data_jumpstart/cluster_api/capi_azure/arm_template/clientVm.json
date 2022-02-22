@@ -164,10 +164,10 @@
         "description": "the Azure Bastion host name"
       }
     },
-    "bastionSubnetIpPrefix": {
+    "bastionSubnetRef": {
       "type": "string",
       "metadata": {
-        "description": "Bastion subnet IP prefix"
+        "description": "Bastion subnet reference"
       }
     },
     "templateBaseUrl": {
@@ -342,7 +342,7 @@
             "name": "IpConf",
             "properties": {
               "subnet": {
-                "id": "[parameters('bastionSubnetIpPrefix')]"
+                "id": "[parameters('bastionSubnetRef')]"
               },
               "publicIPAddress": {
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"

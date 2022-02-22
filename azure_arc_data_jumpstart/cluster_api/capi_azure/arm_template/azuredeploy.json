@@ -107,9 +107,8 @@
     "subnetAddressPrefix": "172.16.1.0/24",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]",
-    "bastionName" : "[concat(parameters('bastionHostName'))]",
-    "bastionSubnetIpPrefix": "172.16.2.0/27",
-    "deployBastion" : "[concat(parameters('deployBastion'))]"
+    "bastionSubnetIpPrefix": "172.16.2.0/27"
+
   },
   "resources": [
     {
@@ -136,8 +135,8 @@
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
           },
-          "bastionSubnetIpPrefix": {
-            "value": "[variables('bastionSubnetIpPrefix')]"
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
           }
         }
       }
