@@ -96,7 +96,7 @@
   },
   "variables": {
     "capiTemplateUrl": "[uri(parameters('templateBaseUrl'), 'ubuntuCapi.json')]",
-    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
+    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm2.json')]",
     "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
     "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
