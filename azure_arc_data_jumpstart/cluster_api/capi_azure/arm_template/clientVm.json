@@ -185,6 +185,7 @@
   },
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
+    "bastionSubnetPrefix" : "[concat(parameters('bastionSubnetPrefix'))]",
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
@@ -235,7 +236,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),parameters('bastionSubnetPrefix'),parameters('myIpAddress'))]",
+              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"
