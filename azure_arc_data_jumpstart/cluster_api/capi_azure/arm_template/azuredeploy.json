@@ -238,8 +238,8 @@
           },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
-          }
-          /*"deployBastion": {
+          },
+          "deployBastion": {
             "value": "[parameters('deployBastion')]"
           },
           "bastionHostName": {
@@ -250,7 +250,7 @@
           },
           "bastionSubnetRef": {
             "value": "[variables('bastionSubnetRef')]"
-          }*/
+          }
         }
       }
     },
