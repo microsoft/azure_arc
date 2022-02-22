@@ -25,6 +25,12 @@
       "metadata": {
         "description": "Subnet CIDR"
       }
+    },
+    "bastionSubnetIpPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Bastion subnet prefix"
+      }
     }
   },
   "resources": [
@@ -36,7 +42,7 @@
       "location": "[resourceGroup().location]",
       "properties": {
         "addressSpace": {
-          "addressPrefixes": ["[parameters('addressPrefix')]"]
+          "addressPrefixes": [ "[parameters('addressPrefix')]" ]
         },
         "subnets": [
           {
@@ -45,6 +51,12 @@
               "addressPrefix": "[parameters('subnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('bastionSubnetIpPrefix')]"
             }
           }
         ]

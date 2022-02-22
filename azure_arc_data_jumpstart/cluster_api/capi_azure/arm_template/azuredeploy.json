@@ -65,12 +65,26 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },    
+    },
     "deployPostgreSQL": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
         "description": "PostgreSQL Hyperscale deployment"
+      }
+    },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "allowedValues": [ "Yes", "No" ]
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Win-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
       }
     },
     "templateBaseUrl": {
@@ -90,7 +104,12 @@
     "virtualNetworkName": "Arc-Data-CAPI-VNet",
     "subnetName": "Arc-Data-CAPI-Subnet",
     "addressPrefix": "172.16.0.0/16",
-    "subnetAddressPrefix": "172.16.1.0/24"
+    "subnetAddressPrefix": "172.16.1.0/24",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]",
+    "bastionName" : "[concat(parameters('bastionHostName'))]",
+    "bastionSubnetIpPrefix": "172.16.2.0/27",
+    "deployBastion" : "[concat(parameters('deployBastion'))]"
   },
   "resources": [
     {
@@ -116,6 +135,9 @@
           },
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
+          },
+          "bastionSubnetIpPrefix": {
+            "value": "[variables('bastionSubnetIpPrefix')]"
           }
         }
       }
@@ -125,7 +147,7 @@
       "comments": "Deploy the CAPI environment",
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -168,7 +190,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -214,9 +236,18 @@
           },
           "SQLMIHA": {
             "value": "[parameters('SQLMIHA')]"
-          },          
+          },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetIpPrefix": {
+            "value": "[variables('bastionSubnetIpPrefix')]"
           }
         }
       }
