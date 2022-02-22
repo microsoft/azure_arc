@@ -52,7 +52,7 @@
         "description": "The size of the VM"
       }
     },
-        "bastionSubnetRef": {
+    "bastionSubnetRef": {
       "type": "string",
       "metadata": {
         "description": "Azure Bastion subnet reference"
@@ -160,8 +160,7 @@
       "type": "string",
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
-      },
-      "allowedValues": [ "Yes", "No" ]
+      }
     },
     "bastionHostName": {
       "type": "string",
@@ -185,10 +184,10 @@
   },
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
-    "bastionSubnetPrefix" : "[concat(parameters('bastionSubnetPrefix'))]",
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-    "virtualNetworkName" : "[concat(parameters('virtualNetworkName'))]",
+    "virtualNetworkName": "[concat(parameters('virtualNetworkName'))]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), parameters('subnetName'))]",
     "osDiskType": "Premium_LRS",
     "PublicIPNoBastion": {
