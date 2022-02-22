@@ -161,13 +161,19 @@
       "type": "string",
       "defaultValue": "Arc-Win-Demo-Bastion",
       "metadata": {
-        "description": "the Azure Bastion host name"
+        "description": "Azure Bastion host name"
+      }
+    },
+    "bastionSubnetIpPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet IP prefix"
       }
     },
     "bastionSubnetRef": {
       "type": "string",
       "metadata": {
-        "description": "Bastion subnet reference"
+        "description": "Azure Bastion subnet reference"
       }
     },
     "templateBaseUrl": {
@@ -229,7 +235,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),parameters('bastionHostName'),parameters('myIpAddress'))]",
+              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),parameters('bastionSubnetIpPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"

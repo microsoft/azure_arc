@@ -245,11 +245,11 @@
           "bastionHostName": {
             "value": "[parameters('bastionHostName')]"
           },
-          "bastionSubnetRef": {
-            "value": "[variables('bastionSubnetRef')]"
-          },
           "bastionSubnetIpPrefix": {
             "value": "[variables('bastionSubnetIpPrefix')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
           }
         }
       }
