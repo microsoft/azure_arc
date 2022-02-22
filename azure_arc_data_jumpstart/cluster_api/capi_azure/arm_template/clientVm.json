@@ -164,7 +164,7 @@
         "description": "Azure Bastion host name"
       }
     },
-    "bastionSubnetIpPrefix": {
+    "bastionSubnetPrefix": {
      "type": "string",
       "metadata": {
         "description": "Azure Bastion subnet IP prefix"
@@ -235,7 +235,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),parameters('bastionHostName'),parameters('myIpAddress'))]",
+              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),parameters('bastionSubnetPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"
