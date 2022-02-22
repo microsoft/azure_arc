@@ -52,6 +52,12 @@
         "description": "The size of the VM"
       }
     },
+        "bastionSubnetRef": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet reference"
+      }
+    },
     "virtualNetworkName": {
       "type": "string",
       "defaultValue": "Arc-Data-CAPI-VNet",
@@ -168,12 +174,6 @@
       "type": "string",
       "metadata": {
         "description": "Azure Bastion subnet IP prefix"
-      }
-    },
-    "bastionSubnetRef": {
-      "type": "string",
-      "metadata": {
-        "description": "Azure Bastion subnet reference"
       }
     },
     "templateBaseUrl": {
