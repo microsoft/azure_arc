@@ -165,7 +165,7 @@
       }
     },
     "bastionSubnetPrefix": {
-     "type": "string",
+      "type": "string",
       "metadata": {
         "description": "Azure Bastion subnet IP prefix"
       }
