@@ -122,6 +122,7 @@
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "subnetAddressPrefix": "172.16.1.0/24",
+        "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
         "addressPrefix": "172.16.0.0/16",
         "osDiskType": "Premium_LRS"
     },
@@ -201,7 +202,7 @@
                     {
                         "name": "AzureBastionSubnet",
                         "properties": {
-                            "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+                            "addressPrefix": "[variables('bastionSubnetPrefix')]"
                         }
                     }
                 ]
