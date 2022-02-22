@@ -96,7 +96,7 @@
   },
   "variables": {
     "capiTemplateUrl": "[uri(parameters('templateBaseUrl'), 'ubuntuCapi.json')]",
-    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm2.json')]",
+    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
     "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
     "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
@@ -215,7 +215,7 @@
           "myIpAddress": {
             "value": "[parameters('myIpAddress')]"
           },
-           "bastionSubnetPrefix": {
+          "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"
           },
           "stagingStorageAccountName": {
