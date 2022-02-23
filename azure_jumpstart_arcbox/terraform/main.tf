@@ -151,6 +151,7 @@ module "management_artifacts" {
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   workspace_name       = var.workspace_name
+  deployment_flavor    = var.deployment_flavor
 
   depends_on = [azurerm_resource_group.rg]
 }
