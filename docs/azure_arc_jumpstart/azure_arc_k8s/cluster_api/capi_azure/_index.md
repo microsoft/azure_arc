@@ -8,7 +8,7 @@ description: >
 
 ## Deploy Kubernetes cluster and connect it to Azure Arc using Cluster API Azure provider
 
-The following README will guide you on to deploy an Kubernetes cluster in Azure virtual machines and connected it as an Azure Arc cluster resource by leveraging the [Kubernetes Cluster API (CAPI) project](https://cluster-api.sigs.k8s.io/introduction.html) and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
+The following README will guide you on to deploy an Kubernetes cluster in Azure virtual machines and connected it as an Azure Arc cluster resource by using the [Kubernetes Cluster API (CAPI) project](https://cluster-api.sigs.k8s.io/introduction.html) and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
 
 ## Architecture (In a nutshell)
 
@@ -16,9 +16,11 @@ From the Cluster API Book docs:
 
 "Cluster API requires an existing Kubernetes cluster accessible via kubectl; during the installation process the Kubernetes cluster will be transformed into a management cluster by installing the Cluster API provider components, so it is recommended to keep it separated from any application workload."
 
-In this guide (as explained in the CAPI Book docs), you will deploy a local [kind](https://kind.sigs.k8s.io/) cluster which will be used as the management cluster. This cluster will then be used to deploy the workload cluster using the Cluster API Azure provider (CAPZ).
+In this guide, a [Rancher K3s](https://rancher.com/docs/k3s/latest/en/), single node cluster will be automatically deployed for you and will be used as the management cluster. This cluster will then be used to deploy the workload cluster using the Cluster API Azure provider (CAPZ).
 
 ## Prerequisites
+
+- The automation for this scenario is designed with the assumption of an existing (brownfield) Ubuntu server is already deployed. This can achieved in multiple ways but we recommend using either an [Ubuntu Azure virtual machine](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/quick-create-portal) or Ubuntu deployed [using Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/install).
 
 - Clone the Azure Arc Jumpstart repository
 
@@ -32,19 +34,19 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
   az --version
   ```
 
-- Create Azure service principal (SP)
+- Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with "Contributor" RBAC role is required for provisioning Azure resources
 
-    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    az ad sp create-for-rbac -n "AzureArcK8s" --role "Contributor"
     ```
 
     Output should look like this:
@@ -59,114 +61,105 @@ In this guide (as explained in the CAPI Book docs), you will deploy a local [kin
     }
     ```
 
+    > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+
     > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
 
-- As mentioned, you will need to deploy a local, small footprint Kubernetes cluster using kind which will act the management/provisioner cluster. To install kind on your machine, use the below command.
+## Automation Flow
 
-  > **Note: In order for you to complete this scenario, either a Linux ([WSL incl.](https://docs.microsoft.com/en-us/windows/wsl/install-win10)) or MacOS is required. Currently, this scenario does not support Windows OS**
+For you to get familiar with the automation and deployment flow, below is an explanation.
 
-  On Linux:
+- User is downloading the [provided deployment shell script file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/installCAPI.sh)
 
-  ```shell
-  curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64
-  chmod +x ./kind
-  sudo mv ./kind /usr/local/bin/kind
-  ```
-  
-  On MacOS:
+- User is editing the environment variables section in the in the script file (1-time edit). These variables values will be used throughout the deployment.
 
-  ```shell
-  brew install kind
-  ```
+- At a high level, the script will then perform the following tasks:
+  - Download and install all the required artifacts
+  - Install the required Azure Arc-enabled Kubernetes required Azure CLI extension
+  - Automatically log in to Azure using the provided service principal credentials and will create the deployment Azure resource group
+  - Deploy a single node Rancher K3s cluster and will convert it to a CAPI management cluster
+  - Download the required [Kustomize](https://kustomize.io/) patch files from the Jumpstart repository for deploying the CAPI workload cluster using the Cluster API Azure provider
+  - Onboard the cluster as an Azure Arc-enabled Kubernetes cluster
 
-  ![Screenshot of kind CLI](./01.png)
+## Deployment
 
-## Deployment - Management Cluster
+- As mentioned in the prerequisites section, an existing Ubuntu machine is required.
 
-> **Disclaimer: The deployment process of a the management cluster and the *clusterctl* CLI tool described in below are taken straight from the ["Cluster API Book"](https://cluster-api.sigs.k8s.io/user/quick-start.html) and deserves it's writers all the credit for it!**
-**The reason being for this process to be included is to provide you with the end-to-end user experience which also include the proprietary automation developed for this Jumpstart scenario and will be used later on in this guide.**
+- In the your directory of the cloned Jumpstart repository, navigate to where the [*arc_capi_azure*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/installCAPI.sh) bash script is located. Alternatively, you can also download just the script instead of cloning the entire repository.
 
-- Now that you have kind installed, deploy the local management cluster and test to ensure it's ready using the below commands:
+  The script will transform the Rancher K3s Kubernetes cluster to a CAPI management cluster with the Azure Cluster API provisioned (CAPZ) components that are needed. It will then deploy the workload cluster and it's Azure resources based on the environment variables as described in the next bullet. Upon deployment completion, the cluster will be onboard as an Azure Arc-enabled Kubernetes cluster.
 
-  ```shell
-  kind create cluster
-  kubectl cluster-info
-  ```
+    > **Disclaimer: The CAPI/CAPZ *clusterctl* CLI tool commands used in the script are taken straight from the ["Cluster API Book"](https://cluster-api.sigs.k8s.io/user/quick-start.html) and deserves it's writers all the credit for it!**
+    **The reason being for this process to be included is to provide you with the end-to-end user experience which also include the proprietary automation developed for this Jumpstart scenario.**
 
-  ![Screenshot of kind management cluster deployment](./02.png)
+- To download the script from the Ubuntu machine, use the below command.
 
-## Deployment - Workload Cluster
+    ```shell
+    curl -L https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/InstallCAPI.sh -o ~/installCAPI.sh
+    ```
 
-- In the your directory of the cloned Jumpstart repository, navigate to where the [*arc_capi_azure*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/arc_capi_azure.sh) bash script is located.
+- Once downloaded, edit the environment variables to match your Azure subscription and service principal details created in the prerequisites section as well as the required workload cluster details. The following screenshots shows the downloaded/copied script before editing the environment variables.
 
-  The script will transform the kind Kubernetes cluster to a CAPI management cluster with the Azure Cluster API provisioned (CAPZ) components that are needed. It will then deploy the workload cluster and it's Azure resources based on the environment variables as described in the next bullet. Upon deployment completion, the cluster will be onboard as an Azure Arc-enabled Kubernetes cluster.
+    ![Screenshot showing the curl command and the downloaded script in the Ubuntu machine](01.png)
 
-- Edit the environment variables to match your Azure subscription and SPN details created in the prerequisites section in this guide as well as the required workload cluster details.
-_`sshRSAPublicKey`_
-  - _`KUBERNETES_VERSION`_ - Kubernetes version. For example: 1.22.1
-  - _`CONTROL_PLANE_MACHINE_COUNT`_ - Control Plane node count. For example: 1
-  - _`WORKER_MACHINE_COUNT`_ - Workers node count. For example: 2
-  - _`AZURE_LOCATION`_ - Azure region. For example: eastus
-  - _`CAPI_WORKLOAD_CLUSTER_NAME`_ - Workload cluster name. For example: _arc-capi-azure_. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
-  - _`AZURE_SUBSCRIPTION_ID`_ - Azure subscription id
-  - _`AZURE_TENANT_ID`_ - Azure tenant id
-  - _`AZURE_CLIENT_ID`_ - Azure SPN application client id
-  - _`AZURE_CLIENT_SECRET`_ - Azure SPN application client secret
-  - _`AZURE_CONTROL_PLANE_MACHINE_TYPE`_ - Control Plane node Azure VM type .For example: Standard_D2s_v3
-  - _`AZURE_NODE_MACHINE_TYPE`_ - Worker node Azure VM type .For example: Standard_D4s_v3
+    ![Screenshot showing the script empty environment variables](02.png)
 
-  ![Screenshot of user environment variables](./03.png)
+    > **NOTE: Editing the script can be done either before copy/downloading it to the Ubuntu machine by using an your preferred IDE (for example, VSCode) or after, in the machine itself, using native Linux text editor such as vi or nano.**
 
-  > **Note: CAPI-based Kubernetes cluster deployments are using a yaml file that holds the deployment parameters as a Kubernetes manifest. The script in this scenario [generates the default scheme](https://github.com/kubernetes-sigs/cluster-api-provider-azure/blob/cfdac96526e388eb6374cad5eef581fb1767627f/templates/cluster-template-external-cloud-provider.yaml#L131) that has Premium storage type VMs as it's default. When editing both the _AZURE_CONTROL_PLANE_MACHINE_TYPE_ and the _AZURE_NODE_MACHINE_TYPE_, use Premium storage supported type VMs**
+- Edit ONLY the following environment variables:
 
-- Execute the script using the below command. The script runtime can take ~10-20min, depends on the number of control plane and worker nodes you chose to deploy. In case you don't have the required Azure CLI extensions already installed or if they are requires an update, the script will either install it or perform an update. The script will also install helm and *clusterctl* CLI tool which handles the lifecycle of a Cluster API management cluster.
+    > **NOTE: Both the *`githubAccount`* and the *`githubBranch`* are used for testing purposes. Unless you are developing independent tests that are based on the script, there is no need to edit these variables.**
 
-  ```shell
-  . ./arc_capi_azure.sh
-  ```
+    ![Screenshot showing the githubAccount and the githubBranch environment variables](03.png)
 
-  > **Note: The extra dot is due to the script having an *export* function and needs to have the vars exported in the same shell session as the other commands.**
+  - *`CONTROL_PLANE_MACHINE_COUNT`* - Control Plane node count. For example: 1
+  - *`WORKER_MACHINE_COUNT`* - Workers node count. For example: 2
+  - *`AZURE_LOCATION`* - Azure region. For example: eastus
+  - *`AZURE_ARC_CLUSTER_RESOURCE_NAME`* - Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
+  - *`AZURE_RESOURCE_GROUP`* - Name of the Azure resource group will be used for this deployment
+  - *`AZURE_SUBSCRIPTION_ID`* - Azure subscription id
+  - *`AZURE_TENANT_ID`* - Azure tenant id
+  - *`AZURE_CLIENT_ID`* - Azure SPN application client id
+  - *`AZURE_CLIENT_SECRET`* - Azure SPN application client secret
+  - *`AZURE_CONTROL_PLANE_MACHINE_TYPE`* - Control Plane node Azure VM type .For example: "Standard_D4s_v4"
+  - *`AZURE_NODE_MACHINE_TYPE`* - Worker node Azure VM type .For example: "Standard_D8s_v4"
 
-  ![Screenshot of workload cluster deployment script runtime](./04.png)
+    ![Screenshot showing the user environment variables](./04.png)
 
-  ![Screenshot of workload cluster deployment script runtime](./05.png)
-
-  ![Screenshot of workload cluster deployment script runtime](./06.png)
-
-  ![Screenshot of workload cluster deployment script runtime](./07.png)
-
-  ![Screenshot of workload cluster deployment script runtime](./08.png)
-
-- Upon completion, you will have a new Kubernetes cluster deployed on top of Azure virtual machines  that is already onboard as an Azure Arc-enabled Kubernetes cluster.
-
-  The script will generate the cluster definition *yaml* file which was used to deploy the workload cluster as will as the *kubeconfig* file. To test the cluster is up and running use the below command.
+- Execute the script using the below command. The script runtime can take ~10-20min, depends on the number of control plane and worker nodes you chose to deploy.
 
   ```shell
-  kubectl get nodes --kubeconfig=<Name of your workload cluster>.kubeconfig
+  sudo chmod +x installCAPI.sh && . ./installCAPI.sh
   ```
 
-  ![Screenshot of the workload cluster nodes](./09.png)
+  > **NOTE: The extra dot is due to the script using the *export* command, used for exporting the environment variables in the same shell session as the other commands in the script.**
 
-- In the Azure portal, you can see how all the resources were deployed in a new resource group as well as the Azure Arc-enabled Kubernetes cluster resource.
+    ![Screenshot showing the script runtime](./05.png)
 
-  ![Screenshot of the Azure resources](./10.png)
+    ![Screenshot showing the script runtime](./06.png)
 
-  ![Screenshot of the Azure Arc-enabled Kubernetes cluster resource](./11.png)
+    ![Screenshot showing the script runtime](./07.png)
+
+    ![Screenshot showing the script runtime](./08.png)
+
+- Upon completion, you will have a new Cluster API Kubernetes cluster deployed on top of Azure virtual machines that is already onboard as an Azure Arc-enabled Kubernetes cluster.
+
+  ![Screenshot showing the Azure resource group](./09.png)
+
+  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster resource](./10.png)
+
+## Logging
+
+For ease of troubleshooting and tracking, a deployment log will be created automatically as part of the script runtime. To view the deployment log use the below command:
+
+```shell
+cat /home/<USER>/jumpstart_logs/installCAPI.log
+```
+
+![Screenshot showing the installCAPI log file](./11.png)
 
 ## Cleanup
 
-- To delete only the workload cluster (and as a result, the Azure resources as well), run the below command. Deletion can take ~10-15 minutes, depends on the number of control plane and worker nodes you deployed.
+To cleanup the deployment, simply delete the Azure resource group.
 
-  ```shell
-  kubectl delete cluster "<Name of your cluster>"
-  ```
-
-  ![Screenshot of the workload cluster deletion](./12.png)
-
-- In addition, you can also delete the management cluster using the below command.
-
-  ```shell
-  kind delete cluster
-  ```
-
-  ![Screenshot of the management cluster deletion](./13.png)
+![Screenshot showing the deletion of the Azure resource group](./12.png)
