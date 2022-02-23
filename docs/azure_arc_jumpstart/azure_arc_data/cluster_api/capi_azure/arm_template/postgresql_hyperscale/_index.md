@@ -121,6 +121,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *logAnalyticsWorkspaceName* - Unique name for the deployment log analytics workspace.
   * *deploySQLMI* - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure PostgreSQL Hyperscale scenario, we will set it to _**false**_.
   * *deployPostgreSQL* - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure PostgreSQL Hyperscale scenario , we leave it set to _**true**_.
+  * *deployBastion* - Choice to deploy Azure Bastion or not to connect to the client VM.
+  * *bastionHostName* - Azure Bastion host name.
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template) and run the below command:
 
@@ -148,7 +150,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: The deployment time for this scenario can take ~15-20min**
 
-* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed.
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed (If you chose to deploy Azure Bastion, you will have **35 Azure resources**).
 
     ![ARM template deployment completed](./01.png)
 
@@ -158,15 +160,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-* Now that first phase of the automation is completed, it is time to RDP to the sidecar VM using it's public IP.
+* Now that first phase of the automation is completed, it is time to RDP to the sidecar VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public Ip.
 
     ![Client VM public IP](./04.png)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Connecting using Azure Bastion](./05.png)
 
 * At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 * Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and PostgreSQL will be deployed on the cluster and be ready to use.
-
-![PowerShell logon script run](./05.png)
 
 ![PowerShell logon script run](./06.png)
 
@@ -194,7 +198,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ![PowerShell logon script run](./18.png)
 
-* Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL Hyperscale instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **56 various Azure resources deployed**. The important ones to notice are:
+![PowerShell logon script run](./19.png)
+
+* Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL Hyperscale instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **56 various Azure resources deployed** and **57 Azure resources if you chose to deploy Azure Bastion**). The important ones to notice are:
 
   * Azure Arc-enabled Kubernetes cluster - Azure Arc-enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
@@ -204,17 +210,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   * Azure Arc-enabled PostgreSQL Hyperscale - The PostgreSQL Hyperscale instance that is now deployed on the Kubernetes cluster.
 
-![Additional Azure resources in the resource group](./19.png)
+![Additional Azure resources in the resource group](./20.png)
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Azure Data Studio shortcut](./20.png)
+  ![Azure Data Studio shortcut](./21.png)
 
 * Additionally, the PostgreSQL Hyperscale instance connection will be configured as well as the sample [_AdventureWorks_](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will restored automatically for you.
 
-  ![Azure Data Studio connection](./21.png)
+  ![Azure Data Studio connection](./22.png)
 
-  ![Configured PostgreSQL Hyperscale instance connection](./22.png)
+  ![Configured PostgreSQL Hyperscale instance connection](./23.png)
 
 ## Cluster extensions
 
@@ -228,14 +234,14 @@ In this scenario, three Azure Arc-enabled Kubernetes cluster extensions were dep
 
 * In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc-enabled Kubernetes resource](./23.png)
+  ![Azure Arc-enabled Kubernetes resource](./24.png)
 
-  ![Azure Arc-enabled Kubernetes cluster extensions settings](./24.png)
+  ![Azure Arc-enabled Kubernetes cluster extensions settings](./25.png)
 
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Delete Azure resource group](./25.png)
+    ![Delete Azure resource group](./26.png)
 
 <!-- ## Known Issues -->
