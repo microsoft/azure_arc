@@ -45,7 +45,7 @@
     "flavor": {
       "type": "string",
       "metadata": {
-        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       }
     }
   },
@@ -62,7 +62,7 @@
       "name": "[concat('Security', '(', parameters('workspaceName'), ')')]",
       "galleryName": "Security"
     },
-    "policyTemplate": "[if(equals(parameters('flavor'),'ITPro'), uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsITPro.json'),uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsFull.json'))]",
+    "policyTemplate": "[if(equals(parameters('flavor'),'ITPro'), uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsITPro.json'), if(equals(parameters('flavor'),'DevOps'),uri(parameters('templateBaseUrl'),'ARM/mgmt/policyAzureArcBuiltinsDevOps.json'), uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsFull.json')))]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",
