@@ -81,7 +81,7 @@ param templateBaseUrl string
 @allowed([
   'Full'
   'ITPro'
-  'Developer'
+  'DevOps'
 ])
 param flavor string = 'Full'
 
