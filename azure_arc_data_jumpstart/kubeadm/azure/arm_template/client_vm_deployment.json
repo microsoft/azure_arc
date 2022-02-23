@@ -15,7 +15,7 @@
             "metadata": {
                 "description": "The name of you Virtual Machine."
             }
-        },       
+        },
         "adminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
@@ -29,12 +29,12 @@
             "metadata": {
                 "description": "Windows password for the Virtual Machine"
             }
-        },       
+        },
         "windowsOSVersion": {
-        "type": "string",
-        "defaultValue": "2022-datacenter-g2",
-        "metadata": {
-            "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+            "type": "string",
+            "defaultValue": "2022-datacenter-g2",
+            "metadata": {
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
             }
         },
         "location": {
@@ -68,13 +68,13 @@
             "metadata": {
                 "description": "Unique SPN tenant ID"
             }
-        },        
+        },
         "SPN_AUTHORITY": {
             "type": "string",
             "metadata": {
                 "description": "The Service Principal authority"
             }
-        }, 
+        },
         "AZDATA_USERNAME": {
             "type": "string",
             "metadata": {
@@ -89,7 +89,7 @@
         },
         "ACCEPT_EULA": {
             "type": "string",
-            "defaultValue":"yes",
+            "defaultValue": "yes",
             "metadata": {
                 "description": "azdata CLI EULA"
             }
@@ -171,12 +171,32 @@
                 "description": "Name of the Network Security Group"
             }
         },
+        "deployBastion": {
+            "type": "string",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            }
+        },
+        "bastionHostName": {
+            "type": "string",
+            "defaultValue": "Arc-Win-Demo-Bastion",
+            "metadata": {
+                "description": "Azure Bastion host name"
+            }
+        },
+        "bastionSubnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure Bastion subnet IP prefix"
+            }
+        },
         "resourceTags": {
             "type": "object",
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_data"
             }
         }
+
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
@@ -185,7 +205,12 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "10.1.0.0/24",
-        "addressPrefix": "10.1.0.0/16"
+        "addressPrefix": "10.1.0.0/16",
+        "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+        "bastionSubnetRef": "[concat(variables('bastionSubnetRef'))]",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
@@ -207,9 +232,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -232,7 +255,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),'*')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
@@ -263,7 +286,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "443"
                         }
-                    }                    
+                    }
                 ]
             }
         },
@@ -301,7 +324,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
@@ -310,7 +333,7 @@
             "apiVersion": "2019-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
-            "tags": "[parameters('resourceTags')]",            
+            "tags": "[parameters('resourceTags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -349,32 +372,32 @@
             }
         },
         {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('vmName'),'/ClientTools')]",
-          "apiVersion": "2019-07-01",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "tags": {
-              "displayName": "config-choco"
-          },          
-          "properties": {
-            "publisher": "Microsoft.Compute",
-            "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.10",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/ClientTools.ps1"
-              ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -SPN_CLIENT_ID ', parameters('SPN_CLIENT_ID'), ' -SPN_CLIENT_SECRET ', parameters('SPN_CLIENT_SECRET'), ' -adminUsername ', parameters('adminUsername'), ' -adminPassword ', parameters('adminPassword'), ' -SPN_TENANT_ID ', parameters('SPN_TENANT_ID'), ' -SPN_AUTHORITY ', parameters('SPN_AUTHORITY'), ' -ARC_DC_RG ', parameters('ARC_DC_RG'), ' -K8svmName ', parameters('K8svmName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -DOCKER_USERNAME ', parameters('DOCKER_USERNAME'), ' -DOCKER_PASSWORD ', parameters('DOCKER_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -DOCKER_REGISTRY ', parameters('DOCKER_REGISTRY'), ' -DOCKER_REPOSITORY ', parameters('DOCKER_REPOSITORY'), ' -DOCKER_TAG ', parameters('DOCKER_TAG'))]" 
-            }            
-          }
-        }                        
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/ClientTools')]",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "tags": {
+                "displayName": "config-choco"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/ClientTools.ps1"
+                    ],
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File ClientTools.ps1', ' -SPN_CLIENT_ID ', parameters('SPN_CLIENT_ID'), ' -SPN_CLIENT_SECRET ', parameters('SPN_CLIENT_SECRET'), ' -adminUsername ', parameters('adminUsername'), ' -adminPassword ', parameters('adminPassword'), ' -SPN_TENANT_ID ', parameters('SPN_TENANT_ID'), ' -SPN_AUTHORITY ', parameters('SPN_AUTHORITY'), ' -ARC_DC_RG ', parameters('ARC_DC_RG'), ' -K8svmName ', parameters('K8svmName'), ' -AZDATA_USERNAME ', parameters('AZDATA_USERNAME'), ' -AZDATA_PASSWORD ', parameters('AZDATA_PASSWORD'), ' -ACCEPT_EULA ', parameters('ACCEPT_EULA'), ' -DOCKER_USERNAME ', parameters('DOCKER_USERNAME'), ' -DOCKER_PASSWORD ', parameters('DOCKER_PASSWORD'), ' -ARC_DC_NAME ', parameters('ARC_DC_NAME'), ' -ARC_DC_SUBSCRIPTION ', parameters('ARC_DC_SUBSCRIPTION'), ' -ARC_DC_REGION ', parameters('ARC_DC_REGION'), ' -DOCKER_REGISTRY ', parameters('DOCKER_REGISTRY'), ' -DOCKER_REPOSITORY ', parameters('DOCKER_REPOSITORY'), ' -DOCKER_TAG ', parameters('DOCKER_TAG'))]"
+                }
+            }
+        }
     ],
 
-    
+
     "outputs": {
         "adminUsername": {
             "type": "string",

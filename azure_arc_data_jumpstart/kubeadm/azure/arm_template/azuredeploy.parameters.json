@@ -1,57 +1,63 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "K8svmName": {
-            "value": "<Kubeadm Ubuntu VM name>"
-        },
-        "vmName": {
-            "value": "<Client Windows VM name>"
-        },         
-        "adminUsername": {
-            "value": "<Client Windows VM admin username>"
-        },
-        "adminPassword": {
-            "value": "<Client Windows VM admin password>"
-        },
-        "K8sVMSize": {
-            "value": "<Kubeadm Ubuntu VM size>"
-        },
-        "vmSize": {
-            "value": "<Client Windows VM size>"
-        },
-        "SPN_CLIENT_ID": {
-            "value": "<Your Azure service principal name>"
-        },
-        "SPN_CLIENT_SECRET": {
-            "value": "<Your Azure service principal password>"
-        },
-        "SPN_TENANT_ID": {
-            "value": "<Azure tenant ID>"
-        },
-        "SPN_AUTHORITY": {
-            "value": "https://login.microsoftonline.com"
-        },
-        "AZDATA_USERNAME": {
-            "value": "<Azure Arc Data Controller admin username>"
-        },
-        "AZDATA_PASSWORD": {
-            "value": "<Azure Arc Data Controller admin password>"
-        },
-        "ACCEPT_EULA": {
-            "value": "yes"
-        },
-        "ARC_DC_NAME": {
-            "value": "<Azure Arc Data Controller name (will be used for k8s namespace as well)>"
-        },
-        "ARC_DC_SUBSCRIPTION": {
-            "value": "<Azure Arc Data Controller Azure subscription ID>"
-        },
-        "ARC_DC_RG": {
-            "value": "<Azure resource group where all the resources get deploy>"
-        },
-        "ARC_DC_REGION": {
-            "value": "eastus"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "K8svmName": {
+      "value": "<Kubeadm Ubuntu VM name>"
+    },
+    "vmName": {
+      "value": "<Client Windows VM name>"
+    },
+    "adminUsername": {
+      "value": "<Client Windows VM admin username>"
+    },
+    "adminPassword": {
+      "value": "<Client Windows VM admin password>"
+    },
+    "K8sVMSize": {
+      "value": "<Kubeadm Ubuntu VM size>"
+    },
+    "vmSize": {
+      "value": "<Client Windows VM size>"
+    },
+    "SPN_CLIENT_ID": {
+      "value": "<Your Azure service principal name>"
+    },
+    "SPN_CLIENT_SECRET": {
+      "value": "<Your Azure service principal password>"
+    },
+    "SPN_TENANT_ID": {
+      "value": "<Azure tenant ID>"
+    },
+    "SPN_AUTHORITY": {
+      "value": "https://login.microsoftonline.com"
+    },
+    "AZDATA_USERNAME": {
+      "value": "<Azure Arc Data Controller admin username>"
+    },
+    "AZDATA_PASSWORD": {
+      "value": "<Azure Arc Data Controller admin password>"
+    },
+    "ACCEPT_EULA": {
+      "value": "yes"
+    },
+    "ARC_DC_NAME": {
+      "value": "<Azure Arc Data Controller name (will be used for k8s namespace as well)>"
+    },
+    "ARC_DC_SUBSCRIPTION": {
+      "value": "<Azure Arc Data Controller Azure subscription ID>"
+    },
+    "ARC_DC_RG": {
+      "value": "<Azure resource group where all the resources get deploy>"
+    },
+    "ARC_DC_REGION": {
+      "value": "eastus"
+    },
+    "deployBastion": {
+      "value": "<Deploy Bastion (Yes/No)>"
+    },
+    "bastionHostName": {
+      "value": "<Azure Bastion Hostname>"
     }
+  }
 }
