@@ -89,7 +89,7 @@
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
-      "condition": "[equals(parameters('flavor'),'Full')]",
+      "condition": "[equals(parameters('flavor'),or('Full','DevOps'))]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -129,7 +129,7 @@
       "apiVersion": "2019-10-01",
       "name": "ubuntuRancherDeployment",
       "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
-      "condition": "[equals(parameters('flavor'),'Full')]",
+      "condition": "[equals(parameters('flavor'),or('Full','DevOps'))]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
