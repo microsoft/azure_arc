@@ -58,13 +58,13 @@
             "metadata": {
                 "description": "Unique SPN tenant ID"
             }
-        },        
+        },
         "SPN_AUTHORITY": {
             "type": "string",
             "metadata": {
                 "description": "The Service Principal authority"
             }
-        },        
+        },
         "AZDATA_USERNAME": {
             "type": "string",
             "metadata": {
@@ -79,7 +79,7 @@
         },
         "ACCEPT_EULA": {
             "type": "string",
-            "defaultValue":"yes",
+            "defaultValue": "yes",
             "metadata": {
                 "description": "azdata CLI EULA"
             }
@@ -173,7 +173,7 @@
             "metadata": {
                 "description": "The size of the Client VM"
             }
-        },        
+        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "Arc-Data-Demo-VNET",
@@ -200,7 +200,21 @@
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_data"
             }
-        }         
+        },
+        "deployBastion": {
+            "type": "string",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            },
+            "allowedValues": [ "Yes", "No" ]
+        },
+        "bastionHostName": {
+            "type": "string",
+            "defaultValue": "Arc-Data-Demo-Bastion",
+            "metadata": {
+                "description": "the Azure Bastion host name"
+            }
+        }
     },
     "variables": {
         "K8svmName": "[concat(parameters('K8svmName'))]",
@@ -210,6 +224,12 @@
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
+        "bastionSubnetPrefix": "10.1.2.0/27",
+        "bastionSubnetName": "AzureBastionSubnet",
+        "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        },
         "linuxConfiguration": {
             "disablePasswordAuthentication": false,
             "ssh": {
@@ -242,9 +262,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -267,7 +285,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),'*')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -324,7 +342,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "443"
                         }
-                    }, 
+                    },
                     {
                         "name": "allow_k8s_kubelet",
                         "properties": {
@@ -350,7 +368,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "32323"
                         }
-                    }                                                                                                                       
+                    }
                 ]
             }
         },
@@ -373,6 +391,12 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('bastionSubnetPrefix')]"
+                        }
                     }
                 ]
             }
@@ -388,7 +412,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
@@ -397,7 +421,7 @@
             "apiVersion": "2019-03-01",
             "name": "[variables('K8svmName')]",
             "location": "[parameters('location')]",
-            "tags": "[parameters('resourceTags')]",            
+            "tags": "[parameters('resourceTags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -437,62 +461,91 @@
             }
         },
         {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('K8svmName'),'/setup_controller')]",
-          "apiVersion": "2019-07-01",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('K8svmName'))]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.1",
-            "autoUpgradeMinorVersion": true,
-            "protectedSettings": {
-                        "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'), ' ', parameters('DOCKER_REGISTRY'), ' ', parameters('DOCKER_REPOSITORY'), ' ', parameters('DOCKER_TAG'),' ', parameters('SPN_CLIENT_ID'),' ', parameters('SPN_CLIENT_SECRET'),' ', parameters('SPN_TENANT_ID'),' ', parameters('SPN_AUTHORITY'))]",
-            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh"]
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('K8svmName'),'/setup_controller')]",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('K8svmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash setup_controller.sh', ' ', parameters('adminUsername'), ' ', parameters('AZDATA_USERNAME'), ' ', parameters('AZDATA_PASSWORD'), ' ', parameters('DOCKER_USERNAME'), ' ', parameters('DOCKER_PASSWORD'), ' ', parameters('ARC_DC_NAME'), ' ', parameters('ARC_DC_SUBSCRIPTION'), ' ', parameters('ARC_DC_RG'), ' ', parameters('ARC_DC_REGION'), ' ', parameters('ACCEPT_EULA'), ' ', parameters('DOCKER_REGISTRY'), ' ', parameters('DOCKER_REPOSITORY'), ' ', parameters('DOCKER_TAG'),' ', parameters('SPN_CLIENT_ID'),' ', parameters('SPN_CLIENT_SECRET'),' ', parameters('SPN_TENANT_ID'),' ', parameters('SPN_AUTHORITY'))]",
+                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh" ]
+                }
             }
-          }
         },
         {
-        "type": "Microsoft.Resources/deployments",
-        "apiVersion": "2019-10-01",
-        "name": "linkedTemplate",
-        "dependsOn": [
-            "[concat(resourceId('Microsoft.Compute/virtualMachines', parameters('K8svmName')))]"
-        ], 
-        "properties": {
-            "mode": "Incremental",
-            "templateLink": {
-            "uri":"https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/client_vm_deployment.json",
-            "contentVersion":"1.0.0.0"
-            },
-            "parameters": {
-            "vmName":{"value": "[parameters('vmName')]"},
-            "K8svmName":{"value": "[parameters('K8svmName')]"},           
-            "adminUsername":{"value": "[parameters('adminUsername')]"},
-            "adminPassword":{"value": "[parameters('adminPassword')]"},
-            "vmSize":{"value": "[parameters('vmSize')]"},
-            "SPN_CLIENT_ID":{"value": "[parameters('SPN_CLIENT_ID')]"},
-            "SPN_CLIENT_SECRET":{"value": "[parameters('SPN_CLIENT_SECRET')]"},
-            "SPN_TENANT_ID":{"value": "[parameters('SPN_TENANT_ID')]"},
-            "SPN_AUTHORITY":{"value": "[parameters('SPN_AUTHORITY')]"},
-            "ARC_DC_RG":{"value": "[parameters('ARC_DC_RG')]"},
-            "AZDATA_USERNAME":{"value": "[parameters('AZDATA_USERNAME')]"},
-            "AZDATA_PASSWORD":{"value": "[parameters('AZDATA_PASSWORD')]"},
-            "ACCEPT_EULA":{"value": "[parameters('ACCEPT_EULA')]"},
-            "DOCKER_USERNAME":{"value": "[parameters('DOCKER_USERNAME')]"},
-            "DOCKER_PASSWORD":{"value": "[parameters('DOCKER_PASSWORD')]"},
-            "ARC_DC_NAME":{"value": "[parameters('ARC_DC_NAME')]"},
-            "ARC_DC_SUBSCRIPTION":{"value": "[parameters('ARC_DC_SUBSCRIPTION')]"},
-            "ARC_DC_REGION":{"value": "[parameters('ARC_DC_REGION')]"},
-            "DOCKER_REGISTRY":{"value": "[parameters('DOCKER_REGISTRY')]"},
-            "DOCKER_REPOSITORY":{"value": "[parameters('DOCKER_REPOSITORY')]"},
-            "DOCKER_TAG":{"value": "[parameters('DOCKER_TAG')]"}
+            "type": "Microsoft.Network/bastionHosts",
+            "condition": "[equals(parameters('deployBastion'),'Yes')]",
+            "name": "[parameters('bastionHostName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2020-11-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "IpConf",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('bastionSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            }
+                        }
+                    }
+                ]
             }
-          }        
-        }        
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "linkedTemplate",
+            "dependsOn": [
+                "[concat(resourceId('Microsoft.Compute/virtualMachines', parameters('K8svmName')))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/client_vm_deployment.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": { "value": "[parameters('vmName')]" },
+                    "K8svmName": { "value": "[parameters('K8svmName')]" },
+                    "adminUsername": { "value": "[parameters('adminUsername')]" },
+                    "adminPassword": { "value": "[parameters('adminPassword')]" },
+                    "vmSize": { "value": "[parameters('vmSize')]" },
+                    "SPN_CLIENT_ID": { "value": "[parameters('SPN_CLIENT_ID')]" },
+                    "SPN_CLIENT_SECRET": { "value": "[parameters('SPN_CLIENT_SECRET')]" },
+                    "SPN_TENANT_ID": { "value": "[parameters('SPN_TENANT_ID')]" },
+                    "SPN_AUTHORITY": { "value": "[parameters('SPN_AUTHORITY')]" },
+                    "ARC_DC_RG": { "value": "[parameters('ARC_DC_RG')]" },
+                    "AZDATA_USERNAME": { "value": "[parameters('AZDATA_USERNAME')]" },
+                    "AZDATA_PASSWORD": { "value": "[parameters('AZDATA_PASSWORD')]" },
+                    "ACCEPT_EULA": { "value": "[parameters('ACCEPT_EULA')]" },
+                    "DOCKER_USERNAME": { "value": "[parameters('DOCKER_USERNAME')]" },
+                    "DOCKER_PASSWORD": { "value": "[parameters('DOCKER_PASSWORD')]" },
+                    "ARC_DC_NAME": { "value": "[parameters('ARC_DC_NAME')]" },
+                    "ARC_DC_SUBSCRIPTION": { "value": "[parameters('ARC_DC_SUBSCRIPTION')]" },
+                    "ARC_DC_REGION": { "value": "[parameters('ARC_DC_REGION')]" },
+                    "DOCKER_REGISTRY": { "value": "[parameters('DOCKER_REGISTRY')]" },
+                    "DOCKER_REPOSITORY": { "value": "[parameters('DOCKER_REPOSITORY')]" },
+                    "DOCKER_TAG": { "value": "[parameters('DOCKER_TAG')]" },
+                    "bastionSubnetRef": "[concat(variables('bastionSubnetRef'))]",
+                    "deployBastion": "[concat(parameters('deployBastion'))]",
+                    "bastionHostName": "[concat(parameters('bastionHostName'))]",
+                    "bastionSubnetPrefix": "[concat(variables('bastionSubnetPrefix'))]"
+                }
+            }
+        }
     ],
     "outputs": {
         "adminUsername": {
