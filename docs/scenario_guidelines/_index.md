@@ -19,7 +19,7 @@ In this document, our goal is to provide you with as many details as possible fo
 
 The Jumpstart project is a mix of various automation, code styles, and high-quality documentation and requires development effort.
 
-Before a scenario is getting published, it will go through a code review process by one of the project maintainers. We want your scenario to be successful and widely adopted and to meet the highest standards possible and we are here to help get there!
+Before a scenario is published, it will go through a code review process by one of the project maintainers. We want your scenario to be successful and widely adopted and to meet the highest standards possible and we are here to help get there!
 
 ## Pull requests and issues
 
@@ -80,7 +80,7 @@ Every Jumpstart scenario should have a "Prerequisites" section as the first sect
 
 * We would love for you to use good judgment and if the scenario's reviewer will find that a certain prerequisite should be automated he will point that out as part of the pull request code review.
 
-* As mentioned at the beginning of this guidelines readme, to avoid a situation you will need to refactor code or make unforced changes, it is highly recommended for you to use existing scenarios as a reference and work from there.
+* As mentioned at the beginning of this guidelines readme, to avoid a situation where you will need to refactor code or make unforced changes, it is highly recommended for you to use existing scenarios as a reference and work from there.
 
 ## Markdown linting and style
 

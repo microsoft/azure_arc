@@ -173,7 +173,7 @@ $onboardSuccessMsg = "SQL Server has been successfully onboaded into Azure Arc! 
 Write-Host "SQL Server Onboarded!"
 Show-Message 'Azure Arc-enabled SQL Server' $onboardSuccessMsg 'None' 'Ok'
 
-$shortcutLink = "$env:Public\Desktop\Onboard SQL Server.lnk"
+$shortcutLink = "$Env:Public\Desktop\Onboard SQL Server.lnk"
 Remove-Item $shortcutLink –Force
 
 Stop-Transcript
