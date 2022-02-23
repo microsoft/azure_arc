@@ -539,9 +539,9 @@
                     "DOCKER_REGISTRY": { "value": "[parameters('DOCKER_REGISTRY')]" },
                     "DOCKER_REPOSITORY": { "value": "[parameters('DOCKER_REPOSITORY')]" },
                     "DOCKER_TAG": { "value": "[parameters('DOCKER_TAG')]" },
-                    "deployBastion": "[concat(parameters('deployBastion'))]",
-                    "bastionHostName": "[concat(parameters('bastionHostName'))]",
-                    "bastionSubnetPrefix": "[concat(variables('bastionSubnetPrefix'))]"
+                    "deployBastion": {"value": "[concat(parameters('deployBastion'))]"},
+                    "bastionHostName": {"value":"[concat(parameters('bastionHostName'))]"},
+                    "bastionSubnetPrefix": {"value":"[concat(variables('bastionSubnetPrefix'))]"}
                 }
             }
         }
