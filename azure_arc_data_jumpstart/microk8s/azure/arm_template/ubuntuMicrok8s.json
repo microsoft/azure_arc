@@ -31,7 +31,7 @@
     "ubuntuOSVersion": {
       "type": "string",
       "defaultValue": "18.04-LTS",
-      "allowedValues": ["18.04-LTS"],
+      "allowedValues": [ "18.04-LTS" ],
       "metadata": {
         "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
       }
@@ -99,6 +99,25 @@
         "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
       }
     },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "description"
+      }
+    },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      }
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Demo-Bastion",
+      "metadata": {
+        "description": "Azure Bastion host name"
+      }
+    },
     "templateBaseUrl": {
       "type": "string",
       "metadata": {
@@ -111,7 +130,11 @@
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-    "osDiskType": "Premium_LRS"
+    "osDiskType": "Premium_LRS",
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+    "PublicIPNoBastion": {
+      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+    }
   },
   "resources": [
     {
@@ -132,9 +155,7 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              }
+              "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ],
@@ -157,7 +178,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[parameters('myIpAddress')]",
+              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "22"
@@ -177,7 +198,7 @@
         "idleTimeoutInMinutes": 4
       },
       "sku": {
-        "name": "Basic",
+        "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
         "tier": "Regional"
       }
     },
