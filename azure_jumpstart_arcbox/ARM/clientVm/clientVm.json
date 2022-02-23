@@ -187,7 +187,7 @@
             "metadata": {
                 "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
             },
-            "allowedValues": [ "Full", "ITPro", "Developer" ],
+            "allowedValues": [ "Full", "ITPro", "DevOps" ],
             "defaultValue": "Full"
         }
     },

@@ -17,7 +17,7 @@
         "flavor": {
             "type": "string",
             "metadata": {
-                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
             }
         },
         "policies": {
