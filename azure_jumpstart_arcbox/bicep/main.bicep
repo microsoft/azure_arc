@@ -27,10 +27,11 @@ param windowsAdminPassword string
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
-@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
+@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
 @allowed([
   'Full'
   'ITPro'
+  'DevOps'
 ])
 param flavor string = 'Full'
 
