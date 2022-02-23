@@ -155,7 +155,7 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": "[if(equals(toupper(parameters('deployBastion')),'NO'),variables('PublicIPNoBastion'),json('null'))]"
+              "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ],
@@ -178,7 +178,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[if(equals(toupper(parameters('deployBastion')),'YES'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
+              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "22"
@@ -198,7 +198,7 @@
         "idleTimeoutInMinutes": 4
       },
       "sku": {
-        "name": "[if(equals(toupper(parameters('deployBastion')),'NO'),'Basic','Standard')]",
+        "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
         "tier": "Regional"
       }
     },
