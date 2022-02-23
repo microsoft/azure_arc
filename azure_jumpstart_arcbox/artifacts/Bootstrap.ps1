@@ -149,8 +149,13 @@ workflow ClientTools_01
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentCentOS.sh") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentCentOS.sh
             }
 
-            # Developers
-            if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+            # DevOps
+            if ($flavor -eq "Full" -Or $flavor -eq "DevOps") {
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/DevOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DevOpsLogonScript.ps1
+            }
+
+            # Full
+            if ($flavor -eq "Full") {
                 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile $Env:ArcBoxDir\azuredatastudio.zip
                 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:ArcBoxDir\AZDataCLI.msi
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:ArcBoxDir\settingsTemplate.json
@@ -196,6 +201,13 @@ if ($flavor -eq "Full") {
     $Trigger = New-ScheduledTaskTrigger -AtLogOn 
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+}
+
+if ($flavor -eq "Full" -Or $flavor -eq "DevOps") {
+    # Creating scheduled task for DevOpsLogonScript.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn 
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
+    Register-ScheduledTask -TaskName "DevOpsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
