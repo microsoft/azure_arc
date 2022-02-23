@@ -70,8 +70,7 @@
       "type": "string",
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
-      },
-      "allowedValues": [ "YES", "NO" ]
+      }
     },
     "bastionHostName": {
       "type": "string",
