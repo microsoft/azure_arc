@@ -148,6 +148,25 @@
       "metadata": {
         "description": "Email address to which all notifications from the deployment will be sent"
       }
+    },
+     "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      }
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Win-Demo-Bastion",
+      "metadata": {
+        "description": "Azure Bastion host name"
+      }
+    },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet IP prefix"
+      }
     }
   },
   "variables": {
@@ -155,7 +174,12 @@
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-    "osDiskType": "Premium_LRS"
+    "osDiskType": "Premium_LRS",
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+    "bastionSubnetRef": "[concat(variables('bastionSubnetRef'))]",
+    "PublicIPNoBastion": {
+      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+    }
   },
   "resources": [
     {
@@ -176,9 +200,7 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              }
+              "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ],
@@ -201,7 +223,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[parameters('myIpAddress')]",
+              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"
@@ -221,7 +243,7 @@
         "idleTimeoutInMinutes": 4
       },
       "sku": {
-        "name": "Basic",
+        "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
         "tier": "Regional"
       }
     },
@@ -295,6 +317,31 @@
           ],
           "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'), ' -templateBaseUrl ', parameters('templateBaseUrl'),' -adminEmail ', parameters('adminEmail'))]"
         }
+      }
+    },
+    {
+      "type": "Microsoft.Network/bastionHosts",
+      "condition": "[equals(parameters('deployBastion'),'Yes')]",
+      "name": "[parameters('bastionHostName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "2020-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
+            "properties": {
+              "subnet": {
+                "id": "[variables('bastionSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              }
+            }
+          }
+        ]
       }
     }
   ],

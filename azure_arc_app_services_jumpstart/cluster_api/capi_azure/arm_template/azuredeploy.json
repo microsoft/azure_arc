@@ -91,6 +91,20 @@
       "metadata": {
         "description": "Email address used on the Azure API Management deployment to receive all system notifications"
       }
+    },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "allowedValues": [ "Yes", "No" ]
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
+      }
     }
   },
   "variables": {
@@ -103,7 +117,10 @@
     "virtualNetworkName": "Arc-App-CAPI-VNet",
     "subnetName": "Arc-App-CAPI-Subnet",
     "addressPrefix": "172.16.0.0/16",
-    "subnetAddressPrefix": "172.16.1.0/24"
+    "subnetAddressPrefix": "172.16.1.0/24",
+    "bastionSubnetPrefix": "172.16.2.0/27",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
   },
   "resources": [
     {
@@ -129,6 +146,9 @@
           },
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
         }
       }
@@ -138,7 +158,7 @@
       "comments": "Deploy the CAPI environment",
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -172,6 +192,15 @@
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -181,7 +210,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -236,6 +265,18 @@
           },
           "adminEmail": {
             "value": "[parameters('adminEmail')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
           }
         }
       }

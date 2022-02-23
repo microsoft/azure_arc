@@ -104,11 +104,31 @@
             }
         },
         "templateBaseUrl": {
-        "type": "string",
-        "metadata": {
-            "description": "Base URL for ARM template"
+            "type": "string",
+            "metadata": {
+                "description": "Base URL for ARM template"
+            }
+        },
+        "bastionSubnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "deployBastion": {
+            "type": "string",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            }
+        },
+        "bastionHostName": {
+            "type": "string",
+            "defaultValue": "Arc-Data-Demo-Bastion",
+            "metadata": {
+                "description": "Azure Bastion host name"
             }
         }
+
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
@@ -117,7 +137,11 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "subnetAddressPrefix": "172.16.1.0/24",
         "addressPrefix": "172.16.0.0/16",
-        "osDiskType": "Premium_LRS"
+        "osDiskType": "Premium_LRS",
+        "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
@@ -138,9 +162,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -163,7 +185,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -191,10 +213,16 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('bastionSubnetPrefix')]"
+                        }
                     }
                 ]
             }
-        },        
+        },
         {
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
@@ -206,7 +234,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
