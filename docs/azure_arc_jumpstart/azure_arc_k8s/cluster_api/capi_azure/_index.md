@@ -95,7 +95,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 - To download the script from the Ubuntu machine, use the below command.
 
     ```shell
-    curl -L https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/InstallCAPI.sh -o ~/installCAPI.sh
+    curl -L https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/installCAPI.sh -o ~/installCAPI.sh
     ```
 
     ![Screenshot showing the curl command and the downloaded script in the Ubuntu machine](01.png)
