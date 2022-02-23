@@ -10,8 +10,8 @@ echo ""
   sudo apt-get update
 
   # Set deployment GitHub repository environment variables
-  export githubAccount="likamrat" # Do not change unless deploying from personal GitHub account
-  export githubBranch="capi_refresh" # Do not change unless deploying from personal GitHub branch
+  export githubAccount="microsoft" # Do not change unless deploying from personal GitHub account
+  export githubBranch="main" # Do not change unless deploying from personal GitHub branch
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
@@ -21,7 +21,7 @@ echo ""
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export KUBERNETES_VERSION="1.22.6" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
-  export WORKER_MACHINE_COUNT="<Workers node count>" 
+  export WORKER_MACHINE_COUNT="<Workers node count>"
   export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
   export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
   export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
