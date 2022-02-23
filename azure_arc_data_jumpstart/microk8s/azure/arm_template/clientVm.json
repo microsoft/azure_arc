@@ -249,7 +249,7 @@
         "idleTimeoutInMinutes": 4
       },
       "sku": {
-        "name": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
+        "name": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]",
         "tier": "Regional"
       }
     },
