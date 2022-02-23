@@ -21,13 +21,13 @@
             "value": "Standard_D4s_v3"
         },
         "SPN_CLIENT_ID": {
-            "value": "36f6d53e-95bb-46e6-a0db-382284f68d18"
+            "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
         },
         "SPN_CLIENT_SECRET": {
-            "value": "~S47Q~.ZFY-pZnOC6wI4DtQOeFKZSejBGVukf"
+            "value": "33333333-XXXX-YTYT-9c21-7777777777"
         },
         "SPN_TENANT_ID": {
-            "value": "030607a1-e6bb-4aef-ae83-170101641ee9"
+            "value": "33333333-XXXX-41af-1111-7777777777"
         },        
         "SPN_AUTHORITY": {
             "value": "https://login.microsoftonline.com"
@@ -45,7 +45,7 @@
             "value": "arcdatactrl"
         },
         "ARC_DC_SUBSCRIPTION": {
-            "value": "9b65ec1f-c8e3-4ec5-a482-56784190935b"
+            "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
         },
         "ARC_DC_RG": {
             "value": "Arc-Data-Demo"
