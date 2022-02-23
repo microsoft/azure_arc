@@ -309,6 +309,12 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+                        }
                     }
                 ]
             }
