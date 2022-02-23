@@ -98,9 +98,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
     curl -L https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/InstallCAPI.sh -o ~/installCAPI.sh
     ```
 
-- Once downloaded, edit the environment variables to match your Azure subscription and service principal details created in the prerequisites section as well as the required workload cluster details. The following screenshots shows the downloaded/copied script before editing the environment variables.
-
     ![Screenshot showing the curl command and the downloaded script in the Ubuntu machine](01.png)
+
+- Once downloaded, edit the environment variables to match your Azure subscription and service principal details created in the prerequisites section as well as the required workload cluster details. The following screenshots shows the downloaded/copied script before editing the environment variables.
 
     ![Screenshot showing the script empty environment variables](02.png)
 
