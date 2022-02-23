@@ -117,12 +117,12 @@ variable "client_admin_ssh" {
 ### This should be swapped to a lower-case value to avoid case sensitivity ###
 variable "deployment_flavor" {
   type        = string
-  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', or 'Developer'."
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', or 'DevOps'."
   default     = "Full"
 
   validation {
-    condition     = contains(["Full", "ITPro", "Developer"], var.deployment_flavor)
-    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', and 'Developer'."
+    condition     = contains(["Full", "ITPro", "DevOps"], var.deployment_flavor)
+    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', and 'DevOps'."
   }
 }
 ##############################################################################

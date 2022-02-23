@@ -180,7 +180,7 @@ workflow ClientTools_02
     }
 }
         
-if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+if ($flavor -eq "Full") {
     ClientTools_02 | Format-Table 
 }
 
@@ -191,7 +191,7 @@ if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
-if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+if ($flavor -eq "Full") {
     # Creating scheduled task for DataServicesLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn 
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
