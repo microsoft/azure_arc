@@ -207,6 +207,7 @@
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
         "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+        "deployBastion": "[concat(parameters('deployBastion'))]",
         "PublicIPNoBastion": {
             "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         }
@@ -231,7 +232,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
+                            "publicIpAddress": "[if(equals(variables('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -254,7 +255,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),'*')]",
+                            "sourceAddressPrefix": "[if(equals(variables('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),'*')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
@@ -323,7 +324,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
+                "name": "[if(equals(variables('deployBastion'),'No'),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
