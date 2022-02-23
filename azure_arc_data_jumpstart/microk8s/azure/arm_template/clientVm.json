@@ -143,6 +143,31 @@
         "description": "PostgreSQL Hyperscale deployment"
       }
     },
+    "bastionSubnetRef": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet reference"
+      }
+    },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      }
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Win-Demo-Bastion",
+      "metadata": {
+        "description": "Azure Bastion host name"
+      }
+    },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet IP prefix"
+      }
+    },
     "templateBaseUrl": {
       "type": "string",
       "metadata": {
@@ -155,7 +180,12 @@
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-    "osDiskType": "Premium_LRS"
+    "osDiskType": "Premium_LRS",
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+    "bastionSubnetRef": "[concat(parameters('bastionSubnetRef'))]",
+    "PublicIPNoBastion": {
+      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+    }
   },
   "resources": [
     {
@@ -176,9 +206,7 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              }
+              "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ],
@@ -201,7 +229,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[parameters('myIpAddress')]",
+              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"
@@ -221,7 +249,7 @@
         "idleTimeoutInMinutes": 4
       },
       "sku": {
-        "name": "Basic",
+        "name": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
         "tier": "Regional"
       }
     },
@@ -295,6 +323,31 @@
           ],
           "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
+      }
+    },
+    {
+      "type": "Microsoft.Network/bastionHosts",
+      "condition": "[equals(parameters('deployBastion'),'Yes')]",
+      "name": "[parameters('bastionHostName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "2020-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
+            "properties": {
+              "subnet": {
+                "id": "[variables('bastionSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              }
+            }
+          }
+        ]
       }
     }
   ],

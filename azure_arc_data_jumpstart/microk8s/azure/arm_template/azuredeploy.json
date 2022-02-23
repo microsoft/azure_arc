@@ -66,6 +66,20 @@
         "description": "PostgreSQL Hyperscale deployment"
       }
     },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "allowedValues": [ "Yes", "No" ]
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
+      }
+    },
     "templateBaseUrl": {
       "type": "string",
       "metadata": {
@@ -83,6 +97,9 @@
     "virtualNetworkName": "Arc-Data-Microk8s-VNet",
     "subnetName": "Arc-Data-Microk8s-Subnet",
     "addressPrefix": "172.16.0.0/16",
+    "bastionSubnetPrefix": "172.16.2.0/27",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]",
     "subnetAddressPrefix": "172.16.1.0/24"
   },
   "resources": [
@@ -109,6 +126,9 @@
           },
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
         }
       }
@@ -152,6 +172,15 @@
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -207,6 +236,18 @@
           },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
+          },
+           "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
           }
         }
       }
