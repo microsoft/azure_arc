@@ -126,6 +126,7 @@ echo ""
     echo "Starting docker"
     sleep 5
     sudo snap start docker
+    sleep 5
     echo ""
     while (! sudo docker stats --no-stream > /dev/null 2>&1); do
       # Docker takes a few seconds to initialize
