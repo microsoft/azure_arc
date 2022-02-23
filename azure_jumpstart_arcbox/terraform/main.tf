@@ -193,7 +193,7 @@ module "client_vm" {
 
 module "capi_vm" {
   source = "./modules/kubernetes/ubuntuCapi"
-  count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
   vm_name              = var.capi_vm_name
@@ -217,7 +217,7 @@ module "capi_vm" {
 
 module "rancher_vm" {
   source = "./modules/kubernetes/ubuntuRancher"
-  count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
   vm_name              = var.rancher_vm_name

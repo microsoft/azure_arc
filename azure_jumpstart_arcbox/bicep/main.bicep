@@ -43,7 +43,7 @@ param githubBranch string = 'main'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
-module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full') {
+module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
   name: 'ubuntuCAPIDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
@@ -58,7 +58,7 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
   }
 }
 
-module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full') {
+module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
   name: 'ubuntuRancherDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
