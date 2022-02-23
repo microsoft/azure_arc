@@ -207,7 +207,6 @@
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
         "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
-        "bastionSubnetRef": "[concat(variables('bastionSubnetRef'))]",
         "PublicIPNoBastion": {
             "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         }

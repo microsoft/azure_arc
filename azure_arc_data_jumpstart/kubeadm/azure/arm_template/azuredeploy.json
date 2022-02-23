@@ -514,7 +514,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/client_vm_deployment.json",
+                    "uri": "https://raw.githubusercontent.com/sebassem/azure_arc/arc_data_adding_bastion/azure_arc_data_jumpstart/kubeadm/azure/arm_template/client_vm_deployment.json",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
