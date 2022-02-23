@@ -70,7 +70,8 @@
       "type": "string",
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
-      }
+      },
+      "allowedValues": [ "Yes", "No" ]
     },
     "bastionHostName": {
       "type": "string",
@@ -179,7 +180,7 @@
             "value": "[parameters('bastionHostName')]"
           },
           "deployBastion": {
-            "value": "[toupper(parameters('deployBastion'))]"
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -240,7 +241,7 @@
             "value": "[variables('bastionSubnetPrefix')]"
           },
           "deployBastion": {
-            "value": "[toupper(parameters('deployBastion'))]"
+            "value": "[parameters('deployBastion')]"
           },
           "bastionHostName": {
             "value": "[parameters('bastionHostName')]"
