@@ -13,15 +13,15 @@ param sshRSAPublicKey string
 
 @description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version')
 @allowed([
-  '18.04-LTS'
+  '20_04-lts-gen2'
 ])
-param ubuntuOSVersion string = '18.04-LTS'
+param ubuntuOSVersion string = '20_04-lts-gen2'
 
 @description('Location for all resources.')
 param azureLocation string = resourceGroup().location
 
 @description('The size of the VM')
-param vmSize string = 'Standard_D4s_v3'
+param vmSize string = 'Standard_D4s_v4'
 
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string 
@@ -49,7 +49,7 @@ param stagingStorageAccountName string
 param logAnalyticsWorkspace string
 
 @description('The base URL used for accessing artifacts and automation artifacts')
-param artifactsBaseUrl string
+param templateBaseUrl string
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -211,7 +211,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
       }
       imageReference: {
         publisher: 'Canonical'
-        offer: 'UbuntuServer'
+        offer: '0001-com-ubuntu-server-focal'
         sku: ubuntuOSVersion
         version: 'latest'
       }
@@ -254,7 +254,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2021-0
     protectedSettings: {
       commandToExecute: 'bash installK3s.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
       fileUris: [
-        '${artifactsBaseUrl}artifacts/installK3s.sh'
+        '${templateBaseUrl}artifacts/installK3s.sh'
       ]
     }
   }
