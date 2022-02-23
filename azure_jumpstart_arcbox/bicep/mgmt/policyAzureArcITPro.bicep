@@ -8,6 +8,7 @@ param logAnalyticsWorkspaceId string
 @allowed([
   'Full'
   'ITPro'
+  'DevOps'
 ])
 param flavor string
 
