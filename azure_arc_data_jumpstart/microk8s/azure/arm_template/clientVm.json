@@ -206,7 +206,7 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
+              "publicIpAddress": "[if(equals(toupper(parameters('deployBastion')),'NO'),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ],
@@ -229,7 +229,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
+              "sourceAddressPrefix": "[if(equals(toupper(parameters('deployBastion')),'YES'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"
@@ -249,7 +249,7 @@
         "idleTimeoutInMinutes": 4
       },
       "sku": {
-        "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
+        "name": "[if(equals(toupper(parameters('deployBastion')),'NO'),'Basic','Standard')]",
         "tier": "Regional"
       }
     },
@@ -327,7 +327,7 @@
     },
     {
       "type": "Microsoft.Network/bastionHosts",
-      "condition": "[equals(parameters('deployBastion'),'Yes')]",
+      "condition": "[equals(toupper(parameters('deployBastion')),'YES')]",
       "name": "[parameters('bastionHostName')]",
       "location": "[parameters('location')]",
       "apiVersion": "2020-11-01",
