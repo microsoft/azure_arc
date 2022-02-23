@@ -83,16 +83,16 @@ echo ""
     echo ""
 
   if [ $(getent group $GROUP) ]; then
-    tput setaf 6;echo "group $GROUP exists."
+    tput setaf 6;echo "Group `tput sitm`$GROUP`tput ritm` already exists."
     tput sgr0
     echo ""
   else
-    tput setaf 1;echo "group $GROUP does not exist. Creating..."
+    tput setaf 1;echo "Group `tput sitm`$GROUP`tput ritm` does not exist. Creating..."
     tput sgr0
     sudo groupadd $GROUP
     getent group $GROUP
     echo ""
-    tput setaf 1;echo "User \`$USER\' does not belong to group \`$GROUP\'. Adding..."
+    tput setaf 1;echo "User `tput sitm`$USER`tput ritm` does not belong to group `tput sitm`$GROUP`tput ritm`. Adding..."
     tput sgr0
     sudo usermod -aG $GROUP $USER
     echo ""
@@ -100,11 +100,11 @@ echo ""
 
   if id -nGz "$USER" | grep -qzxF "$GROUP"
   then
-    tput setaf 6;echo User \`$USER\' belongs to group \`$GROUP\'
+    tput setaf 6;echo "User `tput sitm`$USER`tput ritm` already belongs to group `tput sitm`$GROUP`tput ritm`"
     tput sgr0
     echo ""
   else
-    tput setaf 1;echo "User \`$USER\' does not belong to group \`$GROUP\'. Adding..."
+    tput setaf 1;echo "User `tput sitm`$USER`tput ritm` does not belong to group `tput sitm`$GROUP`tput ritm`. Adding..."
     tput sgr0
     sudo usermod -aG $GROUP $USER
     echo ""
@@ -115,14 +115,18 @@ echo ""
     tput sgr0
     echo ""
     sudo snap install docker
-    tput setaf 1;echo "group $GROUP does not exist. Creating..."
+    tput setaf 1;echo "Group `tput sitm`$GROUP`tput ritm` does not exist. Creating..."
     tput sgr0
     sudo groupadd $GROUP
     getent group $GROUP
     echo ""
-    tput setaf 1;echo "User \`$USER\' does not belong to group \`$GROUP\'. Adding..."
+    tput setaf 1;echo "User `tput sitm`$USER`tput ritm` does not belong to group `tput sitm`$GROUP`tput ritm`. Adding..."
     tput sgr0
     sudo usermod -aG $GROUP $USER
+    echo ""
+    echo "Starting docker"
+    sleep 5
+    sudo snap start docker
     echo ""
     while (! sudo docker stats --no-stream > /dev/null 2>&1); do
       # Docker takes a few seconds to initialize
@@ -160,7 +164,7 @@ echo ""
 
   # Installing Helm
   echo ""
-  echo "Helm"
+  echo "Installing Helm"
   sudo snap install helm --classic
   helm version
   echo ""
