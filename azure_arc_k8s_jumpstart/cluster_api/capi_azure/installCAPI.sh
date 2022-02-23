@@ -15,7 +15,6 @@ echo ""
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
-  export KIND_VERSION="0.11.1" # Do not change!
   export CLUSTERCTL_VERSION="1.1.2" # Do not change!
   export CAPI_PROVIDER="azure" # Do not change!
   export CAPI_PROVIDER_VERSION="1.1.1" # Do not change!
