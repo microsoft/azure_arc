@@ -45,7 +45,7 @@
             "value": false
         },
         "templateBaseUrl": {
-            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/aks/arm_template/"
+            "value": "https://raw.githubusercontent.com/sebassem/azure_arc/arc_app_adding_bastion/azure_arc_app_services_jumpstart/aks/arm_template/"
         },
         "adminEmail": {
             "value": "<youremail@email.com>"
