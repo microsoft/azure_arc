@@ -90,7 +90,7 @@ PARAMETERS
 
 resource "azurerm_role_assignment" "roles" {
   for_each             = { for i, v in local.policies: i => v 
-                           if contains(variable.deployment_flavor, v.flavor)
+                           if contains(var.deployment_flavor, v.flavor)
                          }
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = each.value.role
