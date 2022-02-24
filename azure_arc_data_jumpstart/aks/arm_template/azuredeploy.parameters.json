@@ -3,16 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "sshRSAPublicKey": {
-      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC7bUIOvpPxuWjvfrFO9Rf8ABqQdyRy2pG/3UBsxZEaByFMEHYqh5IuHoaKifM9RW/po5g/GjfdlKMGhkQlloUsassAJw9cRdsTjXqafQGs6OD3oBVrAgAut1VwPttKNH/i9UAQRacefh5fZyIyxLTb6MutGeinif1yKCcTCVe9BTnLmsjic7jAZb7TroEUdYVsXSCDLYxCqD3LE7WaWfNYchxRPDUANSzqNa34SZx8cLry1mBxQLRvWrCwZ4ab96tJ7VIx3ZuJJ2sI882K0pI6lE7uS0/+seaME7iZ5/KKbBEwkzwFebvJbH+qvmwot3EwbLSEDmrREzKhV1u51hugCkyb8Z743jgs9XXP2ENZxL2MrGbh86YeTyyiCZRnusiDR3kDT60PLi9oC2PqpQWrk7KrEu402plENwPziXrTyzXurbpkq8g//qCQOzEMZCdi+Kud+9wdTT/tyrS0n9Z6s+aZaWXUBu2A8hUsCKSh7BYU4kC4i9KX5hSfzKzosj6iHvxxyihk1BXY0MMUP/3NqX1AyBKVSjYnjtHMm8TwdYlLUvEXm6V1zZiXYymLPNS01JJ3Hs4Ks8kmcDhmCxVFINbxw92Fconagp65IU+KXCfXfZOr3bFFFinTnKSr1CeC1Zzqn+K807+cChUB7KV9V4xSgo5Q/+AzywJg6L721Q== sebassem@microsoft.com"
+      "value": "<your RSA public key>"
     },
     "spnClientId": {
-      "value": "36f6d53e-95bb-46e6-a0db-382284f68d18"
+      "value": "<your service principal client id>"
     },
     "spnClientSecret": {
-      "value": "~S47Q~.ZFY-pZnOC6wI4DtQOeFKZSejBGVukf"
+      "value": "<your service principal secret>"
     },
     "spnTenantId": {
-      "value": "030607a1-e6bb-4aef-ae83-170101641ee9"
+      "value": "<your spn tenant id>"
     },
     "windowsAdminUsername": {
       "value": "arcdemo"
@@ -21,34 +21,34 @@
       "value": "ArcPassword123!!"
     },
     "myIpAddress": {
-      "value": "156.200.198.44"
+      "value": "<your IP address>"
     },
     "logAnalyticsWorkspaceName": {
-      "value": "la-data-demo"
+      "value": "<your unique Log Analytics workspace name>"
     },
     "deploySQLMI": {
-      "value": true
+      "value": "<SQL Managed Instance deployment (true/false)>"
     },
     "SQLMIHA": {
-      "value": false
+      "value": "<SQL Managed Instance high-availability deployment (true/false)>"
     },
     "deployPostgreSQL": {
-      "value": false
+      "value": "<PostgreSQL Hyperscale deployment (true/false)>"
     },
     "templateBaseUrl": {
-      "value": "https://raw.githubusercontent.com/sebassem/azure_arc/arc_data_adding_bastion/azure_arc_data_jumpstart/aks/arm_template/"
+      "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/"
     },
     "kubernetesVersion": {
-      "value": "1.22.6"
+      "value": "1.21.2"
     },
     "dnsPrefix": {
       "value": "arcdata"
     },
-    "deployBastion":{
-      "value" : "No"
+    "bastionHostName": {
+        "value": "Arc-Data-Demo-Bastion"
     },
-    "bastionHostName":{
-      "value": "Azure-Data-Bastion"
+    "deployBastion": {
+        "value": "No"
     }
   }
 }
