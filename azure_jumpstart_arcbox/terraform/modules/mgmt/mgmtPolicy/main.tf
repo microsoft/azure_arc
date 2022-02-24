@@ -74,7 +74,7 @@ data "azurerm_resource_group" "rg" {
 
 resource "azurerm_resource_group_policy_assignment" "policies" {
   for_each             = { for i, v in local.policies: i => v 
-                           if contains(var.deployment_flavor, v.flavor)
+                           if contains(v.flavor, var.deployment_flavor)
                          }
   name                 = each.value.name
   location             = data.azurerm_resource_group.rg.location
@@ -90,7 +90,7 @@ PARAMETERS
 
 resource "azurerm_role_assignment" "roles" {
   for_each             = { for i, v in local.policies: i => v 
-                           if contains(var.deployment_flavor, v.flavor)
+                           if contains(v.flavor, var.deployment_flavor)
                          }
   scope                = data.azurerm_resource_group.rg.id
   role_definition_name = each.value.role
