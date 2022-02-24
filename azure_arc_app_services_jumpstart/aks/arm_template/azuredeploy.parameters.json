@@ -49,6 +49,12 @@
         },
         "adminEmail": {
             "value": "<youremail@email.com>"
+        },
+        "bastionHostName": {
+            "value": "Arc-Data-Demo-Bastion"
+        },
+        "deployBastion": {
+            "value": "No"
         }
     }
 }

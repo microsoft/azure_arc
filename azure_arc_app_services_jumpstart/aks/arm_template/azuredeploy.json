@@ -111,6 +111,20 @@
       "metadata": {
         "description": "Email address used on the Azure API Management deployment to receive all system notifications"
       }
+    },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "allowedValues": [ "Yes", "No" ]
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
+      }
     }
   },
   "variables": {
@@ -176,6 +190,12 @@
           },
           "adminEmail": {
             "value": "[parameters('adminEmail')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
           }
         }
       }

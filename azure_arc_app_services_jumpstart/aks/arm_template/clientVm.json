@@ -105,22 +105,22 @@
         },
         "clusterName": {
             "type": "string",
-            "defaultValue":"Arc-App-Service-AKS",
+            "defaultValue": "Arc-App-Service-AKS",
             "metadata": {
                 "description": "The name of the Kubernetes cluster resource.."
             }
         },
         "dnsPrefix": {
-        "type": "string",
-        "metadata": {
-            "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
+            "type": "string",
+            "metadata": {
+                "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
             }
         },
         "kubernetesVersion": {
-        "type": "string",
-        "defaultValue": "1.19.11",
-        "metadata": {
-            "description": "The version of Kubernetes."
+            "type": "string",
+            "defaultValue": "1.19.11",
+            "metadata": {
+                "description": "The version of Kubernetes."
             }
         },
         "deployAppService": {
@@ -162,6 +162,18 @@
             "metadata": {
                 "description": "Email address to which all notifications from the deployment will be sent"
             }
+        },
+        "deployBastion": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
+        },
+        "bastionHostName": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            }
         }
     },
     "variables": {
@@ -171,7 +183,13 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "subnetAddressPrefix": "10.240.0.0/16",
         "addressPrefix": "10.240.0.0/16",
-        "osDiskType": "Premium_LRS"
+        "osDiskType": "Premium_LRS",
+        "bastionSubnetPrefix": "10.240.2.0/27",
+        "bastionSubnetName": "AzureBastionSubnet",
+        "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
@@ -192,9 +210,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -220,7 +236,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
@@ -240,7 +256,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
@@ -338,7 +354,32 @@
                     "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'), ' -kubernetesVersion ',parameters('kubernetesVersion'), ' -dnsPrefix ', parameters('dnsPrefix'), ' -templateBaseUrl ', parameters('templateBaseUrl'),' -adminEmail ', parameters('adminEmail'))]"
                 }
             }
-        }
+        },
+         {
+      "type": "Microsoft.Network/bastionHosts",
+      "condition": "[equals(parameters('deployBastion'),'Yes')]",
+      "name": "[parameters('bastionHostName')]",
+      "location": "[parameters('azureLocation')]",
+      "apiVersion": "2020-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
+            "properties": {
+              "subnet": {
+                "id": "[variables('bastionSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              }
+            }
+          }
+        ]
+      }
+    }
     ],
 
 
