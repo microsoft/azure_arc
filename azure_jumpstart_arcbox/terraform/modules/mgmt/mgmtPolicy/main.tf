@@ -74,7 +74,7 @@ data "azurerm_resource_group" "rg" {
 
 resource "azurerm_resource_group_policy_assignment" "policies" {
   for_each             = { for i, v in local.policies: i => v 
-                           if contains(variable.deployment_flavor, v.flavor)
+                           if contains(var.deployment_flavor, v.flavor)
                          }
   name                 = each.value.name
   location             = data.azurerm_resource_group.rg.location
