@@ -109,6 +109,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * _`deployLogicApp`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**false**_.
   * _`deployApiMgmt`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**false**_.
   * _`templateBaseUrl`_ - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
+  * _`deployBastion`_ - Choice to deploy Azure Bastion or not to connect to the client VM.
+  * _`bastionHostName`_ - Azure Bastion host name.
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template) and run the below command:
 
@@ -138,7 +140,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
 
-* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed.
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed (If you chose to deploy Azure Bastion, you will have **35 Azure resources**).
 
     ![ARM template deployment completed](./01.png)
 
@@ -146,17 +148,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-* Now that first phase of the automation is completed, it is time to RDP to the client VM using it's public IP.
+* Now that first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public Ip.
 
     ![Client VM public IP](./03.png)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Client VM connection using Bastion](./04.png)
 
 * At first login, as mentioned in the "Automation Flow" section above, the [_AppServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AppServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 * Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure web application will be deployed on the cluster and be ready to use.
 
     > **Note: As you will notices from the screenshots below, during the Azure Arc-enabled app services environment, the _log-processor_ service pods will be restarted and will go through multiple Kubernetes pod lifecycle stages. This is normal and can safely be ignored. To learn more about the various Azure Arc-enabled app services Kubernetes components, visit the official [Azure Docs page](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#pods-created-by-the-app-service-extension).**
-
-    ![PowerShell logon script run](./04.png)
 
     ![PowerShell logon script run](./05.png)
 
@@ -198,9 +202,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![PowerShell logon script run](./24.png)
 
+    ![PowerShell logon script run](./25.png)
+
   Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the app service plan and the sample web application deployed on the cluster will be ready.
 
-    ![Wallpaper change](./25.png)
+    ![Wallpaper change](./26.png)
 
   * **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
@@ -216,45 +222,45 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   * Azure Storage Account - The storage account deployed in this scenario is used for hosting the [queue storage](https://docs.microsoft.com/en-us/azure/storage/queues/storage-queues-introduction) where the Azure Function will be sending messages to that can be leveraged later in an application event-driven architecture.
 
-  ![Additional Azure resources in the resource group](./26.png)
+  ![Additional Azure resources in the resource group](./27.png)
 
 * In this scenario, **a sample Jumpstart Azure Function application** was deployed. To open the deployed Function application in your web browser, simply click the Browse button.
 
-  ![Azure Function URL](./27.png)
+  ![Azure Function URL](./28.png)
 
-  ![Azure Function open in a web browser](./28.png)
+  ![Azure Function open in a web browser](./29.png)
 
 * To demonstrate the messaging queuing element and to show how messages are stored in the queue storage, the Azure Function deployment script also generates 10 sample messages. To view it, click on the newly created storage account and go to the "Queues" section where you will see the new queue and the stored messages.
 
-  ![Azure Storage Account](./29.png)
+  ![Azure Storage Account](./30.png)
 
-  ![Azure storage queue](./30.png)
+  ![Azure storage queue](./31.png)
 
-  ![Azure Function messages in storage queue](./31.png)
+  ![Azure Function messages in storage queue](./32.png)
 
 * Alternatively, you can view the same queue storage using the Azure Storage Explorer client application installed automatically in the Client VM or using the Azure Storage Explorer portal-based view.
 
-  ![Azure Storage Explorer client application storage queue](./32.png)
+  ![Azure Storage Explorer client application storage queue](./33.png)
 
-  ![Azure Storage Explorer portal-based view](./33.png)
+  ![Azure Storage Explorer portal-based view](./34.png)
 
-  ![Azure Storage Explorer portal-based view storage queue](./34.png)
+  ![Azure Storage Explorer portal-based view storage queue](./35.png)
 
 * To generate your own messages using the Function application, use the Function invoke URL. As part of the deployment script, a _`funcUrl.txt`_ text file located in the Client VM under _C:\Temp_ folder that includes invoke URL was created for you. Copy the URL and open it in your web browser while adding the message text to it using the _`?name=<Something>`_ syntax, for example, _`?name=Bilbo`_.
 
-  ![funcUrl.txt file](./35.png)
+  ![funcUrl.txt file](./36.png)
 
-  ![Invoke URL](./36.png)
+  ![Invoke URL](./37.png)
 
-  ![Invoke URL in web browser](./37.png)
+  ![Invoke URL in web browser](./38.png)
 
 * Go back to the storage queue and see the new added message.
 
-  ![New message in storage queue](./38.png)
+  ![New message in storage queue](./39.png)
 
 * As part of the deployment, an Application Insights instance was also provisioned to provide you with relevant performance and application telemetry.
 
-  ![Application Insights instance](./39.png)
+  ![Application Insights instance](./40.png)
 
 ## Cluster extensions
 
@@ -262,12 +268,12 @@ In this scenario, the Azure Arc-enabled app services cluster extension was deplo
 
 * In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc-enabled Kubernetes resource](./40.png)
+  ![Azure Arc-enabled Kubernetes resource](./41.png)
 
-  ![Azure Arc-enabled Kubernetes cluster extensions settings](./41.png)
+  ![Azure Arc-enabled Kubernetes cluster extensions settings](./42.png)
 
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./42.png)
+  ![Delete Azure resource group](./43.png)

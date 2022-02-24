@@ -109,6 +109,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * _`deployLogicApp`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**false**_.
   * _`deployApiMgmt`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**false**_.
   * _`templateBaseUrl`_ - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
+  * _`deployBastion`_ - Choice to deploy Azure Bastion or not to connect to the client VM.
+  * _`bastionHostName`_ - Azure Bastion host name.
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template) and run the below command:
 
@@ -138,7 +140,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
 
-* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed.
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed (If you chose to deploy Azure Bastion, you will have **35 Azure resources**)..
 
     ![ARM template deployment completed](./01.png)
 
@@ -146,17 +148,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-* Now that first phase of the automation is completed, it is time to RDP to the client VM using it's public IP.
+* Now that first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public Ip.
 
     ![Client VM public IP](./03.png)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Client VM connection using Bastion](./04.png)
 
 * At first login, as mentioned in the "Automation Flow" section above, the [_AppServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AppServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 * Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure web application will be deployed on the cluster and be ready to use.
 
     > **Note: As you will notices from the screenshots below, during the Azure Arc-enabled app services environment, the _log-processor_ service pods will be restarted and will go through multiple Kubernetes pod lifecycle stages. This is normal and can safely be ignored. To learn more about the various Azure Arc-enabled app services Kubernetes components, visit the official [Azure Docs page](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#pods-created-by-the-app-service-extension).**
-
-    ![PowerShell logon script run](./04.png)
 
     ![PowerShell logon script run](./05.png)
 
@@ -188,9 +192,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![PowerShell logon script run](./19.png)
 
+    ![PowerShell logon script run](./20.png)
+
   Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the app service plan and the sample web application deployed on the cluster will be ready.
 
-    ![Wallpaper change](./20.png)
+    ![Wallpaper change](./21.png)
 
 * Since this scenario is deploying both the app service plan and a sample web application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
@@ -204,15 +210,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   * [**App Service**](https://docs.microsoft.com/en-us/azure/app-service/overview) - Azure App Service is an HTTP-based service for hosting web applications, REST APIs, and mobile back ends.
 
-  ![Additional Azure resources in the resource group](./21.png)
+  ![Additional Azure resources in the resource group](./22.png)
 
 * In this scenario, **a Docker, custom container Linux-based** sample Jumpstart web application was deployed. To open the deployed web application in your web browser, simply click the App Service resource and the Browse button.
 
-  ![App Service resource in a resource group](./22.png)
+  ![App Service resource in a resource group](./23.png)
 
-  ![App Service Browse button](./23.png)
+  ![App Service Browse button](./24.png)
 
-  ![App Service open in a web browser](./24.png)
+  ![App Service open in a web browser](./25.png)
 
 ## Cluster extensions
 
@@ -220,12 +226,12 @@ In this scenario, the Azure Arc-enabled app services cluster extension was deplo
 
 * In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc-enabled Kubernetes resource](./25.png)
+  ![Azure Arc-enabled Kubernetes resource](./26.png)
 
-  ![Azure Arc-enabled Kubernetes cluster extensions settings](./26.png)
+  ![Azure Arc-enabled Kubernetes cluster extensions settings](./27.png)
 
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./27.png)
+  ![Delete Azure resource group](./28.png)

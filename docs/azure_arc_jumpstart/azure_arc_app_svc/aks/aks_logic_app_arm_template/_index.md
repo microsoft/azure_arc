@@ -103,6 +103,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * _`deployFunction`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Function application. For this scenario, we leave it set to _**false**_.
   * _`deployLogicApp`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**true**_.
   * _`templateBaseUrl`_ - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
+  * _`deployBastion`_ - Choice to deploy Azure Bastion or not to connect to the client VM.
+  * _`bastionHostName`_ - Azure Bastion host name.
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_app_services_jumpstart/aks/arm_template) and run the below command:
 
@@ -132,7 +134,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
 
-* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **7 various Azure resources** deployed.
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **7 various Azure resources** deployed (If you chose to deploy Azure Bastion, you will have **8 Azure resources**).
 
     ![ARM template deployment completed](./01.png)
 
@@ -140,17 +142,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-* Now that first phase of the automation is completed, it is time to RDP to the client VM using its public IP.
+* Now that first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public Ip.
 
     ![Client VM public IP](./03.png)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Client VM connection using Bastion](./04.png)
 
 * At first login, as mentioned in the "Automation Flow" section above, the [_AppServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/aks/arm_template/artifacts/AppServicesLogonScript.ps1) PowerShell logon script will start its run.
 
 * Let the script run its course and **do not close** the PowerShell session as this will be done for you once completed. Once the script will finish its run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure Logic App will be deployed on the cluster and ready to use.
 
     > **Note: As you will notice from the screenshots below, during the Azure Arc-enabled app services environment, the _log-processor_ service pods will be restarted and will go through multiple Kubernetes pod lifecycle stages. This is normal and can safely be ignored. To learn more about the various Azure Arc-enabled app services Kubernetes components, visit the official [Azure Docs page](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#pods-created-by-the-app-service-extension).**
-
-    ![PowerShell logon script run](./04.png)
 
     ![PowerShell logon script run](./05.png)
 
@@ -192,9 +196,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![PowerShell logon script run](./24.png)
 
+    ![PowerShell logon script run](./25.png)
+
   Once the script finishes its run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the app service plan and the Azure Logic App deployed on the cluster will be ready.
 
-    ![Wallpaper change](./25.png)
+    ![Wallpaper change](./26.png)
 
 * Since this scenario is deploying both the app service plan and a sample Logic App application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
@@ -214,53 +220,53 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   * Azure Storage Account - The storage account deployed in this scenario is used for hosting the [queue storage](https://docs.microsoft.com/en-us/azure/storage/queues/storage-queues-introduction) and [blob storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) where the Azure Logic App will be creating files in response to messages in a queue.
 
-  ![Additional Azure resources in the resource group](./26.png)
+  ![Additional Azure resources in the resource group](./27.png)
 
 * In this scenario, **a sample Jumpstart Azure Logic App** was deployed. To view the deployed Logic App, simply click the Azure Logic App resource.
 
-  ![Azure Logic App resource](./27.png)
+  ![Azure Logic App resource](./28.png)
 
 * You can view the Logic App workflow by clicking on "Workflows" and then clicking the workflow name "CreateBlobFromQueueMessage".
 
-  ![Azure Logic App detail](./28.png)
-
   ![Azure Logic App detail](./29.png)
+
+  ![Azure Logic App detail](./30.png)
 
 * To demonstrate the messaging queuing element and to show how blobs are created when messages are read from the queue storage, the Azure Logic App deployment script also generates 10 sample queue messages. To view it, click on the newly created storage account and go to the "Queues" section where you will see the queue named "jumpstart-queue". Note that the queue will be empty because the workflow automatically deletes messages from the queue after creating a new blob in the "jumpstart-blobs" container.
 
-  ![Azure storage account](./30.png)
+  ![Azure storage account](./31.png)
 
-  ![Azure storage queue](./31.png)
+  ![Azure storage queue](./32.png)
 
 * Go back to the Azure storage account and click on Containers. From here you will see the "jumpstart-blobs" container. Open this container and view the blobs that were created by the Logic App.
 
-  ![Azure storage container](./32.png)
+  ![Azure storage container](./33.png)
 
-  ![Azure storage blobs](./33.png)
+  ![Azure storage blobs](./34.png)
 
 * Alternatively, you can view the storage details using the Azure Storage Explorer client application installed automatically in the Client VM or using the Azure Storage Explorer portal-based view.
 
-  ![Azure Storage Explorer client application storage queue](./34.png)
+  ![Azure Storage Explorer client application storage queue](./35.png)
 
-  ![Azure Storage Explorer portal-based view](./35.png)
+  ![Azure Storage Explorer portal-based view](./36.png)
 
-  ![Azure Storage Explorer portal-based view storage queue](./36.png)
+  ![Azure Storage Explorer portal-based view storage queue](./37.png)
 
 * To generate your own blobs using the Logic App, create a new message in the queue by using Azure Storage Explorer and clicking Add Message as shown below.
-
-  ![Add queue message](./37.png)
 
   ![Add queue message](./38.png)
 
   ![Add queue message](./39.png)
 
+  ![Add queue message](./40.png)
+
 * Go back to the storage container and see the new added blob that was created automatically by the Logic App.
 
-  ![New message in storage queue](./40.png)
+  ![New message in storage queue](./41.png)
 
 * As part of the deployment, an Application Insights instance was also provisioned to provide you with relevant performance and application telemetry.
 
-  ![Application Insights instance](./41.png)
+  ![Application Insights instance](./42.png)
 
 ## Cluster extensions
 
@@ -268,12 +274,12 @@ In this scenario, the Azure Arc-enabled app services cluster extension was deplo
 
 * In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc-enabled Kubernetes resource](./42.png)
+  ![Azure Arc-enabled Kubernetes resource](./43.png)
 
-  ![Azure Arc-enabled Kubernetes cluster extensions settings](./43.png)
+  ![Azure Arc-enabled Kubernetes cluster extensions settings](./44.png)
 
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Delete Azure resource group](./44.png)
+  ![Delete Azure resource group](./45.png)

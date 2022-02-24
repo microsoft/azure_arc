@@ -110,6 +110,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * _`deployApiMgmt`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**true**_.
   * _`templateBaseUrl`_ - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
   * _`adminEmail`_ - Your email address, it will be used to notify you once the API management deployment is done.
+  * _`deployBastion`_ - Choice to deploy Azure Bastion or not to connect to the client VM.
+  * _`bastionHostName`_ - Azure Bastion host name.
   
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template) and run the below command:
 
@@ -137,7 +139,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: The deployment time for this scenario can take ~60-90 minutes**
 
-* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed.
+* Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **34 various Azure resources** deployed (If you chose to deploy Azure Bastion, you will have **35 Azure resources**).
 
     ![ARM template deployment completed](./01.png)
 
@@ -145,17 +147,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-* Now that first phase of the automation is completed, it is time to RDP to the client VM using it's public IP.
+* Now that first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public Ip.
 
     ![Client VM public IP](./03.png)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Client VM connection using Bastion](./04.png)
 
 * At first login, as mentioned in the "Automation Flow" section above, the [_AppServicesLogonScript_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AppServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 * Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and the Azure web application will be deployed on the cluster and be ready to use.
 
     > **Note: As you will notices from the screenshots below, during the Azure Arc-enabled app services environment, the _log-processor_ service pods will be restarted and will go through multiple Kubernetes pod lifecycle stages. This is normal and can safely be ignored. To learn more about the various Azure Arc-enabled app services Kubernetes components, visit the official [Azure Docs page](https://docs.microsoft.com/en-us/azure/app-service/overview-arc-integration#pods-created-by-the-app-service-extension).**
-
-    ![PowerShell logon script run](./04.png)
 
     ![PowerShell logon script run](./05.png)
 
@@ -167,9 +171,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![PowerShell logon script run](./09.png)
 
+    ![PowerShell logon script run](./10.png)
+
   Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the API Management gateway and the sample API will be configured on the cluster.
 
-    ![Wallpaper change](./10.png)
+    ![Wallpaper change](./11.png)
 
 * Since this scenario is deploying both the app service plan and a sample web application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
@@ -183,7 +189,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   * [**App Service**](https://docs.microsoft.com/en-us/azure/app-service/overview) - Azure App Service is an HTTP-based service for hosting web applications, REST APIs, and mobile back ends.
 
-  ![Additional Azure resources in the resource group](./11.png)
+  ![Additional Azure resources in the resource group](./12.png)
 
 ## API Management self-hosted gateway
 
@@ -191,25 +197,25 @@ In this scenario, the Azure Arc-enabled API Management cluster extension was dep
 
 * In order to view cluster extensions, click on the azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc enabled Kubernetes resource](./12.png)
+  ![Azure Arc enabled Kubernetes resource](./13.png)
 
-  ![Azure Arc enabled Kubernetes cluster extensions settings](./13.png)
+  ![Azure Arc enabled Kubernetes cluster extensions settings](./14.png)
 
 Deploying the API Management gateway extension to an Azure Arc-enabled Kubernetes cluster creates an Azure API Management self-hosted gateway. You can verify this from the portal by going to the Resource Group and selecting the API management service.
 
-  ![API management service](./14.png)
+  ![API management service](./15.png)
 
 Select Gateways on the Deployment + infrastructure section.
 
-  ![Self-hosted Gateway](./15.png)
+  ![Self-hosted Gateway](./16.png)
 
 A self-hosted gateway should be deployed with one connected node.
 
-  ![Connected node on self-hosted gateway](./16.png)
+  ![Connected node on self-hosted gateway](./17.png)
 
 In this scenario, a sample Demo conference API was deployed. To view the deployed API, simply click on the self-hosted gateway resource and select on APIs.
 
-  ![Demo Conference API](./17.png)
+  ![Demo Conference API](./18.png)
 
 To demonstrate that the self-hosted gateway is processing API requests you need to identify two elements:
 
@@ -219,13 +225,13 @@ To demonstrate that the self-hosted gateway is processing API requests you need 
     kubectl get svc -n apimgmt
     ```
 
-  ![Self-hosted gateway public IP](./18.png)
+  ![Self-hosted gateway public IP](./19.png)
 
 * API management subscription key, from the Azure portal on the API Management service resource select Subscriptions under APIs and select Show/hide keys for the one with display name "Built-in all-access subscription".
 
-  ![Self-hosted gateway subscriptions](./19.png)
+  ![Self-hosted gateway subscriptions](./20.png)
 
-  ![Subscription key](./20.png)
+  ![Subscription key](./21.png)
 
 Once you have obtained these two parameters, replace them on the following code snippet and run it from the client VM PowerShell.
 
@@ -246,14 +252,14 @@ Once you have obtained these two parameters, replace them on the following code 
     }
   ```
 
-  ![API calls test](./21.png)
+  ![API calls test](./22.png)
 
 In the Overview page of the API Management service, you can now see how the self-hosted gateway API requests are now shown.
 
-  ![API requests metrics](./22.png)
+  ![API requests metrics](./23.png)
 
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployed resource group from the Azure Portal.
 
-  ![Delete Azure resource group](./23.png)
+  ![Delete Azure resource group](./24.png)
