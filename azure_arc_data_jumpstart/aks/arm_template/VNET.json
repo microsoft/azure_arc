@@ -59,7 +59,7 @@
           {
             "name": "AzureBastionSubnet",
             "properties": {
-              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+              "addressPrefix": "[variables('bastionSubnetPrefix')]"
             }
           }
         ]
