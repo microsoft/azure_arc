@@ -98,6 +98,20 @@
       "metadata": {
         "description": "Base URL for ARM template"
       }
+    },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "allowedValues": [ "Yes", "No" ]
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
+      }
     }
   },
   "variables": {
@@ -109,7 +123,10 @@
     "virtualNetworkName": "Arc-Data-VNet",
     "subnetName": "Arc-Data-Subnet",
     "addressPrefix": "172.16.0.0/16",
-    "subnetAddressPrefix": "172.16.1.0/24"
+    "subnetAddressPrefix": "172.16.1.0/24",
+    "bastionSubnetPrefix": "172.16.2.0/27",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
   },
   "resources": [
     {
@@ -135,6 +152,9 @@
           },
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
         }
       }
@@ -223,6 +243,18 @@
           },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
           }
         }
       }
