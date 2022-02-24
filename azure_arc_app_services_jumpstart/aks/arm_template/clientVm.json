@@ -181,7 +181,7 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "subnetAddressPrefix": "10.240.0.0/16",
+        "subnetAddressPrefix": "10.240.1.0/24",
         "addressPrefix": "10.240.0.0/16",
         "osDiskType": "Premium_LRS",
         "bastionSubnetPrefix": "10.240.2.0/27",
