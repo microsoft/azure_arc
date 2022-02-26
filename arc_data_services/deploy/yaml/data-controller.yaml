@@ -3,7 +3,7 @@ kind: ServiceAccount
 metadata:
   name: sa-arc-controller
 ---
-apiVersion: arcdata.microsoft.com/v2
+apiVersion: arcdata.microsoft.com/v3
 kind: DataController
 metadata:
   generation: 1
@@ -13,9 +13,10 @@ spec:
     controllerAdmin: controller-login-secret
     dockerRegistry: arc-private-registry #Create a registry secret named 'arc-private-registry' if you are going to pull from a private registry instead of MCR.
     serviceAccount: sa-arc-controller
+    "domainServiceAccount": "domain-service-account-secret" #used for AD authentication only
   docker:
     imagePullPolicy: Always
-    imageTag: v1.3.0_2022-01-27
+    imageTag: v1.4.0_2022-02-25
     registry: mcr.microsoft.com
     repository: arcdata
   infrastructure: other #Must be a value in the array [alibaba, aws, azure, gcp, onpremises, other]
@@ -31,13 +32,13 @@ spec:
     ElasticSearch:
       vm.max_map_count: "-1"
     azure:
-      connectionMode: indirect
+      connectionMode: indirect #Only indirect is supported for Kubernetes-native deployment for now.
       location: eastus # Choose a different Azure location if you want
       resourceGroup: <your resource group>
       subscription: <your subscription GUID>
     controller:
       displayName: arc-dc
-      enableBilling: "True"
+      enableBilling: true
       logs.rotation.days: "7"
       logs.rotation.size: "5000"
   storage:
