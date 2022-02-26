@@ -8,17 +8,23 @@ variable "vm_name" {
   description = "The name of the capi virtual machine"
 }
 
+variable "capi_arc_data_cluster_name" {
+  type        = string
+  description = "The name of the capi virtual machine"
+  default     = "ArcBox-CAPI-Data"
+}
+
 variable "vm_size" {
   type        = string
   description = "The size of the capi virtual machine"
-  default     = "Standard_D4s_v3"
+  default     = "Standard_D4s_v4"
 }
 
 variable "os_sku" {
   type        = string
   description = "The Linux version for the capi VM"
-  default     = "18.04-LTS"
-  ### Add limit list, currently only 18.04-LTS ###
+  default     = "20_04-lts-gen2"
+  ### Add limit list, currently only 20.04-LTS ###
 }
 
 variable "admin_username" {
@@ -147,7 +153,7 @@ resource "azurerm_virtual_machine" "client" {
 
   storage_image_reference {
     publisher = "Canonical"
-    offer     = "UbuntuServer"
+    offer     = "0001-com-ubuntu-server-focal"
     sku       = var.os_sku
     version   = "latest"
   }
@@ -185,7 +191,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${var.template_base_url}artifacts/installCAPI.sh"
       ],
-      "commandToExecute": "bash installCAPI.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name}"
+      "commandToExecute": "bash installCAPI.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name} ${var.capi_arc_data_cluster_name} ${var.template_base_url}"
     }
 PROTECTED_SETTINGS
 }

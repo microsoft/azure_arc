@@ -1,0 +1,429 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: storefront
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: storefront
+  name: tigera-pull-secret
+data:
+  .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJxdWF5LmlvIjogewogICAgICAiYXV0aCI6ICJkR2xuWlhKaEszUnBaMlZ5WVY5cGJuUmxjbTVoYkRwWVNVcFhTRlZTV0VRd1Z6VkNWVVZDTTA1Q1ZqWTRTRU5FUVZSR1NsTTJNRTFOUTFaWFMwSTNNVU5YVjFjeVdWRkpUMGxPU1ZkRFEwRlFXamsyTUZoSSIsCiAgICAgICJlbWFpbCI6ICIiCiAgICB9CiAgfQp9
+type: kubernetes.io/dockerconfigjson
+
+---
+apiVersion:  apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: storefront
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        fw-zone: restricted
+    spec:
+      imagePullSecrets:
+      - name: tigera-pull-secret
+      containers:
+      - name: mock-logging
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "logging:80"
+        ports:
+        - containerPort: 9000
+      - name: mock
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "mock"
+        - "--resourcePath"
+        - "/mocks/backend-mock.yaml"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: mockconfig
+          mountPath: /mocks
+      volumes:
+      - name: mockconfig
+        configMap:
+          name: backend
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: backend
+  namespace: storefront
+spec:
+  selector:
+    app: backend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend
+  namespace: storefront
+data:
+  backend-mock.yaml: |
+    apiVersion: peira.tigera.io./v1alpha1
+    kind: MockService
+    metadata:
+       namespace: storefront
+       name: backend
+    spec:
+      imagePullSecrets:
+      - name: tigera-pull-secret
+      logLevel: debug
+      enableProbe: true
+      listenPort: 80
+      actions:
+      - kind: call
+        value: "http://logging"
+      - kind: reply
+        value: "hello world"
+
+---
+apiVersion:  apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: storefront
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+        fw-zone: dmz
+    spec:
+      imagePullSecrets:
+      - name: tigera-pull-secret
+      containers:
+      - name: mock-microservice1
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "microservice1:80"
+        ports:
+        - containerPort: 9000
+      - name: mock-logging
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "--listenPort"
+        - "9001"
+        - "logging:80"
+      - name: mock-microservice2
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "--listenPort"
+        - "9002"
+        - "microservice2:80"
+        ports:
+        - containerPort: 9002
+      - name: mock
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "mock"
+        - "--resourcePath"
+        - "/mocks/frontend-mock.yaml"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: mockconfig
+          mountPath: /mocks
+      volumes:
+      - name: mockconfig
+        configMap:
+          name: frontend
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: frontend
+  namespace: storefront
+spec:
+  selector:
+    app: frontend
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend
+  namespace: storefront
+data:
+  frontend-mock.yaml: |
+    apiVersion: peira.tigera.io./v1alpha1
+    kind: MockService
+    metadata:
+       namespace: storefront
+       name: frontend
+    spec:
+      imagePullSecrets:
+      - name: tigera-pull-secret
+      logLevel: debug
+      enableProbe: false
+      listenPort: 80
+      actions:
+      - kind: call
+        value: "http://logging"
+      - kind: call
+        value: "http://microservice1"
+      - kind: call
+        value: "http://microservice2"
+      - kind: reply
+        value: "hello world"
+
+---
+
+apiVersion:  apps/v1
+kind: Deployment
+metadata:
+  name: microservice1
+  namespace: storefront
+  labels:
+    app: microservice1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice1
+  template:
+    metadata:
+      labels:
+        app: microservice1
+        fw-zone: trusted
+    spec:
+      imagePullSecrets:
+      - name: tigera-pull-secret
+      containers:
+      - name: mock-microservice2
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "microservice2:80"
+        ports:
+        - containerPort: 9000
+      - name: mock-backend
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "--listenPort"
+        - "9001"
+        - "backend:80"
+        ports:
+        - containerPort: 9001
+      - name: mock-logging
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "--listenPort"
+        - "9002"
+        - "backend:80"
+        ports:
+        - containerPort: 9002
+      - name: mock
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "mock"
+        - "--resourcePath"
+        - "/mocks/microservice1-mock.yaml"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: mockconfig
+          mountPath: /mocks
+      volumes:
+      - name: mockconfig
+        configMap:
+          name: microservice1
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: microservice1
+  namespace: storefront
+spec:
+  selector:
+    app: microservice1
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservice1
+  namespace: storefront
+data:
+  microservice1-mock.yaml: |
+    apiVersion: peira.tigera.io./v1alpha1
+    kind: MockService
+    metadata:
+       namespace: storefront
+       name: microservice1
+    spec:
+      imagePullSecrets:
+      - name: tigera-pull-secret
+      logLevel: debug
+      enableProbe: true
+      listenPort: 80
+      actions:
+      - kind: call
+        value: "http://logging"
+      - kind: call
+        value: "http://microservice2"
+      - kind: call
+        value: "http://backend"
+      - kind: reply
+        value: "hello world"
+
+
+---
+apiVersion:  apps/v1
+kind: Deployment
+metadata:
+  name: microservice2
+  namespace: storefront
+  labels:
+    app: microservice2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: microservice2
+  template:
+    metadata:
+      labels:
+        app: microservice2
+        fw-zone: trusted
+    spec:
+      imagePullSecrets:
+      - name: tigera-pull-secret
+      containers:
+      - name: mock-twilio
+        image: busybox
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do wget https://api.twilio.com; sleep 15; done"]
+      - name: mock-microservice1
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "microservice1:80"
+        ports:
+        - containerPort: 9000
+      - name: mock-backend
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "--listenPort"
+        - "9001"
+        - "backend:80"
+        ports:
+        - containerPort: 9001
+      - name: mock-logging
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "probe"
+        - "--listenPort"
+        - "9002"
+        - "backend:80"
+        ports:
+        - containerPort: 9002
+      - name: mock
+        image: quay.io/tigera/peira:v0.2.3
+        args:
+        - "mock"
+        - "--resourcePath"
+        - "/mocks/microservice2-mock.yaml"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: mockconfig
+          mountPath: /mocks
+      volumes:
+      - name: mockconfig
+        configMap:
+          name: microservice2
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: microservice2
+  namespace: storefront
+spec:
+  selector:
+    app: microservice2
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: microservice2
+  namespace: storefront
+data:
+  microservice2-mock.yaml: |
+    apiVersion: peira.tigera.io./v1alpha1
+    kind: MockService
+    metadata:
+       namespace: storefront
+       name: microservice2
+    spec:
+      imagePullSecrets:
+      - name: tigera-pull-secret
+      logLevel: debug
+      enableProbe: true
+      listenPort: 80
+      actions:
+      - kind: call
+        value: "http://logging"
+      - kind: call
+        value: "http://microservice1"
+      - kind: call
+        value: "http://backend"
+      - kind: reply
+        value: "hello world"
