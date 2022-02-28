@@ -13,7 +13,7 @@ The following README will guide you on how to onboard an Azure Arc-enabled serve
 Azure Automanage removes the need to discover virtual machines manually and automatically onboards and configures certain services in Azure following best practices as defined in [Microsoft Cloud Adoption Framework for Azure](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/manage/best-practices). Azure services included in Azure Automanage are:
 
 - [Azure Backup](https://docs.microsoft.com/en-us/azure/backup/backup-overview)
-- [Azure Security Center](https://docs.microsoft.com/en-us/azure/security-center/security-center-introduction)
+- [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction)
 - [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/overview)
 - [Azure Automation](https://docs.microsoft.com/en-us/azure/automation/automation-intro)
 
