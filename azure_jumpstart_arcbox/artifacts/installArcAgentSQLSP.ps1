@@ -375,10 +375,10 @@ $nestedWindowsPassword = "ArcDemo123!!"
 Write-Host "Create SQL Azure Assessment"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip"
 Expand-Archive "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
-$env:PSModulePath = $env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
+$Env:PSModulePath = $Env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
 Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
 $SecureString = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
-Add-SQLAssessmentTask -SQLServerName $env:COMPUTERNAME -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $env:USERNAME -ScheduledTaskPassword $SecureString
+Add-SQLAssessmentTask -SQLServerName $Env:COMPUTERNAME -WorkingDirectory "C:\sql_assessment\work_dir" -RunWithManagedServiceAccount $False -ScheduledTaskUsername $Env:USERNAME -ScheduledTaskPassword $SecureString
 
 $name = "Recurring HealthService Restart"
 $repeat = (New-TimeSpan -Minutes 10)
