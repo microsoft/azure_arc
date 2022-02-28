@@ -56,7 +56,7 @@
       "value": "Always"
     },
     "dockerImageTag": {
-      "value": "v1.2.0_2021-12-15"
+      "value": "v1.4.0_2022-02-25"
     },
     "dockerRegistry": {
       "value": "mcr.microsoft.com"
