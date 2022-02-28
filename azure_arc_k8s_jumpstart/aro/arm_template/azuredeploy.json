@@ -38,7 +38,7 @@
   },
   "variables": {
     "workerNodesResourceGroup": "[format('/subscriptions/{0}/resourceGroups/arc-aro-{1}', subscription().subscriptionId, parameters('clusterDomain'))]",
-    "contributorRoleId": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/4d97b98b-1d4f-4787-a291-c67834d212e7', subscription().subscriptionId)]",
+    "contributorRoleId": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]",
     "addressPrefix": "10.0.0.0/16",
     "masterNodesSubnetPrefix": "10.0.1.0/24",
     "workerNodesSubnetPrefix": "10.0.2.0/24",

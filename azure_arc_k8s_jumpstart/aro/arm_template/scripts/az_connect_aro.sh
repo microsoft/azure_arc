@@ -3,14 +3,13 @@
 # <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export appId='15015a4d-01d7-48c6-aeeb-05e736132e39'
-export password='8817Q~vWv.SBxTEgw-REysKW9aHLL7_ipd2tB'
-export tenantId='030607a1-e6bb-4aef-ae83-170101641ee9'
-export resourceGroup='arc-aro-demo'
-export clusterName='arc-aro-demo'
+export appId='<Azure service principal Id>'
+export password='<Azure service principal password>'
+export resourceGroup='<Azure Resource Group name>'
+export clusterName='<The name of your Aro cluster as it will be shown in Azure Arc>'
 
 # Getting Aro cluster credentials
-echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
+echo "Log in to Azure with Service Principle & Getting Aro credentials (kubeconfig)"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 #az aro get-credentials --name $arcClusterName --resource-group $RESOURCEGROUP --overwrite-existing
 kubcepass=$(az aro list-credentials --name $clusterName -g $resourceGroup --query kubeadminPassword -o tsv)
