@@ -3,7 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "workspaceName": {
-            "value": "<name of your your Log Analytics workspace" // Name for your Log Analytics workspace
+            "value": "la-arc-servers" // Name for your Log Analytics workspace
+        },
+        "emailAddress": {
+            "value": "youremail@domain.com" // Just one email account
         }
     }
 }
