@@ -69,20 +69,6 @@
                 "description": "Location for all resources."
             }
         },
-        "deployBastion": {
-            "type": "string",
-            "metadata": {
-                "description": "Choice to deploy Bastion to connect to the client VM"
-            },
-            "allowedValues": [ "Yes", "No" ]
-        },
-        "bastionHostName": {
-            "type": "string",
-            "defaultValue": "Arc-Win-Demo-Bastion",
-            "metadata": {
-                "description": "the Azure Bastion host name"
-            }
-        },
         "VmSize": {
             "type": "string",
             "defaultValue": "Standard_D4s_v3",
@@ -110,27 +96,22 @@
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
+        },
+        "myIpAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Your IP address"
+            }
         }
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-        "bastionSubnetName": "AzureBastionSubnet",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
-        "bastionName" : "[concat(parameters('bastionHostName'))]",
-        "deployBastion" : "[concat(parameters('deployBastion'))]",
-        "bastionSubnetIpPrefix": "10.1.1.0/27",
-        "PublicIPNoBastion": {
-            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-        },
-        "NsgNoBastion": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
-        },
         "linuxConfiguration": {
             "disablePasswordAuthentication": false,
             "ssh": {
@@ -163,18 +144,21 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(equals(variables('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
+                            "publicIpAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            }
                         }
                     }
                 ],
-                "networkSecurityGroup": "[if(equals(variables('deployBastion'),'No'),variables('NsgNoBastion'),json('null'))]"
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+                }
             }
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-02-01",
             "name": "[parameters('networkSecurityGroupName')]",
-            "condition": "[equals(variables('deployBastion'),'No')]",
             "location": "[parameters('location')]",
             "properties": {
                 "securityRules": [
@@ -185,7 +169,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -291,13 +275,7 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
-                    },
-                    {
-                        "name" : "AzureBastionSubnet",
-                        "properties": {
-                            "addressPrefix": "[variables('bastionSubnetIpPrefix')]"
-                        }
-                     }
+                    }
                 ]
             }
         },
@@ -312,7 +290,8 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "[if(equals(variables('deployBastion'),'No'),'Basic','Standard')]"
+                "name": "Basic",
+                "tier": "Regional"
             }
         },
         {
@@ -378,33 +357,6 @@
                     "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', parameters('location'))]",
                     "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh" ]
                 }
-            }
-        },
-        {
-            "type": "Microsoft.Network/bastionHosts",
-            "condition": "[equals(variables('deployBastion'),'Yes')]",
-            "name": "[variables('bastionName')]",
-            "location": "[parameters('location')]",
-            "apiVersion": "2020-11-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
-
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "IpConf",
-                        "properties": {
-                            "subnet": {
-                                "id": "[variables('bastionSubnetRef')]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
-                        }
-                     }
-                ]
             }
         }
     ],
