@@ -106,7 +106,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
   * `kubernetesVersion` - AKS version
   * `dnsPrefix` - AKS unique DNS prefix
-  * `deployBastion` - Choice to deploy Azure Bastion or not to connect to the client VM.
+  * `deployBastion` - Choice (Yes | No) to deploy Azure Bastion or not to connect to the client VM.
   * `bastionHostName` - Azure Bastion host name.
 
     > **Note: In case you decided to deploy SQL Managed Instance in an highly-available fashion, refer to the ["High Availability"](##-High-Availability-with-Always-On-availability-groups) section in this readme. Also note that this capability is currently in [preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
@@ -146,7 +146,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-* Now that first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public Ip.
+* Now that first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public IP.
 
     ![Client VM public IP](./03.png)
 
