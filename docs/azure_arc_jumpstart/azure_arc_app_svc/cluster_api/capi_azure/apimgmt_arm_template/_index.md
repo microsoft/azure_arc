@@ -110,7 +110,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * _`deployApiMgmt`_ - Boolean that sets whether or not to deploy App Service plan and an Azure Logic App. For this scenario, we leave it set to _**true**_.
   * _`templateBaseUrl`_ - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
   * _`adminEmail`_ - Your email address, it will be used to notify you once the API management deployment is done.
-  * _`deployBastion`_ - Choice to deploy Azure Bastion or not to connect to the client VM.
+  * _`deployBastion`_ - Choice (Yes | No) to deploy Azure Bastion or not to connect to the client VM.
   * _`bastionHostName`_ - Azure Bastion host name.
   
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/arm_template) and run the below command:
