@@ -156,7 +156,7 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
 ## Windows Login & Post Deployment
 
-* Now that the Windows Server VM is created, it is time to login to it. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public Ip.
+* Now that the Windows Server VM is created, it is time to login to it. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public IP.
 
     ![Screenshot showing Overview tab of Azure VM](./03.jpg)
 
