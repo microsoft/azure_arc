@@ -17,7 +17,7 @@
         "tenantId": {
             "value": "<Your Azure tenant ID>"
         },
-        "myIpAddress ": {
+        "myIpAddress": {
             "value": "<Your IP address>"
         }
     }
