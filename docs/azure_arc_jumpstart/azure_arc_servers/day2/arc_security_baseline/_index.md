@@ -84,7 +84,7 @@ Remove the virtual machines from each environment by following the teardown inst
 - **[Vagrant Ubuntu box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_ubuntu/)**
 - **[Vagrant Windows box](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vagrant/local_vagrant_windows/)**
 
-Remove the Azure security baseline policy assignments by executing the powershell script
+Remove the Azure security baseline policy assignments by executing the following PowerShell script,
 
 ```powershell
 $ResourceGroup = Get-AzResourceGroup -Name '<Name of the Azure resource group>'
