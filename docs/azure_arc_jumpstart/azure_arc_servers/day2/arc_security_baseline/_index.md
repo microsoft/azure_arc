@@ -35,7 +35,7 @@ You can use the Azure portal, an ARM template, or PowerShell script to assign po
 
 ## Azure Security Basline on Azure Arc connected machines
 
-- Now you can assign Azure security baseline policies to your Arc connected machines. Note that there are different policies for Windows and Linux machines.
+- Now you can assign Azure security baseline policies to your Arc-connected machines. Note that there are different policies for Windows and Linux machines.
 
   To start the deployment on your Arc connected Windows machines, use the below command:
 
