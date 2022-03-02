@@ -10,7 +10,7 @@ description: >
 
 The following README will guide you on how to use Azure Policy to push Azure Security Baseline to Azure Arc-enabled Windows and Linux servers. With this feature, you can now use the Azure portal to view the compliance status of Azure Arc-enabled servers and whether they meet security baseline requirements, and if not, why.
 
-You can use the Azure Portal, an ARM template or PowerShell script to assign policies to Azure subscriptions or resource groups. In this guide, you will use PowerShell script to assign Azure security baseline policies.
+You can use the Azure portal, an ARM template, or PowerShell script to assign policies to Azure subscriptions or resource groups. In this guide, you will use the PowerShell script to assign Azure security baseline policies.
 
 > **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
