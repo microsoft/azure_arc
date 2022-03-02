@@ -6,7 +6,7 @@ weight: 11
 description: >
 ---
 
-## Use Azure Policy to audit if Azure Arc-enabled servers meet security baseline requiements
+## Use Azure Policy to audit if Azure Arc-enabled servers meet security baseline requirements
 
 The following README will guide you on how to use Azure Policy to push Azure Security Baseline to Azure Arc-enabled Windows and Linux servers. With this feature, you can now use the Azure portal to view the compliance status of Azure Arc-enabled servers and whether they meet security baseline requirements, and if not, why.
 
@@ -33,7 +33,7 @@ You can use the Azure portal, an ARM template, or PowerShell script to assign po
 
     ![Screenshot of Azure Arc-enabled server connectivity status](./02.png)
 
-## Azure Security Basline on Azure Arc connected machines
+## Azure Security Baseline on Azure Arc connected machines
 
 - Now you can assign Azure security baseline policies to your Arc-connected machines. Note that there are different policies for Windows and Linux machines.
 
