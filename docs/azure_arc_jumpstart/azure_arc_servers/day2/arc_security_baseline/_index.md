@@ -47,7 +47,7 @@ You can use the Azure portal, an ARM template, or PowerShell script to assign po
   New-AzPolicyAssignment -Name 'Windows machines should meet requirements of the Azure compute security baseline' -PolicyDefinition $Policy -Scope $ResourceGroup.ResourceId -Location '<Azure Region>' -IdentityType 'SystemAssigned' -PolicyParameterObject $Parameter
   ```
 
-  To start the deployment on your Arc connected Linux machines, use the below command:
+  To start the deployment on your Arc-connected Linux machines, use the below command:
 
   ```powershell
   $policy=Get-AzPolicyDefinition -Name 'fc9b3da7-8347-4380-8e70-0a0361d8dedd'
