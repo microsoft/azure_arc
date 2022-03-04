@@ -2,7 +2,7 @@
 type: docs
 title: "Integrate Microsoft Defender for Cloud with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"
 linkTitle: "Integrate Microsoft Defender for Cloud with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions"
-weight: 1
+weight: 3
 description: >
 ---
 
