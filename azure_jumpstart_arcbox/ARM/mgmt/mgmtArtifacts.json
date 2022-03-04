@@ -55,11 +55,11 @@
       "galleryName": "Updates"
     },
     "ChangeTracking": {
-      "name": "[concat('ChangeTracking', '(', parameters('workspaceName'), ')')]",
+      "name": "[format('ChangeTracking({0})', parameters('workspaceName'))]",
       "galleryName": "ChangeTracking"
     },
     "Security": {
-      "name": "[concat('Security', '(', parameters('workspaceName'), ')')]",
+      "name": "[format('Security({0})', parameters('workspaceName'))]",
       "galleryName": "Security"
     },
     "policyTemplate": "[if(equals(parameters('flavor'),'ITPro'), uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsITPro.json'), if(equals(parameters('flavor'),'DevOps'),uri(parameters('templateBaseUrl'),'ARM/mgmt/policyAzureArcBuiltinsDevOps.json'), uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsFull.json')))]",
@@ -146,12 +146,12 @@
       "name": "[variables('ChangeTracking').name]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
       ],
       "plan": {
-        "name": "[concat('ChangeTracking', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
+        "name": "[variables('ChangeTracking').name]",
         "promotionCode": "",
-        "product": "[concat('OMSGallery/', variables('ChangeTracking').galleryName)]",
+        "product": "[format('OMSGallery/{0}', variables('ChangeTracking').galleryName)]",
         "publisher": "Microsoft"
       },
       "properties": {
@@ -164,12 +164,12 @@
       "name": "[variables('Security').name]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
       ],
       "plan": {
-        "name": "[concat('ChangeTracking', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
+        "name": "[variables('Security').name]",
         "promotionCode": "",
-        "product": "[concat('OMSGallery/', variables('Security').galleryName)]",
+        "product": "[format('OMSGallery/{0}', variables('Security').galleryName)]",
         "publisher": "Microsoft"
       },
       "properties": {
