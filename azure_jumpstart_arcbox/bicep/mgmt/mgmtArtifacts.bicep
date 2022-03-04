@@ -106,7 +106,7 @@ resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11
     workspaceResourceId: workspace.id
   }
   plan: {
-    name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
+    name: changeTracking.name
     promotionCode: ''
     product: 'OMSGallery/${changeTracking.galleryName}'
     publisher: 'Microsoft'
@@ -120,7 +120,7 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
     workspaceResourceId: workspace.id
   }
   plan: {
-    name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
+    name: security.name
     promotionCode: ''
     product: 'OMSGallery/${security.galleryName}'
     publisher: 'Microsoft'
