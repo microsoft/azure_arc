@@ -2,7 +2,7 @@
 type: docs
 title: "Deploy GitOps configurations and perform Helm-based GitOps flow on Cluster API as an Azure Arc Connected Cluster (Flux v2)"
 linkTitle: "Deploy GitOps configurations and perform Helm-based GitOps flow on Cluster API as an Azure Arc Connected Cluster (Flux v2)"
-weight: 5
+weight: 2
 description: >
 ---
 
