@@ -9,6 +9,46 @@ weight: 3
 
 **Release notes will be released on the first week of each month and will cover the previous month.**
 
+## February 2022
+
+### Release highlights and general Jumpstart enhancements
+
+- In this release, we reached 100 individual Jumpstart scenarios!
+- New Azure Arc-enabled servers scenario
+- New Azure Arc-enabled Kubernetes scenarios
+- Azure Arc-enabled data services enhancements
+- Multiple Jumpstart ArcBox optimizations, enhancements and bug fixes
+
+### Azure Arc-enabled servers scenarios
+
+- [New Scenario: Use Azure Policy to audit if Azure Arc-enabled servers meet security baseline requirements](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_security_baseline/)
+- [Bug fix: CentOS VM Arc Onboarding Failure #957](https://github.com/microsoft/azure_arc/issues/957)
+- [Bug fix: VMware vSphere Windows Server VMs VMTools update #940](https://github.com/microsoft/azure_arc/issues/940)
+
+### Azure Arc-enabled Kubernetes scenarios
+
+- [Updated Scenario: Deploy Kubernetes cluster and connect it to Azure Arc using Cluster API Azure provider #980](https://github.com/microsoft/azure_arc/issues/980)
+- [New Scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on Cluster API as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_gitops_helm/)
+- [New Scenario: Use Azure Policy on an Azure-Arc enabled Kubernetes cluster for applying ingress/egress rules with Calico network policy](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/calico/)
+
+### Azure Arc-enabled data services scenarios
+
+- [Enhancement: Updates to Arc Data Services for Feb 2022 release #993](https://github.com/microsoft/azure_arc/pull/993)
+
+### Jumpstart ArcBox
+
+- [ArcBox optimizations #965](https://github.com/microsoft/azure_arc/pull/965)
+  - Replacing _sed_ with Kustomize functionality
+  - Adding _templateBaseUrl_ parameter to the _installCAPI.sh_ script
+  - Adding kubeconfig copy functionality for easy CAPI Management cluster (k3s) operations
+  - Adding cluster naming "fail safe" functionality around CAPI Arc K8s onboarding
+  - Bumping _ArcBox-CAPI-MGMT_ and _ArcBox-K3s_ OS to Ubuntu 20.04
+  - Bumping CAPI K8s version to 1.22.6
+  - Bumping CAPZ version to 1.1.1
+  - Bumping data controller version docker images version to v1.3.0_2022-01-27
+  - Enhanced Troubleshooting section + screenshots
+  - Updating all VMs SKU to v4
+
 ## January 2022
 
 ### Release highlights and general Jumpstart enhancements
