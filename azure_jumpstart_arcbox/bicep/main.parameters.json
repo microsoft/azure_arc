@@ -27,7 +27,7 @@
             "value": "<your unique Log Analytics workspace name>"
         },
         "flavor": {
-            "value": "Full"
+            "value":  "Full"
         }
     }
 }
