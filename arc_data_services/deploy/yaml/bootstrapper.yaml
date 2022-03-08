@@ -58,7 +58,7 @@ spec:
         kubernetes.io/os: linux
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.4.0_2022-02-25
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.4.1_2022-03-08
         imagePullPolicy: Always
         resources:
           limits:
