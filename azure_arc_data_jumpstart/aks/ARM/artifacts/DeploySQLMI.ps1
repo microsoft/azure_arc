@@ -26,7 +26,6 @@ $StorageClassName = "managed-premium"
 $dataStorageSize = "5"
 $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
-$backupsStorageSize = "5"
 
 # If flag set, deploy SQL MI "General Purpose" tier
 if ( $env:SQLMIHA -eq $false )
@@ -70,7 +69,7 @@ az deployment group create --resource-group $env:resourceGroup --template-file "
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes..."
+    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")

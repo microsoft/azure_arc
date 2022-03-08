@@ -106,7 +106,7 @@ az k8s-extension create --name arc-data-services `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
 
 Do {
-    Write-Host "Waiting for bootstrapper pod, hold tight..."
+    Write-Host "Waiting for bootstrapper pod, hold tight...(20s sleeping loop)"
     Start-Sleep -Seconds 20
     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($podStatus -eq "Nope")
@@ -155,7 +155,7 @@ az deployment group create --resource-group $Env:resourceGroup `
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes...(45s sleeping loop)"
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
