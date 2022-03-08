@@ -109,11 +109,11 @@
     }    
   },
   "variables": {
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/')]",
-    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks/ARM/clientVm.json')]",
-    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks/ARM/aks.json')]",
-    "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'aks/ARM/logAnalytics.json')]",
-    "VNETUrl": "[uri(variables('templateBaseUrl'), 'aks/ARM/VNET.json')]",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/ARM/')]",
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
+    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
+    "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
+    "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
     // Virtual Network configuration
     "virtualNetworkName": "Arc-Data-VNet",
     "subnetName": "Arc-Data-Subnet",
