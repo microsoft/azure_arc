@@ -1,6 +1,7 @@
 Start-Transcript -Path C:\Temp\deploySQL.log
 
 # Deployment environment variables
+$Env:TempDir = "C:\Temp"
 $controllerName = "jumpstart-dc"
 
 # Deploying Azure Arc SQL Managed Instance
@@ -43,7 +44,7 @@ if ( $env:SQLMIHA -eq $true )
 
 ################################################
 
-$SQLParams = "C:\Temp\SQLMI.parameters.json"
+$SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $SQLParams
@@ -65,7 +66,7 @@ $SQLParams = "C:\Temp\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'pricingTier-stage' ,$pricingTier | Set-Content -Path $SQLParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\SQLMI.json" --parameters "C:\Temp\SQLMI.parameters.json"
+az deployment group create --resource-group $env:resourceGroup --template-file "$Env:TempDir\SQLMI.json" --parameters "$Env:TempDir\SQLMI.parameters.json"
 Write-Host "`n"
 
 Do {
@@ -92,7 +93,7 @@ if ( $env:SQLMIHA -eq $true )
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-$settingsTemplate = "C:\Temp\settingsTemplate.json"
+$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving SQL MI connection endpoint
 $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
@@ -104,13 +105,13 @@ $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
 
 # Unzip SqlQueryStress
-Expand-Archive -Path C:\Temp\SqlQueryStress.zip -DestinationPath C:\Temp\SqlQueryStress
+Expand-Archive -Path $Env:TempDir\SqlQueryStress.zip -DestinationPath $Env:TempDir\SqlQueryStress
 
 # Create SQLQueryStress desktop shortcut
 Write-Host "`n"
 Write-Host "Creating SQLQueryStress Desktop shortcut"
 Write-Host "`n"
-$TargetFile = "C:\Temp\SqlQueryStress\SqlQueryStress.exe"
+$TargetFile = "$Env:TempDir\SqlQueryStress\SqlQueryStress.exe"
 $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SqlQueryStress.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
@@ -118,7 +119,7 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Creating SQLMI Endpoints data
-& "C:\Temp\SQLMIEndpoints.ps1"
+& "$Env:TempDir\SQLMIEndpoints.ps1"
 
 # If PostgreSQL isn't being deployed, clean up settings file
 if ( $env:deployPostgreSQL -eq $false )
