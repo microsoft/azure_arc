@@ -168,7 +168,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2018-10-01",
+      "apiVersion": "2021-05-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('location')]",
       "dependsOn": [

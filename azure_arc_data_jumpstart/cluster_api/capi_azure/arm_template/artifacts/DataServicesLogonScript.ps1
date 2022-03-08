@@ -90,8 +90,8 @@ Write-Host "`n"
 kubectl get nodes
 azdata --version
 
-# Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
+Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Localize kubeconfig

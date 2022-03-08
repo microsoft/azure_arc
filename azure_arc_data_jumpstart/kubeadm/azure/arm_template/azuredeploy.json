@@ -225,7 +225,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2021-05-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -356,7 +356,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-04-01",
+            "apiVersion": "2021-05-01",
             "name": "[parameters('virtualNetworkName')]",
             "location": "[parameters('location')]",
             "properties": {

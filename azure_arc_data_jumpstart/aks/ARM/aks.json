@@ -111,9 +111,11 @@
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
         "enableRBAC": "[parameters('enableRBAC')]",
         "dnsPrefix": "[parameters('dnsPrefix')]",
-        "aadProfile": {
+        "aadProfile": [
+          {
             "managed": true
-        },
+          }
+        ],
         "agentPoolProfiles": [
           {
             "name": "agentpool",
@@ -124,6 +126,11 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets"
+          }
+        ],
+        "networkProfile": [
+          {
+            "networkPlugin": "azure"
           }
         ],
         "linuxProfile": {

@@ -74,13 +74,13 @@ kubectl get nodes
 Write-Host "`n"
 
 # Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster. Hold tight, this might take a few minutes..."
+Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
-Start-Sleep -Seconds 10
 
 # Localize kubeconfig
 $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
+Start-Sleep -Seconds 10
 
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `

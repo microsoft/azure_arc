@@ -92,8 +92,8 @@ Write-Host "`n"
 
 Start-Sleep -Seconds 10
 
-# Onboarding the EKS cluster as an Azure Arc enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# Onboarding the EKS cluster as an Azure Arc-enabled Kubernetes cluster
+Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Monitor pods across namespaces
@@ -113,7 +113,7 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Create Azure Arc enabled Data Services extension
+# Create Azure Arc-enabled Data Services extension
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `

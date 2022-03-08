@@ -124,7 +124,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys a VNET and Subnet for Client VM",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "VNETDeployment",
       "properties": {
         "mode": "Incremental",
@@ -151,7 +151,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys an AKS Cluster",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "aksDeployment",
       "properties": {
         "mode": "Incremental",
@@ -181,7 +181,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys the Client Windows VM",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
       "dependsOn": ["VNETDeployment"],
       "properties": {
@@ -238,8 +238,8 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs upload",
-      "apiVersion": "2019-10-01",
+      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs upload",
+      "apiVersion": "2021-04-01",
       "name": "logAnalyticsDeployment",
       "properties": {
         "mode": "Incremental",
