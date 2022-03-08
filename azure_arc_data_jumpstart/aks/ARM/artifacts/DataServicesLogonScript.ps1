@@ -8,10 +8,16 @@ Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 # Login as service principal
 az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
-# Installing Azure CLI arcdata extension
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
 Write-Host "`n"
-Write-Host "Installing Azure CLI arcdata extension"
+Write-Host "Installing Azure CLI extensions"
 az extension add --name arcdata
+az extension add --name connectedk8s
+az extension add --name k8s-extension
+Write-Host "`n"
+az -v
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
