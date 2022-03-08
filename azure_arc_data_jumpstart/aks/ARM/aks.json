@@ -111,11 +111,10 @@
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
         "enableRBAC": "[parameters('enableRBAC')]",
         "dnsPrefix": "[parameters('dnsPrefix')]",
-        "aadProfile": [
+        "aadProfile": 
           {
             "managed": true
-          }
-        ],
+          },
         "agentPoolProfiles": [
           {
             "name": "agentpool",
@@ -128,11 +127,10 @@
             "type": "VirtualMachineScaleSets"
           }
         ],
-        "networkProfile": [
+        "networkProfile": 
           {
             "networkPlugin": "azure"
-          }
-        ],
+          },
         "linuxProfile": {
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
