@@ -27,7 +27,7 @@
       "defaultValue": {
         "Project": "jumpstart_azure_arc_data_services"
       }
-    } 
+    }
   },
   "resources": [
     {

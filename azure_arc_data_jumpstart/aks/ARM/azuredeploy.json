@@ -144,9 +144,6 @@
           },
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
-          },
-          "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
           }
         }
       }
@@ -177,10 +174,7 @@
           },
           "dnsPrefix": {
             "value": "[parameters('dnsPrefix')]"
-          },
-          "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
-          }          
+          }   
         }
       }
     },
@@ -256,10 +250,7 @@
         "parameters": {
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },
-          "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
-          }          
+          }  
         }
       }
     }
