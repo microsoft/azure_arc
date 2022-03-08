@@ -99,13 +99,13 @@ workflow ClientTools_01
                                 choco config get cacheLocation
                             }catch{
                                 Write-Output "Chocolatey not detected, trying to install now"
-                                iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+                                Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
                             }
                         }
                         if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
                             Write-Host "Chocolatey Apps Specified"  
                             
-                            $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+                            $appsToInstall = $using:chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
                         
                             foreach ($app in $appsToInstall)
                             {
