@@ -78,9 +78,6 @@ Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster. H
 Write-Host "`n"
 Start-Sleep -Seconds 10
 
-# Monitor pods across arc namespace
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-
 # Localize kubeconfig
 $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
@@ -94,6 +91,9 @@ az connectedk8s connect --name $connectedClusterName `
                         --kube-context $Env:KUBECONTEXT
 
 Start-Sleep -Seconds 10
+
+# Monitor pods across arc namespace
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 
 # Create Azure Arc-enabled Data Services extension
 az k8s-extension create --name arc-data-services `
