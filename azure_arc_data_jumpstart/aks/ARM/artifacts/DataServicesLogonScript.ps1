@@ -1,6 +1,7 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
+$Env:TempDir = "C:\Temp"
 $connectedClusterName = "Arc-Data-AKS"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
@@ -143,7 +144,7 @@ $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-gr
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "C:\Temp\dataController.parameters.json"
+$dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$Env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
@@ -157,8 +158,8 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
 
 az deployment group create --resource-group $Env:resourceGroup `
-                           --template-file "C:\Temp\dataController.json" `
-                           --parameters "C:\Temp\dataController.parameters.json"
+                           --template-file "$Env:TempDir\dataController.json" `
+                           --parameters "$Env:TempDir\dataController.parameters.json"
 Write-Host "`n"
 
 Do {
@@ -166,19 +167,20 @@ Do {
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
+Write-Host "`n"
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # If flag set, deploy SQL MI
 if ( $Env:deploySQLMI -eq $true )
 {
-& "C:\Temp\DeploySQLMI.ps1"
+& "$Env:TempDir\DeploySQLMI.ps1"
 }
 
 # If flag set, deploy PostgreSQL
 if ( $Env:deployPostgreSQL -eq $true )
 {
-& "C:\Temp\DeployPostgreSQL.ps1"
+& "$Env:TempDir\DeployPostgreSQL.ps1"
 }
 
 # Enabling data controller auto metrics & logs upload to log analytics
@@ -193,7 +195,7 @@ az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --a
 if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-    Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+    Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
     # Creating desktop url shortcuts for built-in Grafana and Kibana services 
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -212,7 +214,7 @@ if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
 }
 
 # Changing to Client VM wallpaper
-$imgPath="C:\Temp\wallpaper.png"
+$imgPath="$Env:TempDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
