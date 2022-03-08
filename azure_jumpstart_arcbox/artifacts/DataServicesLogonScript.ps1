@@ -23,7 +23,12 @@ Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincip
 # Required for CLI commands
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
-# Install Azure Data Studio extensions
+# Installing Azure CLI arcdata extension
+Write-Host "`n"
+Write-Host "Installing Azure CLI arcdata extension"
+az extension add --name arcdata
+
+# Installing Azure Data Studio extensions
 Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"

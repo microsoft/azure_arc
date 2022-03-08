@@ -96,7 +96,7 @@ Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connect
 $settingsTemplate = "C:\Temp\settingsTemplate.json"
 
 # Retrieving SQL MI connection endpoint
-$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
+$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
 
 # Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
