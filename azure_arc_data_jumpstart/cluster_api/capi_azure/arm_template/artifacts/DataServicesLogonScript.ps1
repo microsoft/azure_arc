@@ -12,6 +12,11 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 # Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
+# Installing Azure CLI arcdata extension
+Write-Host "`n"
+Write-Host "Installing Azure CLI arcdata extension"
+az extension add --name arcdata
+
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
 # subscription user deployed ARM template to. This is needed in case Service 
@@ -19,15 +24,17 @@ az login --service-principal --username $env:spnClientId --password $env:spnClie
 az account set --subscription $env:subscriptionId
 
 
-# Install Azure Data Studio extensions
+# Installing Azure Data Studio extensions
 Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
-$env:argument1="--install-extension"
-$env:argument2="Microsoft.arc"
-$env:argument3="microsoft.azuredatastudio-postgresql"
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument2
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument3
+$Env:argument1="--install-extension"
+$Env:argument2="Microsoft.arc"
+$Env:argument3="microsoft.azuredatastudio-postgresql"
+$Env:argument4="microsoft.azdata"
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
 
 # Create Azure Data Studio desktop shortcut
 Write-Host "`n"
