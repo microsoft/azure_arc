@@ -3,16 +3,16 @@
 # <--- Change the following environment variables according to your Azure service principal name --->
 
 echo "Exporting environment variables"
-export appId='<Azure service principal Id>'
-export password='<Azure service principal password>'
-export resourceGroup='<Azure Resource Group name>'
-export clusterName='<The name of your Aro cluster as it will be shown in Azure Arc>'
+export AZURE_CLIENT_ID='<Azure SPN application client id>'
+export AZURE_CLIENT_SECRET='<Azure SPN application client secret>'
+export AZURE_RESOURCE_GROUP='<AZURE_RESOURCE_GROUP>'
+export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
+export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 
 # Getting ARO cluster credentials
 echo "Log in to Azure with Service Principle & Getting Aro credentials (kubeconfig)"
-az login --service-principal --username $appId --password $password --tenant $tenantId
-#az aro get-credentials --name $arcClusterName --resource-group $RESOURCEGROUP --overwrite-existing
-kubcepass=$(az aro list-credentials --name $clusterName -g $resourceGroup --query kubeadminPassword -o tsv)
+az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $tenantId
+kubcepass=$(az aro list-credentials --name $CLUSTER_NAME -g $AZURE_RESOURCE_GROUP --query kubeadminPassword -o tsv)
 rm -rf ~/.azure/AzureArcCharts
 
 # Installing Azure Arc k8s CLI extensions
@@ -54,7 +54,7 @@ wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-
 mkdir openshift
 tar -zxvf openshift-client-linux.tar.gz -C openshift
 echo 'export PATH=$PATH:~/openshift' >> ~/.bashrc && source ~/.bashrc
-apiServer=$(az aro show -g $resourceGroup -n $clusterName --query apiserverProfile.url -o tsv)
+apiServer=$(az aro show -g $AZURE_RESOURCE_GROUP -n $CLUSTER_NAME --query apiserverProfile.url -o tsv)
 oc login $apiServer -u kubeadmin -p $kubcepass
 
 
@@ -62,13 +62,5 @@ oc login $apiServer -u kubeadmin -p $kubcepass
 oc adm policy add-scc-to-user privileged system:serviceaccount:azure-arc:azure-arc-kube-aad-proxy-sa
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8s connect --name $clusterName --resource-group $resourceGroup --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
+az connectedk8s connect --name $CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
 
-# Enable cluster connect
-#ARM_ID_CLUSTER=$(az connectedk8s show -n $clusterName -g $resourceGroup --query id -o tsv)
-#az connectedk8s enable-features --features cluster-connect -n $clusterName -g $resourceGroup
-#kubectl create serviceaccount admin-user
-#kubectl create clusterrolebinding admin-user-binding --clusterrole cluster-admin --serviceaccount default:admin-user
-#SECRET_NAME=$(kubectl get serviceaccount admin-user -o jsonpath='{$.secrets[0].name}')
-#TOKEN=$(kubectl get secret ${SECRET_NAME} -o jsonpath='{$.data.token}' | base64 -d | sed $'s/$/\\\n/g')
-#az connectedk8s proxy -n $clusterName -g $resourceGroup
