@@ -64,6 +64,7 @@ $pgWorkerPodName = "jumpstartpsw0-0"
         Start-Sleep -Seconds 45
         $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
+Write-Host "`n"
 Write-Host "Azure Arc-enabled PostgreSQL Hyperscale is ready!"
 Write-Host "`n"
 
