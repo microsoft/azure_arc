@@ -184,6 +184,7 @@ if ( $Env:deployPostgreSQL -eq $true )
 }
 
 # Enabling data controller auto metrics & logs upload to log analytics
+Write-Host "`n"
 Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
 Write-Host "`n"
 $Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
@@ -193,6 +194,7 @@ az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --a
 
 # Applying Azure Data Studio settings template file and operations url shortcut
 if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
+    Write-Host "`n"
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
     Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
