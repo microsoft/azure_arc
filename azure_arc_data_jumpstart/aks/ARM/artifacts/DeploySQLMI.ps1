@@ -74,6 +74,7 @@ Do {
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
+Write-Host "`n"
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
