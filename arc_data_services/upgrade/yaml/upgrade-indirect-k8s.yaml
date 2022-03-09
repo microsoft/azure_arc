@@ -39,10 +39,10 @@ spec:
       - name: arc-private-registry
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.2.0_2021-12-15
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.4.1_2022-03-08
         imagePullPolicy: Always
         command: ["/opt/bootstrapper/bin/bootstrapper"]
-        args: ["-image", "mcr.microsoft.com/arcdata/arc-bootstrapper:v1.2.0_2021-12-15", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
+        args: ["-image", "mcr.microsoft.com/arcdata/arc-bootstrapper:v1.4.1_2022-03-08", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
       restartPolicy: Never
       serviceAccountName: sa-arc-upgrade-worker
   backoffLimit: 0
@@ -53,4 +53,4 @@ metadata:
   name: arc
 spec:
   docker:
-    imageTag: v1.2.0_2021-12-15
+    imageTag: v1.4.1_2022-03-08
