@@ -104,7 +104,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   ![Scripts output](./05.png)
 
-  > **Note: For the script to work properly you must run this command from the deployment folder. The extra dot is due to the shell script has an *export- function and needs to have the vars exported in the same shell session as the rest of the commands.**
+  > **NOTE: For the script to work properly you must run this command from the deployment folder. The extra dot is due to the shell script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
 - After the script has finished its run you will have Azure Automanage enabled. You should be able to see the Azure Arc-enabled Server under 'Automanage – Azure machine best practices' with the Status set in 'Configured'.
 
