@@ -48,7 +48,7 @@ rm extension_output
 fi
 echo ""
 
-# Install Aro CLI
+# Install ARO CLI
 cd ~
 wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
 mkdir openshift
