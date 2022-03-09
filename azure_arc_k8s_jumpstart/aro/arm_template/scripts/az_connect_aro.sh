@@ -8,7 +8,7 @@ export password='<Azure service principal password>'
 export resourceGroup='<Azure Resource Group name>'
 export clusterName='<The name of your Aro cluster as it will be shown in Azure Arc>'
 
-# Getting Aro cluster credentials
+# Getting ARO cluster credentials
 echo "Log in to Azure with Service Principle & Getting Aro credentials (kubeconfig)"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 #az aro get-credentials --name $arcClusterName --resource-group $RESOURCEGROUP --overwrite-existing
