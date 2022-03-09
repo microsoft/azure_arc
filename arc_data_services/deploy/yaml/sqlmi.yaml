@@ -7,7 +7,7 @@ metadata:
   name: sql1-login-secret
 type: Opaque
 ---
-apiVersion: sql.arcdata.microsoft.com/v2
+apiVersion: sql.arcdata.microsoft.com/v4
 kind: SqlManagedInstance
 metadata:
   name: sql1
@@ -36,10 +36,10 @@ spec:
     primary:
       type: LoadBalancer
   storage:
-    backups:
-      volumes:
-      - className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
-        size: 5Gi
+    #backups:
+    #  volumes:
+    #  - className: azurefile # Backup volumes require a ReadWriteMany (RWX) capable storage class
+    #    size: 5Gi
     data:
       volumes:
       - className: default # Use default configured storage class or modify storage class based on your Kubernetes environment
