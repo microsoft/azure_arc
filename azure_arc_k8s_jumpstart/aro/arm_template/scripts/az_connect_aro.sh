@@ -10,9 +10,16 @@ export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster re
 export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 
 # Getting ARO cluster credentials
+<<<<<<< HEAD
 echo "Log in to Azure with Service Principle & Getting Aro credentials (kubeconfig)"
 az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $tenantId
 kubcepass=$(az aro list-credentials --name $CLUSTER_NAME -g $AZURE_RESOURCE_GROUP --query kubeadminPassword -o tsv)
+=======
+echo "Log in to Azure with Service Principle & Getting ARO credentials (kubeconfig)"
+az login --service-principal --username $appId --password $password --tenant $tenantId
+#az aro get-credentials --name $arcClusterName --resource-group $RESOURCEGROUP --overwrite-existing
+kubcepass=$(az aro list-credentials --name $clusterName -g $resourceGroup --query kubeadminPassword -o tsv)
+>>>>>>> bcbff1dc74ede3154dac2b29c8866827fd386ea8
 rm -rf ~/.azure/AzureArcCharts
 
 # Installing Azure Arc k8s CLI extensions
@@ -48,7 +55,7 @@ rm extension_output
 fi
 echo ""
 
-# Install Aro CLI
+# Install ARO CLI
 cd ~
 wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
 mkdir openshift
