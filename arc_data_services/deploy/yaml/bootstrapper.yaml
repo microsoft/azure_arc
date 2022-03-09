@@ -52,13 +52,13 @@ spec:
       serviceAccountName: sa-arc-bootstrapper
       securityContext:
         fsGroup: 1000700001
-      nodeSelector:
-        kubernetes.io/os: linux
       imagePullSecrets:
       - name: arc-private-registry
+      nodeSelector:
+        kubernetes.io/os: linux
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.2.0_2021-12-15
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.4.1_2022-03-08
         imagePullPolicy: Always
         resources:
           limits:
@@ -69,3 +69,4 @@ spec:
             memory: 100Mi
         securityContext:
           runAsUser: 1000700001
+          runAsGroup: 1000700001

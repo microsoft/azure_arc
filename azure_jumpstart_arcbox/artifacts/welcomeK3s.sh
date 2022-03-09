@@ -4,8 +4,6 @@ tput setaf 6;echo "Welcome to Jumpstart ArcBox Rancher K3s Kubernetes cluster ma
 echo ""
 tput setaf 6;echo "* To check the Rancher K3s deployment log, use the 'cat jumpstart_logs/installK3s.log' command."
 echo ""
-tput setaf 6;echo "* This deployment log can also be found in your ArcBox deployment Azure resource group storage account container."
-echo ""
 tput setaf 6;echo "* To work with Rancher K3s workload Kubernetes cluster, use the 'kubectl <command>'. For example: kubectl get nodes"
 echo ""
 tput setaf 1;echo "-----------------------------------------------------------------------------------------------------------------------------"
