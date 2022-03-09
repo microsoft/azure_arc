@@ -5,13 +5,13 @@
 echo "Exporting environment variables"
 export AZURE_CLIENT_ID='<Azure SPN application client id>'
 export AZURE_CLIENT_SECRET='<Azure SPN application client secret>'
+export AZURE_TENANT_ID="<Azure tenant id>"
 export AZURE_RESOURCE_GROUP='<AZURE_RESOURCE_GROUP>'
 export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
-export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 
 # Getting ARO cluster credentials
 echo "Log in to Azure with Service Principle & Getting ARO credentials (kubeconfig)"
-az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $tenantId
+az login --service-principal --username $AZURE_CLIENT_ID --password $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
 kubcepass=$(az aro list-credentials --name $CLUSTER_NAME -g $AZURE_RESOURCE_GROUP --query kubeadminPassword -o tsv)
 rm -rf ~/.azure/AzureArcCharts
 
@@ -62,5 +62,5 @@ oc login $apiServer -u kubeadmin -p $kubcepass
 oc adm policy add-scc-to-user privileged system:serviceaccount:azure-arc:azure-arc-kube-aad-proxy-sa
 
 echo "Connecting the cluster to Azure Arc"
-az connectedk8s connect --name $CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s'
+az connectedk8s connect --name $CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s' --kube-config .kube/config
 
