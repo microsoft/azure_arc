@@ -74,15 +74,13 @@ $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-pgsql\",\"port\":15432,\"targ
 kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 60
 
-###### Currently instant restore is not working on AKS ######
-
-# # Downloading demo database and restoring onto Postgres
-# Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-# kubectl exec $pgCoordinatorPodName -n arc -c postgres -- /bin/bash -c "cd /tmp && curl -k -O https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template/artifacts/AdventureWorks2019.sql" 2>&1 | Out-Null
-# Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-# kubectl exec $pgCoordinatorPodName -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
-# Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-# kubectl exec $pgCoordinatorPodName -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
+# Downloading demo database and restoring onto Postgres
+Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
+kubectl exec $pgControllerPodName -n arc -c postgres -- /bin/bash -c "curl -o /tmp/AdventureWorks2019.sql 'https://jumpstart.blob.core.windows.net/jumpstartbaks/AdventureWorks2019.sql?sp=r&st=2021-09-08T21:04:16Z&se=2030-09-09T05:04:16Z&spr=https&sv=2020-08-04&sr=b&sig=MJHGMyjV5Dh5gqyvfuWRSsCb4IMNfjnkM%2B05F%2F3mBm8%3D'" 2>&1 | Out-Null
+Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
+kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
+Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
+kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
 
 # Creating Azure Data Studio settings for PostgreSQL connection
 Write-Host ""
