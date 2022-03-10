@@ -92,7 +92,7 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-- User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
+- User is editing the [ARM template parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.parameters.json) (1-time edit). These parameters values are being used throughout the deployment.
 
 - Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.json) will initiate the deployment of the Azure Red Hat OpenShift cluster and the virtual network.
 
