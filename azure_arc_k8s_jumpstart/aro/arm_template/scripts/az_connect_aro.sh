@@ -57,7 +57,7 @@ echo 'export PATH=$PATH:~/openshift' >> ~/.bashrc && source ~/.bashrc
 apiServer=$(az aro show -g $AZURE_RESOURCE_GROUP -n $CLUSTER_NAME --query apiserverProfile.url -o tsv)
 oc login $apiServer -u kubeadmin -p $kubcepass
 
-# Openshift prep before connecting
+# OpenShift prep before connecting
 oc adm policy add-scc-to-user privileged system:serviceaccount:azure-arc:azure-arc-kube-aad-proxy-sa
 
 #Getting thre ARO context
