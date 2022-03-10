@@ -96,7 +96,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.json) will initiate the deployment of the Azure Red Hat OpenShift cluster and the virtual network.
 
-- User is editing the environment variables section in the in the [az_connect_aro.sh script file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/scripts/az_connect_aro.sh) (1-time edit). These variables values will be used throughout the deployment.
+- User is editing the environment variables section in the in the [az_connect_aro.sh script file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/scripts/az_connect_aro.sh) (1-time edit). These variables' values will be used throughout the deployment.
 
 - At a high level, the script will then perform the following tasks:
   - Install the required Azure Arc-enabled Kubernetes required Azure CLI extension
