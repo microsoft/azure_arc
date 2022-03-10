@@ -57,10 +57,15 @@ echo 'export PATH=$PATH:~/openshift' >> ~/.bashrc && source ~/.bashrc
 apiServer=$(az aro show -g $AZURE_RESOURCE_GROUP -n $CLUSTER_NAME --query apiserverProfile.url -o tsv)
 oc login $apiServer -u kubeadmin -p $kubcepass
 
-
 # Openshift prep before connecting
 oc adm policy add-scc-to-user privileged system:serviceaccount:azure-arc:azure-arc-kube-aad-proxy-sa
 
+#Getting thre ARO context
+apiServerURI="${apiServer#https://}"
+clusterName="${apiServerURI//[.]/-}"
+user="kube:admin"
+context="default/$clusterName$user"
+
 echo "Connecting the cluster to Azure Arc"
-az connectedk8s connect --name $CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s' --kube-config .kube/config
+az connectedk8s connect --name $CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s' --kube-context $context
 
