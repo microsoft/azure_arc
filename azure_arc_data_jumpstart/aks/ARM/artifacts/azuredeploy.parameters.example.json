@@ -34,9 +34,6 @@
     },
     "deployPostgreSQL": {
       "value": false
-    },
-    "dnsPrefix": {
-      "value": "arcdata"
     }
   }
 }

@@ -34,9 +34,6 @@
       },
       "deployPostgreSQL": {
         "value": "<PostgreSQL Hyperscale deployment (true/false)>"
-      },
-      "dnsPrefix": {
-        "value": "arcdata"
       }
   }
 }
