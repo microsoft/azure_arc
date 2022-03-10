@@ -66,6 +66,7 @@ clusterName="${apiServerURI//[.]/-}"
 user="kube:admin"
 context="default/$clusterName$user"
 
+# Connecting the cluster to Azure Arc
 echo "Connecting the cluster to Azure Arc"
 az connectedk8s connect --name $CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location 'eastus' --tags 'Project=jumpstart_azure_arc_k8s' --kube-context $context
 
