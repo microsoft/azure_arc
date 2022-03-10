@@ -100,7 +100,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - At a high level, the script will then perform the following tasks:
   - Install the required Azure Arc-enabled Kubernetes required Azure CLI extension
-  - Automatically log in to Azure using the provided service principal credentials and will create the deployment Azure resource group
+  - Automatically login to Azure using the provided service principal credentials and will create the deployment Azure resource group
   - Download and install all the Azure Red Hat OpenShift CLI.
   - Onboard the cluster as an Azure Arc-enabled Kubernetes cluster
 
