@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Enable logging
-exec >onboardARO.log
+mkdir ~/jumpstart_logs
+exec > jumpstart_logs/onboardARO.log
 exec 2>&1
 
 # <--- Change the following environment variables according to your Azure service principal name --->
