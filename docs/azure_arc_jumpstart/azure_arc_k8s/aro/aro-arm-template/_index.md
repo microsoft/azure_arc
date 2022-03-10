@@ -88,6 +88,24 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
   ![Screenshot of Azure resource provider for Aro](./02.png)
 
+## Automation Flow
+
+For you to get familiar with the automation and deployment flow, below is an explanation.
+
+- User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
+
+- Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.json) will initiate the deployment of the Azure Red Hat OpenShift cluster and the virtual network.
+
+- User is editing the environment variables section in the in the [az_connect_aro.sh script file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/scripts/az_connect_aro.sh) (1-time edit). These variables values will be used throughout the deployment.
+
+- At a high level, the script will then perform the following tasks:
+  - Install the required Azure Arc-enabled Kubernetes required Azure CLI extension
+  - Automatically log in to Azure using the provided service principal credentials and will create the deployment Azure resource group
+  - Download and install all the Azure Red Hat OpenShift CLI.
+  - Onboard the cluster as an Azure Arc-enabled Kubernetes cluster
+
+
+
 ## Deployment
 
 - The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.parameters.json) file to match your environment.
@@ -150,6 +168,13 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
   ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./12.png)
 
+## Logging
+
+For ease of troubleshooting and tracking, a deployment log will be created automatically as part of the script runtime. To view the deployment log use the below command:
+
+```shell
+cat /home/<USER>/jumpstart_logs/onboardARO.log
+```
 ## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
