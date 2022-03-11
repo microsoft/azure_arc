@@ -98,7 +98,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERN
 Write-Host "Downloading 'installCAPI.log' log file"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
 $sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:TempDir\installCAPI.log"
 
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
