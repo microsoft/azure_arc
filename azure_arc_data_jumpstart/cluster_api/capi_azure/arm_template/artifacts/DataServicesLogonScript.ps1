@@ -90,8 +90,8 @@ Write-Host "`n"
 kubectl get nodes
 azdata --version
 
-# Onboarding the CAPI cluster as an Azure Arc enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
+Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Localize kubeconfig
@@ -118,7 +118,6 @@ az k8s-extension create --name arc-data-services `
                         --scope cluster `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
-                        --version 1.1.18791000
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."
