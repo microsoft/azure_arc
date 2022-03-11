@@ -89,7 +89,7 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/cluster_api/ARM/')]",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/')]",
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmtStagingStorage.json')]",
