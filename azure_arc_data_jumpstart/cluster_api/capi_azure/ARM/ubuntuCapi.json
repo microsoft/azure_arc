@@ -37,12 +37,12 @@
         },
         "ubuntuOSVersion": {
             "type": "string",
-            "defaultValue": "20.04-LTS",
+            "defaultValue": "20_04-lts-gen2",
             "allowedValues": [
-                "20.04-LTS"
+                "20_04-lts-gen2"
             ],
             "metadata": {
-                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
             }
         },
         "azureLocation": {
