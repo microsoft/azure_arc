@@ -136,6 +136,9 @@ workflow ClientTools_01
             if ($flavor -eq "ITPro") {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookITPro.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
             }
+            elseif ($flavor -eq "DevOps") {
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookDevOps.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
+            }
             else {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookFull.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
             }
