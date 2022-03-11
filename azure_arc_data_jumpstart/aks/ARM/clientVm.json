@@ -47,7 +47,7 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_D8s_v3",
+      "defaultValue": "Standard_D8s_v4",
       "metadata": {
         "description": "The size of the VM"
       }
@@ -168,7 +168,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2018-10-01",
+      "apiVersion": "2021-05-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
