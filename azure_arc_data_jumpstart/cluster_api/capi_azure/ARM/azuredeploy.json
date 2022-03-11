@@ -25,7 +25,7 @@
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
-        "description": "RSA public key used for securing SSH access to Azure resources."
+        "description": "RSA public key used for securing SSH access to Azure resources"
       }
     },
     "spnClientId": {
@@ -163,14 +163,14 @@
           "logAnalyticsWorkspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
-          "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
-          },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
           }
         }
       }
@@ -212,9 +212,6 @@
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
-          "templateBaseUrl": {
-            "value": "[variables('templateBaseUrl')]"
-          },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
           },
@@ -229,7 +226,10 @@
           },          
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
-          }
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          }          
         }
       }
     },
