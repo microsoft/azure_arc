@@ -160,6 +160,9 @@
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
+          "logAnalyticsWorkspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           },
