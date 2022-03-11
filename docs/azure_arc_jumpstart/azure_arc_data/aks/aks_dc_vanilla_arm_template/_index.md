@@ -12,7 +12,7 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services:
 
-![Deployed Architecture](./diagram.png)
+![Screenshot showing the deployed architecture](./diagram.png)
 
 > **NOTE: Currently, Azure Arc-enabled PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
@@ -184,7 +184,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Screenshot showing the PowerShell logon script run](./21.png)
 
-    ![Screenshot showing the PowerShell logon script run](./22.png)
+    ![Screenshot showing the post-run desktop](./22.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **11 various Azure resources deployed**. The important ones to notice are:
 
@@ -208,9 +208,9 @@ In this scenario, the both Azure Arc-enabled data services and Azure Monitor Con
 
 - In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing Azure Arc-enabled Kubernetes resource](./26.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes resource](./26.png)
 
-  ![Screenshot showing Azure Arc-enabled Kubernetes cluster extensions settings](./27.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./27.png)
 
 ## Cleanup
 

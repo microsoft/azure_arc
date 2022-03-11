@@ -12,7 +12,7 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller, SQL Managed Instance, and a Microsoft Windows Server 2022 (Datacenter) Azure client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
-![Deployed Architecture](./41.png)
+![Screenshot showing the deployed architecture](./diagram.png)
 
 > **NOTE: Currently, Azure Arc-enabled PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
@@ -87,6 +87,8 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 User remotes into client Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploy and configure Azure Arc-enabled data services on the AKS cluster including the data controller and SQL Managed Instance.
 
+In addition to deploying the data controller and SQL Managed Instance, the sample [_AdventureWorks_](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will restored automatically for you as well.
+
 ## Deployment
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template that will initiate the entire automation for this scenario.
@@ -136,15 +138,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **8 various Azure resources** deployed.
 
-    ![ARM template deployment completed](./01.png)
+    ![Screenshot showing ARM template deployment completed](./01.png)
 
-    ![New Azure resource group with all resources](./02.png)
+    ![Screenshot showing the new Azure resource group with all resources](./02.png)
 
 ## Windows Login & Post Deployment
 
 - Now that first phase of the automation is completed, it is time to RDP to the client VM using it's public IP.
 
-    ![Client VM public IP](./03.png)
+    ![Screenshot showing the Client VM public IP](./03.png)
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
@@ -184,6 +186,24 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing the PowerShell logon script run](./20.png)
 
+  ![Screenshot showing the PowerShell logon script run](./21.png)
+
+  ![Screenshot showing the PowerShell logon script run](./22.png)
+
+  ![Screenshot showing the PowerShell logon script run](./23.png)
+
+  ![Screenshot showing the PowerShell logon script run](./24.png)
+
+  ![Screenshot showing the PowerShell logon script run](./25.png)
+
+  ![Screenshot showing the PowerShell logon script run](./26.png)
+
+  ![Screenshot showing the PowerShell logon script run](./27.png)
+
+  ![Screenshot showing the PowerShell logon script run](./28.png)
+
+  ![Screenshot showing the post-run desktop](./29.png)
+
 - Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
 
   - Azure Arc-enabled Kubernetes cluster - Azure Arc-enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
@@ -194,17 +214,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - Azure Arc-enabled SQL Managed Instance - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
-    ![additional Azure resources in the resource group](./21.png)
+    ![Screenshot showing additional Azure resources in the resource group](./30.png)
 
 - As part of the automation, Azure Data Studio is installed along with the _Azure Data CLI_, _Azure CLI_, _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-  ![Azure Data Studio connection](./22.png)
+  ![Screenshot showing Azure Data Studio shortcut](./31.png)
 
-- Additionally, the SQL Managed Instance connection will be configured automatically for you.
+  ![Screenshot showing Azure Data Studio extensions](./32.png)
 
-  ![Azure Data Studio connection](./23.png)
+- Additionally, the SQL Managed Instance connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
 
-  ![Configured SQL Managed Instance connection](./24.png)
+  ![Screenshot showing Azure Data Studio SQL MI connection](./33.png)
 
 ## Cluster extensions
 
@@ -212,9 +232,9 @@ In this scenario, the Azure Arc-enabled data services cluster extension was depl
 
 - In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Azure Arc-enabled Kubernetes resource](./25.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes resource](./34.png)
 
-  ![Azure Arc-enabled Kubernetes cluster extensions settings](./26.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./35.png)
 
 ## High Availability with SQL Always-On availability groups
 
@@ -230,15 +250,15 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
 
 - To start with, open the _SqlQueryStress_ desktop shortcut and connect to the SQL Managed Instance **primary** endpoint IP address. This can be found in the _SQLMI Endpoints_ text file desktop shortcut that was also created for you alongside the username and password you used to deploy the environment.
 
-  ![Open SqlQueryStress](./27.png)
+  ![Screenshot showing opened SqlQueryStress](./36.png)
 
-  ![SQLMI Endpoints text file](./28.png)
+  ![Screenshot showing SQLMI Endpoints text file](./37.png)
 
 > **NOTE: Secondary SQL Managed Instance endpoint will be available only when using the [HA deployment model ("Business Critical")](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/cluster_api/capi_azure/capi_mssql_ha/).**
 
 - To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
 
-  ![SqlQueryStress connected](./29.png)
+  ![Screenshot showing SqlQueryStress connected](./38.png)
 
 - To generate some load, we will be running a simple stored procedure. Copy the below procedure and change the number of iterations you want it to run as well as the number of threads to generate even more load on the database. In addition, change the delay between queries to 1ms for allowing the stored procedure to run for a while.
 
@@ -248,9 +268,9 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
 
 - As you can see from the example below, the configuration settings are 100,000 iterations, five threads per iteration, and a 1ms delay between queries. These configurations should allow you to have the stress test running for a while.
 
-  ![SqlQueryStress settings](./30.png)
+  ![Screenshot showing SqlQueryStress settings](./39.png)
 
-  ![SqlQueryStress running](./31.png)
+  ![Screenshot showing SqlQueryStress running](./40.png)
 
 ### Azure Arc-enabled SQL Managed Instance monitoring using Grafana
 
@@ -258,34 +278,34 @@ When deploying Azure Arc-enabled data services, a [Grafana](https://grafana.com/
 
 - Now that you have the _SqlQueryStress_ stored procedure running and generating load, we can look how this is shown in the the built-in Grafana dashboard. As part of the automation, a new URL desktop shortcut simply named "Grafana" was created.
 
-  ![Grafana desktop shortcut](./32.png)
+  ![Screenshot showing Grafana desktop shortcut](./41.png)
 
-- [Optional] The IP address for this instance represents the Kubernetes _LoadBalancer_ external IP that was provision as part of Azure Arc-enabled data services. Use the _```kubectl get svc -n arc```_ command to view the _metricsui_ external service IP address.
+- [Optional] The IP address for this instance represents the Kubernetes _LoadBalancer_ external IP that was provision as part of Azure Arc-enabled data services. Use the _`kubectl get svc -n arc`_ command to view the _metricsui_ external service IP address.
 
-  ![metricsui Kubernetes service](./33.png)
+  ![Screenshot showing metricsui Kubernetes service](./42.png)
 
 - To log in, use the same username and password that is in the _SQLMI Endpoints_ text file desktop shortcut.
 
-  ![Grafana username and password](./34.png)
+  ![Screenshot showing Grafana username and password](./43.png)
 
 - Navigate to the built-in "SQL Managed Instance Metrics" dashboard.
 
-  ![Grafana dashboards](./35.png)
+  ![Screenshot showing Grafana dashboards](./44.png)
 
-  ![Grafana "SQL Managed Instance Metrics" dashboard](./36.png)
+  ![Screenshot showing Grafana "SQL Managed Instance Metrics" dashboard](./45.png)
 
 - Change the dashboard time range to "Last 5 minutes" and re-run the stress test using _SqlQueryStress_ (in case it was already finished).
 
-  ![Last 5 minutes time range](./37.png)
+  ![Screenshot showing "Last 5 minutes" time range](./46.png)
 
 - You can now see how the SQL graphs are starting to show increased activity and load on the database instance.
 
-  ![Increased load activity](./38.png)
+  ![Screenshot showing increased load activity](./47.png)
 
-  ![Increased load activity](./39.png)
+  ![Screenshot showing increased load activity](./48.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Delete Azure resource group](./40.png)
+    ![Screenshot showing Azure resource group deletion](./49.png)
