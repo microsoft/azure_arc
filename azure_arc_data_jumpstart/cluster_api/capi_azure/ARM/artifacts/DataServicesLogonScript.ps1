@@ -1,3 +1,22 @@
+# Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
+
+# $connectedClusterName = "Arc-Data-CAPI"
+
+# Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+# # Required for azcopy
+# $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+# $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientId , $azurePassword)
+# Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+
+# # Login as service principal
+# az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
+
+# # Installing Azure CLI arcdata extension
+# Write-Host "`n"
+# Write-Host "Installing Azure CLI arcdata extension"
+# az extension add --name arcdata
+
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
@@ -26,6 +45,7 @@ az -v
 # Principal has access to multiple subscriptions, which can break the automation logic
 az account set --subscription $Env:subscriptionId
 
+
 # Installing Azure Data Studio extensions
 Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
@@ -38,6 +58,8 @@ $Env:argument4="microsoft.azdata"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
 
+# Create Azure Data Studio desktop shortcut
+Write-Host "`n"
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
@@ -64,30 +86,33 @@ Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
 
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-az -v
+# Downloading CAPI Kubernetes cluster kubeconfig file
+Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
+$context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
+$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
-# Getting AKS cluster credentials kubeconfig file
-Write-Host "Getting AKS cluster credentials"
-Write-Host "`n"
-az aks get-credentials --resource-group $Env:resourceGroup `
-                       --name $Env:clusterName --admin
+# Downloading 'installCAPI.log' log file
+Write-Host "Downloading 'installCAPI.log' log file"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
 
+Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
 
-# Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
+# Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Localize kubeconfig
 $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
-Start-Sleep -Seconds 10
 
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `
@@ -99,16 +124,8 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
-Write-Host "`n"
-Write-Host "Enabling Container Insights cluster extensions"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-Write-Host "`n"
-
-# Monitor pods across arc namespace
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 
-# Create Azure Arc-enabled Data Services extension
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
@@ -120,7 +137,7 @@ az k8s-extension create --name arc-data-services `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
 
 Do {
-    Write-Host "Waiting for bootstrapper pod, hold tight...(20s sleeping loop)"
+    Write-Host "Waiting for bootstrapper pod, hold tight..."
     Start-Sleep -Seconds 20
     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($podStatus -eq "Nope")
@@ -151,7 +168,7 @@ $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-gr
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "$Env:TempDir\dataController.parameters.json"
+$dataControllerParams = "C:\Temp\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$Env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
@@ -191,7 +208,6 @@ if ( $Env:deployPostgreSQL -eq $true )
 }
 
 # Enabling data controller auto metrics & logs upload to log analytics
-Write-Host "`n"
 Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
 Write-Host "`n"
 $Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
@@ -201,10 +217,9 @@ az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --a
 
 # Applying Azure Data Studio settings template file and operations url shortcut
 if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
-    Write-Host "`n"
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-    Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+    Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
     # Creating desktop url shortcuts for built-in Grafana and Kibana services 
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -223,7 +238,7 @@ if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
 }
 
 # Changing to Client VM wallpaper
-$imgPath="$Env:TempDir\wallpaper.png"
+$imgPath="C:\Temp\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 

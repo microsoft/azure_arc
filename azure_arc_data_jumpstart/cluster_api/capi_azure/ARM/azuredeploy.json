@@ -1,0 +1,265 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "windowsAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username for Windows account"
+      }
+    },
+    "windowsAdminPassword": {
+      "type": "securestring",
+      "minLength": 12,
+      "maxLength": 123,
+      "metadata": {
+        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
+      }
+    },
+    "myIpAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address."
+      }
+    },
+    "sshRSAPublicKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "RSA public key used for securing SSH access to Azure resources."
+      }
+    },
+    "spnClientId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure service principal client id"
+      }
+    },
+    "spnClientSecret": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Azure service principal client secret"
+      }
+    },
+    "spnTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure AD tenant id for your service principal"
+      }
+    },
+    "logAnalyticsWorkspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for your log analytics workspace"
+      }
+    },
+    "deploySQLMI": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "SQL Managed Instance deployment"
+      }
+    },
+    "SQLMIHA": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "SQL Managed Instance high-availability deployment"
+      }
+    },    
+    "deployPostgreSQL": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "PostgreSQL Hyperscale deployment"
+      }
+    },
+    "githubAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub account"
+      },
+      "defaultValue": "microsoft"
+    },
+    "githubBranch": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub branch"
+      },
+      "defaultValue": "main"
+    }
+  },
+  "variables": {
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/cluster_api/ARM/')]",
+    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuCapi.json')]",
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmtStagingStorage.json')]",
+    "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
+    "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
+    // Virtual Network configuration
+    "virtualNetworkName": "Arc-Data-CAPI-VNet",
+    "subnetName": "Arc-Data-CAPI-Subnet",
+    "addressPrefix": "172.16.0.0/16",
+    "subnetAddressPrefix": "172.16.1.0/24"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys a VNET and Subnet for Client and K8s VM",
+      "apiVersion": "2021-04-01",
+      "name": "VNETDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('VNETUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "addressPrefix": {
+            "value": "[variables('addressPrefix')]"
+          },
+          "subnetAddressPrefix": {
+            "value": "[variables('subnetAddressPrefix')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploy the CAPI environment",
+      "apiVersion": "2021-04-01",
+      "name": "ubuntuCAPIDeployment",
+      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('capiTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "myIpAddress": {
+            "value": "[parameters('myIpAddress')]"
+          },
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
+          },
+          "stagingStorageAccountName": {
+            "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys the Client Windows VM",
+      "apiVersion": "2021-04-01",
+      "name": "clientVmDeployment",
+      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('clientVmTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "windowsAdminUsername": {
+            "value": "[parameters('windowsAdminUsername')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
+          },
+          "myIpAddress": {
+            "value": "[parameters('myIpAddress')]"
+          },
+          "stagingStorageAccountName": {
+            "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
+          },
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "deploySQLMI": {
+            "value": "[parameters('deploySQLMI')]"
+          },
+          "SQLMIHA": {
+            "value": "[parameters('SQLMIHA')]"
+          },          
+          "deployPostgreSQL": {
+            "value": "[parameters('deployPostgreSQL')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Storage Account used for staging kubectl config and staging scripts",
+      "apiVersion": "2021-04-01",
+      "name": "stagingStorageAccountDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('mgmtStagingStorageUrl')]",
+          "contentVersion": "1.0.0.0"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs upload",
+      "apiVersion": "2021-04-01",
+      "name": "logAnalyticsDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('logAnalyticsUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          }
+        }
+      }
+    }
+  ]
+}
