@@ -127,7 +127,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --name arcdata \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm/azuredeploy.json \
     --parameters azuredeploy.parameters.json
-    --parameters templateBaseUrl="https://raw.githubusercontent.com/your--github--handle/azure_arc/main/azure_arc_data_jumpstart/aks/arm/"
     ```
 
     > **NOTE: The deployment time for this scenario can take ~15-20min**
