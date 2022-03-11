@@ -77,7 +77,6 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.json") -OutFile "C:\Temp\
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.parameters.json") -OutFile "C:\Temp\SQLMI.parameters.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\Temp\postgreSQL.json"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\Temp\postgreSQL.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/RestoreDB.ps1") -OutFile "C:\Temp\RestoreDB.ps1"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\Temp\SQLMIEndpoints.ps1"
 Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\Temp\SqlQueryStress.zip"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
@@ -99,20 +98,20 @@ workflow ClientTools_01
                                 choco config get cacheLocation
                             }catch{
                                 Write-Output "Chocolatey not detected, trying to install now"
-                                iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+                                Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
                             }
                         }
                         if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
                             Write-Host "Chocolatey Apps Specified"  
                             
-                            $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+                            $appsToInstall = $using:chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
                         
                             foreach ($app in $appsToInstall)
                             {
                                 Write-Host "Installing $app"
                                 & choco install $app /y -Force| Write-Output
                             }
-                        }                        
+                        }
                     }
                     Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
                     Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"

@@ -34,15 +34,6 @@
     },
     "deployPostgreSQL": {
       "value": false
-    },
-    "templateBaseUrl": {
-      "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/"
-    },
-    "kubernetesVersion": {
-      "value": "1.21.2"
-    },
-    "dnsPrefix": {
-      "value": "arcdata"
     }
   }
 }
