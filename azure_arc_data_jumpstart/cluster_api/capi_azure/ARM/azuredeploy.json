@@ -206,6 +206,12 @@
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
           },
