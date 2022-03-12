@@ -21,7 +21,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = "Arc-Data-AKS"
+$connectedClusterName = $Env:capiArcDataSvcClusterName
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -111,21 +111,9 @@ Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
 
-# Onboarding the CAPI cluster as an Azure Arc-enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
-Write-Host "`n"
-
 # Localize kubeconfig
 $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
-
-# Create Kubernetes - Azure Arc Cluster
-az connectedk8s connect --name $connectedClusterName `
-                        --resource-group $Env:resourceGroup `
-                        --location $Env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_data_services' `
-                        --kube-config $Env:KUBECONFIG `
-                        --kube-context $Env:KUBECONTEXT
 
 Start-Sleep -Seconds 10
 
