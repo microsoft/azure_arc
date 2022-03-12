@@ -151,6 +151,7 @@ sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBa
 sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
 sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
 sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
+sed -e "s|CLUSTERCTL_VERSION|v$CLUSTERCTL_VERSION|" -i capz_kustomize/kustomization.yaml
 kubectl kustomize capz_kustomize/ > jumpstart.yaml
 clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
@@ -221,7 +222,7 @@ sudo -u $adminUsername az connectedk8s connect --name $arcK8sClusterName --resou
 echo ""
 sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $arcK8sClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights 
 
-# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+# Installing Container Insights and Microsoft Defender for Containers cluster extensions
 echo ""
 sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $arcK8sClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 echo ""
