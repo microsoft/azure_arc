@@ -13,13 +13,13 @@
       "minLength": 12,
       "maxLength": 123,
       "metadata": {
-        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
+        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
       }
     },
     "myIpAddress": {
       "type": "string",
       "metadata": {
-        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address."
+        "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address"
       }
     },
     "sshRSAPublicKey": {
@@ -96,8 +96,8 @@
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
     // Virtual Network configuration
-    "virtualNetworkName": "Arc-Data-CAPI-VNet",
-    "subnetName": "Arc-Data-CAPI-Subnet",
+    "virtualNetworkName": "Arc-Data-VNet",
+    "subnetName": "Arc-Data-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24"
   },
@@ -174,7 +174,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -223,7 +223,7 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
-          }          
+          }
         }
       }
     },
