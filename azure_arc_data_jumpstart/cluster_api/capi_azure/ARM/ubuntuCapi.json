@@ -135,7 +135,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2021-07-01",
+            "apiVersion": "2021-05-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
@@ -225,7 +225,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2021-11-01",
+            "apiVersion": "2021-07-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('azureLocation')]",
             "tags": "[parameters('resourceTags')]",
