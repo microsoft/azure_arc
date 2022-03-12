@@ -45,13 +45,13 @@
             "value": "logsStorageClassName-stage"
         },
         "dataLogsStorageClassName": {
-            "value": "dataLogStorageClassName-stage"
+            "value": "dataLogsStorageClassName-stage"
         },
         "logsStorageSize": {
             "value": "logsSize-stage"
         },
         "dataLogsStorageSize": {
-            "value": "dataLogSize-stage"
+            "value": "dataLogseSize-stage"
         },
         "replicas": {
             "value": replicasStage
