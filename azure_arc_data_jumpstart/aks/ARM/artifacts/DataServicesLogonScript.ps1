@@ -38,6 +38,8 @@ $Env:argument4="microsoft.azdata"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
 
+# Creating Azure Data Studio desktop shortcut
+Write-Host "`n"
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
@@ -108,7 +110,9 @@ Write-Host "`n"
 # Monitor pods across arc namespace
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 
-# Create Azure Arc-enabled Data Services extension
+# Installing Azure Arc-enabled data services extension
+Write-Host "`n"
+Write-Host "Installing Azure Arc-enabled data services extension"
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
@@ -119,6 +123,7 @@ az k8s-extension create --name arc-data-services `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
 
+Write-Host "`n"
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight...(20s sleeping loop)"
     Start-Sleep -Seconds 20
@@ -144,6 +149,7 @@ az customlocation create --name 'jumpstart-cl' `
                          --kubeconfig $Env:KUBECONFIG
 
 # Deploying Azure Arc Data Controller
+Write-Host "`n"
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
@@ -167,13 +173,14 @@ $dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 az deployment group create --resource-group $Env:resourceGroup `
                            --template-file "$Env:TempDir\dataController.json" `
                            --parameters "$Env:TempDir\dataController.parameters.json"
-Write-Host "`n"
 
+Write-Host "`n"
 Do {
     Write-Host "Waiting for data controller. Hold tight, this might take a few minutes...(45s sleeping loop)"
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
+
 Write-Host "`n"
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"

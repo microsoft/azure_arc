@@ -15,13 +15,13 @@
         "description": "The name of your Virtual Machine"
       }
     },
-    "capiArcDataSvcClusterName": {
+    "ArcK8sClusterName": {
       "type": "string",
       "defaultValue": "Arc-DataSvc-CAPI",
       "metadata": {
       "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
       }
-    },    
+    },
     "windowsAdminUsername": {
       "type": "string",
       "defaultValue": "arcdemo",
@@ -307,7 +307,7 @@
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -capiArcDataSvcClusterName ', parameters('capiArcDataSvcClusterName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -ArcK8sClusterName ', parameters('ArcK8sClusterName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
       }
     }

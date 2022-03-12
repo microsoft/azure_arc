@@ -5,6 +5,7 @@ $Env:TempDir = "C:\Temp"
 $controllerName = "jumpstart-dc"
 
 # Deploying Azure Arc PostgreSQL Hyperscale
+Write-Host "`n"
 Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
 Write-Host "`n"
 
@@ -52,18 +53,22 @@ $PSQLParams = "$Env:TempDir\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'numWorkersStage',$numWorkers | Set-Content -Path $PSQLParams
 
-az deployment group create --resource-group $env:resourceGroup --template-file "$Env:TempDir\postgreSQL.json" --parameters "$Env:TempDir\postgreSQL.parameters.json"
-Write-Host "`n"
+az deployment group create --resource-group $env:resourceGroup `
+                           --template-file "$Env:TempDir\postgreSQL.json" `
+                           --parameters "$Env:TempDir\postgreSQL.parameters.json"
 
-# Ensures postgres container is initiated and ready to accept restores
+Write-Host "`n"
+# Ensures Postgres container is initiated and ready to accept restores
 $pgControllerPodName = "jumpstartpsc0-0"
 $pgWorkerPodName = "jumpstartpsw0-0"
 
+Write-Host "`n"
     Do {
         Write-Host "Waiting for PostgreSQL Hyperscale. Hold tight, this might take a few minutes...(45s sleeping loop)"
         Start-Sleep -Seconds 45
         $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
+
 Write-Host "`n"
 Write-Host "Azure Arc-enabled PostgreSQL Hyperscale is ready!"
 Write-Host "`n"
@@ -76,6 +81,7 @@ kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
+Write-Host "`n"
 Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
 kubectl exec $pgControllerPodName -n arc -c postgres -- /bin/bash -c "curl -o /tmp/AdventureWorks2019.sql 'https://jumpstart.blob.core.windows.net/jumpstartbaks/AdventureWorks2019.sql?sp=r&st=2021-09-08T21:04:16Z&se=2030-09-09T05:04:16Z&spr=https&sv=2020-08-04&sr=b&sig=MJHGMyjV5Dh5gqyvfuWRSsCb4IMNfjnkM%2B05F%2F3mBm8%3D'" 2>&1 | Out-Null
 Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
@@ -84,7 +90,7 @@ Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
 kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
 
 # Creating Azure Data Studio settings for PostgreSQL connection
-Write-Host ""
+Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
 $settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 

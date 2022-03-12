@@ -1,27 +1,8 @@
-# Start-Transcript -Path $Env:TempDir\DataServicesLogonScript.log
-
-# $connectedClusterName = "Arc-Data-CAPI"
-
-# Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
-
-# # Required for azcopy
-# $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-# $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientId , $azurePassword)
-# Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
-
-# # Login as service principal
-# az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
-
-# # Installing Azure CLI arcdata extension
-# Write-Host "`n"
-# Write-Host "Installing Azure CLI arcdata extension"
-# az extension add --name arcdata
-
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = $Env:capiArcDataSvcClusterName
+$connectedClusterName = $Env:ArcK8sClusterName
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -63,7 +44,7 @@ $Env:argument4="microsoft.azdata"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
 
-# Create Azure Data Studio desktop shortcut
+# Creating Azure Data Studio desktop shortcut
 Write-Host "`n"
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
@@ -119,6 +100,9 @@ Start-Sleep -Seconds 10
 
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 
+# Installing Azure Arc-enabled data services extension
+Write-Host "`n"
+Write-Host "Installing Azure Arc-enabled data services extension"
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
@@ -129,8 +113,9 @@ az k8s-extension create --name arc-data-services `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
 
+Write-Host "`n"
 Do {
-    Write-Host "Waiting for bootstrapper pod, hold tight..."
+    Write-Host "Waiting for bootstrapper pod, hold tight...(20s sleeping loop)"
     Start-Sleep -Seconds 20
     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($podStatus -eq "Nope")
@@ -154,6 +139,7 @@ az customlocation create --name 'jumpstart-cl' `
                          --kubeconfig $Env:KUBECONFIG
 
 # Deploying Azure Arc Data Controller
+Write-Host "`n"
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
@@ -177,13 +163,14 @@ $dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 az deployment group create --resource-group $Env:resourceGroup `
                            --template-file "$Env:TempDir\dataController.json" `
                            --parameters "$Env:TempDir\dataController.parameters.json"
-Write-Host "`n"
 
+Write-Host "`n"
 Do {
     Write-Host "Waiting for data controller. Hold tight, this might take a few minutes...(45s sleeping loop)"
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
+
 Write-Host "`n"
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
@@ -201,6 +188,7 @@ if ( $Env:deployPostgreSQL -eq $true )
 }
 
 # Enabling data controller auto metrics & logs upload to log analytics
+Write-Host "`n"
 Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
 Write-Host "`n"
 $Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
@@ -210,6 +198,7 @@ az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --a
 
 # Applying Azure Data Studio settings template file and operations url shortcut
 if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
+    Write-Host "`n"
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
     Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
