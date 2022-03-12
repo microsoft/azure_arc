@@ -72,7 +72,7 @@
       "metadata": {
         "description": "PostgreSQL Hyperscale deployment"
       }
-    },
+    },    
     "githubAccount": {
       "type": "string",
       "metadata": {
@@ -220,7 +220,7 @@
           },          
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
-          },
+          },       
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           }

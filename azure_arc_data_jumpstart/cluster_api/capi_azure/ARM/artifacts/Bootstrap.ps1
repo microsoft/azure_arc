@@ -16,6 +16,7 @@ param (
     [string]$deploySQLMI,
     [string]$SQLMIHA,    
     [string]$deployPostgreSQL,
+    [string]$capiArcDataSvcClusterName,
     [string]$templateBaseUrl
 )
 
@@ -36,6 +37,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', $deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SQLMIHA', $SQLMIHA,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('capiArcDataSvcClusterName', $capiArcDataSvcClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
