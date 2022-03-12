@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\Temp\deployPostgreSQL.log
+Start-Transcript -Path C:\Temp\DeployPostgreSQL.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"

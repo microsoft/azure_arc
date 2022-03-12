@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\Temp\deploySQL.log
+Start-Transcript -Path C:\Temp\DeploySQLMI.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
