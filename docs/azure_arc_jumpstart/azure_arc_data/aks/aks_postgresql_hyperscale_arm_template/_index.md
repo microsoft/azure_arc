@@ -213,7 +213,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing Azure Data Studio extensions](./29.png)
 
-- Additionally, the SQL Managed Instance connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
+- Additionally, the PostgreSQL connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
 
   ![Screenshot showing Azure Data Studio PostgresSQL Hyperscale connection](./30.png)
 

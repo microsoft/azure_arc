@@ -86,6 +86,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json) will initiate the deployment of the linked ARM templates:
 
+  - [_VNET_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/VNET.json) - Deploys a Virtual Network with a single subnet to be used by the Client virtual machine.
   - [_ubuntuCapi_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/ubuntuCapi.json) - Deploys an Ubuntu Linux VM which will have Rancher K3s installed and transformed into a Cluster API management cluster via the Azure CAPZ provider. As part of it's automation and the [_installCAPI_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/artifacts/_installCAPI_.sh) shell script, a new Azure Arc-enabled Kubernetes cluster will already be created to be used by the rest of the Azure Arc-enabled data services automation. Azure Arc-enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom location](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
   - [_clientVm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/clientVm.json) - Deploys the client Windows VM. This is where all user interactions with the environment are made from.
   - [_mgmtStagingStorage_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/mgmtStagingStorage.json) - Used for staging files in automation scripts.
@@ -127,9 +128,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     For example:
 
     ```shell
-    az group create --name Arc-Data-CAPI --location "East US"
+    az group create --name Arc-Data-Demo --location "East US"
     az deployment group create \
-    --resource-group Arc-Data-CAPI \
+    --resource-group Arc-Data-Demo \
     --name arcdatademo \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json \
     --parameters azuredeploy.parameters.json
@@ -233,4 +234,4 @@ Occasionally, you may need to review log output from scripts that run on the _Ar
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Delete Azure resource group](./26.png)
+    ![Screenshot showing Azure resource group deletion](./26.png)
