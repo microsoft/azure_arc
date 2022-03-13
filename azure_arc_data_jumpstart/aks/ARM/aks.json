@@ -4,7 +4,7 @@
   "parameters": {
     "clusterName": {
       "type": "string",
-      "defaultValue": "Arc-Data-AKS",
+      "defaultValue": "Arc-DataSvc-AKS",
       "metadata": {
         "description": "The name of the Kubernetes cluster resource"
       }
