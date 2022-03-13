@@ -151,7 +151,7 @@ sudo curl -o capz_kustomize/patches/AzureCluster.yaml --create-dirs ${templateBa
 sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
 sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
 sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
-sed -e "s|CLUSTERCTL_VERSION|v$CLUSTERCTL_VERSION|" -i capz_kustomize/kustomization.yaml
+sed -e "s|CAPI_PROVIDER_VERSION|v$CAPI_PROVIDER_VERSION|" -i capz_kustomize/kustomization.yaml
 kubectl kustomize capz_kustomize/ > jumpstart.yaml
 clusterctl generate yaml --from jumpstart.yaml > template.yaml
 
