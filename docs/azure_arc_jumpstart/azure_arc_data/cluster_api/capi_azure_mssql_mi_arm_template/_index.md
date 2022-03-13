@@ -290,6 +290,19 @@ When deploying Azure Arc-enabled data services, a [Grafana](https://grafana.com/
 
   ![Increased load activity](./35.png)
 
+### Exploring logs from the Client virtual machine
+
+Occasionally, you may need to review log output from scripts that run on the _Arc-Data-Client_ or _Arc-Data-CAPI-MGMT_ virtual machines in case of deployment failures. To make troubleshooting easier, the scenario deployment scripts collect all relevant logs in the _C:\Temp_ folder on _Arc-Data-Client_. A short description of the logs and their purpose can be seen in the list below:
+
+| Logfile | Description |
+| ------- | ----------- |
+| _C:\Temp\Bootstrap.log_ | Output from the initial bootstrapping script that runs on _Arc-Data-Client_. |
+| _C:\Temp\DataServicesLogonScript.log_ | Output of _DataServicesLogonScript.ps1_ which configures Azure Arc-enabled data services baseline capability. |
+| _C:\Temp\DeployPostgreSQL.log_ | Output of _deployPostgreSQL.ps1_ which deploys and configures PostgreSQL Hyperscale with Azure Arc. |
+| _C:\Temp\DeploySQLMI.log_ | Output of _deploySQL.ps1_ which deploys and configures SQL Managed Instance with Azure Arc. |
+| _C:\Temp\installCAPI.log_ | Output from the custom script extension which runs on _Arc-Data-CAPI-MGMT_ and configures the Cluster API for Azure cluster and onboards it as an Azure Arc-enabled Kubernetes cluster. If you encounter ARM deployment issues with _ubuntuCapi.json_ then review this log. |
+| _C:\Temp\SQLMIEndpoints.log_ | Output from _SQLMIEndpoints.ps1_ which collects the service endpoints for SQL MI and uses them to configure Azure Data Studio connection settings. |
+
 ## Cleanup
 
 * If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
