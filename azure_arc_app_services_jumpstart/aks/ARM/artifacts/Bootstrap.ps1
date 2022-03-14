@@ -11,7 +11,7 @@ param (
     [string]$deployAppService,
     [string]$deployFunction,
     [string]$deployApiMgmt,
-    [string]$deployLogicApp
+    [string]$deployLogicApp,
     [string]$adminEmail,
     [string]$templateBaseUrl
 )
