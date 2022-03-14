@@ -68,6 +68,7 @@
         },
         "dnsPrefix": {
             "type": "string",
+            "defaultValue": "arcappsvc",
             "metadata": {
                 "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
             }
