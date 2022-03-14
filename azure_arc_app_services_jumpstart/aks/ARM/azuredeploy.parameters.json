@@ -26,12 +26,6 @@
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
         },
-        "kubernetesVersion": {
-            "value": "1.19.11"
-        },
-        "dnsPrefix": {
-            "value": "arcappsvc"
-        },
         "deployAppService": {
             "value": false
         },
@@ -44,11 +38,14 @@
         "deployLogicApp": {
             "value": false
         },
-        "templateBaseUrl": {
-            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/aks/arm_template/"
-        },
         "adminEmail": {
             "value": "<youremail@email.com>"
+        },        
+        "githubAccount": {
+            "value": "microsoft"
+        },
+        "githubBranch": {
+            "value": "main"
         }
     }
 }
