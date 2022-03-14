@@ -25,17 +25,17 @@
     "tags": {
       "type": "object",
       "defaultValue": {
-        "Project": "jumpstart_azure_arc_data"
+        "Project": "jumpstart_azure_arc_app_services"
       }
-    } 
+    }
   },
   "resources": [
     {
       "type": "Microsoft.OperationalInsights/workspaces",
-      "apiVersion": "2020-03-01-preview",
+      "apiVersion": "2021-12-01-preview",
       "name": "[parameters('workspaceName')]",
       "location": "[parameters('location')]",
-      "tags": "[parameters('tags')]",      
+      "tags": "[parameters('tags')]",
       "properties": {
         "sku": {
           "name": "[parameters('sku')]"
