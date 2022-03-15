@@ -11,6 +11,7 @@ $connectedClusterName = "Arc-AppSvc-AKS"
 $namespace="appservices"
 $extensionName = "arc-app-services"
 $extensionVersion = "0.12.2"
+$apiVersion = "2020-07-01-preview"
 $kubeEnvironmentName=$Env:clusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
@@ -38,13 +39,6 @@ az -v
 az account set --subscription $Env:subscriptionId
 
 $aksClusterGroupName = $(az aks show --resource-group $Env:resourceGroup --name $Env:clusterName -o tsv --query nodeResourceGroup)
-
-# # Creating Azure Public IP resource to be used by the Azure Arc app service
-# Write-Host "`n"
-# Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
-# Write-Host "`n"
-# az network public-ip create --resource-group $aksClusterGroupName --name "Arc-AppSvc-PIP" --sku STANDARD
-# $staticIp = $(az network public-ip show --resource-group $aksClusterGroupName --name "Arc-AppSvc-PIP" --output tsv --query ipAddress)
 
 # Registering Azure Arc providers
 Write-Host "`n"
@@ -99,7 +93,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl ge
 Write-Host "Deploying Azure App Service Kubernetes environment"
 Write-Host "`n"
 
-$extensionId = az k8s-extension create `
+az k8s-extension create `
     --resource-group $Env:resourceGroup `
     --name $extensionName `
     --version $extensionVersion `
@@ -120,9 +114,17 @@ $extensionId = az k8s-extension create `
     --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=${aksClusterGroupName}" `
     --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
     --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
-    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"    
+    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
-az resource wait --ids $extensionId --api-version 2020-07-01-preview --custom "properties.installState!='Pending'"
+$extensionId=$(az k8s-extension show `
+    --cluster-type connectedClusters `
+    --cluster-name $Env:clusterName `
+    --resource-group $Env:resourceGroup `
+    --name $extensionName `
+    --query id `
+    --output tsv)
+
+az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version $apiVersion
 
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes...(15s sleeping loop)"
@@ -140,7 +142,7 @@ Write-Host "`n"
 Write-Host "Deploying App Service Kubernetes Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
+# $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $Env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" --query id -o tsv)
 az appservice kube create --resource-group $Env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $Env:azureLocation --output none 
 
