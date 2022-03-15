@@ -11,7 +11,7 @@ $connectedClusterName = "Arc-AppSvc-AKS"
 $namespace="appservices"
 $extensionName = "arc-app-services"
 $extensionVersion = "0.12.2"
-$kubeEnvironmentName=$Env:clusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
+$kubeEnvironmentName=$Env:clusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
@@ -142,7 +142,7 @@ Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $Env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" --query id -o tsv)
-az appservice kube create --resource-group $Env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --static-ip "$staticIp" --location $Env:azureLocation --output none 
+az appservice kube create --resource-group $Env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $Env:azureLocation --output none 
 
 Do {
    Write-Host "Waiting for kube environment to become available. Hold tight, this might take a few minutes...(15s sleeping loop)"
