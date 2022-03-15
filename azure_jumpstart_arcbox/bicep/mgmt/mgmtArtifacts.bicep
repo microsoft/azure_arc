@@ -188,7 +188,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if(deployBast
         name: 'IpConf'
         properties: {
           publicIPAddress: {
-            id: '${publicIpAddress.id}/${bastionPublicIpAddressName}'
+            id: '${publicIpAddress.id}'
           }
           subnet: {
             id: bastionSubnetRef
