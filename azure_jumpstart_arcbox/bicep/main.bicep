@@ -36,10 +36,17 @@ param logAnalyticsWorkspaceName string
 param flavor string = 'Full'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'arcbox_devops_Bastion'
+
+@description('Choice to deploy Bastion to connect to the client VM')
+@allowed([
+  'Yes'
+  'No'
+])
+param deployBastion string = 'No'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
@@ -55,6 +62,7 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
+    deployBastion: deployBastion
   }
 }
 
@@ -70,6 +78,7 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
+    deployBastion: deployBastion
   }
 }
 
@@ -87,6 +96,7 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     templateBaseUrl: templateBaseUrl
     flavor: flavor
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
+    deployBastion: deployBastion
   }
 }
 
@@ -100,5 +110,6 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   params: {
     workspaceName: logAnalyticsWorkspaceName
     flavor: flavor
+    deployBastion: deployBastion
   }
 }

@@ -51,9 +51,21 @@ param logAnalyticsWorkspace string
 @description('The base URL used for accessing artifacts and automation artifacts')
 param templateBaseUrl string
 
+@description('Choice to deploy Bastion to connect to the client VM')
+@allowed([
+  'Yes'
+  'No'
+])
+param deployBastion string = 'No'
+
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
+var bastionSubnetIpPrefix = '172.16.3.0/27'
+var PublicIPNoBastion = {
+  id: resourceId('Microsoft.Network/publicIPAddresses', '${publicIpAddress}')
+}
+
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: networkInterfaceName
@@ -67,9 +79,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIpAddress.id
-          }
+          publicIPAddress: PublicIPNoBastion
         }
       }
     ]
@@ -91,7 +101,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
-          sourceAddressPrefix: myIpAddress
+          sourceAddressPrefix: deployBastion == 'Yes' ? bastionSubnetIpPrefix : myIpAddress
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '22'
@@ -179,7 +189,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if(deployBastion == 'No'){
   name: publicIpAddressName
   location: azureLocation
   properties: {
