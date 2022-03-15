@@ -70,13 +70,13 @@ variable "user_ip_address" {
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
-  default     = "microsoft"
+  default     = "sebassem"
 }
 
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "main"
+  default     = "arcbox_devops_Bastion"
 }
 
 variable "spn_client_id" {
@@ -112,6 +112,16 @@ variable "client_admin_ssh" {
   type        = string
   description = "SSH Key for the Linux VM's."
   sensitive   = true
+}
+
+variable "deploy_bastion" {
+  type        = string
+  description = "Choice to deploy Azure Bastion"
+  default = "No"
+  validation {
+    condition = contains(["Yes","No"],var.deploy_bastion)
+    error_message = "Valid options for Bastion deployment: 'Yes', and 'No'."
+  }
 }
 
 ### This should be swapped to a lower-case value to avoid case sensitivity ###
@@ -151,6 +161,7 @@ module "management_artifacts" {
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [azurerm_resource_group.rg]
 }
@@ -184,6 +195,7 @@ module "client_vm" {
   admin_password       = var.client_admin_password
   github_repo          = var.github_repo
   github_branch        = var.github_branch
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -208,6 +220,7 @@ module "capi_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -232,6 +245,7 @@ module "rancher_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
