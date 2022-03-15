@@ -8,9 +8,6 @@ sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/s
 sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
-# Creating login message of the day (motd)
-sudo curl -o /etc/profile.d/welcomeK3s.sh https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/welcomeK3s.sh
-
 # Injecting environment variables
 echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
@@ -32,6 +29,9 @@ sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 
 chmod +x vars.sh 
 . ./vars.sh
+
+# Creating login message of the day (motd)
+sudo curl -o /etc/profile.d/welcomeCAPI.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
