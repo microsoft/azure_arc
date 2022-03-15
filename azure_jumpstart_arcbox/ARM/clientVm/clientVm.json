@@ -263,7 +263,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "name": "[variables('publicIpAddressName')]",
-            "condition": "[equals(parameters('deployBastion'),'Yes')]",
+            "condition": "[equals(parameters('deployBastion'),'No')]",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
