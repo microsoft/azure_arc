@@ -5,7 +5,7 @@ Write-Host "`n"
 Write-Host "Creting Azure Storage Account for Azure Function application queue usage"
 Write-Host "`n"
 $storageAccountName = "jumpstartappservices" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
-az storage account create --name $storageAccountName --location $env:azureLocation --resource-group $env:resourceGroup --sku Standard_LRS
+az storage account create --name $storageAccountName --location $Env:azureLocation --resource-group $Env:resourceGroup --sku Standard_LRS
 
 # Creating local Azure Function application project
 Write-Host "`n"
@@ -21,9 +21,9 @@ func new --name HttpJumpstart --template "HTTP trigger" --authlevel "anonymous"
 $extensionName = "arc-app-services"
 Write-Host "Creating the new Azure Function application in the Kubernetes environment"
 Write-Host "`n"
-$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
-az functionapp create --resource-group $env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
+az functionapp create --resource-group $Env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
 
 Do {
     Write-Host "Waiting for Azure Function application to become available. Hold tight, this might take a few minutes..."
@@ -72,7 +72,7 @@ $string.Split(' ')[-1] | Out-File C:\Temp\funcStorage.txt
 $string = Get-Content C:\Temp\funcStorage.txt
 $string = $string.TrimEnd(",") | Out-File C:\Temp\funcStorage.txt
 $string = Get-Content C:\Temp\funcStorage.txt
-$env:AZURE_STORAGE_CONNECTION_STRING = $string
+$Env:AZURE_STORAGE_CONNECTION_STRING = $string
 
 # Publishing the Azure Function application to Azure
 Write-Host "`n"

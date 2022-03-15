@@ -1,5 +1,10 @@
 Start-Transcript -Path C:\Temp\AppServicesLogonScript.log
 
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+# Login as service principal
+az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
+
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
 $connectedClusterName = "Arc-AppSvc-AKS"
@@ -11,11 +16,6 @@ $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $En
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
-
-Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
-
-# Login as service principal
-az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
