@@ -115,11 +115,17 @@
             "metadata": {
                 "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
-        },        
+        },
         "templateBaseUrl": {
             "type": "string",
             "metadata": {
                 "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template"
+            }
+        },
+        "deployBastion": {
+            "type": "string",
+            "metadata": {
+                "description": "Choice to deploy Azure Bastion"
             }
         }
     },
@@ -128,7 +134,11 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "osDiskType": "Premium_LRS"
+        "osDiskType": "Premium_LRS",
+        "bastionSubnetIpPrefix": "172.16.3.0/27",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
@@ -149,9 +159,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -174,7 +182,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetIpPrefix'),parameters('myIpAddress'))]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -187,6 +195,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "name": "[variables('publicIpAddressName')]",
+            "condition": "[equals(parameters('deployBastion'),'Yes')]",
             "location": "[parameters('azureLocation')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
