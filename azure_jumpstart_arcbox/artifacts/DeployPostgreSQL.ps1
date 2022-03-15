@@ -1,7 +1,7 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 
-Start-Transcript -Path $Env:ArcBoxLogsDir\deployPostgreSQL.log
+Start-Transcript -Path $Env:ArcBoxLogsDir\DeployPostgreSQL.log
 
 # Deployment environment variables
 $controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
@@ -63,7 +63,7 @@ $pgControllerPodName = "jumpstartpsc0-0"
 $pgWorkerPodName = "jumpstartpsw0-0"
 
     Do {
-        Write-Host "Waiting for PostgreSQL Hyperscale. Hold tight, this might take a few minutes..."
+        Write-Host "Waiting for PostgreSQL Hyperscale. Hold tight, this might take a few minutes...(45s sleeping loop)"
         Start-Sleep -Seconds 45
         $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
