@@ -126,6 +126,7 @@ $extensionId=$(az k8s-extension show `
 
 az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version $apiVersion
 
+Write-Host "`n"
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes...(15s sleeping loop)"
    Start-Sleep -Seconds 15
@@ -143,8 +144,8 @@ Write-Host "Deploying App Service Kubernetes Environment. Hold tight, this might
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
 # $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
-$customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $Env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" --query id -o tsv)
-az appservice kube create --resource-group $Env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $Env:azureLocation --output none 
+$customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $Env:resourceGroup --namespace $namespace --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" --query id -o tsv)
+az appservice kube create --resource-group $Env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $Env:azureLocation --output none
 
 Do {
    Write-Host "Waiting for kube environment to become available. Hold tight, this might take a few minutes...(15s sleeping loop)"
