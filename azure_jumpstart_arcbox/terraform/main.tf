@@ -195,7 +195,6 @@ module "client_vm" {
   admin_password       = var.client_admin_password
   github_repo          = var.github_repo
   github_branch        = var.github_branch
-  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -220,7 +219,6 @@ module "capi_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
-  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -245,7 +243,6 @@ module "rancher_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
-  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
