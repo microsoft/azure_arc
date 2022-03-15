@@ -63,7 +63,7 @@ var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
 var bastionSubnetIpPrefix = '172.16.3.0/27'
 var PublicIPNoBastion = {
-  id: '${publicIpAddress.id}/${publicIpAddressName}'
+  id: '${publicIpAddress.id}'
 }
 
 
