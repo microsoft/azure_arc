@@ -47,6 +47,12 @@
       "metadata": {
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       }
+    },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Choice to deploy Azure Bastion"
+      }
     }
   },
   "variables": {
@@ -66,7 +72,12 @@
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",
-    "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]"
+    "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
+    "bastionName": "ArcBox-Bastion",
+    "bastionSubnetIpPrefix": "172.16.3.0/27",
+    "publicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]"
   },
   "resources": [
     {
@@ -87,6 +98,12 @@
               "addressPrefix": "[variables('subnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[variables('bastionSubnetIpPrefix')]"
             }
           }
         ]
@@ -227,6 +244,48 @@
             "value": "[parameters('flavor')]"
           }
         }
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2019-02-01",
+      "name": "[variables('publicIpAddressName')]",
+      "condition": "[equals(parameters('deployBastion'),'Yes')]" ,
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4",
+        "idleTimeoutInMinutes": 4
+      },
+      "sku": {
+        "name": "Standard"
+      }
+    },
+    {
+      "type": "Microsoft.Network/bastionHosts",
+      "condition": "[equals(parameters('deployBastion'),'Yes')]",
+      "name": "[variables('bastionName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "2020-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
+            "properties": {
+              "subnet": {
+                "id": "[variables('bastionSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              }
+            }
+          }
+        ]
       }
     }
   ]
