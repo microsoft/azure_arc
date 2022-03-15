@@ -194,7 +194,9 @@
             "type": "string",
             "metadata": {
                 "description": "Choice to deploy Azure Bastion"
-            }
+            },
+            "allowedValues": ["Yes","No"],
+            "defaultValue": "No"
         }
     },
     "variables": {

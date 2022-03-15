@@ -79,7 +79,8 @@
             "metadata": {
                 "description": "Choice to deploy Bastion to connect to the client VM"
             },
-            "allowedValues": ["Yes","No"]
+            "allowedValues": ["Yes","No"],
+            "defaultValue" : "No"
         }
   },
   "variables": {
