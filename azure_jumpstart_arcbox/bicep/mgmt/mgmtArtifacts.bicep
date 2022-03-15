@@ -46,7 +46,7 @@ var subnetAddressPrefix = '172.16.1.0/24'
 var addressPrefix = '172.16.0.0/16'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 var bastionSubnetName = 'AzureBastionSubnet'
-var bastionSubnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets','${virtualNetworkName}','${bastionSubnetName}')
+var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'ArcBox-Bastion'
 var bastionSubnetIpPrefix = '172.16.3.0/27'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
@@ -182,17 +182,13 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if(d
 resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if(deployBastion == 'Yes'){
   name: bastionName
   location: location
-  dependsOn: [
-    arcVirtualNetwork
-    publicIpAddress
-  ]
   properties: {
     ipConfigurations: [
       {
         name: 'IpConf'
         properties: {
           publicIPAddress: {
-            id: resourceId('Microsoft.Network/publicIPAddresses',bastionPublicIpAddressName)
+            id: '${publicIpAddress.id}/${bastionPublicIpAddressName}'
           }
           subnet: {
             id: bastionSubnetRef
