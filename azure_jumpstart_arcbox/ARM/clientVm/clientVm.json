@@ -189,6 +189,13 @@
             },
             "allowedValues": [ "Full", "ITPro", "DevOps" ],
             "defaultValue": "Full"
+        },
+        "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Azure Bastion"
+            },
+            "defaultValue": false
         }
     },
     "variables": {
@@ -196,7 +203,11 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "osDiskType": "Premium_LRS"
+        "osDiskType": "Premium_LRS",
+        "bastionSubnetIpPrefix": "172.16.3.0/27",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
@@ -217,9 +228,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -242,7 +251,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),parameters('myIpAddress'))]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
@@ -255,6 +264,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "name": "[variables('publicIpAddressName')]",
+            "condition": "[not(parameters('deployBastion'))]",
             "location": "[parameters('location')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
@@ -346,6 +356,7 @@
             "value": "[parameters('windowsAdminUsername')]"
         },
         "publicIP": {
+            "condition": "[not(parameters('deployBastion'))]",
             "type": "string",
             "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
         }

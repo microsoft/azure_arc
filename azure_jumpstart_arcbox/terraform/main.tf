@@ -114,6 +114,12 @@ variable "client_admin_ssh" {
   sensitive   = true
 }
 
+variable "deploy_bastion" {
+  type        = bool
+  description = "Choice to deploy Azure Bastion"
+  default = false
+}
+
 ### This should be swapped to a lower-case value to avoid case sensitivity ###
 variable "deployment_flavor" {
   type        = string
@@ -151,6 +157,7 @@ module "management_artifacts" {
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [azurerm_resource_group.rg]
 }
@@ -184,6 +191,7 @@ module "client_vm" {
   admin_password       = var.client_admin_password
   github_repo          = var.github_repo
   github_branch        = var.github_branch
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -208,6 +216,7 @@ module "capi_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -232,6 +241,7 @@ module "rancher_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
