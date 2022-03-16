@@ -223,4 +223,4 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' =
 }
 
 output adminUsername string = windowsAdminUsername
-output publicIP string = concat(publicIpAddress.properties.ipAddress)
+output publicIP string = deployBastion=='No' ? concat(publicIpAddress.properties.ipAddress) : ''
