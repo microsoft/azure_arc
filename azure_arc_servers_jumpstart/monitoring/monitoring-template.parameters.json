@@ -6,7 +6,7 @@
             "value": "<name of your your Log Analytics workspace>" // Name for your Log Analytics workspace
         },
         "emailAddress": {
-            "value": "<your email account>" // Just one email account
+            "value": "<your email account>" // Just one email account for Azure Monitor alerts notifications
         }
     }
 }

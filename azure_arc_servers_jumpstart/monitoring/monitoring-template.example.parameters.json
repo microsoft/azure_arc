@@ -6,7 +6,7 @@
             "value": "la-arc-servers" // Name for your Log Analytics workspace
         },
         "emailAddress": {
-            "value": "youremail@domain.com" // Just one email account
+            "value": "youremail@domain.com" // Just one email account for Azure Monitor alerts notifications
         }
     }
 }
