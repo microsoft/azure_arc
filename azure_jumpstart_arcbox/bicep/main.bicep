@@ -42,11 +42,7 @@ param githubAccount string = 'microsoft'
 param githubBranch string = 'main'
 
 @description('Choice to deploy Bastion to connect to the client VM')
-@allowed([
-  'Yes'
-  'No'
-])
-param deployBastion string = 'No'
+param deployBastion bool = false
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 

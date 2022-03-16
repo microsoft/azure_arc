@@ -90,7 +90,7 @@ param flavor string = 'Full'
   'Yes'
   'No'
 ])
-param deployBastion string = 'No'
+param deployBastion bool = false
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -112,7 +112,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: deployBastion == 'No' ? PublicIPNoBastion : json('null')
+          publicIPAddress: deployBastion == false ? PublicIPNoBastion : json('null')
         }
       }
     ]
@@ -134,7 +134,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
-          sourceAddressPrefix: deployBastion == 'Yes' ? bastionSubnetIpPrefix : myIpAddress
+          sourceAddressPrefix: deployBastion == true ? bastionSubnetIpPrefix : myIpAddress
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '3389'
@@ -144,7 +144,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if(deployBastion == 'No'){
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if(deployBastion == false){
   name: publicIpAddressName
   location: location
   properties: {
@@ -223,4 +223,4 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' =
 }
 
 output adminUsername string = windowsAdminUsername
-output publicIP string = deployBastion=='No' ? concat(publicIpAddress.properties.ipAddress) : ''
+output publicIP string = deployBastion==false ? concat(publicIpAddress.properties.ipAddress) : ''

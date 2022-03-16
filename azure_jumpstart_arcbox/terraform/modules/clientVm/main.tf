@@ -124,13 +124,9 @@ variable "trigger_at_logon" {
 }
 
 variable "deploy_bastion" {
-  type       = string
+  type       = bool
   description = "Choice to deploy Bastion to connect to the client VM"
-  default = "No"
-  validation {
-    condition = contains(["Yes","No"],var.deploy_bastion)
-    error_message = "Valid options for Bastion deployment: 'Yes', and 'No'."
-  }
+  default = false
 }
 
 ### THESE ARE LEGACY VARIABLES FOR BACKWARDS COMPATIBILITY WITH LEGACY SCRIPT FUNCTIONS ###
@@ -211,7 +207,7 @@ data "azurerm_subnet" "subnet" {
 }
 
 resource "azurerm_public_ip" "pip" {
-  count               = var.deploy_bastion == "No" ? 1: 0
+  count               = var.deploy_bastion == false ? 1: 0
   name                = local.public_ip_name
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
@@ -231,7 +227,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "3389"
-    source_address_prefix      =  var.deploy_bastion == "Yes" ? local.bastionSubnetIpPrefix : var.user_ip_address
+    source_address_prefix      =  var.deploy_bastion == true ? local.bastionSubnetIpPrefix : var.user_ip_address
     destination_address_prefix = "*"
   }
 }
@@ -245,7 +241,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = var.deploy_bastion == "No" ? azurerm_public_ip.pip[0].id : null
+    public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }
 

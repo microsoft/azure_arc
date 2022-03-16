@@ -115,13 +115,9 @@ variable "client_admin_ssh" {
 }
 
 variable "deploy_bastion" {
-  type        = string
+  type        = bool
   description = "Choice to deploy Azure Bastion"
-  default = "No"
-  validation {
-    condition = contains(["Yes","No"], var.deploy_bastion)
-    error_message = "Valid options for Bastion deployment: 'Yes', and 'No'."
-  }
+  default = false
 }
 
 ### This should be swapped to a lower-case value to avoid case sensitivity ###

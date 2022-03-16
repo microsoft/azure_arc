@@ -19,13 +19,9 @@ variable "workspace_name" {
 }
 
 variable "deploy_bastion" {
-  type       = string
+  type       = bool
   description = "Choice to deploy Bastion to connect to the client VM"
-  default = "No"
-  validation {
-    condition = contains(["Yes","No"],var.deploy_bastion)
-    error_message = "Valid options for Bastion deployment: 'Yes', and 'No'."
-  }
+  default = false
 }
 locals {
   vnet_address_space    = ["172.16.0.0/16"]
@@ -102,7 +98,7 @@ resource "azurerm_log_analytics_linked_service" "linked_service" {
 }
 
 resource "azurerm_public_ip" "publicIpAddress" {
-  count               = var.deploy_bastion == "Yes" ? 1: 0
+  count               = var.deploy_bastion == true ? 1: 0
   resource_group_name = data.azurerm_resource_group.rg.name
   name                = local.bastionPublicIpAddressName
   location            = data.azurerm_resource_group.rg.location
@@ -117,7 +113,7 @@ resource "azurerm_bastion_host" "bastionHost" {
   name                = local.bastionName
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  count               = var.deploy_bastion == "Yes" ? 1: 0
+  count               = var.deploy_bastion == true ? 1: 0
   depends_on = [
     azurerm_public_ip.publicIpAddress
   ]

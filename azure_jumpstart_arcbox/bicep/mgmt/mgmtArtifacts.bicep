@@ -22,11 +22,7 @@ param location string = resourceGroup().location
 param sku string = 'pergb2018'
 
 @description('Choice to deploy Bastion to connect to the client VM')
-@allowed([
-  'Yes'
-  'No'
-])
-param deployBastion string = 'No'
+param deployBastion bool = false
 
 var updates = {
   name: 'Updates(${workspaceName})'
@@ -166,7 +162,7 @@ resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedSer
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if(deployBastion == 'Yes'){
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if(deployBastion == true){
   name: bastionPublicIpAddressName
   location: location
   properties:{
@@ -179,7 +175,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if(d
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if(deployBastion == 'Yes'){
+resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if(deployBastion == true){
   name: bastionName
   location: location
   properties: {
