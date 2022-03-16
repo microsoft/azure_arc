@@ -54,7 +54,7 @@
             "value": "Arc-AppSvc-Bastion"
         },
         "deployBastion": {
-            "value": "No"
+            "value": false
         }
     }
 }
