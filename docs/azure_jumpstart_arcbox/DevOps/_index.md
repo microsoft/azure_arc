@@ -28,6 +28,8 @@ ArcBox deploys two Kubernetes clusters.
 - One single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource (_ArcBox-K3s_).
 - ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider Azure(CAPZ), and a workload cluster is deployed onto the management cluster.
 
+### App 
+
 ### GitOps
 
 Lorem ipsum dolor whatever
@@ -324,6 +326,8 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
 - thing 1
 - thing 2
+
+### App
 
 ### GitOps configurations
 
