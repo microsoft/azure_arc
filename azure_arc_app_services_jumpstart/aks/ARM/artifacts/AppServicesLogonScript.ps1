@@ -18,6 +18,9 @@ $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
+# Running Jumpstart global artifacts automation
+& "C:\Temp\globalArtifacts.ps1"
+
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
