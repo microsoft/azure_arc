@@ -40,7 +40,17 @@ Lorem ipsum dolor whatever
 
 ### Microsoft Defender for Cloud / k8s integration
 
-Lorem ipsum dolor whatever
+ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources, one of these services is Microsoft Defender for Cloud that is deployed by installing the [Defender extension](https://docs.microsoft.com/azure/defender-for-cloud/defender-for-containers-enable?tabs=aks-deploy-portal%2Ck8s-deploy-cli%2Ck8s-verify-cli%2Ck8s-remove-arc%2Caks-removeprofile-api#protect-arc-enabled-kubernetes-clusters) on your Kubernetes cluster in order to start collecting security related logs and telemetry.  
+
+Kubernetes extensions are add-ons for Kubernetes clusters. The extensions feature on Azure Arc-enabled Kubernetes clusters enables usage of Azure Resource Manager based APIs, CLI and portal UX for deployment of extension components (Helm charts in initial release) and will also provide lifecycle management capabilities such as auto/manual extension version upgrades for the extensions.
+
+After you have finished the deployment of ArBox for DevOps, you can verify that Microsoft Defender for Cloud is working properly and alerting on security threats, by running the below command to simulate an alert:
+
+  ```bash
+  kubectl get pods --namespace=asc-alerttest-662jfi039n --kubeconfig <cluster-name>.kubeconfig
+  ```
+
+Within 30 minutes Microsoft Defender for Cloud will detect this event and trigger a security alert that you wil see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled cluster.
 
 ### Cluster connect??
 
