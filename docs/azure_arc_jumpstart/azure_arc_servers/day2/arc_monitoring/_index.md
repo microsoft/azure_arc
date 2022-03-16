@@ -97,13 +97,13 @@ In this guide, you will create the following Azure resources that support this A
 
     ![Screenshot showing Azure Portal hidden resources](./06.png)
 
-## Confirm that all the Azure Monitor deployed resources are configured
+## Review that all the Azure Monitor deployed resources are configured
 
-- Click on the **Policies** blade of the **resource group** where you deployed this scenario. Verify that the following **policies** are assigned:
+- Click on the **Policies** blade of the **resource group** where you deployed this scenario. Review that the following **four policies** are assigned:
 
     ![Screenshot showing Azure Policies assigned at resource group](./07.png)
 
-- Click on the **Agents Configuration** blade of the **Log Analytics workspace**. Verify that the following **data sources** are enabled:
+- Click on the **Agents Configuration** blade of the **Log Analytics workspace**. Review that the following **data sources** are already enabled as shown in the screenshots:
 
     ![Screenshot showing Windows Events of Log Analytics workspace](./08.png)
 
@@ -113,7 +113,7 @@ In this guide, you will create the following Azure resources that support this A
 
     ![Screenshot showing Syslog of Log Analytics workspace](./11.png)
 
-- Click on the **Solutions** blade of the **Log Analytics workspace**. Verify that  **VMInsights** solution is enabled:
+- Click on the **Solutions** blade of the **Log Analytics workspace**. Review that  **VMInsights** solution is enabled:
 
     ![Screenshot showing VMInsights solution of Log Analytics workspace](./12.png)
 
@@ -121,11 +121,11 @@ In this guide, you will create the following Azure resources that support this A
 
     ![Screenshot showing steps to list action groups](./13.png)
 
-- Filter by **Subscription** and **Resource Group**. Verify that the following **action group** is created:
+- Filter by **Subscription** and **Resource Group**. Review that the following **action group** is created:
 
     ![Screenshot showing action group created](./14.png)
 
-- Click on the **action group name**, then on the **edit** button. Verify the **email account** is the one you provided in the **parameters file**:
+- Click on the **action group name**, then on the **edit** button. Review that the **email account** is the one you provided in the **parameters file**:
 
     ![Screenshot showing how to click on action group name](./15.png)
 
@@ -135,7 +135,7 @@ In this guide, you will create the following Azure resources that support this A
 
     ![Screenshot showing steps to list alerts](./17.png)
 
-- Filter by **Subscription** and **Resource Group**. Verify the following **alerts** are enabled:
+- Filter by **Subscription** and **Resource Group**. Review that the following **alerts** are enabled:
 
     ![Screenshot showing created alerts](./18.png)
 
@@ -167,7 +167,7 @@ For **existing** Azure Arc-enabled servers connected within the scope of the pol
 
    ![Screenshot showing Azure Policy compliant results](./22.png)
 
-- The agents will be installed as extensions in the Azure Arc-enabled server:
+- The agents will be installed as **extensions** in the Azure Arc-enabled server:
 
    ![Screenshot showing agent extensions on Azure Arc-enabled server](./23.png)
 
@@ -208,7 +208,7 @@ Once the data starts arriving into the Log Analytics workspace, we can leverage 
 
    ![Screenshot showing how to get into the OSPerformanceAndCapacity workbook](./30.png)
 
-- This workbook, apart from the **Top servers** summary table available at the top of the **shared dashboard**, shows two charts for each of some the key OS performance counters:
+- This workbook, apart from the **Top servers** summary table available at the top of the **shared dashboard**, shows two charts for each of some of the key OS performance counters:
 
    ![Screenshot showing performance charts of the OSPerformanceAndCapacity workbook](./31.png)
 
