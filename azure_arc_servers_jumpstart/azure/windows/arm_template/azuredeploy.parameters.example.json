@@ -33,7 +33,7 @@
       "value": "eastus"
     },
     "deployBastion": {
-        "value": "Yes"
+        "value": false
     },
     "bastionHostName": {
       "value": "Arc-Win-Demo-Bastion"
