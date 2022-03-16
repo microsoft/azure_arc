@@ -357,6 +357,7 @@
             "value": "[parameters('windowsAdminUsername')]"
         },
         "publicIP": {
+            "condition": "[equals(parameters('deployBastion'),'No')]",
             "type": "string",
             "value": "[concat(reference(variables('publicIPAddressName')).IpAddress)]"
         }
