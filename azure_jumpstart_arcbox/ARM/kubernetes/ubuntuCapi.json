@@ -123,12 +123,11 @@
             }
         },
         "deployBastion": {
-            "type": "string",
+            "type": "bool",
             "metadata": {
                 "description": "Choice to deploy Azure Bastion"
             },
-            "allowedValues": ["Yes","No"],
-            "defaultValue" : "No"
+            "defaultValue" : false
         }
     },
     "variables": {
@@ -161,7 +160,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -184,7 +183,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetIpPrefix'),parameters('myIpAddress'))]",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),parameters('myIpAddress'))]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -197,7 +196,7 @@
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "name": "[variables('publicIpAddressName')]",
-            "condition": "[equals(parameters('deployBastion'),'No')]",
+            "condition": "[not(parameters('deployBastion'))]",
             "location": "[parameters('azureLocation')]",
             "properties": {
                 "publicIpAllocationMethod": "Static",
