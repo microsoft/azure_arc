@@ -33,7 +33,7 @@
       "value": "Arc-Servers-Linux-Demo"
     },
     "deployBastion": {
-      "value": "Yes"
+      "value": false
     },
     "bastionHostName": {
       "value": "Arc-Linux-Demo-Bastion"

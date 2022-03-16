@@ -67,11 +67,10 @@
       }
     },
     "deployBastion": {
-      "type": "string",
+      "type": "bool",
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
-      },
-      "allowedValues": [ "Yes", "No" ]
+      }
     },
     "bastionHostName": {
       "type": "string",
@@ -142,7 +141,6 @@
     "subnetAddressPrefix": "10.1.0.0/24",
     "addressPrefix": "10.1.0.0/16",
     "bastionName": "[concat(parameters('bastionHostName'))]",
-    "deployBastion": "[concat(parameters('deployBastion'))]",
     "bastionSubnetIpPrefix": "10.1.1.0/27",
     "PublicIPNoBastion": {
       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
@@ -179,7 +177,7 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": "[if(equals(variables('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
+              "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ],
@@ -202,7 +200,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[if(equals(variables('deployBastion'),'Yes'),variables('bastionSubnetIpPrefix'),'*')]",
+              "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),'*')]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "22"
@@ -246,7 +244,7 @@
       "name": "[variables('publicIpAddressName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "[if(equals(variables('deployBastion'),'No'),'Basic','Standard')]"
+        "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
       },
       "properties": {
         "publicIpAllocationMethod": "Static",
@@ -321,7 +319,7 @@
     },
     {
       "type": "Microsoft.Network/bastionHosts",
-      "condition": "[equals(variables('deployBastion'),'Yes')]",
+      "condition": "[parameters('deployBastion')]",
       "name": "[variables('bastionName')]",
       "location": "[parameters('location')]",
       "apiVersion": "2020-11-01",

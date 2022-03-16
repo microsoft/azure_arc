@@ -21,7 +21,7 @@
       "value": "<Your Subscription ID>"
     },
     "deployBastion": {
-      "value": "<Yes | No>"
+      "value": "<true | false>"
     },
     "bastionHostName": {
       "value": "<Azure Bastion Host name>"
