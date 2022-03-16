@@ -73,7 +73,14 @@
         "description": "Target GitHub branch"
       },
       "defaultValue": "main"
-    }
+    },
+    "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            },
+            "defaultValue" : false
+        }
   },
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_jumpstart_arcbox/')]",
@@ -117,9 +124,12 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },          
+          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -160,6 +170,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -205,6 +218,9 @@
           },
           "flavor": {
             "value": "[parameters('flavor')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -240,6 +256,9 @@
           },
           "flavor": {
             "value": "[parameters('flavor')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
