@@ -65,14 +65,14 @@
       "metadata": {
         "description": "Target GitHub account"
       },
-      "defaultValue": "sebassem"
+      "defaultValue": "microsoft"
     },
     "githubBranch": {
       "type": "string",
       "metadata": {
         "description": "Target GitHub branch"
       },
-      "defaultValue": "arcbox_devops_Bastion"
+      "defaultValue": "main"
     },
     "deployBastion": {
             "type": "string",
