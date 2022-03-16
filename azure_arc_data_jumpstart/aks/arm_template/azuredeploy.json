@@ -100,11 +100,11 @@
       }
     },
     "deployBastion": {
-      "type": "string",
+      "type": "bool",
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
       },
-      "allowedValues": [ "Yes", "No" ]
+      "defaultValue" : false
     },
     "bastionHostName": {
       "type": "string",
