@@ -82,10 +82,23 @@ variable "workspace_name" {
   description = "Log Analytics workspace name"
 }
 
+variable "deploy_bastion" {
+  type       = string
+  description = "Choice to deploy Bastion to connect to the client VM"
+  default = "No"
+  validation {
+    condition = contains(["Yes","No"],var.deploy_bastion)
+    error_message = "Valid options for Bastion deployment: 'Yes', and 'No'."
+  }
+}
 locals {
     public_ip_name         = "${var.vm_name}-PIP"
     nsg_name               = "${var.vm_name}-NSG"
     network_interface_name = "${var.vm_name}-NIC"
+    bastionSubnetIpPrefix  = "172.16.3.0/27"
+    PublicIPNoBastion      = {
+      id = "${azurerm_public_ip.pip.id}"
+      }
 }
 
 data "azurerm_subscription" "primary" {
@@ -106,6 +119,7 @@ resource "azurerm_public_ip" "pip" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   allocation_method   = "Static"
+  count               = var.deploy_bastion == "No" ? 1: 0
 }
 
 resource "azurerm_network_security_group" "nsg" {
@@ -121,7 +135,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = var.user_ip_address
+    source_address_prefix      = var.deploy_bastion == "Yes" ? local.bastionSubnetIpPrefix : var.user_ip_address
     destination_address_prefix = "*"
   }
 }
@@ -135,7 +149,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pip.id
+    public_ip_address_id          = var.deploy_bastion == "No" ? azurerm_public_ip.pip.id : json("null")
   }
 }
 
