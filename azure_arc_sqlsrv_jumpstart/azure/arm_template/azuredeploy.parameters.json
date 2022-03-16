@@ -33,7 +33,7 @@
       "value": "<Azure region>"
     },
     "deployBastion": {
-      "value": "<Yes | No>"
+      "value": "<true | false>"
     },
     "bastionHostName": {
       "value": "<Azure Bastion Host name>"
