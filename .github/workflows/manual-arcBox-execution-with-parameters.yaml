@@ -1,0 +1,271 @@
+name: Manual ArcBox Execution with parameters
+on:
+  workflow_dispatch:
+    inputs:
+      flavor:
+        type: choice
+        description: "Flavor to be executed"
+        required: true
+        options:
+          - Full
+          - ITPro
+          - DevOps
+      mechanism:
+        type: choice
+        description: "Kind of deploy tool"
+        required: true
+        options:
+          - Arm
+          - Bicep
+          - Terraform
+      githubBranch:
+        description: "git hub branch to take the scripts"
+        required: true
+        default: "main"
+      resourceGroupName:
+        description: "resource group where we will deploy"
+        required: true
+        default: "arcbox-test-rg"
+      location:
+        description: "location where we will deploy"
+        required: true
+        default: "westus2"
+      logAnalyticsWorkspaceName:
+        description: "Name of log Analytics Workspace"
+        required: true
+        default: "MyAnalyticsWorkspace123"
+      myPublicIp:
+        description: "your public ip to allow access by RDP"
+        required: true
+        default: "45.191.156.175"
+      windowsAdminUsername:
+        description: "Windows admin username"
+        required: true
+        default: "arcdemo"
+      deployBastion:
+        type: boolean
+        description: "Choice to deploy Bastion to connect to the client VM"
+        required: true
+        default: false       
+jobs:
+  BashScriptAnalyzerTool:
+    runs-on: ubuntu-latest
+    env:
+      ExcludeRules: SC2148,SC2116,SC2044
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.githubBranch }}
+      - name: Validate Bash Script
+        run: |
+          chmod +x ./azure_jumpstart_arcbox/artifacts/GHAction/BashStaticCheck.sh
+          ./azure_jumpstart_arcbox/artifacts/GHAction/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts
+        continue-on-error: true
+
+  PowerShellToolkit:
+    runs-on: windows-latest
+    env:
+      ExcludeRules: "PSAvoidUsingInvokeExpression,PSAvoidTrailingWhitespace"
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.githubBranch }}
+      - name: Validate Power Shell
+        run: |
+          .\azure_jumpstart_arcbox\artifacts\GHAction\PowerShellStaticCheck.ps1 $Env:ExcludeRules .\azure_jumpstart_arcbox\artifacts
+        continue-on-error: true
+
+  armTemplateToolkit:
+    runs-on: windows-latest
+    env:
+      ExcludeRules: "Secure-String-Parameters-Cannot-Have-Default,CommandToExecute-Must-Use-ProtectedSettings-For-Secrets"
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.githubBranch }}
+      - name: Compile bicep
+        run: |
+          az bicep build --file "azure_jumpstart_arcbox/bicep/main.bicep"
+      - name: Check Bicep
+        run: |
+          .\azure_jumpstart_arcbox\artifacts\GHAction\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
+        continue-on-error: true
+      - name: Check ARM
+        run: |
+          .\azure_jumpstart_arcbox\artifacts\GHAction\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules
+        continue-on-error: true
+
+  deployValidateAndClean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check inputs values
+        run: |
+          echo "flavor selected: ${{ github.event.inputs.flavor }}"
+          echo "mechanism selected: ${{ github.event.inputs.mechanism }}" 
+          echo "githubAccount selected: ${GITHUB_REPOSITORY_OWNER}"
+          echo "githubBranch selected: ${{ github.event.inputs.githubBranch }}"
+          echo "resourceGroupName selected: ${{ github.event.inputs.resourceGroupName }}"
+          echo "location selected: ${{ github.event.inputs.location }}"
+          echo "logAnalyticsWorkspaceName selected: ${{ github.event.inputs.logAnalyticsWorkspaceName }}"
+          echo "myPublicIp selected: ${{ github.event.inputs.myPublicIp }}"
+          echo "windowsAdminUsername selected: ${{ github.event.inputs.windowsAdminUsername }}"
+          echo "deployBastion selected: ${{ github.event.inputs.deployBastion }}"
+      - name: Install package for ssh with password inline
+        run: |
+          sudo apt-get -y install putty-tools
+          sudo apt-get -y install sshpass
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        if: github.event.inputs.mechanism == 'Terraform'
+        with:
+          terraform_version: 1.0.11
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.githubBranch }}
+      - name: Azure Login
+        uses: Azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy ArcBox - Arm
+        uses: Azure/cli@v1.0.6
+        if: github.event.inputs.mechanism == 'Arm'
+        with:
+          inlineScript: |
+            az group create --name ${{ github.event.inputs.resourceGroupName }} --location ${{ github.event.inputs.location }}
+            az deployment group create -g  ${{ github.event.inputs.resourceGroupName }} -f "azure_jumpstart_arcbox/ARM/azuredeploy.json" -p sshRSAPublicKey='${{secrets.SSH_RSA_PUBLIC_KEY}}' spnClientId=${{secrets.SPN_CLIENT_ID}} spnClientSecret=${{secrets.SPN_CLIENT_SECRET}} spnTenantId=${{secrets.SPN_TENANT_ID}} windowsAdminUsername=${{ github.event.inputs.windowsAdminUsername }} windowsAdminPassword=${{secrets.WINDOWS_ADMIN_PASSWORD}} myIpAddress=${{ github.event.inputs.myPublicIp }} logAnalyticsWorkspaceName=${{ github.event.inputs.logAnalyticsWorkspaceName }} flavor=${{ github.event.inputs.flavor }} githubAccount="${GITHUB_REPOSITORY_OWNER}" githubBranch=${{github.event.inputs.githubBranch}} deployBastion=${{github.event.inputs.deployBastion}}
+      - name: Deploy ArcBox - Bicep
+        uses: Azure/cli@v1.0.6
+        if: github.event.inputs.mechanism == 'Bicep'
+        with:
+          inlineScript: |
+            az group create --name ${{ github.event.inputs.resourceGroupName }} --location ${{ github.event.inputs.location }}
+            az deployment group create -g  ${{ github.event.inputs.resourceGroupName }} -f "azure_jumpstart_arcbox/bicep/main.bicep" -p sshRSAPublicKey='${{secrets.SSH_RSA_PUBLIC_KEY}}' spnClientId=${{secrets.SPN_CLIENT_ID}} spnClientSecret=${{secrets.SPN_CLIENT_SECRET}} spnTenantId=${{secrets.SPN_TENANT_ID}} windowsAdminUsername=${{ github.event.inputs.windowsAdminUsername }} windowsAdminPassword=${{secrets.WINDOWS_ADMIN_PASSWORD}} myIpAddress=${{ github.event.inputs.myPublicIp }} logAnalyticsWorkspaceName=${{ github.event.inputs.logAnalyticsWorkspaceName }} flavor=${{ github.event.inputs.flavor }} githubAccount="${GITHUB_REPOSITORY_OWNER}" githubBranch=${{github.event.inputs.githubBranch}} deployBastion=${{github.event.inputs.deployBastion}}
+      - name: Deploy ArcBox - Terraform
+        if: github.event.inputs.mechanism == 'Terraform'
+        run: |
+          cd azure_jumpstart_arcbox
+          cd terraform
+          echo "${{secrets.SSH_RSA_PUBLIC_KEY}}" > ./rsa.pub
+          path=$(realpath ./rsa.pub)
+
+          > azure_jumpstart_arcbox\terraform\terraform.tfvars
+          echo "resource_group_name=\"${{ github.event.inputs.resourceGroupName }}\"" >> terraform.tfvars
+          echo "azure_location=\"${{ github.event.inputs.location }}\"" >> terraform.tfvars
+          echo "spn_client_id=\"${{secrets.SPN_CLIENT_ID}}\"" >> terraform.tfvars
+          echo "spn_client_secret=\"${{secrets.SPN_CLIENT_SECRET}}\"" >> terraform.tfvars
+          echo "spn_tenant_id=\"${{secrets.SPN_TENANT_ID}}\"" >> terraform.tfvars
+          echo "user_ip_address=\"${{ github.event.inputs.myPublicIp }}\"" >> terraform.tfvars
+          echo "client_admin_ssh=\"$path\"" >> terraform.tfvars
+          echo "client_admin_username=\"${{ github.event.inputs.windowsAdminUsername }}\"" >> terraform.tfvars
+          echo "client_admin_password=\"${{secrets.WINDOWS_ADMIN_PASSWORD}}\"" >> terraform.tfvars
+          echo "deployment_flavor=\"${{ github.event.inputs.flavor }}\"" >> terraform.tfvars
+          echo "workspace_name=\"${{ github.event.inputs.logAnalyticsWorkspaceName }}\"" >>terraform.tfvars
+          echo "github_repo=\"${GITHUB_REPOSITORY_OWNER}\"" >>terraform.tfvars
+          echo "github_branch=\"${{ github.event.inputs.githubBranch }}\"" >>terraform.tfvars
+          echo "deploy_bastion=\"${{ github.event.inputs.deployBastion }}\"" >>terraform.tfvars
+
+          export ARM_CLIENT_ID="${{secrets.SPN_CLIENT_ID}}"
+          export ARM_CLIENT_SECRET="${{secrets.SPN_CLIENT_SECRET}}"
+          export ARM_SUBSCRIPTION_ID="${{secrets.SPN_SUBSCRIPTION_ID}}"
+          export ARM_TENANT_ID="${{secrets.SPN_TENANT_ID}}"
+          terraform init -input=false
+          terraform plan -out=infra.out
+          terraform apply -input=false "infra.out"
+
+          cd ..
+          cd ..
+      - name: Add NSG Rule to open our SSH Port (2204) and Run Command requires connectivity to Azure public IP addresses
+        uses: Azure/cli@v1.0.6
+        with:
+          inlineScript: |
+            az network nsg rule create -g  ${{ github.event.inputs.resourceGroupName }} --nsg-name 'ArcBox-NSG' -n 'AllowOpenSsh' --source-port-ranges  '*' --source-address-prefixes '*' --priority 1100 --destination-address-prefixes  '*' --destination-port-ranges '2204' --direction Inbound --access Allow --protocol Tcp --description "Allow Open SSH"
+            az network nsg rule create -g  ${{ github.event.inputs.resourceGroupName }} --nsg-name 'ArcBox-NSG' -n 'AllowAzureCloud' --source-port-ranges  '*' --source-address-prefixes 'AzureCloud' --priority 1200 --destination-address-prefixes  '*' --destination-port-ranges '*' --direction Inbound --access Allow --protocol '*' --description "Allow allow azure ips"
+            az network nsg rule create -g  ${{ github.event.inputs.resourceGroupName }} --nsg-name 'ArcBox-NSG' -n 'AllowAzureCloudOutBound' --source-port-ranges  '*' --source-address-prefixes '*' --priority 1300 --destination-address-prefixes  'AzureCloud' --destination-port-ranges '*' --direction Outbound --access Allow --protocol '*' --description "Allow allow azure ips outbound"
+      - name: Count Resources pre vm Script execution
+        uses: Azure/cli@v1.0.6
+        with:
+          inlineScript: |
+            chmod +x ./azure_jumpstart_arcbox/artifacts/GHAction/CountResources.sh
+            ./azure_jumpstart_arcbox/artifacts/GHAction/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./azure_jumpstart_arcbox/DeployTestParameters.json
+      - name: Install Open SSH + execute ArcServersLogonScript
+        run: |
+          az vm run-command invoke -g  ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --command-id RunPowerShellScript --scripts "C:\ArcBox\GHActionDeploy.ps1"
+        continue-on-error: true
+      - name: Auto-storing server host key in cache and Create directory
+        run: |
+          echo y | plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' "exit"
+          plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'cd'
+      - name: Check ArcServersLogonScript and Open SSH completion
+        run: |
+          finishedScript=$(plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv) -pw '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch  "powershell -Command Test-Path -Path ../../ArcBox/Logs/OpenSSHDeployed.txt")
+          if [ $(echo $finishedScript | grep 'True' | wc -l) == 0 ]; then
+             echo "The files which tell us that the script has finished was not found"
+             exit 1
+          fi
+      - name: Open SSH, execute DataServicesLogonScript
+        if: github.event.inputs.flavor == 'Full'
+        run: |
+          plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'powershell -InputFormat None -F C:\ArcBox\DataServicesLogonScript.ps1'
+      - name: Open SSH, execute DevOpsLogonScript
+        if: github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps'
+        run: |
+          plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'powershell -InputFormat None -F C:\ArcBox\DevOpsLogonScript.ps1'
+      - name: Open SSH, execute MonitorWorkbookLogonScript
+        run: |
+          plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'powershell -InputFormat None -F C:\ArcBox\MonitorWorkbookLogonScript.ps1'
+      - name: Download logs from VM
+        run: |
+          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'
+          if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'ITPro' ]; then
+           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\ArcServersLogonScript.log' '.'
+          fi
+          if [ '${{ github.event.inputs.flavor }}' == 'Full' ]; then
+           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DataServicesLogonScript.log' '.'
+          fi 
+          if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'DevOps' ]; then
+           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DevOpsLogonScript.log' '.'
+          fi           
+          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\MonitorWorkbookLogonScript.log' '.'
+      - name: Upload Bootstrap.log File
+        uses: actions/upload-artifact@v3
+        with:
+          name: Bootstrap.log
+          path: Bootstrap.log
+      - name: Upload ArcServersLogonScript.log File
+        uses: actions/upload-artifact@v3
+        if: github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'ITPro'
+        with:
+          name: ArcServersLogonScript.log
+          path: ArcServersLogonScript.log
+      - name: Upload DataServicesLogonScript.log File
+        uses: actions/upload-artifact@v3
+        if: github.event.inputs.flavor == 'Full'
+        with:
+          name: DataServicesLogonScript.log
+          path: DataServicesLogonScript.log
+      - name: Upload DevOpsLogonScript.log File
+        uses: actions/upload-artifact@v3
+        if: github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps'
+        with:
+          name: DevOpsLogonScript.log
+          path: DevOpsLogonScript.log                
+      - name: Upload MonitorWorkbookLogonScript.log File
+        uses: actions/upload-artifact@v3
+        with:
+          name: MonitorWorkbookLogonScript.log
+          path: MonitorWorkbookLogonScript.log
+      - name: Final Deploy Validation
+        uses: Azure/cli@v1.0.6
+        with:
+          inlineScript: |
+            chmod +x ./azure_jumpstart_arcbox/artifacts/GHAction/FinalValidation.sh
+            ./azure_jumpstart_arcbox/artifacts/GHAction/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./azure_jumpstart_arcbox/DeployTestParameters.json
+      - name: Delete Resources
+        uses: Azure/cli@v1.0.6
+        with:
+          inlineScript: |
+            az group delete -n ${{ github.event.inputs.resourceGroupName }} -y
