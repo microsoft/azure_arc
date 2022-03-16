@@ -48,7 +48,7 @@
             "value": "Arc-Data-Demo-Bastion"
         },
         "deployBastion": {
-            "value": "No"
+            "value": false
         }
     }
 }
