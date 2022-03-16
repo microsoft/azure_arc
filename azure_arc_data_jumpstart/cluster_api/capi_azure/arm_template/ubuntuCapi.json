@@ -110,10 +110,11 @@
             }
         },
         "deployBastion": {
-            "type": "string",
+            "type": "bool",
             "metadata": {
                 "description": "Choice to deploy Bastion to connect to the client VM"
-            }
+            },
+            "defaultValue": false
         },
         "bastionHostName": {
             "type": "string",
@@ -161,7 +162,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(equals(parameters('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -184,7 +185,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(equals(parameters('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -233,7 +234,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "[if(equals(parameters('deployBastion'),'No'),'Basic','Standard')]",
+                "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },

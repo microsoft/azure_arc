@@ -12,7 +12,7 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller, SQL Managed Instance, and a Microsoft Windows Server 2022 (Datacenter) Azure client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
-![Deployed Architecture](./41.png)
+![Deployed Architecture](./42.png)
 
 > **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -106,7 +106,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
   * `kubernetesVersion` - AKS version
   * `dnsPrefix` - AKS unique DNS prefix
-  * `deployBastion` - Choice (Yes | No) to deploy Azure Bastion or not to connect to the client VM.
+  * `deployBastion` - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
   * `bastionHostName` - Azure Bastion host name.
 
     > **Note: In case you decided to deploy SQL Managed Instance in an highly-available fashion, refer to the ["High Availability"](##-High-Availability-with-Always-On-availability-groups) section in this readme. Also note that this capability is currently in [preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.

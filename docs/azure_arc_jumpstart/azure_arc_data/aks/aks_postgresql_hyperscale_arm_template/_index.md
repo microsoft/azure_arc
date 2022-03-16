@@ -12,7 +12,7 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller, PostgreSQL Hyperscale instance, and a Microsoft Windows Server 2022 (Datacenter) Azure client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
-![Deployed Architecture](./24.png)
+![Deployed Architecture](./25.png)
 
 > **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
@@ -105,7 +105,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *deployPostgreSQL* - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure PostgreSQL Hyperscale scenario , we leave it set to _**true**_.
   * *kubernetesVersion* - AKS version
   * *dnsPrefix* - AKS unique DNS prefix
-  * *deployBastion* - Choice (Yes | No) to deploy Azure Bastion or not to connect to the client VM.
+  * *deployBastion* - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
   * *bastionHostName* - Azure Bastion host name.
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template) and run the below command:

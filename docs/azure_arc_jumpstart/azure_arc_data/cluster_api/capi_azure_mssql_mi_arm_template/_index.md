@@ -121,7 +121,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *logAnalyticsWorkspaceName* - Unique name for the deployment log analytics workspace.
   * *deploySQLMI* - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure SQL Managed Instance scenario, we will set it to _**true**_.
   * *deployPostgreSQL* - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure SQL Managed Instance scenario, we leave it set to _**false**_.
-  * *deployBastion* - Choice (Yes | No) to deploy Azure Bastion or not to connect to the client VM.
+  * *deployBastion* - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
   * *bastionHostName* - Azure Bastion host name.
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/cluster_api/capi_azure/arm_template) and run the below command:
