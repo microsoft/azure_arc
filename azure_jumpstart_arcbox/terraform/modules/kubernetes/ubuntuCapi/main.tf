@@ -96,9 +96,6 @@ locals {
     nsg_name               = "${var.vm_name}-NSG"
     network_interface_name = "${var.vm_name}-NIC"
     bastionSubnetIpPrefix  = "172.16.3.0/27"
-    PublicIPNoBastion      = {
-      id = "${azurerm_public_ip.pip[0].id}"
-      }
 }
 
 data "azurerm_subscription" "primary" {
@@ -149,7 +146,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = var.deploy_bastion == "No" ? azurerm_public_ip.pip[0].id : json("null")
+    public_ip_address_id          = var.deploy_bastion == "No" ? azurerm_public_ip.pip[0].id : null
   }
 }
 
