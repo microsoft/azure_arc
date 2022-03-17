@@ -86,10 +86,6 @@ param templateBaseUrl string
 param flavor string = 'Full'
 
 @description('Choice to deploy Bastion to connect to the client VM')
-@allowed([
-  'Yes'
-  'No'
-])
 param deployBastion bool = false
 
 var publicIpAddressName = '${vmName}-PIP'
