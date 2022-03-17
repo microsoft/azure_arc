@@ -38,11 +38,11 @@ chmod +x vars.sh
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
 
-if $deployBastion -eq true
+if $deployBastion
 then
-publicIp=$(hostname -i)
+    publicIp=$(hostname -i)
 else
-publicIp=$(curl icanhazip.com)
+    publicIp=$(curl icanhazip.com)
 fi
 
 # Installing Rancher K3s single master cluster using k3sup
