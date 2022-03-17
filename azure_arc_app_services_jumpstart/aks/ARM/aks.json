@@ -95,7 +95,7 @@
       }
     },
     "resourceTags": {
-      "type": "string",
+      "type": "object",
       "defaultValue": {
         "Project": "jumpstart_azure_arc_app_services"
       }

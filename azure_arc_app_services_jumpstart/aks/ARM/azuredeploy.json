@@ -107,12 +107,6 @@
                 "description": "Email address used on the Azure API Management deployment to receive all system notifications"
             }
         },
-         "resourceTags": {
-            "type": "string",
-            "defaultValue": {
-                "Project": "jumpstart_azure_arc_app_services"
-            }
-        },
         "githubAccount": {
             "type": "string",
             "metadata": {
@@ -255,9 +249,6 @@
                     },
                     "adminEmail": {
                         "value": "[parameters('adminEmail')]"
-                    },
-                    "resourceTags": {
-                        "value": "[parameters('resourceTags')]"
                     },
                     "templateBaseUrl": {
                         "value": "[variables('templateBaseUrl')]"
