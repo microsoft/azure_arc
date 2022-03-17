@@ -231,7 +231,6 @@
             "apiVersion": "2019-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('azureLocation')]",
-            "tags": "[parameters('resourceTags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
