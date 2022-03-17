@@ -258,7 +258,7 @@ resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2021-0
     autoUpgradeMinorVersion: true
     settings: {}
     protectedSettings: {
-      commandToExecute: 'bash installK3s.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace}'
+      commandToExecute: 'bash installK3s.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${deployBastion}'
       fileUris: [
         '${templateBaseUrl}artifacts/installK3s.sh'
       ]
