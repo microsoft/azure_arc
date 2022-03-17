@@ -30,14 +30,15 @@ sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
 
-chmod +x vars.sh 
+chmod +x vars.sh
 . ./vars.sh
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
 
-publicIp=$(curl icanhazip.com)
+publicIp=$(hostname -i)
+#publicIp=$(curl icanhazip.com)
 
 # Installing Rancher K3s single master cluster using k3sup
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
