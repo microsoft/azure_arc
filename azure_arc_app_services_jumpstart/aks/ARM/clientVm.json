@@ -91,10 +91,6 @@
                 "description": "Client secret of the service principal"
             }
         },
-        "spnAuthority": {
-            "type": "string",
-            "defaultValue": "https://login.microsoftonline.com"
-        },
         "spnTenantId": {
             "type": "string",
             "metadata": {
