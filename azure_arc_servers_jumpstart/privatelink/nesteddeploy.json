@@ -189,6 +189,7 @@
         }
     },
     "variables": {
+        
     },
     "resources": [
         {
@@ -467,6 +468,9 @@
                     },
                     "tenantId": {
                         "value": "[parameters('tenantId')]"
+                    },
+                    "PLscope": {
+                        "value": "[reference('AzureDeployment').outputs.PLscope.value]" 
                     }
 
                 },
@@ -488,10 +492,13 @@
                     },
                     "tenantId": {
                         "type": "string"
+                    },
+                     "PLscope": {
+                        "type": "string"
                     }
                     },
                     "variables": {
-                        "PLscope": { "value": "[reference('AzureDeployment').outputs.PLscope.value]" }
+                        
                     },
                     "resources": [
                         {
@@ -508,7 +515,7 @@
                                     "fileUris": [
                                         "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1"
                                     ],
-                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File installArcAgent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', variables('PLscope') )]"
+                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File installArcAgent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', parameters('PLscope') )]"
                                 }
                             }
                         }

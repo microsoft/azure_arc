@@ -4,6 +4,7 @@ param (
     [string]$tenantId,
     [string]$resourceGroup,
     [string]$subscriptionId,
+    [string]$Location,
     [string]$PLscope
 )
 
