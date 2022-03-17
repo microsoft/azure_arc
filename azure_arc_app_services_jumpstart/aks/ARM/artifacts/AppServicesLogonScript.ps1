@@ -84,7 +84,7 @@ Start-Sleep -Seconds 10
 az connectedk8s connect --name $connectedClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $Env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_app_services' `
+                        --tags $Env:resourceTags `
                         --kube-config $Env:KUBECONFIG `
                         --kube-context $Env:KUBECONTEXT
 
