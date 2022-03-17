@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\globalArtifacts.log
 # Installing needed providers and CLI extensions for Azure Are-enabled app services
 if ( $Env:resourceTags -eq "jumpstart_azure_arc_app_services" ){
     Write-Host "`n"
-    Write-Host "Registering Azure Arc providers, hold tight..."
+    Write-Host "Registering Azure Arc providers for Azure Arc-enabled app services, hold tight..."
     Write-Host "`n"
     az provider register --namespace Microsoft.Kubernetes --wait
     az provider register --namespace Microsoft.KubernetesConfiguration --wait
@@ -23,7 +23,7 @@ if ( $Env:resourceTags -eq "jumpstart_azure_arc_app_services" ){
     az config set extension.use_dynamic_install=yes_without_prompt
     # Installing Azure CLI extensions
     Write-Host "`n"
-    Write-Host "Installing Azure CLI extensions"
+    Write-Host "Installing Azure CLI extensions for Azure Arc-enabled app services"
     az extension add --name "connectedk8s" -y
     az extension add --name "k8s-configuration" -y
     az extension add --name "k8s-extension" -y

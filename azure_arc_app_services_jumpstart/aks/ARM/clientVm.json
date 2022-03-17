@@ -101,22 +101,6 @@
                 "description": "Tenant id of the service principal"
             }
         },
-        "azdataUsername": {
-            "type": "string",
-            "defaultValue": "arcdemo"
-        },
-        "azdataPassword": {
-            "type": "securestring",
-            "defaultValue": "ArcPassword123!!"
-        },
-        "acceptEula": {
-            "type": "string",
-            "defaultValue": "yes"
-        },
-        "arcDcName": {
-            "type": "string",
-            "defaultValue": "arcdatactrl"
-        },
         "workspaceName": {
             "type": "string",
             "metadata": {
@@ -314,7 +298,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'), ' -clusterName ', parameters('clusterName'), ' -adminEmail ', parameters('adminEmail'), ' -resourceTags ', parameters('resourceTags'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('azureLocation'), ' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'), ' -clusterName ', parameters('clusterName'), ' -adminEmail ', parameters('adminEmail'), ' -resourceTags ', parameters('resourceTags'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
                 }
             }
         }
