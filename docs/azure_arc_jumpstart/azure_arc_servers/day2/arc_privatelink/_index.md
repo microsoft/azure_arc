@@ -8,20 +8,20 @@ description: >
 
 ## Use Azure Private Link to securely connect networks to Azure Arc
 
-The following README will guide you on how to use [Azure Private Link](https://docs.microsoft.com/en-us/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure PaaS services. [This feature](https://docs.microsoft.com/en-us/azure/azure-arc/servers/private-link-security) not only allows you to link your Azure PaaS services to your virtual network using private endpoints but also enables you to connect your on-premises or multi-cloud resources with Azure Arc and ensure that all traffic is being sent over a VPN or ExpressRoute connection.
+The following README will guide you on how to use [Azure Private Link](https://docs.microsoft.com/en-us/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure using a VPN. [This feature](https://docs.microsoft.com/en-us/azure/azure-arc/servers/private-link-security) allows you to connect privately to Azure Arc without opening up public network access but rather using private endpoints over a VPN or ExpressRoute connection, ensuring that all traffic is being sent to Azure privately.
 
-In this guide, you will emulate a hybrid environment connected to Azure over a VPN with hybrid resources that will be Arc-enabled, and Azure Private Link will be used to connect to an Azure PaaS service over a private connection. To complete this process you deploy a single ARM template that will:
+In this guide, you will emulate a hybrid environment connected to Azure over a VPN with hybrid resources that will be Arc-enabled, and Azure Private Link Scope will be used to connect over a private connection. To complete this process you deploy a single ARM template that will:
 
 - Create two separate resource groups:
 
   - "On-premises" resource group: will simulate a private on-premises environment with a Windows virtual machine. This VM does will not have a public IP address assigned to it so [Azure Bastion](https://docs.microsoft.com/en-us/azure/bastion/bastion-overview) is deployed to have access to the operating system. The Windows virtual machine is an Azure Arc-enabled server by installing the Azure Arc-connected machine agent.
-  - Azure resource group: in this resource group, you will be deploying all Azure PaaS resources, in this case, [Azure DNS](https://docs.microsoft.com/en-us/azure/dns/dns-overview) and [Azure SQL](https://docs.microsoft.com/en-us/azure/azure-sql/database/sql-database-paas-overview). In order to establish a private connection to these Azure services, Azure Private Link will be deployed as well.
+  - Azure resource group: in this resource group, you will have the Azure Arc-enable server and its Private Link Scope, as well as the required [Azure DNS](https://docs.microsoft.com/en-us/azure/dns/dns-overview) configurations.
 
 - Both resource groups have their own virtual networks and address spaces, however, they are connected via Azure VPN gateways to set up a hybrid private connection.
 
   ![Deployment Overview](./01.png)
 
-Once everything is deployed, you will be able to access the Azure SQL private IP address from the "on-premises" Windows machine while network traffic will go over the VPN connection and be kept within the Azure VNET via Private Link to access the database service.
+Once everything is deployed, you will be able to onboard the Windows machine on the "on-premises" to Azure Arc using private endpoints via the Azure Arc Private Link Scope, while network traffic will go over the VPN connection.
 
   > **Note: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
   > **Note: The below scenario assumes the on-premises VM has outbound internet connectivity for the deployment of the Azure Arc connected machine agent, for internet disconnected environments you will need to adjust the automation to retrieve the agent's software from locally accessible storage**
@@ -62,22 +62,24 @@ For you to get familiar with the automation and deployment flow, below is an exp
 2. User deploys the ARM template at subscription level. The ARM template will create two resources groups with:
 
     - Azure resource group:
-        - Azure SQL server and a SQL database
-        - Azure Private Link Endpoint for SQL DB
-        - Azure Private DNS zone
+        - Azure Arc Private Link Scope
+        - Azure Arc-enabled server
+        - Azure Private Link Endpoint for the Azure Arc-enabled Server
+        - Three Azure Private DNS zones
         - Azure VPN Gateway and its public IP address
-        - Two Azure VNETs
-        - Azure Private Link Endpoint for Azure-Arc enabled server
+        - Azure VNET
 
     - On-premises resource group:
         - Azure VNET
         - Azure Bastion
         - Azure VPN Gateway and its public IP address
-        - Azure Windows Virtual Machine with a custom script extension that will run the [_install_arc_agent.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script to Arc-enable the Azure VM.
+        - Azure Windows Virtual Machine with a custom script extension that runs the **install_arc_agent.sh** script
 
-        > **Note: The [_install_arc_agent.sh_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
+        > **Note: The [*install_arc_agent.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
 
-3. User tests private connectivity to Azure SQL server from the Azure Windows Virtual Machine over Azure Private Link Endpoints.
+3. User configure DNS resolution for private DNS endpoints.
+
+4. User adds the Azure Arc-enabled server to the Azure Arc Private Link Scope.
 
 ## Deployment
 
@@ -97,11 +99,10 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     For example:
 
-    az deployment group create \
-    --resource-group <Name of the Azure resource group> \
-    --name <The name of this deployment> \
+    az deployment sub create \
+    --location eastus \
     --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/privatelink/nesteddeploy.json \
-    --parameters <The *azuredeploy.parameters.json* parameters file location>
+    --parameters nesteddeploy.example.parameters.json
     ```
 
      > **Note: The deployment may take around 30-40 minutes to complete**
@@ -116,57 +117,56 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Azure Arc-enabled server](./04.png)
 
-## Connectivity test
+## Configure DNS and add the Azure-Arc enabled server to the Private Link Scope
 
-- Now that all resources are deployed in both resources groups, you can verify that there is a private connection from the Azure Arc-enabled server to the Azure SQL database, this connection will go through the VPN gateways that connect the two VNETs and the network traffic will continue over the Microsoft's network to reach the PaaS service on its private IP enpoint's address since Azure Private link has been enabled.
+- Now that all resources are deployed you will need to configure DNS resolution for the Azure Arc private endpoints. The Azure Arc connected machine agent connects to a set of Azure Endpoints that by default are public, by adding the Azure Arc-enabled server to the Azure Arc Private Link scope we are making the connection between the agent and Azure private, however you need to make sure that there is DNS resolution for those endpoints and that they resolve the private IP address. To make sure that the [DNS settings resolve the private endpoint](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns) IP address to the fully qualified domain name (FQDN) of the connection string, you could:
+  - Use the host file
+  - Use a private DNS zone
+  - Configure a DNS forwarder
 
-- To perform the test you will need the database's private endpoint IP address. Navigate to the resource group in the Azure Portal as described below:
+  For this instance we will modify the host file on the virtual machine to override the DNS.
 
-  - Select the Private endpoint resource:
-
-      ![Private endpoint resource](./05.png)
-
-  - Select the Private Enpoint's network interface:
-
-      ![Private endpoint network interface](./06.png)
-
-  - Copy the private IP address:
-
-      ![Private endpoint private IP address](./07.png)
-
-- You can then do some connectivity checks to ensure that the on-premises VM is connecting to SQL Database via the private endpoint, you will use telnet for this purpose. To connect to the Azure Windows VM you will use Azure Bastion to connect and test private connectivity to the database:
+- Connect to the Azure Windows VM using Azure Bastion:
 
   - On the "on-premises" resource group select the Windows VM:
 
-    ![Azure Bastion session 01](./08.png)
+    ![Azure Bastion session 01](./05.png)
 
   - Under "Connect" choose Bastion:
 
-    ![Azure Bastion session 02](./09.png)
+    ![Azure Bastion session 02](./06.png)
 
   - Provide the VM credentials and click on "Connect":
 
-    ![Azure Bastion session 03](./10.png)
+    ![Azure Bastion session 03](./07.png)
 
-  - Open an administrative session of PowerShell and run the commands below:
+- Get the private endpoint's private IP addresses, navigate to the Private endpoint resource and choose "DNS configuration"
+
+  ![Private Endpoint](./08.png)
+
+  ![Private Endpoint DNS configuration](./09.png)
+
+- From the Bastion session open a PowerShell with admini priviliges and run the commands below to add the list of private IP addresses and FQDNs to the on-premises Windows VM host file.
 
     ```powershell
-    Install-WindowsFeature -Name Telnet-Client
-    telnet <private_endpoint_IP> 1433
+    Install-Module -Name 'Carbon' -AllowClobber
+    Import-Module 'Carbon'
+    Set-CHostsEntry -IPAddress <your IP address> -HostName 'glb.his.arc.azure.com'
+    Set-CHostsEntry -IPAddress <your IP address> -HostName 'we.his.arc.azure.com'
+    Set-CHostsEntry -IPAddress <your IP address> -HostName 'agentserviceapi.guestconfiguration.azure.com'
+    Set-CHostsEntry -IPAddress <your IP address> -HostName 'westeurope-gas.guestconfiguration.azure.com'
+    Set-CHostsEntry -IPAddress <your IP address> -HostName 'westeurope.dp.kubernetesconfiguration.azure.com'
     ```
 
-  For example:
+  ![Add Host files](./10.png)
 
-    ```powershell
-    Install-WindowsFeature -Name Telnet-Client
-    telnet 172.16.0.68 1433
-    ```
+- Add the Azure Arc-enabled server to the Azure Arc Private Link Scope. Navigate to the Azure Arc Private Link Scope on the Azure resource group and select "Azure Arc resources" to add the Azure Arc-enabled server.
 
-    ![Azure Bastion session 04](./11.png)
+  ![Private Link Scope](./11.png)
 
-- When Telnet connects successfully, you'll see a window like the below image:
+  ![Azure Arc resources](./12.png)
 
-  ![Telnet connection](./12.png)
+  ![Add Azure Arc-enabled Server](./13.png)
 
 ## Clean up environment
 

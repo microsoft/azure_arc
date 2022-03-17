@@ -168,6 +168,24 @@
             "metadata": {
                 "description": "Shared secret key for the vNET-to-vNET connection between Virtual Network Gateways."
             }
+        },
+        "appId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN app ID"
+            }
+        },
+        "password": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN password"
+            }
+        },
+        "tenantId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN tenant ID"
+            }
         }
     },
     "variables": {
@@ -208,7 +226,7 @@
                         "value": "[parameters('privateLinkScopes_name')]"
                     },
                     "privateEndpoints_name": {
-                         "value": "[parameters('privateEndpoints_name')]"
+                        "value": "[parameters('privateEndpoints_name')]"
                     },
                     "cloudVNetName": {
                         "value": "[parameters('cloudVNetName')]"
@@ -423,82 +441,11 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
-            "name": "GetAccessToken",
+            "name": "OnboardArcMachine",
             "resourceGroup": "[parameters('onPremRgName')]",
             "dependsOn": [
                 "ConnectAzureGateway",
                 "ConnectOnPremGateway"
-            ],
-            "properties": {
-                "expressionEvaluationOptions": {
-                    "scope": "Inner"
-                },
-                "mode": "Incremental",
-                "parameters": {
-                    "roleAssignmentName": {
-                        "value": "[reference('AzureDeployment').outputs.roleAssignmentName.value]"
-                    },
-                    "managedIdentityId": {
-                        "value": "[reference('AzureDeployment').outputs.managedIdentityId.value]"
-                    }
-                },
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                        "roleAssignmentName": {
-                            "type": "string"
-                        },
-                        "managedIdentityId": {
-                            "type": "string"
-                        }
-                    },
-                    "variables": {
-                        "identityName": "deploy-identity",
-                        "deploymentScriptName": "getAzureToken"
-                    },
-                    "resources": [
-                        {
-                            "type": "Microsoft.Resources/deploymentScripts",
-                            "apiVersion": "2020-10-01",
-                            "name": "[variables('deploymentScriptName')]",
-                            "location": "[resourceGroup().location]",
-                            "kind": "AzurePowerShell",
-                            "identity": {
-                                "type": "UserAssigned",
-                                "userAssignedIdentities": {
-                                    "[parameters('managedIdentityId')]": {}
-                                }
-                            },
-                            "properties": {
-                                "azPowerShellVersion": "6.6",
-                                "scriptContent": "
-                                    $token = $(Get-AzAccessToken).Token
-                                    $DeploymentScriptOutputs = @{}
-                                    $DeploymentScriptOutputs['token'] = $token
-                                ",
-                                "timeout": "PT30M",
-                                "cleanupPreference": "OnSuccess",
-                                "retentionInterval": "PT1H"
-                            }
-                        }
-                    ],
-                    "outputs": {
-                        "token": {
-                            "type": "string",
-                            "value": "[reference(variables('deploymentScriptName')).outputs.token]"
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2021-04-01",
-            "name": "OnboardArcMachine",
-            "resourceGroup": "[parameters('onPremRgName')]",
-            "dependsOn": [
-                "GetAccessToken"
             ],
             "properties": {
                 "expressionEvaluationOptions": {
@@ -512,9 +459,16 @@
                     "azureRgName": {
                         "value": "[parameters('azureRgName')]"
                     },
-                    "token": {
-                        "value": "[reference('GetAccessToken').outputs.token.value]"
+                    "appId": {
+                        "value": "[parameters('appId')]"
+                    },
+                    "password": {
+                        "value": "[parameters('password')]"
+                    },
+                    "tenantId": {
+                        "value": "[parameters('tenantId')]"
                     }
+
                 },
                 "template": {
                     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
@@ -526,11 +480,19 @@
                         "azureRgName": {
                             "type": "string"
                         },
-                        "token": {
-                            "type": "string"
-                        }
+                    "appId": {
+                        "type": "string"
                     },
-                    "variables": {},
+                    "password": {
+                        "type": "string"
+                    },
+                    "tenantId": {
+                        "type": "string"
+                    }
+                    },
+                    "variables": {
+                        "PLscope": { "value": "[reference('AzureDeployment').outputs.PLscope.value]" }
+                    },
                     "resources": [
                         {
                             "type": "Microsoft.Compute/virtualMachines/extensions",
@@ -546,7 +508,7 @@
                                     "fileUris": [
                                         "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1"
                                     ],
-                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File installArcAgent.ps1', ' -Token ', parameters('token'), ' -Location ', resourceGroup().location, ' -SubscriptionId ', subscription().subscriptionId, ' -ResourceGroup ', parameters('azureRgName'))]"
+                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File installArcAgent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', variables('PLscope') )]"
                                 }
                             }
                         }

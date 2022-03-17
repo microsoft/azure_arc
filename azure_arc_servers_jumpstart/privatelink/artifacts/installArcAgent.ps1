@@ -1,8 +1,10 @@
-param(
-    [string]$Token,
-    [string]$Location,
-    [string]$SubscriptionId,
-    [string]$ResourceGroup
+param (
+    [string]$appId,
+    [string]$password,
+    [string]$tenantId,
+    [string]$resourceGroup,
+    [string]$subscriptionId,
+    [string]$PLscope
 )
 
 Start-Transcript -Path "C:\Temp\installArcAgent.log"
@@ -31,7 +33,9 @@ if($LASTEXITCODE -ne 0) {
     --subscription-id $SubscriptionId `
     --resource-group $ResourceGroup `
     --cloud "AzureCloud" `
-    --tags "Project=jumpstart_arcbox"
+    --private-link-scope $PLscope `
+    --tags "Project=jumpstart_azure_arc_servers" `
+
 
 if($LastExitCode -eq 0){
     Write-Host -ForegroundColor yellow "To view your onboarded server(s), navigate to https://portal.azure.com/#blade/HubsExtension/BrowseResource/resourceType/Microsoft.HybridCompute%2Fmachines"
