@@ -54,7 +54,7 @@
         }
     },
     "variables": {
-        "identityName": "deploy-identity",
+        "identityName": "deployment-identity",
         "roleAssignmentName": "[guid(resourceGroup().id)]",
         "gatewayPublicIPName": "[concat(parameters('cloudGatewayName'), '-PIP')]",
         "contributorRole": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
@@ -327,13 +327,9 @@
         }
     ],
     "outputs": {
-        "roleAssignmentName": {
+        "PLscope": {
             "type": "string",
-            "value": "[variables('roleAssignmentName')]"
-        },
-        "managedIdentityId": {
-            "type": "string",
-            "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]"
+            "value": "[resourceId('Microsoft.HybridCompute/privateLinkScopes', parameters('privateLinkScopes_name'))]"
         }
     }
 }

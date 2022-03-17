@@ -64,6 +64,15 @@
         },
         "sharedKey": {
             "value": "<VPN shared Key>"
+        },
+        "appId": {
+            "value": "<Service Principal AppId>"
+        },
+        "password": {
+            "value": "<Service Principal password>"
+        },
+        "tenantId": {
+            "value": "<Tenant ID>"
         }
     }
 }
