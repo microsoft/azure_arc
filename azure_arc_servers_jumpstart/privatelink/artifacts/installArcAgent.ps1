@@ -11,12 +11,12 @@ param (
 Start-Transcript -Path "C:\Temp\installArcAgent.log"
 
 # Block Azure IMDS communication
-New-NetFirewallRule -DisplayName "Block Azure IMDS Service" `
-    -Direction Outbound `
-    -LocalPort Any `
-    -Protocol TCP `
-    -Action Block `
-    -RemoteAddress "169.254.169.254"
+#New-NetFirewallRule -DisplayName "Block Azure IMDS Service" `
+#    -Direction Outbound `
+#    -LocalPort Any `
+#    -Protocol TCP `
+#    -Action Allow `
+#    -RemoteAddress "169.254.169.254"
 
 # Download the installation package
 Invoke-WebRequest -Uri "https://aka.ms/azcmagent-windows" -TimeoutSec 30 -OutFile "$env:TEMP\install_windows_azcmagent.ps1"
@@ -29,13 +29,17 @@ if($LASTEXITCODE -ne 0) {
 
 # Run connect command
 & "$env:ProgramW6432\AzureConnectedMachineAgent\azcmagent.exe" connect `
-    --access-token $Token `
+    --service-principal-id $appId `
+    --service-principal-secret $password `
     --location $Location `
+    --tenant-id $tenantId `
     --subscription-id $SubscriptionId `
     --resource-group $ResourceGroup `
     --cloud "AzureCloud" `
     --private-link-scope $PLscope `
     --tags "Project=jumpstart_azure_arc_servers" `
+    --correlation-id "86501baa-0b82-478c-b3cf-620533617001"
+
 
 
 if($LastExitCode -eq 0){
