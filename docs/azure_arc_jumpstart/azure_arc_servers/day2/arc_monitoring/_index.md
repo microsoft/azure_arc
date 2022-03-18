@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure Monitor"
-linkTitle: "Azure Monitor"
+title: "Monitoring, Alerting, and Visualization"
+linkTitle: "Monitoring, Alerting, and Visualization"
 weight: 12
 description: >
 ---
