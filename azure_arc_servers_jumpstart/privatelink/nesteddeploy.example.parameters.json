@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "azureRgName": {
-            "value": "Arc-Azure-PL-demo"
+            "value": "Arc-Azure-PLdemo"
         },
         "onPremRgName": {
-            "value": "Arc-Onpremise-PL-Demo"
+            "value": "Arc-Onpremise-PLDemo"
         },
         "cloudVNetName": {
             "value": "Cloud-VNET"
@@ -70,9 +70,6 @@
         },
         "sharedKey": {
             "value": "ArcPassword123!!"
-        },
-        "appId": {
-            "value": "c4d061d5-a7f5-4eef-8e6f-de5a1e4fe044"
         }
     }
 }
