@@ -8,16 +8,6 @@ param (
     [string]$PLscope
 )
 
-param (
-    [string]$subscriptionId,
-    [string]$appId,
-    [string]$password,
-    [string]$tenantId,
-    [string]$resourceGroup,
-    [string]$location,
-    [string]$PLscope
-)
-
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM

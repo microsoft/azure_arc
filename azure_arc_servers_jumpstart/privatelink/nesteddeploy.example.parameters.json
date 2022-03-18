@@ -70,6 +70,15 @@
         },
         "sharedKey": {
             "value": "ArcPassword123!!"
+        },
+        "appId": {
+            "value": "c4d061d5-a7f5-4eef-8e6f-de5a1e4fe044"
+        },
+        "password": {
+            "value": "HTer4U~-DKLW4-VArn5okMw~xjODnn~oce"
+        },
+        "tenantId": {
+            "value": "72f988bf-86f1-41af-91ab-2d7cd011db47"
         }
     }
 }
