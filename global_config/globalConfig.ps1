@@ -192,7 +192,7 @@ if ($Env:flavor -eq $null -eq $true) {
     $clusterTypeARO = (az resource list --resource-group $Env:resourceGroup --resource-type "Microsoft.RedHatOpenShift/openShiftClusters" --query "[].type" -o tsv)
 }
 
-# Required for Jumpstart scenarios which are based EITHER OF the following Kubernetes distributions:
+# Required for Jumpstart scenarios which are based on EITHER OF the following Kubernetes distributions:
 #   - Azure Kubernetes Service (AKS)
 #   - Azure RedHat OpenShift (ARO)
 if ($Env:flavor -eq $null -eq $true -and $Env:clusterName -eq $null -eq $false -and $clusterTypeAKS -eq $null -eq $false -or $clusterTypeARO -eq $null -eq $false){
