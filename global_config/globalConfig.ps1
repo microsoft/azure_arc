@@ -11,7 +11,18 @@ $kubernetesExtensions = "connectedk8s", "k8s-configuration", "k8s-extension", "c
 $dataSvcExtensions = "arcdata"
 $appSvcExtensions = "appservice-kube"
 
-$Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart.azconfig.io;Id=+A2N-l6-s0:HduXxNbsjAPqp1NqVd6D;Secret=yxSifihWSNl6tZ2Q5HQY2bulfmre94aJmY+K9saWu0E="
+# Declaring the deployment environment (Production/Dev)
+$deploymentEnvironment = ($Env:templateBaseUrl | Select-String "microsoft/azure_arc/main")
+
+if ($deploymentEnvironment -eq $null -eq $false){
+    $Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart-prod.azconfig.io;Id=xcEf-l6-s0:Fn+IoFEzNKvm/Bo0+W1I;Secret=dkuO3eUhqccYw6YWkFYNcPMZ/XYQ4r9B/4OhrWTLtL0="
+    $deploymentEnvironment = "Production"
+    Write-Host "This is a "$deploymentEnvironment" deployment environment"
+} else {
+    $Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart-dev.azconfig.io;Id=5xh8-l6-s0:q89J0MWp2twZnTsqoiLQ;Secret=y5UFAWzPNdJsPcRlKC538DimC4/nb1k3bKuzaLC90f8="
+    $deploymentEnvironment = "Dev"
+    Write-Host "This is a "$deploymentEnvironment" deployment environment"
+}
 
 # Global Jumpstart PowerShell functions - Azure resource providers
 function Register-ArcKubernetesProviders {
@@ -25,7 +36,7 @@ function Register-ArcKubernetesProviders {
     #>
 	[CmdletBinding()]
     [Parameter(Mandatory)]
-    [string]$providersArcKubernetes
+    [string]$providersArcKubernetes | Out-Null
 
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
@@ -61,7 +72,7 @@ function Register-ArcDataSvcProviders {
     #>
     [CmdletBinding()]
     [Parameter(Mandatory)]
-    [string]$providersArcDataSvc
+    [string]$providersArcDataSvc | Out-Null
 
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
@@ -97,7 +108,7 @@ function Register-ArcAppSvcProviders {
     #>
     [CmdletBinding()]
     [Parameter(Mandatory)]
-    [string]$providersArcAppSvc
+    [string]$providersArcAppSvc | Out-Null
 
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
@@ -135,13 +146,13 @@ function Install-ArcK8sCLIExtensions {
     #>
     [CmdletBinding()]
     [Parameter(Mandatory)]
-    [string]$kubernetesExtensions
+    [string]$kubernetesExtensions | Out-Null
 
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
     # Installing Azure CLI extensions
     foreach ($extension in $kubernetesExtensions) {
-        $version = (az appconfig kv list --key $extension --label "Production" --query "[].value" -o tsv)
+        $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
     }
 }
@@ -157,13 +168,13 @@ function Install-ArcDataSvcCLIExtensions {
     #>
     [CmdletBinding()]
     [Parameter(Mandatory)]
-    [string]$dataSvcExtensions
+    [string]$dataSvcExtensions | Out-Null
 
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
     # Installing Azure CLI extensions
     foreach ($extension in $dataSvcExtensions) {
-        $version = (az appconfig kv list --key $extension --label "Production" --query "[].value" -o tsv)
+        $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
     }
 }
@@ -179,13 +190,13 @@ function Install-ArcAppSvcCLIExtensions {
     #>	
     [CmdletBinding()]
     [Parameter(Mandatory)]
-    [string]$appSvcExtensions
+    [string]$appSvcExtensions | Out-Null
 
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
     # Installing Azure CLI extensions
     foreach ($extension in $appSvcExtensions) {
-        $version = (az appconfig kv list --key $extension --label "Production" --query "[].value" -o tsv)
+        $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
     }
 }
