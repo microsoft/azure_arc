@@ -13,10 +13,7 @@
         },
         "adminPassword": {
             "value": "<Windows VM admin password>"
-        },
-        "resourceGroup": {
-          "value": "<Azure resource group where all resource to be deployed>"
-        },      
+        },    
         "servicePrincipalAppId": {
             "value": "<Azure service principal name>"
         },
@@ -25,12 +22,6 @@
         },
         "servicePrincipalTenantId": {
             "value": "<Azure tenant ID>"
-        },
-        "subId": {
-            "value": "<Azure subscription ID>"
-        },
-        "location": {
-            "value": "<Azure region>"
         }
       }
   }

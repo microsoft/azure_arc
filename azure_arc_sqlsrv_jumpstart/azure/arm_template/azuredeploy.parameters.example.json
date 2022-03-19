@@ -14,9 +14,6 @@
         "adminPassword": {
             "value": "ArcPassword123!!"
         },
-        "resourceGroup": {
-          "value": "Arc-SQL-Demo"
-        },      
         "servicePrincipalAppId": {
             "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
         },
@@ -25,12 +22,6 @@
         },
         "servicePrincipalTenantId": {
             "value": "33333333-XXXX-41af-1111-7777777777"
-        },
-        "subId": {
-            "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
-        },
-        "location": {
-            "value": "eastus"
         }
       }
   }
