@@ -1,28 +1,30 @@
 Start-Transcript -Path C:\Temp\globalConfig.log
 
-# Declaring required Azure Arc resource providers
-$providersArcKubernetes = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation"
-$providersArcDataSvc = "Microsoft.AzureArcData"
-$providersArcAppSvc = "Microsoft.Web"
-$allArcProviders = $providersArcKubernetes + $providersArcDataSvc + $providersArcAppSvc
-
-# Declaring required Azure Arc Azure CLI extensions
-$kubernetesExtensions = "connectedk8s", "k8s-configuration", "k8s-extension", "customlocation"
-$dataSvcExtensions = "arcdata"
-$appSvcExtensions = "appservice-kube"
-
 # Declaring the deployment environment (Production/Dev)
 $deploymentEnvironment = ($Env:templateBaseUrl | Select-String "microsoft/azure_arc/main")
 
 if ($deploymentEnvironment -eq $null -eq $false){
     $Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart-prod.azconfig.io;Id=xcEf-l6-s0:Fn+IoFEzNKvm/Bo0+W1I;Secret=dkuO3eUhqccYw6YWkFYNcPMZ/XYQ4r9B/4OhrWTLtL0="
     $deploymentEnvironment = "Production"
+    Write-Host "`n"
     Write-Host "This is a "$deploymentEnvironment" deployment environment"
 } else {
     $Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart-dev.azconfig.io;Id=5xh8-l6-s0:q89J0MWp2twZnTsqoiLQ;Secret=y5UFAWzPNdJsPcRlKC538DimC4/nb1k3bKuzaLC90f8="
     $deploymentEnvironment = "Dev"
+    Write-Host "`n"
     Write-Host "This is a "$deploymentEnvironment" deployment environment"
 }
+
+# Declaring required Azure Arc resource providers
+$providersArcKubernetes = (az appconfig kv list --key "providersArcKubernetes" --label $deploymentEnvironment --query "[].value" -o tsv)
+$providersArcDataSvc = (az appconfig kv list --key "providersArcDataSvc" --label $deploymentEnvironment --query "[].value" -o tsv)
+$providersArcAppSvc = (az appconfig kv list --key "providersArcAppSvc" --label $deploymentEnvironment --query "[].value" -o tsv)
+$allArcProviders = $providersArcKubernetes + $providersArcDataSvc + $providersArcAppSvc
+
+# Declaring required Azure Arc Azure CLI extensions
+$kubernetesExtensions = (az appconfig kv list --key "kubernetesExtensions" --label $deploymentEnvironment --query "[].value" -o tsv)
+$dataSvcExtensions = (az appconfig kv list --key "dataSvcExtensions" --label $deploymentEnvironment --query "[].value" -o tsv)
+$appSvcExtensions = (az appconfig kv list --key "appSvcExtensions" --label $deploymentEnvironment --query "[].value" -o tsv)
 
 # Global Jumpstart PowerShell functions - Azure resource providers
 function Register-ArcKubernetesProviders {
