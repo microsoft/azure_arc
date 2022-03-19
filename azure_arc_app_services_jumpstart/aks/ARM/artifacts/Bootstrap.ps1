@@ -13,7 +13,6 @@ param (
     [string]$deployApiMgmt,
     [string]$deployLogicApp,
     [string]$adminEmail,
-    [string]$resourceTags,
     [string]$globalConfigBaseUrl    
     [string]$templateBaseUrl
 )
@@ -32,7 +31,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('deployApiMgmt', $deployApiMgmt,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployLogicApp,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminEmail', $adminEmail,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('resourceTags', $resourceTags,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('globalConfigBaseUrl', $globalConfigBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
