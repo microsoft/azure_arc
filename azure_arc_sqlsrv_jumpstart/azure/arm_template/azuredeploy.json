@@ -270,7 +270,7 @@
                 "autoUpgradeMinorVersion": true,
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Bootstrap.ps1"
+                        "[uri(variables('templateBaseUrl'), 'arm_template/scripts/Bootstrap.ps1')]"
                     ],
                     "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -subscriptionId ', subscription().id, ' -servicePrincipalAppId ', parameters('servicePrincipalAppId'), ' -servicePrincipalSecret ', parameters('servicePrincipalSecret'), ' -servicePrincipalTenantId ', parameters('servicePrincipalTenantId'), ' -resourceGroup ', resourceGroup().name, ' -location ', resourceGroup().location, ' -adminUsername ', parameters('adminUsername'), ' -adminPassword ', parameters('adminPassword'), ' -workspaceName ', parameters('logAnalyticsWorkspaceName'), ' -templateBaseUrl ', variables('templateBaseUrl'))]"
                 }
