@@ -4,14 +4,16 @@ Start-Transcript -Path C:\Temp\globalConfig.log
 $providersArcKubernetes = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation"
 $providersArcDataSvc = "Microsoft.AzureArcData"
 $providersArcAppSvc = "Microsoft.Web"
+$allArcProviders = $providersArcKubernetes + $providersArcDataSvc + $providersArcAppSvc
 
 # Declaring required Azure Arc Azure CLI extensions
 $kubernetesExtensions = "connectedk8s", "k8s-configuration", "k8s-extension", "customlocation"
 $dataSvcExtensions = "arcdata"
 $appSvcExtensions = "appservice-kube"
 
-# Global Jumpstart PowerShell functions
+$Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart.azconfig.io;Id=+A2N-l6-s0:HduXxNbsjAPqp1NqVd6D;Secret=yxSifihWSNl6tZ2Q5HQY2bulfmre94aJmY+K9saWu0E="
 
+# Global Jumpstart PowerShell functions - Azure resource providers
 function Register-ArcKubernetesProviders {
     <#
         .SYNOPSIS
@@ -45,27 +47,6 @@ function Register-ArcKubernetesProviders {
             Write-Host "$provider Azure resource provider is now registered"
             Write-Host "`n"
             }
-    }
-}
-
-function Install-ArcK8sCLIExtensions {
-	<#
-        .SYNOPSIS
-        PowerShell function for installing Azure Arc-enabled Kubernetes Azure CLI extensions
-        
-        .DESCRIPTION
-        PowerShell function for installing Azure Arc-enabled Kubernetes Azure CLI extensions required in Jumpstart Kubernetes-based automation.
-        Depended on the $kubernetesExtensions environment variables
-    #>
-    [CmdletBinding()]
-    [Parameter(Mandatory)]
-    [string]$kubernetesExtensions
-
-    Write-Host "`n"
-    Write-Host "Installing Azure CLI extensions for $service"
-    # Installing Azure CLI extensions
-    foreach ($extension in $kubernetesExtensions) {
-        az extension add --name $extension -y
     }
 }
 
@@ -105,27 +86,6 @@ function Register-ArcDataSvcProviders {
     }
 }
 
-function Install-ArcDataSvcCLIExtensions {
-    <#
-        .SYNOPSIS
-        PowerShell function for installing Azure Arc-enabled data services Azure CLI extensions
-        
-        .DESCRIPTION
-        PowerShell function for installing Azure Arc-enabled data services Azure CLI extensions required in Jumpstart Kubernetes-based automation.
-        Depended on the $dataSvcExtensions environment variables
-    #>
-    [CmdletBinding()]
-    [Parameter(Mandatory)]
-    [string]$dataSvcExtensions
-
-    Write-Host "`n"
-    Write-Host "Installing Azure CLI extensions for $service"
-    # Installing Azure CLI extensions
-    foreach ($extension in $dataSvcExtensions) {
-        az extension add --name $extension -y
-    }
-}
-
 function Register-ArcAppSvcProviders {
     <#
         .SYNOPSIS
@@ -162,6 +122,52 @@ function Register-ArcAppSvcProviders {
     }
 }
 
+# Global Jumpstart PowerShell functions - Azure CLI extensions
+
+function Install-ArcK8sCLIExtensions {
+	<#
+        .SYNOPSIS
+        PowerShell function for installing Azure Arc-enabled Kubernetes Azure CLI extensions
+        
+        .DESCRIPTION
+        PowerShell function for installing Azure Arc-enabled Kubernetes Azure CLI extensions required in Jumpstart Kubernetes-based automation.
+        Depended on the $kubernetesExtensions environment variables
+    #>
+    [CmdletBinding()]
+    [Parameter(Mandatory)]
+    [string]$kubernetesExtensions
+
+    Write-Host "`n"
+    Write-Host "Installing Azure CLI extensions for $service"
+    # Installing Azure CLI extensions
+    foreach ($extension in $kubernetesExtensions) {
+        $version = (az appconfig kv list --key $extension --label "Production" --query "[].value" -o tsv)
+        az extension add --name $extension --version $version -y
+    }
+}
+
+function Install-ArcDataSvcCLIExtensions {
+    <#
+        .SYNOPSIS
+        PowerShell function for installing Azure Arc-enabled data services Azure CLI extensions
+        
+        .DESCRIPTION
+        PowerShell function for installing Azure Arc-enabled data services Azure CLI extensions required in Jumpstart Kubernetes-based automation.
+        Depended on the $dataSvcExtensions environment variables
+    #>
+    [CmdletBinding()]
+    [Parameter(Mandatory)]
+    [string]$dataSvcExtensions
+
+    Write-Host "`n"
+    Write-Host "Installing Azure CLI extensions for $service"
+    # Installing Azure CLI extensions
+    foreach ($extension in $dataSvcExtensions) {
+        $version = (az appconfig kv list --key $extension --label "Production" --query "[].value" -o tsv)
+        az extension add --name $extension --version $version -y
+    }
+}
+
 function Install-ArcAppSvcCLIExtensions {
     <#
         .SYNOPSIS
@@ -179,7 +185,8 @@ function Install-ArcAppSvcCLIExtensions {
     Write-Host "Installing Azure CLI extensions for $service"
     # Installing Azure CLI extensions
     foreach ($extension in $appSvcExtensions) {
-        az extension add --name $extension -y
+        $version = (az appconfig kv list --key $extension --label "Production" --query "[].value" -o tsv)
+        az extension add --name $extension --version $version -y
     }
 }
 
@@ -221,7 +228,12 @@ if (Test-Path -Path 'C:\Temp\DataServicesLogonScript.ps1'){
 if (Test-Path -Path 'C:\Temp\AppServicesLogonScript.ps1'){
     $service = "Azure Arc-enabled app services"
     Register-ArcAppSvcProviders
-    Install-ArcDataSvcCLIExtensions
+    Install-ArcAppSvcCLIExtensions
+}
+
+foreach ($provider in $allArcProviders){
+    az provider show --namespace $provider --query "{Namespace:namespace, RegistrationState:registrationState}" -o table
+    Write-Host "`n"
 }
 
 Write-Host "`n"
