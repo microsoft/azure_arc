@@ -13,7 +13,7 @@ param (
     [string]$deployApiMgmt,
     [string]$deployLogicApp,
     [string]$adminEmail,
-    [string]$globalConfigBaseUrl    
+    [string]$globalConfigBaseUrl,
     [string]$templateBaseUrl
 )
 
