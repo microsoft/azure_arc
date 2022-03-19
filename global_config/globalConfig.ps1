@@ -187,8 +187,10 @@ function Install-ArcAppSvcCLIExtensions {
 az config set extension.use_dynamic_install=yes_without_prompt
 
 # Determining which Kubernetes distributions is being used
-$clusterTypeAKS = (az resource list --resource-group $Env:resourceGroup --resource-type "Microsoft.ContainerService/managedClusters" --query "[].type" -o tsv)
-$clusterTypeARO = (az resource list --resource-group $Env:resourceGroup --resource-type "Microsoft.RedHatOpenShift/openShiftClusters" --query "[].type" -o tsv)
+if ($Env:flavor -eq $null -eq $true) {
+    $clusterTypeAKS = (az resource list --resource-group $Env:resourceGroup --resource-type "Microsoft.ContainerService/managedClusters" --query "[].type" -o tsv)
+    $clusterTypeARO = (az resource list --resource-group $Env:resourceGroup --resource-type "Microsoft.RedHatOpenShift/openShiftClusters" --query "[].type" -o tsv)
+}
 
 # Required for Jumpstart scenarios which are based EITHER OF the following Kubernetes distributions:
 #   - Azure Kubernetes Service (AKS)
