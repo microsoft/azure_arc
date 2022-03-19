@@ -123,6 +123,7 @@
         }
     },
     "variables": {
+        "globalConfigBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/global_config/')]",
         "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_app_services_jumpstart/aks/ARM/')]",
         "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
         "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
@@ -249,6 +250,9 @@
                     },
                     "adminEmail": {
                         "value": "[parameters('adminEmail')]"
+                    },
+                    "globalConfigBaseUrl": {
+                        "value": "[variables('globalConfigBaseUrl')]"
                     },
                     "templateBaseUrl": {
                         "value": "[variables('templateBaseUrl')]"

@@ -141,7 +141,13 @@
             "type": "string",
             "defaultValue": "Arc-AppSvc-AKS",
             "metadata": {
-                "description": "The name of the Kubernetes cluster resource."
+                "description": "The name of the Kubernetes cluster resource"
+            }
+        },
+        "globalConfigBaseUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "Base URL for Jumpstart global configuration folder"
             }
         },
         "templateBaseUrl": {
@@ -294,7 +300,7 @@
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
                     ],
-                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'), ' -adminEmail ', parameters('adminEmail'), ' -resourceTags ', parameters('resourceTags'),  ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name,' -azureLocation ', parameters('azureLocation'),' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),  ' -clusterName ', parameters('clusterName'), ' -adminEmail ', parameters('adminEmail'), ' -resourceTags ', parameters('resourceTags'), ' -globalConfigBaseUrl ', parameters('globalConfigBaseUrl'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
                 }
             }
         }
