@@ -3,16 +3,27 @@ Start-Transcript -Path C:\Temp\globalConfig.log
 # Declaring the deployment environment (Production/Dev)
 $deploymentEnvironment = ($Env:templateBaseUrl | Select-String "microsoft/azure_arc/main")
 
+# Declaring if this is a Jumpstart scenario or ArcBox deployment
+if ($Env:flavor -eq $null -eq $true){
+    $jumpstartSolution = "Jumpstart scenario"
+}else {
+    $jumpstartSolution = "Jumpstart ArcBox"
+}
+
+# Setting up the environment variable for the Jumpstart App Configuration connection string deployment (Production/Dev)
+$jumpstartAppConfigProduction = "Endpoint=https://jumpstart-prod.azconfig.io;Id=xcEf-l6-s0:Fn+IoFEzNKvm/Bo0+W1I;Secret=dkuO3eUhqccYw6YWkFYNcPMZ/XYQ4r9B/4OhrWTLtL0="
+$jumpstartAppConfigDev = "Endpoint=https://jumpstart-dev.azconfig.io;Id=5xh8-l6-s0:q89J0MWp2twZnTsqoiLQ;Secret=y5UFAWzPNdJsPcRlKC538DimC4/nb1k3bKuzaLC90f8="
+
 if ($deploymentEnvironment -eq $null -eq $false){
-    $Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart-prod.azconfig.io;Id=xcEf-l6-s0:Fn+IoFEzNKvm/Bo0+W1I;Secret=dkuO3eUhqccYw6YWkFYNcPMZ/XYQ4r9B/4OhrWTLtL0="
+    $Env:AZURE_APPCONFIG_CONNECTION_STRING = $jumpstartAppConfigProduction
     $deploymentEnvironment = "Production"
     Write-Host "`n"
-    Write-Host "This is a Jumpstart $deploymentEnvironment deployment environment"
+    Write-Host "This is a $jumpstartSolution $deploymentEnvironment deployment!"
 } else {
-    $Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart-dev.azconfig.io;Id=5xh8-l6-s0:q89J0MWp2twZnTsqoiLQ;Secret=y5UFAWzPNdJsPcRlKC538DimC4/nb1k3bKuzaLC90f8="
+    $Env:AZURE_APPCONFIG_CONNECTION_STRING = $jumpstartAppConfigDev
     $deploymentEnvironment = "Dev"
     Write-Host "`n"
-    Write-Host "This is a Jumpstart $deploymentEnvironment deployment environment"
+    Write-Host "This is a $jumpstartSolution $deploymentEnvironment deployment!"
 }
 
 # Declaring required Azure Arc resource providers
