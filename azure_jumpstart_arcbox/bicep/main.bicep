@@ -36,10 +36,10 @@ param logAnalyticsWorkspaceName string
 param flavor string = 'Full'
 
 @description('Target GitHub account')
-param githubAccount string = 'microsoft'
+param githubAccount string = 'sebassem'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'arcbox_devops_Bastion'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
