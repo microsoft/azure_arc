@@ -42,7 +42,7 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 
 # Setting Ip address of VM based on Bastion choice
 boolDeployBastion=$(echo "${deployBastion,,}")
-if "$boolDeployBastion" == true
+if "$boolDeployBastion" == "true"
 then
     publicIp=$(hostname -i); echo "True*****"; echo $publicIp
 else
