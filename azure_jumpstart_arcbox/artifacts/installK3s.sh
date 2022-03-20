@@ -41,7 +41,8 @@ sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
 
 # Setting Ip address of VM based on Bastion choice
-if $deployBastion
+boolDeployBastion=$(echo "${deployBastion,,}") ## Converting boolean variable to lowercase string
+if "$boolDeployBastion" == "true"
 then
     publicIp=$(hostname -i)
 else
