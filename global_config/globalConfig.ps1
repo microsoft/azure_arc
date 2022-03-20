@@ -16,26 +16,15 @@ if ($deploymentEnvironment -eq $null -eq $false){
 }
 
 # Declaring required Azure Arc resource providers
-$providersArcKubernetes = (az appconfig kv list --key "providersArcKubernetes" --label $deploymentEnvironment --query "[].value" -o tsv)
-$providersArcDataSvc = (az appconfig kv list --key "providersArcDataSvc" --label $deploymentEnvironment --query "[].value" -o tsv)
-$providersArcAppSvc = (az appconfig kv list --key "providersArcAppSvc" --label $deploymentEnvironment --query "[].value" -o tsv)
+$providersArcKubernetes = (az appconfig kv list --key "providersArcKubernetes" --label $deploymentEnvironment --query "[].value" -o tsv).split(" ")
+$providersArcDataSvc = (az appconfig kv list --key "providersArcDataSvc" --label $deploymentEnvironment --query "[].value" -o tsv).split(" ")
+$providersArcAppSvc = (az appconfig kv list --key "providersArcAppSvc" --label $deploymentEnvironment --query "[].value" -o tsv).split(" ")
 $allArcProviders = $providersArcKubernetes + $providersArcDataSvc + $providersArcAppSvc
 
 # Declaring required Azure Arc Azure CLI extensions
-$kubernetesExtensions = (az appconfig kv list --key "kubernetesExtensions" --label $deploymentEnvironment --query "[].value" -o tsv)
-$dataSvcExtensions = (az appconfig kv list --key "dataSvcExtensions" --label $deploymentEnvironment --query "[].value" -o tsv)
-$appSvcExtensions = (az appconfig kv list --key "appSvcExtensions" --label $deploymentEnvironment --query "[].value" -o tsv)
-
-# # Declaring required Azure Arc resource providers
-# $providersArcKubernetes = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation"
-# $providersArcDataSvc = "Microsoft.AzureArcData"
-# $providersArcAppSvc = "Microsoft.Web"
-# $allArcProviders = $providersArcKubernetes + $providersArcDataSvc + $providersArcAppSvc
-
-# # Declaring required Azure Arc Azure CLI extensions
-# $kubernetesExtensions = "connectedk8s", "k8s-configuration", "k8s-extension", "customlocation"
-# $dataSvcExtensions = "arcdata"
-# $appSvcExtensions = "appservice-kube"
+$kubernetesExtensions = (az appconfig kv list --key "kubernetesExtensions" --label $deploymentEnvironment --query "[].value" -o tsv).split(" ")
+$dataSvcExtensions = (az appconfig kv list --key "dataSvcExtensions" --label $deploymentEnvironment --query "[].value" -o tsv).split(" ")
+$appSvcExtensions = (az appconfig kv list --key "appSvcExtensions" --label $deploymentEnvironment --query "[].value" -o tsv).split(" ")
 
 # Global Jumpstart PowerShell functions - Azure resource providers
 function Register-ArcKubernetesProviders {
@@ -50,7 +39,6 @@ function Register-ArcKubernetesProviders {
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
     Write-Host "`n"
-    $providersArcKubernetes = $providersArcKubernetes.split(" ")
     foreach ($provider in $providersArcKubernetes){
         $registrationState = (az provider show --namespace $provider --query registrationState -o tsv)
         if ($registrationState -eq "Registered"){
@@ -83,7 +71,6 @@ function Register-ArcDataSvcProviders {
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
     Write-Host "`n"
-    $providersArcDataSvc = $providersArcDataSvc.split(" ")
     foreach ($provider in $providersArcDataSvc){
         $registrationState = (az provider show --namespace $provider --query registrationState -o tsv)
         if ($registrationState -eq "Registered"){
@@ -116,7 +103,6 @@ function Register-ArcAppSvcProviders {
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
     Write-Host "`n"
-    $providersArcAppSvc = $providersArcAppSvc.split(" ")
     foreach ($provider in $providersArcAppSvc){
         $registrationState = (az provider show --namespace $provider --query registrationState -o tsv)
         if ($registrationState -eq "Registered"){
@@ -150,8 +136,8 @@ function Install-ArcK8sCLIExtensions {
     #>
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
+    Write-Host "`n"
     # Installing Azure CLI extensions
-    $kubernetesExtensions = $kubernetesExtensions.split(" ")
     foreach ($extension in $kubernetesExtensions) {
         $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
@@ -170,8 +156,8 @@ function Install-ArcDataSvcCLIExtensions {
     #>
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
+    Write-Host "`n"
     # Installing Azure CLI extensions
-    $dataSvcExtensions = $dataSvcExtensions.split(" ")
     foreach ($extension in $dataSvcExtensions) {
         $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
@@ -189,8 +175,8 @@ function Install-ArcAppSvcCLIExtensions {
     #>	
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
+    Write-Host "`n"
     # Installing Azure CLI extensions
-    $appSvcExtensions = $appSvcExtensions.split(" ")
     foreach ($extension in $appSvcExtensions) {
         $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
@@ -238,6 +224,7 @@ if (Test-Path -Path 'C:\Temp\AppServicesLogonScript.ps1'){
     Install-ArcAppSvcCLIExtensions
 }
 
+# Showing the output of registered resource providers and Azure CLI installed extensions
 foreach ($provider in $allArcProviders){
     az provider show --namespace $provider --query "{Namespace:namespace, RegistrationState:registrationState}" -o table
     Write-Host "`n"
