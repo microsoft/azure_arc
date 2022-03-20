@@ -70,13 +70,13 @@ variable "user_ip_address" {
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
-  default     = "sebassem"
+  default     = "microsoft"
 }
 
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "arcbox_devops_Bastion"
+  default     = "main"
 }
 
 variable "spn_client_id" {
