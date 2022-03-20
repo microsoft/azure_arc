@@ -7,12 +7,12 @@ if ($deploymentEnvironment -eq $null -eq $false){
     $Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart-prod.azconfig.io;Id=xcEf-l6-s0:Fn+IoFEzNKvm/Bo0+W1I;Secret=dkuO3eUhqccYw6YWkFYNcPMZ/XYQ4r9B/4OhrWTLtL0="
     $deploymentEnvironment = "Production"
     Write-Host "`n"
-    Write-Host "This is a "$deploymentEnvironment" deployment environment"
+    Write-Host "This is a Jumpstart $deploymentEnvironment deployment environment"
 } else {
     $Env:AZURE_APPCONFIG_CONNECTION_STRING = "Endpoint=https://jumpstart-dev.azconfig.io;Id=5xh8-l6-s0:q89J0MWp2twZnTsqoiLQ;Secret=y5UFAWzPNdJsPcRlKC538DimC4/nb1k3bKuzaLC90f8="
     $deploymentEnvironment = "Dev"
     Write-Host "`n"
-    Write-Host "This is a "$deploymentEnvironment" deployment environment"
+    Write-Host "This is a Jumpstart $deploymentEnvironment deployment environment"
 }
 
 # Declaring required Azure Arc resource providers
@@ -26,6 +26,17 @@ $kubernetesExtensions = (az appconfig kv list --key "kubernetesExtensions" --lab
 $dataSvcExtensions = (az appconfig kv list --key "dataSvcExtensions" --label $deploymentEnvironment --query "[].value" -o tsv)
 $appSvcExtensions = (az appconfig kv list --key "appSvcExtensions" --label $deploymentEnvironment --query "[].value" -o tsv)
 
+# # Declaring required Azure Arc resource providers
+# $providersArcKubernetes = "Microsoft.Kubernetes", "Microsoft.KubernetesConfiguration", "Microsoft.ExtendedLocation"
+# $providersArcDataSvc = "Microsoft.AzureArcData"
+# $providersArcAppSvc = "Microsoft.Web"
+# $allArcProviders = $providersArcKubernetes + $providersArcDataSvc + $providersArcAppSvc
+
+# # Declaring required Azure Arc Azure CLI extensions
+# $kubernetesExtensions = "connectedk8s", "k8s-configuration", "k8s-extension", "customlocation"
+# $dataSvcExtensions = "arcdata"
+# $appSvcExtensions = "appservice-kube"
+
 # Global Jumpstart PowerShell functions - Azure resource providers
 function Register-ArcKubernetesProviders {
     <#
@@ -36,13 +47,10 @@ function Register-ArcKubernetesProviders {
         PowerShell function for registering Azure Arc-enabled Kubernetes resource providers required in Jumpstart Kubernetes-based automation.
         Depended on the $providersArcKubernetes environment variables
     #>
-	[CmdletBinding()]
-    [Parameter(Mandatory)]
-    [string]$providersArcKubernetes | Out-Null
-
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
     Write-Host "`n"
+    $providersArcKubernetes = $providersArcKubernetes.split(" ")
     foreach ($provider in $providersArcKubernetes){
         $registrationState = (az provider show --namespace $provider --query registrationState -o tsv)
         if ($registrationState -eq "Registered"){
@@ -72,13 +80,10 @@ function Register-ArcDataSvcProviders {
         PowerShell function for registering Azure Arc-enabled data services resource providers required in Jumpstart Kubernetes-based automation.
         Depended on the $providersArcDataSvc environment variables
     #>
-    [CmdletBinding()]
-    [Parameter(Mandatory)]
-    [string]$providersArcDataSvc | Out-Null
-
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
     Write-Host "`n"
+    $providersArcDataSvc = $providersArcDataSvc.split(" ")
     foreach ($provider in $providersArcDataSvc){
         $registrationState = (az provider show --namespace $provider --query registrationState -o tsv)
         if ($registrationState -eq "Registered"){
@@ -108,13 +113,10 @@ function Register-ArcAppSvcProviders {
         PowerShell function for registering Azure Arc-enabled app services resource providers required in Jumpstart Kubernetes-based automation.
         Depended on the $providersArcDataSvc environment variables
     #>
-    [CmdletBinding()]
-    [Parameter(Mandatory)]
-    [string]$providersArcAppSvc | Out-Null
-
     Write-Host "`n"
     Write-Host "Checking $service Azure resource provider registration state"
     Write-Host "`n"
+    $providersArcAppSvc = $providersArcAppSvc.split(" ")
     foreach ($provider in $providersArcAppSvc){
         $registrationState = (az provider show --namespace $provider --query registrationState -o tsv)
         if ($registrationState -eq "Registered"){
@@ -146,18 +148,16 @@ function Install-ArcK8sCLIExtensions {
         PowerShell function for installing Azure Arc-enabled Kubernetes Azure CLI extensions required in Jumpstart Kubernetes-based automation.
         Depended on the $kubernetesExtensions environment variables
     #>
-    [CmdletBinding()]
-    [Parameter(Mandatory)]
-    [string]$kubernetesExtensions | Out-Null
-
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
     # Installing Azure CLI extensions
+    $kubernetesExtensions = $kubernetesExtensions.split(" ")
     foreach ($extension in $kubernetesExtensions) {
         $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
     }
 }
+
 
 function Install-ArcDataSvcCLIExtensions {
     <#
@@ -168,13 +168,10 @@ function Install-ArcDataSvcCLIExtensions {
         PowerShell function for installing Azure Arc-enabled data services Azure CLI extensions required in Jumpstart Kubernetes-based automation.
         Depended on the $dataSvcExtensions environment variables
     #>
-    [CmdletBinding()]
-    [Parameter(Mandatory)]
-    [string]$dataSvcExtensions | Out-Null
-
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
     # Installing Azure CLI extensions
+    $dataSvcExtensions = $dataSvcExtensions.split(" ")
     foreach ($extension in $dataSvcExtensions) {
         $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
@@ -190,13 +187,10 @@ function Install-ArcAppSvcCLIExtensions {
         PowerShell function for installing Azure Arc-enabled app services Azure CLI extensions required in Jumpstart Kubernetes-based automation.
         Depended on the $appSvcExtensions environment variables
     #>	
-    [CmdletBinding()]
-    [Parameter(Mandatory)]
-    [string]$appSvcExtensions | Out-Null
-
     Write-Host "`n"
     Write-Host "Installing Azure CLI extensions for $service"
     # Installing Azure CLI extensions
+    $appSvcExtensions = $appSvcExtensions.split(" ")
     foreach ($extension in $appSvcExtensions) {
         $version = (az appconfig kv list --key $extension --label $deploymentEnvironment --query "[].value" -o tsv)
         az extension add --name $extension --version $version -y
