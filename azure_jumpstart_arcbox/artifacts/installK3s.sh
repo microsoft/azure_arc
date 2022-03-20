@@ -41,12 +41,12 @@ sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
 
 # Setting Ip address of VM based on Bastion choice
-boolDeployBastion=$(echo "${deployBastion,,}")
+boolDeployBastion=$(echo "${deployBastion,,}") ## Converting boolean variable to lowercase string
 if "$boolDeployBastion" == "true"
 then
-    publicIp=$(hostname -i); echo "True*****"; echo $publicIp
+    publicIp=$(hostname -i)
 else
-    publicIp=$(curl icanhazip.com);echo "False****"; echo $publicIp
+    publicIp=$(curl icanhazip.com)
 fi
 
 # Installing Rancher K3s single master cluster using k3sup
