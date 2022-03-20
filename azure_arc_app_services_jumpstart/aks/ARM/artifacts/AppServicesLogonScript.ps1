@@ -19,6 +19,8 @@ $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.Ge
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
 # Running Jumpstart global config automation
+Write-Host "`n"
+Write-Host "Running Jumpstart global config automation"
 & "C:\Temp\globalConfig.ps1"
 
 # Set default subscription to run commands against
@@ -30,6 +32,7 @@ az account set --subscription $Env:subscriptionId
 $aksClusterGroupName = $(az aks show --resource-group $Env:resourceGroup --name $Env:clusterName -o tsv --query nodeResourceGroup)
 
 # Getting AKS cluster credentials kubeconfig file
+Write-Host "`n"
 Write-Host "Getting AKS cluster credentials"
 Write-Host "`n"
 az aks get-credentials --resource-group $Env:resourceGroup `
