@@ -5,9 +5,9 @@ $deploymentEnvironment = ($Env:templateBaseUrl | Select-String "microsoft/azure_
 
 # Declaring if this is a Jumpstart scenario or ArcBox deployment
 if ($Env:flavor -eq $null -eq $true){
-    $jumpstartSolution = "Jumpstart scenario"
-}else {
-    $jumpstartSolution = "Jumpstart ArcBox"
+    $jumpstartDeployment = "Jumpstart scenario"
+} else {
+    $jumpstartDeployment = "Jumpstart ArcBox"
 }
 
 # Setting up the environment variable for the Jumpstart App Configuration connection string deployment (Production/Dev)
@@ -18,12 +18,12 @@ if ($deploymentEnvironment -eq $null -eq $false){
     $Env:AZURE_APPCONFIG_CONNECTION_STRING = $jumpstartAppConfigProduction
     $deploymentEnvironment = "Production"
     Write-Host "`n"
-    Write-Host "This is a $jumpstartSolution $deploymentEnvironment deployment!"
+    Write-Host "This is a $jumpstartDeployment $deploymentEnvironment deployment!"
 } else {
     $Env:AZURE_APPCONFIG_CONNECTION_STRING = $jumpstartAppConfigDev
     $deploymentEnvironment = "Dev"
     Write-Host "`n"
-    Write-Host "This is a $jumpstartSolution $deploymentEnvironment deployment!"
+    Write-Host "This is a $jumpstartDeployment $deploymentEnvironment deployment!"
 }
 
 # Declaring required Azure Arc resource providers
@@ -194,29 +194,29 @@ function Install-ArcAppSvcCLIExtensions {
     }
 }
 
-# Making extension install dynamic
+# Making extension installation dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
 
 # Determining which Kubernetes distributions is being used
-if ($Env:flavor -eq $null -eq $true) {
+if ($jumpstartDeployment -eq "Jumpstart scenario"){
     $clusterTypeAKS = (az resource list --resource-group $Env:resourceGroup --resource-type "Microsoft.ContainerService/managedClusters" --query "[].type" -o tsv)
     $clusterTypeARO = (az resource list --resource-group $Env:resourceGroup --resource-type "Microsoft.RedHatOpenShift/openShiftClusters" --query "[].type" -o tsv)
 }
 
-# Required for Jumpstart scenarios which are based on EITHER OF the following Kubernetes distributions:
+# Required for Jumpstart scenarios which are based on ##EITHER OF## the following Kubernetes distributions:
 #   - Azure Kubernetes Service (AKS)
 #   - Azure RedHat OpenShift (ARO)
-if ($Env:flavor -eq $null -eq $true -and $Env:clusterName -eq $null -eq $false -and $clusterTypeAKS -eq $null -eq $false -or $clusterTypeARO -eq $null -eq $false){
+if ($jumpstartDeployment -eq "Jumpstart scenario" -and $Env:clusterName -eq $null -eq $false -and $clusterTypeAKS -eq $null -eq $false -or $clusterTypeARO -eq $null -eq $false){
     # Installing needed providers and CLI extensions for all Azure Arc-enabled Kubernetes-based automations
     $service = "Azure Arc-enabled Kubernetes"
     Register-ArcKubernetesProviders
     Install-ArcK8sCLIExtensions
 }
 
-# Required for Jumpstart scenarios which are based on Kubernetes distribution that is NOT one the following Kubernetes distributions:
+# Required for Jumpstart scenarios which are based on Kubernetes distribution ##that is NOT## one the following Kubernetes distributions:
 #   - Azure Kubernetes Service (AKS)
 #   - Azure RedHat OpenShift (ARO)
-if ($Env:flavor -eq $null -eq $true -and $Env:clusterName -eq $null -eq $false -and $clusterTypeAKS -eq $null -eq $true -or $clusterTypeARO -eq $null -eq $true){
+if ($jumpstartDeployment -eq "Jumpstart scenario" -and $Env:clusterName -eq $null -eq $false -and $clusterTypeAKS -eq $null -eq $true -or $clusterTypeARO -eq $null -eq $true){
     # Installing Azure CLI extensions
     Install-ArcK8sCLIExtensions
 }
