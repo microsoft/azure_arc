@@ -75,12 +75,12 @@
       "defaultValue": "main"
     },
     "deployBastion": {
-            "type": "bool",
-            "metadata": {
-                "description": "Choice to deploy Bastion to connect to the client VM"
-            },
-            "defaultValue" : false
-        }
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "defaultValue": false
+    }
   },
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_jumpstart_arcbox/')]",
