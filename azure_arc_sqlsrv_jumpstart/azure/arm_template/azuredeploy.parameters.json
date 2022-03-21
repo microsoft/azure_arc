@@ -5,15 +5,15 @@
         "vmSize": {
             "value": "<VM size>"
         },
-        "vmName":{
+        "vmName": {
             "value": "<VM Name>"
         },
         "adminUsername": {
-          "value": "<Windows VM admin username>"
+            "value": "<Windows VM admin username>"
         },
         "adminPassword": {
             "value": "<Windows VM admin password>"
-        },    
+        },
         "servicePrincipalAppId": {
             "value": "<Azure service principal name>"
         },
@@ -23,6 +23,5 @@
         "servicePrincipalTenantId": {
             "value": "<Azure tenant ID>"
         }
-      }
-  }
-  
+    }
+}

@@ -5,11 +5,11 @@
         "vmSize": {
             "value": "Standard_D8s_v3"
         },
-        "vmName":{
+        "vmName": {
             "value": "Arc-SQL-Demo"
         },
         "adminUsername": {
-          "value": "arcdemo"
+            "value": "arcdemo"
         },
         "adminPassword": {
             "value": "ArcPassword123!!"
@@ -23,6 +23,5 @@
         "servicePrincipalTenantId": {
             "value": "33333333-XXXX-41af-1111-7777777777"
         }
-      }
-  }
-  
+    }
+}
