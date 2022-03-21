@@ -1,7 +1,3 @@
-#
-# Outputs
-#
-
 locals {
   config_map_aws_auth = <<CONFIGMAPAWSAUTH
 
@@ -13,7 +9,7 @@ metadata:
   namespace: kube-system
 data:
   mapRoles: |
-    - rolearn: ${aws_iam_role.arcdemo-node.arn}
+    - rolearn: ${module.eks_workers.worker_role_arn}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers
@@ -26,8 +22,8 @@ CONFIGMAPAWSAUTH
 apiVersion: v1
 clusters:
 - cluster:
-    server: ${aws_eks_cluster.arcdemo.endpoint}
-    certificate-authority-data: ${aws_eks_cluster.arcdemo.certificate_authority.0.data}
+    server: ${module.eks_cluster.cluster_endpoint}
+    certificate-authority-data: ${module.eks_cluster.cluster_ca_data}
   name: kubernetes
 contexts:
 - context:
@@ -46,7 +42,7 @@ users:
       args:
         - "token"
         - "-i"
-        - "${var.cluster-name}"
+        - "${var.cluster_name}"
 KUBECONFIG
 }
 
@@ -55,5 +51,5 @@ output "config_map_aws_auth" {
 }
 
 output "kubeconfig" {
-  value = local.kubeconfig
+  value = "${local.kubeconfig}"
 }

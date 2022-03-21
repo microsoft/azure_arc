@@ -1,18 +1,11 @@
-#
-# Variables Configuration
-#
-
-variable "AWS_ACCESS_KEY_ID" {
-  description = "Your AWS Access Key ID"
+variable "aws_region" {
   type        = string
+  description = "Target AWS region."
+  default     = "us-west-1"
 }
 
-variable "AWS_SECRET_ACCESS_KEY" {
-  description = "Your AWS Secret Key"
+variable "cluster_name" {
   type        = string
-}
-
-variable "cluster-name" {
-  default = "arc-eks-demo"
-  type    = string
+  description = "EKS cluster name."
+  default     = "arcdemo-cluster"
 }
