@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "arcdemo-cluster-AmazonEKSServicePolic
 resource "aws_security_group" "arcdemo-cluster" {
   name        = "terraform-eks-arcdemo-cluster"
   description = "Cluster communication with worker nodes"
-  vpc_id      = aws_vpc.arcdemo.id
+  vpc_id      = var.cluster_vpc_id
 
   egress {
     from_port   = 0
@@ -52,7 +52,7 @@ resource "aws_security_group" "arcdemo-cluster" {
 }
 
 resource "aws_security_group_rule" "arcdemo-cluster-ingress-workstation-https" {
-  cidr_blocks       = [local.workstation-external-cidr]
+  cidr_blocks       = [var.workstation_cidr]
   description       = "Allow workstation to communicate with the cluster API Server"
   from_port         = 443
   protocol          = "tcp"
@@ -62,12 +62,12 @@ resource "aws_security_group_rule" "arcdemo-cluster-ingress-workstation-https" {
 }
 
 resource "aws_eks_cluster" "arcdemo" {
-  name     = var.cluster-name
+  name     = var.cluster_name
   role_arn = aws_iam_role.arcdemo-cluster.arn
 
   vpc_config {
     security_group_ids = [aws_security_group.arcdemo-cluster.id]
-    subnet_ids         = aws_subnet.arcdemo[*].id
+    subnet_ids         = var.cluster_subnet_ids
   }
 
   depends_on = [
