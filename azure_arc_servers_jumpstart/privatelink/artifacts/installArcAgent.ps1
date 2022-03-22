@@ -9,6 +9,10 @@ param (
 
 )
 
+$LogonScript = @'
+Start-Transcript -Path C:\tmp\LogonScript.log
+
+
 #Configure hosts file for PL 
 $file = "C:\Windows\System32\drivers\etc\hosts"
 $gisfqdn=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[0].recordSets[0].fqdn -o json).replace('.privatelink','').replace("`"","")
@@ -61,3 +65,14 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
 --tags "Project=jumpstart_azure_arc_servers" `
 --correlation-id "86501baa-0b82-478c-b3cf-620533617001"
 
+Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
+Stop-Process -Name powershell -Force
+'@ > C:\tmp\LogonScript.ps1
+
+# Creating LogonScript Windows Scheduled Task
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\LogonScript.ps1'
+Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User "${adminUsername}" -Action $Action -RunLevel "Highest" -Force
+
+# Disabling Windows Server Manager Scheduled Task
+Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
