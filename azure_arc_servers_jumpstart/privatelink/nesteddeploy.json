@@ -470,7 +470,10 @@
                         "value": "[parameters('tenantId')]"
                     },
                     "PLscope": {
-                        "value": "[reference('AzureDeployment').outputs.PLscope.value]" 
+                        "value": "[reference('AzureDeployment').outputs.PLscope.value]"
+                    }, 
+                    "privateEndpoints_name": {
+                        "value": "[parameters('privateEndpoints_name')]"
                     }
 
                 },
@@ -495,6 +498,9 @@
                     },
                      "PLscope": {
                         "type": "string"
+                    },
+                    "privateEndpoints_name": {
+                        "type": "string"
                     }
                     },
                     "variables": {
@@ -515,7 +521,7 @@
                                     "fileUris": [
                                         "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1"
                                     ],
-                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File installArcAgent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', parameters('PLscope') )]"
+                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File installArcAgent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', parameters('PLscope'),' -PEname ', parameters('privateEndpoints_name') )]"
                                 }
                             }
                         }

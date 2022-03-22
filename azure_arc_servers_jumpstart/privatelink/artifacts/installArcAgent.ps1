@@ -5,21 +5,22 @@ param (
     [string]$resourceGroup,
     [string]$subscriptionId,
     [string]$Location,
-    [string]$PLscope
+    [string]$PEname 
+
 )
 
-
+#Configure hosts file for PL 
 $file = "C:\Windows\System32\drivers\etc\hosts"
-$gisfqdn=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[0].recordSets[0].fqdn -o json).replace('.privatelink','').replace("`"","")
-$gisIP= (az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[0].recordSets[0].ipAddresses[0] -o json).replace("`"","")
-$hisfqdn=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[0].recordSets[1].fqdn -o json).replace('.privatelink','').replace("`"","")
-$hisIP=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[0].recordSets[1].ipAddresses[0] -o json).replace('.privatelink','').replace("`"","")
-$agentfqdn=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[1].recordSets[0].fqdn -o json).replace('.privatelink','').replace("`"","")
-$agentIp=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[1].recordSets[0].ipAddresses[0] -o json).replace('.privatelink','').replace("`"","")
-$gasfqdn=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[1].recordSets[1].fqdn -o json).replace('.privatelink','').replace("`"","")
-$gasIp=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[1].recordSets[1].ipAddresses[0] -o json).replace('.privatelink','').replace("`"","")
-$dpfqdn=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[2].recordSets[0].fqdn -o json).replace('.privatelink','').replace("`"","")
-$dpIp=(az network private-endpoint dns-zone-group list --endpoint-name Arc-PE-demo --resource-group Arc-Azure-PL-demo --query [0].privateDnsZoneConfigs[2].recordSets[0].ipAddresses[0] -o json).replace('.privatelink','').replace("`"","")
+$gisfqdn=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[0].recordSets[0].fqdn -o json).replace('.privatelink','').replace("`"","")
+$gisIP= (az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[0].recordSets[0].ipAddresses[0] -o json).replace("`"","")
+$hisfqdn=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[0].recordSets[1].fqdn -o json).replace('.privatelink','').replace("`"","")
+$hisIP=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[0].recordSets[1].ipAddresses[0] -o json).replace('.privatelink','').replace("`"","")
+$agentfqdn=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[1].recordSets[0].fqdn -o json).replace('.privatelink','').replace("`"","")
+$agentIp=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[1].recordSets[0].ipAddresses[0] -o json).replace('.privatelink','').replace("`"","")
+$gasfqdn=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[1].recordSets[1].fqdn -o json).replace('.privatelink','').replace("`"","")
+$gasIp=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[1].recordSets[1].ipAddresses[0] -o json).replace('.privatelink','').replace("`"","")
+$dpfqdn=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[2].recordSets[0].fqdn -o json).replace('.privatelink','').replace("`"","")
+$dpIp=(az network private-endpoint dns-zone-group list --endpoint-name $PEname --resource-group $resourceGroup --query [0].privateDnsZoneConfigs[2].recordSets[0].ipAddresses[0] -o json).replace('.privatelink','').replace("`"","")
 $hostfile = Get-Content $file
 $hostfile += "$gisIP $gisfqdn"
 $hostfile += "$hisIP $hisfqdn"
