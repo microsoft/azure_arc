@@ -70,6 +70,15 @@
         },
         "sharedKey": {
             "value": "ArcPassword123!!"
+        },
+        "appId": {
+            "value": "xxxxxxxxxxxxxxxxx"
+        },
+        "password": {
+            "value": "xxxxxxxxxxxxxxxxx"
+        },
+        "tenantId": {
+            "value": "xxxxxxxxxxxxxxxxx"
         }
     }
 }
