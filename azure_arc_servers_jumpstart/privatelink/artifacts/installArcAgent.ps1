@@ -8,6 +8,14 @@ param (
     [string]$PEname 
 
 )
+[System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('password', $password,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('tenantId', $tenantId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('Location', $location,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('PEname', $PEname,[System.EnvironmentVariableTarget]::Machine)
+
 
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
@@ -54,14 +62,14 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
 
 # Run connect command
 & "$env:ProgramW6432\AzureConnectedMachineAgent\azcmagent.exe" connect `
---service-principal-id $appId `
---service-principal-secret $password `
---location $Location `
---tenant-id $tenantId `
---subscription-id $SubscriptionId `
---resource-group $resourceGroup `
+--service-principal-id $env:appId `
+--service-principal-secret $env:password `
+--location $env:Location `
+--tenant-id $env:tenantId `
+--subscription-id $env:SubscriptionId `
+--resource-group $env:resourceGroup `
 --cloud "AzureCloud" `
---private-link-scope $PLscope `
+--private-link-scope $env:PLscope `
 --tags "Project=jumpstart_azure_arc_servers" `
 --correlation-id "86501baa-0b82-478c-b3cf-620533617001"
 
