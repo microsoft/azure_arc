@@ -474,6 +474,9 @@
                     }, 
                     "privateEndpoints_name": {
                         "value": "[parameters('privateEndpoints_name')]"
+                    }, 
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
                     }
 
                 },
@@ -501,6 +504,9 @@
                     },
                     "privateEndpoints_name": {
                         "type": "string"
+                    },
+                    "adminUsername": {
+                        "type": "string"
                     }
                     },
                     "variables": {
@@ -519,9 +525,9 @@
                                 "autoUpgradeMinorVersion": true,
                                 "settings": {
                                     "fileUris": [
-                                        "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1"
+                                        "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/bootstrap.ps1"
                                     ],
-                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File installArcAgent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', parameters('PLscope'),' -PEname ', parameters('privateEndpoints_name') )]"
+                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File bootstrap.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', parameters('PLscope'),' -PEname ', parameters('privateEndpoints_name'),' -adminUsername ', parameters('adminUsername') )]"
                                 }
                             }
                         }

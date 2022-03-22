@@ -158,7 +158,7 @@
             "type": "Microsoft.HybridCompute/privateLinkScopes",
             "apiVersion": "2021-06-10-preview",
             "name": "[parameters('privateLinkScopes_name')]",
-            "location": "westeurope",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "publicNetworkAccess": "Disabled"
             }
@@ -167,7 +167,7 @@
             "type": "Microsoft.Network/privateEndpoints",
             "apiVersion": "2020-11-01",
             "name": "[parameters('privateEndpoints_name')]",
-            "location": "westeurope",
+            "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/virtualNetworks/', parameters('cloudVNetName'))]"
             ],
