@@ -1,34 +1,77 @@
-# Azure Arc Jumpstart documentation
+# Support GitHub Actions Deployment for EKS
 
-If you are looking to explore the Jumpstart documentation, please go to the documentation website:
+Simplifly deployment using Gtihub Workflows and the verified [Terraform Action](https://github.com/hashicorp/setup-terraform) published on [GitHub Actions Marketplace](https://github.com/marketplace/actions/hashicorp-setup-terraform) 
 
-https://azurearcjumpstart.io
+### Files added:
+- [tf-deploy-eks.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github/workflow/tf-deploy-eks.yml)
+- [connect-eks-and-arc.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github/workflow/connect-eks-and-arc.yml)
 
-This repository contains the markdown files which generate the above website. See below for guidance on running with a local environment to contribute to the docs.
+### Files modified:
+- [providers.tf](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github/providers.tf)
+- [variables.tf](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github/variables.tf)
 
-## Want to help and contribute?
+```
+# This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
+# with an API token for Terraform Cloud (app.terraform.io). On manual trigger events, this workflow will run
+# `terraform init`, `terraform fmt`, and `terraform plan` and `terraform apply` (speculative plan via Terraform Cloud). 
+#
+# Documentation for `hashicorp/setup-terraform` is located here: https://github.com/hashicorp/setup-terraform
+#
+# To use this workflow, you will need to complete the following setup steps.
+#
+# 1. Create a `main.tf` file in the root of this repository with the `remote` backend and one or more resources defined.
+#   Example `main.tf`:
+#     # The configuration for the `remote` backend.
+#     terraform {
+#       backend "remote" {
+#         # The name of your Terraform Cloud organization.
+#         organization = "example-organization"
+#
+#         # The name of the Terraform Cloud workspace to store Terraform state files in.
+#         workspaces {
+#           name = "example-workspace"
+#         }
+#       }
+#     }
+#
+#     # An example resource that does nothing.
+#     resource "null_resource" "example" {
+#       triggers = {
+#         value = "A example resource that does nothing!"
+#       }
+#     }
+#
+#
+# 2. Generate a Terraform Cloud user API token and store it as a GitHub secret (e.g. TF_API_TOKEN) on this repository.
+#   Documentation:
+#     - https://www.terraform.io/docs/cloud/users-teams-organizations/api-tokens.html
+#     - https://docs.github.com/en/actions/security-guides/encrypted-secrets
+#
+# 3. Reference the GitHub secret in step using the `hashicorp/setup-terraform` GitHub Action.
+#   Example:
+#     - name: Setup Terraform
+#       uses: hashicorp/setup-terraform@v1
+#       with:
+#         cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+#
+# 4. Create the following GitHub secrets, these secrets will be used by GitHub Workflow called "connect-eks-and-arc.yml".
+#   Secrets:
+#     - AZURE_RG = "Name of your Azure Resurce Group"
+#     - CLIENTID = "Service Principal appId"
+#     - CLIENTSECRET = "Service Principal password"
+#     - TENANTID = "Service Principal tenant"
+#     - EKSCLUSTER_NAME = "Your EKS Cluster Name"
+#   Documentation:
+#     - https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository
+#
+# 5. Create the following Terraform Cloud Workspace Variables, these variables will be used by GitHub Workflow called "tf-deploy-eks.yml".
+#   Workspace Variables:
+#     - AWS_SECRET_ACCESS_KEY  = "your aws secret key"
+#     - AWS_ACCESS_KEY_ID = "your aws access key"
+#   Documentation:
+#     - https://www.terraform.io/cloud-docs/workspaces/variables#precedence
 
-Before making your first contribution, make sure to review the [contributing](https://azurearcjumpstart.io/contributing/) section in the docs.
-
-* Found a bug?! Use the [Bug Report](https://github.com/microsoft/azure_arc/issues/new?assignees=&labels=bug&template=bug_report.md&title=) issue template to let us know.
-
-* To ask for a Jumpstart scenario, create one yourself or submit an Azure Arc core product feature request, use the [Feature Request](https://github.com/microsoft/azure_arc/issues/new?assignees=&labels=&template=feature_request.md&title=) issue template.
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-## Jumpstart Roadmap
-
-Up-to-date roadmap for the Azure Arc Jumpstart scenarios can be found under [the repository GitHub Project](https://github.com/microsoft/azure_arc/projects/1).
+```
 
 ## Legal Notices
 
