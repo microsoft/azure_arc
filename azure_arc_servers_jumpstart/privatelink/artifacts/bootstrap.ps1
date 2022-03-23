@@ -6,7 +6,8 @@ param (
     [string]$subscriptionId,
     [string]$Location,
     [string]$PEname, 
-    [string]$adminUsername 
+    [string]$adminUsername,
+    [string]$PLscope 
 
 )
 [System.Environment]::SetEnvironmentVariable('appId', $appId,[System.EnvironmentVariableTarget]::Machine)
@@ -17,6 +18,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('Location', $location,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PEname', $PEname,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('PLscope', $PLscope,[System.EnvironmentVariableTarget]::Machine)
 
 
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
