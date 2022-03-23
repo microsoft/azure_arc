@@ -57,7 +57,7 @@ param deployBastion bool = false
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
-var bastionSubnetIpPrefix = '172.16.3.0/27'
+var bastionSubnetIpPrefix = '172.16.3.64/26'
 var PublicIPNoBastion = {
   id: '${publicIpAddress.id}'
 }
