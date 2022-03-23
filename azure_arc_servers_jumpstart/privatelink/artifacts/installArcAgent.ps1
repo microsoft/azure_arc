@@ -9,7 +9,7 @@ Start-Transcript -Path C:\tmp\LogonScript_Install.log
 az login --service-principal -u $Env:appId -p $Env:password --tenant $Env:tenantId
 az account set -s $Env:SubscriptionId
 
-#Configure hosts file for Private link endpoints
+#Configure hosts file for Private link endpoints resolution
 
 $file = "C:\Windows\System32\drivers\etc\hosts"
 
