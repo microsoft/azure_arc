@@ -1,0 +1,37 @@
+name: "Deploying EKS with GitHub Actions"
+
+on: workflow_dispatch
+
+jobs:
+  Terraform-Deploy:
+    name: "Deploy EKS"
+    runs-on: ubuntu-latest
+    environment: PoC
+    defaults:
+      run:
+        working-directory: "./azure_arc_k8s_jumpstart/eks/terraform/IaC"
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -recursive
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color
+        
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve
