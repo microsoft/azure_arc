@@ -123,7 +123,7 @@
         "bastionSubnetName": "AzureBastionSubnet",
         "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
         "bastionName" : "[concat(parameters('bastionHostName'))]",
-        "bastionSubnetIpPrefix": "10.1.1.0/27",
+        "bastionSubnetIpPrefix": "10.1.1.64/26",
         "PublicIPNoBastion": {
             "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         },
