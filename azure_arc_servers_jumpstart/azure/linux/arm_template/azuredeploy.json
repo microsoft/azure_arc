@@ -141,7 +141,7 @@
     "subnetAddressPrefix": "10.1.0.0/24",
     "addressPrefix": "10.1.0.0/16",
     "bastionName": "[concat(parameters('bastionHostName'))]",
-    "bastionSubnetIpPrefix": "10.1.1.0/27",
+    "bastionSubnetIpPrefix": "10.1.1.64/26",
     "PublicIPNoBastion": {
       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
     },
