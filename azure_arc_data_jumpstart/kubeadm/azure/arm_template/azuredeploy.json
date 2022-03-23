@@ -224,7 +224,7 @@
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
-        "bastionSubnetPrefix": "10.1.2.0/27",
+        "bastionSubnetPrefix": "10.1.2.64/26",
         "bastionSubnetName": "AzureBastionSubnet",
         "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
         "PublicIPNoBastion": {
