@@ -30,7 +30,7 @@ locals {
   bastionSubnetName     = "AzureBastionSubnet"
   bastionSubnetRef      = "${azurerm_virtual_network.vnet.id}/subnets/${local.bastionSubnetName}"
   bastionName           = "ArcBox-Bastion"
-  bastionSubnetIpPrefix = "172.16.3.0/27"
+  bastionSubnetIpPrefix = "172.16.3.64/26"
   bastionPublicIpAddressName = "${local.bastionName}-PIP"
 }
 

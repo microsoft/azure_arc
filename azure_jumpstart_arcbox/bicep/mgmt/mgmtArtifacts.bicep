@@ -44,7 +44,7 @@ var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'ArcBox-Bastion'
-var bastionSubnetIpPrefix = '172.16.3.0/27'
+var bastionSubnetIpPrefix = '172.16.3.64/26'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 
 resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
