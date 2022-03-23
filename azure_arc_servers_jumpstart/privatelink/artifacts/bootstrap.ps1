@@ -22,7 +22,6 @@ param (
 
 # Creating Log File
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
-$LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
 #Install pre-requisites
@@ -63,7 +62,6 @@ Invoke-WebRequest ("https://raw.githubusercontent.com/lanicolas/azure_arc/privat
 #Create scheduled task
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
 Stop-Process -Name powershell -Force
-'@ > C:\tmp\installArcAgent.ps1
 
 # Creating LogonScript Windows Scheduled Task
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
