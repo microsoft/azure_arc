@@ -1,3 +1,6 @@
+# Creating Log File
+Start-Transcript -Path C:\tmp\ArcInstallScript.log
+
 # Azure Login 
 
 az login --service-principal -u $Env:appId -p $Env:password --tenant $Env:tenantId
