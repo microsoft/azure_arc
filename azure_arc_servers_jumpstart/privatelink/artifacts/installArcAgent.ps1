@@ -1,9 +1,3 @@
-# Creating log file
-
-New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
-$LogonScript = @'
-Start-Transcript -Path C:\tmp\LogonScript_Install.log
-
 # Azure Login 
 
 az login --service-principal -u $Env:appId -p $Env:password --tenant $Env:tenantId
@@ -62,5 +56,3 @@ msiexec /i AzureConnectedMachineAgent.msi /l*v installationlog.txt /qn | Out-Str
 --service-principal-secret $Env:password `
 --correlation-id "e5089a61-0238-48fd-91ef-f67846168001" `
 --tags "Project=jumpstart_azure_arc_servers" 
-
-'@ > C:\tmp\LogonScript_Install.log
