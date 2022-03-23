@@ -20,11 +20,12 @@ param (
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('PLscope', $PLscope,[System.EnvironmentVariableTarget]::Machine)
 
-
+# Creating Log File
 New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
 $LogonScript = @'
 Start-Transcript -Path C:\tmp\LogonScript.log
 
+#Install pre-requisites
 workflow ClientTools_01
         {
             $chocolateyAppList = 'azure-cli,az.powershell'
@@ -56,10 +57,12 @@ workflow ClientTools_01
         }
 ClientTools_01 | Format-Table
 
+#Download and run Arc onboarding script
 Invoke-WebRequest ("https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1") -OutFile C:\tmp\installArcAgent.ps1
 
 & "C:\tmp\installArcAgent.ps1"
 
+#Create scheduled task
 Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
 Stop-Process -Name powershell -Force
 '@ > C:\tmp\LogonScript.ps1
