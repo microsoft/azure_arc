@@ -124,7 +124,7 @@
     "subnetName": "Arc-Data-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24",
-    "bastionSubnetPrefix": "172.16.2.0/27",
+    "bastionSubnetPrefix": "172.16.2.64/26",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
   },
