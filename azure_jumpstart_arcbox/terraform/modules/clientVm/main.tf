@@ -190,7 +190,7 @@ locals {
     public_ip_name         = "${var.vm_name}-PIP"
     nsg_name               = "${var.vm_name}-NSG"
     network_interface_name = "${var.vm_name}-NIC"
-    bastionSubnetIpPrefix  = "172.16.3.0/27"
+    bastionSubnetIpPrefix  = "172.16.3.64/26"
 }
 
 data "azurerm_subscription" "primary" {
