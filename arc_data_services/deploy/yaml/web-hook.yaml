@@ -103,7 +103,7 @@ spec:
       - name: arc-private-registry
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.3.0_2022-01-27
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.4.1_2022-03-08
         command: ["/opt/webhook/create-and-deploy-webhook.sh",  "{{namespace}}", "arc-webhook-job"]
       restartPolicy: Never
       serviceAccountName: sa-arc-webhook-job

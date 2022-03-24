@@ -226,7 +226,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc enabled data services logs upload",
+      "comments": "Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs upload",
       "apiVersion": "2019-10-01",
       "name": "logAnalyticsDeployment",
       "properties": {
