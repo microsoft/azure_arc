@@ -59,14 +59,10 @@ ClientTools_01 | Format-Table
 #Download and run Arc onboarding script
 Invoke-WebRequest ("https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1") -OutFile C:\tmp\installArcAgent.ps1
 
-#Create scheduled task
-Unregister-ScheduledTask -TaskName "LogonScript" -Confirm:$False
-Stop-Process -Name powershell -Force
-
 # Creating LogonScript Windows Scheduled Task
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\installArcAgent.ps1'
-Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User "${adminUsername}" -Action $Action -RunLevel "Highest" -Force
+Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User "${Env:adminUsername}" -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
