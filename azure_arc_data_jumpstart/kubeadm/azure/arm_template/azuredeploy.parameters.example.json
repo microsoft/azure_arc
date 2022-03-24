@@ -54,7 +54,7 @@
             "value": "eastus"
         },
         "deployBastion": {
-            "value": "No"
+            "value": false
           },
           "bastionHostName": {
             "value": "Azure-Data-bastion"

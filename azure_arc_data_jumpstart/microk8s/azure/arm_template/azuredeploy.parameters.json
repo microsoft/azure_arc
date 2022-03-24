@@ -33,7 +33,7 @@
       "value": "<PostgreSQL Hyperscale deployment (true/false)>"
     },
     "deployBastion": {
-      "value": "<Deploy Bastion (Yes/No)>"
+      "value": "<true | false>"
     },
     "bastionHostName": {
       "value": "<Azure Bastion Hostname>"

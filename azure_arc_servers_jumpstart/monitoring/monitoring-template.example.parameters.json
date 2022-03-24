@@ -1,0 +1,12 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName": {
+            "value": "la-arc-servers" // Name for your Log Analytics workspace
+        },
+        "emailAddress": {
+            "value": "youremail@domain.com" // Just one email account for Azure Monitor alerts notifications
+        }
+    }
+}

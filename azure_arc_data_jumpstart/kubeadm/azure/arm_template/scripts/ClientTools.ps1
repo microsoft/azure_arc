@@ -128,15 +128,22 @@ Start-Sleep -s 5
 Stop-Process -Name "azuredatastudio" -Force
 Copy-Item -Path "C:\tmp\settings.json" -Destination $SettingsDestination -Recurse -Force -ErrorAction Continue
 
+# Installing Azure CLI arcdata extension
+Write-Host "`n"
+Write-Host "Installing Azure CLI arcdata extension"
+az extension add --name arcdata
+
+# Installing Azure Data Studio extensions
+Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
-
-$env:argument1="--install-extension"
-$env:argument2="Microsoft.arc"
-$env:argument3="microsoft.azuredatastudio-postgresql"
-
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument2
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument3
+$Env:argument1="--install-extension"
+$Env:argument2="Microsoft.arc"
+$Env:argument3="microsoft.azuredatastudio-postgresql"
+$Env:argument4="microsoft.azdata"
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
 
 Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
