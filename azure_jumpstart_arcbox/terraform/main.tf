@@ -114,15 +114,21 @@ variable "client_admin_ssh" {
   sensitive   = true
 }
 
+variable "deploy_bastion" {
+  type        = bool
+  description = "Choice to deploy Azure Bastion"
+  default = false
+}
+
 ### This should be swapped to a lower-case value to avoid case sensitivity ###
 variable "deployment_flavor" {
   type        = string
-  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', or 'Developer'."
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', or 'DevOps'."
   default     = "Full"
 
   validation {
-    condition     = contains(["Full", "ITPro", "Developer"], var.deployment_flavor)
-    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', and 'Developer'."
+    condition     = contains(["Full", "ITPro", "DevOps"], var.deployment_flavor)
+    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', and 'DevOps'."
   }
 }
 ##############################################################################
@@ -151,6 +157,7 @@ module "management_artifacts" {
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [azurerm_resource_group.rg]
 }
@@ -161,7 +168,7 @@ module "management_policy" {
   resource_group_name = azurerm_resource_group.rg.name
   workspace_name      = var.workspace_name
   workspace_id        = module.management_artifacts.workspace_id
-
+  deployment_flavor    = var.deployment_flavor
   depends_on = [azurerm_resource_group.rg]
 }
 
@@ -184,6 +191,7 @@ module "client_vm" {
   admin_password       = var.client_admin_password
   github_repo          = var.github_repo
   github_branch        = var.github_branch
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -193,7 +201,7 @@ module "client_vm" {
 
 module "capi_vm" {
   source = "./modules/kubernetes/ubuntuCapi"
-  count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
   vm_name              = var.capi_vm_name
@@ -208,6 +216,7 @@ module "capi_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -217,7 +226,7 @@ module "capi_vm" {
 
 module "rancher_vm" {
   source = "./modules/kubernetes/ubuntuRancher"
-  count  = contains(["Full", "Developer"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
   vm_name              = var.rancher_vm_name
@@ -232,6 +241,7 @@ module "rancher_vm" {
   admin_username       = var.client_admin_username
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
 
   depends_on = [
     azurerm_resource_group.rg,

@@ -81,13 +81,20 @@ param templateBaseUrl string
 @allowed([
   'Full'
   'ITPro'
-  'Developer'
+  'DevOps'
 ])
 param flavor string = 'Full'
+
+@description('Choice to deploy Bastion to connect to the client VM')
+param deployBastion bool = false
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
+var bastionSubnetIpPrefix = '172.16.3.64/26'
+var PublicIPNoBastion = {
+  id: '${publicIpAddress.id}'
+}
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: networkInterfaceName
@@ -101,9 +108,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIpAddress.id
-          }
+          publicIPAddress: deployBastion == false ? PublicIPNoBastion : json('null')
         }
       }
     ]
@@ -125,7 +130,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
-          sourceAddressPrefix: myIpAddress
+          sourceAddressPrefix: deployBastion == true ? bastionSubnetIpPrefix : myIpAddress
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '3389'
@@ -135,7 +140,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if(deployBastion == false){
   name: publicIpAddressName
   location: location
   properties: {
@@ -214,4 +219,4 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' =
 }
 
 output adminUsername string = windowsAdminUsername
-output publicIP string = concat(publicIpAddress.properties.ipAddress)
+output publicIP string = deployBastion==false ? concat(publicIpAddress.properties.ipAddress) : ''

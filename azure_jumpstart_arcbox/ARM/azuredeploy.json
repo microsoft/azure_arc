@@ -5,13 +5,13 @@
     "myIpAddress": {
       "type": "string",
       "metadata": {
-        "description": "IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address."
+        "description": "IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address"
       }
     },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
-        "description": "RSA public key used for securing SSH access to ArcBox resources."
+        "description": "RSA public key used for securing SSH access to ArcBox resources"
       }
     },
     "spnClientId": {
@@ -43,7 +43,7 @@
       "minLength": 12,
       "maxLength": 123,
       "metadata": {
-        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
+        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
       }
     },
     "logAnalyticsWorkspaceName": {
@@ -55,9 +55,9 @@
     "flavor": {
       "type": "string",
       "metadata": {
-        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       },
-      "allowedValues": [ "Full", "ITPro" ],
+      "allowedValues": [ "Full", "ITPro", "DevOps" ],
       "defaultValue": "Full"
     },
     "githubAccount": {
@@ -73,6 +73,13 @@
         "description": "Target GitHub branch"
       },
       "defaultValue": "main"
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "defaultValue": false
     }
   },
   "variables": {
@@ -89,7 +96,7 @@
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
-      "condition": "[equals(parameters('flavor'),'Full')]",
+      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'))]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -117,9 +124,12 @@
           },
           "logAnalyticsWorkspace": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
-          },          
+          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -129,7 +139,7 @@
       "apiVersion": "2019-10-01",
       "name": "ubuntuRancherDeployment",
       "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
-      "condition": "[equals(parameters('flavor'),'Full')]",
+      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'))]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -160,6 +170,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -205,6 +218,9 @@
           },
           "flavor": {
             "value": "[parameters('flavor')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -240,6 +256,9 @@
           },
           "flavor": {
             "value": "[parameters('flavor')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
