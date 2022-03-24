@@ -62,7 +62,7 @@ Invoke-WebRequest ("https://raw.githubusercontent.com/lanicolas/azure_arc/privat
 # Creating LogonScript Windows Scheduled Task
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\installArcAgent.ps1'
-Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User "${Env:adminUsername}" -Action $Action -RunLevel "Highest" -Force
+Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User $Env:adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
