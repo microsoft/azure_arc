@@ -5,7 +5,7 @@ $agentScript = "$Env:ArcBoxDir\agentScript"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DevOpsLogonScript.log
 
-$cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory
+$cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".devops" -ItemType Directory
 
 if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
     $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
