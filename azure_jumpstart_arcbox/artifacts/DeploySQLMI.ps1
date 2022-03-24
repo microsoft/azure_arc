@@ -1,7 +1,7 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 
-Start-Transcript -Path $Env:ArcBoxLogsDir\deploySQL.log
+Start-Transcript -Path $Env:ArcBoxLogsDir\DeploySQL.log
 
 # Deployment environment variables
 $controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
@@ -34,7 +34,7 @@ $backupsStorageSize = "5"
 
 # High Availability
 $replicas = 3 # Deploy SQL MI "Business Critical" tier
-################################################
+#######################################################
 
 $SQLParams = "$Env:ArcBoxDir\SQLMI.parameters.json"
 
@@ -61,7 +61,7 @@ az deployment group create --resource-group $Env:resourceGroup --template-file "
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes..."
+    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")

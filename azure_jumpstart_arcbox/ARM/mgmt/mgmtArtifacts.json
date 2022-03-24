@@ -45,8 +45,15 @@
     "flavor": {
       "type": "string",
       "metadata": {
-        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro'"
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       }
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Azure Bastion"
+      },
+      "defaultValue": false
     }
   },
   "variables": {
@@ -55,18 +62,23 @@
       "galleryName": "Updates"
     },
     "ChangeTracking": {
-      "name": "[concat('ChangeTracking', '(', parameters('workspaceName'), ')')]",
+      "name": "[format('ChangeTracking({0})', parameters('workspaceName'))]",
       "galleryName": "ChangeTracking"
     },
     "Security": {
-      "name": "[concat('Security', '(', parameters('workspaceName'), ')')]",
+      "name": "[format('Security({0})', parameters('workspaceName'))]",
       "galleryName": "Security"
     },
-    "policyTemplate": "[if(equals(parameters('flavor'),'ITPro'), uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsITPro.json'),uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltinsFull.json'))]",
+    "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
     "subnetAddressPrefix": "172.16.1.0/24",
     "addressPrefix": "172.16.0.0/16",
-    "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]"
+    "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
+    "bastionName": "ArcBox-Bastion",
+    "bastionSubnetIpPrefix": "172.16.3.64/26",
+    "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]"
   },
   "resources": [
     {
@@ -87,6 +99,12 @@
               "addressPrefix": "[variables('subnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[variables('bastionSubnetIpPrefix')]"
             }
           }
         ]
@@ -146,12 +164,12 @@
       "name": "[variables('ChangeTracking').name]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
       ],
       "plan": {
-        "name": "[concat('ChangeTracking', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
+        "name": "[variables('ChangeTracking').name]",
         "promotionCode": "",
-        "product": "[concat('OMSGallery/', variables('ChangeTracking').galleryName)]",
+        "product": "[format('OMSGallery/{0}', variables('ChangeTracking').galleryName)]",
         "publisher": "Microsoft"
       },
       "properties": {
@@ -164,12 +182,12 @@
       "name": "[variables('Security').name]",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
       ],
       "plan": {
-        "name": "[concat('ChangeTracking', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
+        "name": "[variables('Security').name]",
         "promotionCode": "",
-        "product": "[concat('OMSGallery/', variables('Security').galleryName)]",
+        "product": "[format('OMSGallery/{0}', variables('Security').galleryName)]",
         "publisher": "Microsoft"
       },
       "properties": {
@@ -227,6 +245,48 @@
             "value": "[parameters('flavor')]"
           }
         }
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIpAddresses",
+      "apiVersion": "2019-02-01",
+      "name": "[variables('bastionPublicIpAddressName')]",
+      "condition": "[parameters('deployBastion')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publicIpAllocationMethod": "Static",
+        "publicIPAddressVersion": "IPv4",
+        "idleTimeoutInMinutes": 4
+      },
+      "sku": {
+        "name": "Standard"
+      }
+    },
+    {
+      "type": "Microsoft.Network/bastionHosts",
+      "condition": "[parameters('deployBastion')]",
+      "name": "[variables('bastionName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "2020-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"
+
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
+            "properties": {
+              "subnet": {
+                "id": "[variables('bastionSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('bastionPublicIpAddressName'))]"
+              }
+            }
+          }
+        ]
       }
     }
   ]

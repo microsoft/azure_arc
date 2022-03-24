@@ -104,7 +104,7 @@ variable "spn_tenant_id" {
 
 variable "deployment_flavor" {
   type        = string
-  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', and 'Developer'."
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', and 'DevOps'."
 }
 
 variable "github_repo" {
@@ -121,6 +121,12 @@ variable "trigger_at_logon" {
   type        = bool
   description = "Whether or not the automation scripts will trigger at log on, or at startup. True for AtLogon, False for AtStartup."
   default     = true
+}
+
+variable "deploy_bastion" {
+  type       = bool
+  description = "Choice to deploy Bastion to connect to the client VM"
+  default = false
 }
 
 ### THESE ARE LEGACY VARIABLES FOR BACKWARDS COMPATIBILITY WITH LEGACY SCRIPT FUNCTIONS ###
@@ -140,7 +146,7 @@ variable "registry_username" {
 variable "registry_password" {
   type        = string
   description = "Registry password"
-  default     = "registrySecret"  
+  default     = "registrySecret"
 }
 
 variable "data_controller_name" {
@@ -184,6 +190,7 @@ locals {
     public_ip_name         = "${var.vm_name}-PIP"
     nsg_name               = "${var.vm_name}-NSG"
     network_interface_name = "${var.vm_name}-NIC"
+    bastionSubnetIpPrefix  = "172.16.3.64/26"
 }
 
 data "azurerm_subscription" "primary" {
@@ -200,6 +207,7 @@ data "azurerm_subnet" "subnet" {
 }
 
 resource "azurerm_public_ip" "pip" {
+  count               = var.deploy_bastion == false ? 1: 0
   name                = local.public_ip_name
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
@@ -219,7 +227,7 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "3389"
-    source_address_prefix      = var.user_ip_address
+    source_address_prefix      =  var.deploy_bastion == true ? local.bastionSubnetIpPrefix : var.user_ip_address
     destination_address_prefix = "*"
   }
 }
@@ -233,7 +241,7 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pip.id
+    public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }
 
