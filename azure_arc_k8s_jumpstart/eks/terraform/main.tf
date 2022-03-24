@@ -9,7 +9,7 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region = var.aws_region
+  region = var.AWS_REGION
 }
 
 data "http" "workstation_ip" {
