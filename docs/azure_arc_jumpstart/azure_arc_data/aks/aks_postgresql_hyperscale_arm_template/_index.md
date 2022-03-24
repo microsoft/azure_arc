@@ -12,11 +12,7 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an AKS cluster deployed with an Azure Arc Data Controller, PostgreSQL Hyperscale instance, and a Microsoft Windows Server 2022 (Datacenter) Azure client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
-<<<<<<< HEAD
-![Deployed Architecture](./25.png)
-=======
 ![Screenshot showing the deployed architecture](./diagram.png)
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
 
 > **NOTE: Currently, Azure Arc-enabled PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
@@ -99,22 +95,6 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM/artifacts/azuredeploy.parameters.example.json).
 
-<<<<<<< HEAD
-  * *sshRSAPublicKey* - Your SSH public key
-  * *spnClientId* - Your Azure service principal id
-  * *spnClientSecret* - Your Azure service principal secret
-  * *spnTenantId* - Your Azure tenant id
-  * *windowsAdminUsername* - Client Windows VM Administrator name
-  * *windowsAdminPassword* - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  * *myIpAddress* - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and AKS cluster.
-  * *logAnalyticsWorkspaceName* - Unique name for the deployment log analytics workspace.
-  * *deploySQLMI* - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure PostgreSQL Hyperscale scenario, we will set it to _**false**_.
-  * *deployPostgreSQL* - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure PostgreSQL Hyperscale scenario , we leave it set to _**true**_.
-  * *kubernetesVersion* - AKS version
-  * *dnsPrefix* - AKS unique DNS prefix
-  * *deployBastion* - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
-  * *bastionHostName* - Azure Bastion host name.
-=======
   - _'sshRSAPublicKey'_ - Your SSH public key
   - _'spnClientId'_ - Your Azure service principal id
   - _'spnClientSecret'_ - Your Azure service principal secret
@@ -126,7 +106,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _'deploySQLMI'_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we leave it set to _**false**_.
   - _'SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this scenario we leave it set to _**false**_.
   - _'deployPostgreSQL'_ - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this Azure Arc-enabled PostgreSQL Hyperscale scenario we will set it to _**true**_.
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
+  - _'deployBastion'_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
+  - _'bastionHostName'_ - Azure Bastion host name.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM) and run the below command:
 
@@ -154,11 +135,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **NOTE: The deployment time for this scenario can take ~15-20min**
 
-<<<<<<< HEAD
 * Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **8 various Azure resources** deployed (If you chose to deploy Azure Bastion, you will have **9 Azure resources**).
-=======
-- Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **8 various Azure resources** deployed.
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
 
     ![Screenshot showing ARM template deployment completed](./01.png)
 
@@ -166,33 +143,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-<<<<<<< HEAD
 * Now that first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using it's public IP.
-=======
-- Now that first phase of the automation is completed, it is time to RDP to the client VM using it's public IP.
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
 
     ![Screenshot showing the Client VM public IP](./03.png)
 
-<<<<<<< HEAD
 * If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
 
     ![Connecting using Azure Bastion](./04.png)
 
 * At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/arm_template/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
-=======
-- At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
 
 - Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and PostgreSQL will be deployed on the cluster and be ready to use.
 
-<<<<<<< HEAD
-![PowerShell logon script run](./05.png)
-=======
-  ![Screenshot showing the PowerShell logon script run](./04.png)
-
   ![Screenshot showing the PowerShell logon script run](./05.png)
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
 
   ![Screenshot showing the PowerShell logon script run](./06.png)
 
@@ -216,44 +179,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing the PowerShell logon script run](./16.png)
 
-<<<<<<< HEAD
-![PowerShell logon script run](./17.png)
-
-* Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL Hyperscale instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
-=======
   ![Screenshot showing the PowerShell logon script run](./17.png)
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
-
-  ![Screenshot showing the PowerShell logon script run](./18.png)
-
-  ![Screenshot showing the PowerShell logon script run](./19.png)
-
-  ![Screenshot showing the PowerShell logon script run](./20.png)
-
-  ![Screenshot showing the PowerShell logon script run](./21.png)
-
-<<<<<<< HEAD
-![additional Azure resources in the resource group](./18.png)
-=======
-  ![Screenshot showing the PowerShell logon script run](./22.png)
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
-
-  ![Screenshot showing the PowerShell logon script run](./23.png)
-
-<<<<<<< HEAD
-  ![Azure Data Studio connection](./19.png)
-=======
-  ![Screenshot showing the PowerShell logon script run](./24.png)
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
-
-  ![Screenshot showing the PowerShell logon script run](./25.png)
-
-<<<<<<< HEAD
-  ![Azure Data Studio connection](./20.png)
-
-  ![Configured PostgreSQL Hyperscale instance connection](./21.png)
-=======
-  ![Screenshot showing the post-run desktop](./26.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL Hyperscale instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
 
@@ -265,18 +191,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - Azure Arc-enabled PostgreSQL Hyperscale - The PostgreSQL Hyperscale instance that is now deployed on the Kubernetes cluster.
 
-  ![Screenshot showing additional Azure resources in the resource group](./27.png)
+  ![Screenshot showing the post-run desktop](./18.png)
 
 - As part of the automation, Azure Data Studio is installed along with the _Azure Data CLI_, _Azure CLI_, _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see the installed extensions.
 
-  ![Screenshot showing Azure Data Studio shortcut](./28.png)
+  ![Screenshot showing Azure Data Studio shortcut](./19.png)
 
-  ![Screenshot showing Azure Data Studio extensions](./29.png)
+  ![Screenshot showing Azure Data Studio extensions](./20.png)
 
 - Additionally, the PostgreSQL connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
 
-  ![Screenshot showing Azure Data Studio PostgresSQL Hyperscale connection](./30.png)
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
+  ![Screenshot showing Azure Data Studio PostgresSQL Hyperscale connection](./21.png)
 
 ## Cluster extensions
 
@@ -284,32 +209,16 @@ In this scenario, two Azure Arc-enabled Kubernetes cluster extensions were insta
 
 - _azuremonitor-containers_ - The Azure Monitor Container Insights cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/) scenario.
 
-<<<<<<< HEAD
-  ![Azure Arc-enabled Kubernetes resource](./22.png)
-
-  ![Azure Arc-enabled Kubernetes cluster extensions settings](./23.png)
-=======
 - _arc-data-services_ - The Azure Arc-enabled data services cluster extension that was used throughout this scenario in order to deploy the data services infrastructure.
 
 In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./31.png)
+![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./22.png)
 
-![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./32.png)
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
+![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./23.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-<<<<<<< HEAD
-    ![Delete Azure resource group](./24.png)
-
-## Known Issues
-
-* Webhook pods go into error state, even after Data Controller/SQL MI/Postgres pods are up, caused by a known Helm-related backend issue that is being worked on. These errors can be safely ignored and do not impact the functionality of Azure Arc-enabled data services and the Jumpstart automation.
-
-    ![webhook known issue](https://raw.githubusercontent.com/microsoft/azure_arc/main/docs/known_issues/webhook_issue.png)
-=======
-    ![Screenshot showing Azure resource group deletion](./33.png)
->>>>>>> 269284b9833096bba1d614e3fb0d13df0d3c62e5
+    ![Screenshot showing Azure resource group deletion](./24.png)

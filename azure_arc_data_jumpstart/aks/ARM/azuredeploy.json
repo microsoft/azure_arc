@@ -105,7 +105,7 @@
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
       },
-      "defaultValue": false
+      "defaultValue" : false
     },
     "bastionHostName": {
       "type": "string",
