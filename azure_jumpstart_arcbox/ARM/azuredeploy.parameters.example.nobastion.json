@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sshRSAPublicKey": {
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDHBCjiSbsVPRTNkkzSYxAEmT+cePtji5fNzsSko9HVxz7HwlWLyXwnxFATh69vSEmze+6/EOTx3PGoAb0hQc0s7eE3hrepubc46NuRf2XpYutAaCDIdpFRA3/Y6daJXzy6fVDjSWNUXRMgH2vlamvkxAdyBUK7DHyYF4UY72coeR9xSh4ImhcGyHQ0Xvrk0YFkWKoaNFD98AbfL4+n9S5u+vcwMQ+TZT51ZocLHMaQAtSX9Q47J/aVNq8MwwahNRnc6fzu0EkSX3b6IoH+Lo5GLfZnI75RPuXhi3qwiAplEdcPYt74e9afaNtlnzJVZoixmJqaXXnX1gwI4ZFjx7IWOqqIKgjn1pYM2MfwHZlh4KqDO8N912rEF7aZEJ+m5IyS8UUJ6nxHh+KjNwieEslkQdXFY6D2NJhuA5/0fK+zjjUj/WSgH8SIwH6IgzqNEHQCxxKS1K7x6fdUKYPrn1b3QF5HWeEQ/vRedxsMHreHFmRYFmTXxpk6hCs/T5Pif1DeayPWd3Rjtg1PCn07oRsGQuWR8AmJj1AVLj7ZPsV3/ckdowS8SbNzdN3g99eBZdb/D5H7CRri/cDLnzPzeJ6tooemfnKFG/DaKGyByYGpolLVkx8LT5HiRlKibIbdZFKeQ+63RHTULFV0OQ61rBvnj5Yhk2u++4Oq9d+tpJ8Tjw== sebassem@microsoft.com"
+        },
+        "spnClientId": {
+            "value": "d8d32c66-ff85-4f70-952d-beeccd5c011b"
+        },
+        "spnClientSecret": {
+            "value": "Q3c7Q~IrOWZovd5ob.hV.6C5uY6fXj5EWjXr2"
+        },
+        "spnTenantId": {
+            "value": "030607a1-e6bb-4aef-ae83-170101641ee9"
+        },
+        "windowsAdminUsername": {
+            "value": "arcdemo"
+        },
+        "windowsAdminPassword": {
+            "value": "ArcPassword123!!"
+        },
+        "myIpAddress": {
+            "value": "196.156.4.134"
+        },
+        "logAnalyticsWorkspaceName": {
+            "value": "la-arc-001"
+        },
+        "flavor": {
+            "value": "DevOps"
+        },
+        "deployBastion": {
+            "value": false
+        }
+    }
+}
