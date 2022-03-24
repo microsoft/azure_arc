@@ -2,7 +2,7 @@
 type: docs
 title: "Monitoring Agent Extension"
 linkTitle: "Monitoring Agent Extension"
-weight: 2
+weight: 3
 description: >
 ---
 

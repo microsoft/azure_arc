@@ -113,6 +113,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
   * *ARC_DC_RG* - Azure resource group where all the resources get deploy
   * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+  * *deployBastion* - choice (true | false) to deploy Azure Bastion
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template) and run the below command:
 

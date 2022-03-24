@@ -5,21 +5,20 @@
         "machineName": {
             "type": "String"
         },
-        "automanageAccountName": {
-            "type": "String"
-        },
-        "configurationProfileAssignment": {
+        "configurationProfileName": {
             "type": "String"
         }
+    },
+    "variables": {
+        "configurationProfile": "[concat('/providers/Microsoft.Automanage/bestPractices/AzureBestPractices',parameters('configurationProfileName'))]"
     },
     "resources": [
         {
             "type": "Microsoft.HybridCompute/machines/providers/configurationProfileAssignments",
-            "apiVersion": "2020-06-30-preview",
-            "name": "[concat(parameters('machineName'), '/Microsoft.Automanage/', 'default')]",
+            "apiVersion": "2021-04-30-preview",
+            "name": "[concat(parameters('machineName'), '/Microsoft.Automanage/default')]",
             "properties": {
-                "configurationProfile": "[parameters('configurationProfileAssignment')]",
-                "accountId": "[concat(resourceGroup().id, '/providers/Microsoft.Automanage/accounts/', parameters('automanageAccountName'))]"
+                "configurationProfile": "[variables('configurationProfile')]"
             }
         }
     ]

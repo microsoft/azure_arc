@@ -172,10 +172,11 @@
             }
         },
         "deployBastion": {
-            "type": "string",
+            "type": "bool",
             "metadata": {
                 "description": "Choice to deploy Bastion to connect to the client VM"
-            }
+            },
+            "defaultValue" : false
         },
         "bastionHostName": {
             "type": "string",
@@ -207,7 +208,6 @@
         "subnetAddressPrefix": "10.1.0.0/24",
         "addressPrefix": "10.1.0.0/16",
         "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
-        "deployBastion": "[concat(parameters('deployBastion'))]",
         "PublicIPNoBastion": {
             "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         }
@@ -215,7 +215,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2021-05-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -232,7 +232,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": "[if(equals(variables('deployBastion'),'No'),variables('PublicIPNoBastion'),json('null'))]"
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -255,7 +255,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(equals(variables('deployBastion'),'Yes'),variables('bastionSubnetPrefix'),'*')]",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),'*')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
@@ -292,7 +292,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-04-01",
+            "apiVersion": "2021-05-01",
             "name": "[parameters('virtualNetworkName')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -330,7 +330,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "[if(equals(variables('deployBastion'),'No'),'Basic','Standard')]",
+                "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
