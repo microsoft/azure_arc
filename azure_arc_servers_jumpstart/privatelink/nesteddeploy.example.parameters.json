@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "azureRgName": {
-            "value": "Arc-Azure-PL-demo"
+            "value": "Arc-Azure-PL-demo2"
         },
         "onPremRgName": {
-            "value": "Arc-Onpremise-PL-Demo"
+            "value": "Arc-Onpremise-PL-Demo2"
         },
         "cloudVNetName": {
             "value": "Cloud-VNET"
