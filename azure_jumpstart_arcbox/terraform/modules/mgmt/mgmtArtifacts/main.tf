@@ -18,10 +18,20 @@ variable "workspace_name" {
   description = "Log Analytics workspace name."
 }
 
+variable "deploy_bastion" {
+  type       = bool
+  description = "Choice to deploy Bastion to connect to the client VM"
+  default = false
+}
 locals {
   vnet_address_space    = ["172.16.0.0/16"]
   subnet_address_prefix = "172.16.1.0/24"
   solutions             = ["Updates", "VMInsights", "ChangeTracking", "Security"]
+  bastionSubnetName     = "AzureBastionSubnet"
+  bastionSubnetRef      = "${azurerm_virtual_network.vnet.id}/subnets/${local.bastionSubnetName}"
+  bastionName           = "ArcBox-Bastion"
+  bastionSubnetIpPrefix = "172.16.3.64/26"
+  bastionPublicIpAddressName = "${local.bastionName}-PIP"
 }
 
 resource "random_string" "random" {
@@ -44,6 +54,11 @@ resource "azurerm_virtual_network" "vnet" {
   subnet {
     name           = var.subnet_name
     address_prefix = local.subnet_address_prefix
+  }
+
+  subnet {
+    name           = "AzureBastionSubnet"
+    address_prefix = local.bastionSubnetIpPrefix
   }
 }
 
@@ -82,6 +97,33 @@ resource "azurerm_log_analytics_linked_service" "linked_service" {
   read_access_id      = azurerm_automation_account.automation.id
 }
 
+resource "azurerm_public_ip" "publicIpAddress" {
+  count               = var.deploy_bastion == true ? 1: 0
+  resource_group_name = data.azurerm_resource_group.rg.name
+  name                = local.bastionPublicIpAddressName
+  location            = data.azurerm_resource_group.rg.location
+  allocation_method   = "Static"
+  ip_version          = "IPv4"
+  idle_timeout_in_minutes = 4
+  sku                 = "Standard"
+
+}
+
+resource "azurerm_bastion_host" "bastionHost" {
+  name                = local.bastionName
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  count               = var.deploy_bastion == true ? 1: 0
+  depends_on = [
+    azurerm_public_ip.publicIpAddress
+  ]
+  ip_configuration {
+    name = "IpConf"
+    public_ip_address_id = azurerm_public_ip.publicIpAddress[0].id
+    subnet_id = local.bastionSubnetRef
+  }
+
+}
 output "workspace_id" {
   value = azurerm_log_analytics_workspace.workspace.id
 }

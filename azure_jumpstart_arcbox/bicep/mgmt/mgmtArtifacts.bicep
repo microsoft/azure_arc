@@ -11,6 +11,7 @@ param workspaceName string
 @allowed([
   'Full'
   'ITPro'
+  'DevOps'
 ])
 param flavor string
 
@@ -19,6 +20,9 @@ param location string = resourceGroup().location
 
 @description('SKU, leave default pergb2018')
 param sku string = 'pergb2018'
+
+@description('Choice to deploy Bastion to connect to the client VM')
+param deployBastion bool = false
 
 var updates = {
   name: 'Updates(${workspaceName})'
@@ -37,6 +41,11 @@ var automationAccountName = 'ArcBox-Automation-${uniqueString(resourceGroup().id
 var subnetAddressPrefix = '172.16.1.0/24'
 var addressPrefix = '172.16.0.0/16'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
+var bastionSubnetName = 'AzureBastionSubnet'
+var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
+var bastionName = 'ArcBox-Bastion'
+var bastionSubnetIpPrefix = '172.16.3.64/26'
+var bastionPublicIpAddressName = '${bastionName}-PIP'
 
 resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
@@ -54,6 +63,12 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
           addressPrefix: subnetAddressPrefix
           privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
+        }
+      }
+      {
+        name: 'AzureBastionSubnet'
+        properties:{
+          addressPrefix: bastionSubnetIpPrefix
         }
       }
     ]
@@ -105,7 +120,7 @@ resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11
     workspaceResourceId: workspace.id
   }
   plan: {
-    name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
+    name: changeTracking.name
     promotionCode: ''
     product: 'OMSGallery/${changeTracking.galleryName}'
     publisher: 'Microsoft'
@@ -119,7 +134,7 @@ resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
     workspaceResourceId: workspace.id
   }
   plan: {
-    name: 'ChangeTracking(${split(workspace.id, '/')[8]})'
+    name: security.name
     promotionCode: ''
     product: 'OMSGallery/${security.galleryName}'
     publisher: 'Microsoft'
@@ -147,7 +162,39 @@ resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedSer
   }
 }
 
-module policyDeployment './policyAzureArcITPro.bicep' = {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if(deployBastion == true){
+  name: bastionPublicIpAddressName
+  location: location
+  properties:{
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+  }
+  sku: {
+    name: 'Standard'
+  }
+}
+
+resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if(deployBastion == true){
+  name: bastionName
+  location: location
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'IpConf'
+        properties: {
+          publicIPAddress: {
+            id: '${publicIpAddress.id}'
+          }
+          subnet: {
+            id: bastionSubnetRef
+          }
+        }
+      }
+    ]
+  }
+}
+module policyDeployment './policyAzureArc.bicep' = {
   name: 'policyDeployment'
   params: {
     azureLocation: location
@@ -155,6 +202,8 @@ module policyDeployment './policyAzureArcITPro.bicep' = {
     flavor: flavor
   }
 }
+
+
 
 output vnetId string = arcVirtualNetwork.id
 output subnetId string = arcVirtualNetwork.properties.subnets[0].id
