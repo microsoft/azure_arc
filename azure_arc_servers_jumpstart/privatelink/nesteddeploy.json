@@ -219,7 +219,7 @@
                     "scope": "Inner"
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/ARM/azuredeploy.json"
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/azuredeploy.json"
                 },
                 "mode": "Incremental",
                 "parameters": {
@@ -263,7 +263,7 @@
                     "scope": "Inner"
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/ARM/onpremisedeploy.json"
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/onpremisedeploy.json"
                 },
                 "mode": "Incremental",
                 "parameters": {
@@ -525,7 +525,7 @@
                                 "autoUpgradeMinorVersion": true,
                                 "settings": {
                                     "fileUris": [
-                                        "https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/bootstrap.ps1"
+                                        "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/artifacts/bootstrap.ps1"
                                     ],
                                     "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File bootstrap.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', parameters('PLscope'),' -PEname ', parameters('privateEndpoints_name'),' -adminUsername ', parameters('adminUsername') )]"
                                 }

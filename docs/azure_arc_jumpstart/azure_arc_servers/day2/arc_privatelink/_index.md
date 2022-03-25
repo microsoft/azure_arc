@@ -141,5 +141,21 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Azure Arc-enabled server Private Link connectivity
 
-To make sure that your Azure that your Azure Arc-enabled server is using Private Link for its connection. Use your Azure Bastion session to run the command below: 
+To make sure that your Azure that your Azure Arc-enabled server is using Private Link for its connection. Use your Azure Bastion session to run the command below:
+
+  ```shell
+    azcmagent.exe show
+  ```
+
+It should list your Private Link Scope ID.
+
+  ![Connected Machine agent using PL](./09.jpg)
+
+## Delete the deployment
+
+The most straightforward way is to delete both resource groups:
+
+  ![Delete Resource Group On-premises](./10.jpg)
+  
+  ![Delete Resource Group Azure](./11.jpg)
 
