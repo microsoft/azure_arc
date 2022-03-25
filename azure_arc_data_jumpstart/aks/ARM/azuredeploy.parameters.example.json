@@ -3,16 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "sshRSAPublicKey": {
-      "value": "<your RSA public key>"
+      "value": "ssh-rsaxx33333333-XXXX-YYYY-XXXX-YTYTYTYT"
     },
     "spnClientId": {
-      "value": "<your service principal client id>"
+      "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
     },
     "spnClientSecret": {
-      "value": "<your service principal secret>"
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
     },
     "spnTenantId": {
-      "value": "<your spn tenant id>"
+      "value": "33333333-XXXX-41af-1111-7777777777"
     },
     "windowsAdminUsername": {
       "value": "arcdemo"
@@ -21,28 +21,28 @@
       "value": "ArcPassword123!!"
     },
     "myIpAddress": {
-      "value": "<your IP address>"
+      "value": "192.168.10.10"
     },
     "logAnalyticsWorkspaceName": {
-      "value": "<your unique Log Analytics workspace name>"
+      "value": "rg-la-arc"
     },
     "deploySQLMI": {
-      "value": "<SQL Managed Instance deployment (true/false)>"
+      "value": true
     },
     "SQLMIHA": {
-      "value": "<SQL Managed Instance high-availability deployment (true/false)>"
+      "value": true
     },
     "deployPostgreSQL": {
-      "value": "<PostgreSQL Hyperscale deployment (true/false)>"
+      "value": false
     },
     "bastionHostName": {
       "value": "Arc-Data-Demo-Bastion"
     },
     "deployBastion": {
-      "value": "(true/false)"
+      "value": false
     },
     "dnsPrefix": {
-        "value": "<A DNS prefix for the Public IP>"
+      "value": "arcAksdemoXXX"
     }
   }
 }
