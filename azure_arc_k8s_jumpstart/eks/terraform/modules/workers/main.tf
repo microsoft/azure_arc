@@ -43,7 +43,7 @@ resource "aws_eks_node_group" "arcdemo" {
   node_group_name = "arcdemo"
   node_role_arn   = aws_iam_role.arcdemo-node.arn
   subnet_ids      = var.cluster_subnet_ids
-  instance_types  = ["t2.small"]
+  instance_types  = ["t2.medium"]
 
   scaling_config {
     desired_size = 1
