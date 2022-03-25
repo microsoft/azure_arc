@@ -52,6 +52,12 @@ After you have finished the deployment of ArBox for DevOps, you can verify that 
 
 Within 30 minutes Microsoft Defender for Cloud will detect this event and trigger a security alert that you wil see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled cluster.
 
+![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert01.png)
+
+![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert02.png)
+
+![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert03.png)
+
 ### Cluster connect??
 
 Lorem ipsum dolor whatever
