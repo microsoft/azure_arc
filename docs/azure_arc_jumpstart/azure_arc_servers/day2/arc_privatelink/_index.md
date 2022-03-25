@@ -133,11 +133,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: The script run time is ~1-2min long.**
 
-    ![Screenshot script output](./07.jpg)
+    ![Screenshot script output](./07.png)
 
 - Upon successful run, a new Azure Arc-enabled server will be added to the resource group.
 
-  ![Screenshot Azure Arc-enabled server on resource group](./08.jpg)
+  ![Screenshot Azure Arc-enabled server on resource group](./08.png)
 
 ## Azure Arc-enabled server Private Link connectivity
 
@@ -149,13 +149,12 @@ To make sure that your Azure that your Azure Arc-enabled server is using Private
 
 It should list your Private Link Scope ID.
 
-  ![Connected Machine agent using PL](./09.jpg)
+  ![Connected Machine agent using PL](./09.png)
 
 ## Delete the deployment
 
 The most straightforward way is to delete both resource groups:
 
-  ![Delete Resource Group On-premises](./10.jpg)
+  ![Delete Resource Group On-premises](./10.png)
   
-  ![Delete Resource Group Azure](./11.jpg)
-
+  ![Delete Resource Group Azure](./11.png)
