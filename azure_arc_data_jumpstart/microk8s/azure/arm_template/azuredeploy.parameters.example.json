@@ -3,16 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "sshRSAPublicKey": {
-      "value": "<your RSA public key>"
+      "value": "ssh-rsaxx33333333-XXXX-YYYY-XXXX-YTYTYTYT"
     },
     "spnClientId": {
-      "value": "<your service principal client id>"
+      "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
     },
     "spnClientSecret": {
-      "value": "<your service principal secret>"
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
     },
     "spnTenantId": {
-      "value": "<your spn tenant id>"
+      "value": "33333333-XXXX-41af-1111-7777777777"
     },
     "windowsAdminUsername": {
       "value": "arcdemo"
@@ -21,25 +21,25 @@
       "value": "ArcPassword123!!"
     },
     "myIpAddress": {
-      "value": "<your IP address>"
+      "value": "192.168.10.10"
     },
     "logAnalyticsWorkspaceName": {
-      "value": "<your unique Log Analytics workspace name>"
+      "value": "rg-la-arc"
     },
     "deploySQLMI": {
-      "value": "<SQL Managed Instance deployment (true/false)>"
+      "value": true
     },
     "deployPostgreSQL": {
-      "value": "<PostgreSQL Hyperscale deployment (true/false)>"
+      "value": false
     },
     "templateBaseUrl": {
       "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/"
     },
     "deployBastion": {
-      "value": "(true/false)"
+      "value": true
     },
     "bastionHostName": {
-      "value": "<Azure Bastion Hostname>"
+      "value": "Arc-Data-Demo-Bastion"
     }
   }
 }
