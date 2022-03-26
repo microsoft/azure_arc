@@ -17,5 +17,5 @@ variable "AWS_REGION" {
 variable "cluster_name" {
   type        = string
   description = "EKS cluster name."
-  default     = "arcdemo-cluster"
+  default     = "Arc-EKS-Demo"
 }
