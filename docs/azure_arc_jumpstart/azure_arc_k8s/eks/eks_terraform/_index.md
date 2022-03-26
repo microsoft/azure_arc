@@ -91,7 +91,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ![Screenshot showing AWS IAM user details](./iam_user_select.png)
 
-  * Select ***Security credentials** of the **User** selected.
+  * Select **Security credentials** of the **User** selected.
 
     ![Screenshot showing AWS IAM user security credentials](./iam_security_credentials.png)
 
@@ -148,7 +148,7 @@ The following README will guide you on how to use the provided [Terraform](https
   mkdir %USERPROFILE%\.kube
   terraform output -raw kubeconfig > %USERPROFILE%\.kube\config
   ```
-  
+
   Check to see if cluster is discoverable by ```kubectl``` by running:
 
   ```shell
@@ -156,7 +156,7 @@ The following README will guide you on how to use the provided [Terraform](https
   ```
 
   Output should look similar to this:
-  
+
   ```shell
   Client Version: version.Info{Major:"1", Minor:"23", GitVersion:"v1.23.0", GitCommit:"ab69524f795c42094a6630298ff53f3c3ebab7f4", GitTreeState:"clean", BuildDate:"2021-12-07T18:16:20Z", GoVersion:"go1.17.3", Compiler:"gc", Platform:"windows/amd64"}
   Server Version: version.Info{Major:"1", Minor:"21+", GitVersion:"v1.21.5-eks-bc4871b", GitCommit:"5236faf39f1b7a7dabea8df12726f25608131aa9", GitTreeState:"clean", BuildDate:"2021-10-29T23:32:16Z", GoVersion:"go1.16.8", Compiler:"gc", Platform:"linux/amd64"}
