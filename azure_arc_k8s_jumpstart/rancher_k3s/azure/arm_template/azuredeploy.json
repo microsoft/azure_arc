@@ -96,6 +96,12 @@
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
+        },
+        "myIpAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Your IP address"
+            }
         }
     },
     "variables": {
@@ -163,7 +169,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
