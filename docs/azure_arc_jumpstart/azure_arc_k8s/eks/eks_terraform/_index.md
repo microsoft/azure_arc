@@ -144,7 +144,7 @@ The following README will guide you on how to use the provided [Terraform](https
   ```
 
   **Windows**
-  ```shell
+  ```text
   mkdir %USERPROFILE%\.kube
   terraform output -raw kubeconfig > %USERPROFILE%\.kube\config
   ```
