@@ -2,9 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "automanageAccountName": {
-            "value": "<Name of your Azure Automanage Account>"
-        },
         "machineName": {
             "value": "<Name of your Azure Arc enabled Server>"
         },
