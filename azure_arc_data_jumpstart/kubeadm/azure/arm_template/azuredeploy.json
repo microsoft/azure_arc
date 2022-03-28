@@ -200,7 +200,21 @@
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_data"
             }
-        }         
+        },
+        "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            },
+            "defaultValue": false
+        },
+        "bastionHostName": {
+            "type": "string",
+            "defaultValue": "Arc-Data-Demo-Bastion",
+            "metadata": {
+                "description": "the Azure Bastion host name"
+            }
+        }
     },
     "variables": {
         "K8svmName": "[concat(parameters('K8svmName'))]",
@@ -220,12 +234,18 @@
                     }
                 ]
             }
+        },
+        "bastionSubnetPrefix": "10.1.2.64/26",
+        "bastionSubnetName": "AzureBastionSubnet",
+        "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         }
     },
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2021-05-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -242,9 +262,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -267,7 +285,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),'*')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -356,7 +374,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-04-01",
+            "apiVersion": "2021-05-01",
             "name": "[parameters('virtualNetworkName')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -373,6 +391,12 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('bastionSubnetPrefix')]"
+                        }
                     }
                 ]
             }
@@ -388,7 +412,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
@@ -454,6 +478,31 @@
             "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/setup_controller.sh"]
             }
           }
+        },
+        {
+            "type": "Microsoft.Network/bastionHosts",
+            "condition": "[parameters('deployBastion')]",
+            "name": "[parameters('bastionHostName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2020-11-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "IpConf",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('bastionSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            }
+                        }
+                    }
+                ]
+            }
         },
         {
         "type": "Microsoft.Resources/deployments",

@@ -67,14 +67,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Prerequisites
 
-- ArcBox for IT Pros requires 16 DSv3-series vCPUs when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
-
-  ```shell
-  az vm list-usage --location <your location> --output table
-  ```
-
-  ![Screenshot showing az vm list-usage](./azvmlistusage.png)
-
 - [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
@@ -82,6 +74,26 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   ```
 
 - Login to AZ CLI using the ```az login``` command.
+
+- Ensure that you have selected the correct subscription you want to deploy ArcBox to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/en-us/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
+
+- ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
+
+  - East US
+  - East US 2
+  - West US 2
+  - North Europe
+  - France Central
+  - UK South
+  - Southeast Asia
+
+- **ArcBox for IT Pros requires 16 DSv4-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
+
+  ```shell
+  az vm list-usage --location <your location> --output table
+  ```
+
+  ![Screenshot showing az vm list-usage](./azvmlistusage.png)
 
 - Register necessary Azure resource providers by running the following commands.
 
@@ -243,7 +255,7 @@ ArcBox must be deployed to one of the following regions. **Deploying ArcBox outs
 
   > **NOTE: Terraform 1.x or higher is supported for this deployment. Tested with Terraform v1.011.**
 
-- Create a `terraform.tfvars` file in the root of the terraform directory and supply some values for your environment.
+- Create a `terraform.tfvars` file in the root of the terraform folder and supply some values for your environment.
 
   ```HCL
   azure_location    = "westus2"
@@ -388,18 +400,13 @@ az group delete -n <name of your resource group>
 
 ## Basic Troubleshooting
 
-- Invalid service principal id, service principal secret provided in _azuredeploy.parameters.json_ file.
+Occasionally deployments of ArcBox may fail at various stages. Common reasons for failed deployments include:
+
+- Invalid service principal id, service principal secret or service principal Azure tenant ID provided in _azuredeploy.parameters.json_ file.
 - Invalid SSH public key provided in _azuredeploy.parameters.json_ file.
   - An example SSH public key is shown here. Note that the public key includes "ssh-rsa" at the beginning. The entire value should be included in your _azuredeploy.parameters.json_ file.
 
-    ```console
-    ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAklOUpkDHrfHY17SbrmTIpNLTGK9Tjom/BWDSU
-    GPl+nafzlHDTYW7hdI4yZ5ew18JH4JW9jbhUFrviQzM7xlELEVf4h9lFX5QVkbPppSwg0cda3
-    Pbv7kOdJ/MTyBlWXFCR+HAo3FXRitBqxiX1nKhXpHAZsMciLq8V6RjsNAQwdsdMFvSlVK/7XA
-    t3FaoJoAsncM1Q9x5+3V0Ww68/eIFmb1zuUFljQJKprrX88XypNDvjYNby6vw/Pb0rwert/En
-    mZ+AW4OZPnTPI89ZPmVMLuayrD2cE86Z/il8b+gw3r3+1nKatmIkjn2so1d01QraTlMqVSsbx
-    NrRFi9wrf+M7Q== myname@mylaptop.local
-    ```
+![Screenshot showing SSH public key example](./ssh_example.png)
 
 - Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 16 available. See the [prerequisites](#prerequisites) section for more details.
 - Target Azure region does not support all required Azure services - ensure you are running ArcBox in one of the supported regions listed in the above section "ArcBox Azure Region Compatibility".
@@ -408,6 +415,8 @@ az group delete -n <name of your resource group>
   ![Screenshot showing BadRequest errors in Az CLI](./error_badrequest.png)
 
   ![Screenshot showing BadRequest errors in Azure portal](./error_badrequest2.png)
+
+### Exploring logs from the _ArcBox-Client_ virtual machine
 
 Occasionally, you may need to review log output from scripts that run on the _ArcBox-Client_ virtual machine in case of deployment failures. To make troubleshooting easier, the ArcBox deployment scripts collect all relevant logs in the _C:\ArcBox\Logs_ folder on _ArcBox-Client_. A short description of the logs and their purpose can be seen in the list below:
 

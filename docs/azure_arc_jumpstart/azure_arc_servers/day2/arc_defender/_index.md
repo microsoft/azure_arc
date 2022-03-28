@@ -2,7 +2,7 @@
 type: docs
 title: "Microsoft Defender for Cloud"
 linkTitle: "Microsoft Defender for Cloud"
-weight: 5
+weight: 7
 description: >
 ---
 
