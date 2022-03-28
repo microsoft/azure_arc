@@ -15,7 +15,7 @@ weight: 3
 
 - New and updated Azure Arc-enabled servers scenarios
 - New and updated Azure Arc-enabled Kubernetes scenario
-- Azure Bastion support
+- Azure Bastion support for Azure Arc-enabled servers and data services
 - Updated Arc-enabled data services enhancements
 
 ### Azure Arc-enabled servers scenarios
