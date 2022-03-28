@@ -15,12 +15,14 @@ weight: 3
 
 - New and updated Azure Arc-enabled servers scenarios
 - New and updated Azure Arc-enabled Kubernetes scenario
+- Azure Bastion support
 - Updated Arc-enabled data services enhancements
 
 ### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Monitoring, Alerting, and Visualization on Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_monitoring/)
 - [Updated Scenario: Update Azure Automanage with new ARM template #1017](https://github.com/microsoft/azure_arc/issues/1017)
+- [Feature: Adding Azure Bastion as an optional RDP/SSH method - Azure Arc-enabled servers #985](https://github.com/microsoft/azure_arc/issues/985)
 
 ### Azure Arc-enabled Kubernetes scenarios
 
