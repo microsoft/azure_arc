@@ -2,7 +2,7 @@
 type: docs
 title: "Azure Sentinel"
 linkTitle: "Azure Sentinel"
-weight: 6
+weight: 8
 description: >
 ---
 

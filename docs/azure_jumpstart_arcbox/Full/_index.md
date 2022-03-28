@@ -502,4 +502,3 @@ If you are still having issues deploying ArcBox, please [submit an issue](https:
 ## Known issues
 
 - Azure Arc-enabled SQL Server assessment report not always visible in Azure portal
-- Microsoft Defender for Cloud is currently disabled on the ArcBox-CAPI cluster.
