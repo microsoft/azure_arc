@@ -144,28 +144,32 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Linux Login & Post Deployment
 
-* Now that the Linux VM is created, it is time to login to it. Using its public IP, SSH to the VM.
+* Now that the Linux Server VM is created, it is time to log in to it. If you have not chosen to deploy Azure Bastion in the ARM template, SSH to the VM using its public IP.
 
     ![Screenshot Azure VM public IP address](./03.png)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Screenshot Azure VM Bastion connectivity](./04.png)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
 * Let the script to run its course and **do not close** the SSH session, this will be done for you once completed.
 
-    ![Screenshot script output](./04.png)
-
     ![Screenshot script output](./05.png)
 
     ![Screenshot script output](./06.png)
 
+    ![Screenshot script output](./07.png)
+
 * Upon successful run, a new Azure Arc-enabled server will be added to the resource group.
 
-    ![Screenshot Azure Arc resource on the Azure portal](./07.png)
+    ![Screenshot Azure Arc resource on the Azure portal](./08.png)
 
-    ![Screenshot details of Azure Arc-enabled server on Azure portal](./08.png)
+    ![Screenshot details of Azure Arc-enabled server on Azure portal](./09.png)
 
 ## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
 
-![Screenshot how to delete resource group](./09.png)
+![Screenshot how to delete resource group](./10.png)
