@@ -8,7 +8,7 @@ sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/s
 sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
-# Creating login welcome message
+# Creating login message of the day (motd)
 sudo curl -o /etc/profile.d/welcomeK3s.sh https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/welcomeK3s.sh
 
 # Injecting environment variables

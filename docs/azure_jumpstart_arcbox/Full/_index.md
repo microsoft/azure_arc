@@ -35,7 +35,7 @@ ArcBox deploys one single-node Rancher K3s cluster running on an Azure virtual m
 
 ### Azure Arc-enabled data services
 
-ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster with the Azure CAPZ provider, and a workload cluster is deployed onto the management cluster. The Azure Arc-enabled data services and data controller are deployed onto this workload cluster via a PowerShell script that runs when first logging into _ArcBox-Client_ virtual machine.
+ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider Azure(CAPZ), and a workload cluster is deployed onto the management cluster. The Azure Arc-enabled data services and data controller are deployed onto this workload cluster via a PowerShell script that runs when first logging into _ArcBox-Client_ virtual machine.
 
 <img src="./dataservices2.png" width="400" alt="Data services diagram">
 
@@ -79,14 +79,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Prerequisites
 
-- ArcBox Full requires 52 DSv3-series vCPUs when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
-
-  ```shell
-  az vm list-usage --location <your location> --output table
-  ```
-
-  ![Screenshot showing az vm list-usage](./azvmlistusage.png)
-
 - [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
@@ -94,6 +86,26 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   ```
 
 - Login to AZ CLI using the ```az login``` command.
+
+- Ensure that you have selected the correct subscription you want to deploy ArcBox to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/en-us/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
+
+- ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
+
+  - East US
+  - East US 2
+  - West US 2
+  - North Europe
+  - France Central
+  - UK South
+  - Southeast Asia
+
+- **ArcBox Full requires 52 DSv4-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
+
+  ```shell
+  az vm list-usage --location <your location> --output table
+  ```
+
+  ![Screenshot showing az vm list-usage](./azvmlistusage.png)
 
 - Register necessary Azure resource providers by running the following commands.
 
@@ -156,18 +168,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   ```shell
   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
   ```
-
-## ArcBox Azure Region Compatibility
-
-ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
-
-- East US
-- East US 2
-- West US 2
-- North Europe
-- France Central
-- UK South
-- Southeast Asia
 
 ## Deployment Option 1: Azure portal
 
@@ -261,7 +261,7 @@ ArcBox must be deployed to one of the following regions. **Deploying ArcBox outs
 
   > **NOTE: Terraform 1.x or higher is supported for this deployment. Tested with Terraform v1.011.**
 
-- Create a `terraform.tfvars` file in the root of the terraform directory and supply some values for your environment.
+- Create a `terraform.tfvars` file in the root of the terraform folder and supply some values for your environment.
 
   ```HCL
   azure_location    = "westus2"
@@ -437,18 +437,11 @@ az group delete -n <name of your resource group>
 
 Occasionally deployments of ArcBox may fail at various stages. Common reasons for failed deployments include:
 
-- Invalid service principal id, service principal secret provided in _azuredeploy.parameters.json_ file.
+- Invalid service principal id, service principal secret or service principal Azure tenant ID provided in _azuredeploy.parameters.json_ file.
 - Invalid SSH public key provided in _azuredeploy.parameters.json_ file.
   - An example SSH public key is shown here. Note that the public key includes "ssh-rsa" at the beginning. The entire value should be included in your _azuredeploy.parameters.json_ file.
 
-    ```console
-    ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAklOUpkDHrfHY17SbrmTIpNLTGK9Tjom/BWDSU
-    GPl+nafzlHDTYW7hdI4yZ5ew18JH4JW9jbhUFrviQzM7xlELEVf4h9lFX5QVkbPppSwg0cda3
-    Pbv7kOdJ/MTyBlWXFCR+HAo3FXRitBqxiX1nKhXpHAZsMciLq8V6RjsNAQwdsdMFvSlVK/7XA
-    t3FaoJoAsncM1Q9x5+3V0Ww68/eIFmb1zuUFljQJKprrX88XypNDvjYNby6vw/Pb0rwert/En
-    mZ+AW4OZPnTPI89ZPmVMLuayrD2cE86Z/il8b+gw3r3+1nKatmIkjn2so1d01QraTlMqVSsbx
-    NrRFi9wrf+M7Q== myname@mylaptop.local
-    ```
+      ![Screenshot showing SSH public key example](./ssh_example.png)
 
 - Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 52 available. See the [prerequisites](#prerequisites) section for more details.
 - Target Azure region does not support all required Azure services - ensure you are running ArcBox in one of the supported regions listed in the above section "ArcBox Azure Region Compatibility".
@@ -457,6 +450,8 @@ Occasionally deployments of ArcBox may fail at various stages. Common reasons fo
   ![Screenshot showing BadRequest errors in Az CLI](./error_badrequest.png)
 
   ![Screenshot showing BadRequest errors in Azure portal](./error_badrequest2.png)
+
+### Exploring logs from the _ArcBox-Client_ virtual machine
 
 Occasionally, you may need to review log output from scripts that run on the _ArcBox-Client_, _ArcBox-CAPI-MGMT_ or _ArcBox-K3s_ virtual machines in case of deployment failures. To make troubleshooting easier, the ArcBox deployment scripts collect all relevant logs in the _C:\ArcBox\Logs_ folder on _ArcBox-Client_. A short description of the logs and their purpose can be seen in the list below:
 
@@ -474,9 +469,36 @@ Occasionally, you may need to review log output from scripts that run on the _Ar
 
   ![Screenshot showing ArcBox logs folder on ArcBox-Client](./troubleshoot_logs.png)
 
+### Exploring installation logs from the Linux virtual machines
+
+In the case of a failed deployment, pointing to a failure in either the _ubuntuRancherDeployment_ or the _ubuntuCAPIDeployment_ Azure deployments, an easy way to explore the deployment logs is available directly from the associated virtual machines.
+
+  ![Screenshot showing failed deployments](./failed_deployments.png)
+
+- Depends on which deployment failed, connect using SSH to the associated virtual machine public IP:
+  - _ubuntuCAPIDeployment_ - _ArcBox-CAPI-MGMT_ virtual machine.
+  - _ubuntuRancherDeployment_ - _ArcBox-K3s_ virtual machine.
+
+    Since you are logging in using the provided SSH public key, all you need is the _arcdemo_ username.
+
+      ![Screenshot showing ArcBox-CAPI-MGMT virtual machine public IP](./arcbox_capi_mgmt_vm_ip.png)
+
+      ![Screenshot showing ArcBox-K3s virtual machine public IP](./arcbox_k3s_vm_ip.png)
+
+- As described in the message of the day (motd), depends on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
+  - _ArcBox-CAPI-MGMT_ log path: *jumpstart_logs/installCAPI.log*
+  - _ArcBox-K3s_ log path: *jumpstart_logs/installK3s.log*
+
+      ![Screenshot showing login and the message of the day](./login_motd.png)
+
+- From the screenshot below, looking at _ArcBox-CAPI-MGMT_ virtual machine CAPI installation log using the `cat jumpstart_logs/installCAPI.log` command, we can see the _az login_ command failed due to bad service principal credentials.
+
+  ![Screenshot showing cat command for showing installation log](./cat_command.png)
+
+  ![Screenshot showing az login error](./az_login_error.png)
+
 If you are still having issues deploying ArcBox, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on GitHub and include a detailed description of your issue, the Azure region you are deploying to, the flavor of ArcBox you are trying to deploy. Inside the _C:\ArcBox\Logs_ folder you can also find instructions for uploading your logs to an Azure storage account for review by the Jumpstart team.
 
 ## Known issues
 
 - Azure Arc-enabled SQL Server assessment report not always visible in Azure portal
-- Microsoft Defender for Cloud is currently disabled on the ArcBox-CAPI cluster.

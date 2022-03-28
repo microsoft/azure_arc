@@ -2,7 +2,7 @@
 type: docs
 title: "Azure Policy"
 linkTitle: "Azure Policy"
-weight: 4
+weight: 5
 description: >
 ---
 
