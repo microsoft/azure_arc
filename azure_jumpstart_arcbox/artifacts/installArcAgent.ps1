@@ -10,7 +10,7 @@
  }
  
  # Run connect command
- & "$env:ProgramW6432\AzureConnectedMachineAgent\azcmagent.exe" connect `
+ & "$Env:ProgramW6432\AzureConnectedMachineAgent\azcmagent.exe" connect `
  --service-principal-id $spnClientId `
  --service-principal-secret $spnClientSecret `
  --resource-group $resourceGroup `
