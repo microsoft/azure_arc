@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "azureRgName": {
-            "value": "<Cloud¡s resource group name>"
+            "value": "<Cloud resource group name>"
         },
         "onPremRgName": {
             "value": "<Onpremise resource group name>"
