@@ -30,35 +30,41 @@ ArcBox deploys two Kubernetes clusters.
 
 ### App
 
-ArcBox deploys two application on the Kubernetes cluster.
+ArcBox deploys two applications on the ArcBox-CAPI-Data cluster.
 
-Hello-Arc application deployed in hello-arc namespace. This will consist of 3 replicas of "Hello World" Azure Arc web application.
+1. Hello Arc application will deploy 3 replicas of "Hello Arc" web application. Hello Arc application will be in hello-arc namespace.
 
-Bookstore application will deploy 5 different pods.
+2. Bookstore application will deploy 5 different pods.
 
 - bookbuyer is an HTTP client making requests to bookstore.
 - bookstore is a server, which responds to HTTP requests. It is also a client making requests to the bookwarehouse service.
 - bookwarehouse is a server and should respond only to bookstore.
 - mysql is a MySQL database only reachable by bookwarehouse.
-- bookstore-v2 - this is the same container as the first bookstore, but for traffic split scenario we will assume that it is a new version of the app we need to upgrade to.
+- bookstore-v2 - this is the same container as the first bookstore, but for Open Service Mesh traffic split scenario we will assume that it is a new version of the app we need to upgrade to.
 
-The bookbuyer, bookstore, and bookwarehouse Pods will be in separate Kubernetes Namespaces with the same names. mysql will be in the bookwarehouse namespace. bookstore-v2
-
-### GitOps
-
-ArcBox deploys three GitOps configurations on the Kubernetes cluster, a cluster-scope config to deploy [nginx-ingress controller](https://kubernetes.github.io/ingress-nginx/), a namespace-scope config to deploy the "Hello World" Azure Arc web application and a cluster-scope config to deploy the "Bookstore" application on the Kubernetes cluster. Users will be able to make real-time changes to the application and see how the GitOps flow takes effect.
-
-GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/). Flux is deployed by installing the [Flux extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-gitops-flux2#flux-cluster-extension) on the Kubernetes cluster. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. Flux provides support for common file sources (Git and Helm repositories, Buckets) and template types (YAML, Helm, and Kustomize).
+The bookbuyer, bookstore, and bookwarehouse Pods will be in separate Kubernetes Namespaces with the same names. mysql will be in the bookwarehouse namespace. bookstore-v2 will be in the bookstore namespace.
 
 ### Open Service Mesh integration
 
-ArcBox deploys Open Service Mesh by installing the [Open Service Mesh extension](https://aka.ms/arc-osm-doc) on the Kubernetes cluster. Bookstore application namespaces will be added to Open Service Mesh control plane. Each new Pod in the service mesh will be injected with an Envoy sidecar container.
+ArcBox deploys Open Service Mesh by installing the [Open Service Mesh extension](https://aka.ms/arc-osm-doc) on the ArcBox-CAPI-Data cluster. Bookstore application namespaces will be added to Open Service Mesh control plane. Each new Pod in the service mesh will be injected with an Envoy sidecar container.
 
 [Open Service Mesh (OSM)](https://openservicemesh.io/) is a lightweight, extensible, Cloud Native service mesh that allows users to uniformly manage, secure, and get out-of-the-box observability features for highly dynamic microservice environments.
 
+### GitOps
+
+ArcBox deploys five GitOps configurations on the ArcBox-CAPI-Data cluster:
+
+- Cluster scope config to deploy [NGINX-ingress controller](https://kubernetes.github.io/ingress-nginx/).
+- Cluster scope config to deploy the "Bookstore" application.
+- Namespace scope config to deploy the "Bookstore" application RBAC.
+- Namespace scope config to deploy the "Bookstore" application open service mesh traffic split policies.
+- Namespace scope config to deploy the "Hello Arc" web application.
+
+GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/). Flux is deployed by installing the [Flux extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-gitops-flux2#flux-cluster-extension) on the Kubernetes cluster. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. Flux provides support for common file sources (Git and Helm repositories, Buckets) and template types (YAML, Helm, and Kustomize).
+
 ### KeyVault integration
 
-ArcBox deploys Azure Key Vault as part of the infrastructure provisioning. Also, it will hook the Cluster API to Azure Key Vault by deploying the [Azure Key Vault Secrets Provider extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/tutorial-akv-secrets-provider).  
+ArcBox deploys Azure Key Vault as part of the infrastructure provisioning. Also, it will hook the ArcBox-CAPI-Data cluster to Azure Key Vault by deploying the [Azure Key Vault Secrets Provider extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/tutorial-akv-secrets-provider).  
 
 The Azure Key Vault Provider for Secrets Store CSI Driver allows for the integration of Azure Key Vault as a secrets store with a Kubernetes cluster via a [CSI volume](https://kubernetes-csi.github.io/docs/).
 
@@ -116,10 +122,10 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - Storage account template/plan - used for staging files in automation scripts
   - Management artifacts template/plan - deploys Azure Log Analytics workspace and solutions and Azure Policy artifacts
 - User remotes into Client Windows VM, which automatically kicks off multiple scripts that:
-  - Deploys OSM Extension on the Kubernetes cluster, create application namespaces and add namespaces to OSM control plane.
-  - Apply three GitOps configurations on the Kubernetes cluster to deploy nginx-ingress controller, Hello World Azure Arc web application and Bookstore application.
+  - Deploys OSM Extension on the ArcBox-CAPI-Data cluster, create application namespaces and add namespaces to OSM control plane.
+  - Applies five GitOps configurations on the ArcBox-CAPI-Data cluster to deploy nginx-ingress controller, Hello Arc web application, Bookstore application and Bookstore RBAC/OSM configurations.
   - Creates certificate and import to Azure Key Vault.
-  - Deploys Azure Key Vault Secrets Provider extension on the Kubernetes cluster.
+  - Deploys Azure Key Vault Secrets Provider extension on the ArcBox-CAPI-Data cluster.
   - Configures Ingress for Hello-Arc and Bookstore application with certificate from the Key Vault.  
   - Deploy an Azure Monitor workbook that provides example reports and metrics for monitoring ArcBox components
 
@@ -368,94 +374,101 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the client VM, here are some things to try:
 
-- thing 1
-- thing 2
-
-### App
-
 ### KeyVault integration
 
-- You can now see that Azure Key Vault Secrets Provider, Flux (GitOps) and Open Service Mesh extensions are now enabled in the extension tab section of the Azure Arc-enabled Kubernetes cluster resource in Azure.
-  ![placeholder](./placeholder.png)
+- You can now see that Azure Key Vault Secrets Provider, Flux (GitOps) and Open Service Mesh extensions are now enabled in the extension tab section of the ArcBox-CAPI-Data cluster resource in Azure.
 
-- Browse to the Hello-Arc application to validate the Ingress certificate used _`https://arcbox.devops.com/hello-arc`_
-  ![placeholder](./placeholder.png)
+  ![Screenshot showing Azure Arc extensions ](./keyvault_01.png)
 
-- Optionally, you can also run curl to validate Ingress certificate details.
+- Browse to the Hello-Arc application to validate the Ingress certificate used from Key Vault _`https://arcbox.devops.com/hello-arc`_
+
+  ![Screenshot showing Hello-Arc App](./keyvault_02.png)
+
+- Optionally, run curl to validate Ingress certificate details.
 
   ```shell
-  curl -v -k https://arcbox.devops.com/hello-arc
+  curl -vk https://arcbox.devops.com/hello-arc
   ```
 
-  ![placeholder](./placeholder.png)
+  ![Screenshot showing Hello-Arc certificate](./keyvault_03.png)
 
 ### GitOps configurations
 
-- You can now see three GitOps configurations on the Kubernetes cluster, a cluster-scope config for the nginx-ingress controller, a cluster-scope config for the "Bookstore" application on the Kubernetes cluster and a namespace-scope config for the "Hello World" Azure Arc web application.
-  ![placeholder](./placeholder.png)
+- You can now see the five GitOps configurations on the ArcBox-CAPI-Data cluster.
+
+  - config-nginx to deploy NGINX-ingress controller.
+  - config-bookstore to deploy the "Bookstore" application.
+  - config-bookstore-rbac to deploy the "Bookstore" application RBAC.
+  - config-bookstore-osm to deploy the "Bookstore" application open service mesh traffic split policy.
+  - config-helloarc to deploy the "Hello Arc" web application.
+
+  ![Screenshot showing Azure Arc GitOps configurations](./GitOps_01.png)
 
 - To show the GitOps flow for Hello-Arc application open 2 side-by-side browser windows.
 
-  - Browse to the Hello-Arc application _`https://arcbox.devops.com/hello-arc`_
-    ![placeholder](./placeholder.png)
-  
+  - Browse to the Hello-Arc application _`https://arcbox.devops.com/hello-arc`_  
   - Shell running the command _`kubectl get pods -n hello-arc -w`_ command.
-    ![placeholder](./placeholder.png)
+  - End result should look like that:
+
+    ![Screenshot showing Hello-Arc app and shell](./GitOps_02.png)
 
   - In your fork of the “Azure Arc Jumpstart Apps” repository, open the hello_arc.yaml file (/hello-arc/yaml/hello_arc.yaml). Change the text under the “MESSAGE” section and commit the change.
-    ![placeholder](./placeholder.png)
   
-  - Upon committing the changes, notice how the Kubernetes Pod rolling upgrade will start. Once the Pod is up & running, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
-    ![placeholder](./placeholder.png)
-
-- To show the GitOps flow for Bookstore application open 2 side-by-side browser windows.
-
-  - Browse to the Hello-Arc application _`https://arcbox.devops.com/bookstore`_
-    ![placeholder](./placeholder.png)
+    ![Screenshot showing hello-arc repo](./GitOps_03.png)
   
+  - Upon committing the changes, notice how the Kubernetes Pod rolling upgrade will start. Once the Pod is up & running, refresh the browser, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
+  
+    ![Screenshot showing Hello-Arc app and shell GitOps](./GitOps_04.png)
+
+- To show the GitOps flow for bookstore application open 2 side-by-side browser windows.
+
+  - Browse to the Hello-Arc application _`https://arcbox.devops.com/bookstore`_  
   - Shell running the command _`kubectl get pods -n bookstore -w`_ command.
-    ![placeholder](./placeholder.png)
+  - End result should look like that:
+  
+    ![Screenshot showing Bookstore app and shell](./GitOps_05.png)
 
   - In your fork of the “Azure Arc Jumpstart Apps” repository, open the hello_arc.yaml file (/bookstore/yaml/bookstore.yaml). Update the image to "v1.1.0" and commit the change.
-    ![placeholder](./placeholder.png)
   
-  - Upon committing the changes, notice how the Kubernetes Pod rolling upgrade will start. Once the Pod is up & running, the new “Bookstore” application version window will show the image, showing the rolling upgrade is completed and the GitOps flow is successful.
-    ![placeholder](./placeholder.png)
+    ![Screenshot showing Bookstore app repo](./GitOps_06.png)
+  
+  - Upon committing the changes, notice how the Kubernetes Pod rolling upgrade will start. Once the Pod is up & running, refresh the browser, the new “Bookstore” application version window will show the image, showing the rolling upgrade is completed and the GitOps flow is successful.
+  
+    ![Screenshot showing Bookstore app and shell GitOps](./GitOps_07.png)
 
-- Run below command to apply GitOps Configuration to create Kubernetes RBAC Role, Role binding, Cluster Role and Role binding.
+- Validate RBAC applied using GitOps Configuration to create Kubernetes RBAC Role, Role binding, Cluster Role and Role binding.
   - Show the RBAC Cluster Role and Cluster Role Binding.
   - Show the RBAC Namespace Role and Role Binding.
   - Test the RBAC role for Bookstore namespace.
   - Optionally, you can validate the access using _`kubectl auth can-i delete pods --as=jane`_
   
-### OSM Split Traffic
+### OSM Traffic Split
 
-- Browse to the Bookstore Apps to validate the current traffic.
 - To show OSM traffic split, open 4 browser windows.
 
-  - Browse to the Bookbuyer application _`https://arcbox.devops.com/bookbuyer`_
+  - Browse to the bookbuyer application _`https://arcbox.devops.com/bookbuyer`_
+  - Browse to the bookstore application _`https://arcbox.devops.com/bookstore`_
+  - Browse to the bookstore-v2 application _`https://arcbox.devops.com/bookstore-v2`_  
+  - Shell running the command _`kubectl -n bookbuyer logs bookbuyer-84dcd9c6dd-lvmgf bookbuyer -f | grep Identity:`_ command.
+  - End result should look like that:
 
-  - Browse to the Bookstore application _`https://arcbox.devops.com/bookstore`_
+    ![Screenshot showing Bookstore apps and shell](./OSM_01.png)
 
-  - Browse to the Bookstore-v2 application _`https://arcbox.devops.com/bookstore-v2`_
-  
-  - Shell running the command _`kubectl -n bookbuyer logs bookbuyer-84dcd9c6dd-lcwpm bookbuyer -f | grep Identity:`_ command.
-    ![placeholder](./placeholder.png)
+- In your fork of the “Azure Arc Jumpstart Apps” repository, open the traffic-split.yaml file (/bookstore/osm-sample/traffic-split.yaml). Update the bookstore weight to "25" and bookstore-v2 weight to "75" and commit the change.
 
-- End result should look like that:
-  ![placeholder](./placeholder.png)
-
-- Run below command to apply GitOps Configuration to create Kubernetes RBAC Role, Role binding, Cluster Role and Role binding.
-  ![placeholder](./placeholder.png)
+  ![Screenshot showing Bookstore repo Traffic split 01](./OSM_02.png)
 
 - Wait for the changes to propagate and observe the counters increment for bookstore-v2 and reduce for bookstore. Also observe the changes on the bookbuyer pod logs.
-  ![placeholder](./placeholder.png)
+
+  ![Screenshot showing Bookstore apps and shell GitOps 01](./OSM_03.png)
 
 - In your fork of the “Azure Arc Jumpstart Apps” repository, open the traffic-split.yaml file (/bookstore/osm-sample/traffic-split.yaml). Update the bookstore weight to "0" and bookstore weight to "100" and commit the change.
-  ![placeholder](./placeholder.png)
+
+  ![Screenshot showing Bookstore repo Traffic split 02](./OSM_04.png)
 
 - Wait for the changes to propagate and observe the counters increment for bookstore-v2 and freeze for bookstore. Also observe the changes on the bookbuyer pod logs.
-  ![placeholder](./placeholder.png)
+
+  ![Screenshot showing Bookstore apps and shell GitOps 02](./OSM_05.png)
 
 ### ArcBox Azure Monitor workbook
 
