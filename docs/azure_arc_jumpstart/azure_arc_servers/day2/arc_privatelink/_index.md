@@ -131,7 +131,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Let the script to run its course and **do not close** the Powershell session, this will be done for you once completed.
 
-    > **Note: The script run time is ~1-2min long.**
+    > **NOTE: The script run time is ~1-2min long.**
 
     ![Screenshot script output](./07.png)
 
