@@ -21,8 +21,8 @@ In this guide, you will emulate a hybrid environment connected to Azure over a V
 
   ![Deployment Overview](./01.png)
 
-  > **Note: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
-  > **Note: The below scenario assumes the on-premises VM has outbound internet connectivity for the deployment of the Azure Arc connected machine agent, for internet disconnected environments you will need to adjust the automation to retrieve the agent's software from locally accessible storage**
+  > **NOTE: It is not expected for an Azure VM to be projected as an Azure Arc-enabled server. The below scenario is unsupported and should ONLY be used for demo and testing purposes.**
+  > **NOTE: The below scenario assumes the on-premises VM has outbound internet connectivity for the deployment of the Azure Arc connected machine agent, for internet disconnected environments you will need to adjust the automation to retrieve the agent's software from locally accessible storage**
 
 ## Prerequisites
 
@@ -73,7 +73,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Azure VPN Gateway and its public IP address
         - Azure Windows Virtual Machine with a custom script extension that runs the **install_arc_agent.sh** script
 
-        > **Note: The [*install_arc_agent.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
+        > **NOTE: The [*install_arc_agent.sh*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure/linux/arm_template/scripts/install_arc_agent.sh) shell script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
 
 3. User logs in to the on-premises VM using Azure Bastion to trigger the Azure Arc onboarding script.
 
@@ -103,7 +103,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters nesteddeploy.example.parameters.json
     ```
 
-     > **Note: The deployment may take around 45 minutes to complete**
+     > **NOTE: The deployment may take around 45 minutes to complete**
 
 - Verify the resources are created on the Azure Portal for both resource groups:
 
@@ -131,7 +131,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Let the script to run its course and **do not close** the Powershell session, this will be done for you once completed.
 
-    > **Note: The script run time is ~1-2min long.**
+    > **NOTE: The script run time is ~1-2min long.**
 
     ![Screenshot script output](./07.png)
 
