@@ -141,7 +141,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Azure Arc-enabled server Private Link connectivity
 
-To make sure that your Azure that your Azure Arc-enabled server is using Private Link for its connection. Use your Azure Bastion session to run the command below:
+To make sure that your Azure Arc-enabled server is using Private Link for its connection. Use your Azure Bastion session to run the command below:
 
   ```powershell
     azcmagent.exe show
