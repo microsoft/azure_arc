@@ -113,7 +113,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that the Windows Server VM is created and the VPN connections are established, it is time to login to it. Using bastio RDP to the VM.
+- Now that the Windows Server VM is created and the VPN connections are established, it is time to RDP to it using Azure Bastion.
 
   - On the "on-premises" resource group select the Windows VM:
 
