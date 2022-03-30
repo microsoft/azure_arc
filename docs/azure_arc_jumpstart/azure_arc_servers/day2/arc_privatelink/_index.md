@@ -14,7 +14,7 @@ In this guide, you will emulate a hybrid environment connected to Azure over a V
 
 - Create two separate resource groups:
 
-  - "On-premises" resource group: will simulate a private on-premises environment with a Windows virtual machine. This VM does will not have a public IP address assigned to it so [Azure Bastion](https://docs.microsoft.com/en-us/azure/bastion/bastion-overview) is deployed to have administrative access to the operating system. The Windows virtual machine is an Azure Arc-enabled server by installing the Azure Arc-connected machine agent using Azure Private Link.
+  - "On-premises" resource group: will simulate a private on-premises environment with a Windows virtual machine. This VM will not have a public IP address assigned to it so [Azure Bastion](https://docs.microsoft.com/en-us/azure/bastion/bastion-overview) is deployed to have administrative access to the operating system. The Windows virtual machine is an Azure Arc-enabled server by installing the Azure Arc-connected machine agent using Azure Private Link.
   - "Azure" resource group: in this resource group, you will have the Azure Arc-enabled server and its Private Link Scope.
 
 - Both resource groups have their own virtual networks and address spaces, and they are connected via Azure VPN gateways to set up a hybrid private connection.
