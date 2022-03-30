@@ -103,7 +103,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters nesteddeploy.example.parameters.json
     ```
 
-     > **Note: The deployment may take around 45 minutes to complete**
+     > **NOTE: The deployment may take around 45 minutes to complete**
 
 - Verify the resources are created on the Azure Portal for both resource groups:
 
