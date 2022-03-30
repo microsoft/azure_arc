@@ -436,12 +436,44 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
   
     ![Screenshot showing Bookstore app and shell GitOps](./GitOps_07.png)
 
-- Validate RBAC applied using GitOps Configuration to create Kubernetes RBAC Role, Role binding, Cluster Role and Role binding.
-  - Show the RBAC Cluster Role and Cluster Role Binding.
-  - Show the RBAC Namespace Role and Role Binding.
-  - Test the RBAC role for Bookstore namespace.
-  - Optionally, you can validate the access using _`kubectl auth can-i delete pods --as=jane`_
+### RBAC configurations
+
+- Show Kubernetes RBAC Role and Role binding applied using GitOps Configuration.
+
+  - Show the bookstore Namespace Role and Role Binding.
   
+  ```shell
+  kubectl --namespace bookstore get role
+  kubectl --namespace bookstore get rolebindings.rbac.authorization.k8s.io
+  ```
+
+  ![Screenshot showing bookstore RBAC get pods](./RBAC_01.png)
+
+  - Validate the RBAC role to get the pods as user Jane.
+
+  ```shell
+  kubectl --namespace bookstore get pods --as=jane
+  ```
+
+  ![Screenshot showing bookstore RBAC get pods](./RBAC_02.png)
+
+  - Validate the RBAC role to delete the pods as user Jane.
+
+  ```shell
+  pod=$(kubectl --namespace bookstore get pods --selector=app=bookstore --output=jsonpath={.items..metadata.name})
+  kubectl --namespace bookstore delete pods $pod --as=jane
+  ```
+
+   ![Screenshot showing bookstore RBAC delete pods](./RBAC_03.png)
+
+  - Optionally, you can test the access usinh auth command
+  
+  ```shell
+  kubectl --namespace bookstore auth can-i delete pods --as=jane
+  ```
+  
+  ![Screenshot showing bookstore RBAC delete pods](./RBAC_04.png)
+
 ### OSM Traffic Split
 
 - To show OSM traffic split, open 4 browser windows.
@@ -450,6 +482,12 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
   - Browse to the bookstore application _`https://arcbox.devops.com/bookstore`_
   - Browse to the bookstore-v2 application _`https://arcbox.devops.com/bookstore-v2`_  
   - Shell running the command _`kubectl -n bookbuyer logs bookbuyer-84dcd9c6dd-lvmgf bookbuyer -f | grep Identity:`_ command.
+  
+    ```shell
+    pod=$(kubectl --namespace bookbuyer get pods --selector=app=bookbuyer --output=jsonpath={.items..metadata.name})
+    kubectl --namespace bookbuyer logs $pod bookbuyer -f | grep Identity:
+    ```
+
   - End result should look like that:
 
     ![Screenshot showing Bookstore apps and shell](./OSM_01.png)
