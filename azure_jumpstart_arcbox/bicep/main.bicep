@@ -110,11 +110,10 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   }
 }
 
-module keyVaultDeployment 'key-vault/key-vault.bicep' = {
+module keyVaultDeployment 'key-vault/key-vault.bicep' = if (flavor == 'DevOps') {
   name: 'keyVaultDeployment'
   params: {
     spnClientId: spnClientId
     spnTenantId: spnTenantId
-    flavor: flavor
   }
 }
