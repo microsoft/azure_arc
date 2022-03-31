@@ -282,7 +282,7 @@ ArcBox must be deployed to one of the following regions. **Deploying ArcBox outs
 
   > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
 
-- Now you will deploy the Terraform file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/bicep) and run the commands below:
+- Now you will deploy the Terraform file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/terraform) and run the commands below:
 
   ```shell
   terraform init
