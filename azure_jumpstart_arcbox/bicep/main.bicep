@@ -109,3 +109,12 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     deployBastion: deployBastion
   }
 }
+
+module keyVaultDeployment 'key-vault/key-vault.bicep' = {
+  name: 'keyVaultDeployment'
+  params: {
+    spnClientId: spnClientId
+    spnTenantId: spnTenantId
+    flavor: flavor
+  }
+}
