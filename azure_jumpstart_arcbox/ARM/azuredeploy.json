@@ -278,6 +278,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "condition": "[equals(parameters('flavor'), 'DevOps')]",
       "apiVersion": "2019-10-01",
       "name": "keyVaultDeployment",
       "properties": {
@@ -292,9 +293,6 @@
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
-          },
-          "flavor": {
-            "value": "[parameters('flavor')]"
           }
         }
       }

@@ -14,18 +14,6 @@
         "description": "Azure AD tenant id for your service principal"
       }
     },
-    "flavor": {
-      "type": "string",
-      "defaultValue": "Full",
-      "allowedValues": [
-        "Full",
-        "ITPro",
-        "DevOps"
-      ],
-      "metadata": {
-        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
-      }
-    },
     "location": {
       "type": "string",
       "defaultValue": "[resourceGroup().location]",
@@ -36,7 +24,6 @@
   },
   "resources": [
     {
-      "condition": "[equals(parameters('flavor'), 'DevOps')]",
       "type": "Microsoft.KeyVault/vaults",
       "apiVersion": "2021-11-01-preview",
       "name": "[format('kv-arcbox-{0}', uniqueString(resourceGroup().id))]",
