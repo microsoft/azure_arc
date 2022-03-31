@@ -1,0 +1,335 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cloudVNetName": {
+            "type": "string",
+            "defaultValue": "Azure-VNET",
+            "metadata": {
+                "description": "Name of the VNET for the cloud environment."
+            }
+        },
+        "cloudVNetPrefix": {
+            "type": "string",
+            "defaultValue": "172.16.0.0/24",
+            "metadata": {
+                "description": "CIDR prefix for the cloud VNET."
+            }
+        },
+        "cloudGatewaySubnetPrefix": {
+            "type": "string",
+            "defaultValue": "172.16.0.0/26",
+            "metadata": {
+                "description": "CIDR prefix for the cloud Gateway subnet."
+            }
+        },
+        "cloudSubnetName": {
+            "type": "string",
+            "defaultValue": "Resources",
+            "metadata": {
+                "description": "Name of the subnet for the cloud resources."
+            }
+        },
+        "cloudSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "172.16.0.64/26",
+            "metadata": {
+                "description": "CIDR prefix for the cloud resources subnet."
+            }
+        },
+        "cloudGatewayName": {
+            "type": "string",
+            "defaultValue": "AzureGateway",
+            "metadata": {
+                "description": "The name of the Virtual Network Gateway in 'Azure'."
+            }
+        },
+        "privateLinkScopes_name": {
+            "defaultValue": "Arc-PL-demo",
+            "type": "String"
+        },
+        "privateEndpoints_name": {
+            "defaultValue": "Arc-PE-demo",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "identityName": "deployment-identity",
+        "roleAssignmentName": "[guid(resourceGroup().id)]",
+        "gatewayPublicIPName": "[concat(parameters('cloudGatewayName'), '-PIP')]",
+        "contributorRole": "[resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "his_arc_azure_com_externalid":  "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateDnsZones/privatelink.his.arc.azure.com')]",
+        "guestconfiguration_azure_com_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateDnsZones/privatelink.guestconfiguration.azure.com')]",
+        "azure_com_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name , '/providers/Microsoft.Network/privateDnsZones/privatelink.dp.kubernetesconfiguration.azure.com')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "name": "[variables('identityName')]",
+            "apiVersion": "2018-11-30",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2018-09-01-preview",
+            "name": "[variables('roleAssignmentName')]",
+            "properties": {
+                "scope": "[resourceGroup().id]",
+                "roleDefinitionId": "[variables('contributorRole')]",
+                "principalId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName')), '2018-11-30').principalId]",
+                "principalType": "ServicePrincipal"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', variables('identityName'))]"
+            ]
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('gatewayPublicIPName')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('cloudVNetName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('cloudVNetPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('cloudGatewaySubnetPrefix')]",
+                            "privateEndpointNetworkPolicies": "Disabled"
+                        }
+                    },
+                    {
+                        "name": "[parameters('cloudSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('cloudSubnetPrefix')]",
+                            "privateEndpointNetworkPolicies": "Disabled"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2020-05-01",
+            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "name": "[parameters('cloudGatewayName')]",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('cloudVNetName'), 'GatewaySubnet')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('gatewayPublicIPName'))]"
+                            }
+                        },
+                        "name": "default"
+                    }
+                ],
+                "sku": {
+                    "name": "Basic",
+                    "tier": "Basic"
+                },
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('gatewayPublicIPName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('cloudVNetName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.HybridCompute/privateLinkScopes",
+            "apiVersion": "2021-06-10-preview",
+            "name": "[parameters('privateLinkScopes_name')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicNetworkAccess": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2020-11-01",
+            "name": "[parameters('privateEndpoints_name')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('cloudVNetName'))]"
+            ],
+            "properties": {
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "[parameters('privateEndpoints_name')]",
+                        "properties": {
+                            "privateLinkServiceId": "[resourceId('Microsoft.HybridCompute/privateLinkScopes', parameters('privateLinkScopes_name'))]",
+                            "groupIds": [
+                                "hybridcompute"
+                            ]
+                        }
+                    }
+                ],
+                "manualPrivateLinkServiceConnections": [],
+                "subnet": {
+                    "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('cloudVNetName'), parameters('cloudSubnetName'))]"
+                },
+                "customDnsConfigs": []
+            }
+        },
+             {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "privatelink.his.arc.azure.com",
+            "location": "global",
+            "properties": {
+                "maxNumberOfRecordSets": 25000,
+                "maxNumberOfVirtualNetworkLinks": 1000,
+                "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                "numberOfRecordSets": 1,
+                "numberOfVirtualNetworkLinks": 0,
+                "numberOfVirtualNetworkLinksWithRegistration": 0,
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/SOA",
+            "apiVersion": "2018-09-01",
+            "name": "[concat('privatelink.his.arc.azure.com', '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.his.arc.azure.com')]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "soaRecord": {
+                    "email": "azureprivatedns-host.microsoft.com",
+                    "expireTime": 2419200,
+                    "host": "azureprivatedns.net",
+                    "minimumTtl": 10,
+                    "refreshTime": 3600,
+                    "retryTime": 300,
+                    "serialNumber": 1
+                }
+            }
+        },
+              {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "privatelink.guestconfiguration.azure.com",
+            "location": "global",
+            "properties": {
+                "maxNumberOfRecordSets": 25000,
+                "maxNumberOfVirtualNetworkLinks": 1000,
+                "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                "numberOfRecordSets": 1,
+                "numberOfVirtualNetworkLinks": 0,
+                "numberOfVirtualNetworkLinksWithRegistration": 0,
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/SOA",
+            "apiVersion": "2018-09-01",
+            "name": "[concat('privatelink.guestconfiguration.azure.com', '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.guestconfiguration.azure.com')]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "soaRecord": {
+                    "email": "azureprivatedns-host.microsoft.com",
+                    "expireTime": 2419200,
+                    "host": "azureprivatedns.net",
+                    "minimumTtl": 10,
+                    "refreshTime": 3600,
+                    "retryTime": 300,
+                    "serialNumber": 1
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones",
+            "apiVersion": "2018-09-01",
+            "name": "privatelink.dp.kubernetesconfiguration.azure.com",
+            "location": "global",
+            "properties": {
+                "maxNumberOfRecordSets": 25000,
+                "maxNumberOfVirtualNetworkLinks": 1000,
+                "maxNumberOfVirtualNetworkLinksWithRegistration": 100,
+                "numberOfRecordSets": 1,
+                "numberOfVirtualNetworkLinks": 0,
+                "numberOfVirtualNetworkLinksWithRegistration": 0,
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateDnsZones/SOA",
+            "apiVersion": "2018-09-01",
+            "name": "[concat('privatelink.dp.kubernetesconfiguration.azure.com', '/@')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.dp.kubernetesconfiguration.azure.com')]"
+            ],
+            "properties": {
+                "ttl": 3600,
+                "soaRecord": {
+                    "email": "azureprivatedns-host.microsoft.com",
+                    "expireTime": 2419200,
+                    "host": "azureprivatedns.net",
+                    "minimumTtl": 10,
+                    "refreshTime": 3600,
+                    "retryTime": 300,
+                    "serialNumber": 1
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(parameters('privateEndpoints_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', parameters('privateEndpoints_name'))]"
+            ],
+            "properties": {
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "privatelink-his-arc-azure-com",
+                        "properties": {
+                            "privateDnsZoneId": "[variables('his_arc_azure_com_externalid')]"
+                        }
+                    },
+                    {
+                        "name": "privatelink-guestconfiguration-azure-com",
+                        "properties": {
+                            "privateDnsZoneId": "[variables('guestconfiguration_azure_com_externalid')]"
+                        }
+                    },
+                    {
+                        "name": "privatelink-dp-kubernetesconfiguration-azure-com",
+                        "properties": {
+                            "privateDnsZoneId": "[variables('azure_com_externalid')]"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "PLscope": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.HybridCompute/privateLinkScopes', parameters('privateLinkScopes_name'))]"
+        }
+    }
+}
