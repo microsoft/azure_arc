@@ -1,0 +1,541 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "[deployment().location]",
+            "metadata": {
+                "description": "Location for the JumpStart scenario deployment."
+            }
+        },
+        "azureRgName": {
+            "type": "string",
+            "defaultValue": "Azure-RG",
+            "metadata": {
+                "description": "Name for the Resource Group which will imitate an Azure cloud environment."
+            }
+        },
+        "onPremRgName": {
+            "type": "string",
+            "defaultValue": "OnPrem-RG",
+            "metadata": {
+                "description": "Name for the Resource Group which will imitate an on-premises environment."
+            }
+        },
+        "privateLinkScopes_name": {
+            "defaultValue": "Arc-PL-demo",
+            "type": "String",
+            "metadata": {
+                "description": "Name for Azure Arc private Link Scope"
+            }
+        },
+        "privateEndpoints_name": {
+            "defaultValue": "Arc-PE-demo",
+            "type": "String",
+            "metadata": {
+                "description": "Name for Azure Arc private Link Endpoint"
+            }
+        },
+        "cloudVNetName": {
+            "type": "string",
+            "defaultValue": "Azure-NET",
+            "metadata": {
+                "description": "Name of the vNET for the cloud environment."
+            }
+        },
+        "cloudVNetPrefix": {
+            "type": "string",
+            "defaultValue": "172.16.0.0/24",
+            "metadata": {
+                "description": "CIDR prefix for the cloud vNET."
+            }
+        },
+        "cloudSubnetName": {
+            "type": "string",
+            "defaultValue": "Resources",
+            "metadata": {
+                "description": "Name of the subnet for the cloud resources."
+            }
+        },
+        "cloudGatewaySubnetPrefix": {
+            "type": "string",
+            "defaultValue": "172.16.0.0/26",
+            "metadata": {
+                "description": "CIDR prefix for the cloud Gateway subnet."
+            }
+        },
+        "cloudSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "172.16.0.64/26",
+            "metadata": {
+                "description": "CIDR prefix for the cloud resources subnet."
+            }
+        },
+        "cloudGatewayName": {
+            "type": "string",
+            "defaultValue": "AzureGateway",
+            "metadata": {
+                "description": "The name of the Virtual Network Gateway in 'Azure'."
+            }
+        },
+        "vmName": {
+            "type": "string",
+            "defaultValue": "ArcDemo-VM",
+            "metadata": {
+                "description": "Name of the Virtual Machine that will be onboarded to Arc."
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D4s_v4",
+            "metadata": {
+                "description": "Size of the Arc-enabled virtual machine."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "arcadmin",
+            "metadata": {
+                "description": "Admin username for the Arc-enabled virtual machine."
+            }
+        },
+        "adminPassword": {
+            "type": "string",
+            "metadata": {
+                "description": "SSH key or password for the Arc-enabled virtual Machine. SSH key is recommended for Linux."
+            }
+        },
+        "onPremVNetName": {
+            "type": "string",
+            "defaultValue": "OnPrem-NET",
+            "metadata": {
+                "description": "Name of the vNET for the on-premises environment."
+            }
+        },
+        "onPremVNetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.0.0/24",
+            "metadata": {
+                "description": "CIDR prefix for the on-premises vNET."
+            }
+        },
+        "onPremGatewaySubnetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.0.0/26",
+            "metadata": {
+                "description": "CIDR prefix for the on-premises Gateway subnet."
+            }
+        },
+        "onPremBastionSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.0.64/26",
+            "metadata": {
+                "description": "CIDR prefix for the on-premises Bastion subnet."
+            }
+        },
+        "onPremSubnetName": {
+            "type": "string",
+            "defaultValue": "default",
+            "metadata": {
+                "description": "Name of the subnet for the on-premises resources."
+            }
+        },
+        "onPremSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "192.168.0.128/26",
+            "metadata": {
+                "description": "CIDR prefix for the on-premises resources subnet."
+            }
+        },
+        "onPremGatewayName": {
+            "type": "string",
+            "defaultValue": "OnPremGateway",
+            "metadata": {
+                "description": "The name of the Virtual Network Gateway 'on-premises'."
+            }
+        },
+        "onPremBastionName": {
+            "type": "string",
+            "defaultValue": "OnPremBastion",
+            "metadata": {
+                "description": "The name of the Bastion host that will simulate secure access to the on-premises environment."
+            }
+        },
+        "sharedKey": {
+            "type": "string",
+            "defaultValue": "ArcPa$$w0rd",
+            "metadata": {
+                "description": "Shared secret key for the vNET-to-vNET connection between Virtual Network Gateways."
+            }
+        },
+        "appId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN app ID"
+            }
+        },
+        "password": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN password"
+            }
+        },
+        "tenantId": {
+            "type": "string",
+            "metadata": {
+                "description": "Unique SPN tenant ID"
+            }
+        }
+    },
+    "variables": {
+        
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2021-04-01",
+            "name": "[parameters('azureRgName')]",
+            "location": "[parameters('location')]",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2021-04-01",
+            "name": "[parameters('onPremRgName')]",
+            "location": "[parameters('location')]",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "AzureDeployment",
+            "resourceGroup": "[parameters('azureRgName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups', parameters('azureRgName'))]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "Inner"
+                },
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/azuredeploy.json"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "privateLinkScopes_name": {
+                        "value": "[parameters('privateLinkScopes_name')]"
+                    },
+                    "privateEndpoints_name": {
+                        "value": "[parameters('privateEndpoints_name')]"
+                    },
+                    "cloudVNetName": {
+                        "value": "[parameters('cloudVNetName')]"
+                    },
+                    "cloudVNetPrefix": {
+                        "value": "[parameters('cloudVNetPrefix')]"
+                    },
+                    "cloudSubnetName": {
+                        "value": "[parameters('cloudSubnetName')]"
+                    },
+                    "cloudGatewaySubnetPrefix": {
+                        "value": "[parameters('cloudGatewaySubnetPrefix')]"
+                    },
+                    "cloudSubnetPrefix": {
+                        "value": "[parameters('cloudSubnetPrefix')]"
+                    },
+                    "cloudGatewayName": {
+                        "value": "[parameters('cloudGatewayName')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "OnPremDeployment",
+            "resourceGroup": "[parameters('onPremRgName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups', parameters('onPremRgName'))]"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "Inner"
+                },
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/onpremisedeploy.json"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "vmSize": {
+                        "value": "[parameters('vmSize')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    },
+                    "onPremVNetName": {
+                        "value": "[parameters('onPremVNetName')]"
+                    },
+                    "onPremVNetPrefix": {
+                        "value": "[parameters('onPremVNetPrefix')]"
+                    },
+                    "onPremGatewaySubnetPrefix": {
+                        "value": "[parameters('onPremGatewaySubnetPrefix')]"
+                    },
+                    "onPremBastionSubnetPrefix": {
+                        "value": "[parameters('onPremBastionSubnetPrefix')]"
+                    },
+                    "onPremSubnetName": {
+                        "value": "[parameters('onPremSubnetName')]"
+                    },
+                    "onPremSubnetPrefix": {
+                        "value": "[parameters('onPremSubnetPrefix')]"
+                    },
+                    "onPremGatewayName": {
+                        "value": "[parameters('onPremGatewayName')]"
+                    },
+                    "onPremBastionName": {
+                        "value": "[parameters('onPremBastionName')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "ConnectAzureGateway",
+            "resourceGroup": "[parameters('azureRgName')]",
+            "dependsOn": [
+                "AzureDeployment",
+                "OnPremDeployment"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "Inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "azureGatewayName": {
+                        "value": "[parameters('cloudGatewayName')]"
+                    },
+                    "onPremGatewayName": {
+                        "value": "[parameters('onPremGatewayName')]"
+                    },
+                    "onPremGatewayResourceGroupName": {
+                        "value": "[parameters('onPremRgName')]"
+                    },
+                    "sharedKey": {
+                        "value": "[parameters('sharedKey')]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "azureGatewayName": {
+                            "type": "string"
+                        },
+                        "onPremGatewayName": {
+                            "type": "string"
+                        },
+                        "onPremGatewayResourceGroupName": {
+                            "type": "string"
+                        },
+                        "sharedKey": {
+                            "type": "string"
+                        }
+                    },
+                    "resources": [
+                        {
+                            "apiVersion": "2020-05-01",
+                            "type": "Microsoft.Network/connections",
+                            "name": "azure-to-onprem",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "virtualNetworkGateway1": {
+                                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('azureGatewayName'))]"
+                                },
+                                "virtualNetworkGateway2": {
+                                    "id": "[resourceId(parameters('onPremGatewayResourceGroupName'), 'Microsoft.Network/virtualNetworkGateways', parameters('onPremGatewayName'))]"
+                                },
+                                "connectionType": "Vnet2Vnet",
+                                "routingWeight": 3,
+                                "sharedKey": "[parameters('sharedKey')]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "ConnectOnPremGateway",
+            "resourceGroup": "[parameters('onPremRgName')]",
+            "dependsOn": [
+                "ConnectAzureGateway"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "Inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "azureGatewayName": {
+                        "value": "[parameters('cloudGatewayName')]"
+                    },
+                    "onPremGatewayName": {
+                        "value": "[parameters('onPremGatewayName')]"
+                    },
+                    "azureGatewayResourceGroupName": {
+                        "value": "[parameters('azureRgName')]"
+                    },
+                    "sharedKey": {
+                        "value": "[parameters('sharedKey')]"
+                    }
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "onPremGatewayName": {
+                            "type": "string"
+                        },
+                        "azureGatewayName": {
+                            "type": "string"
+                        },
+                        "azureGatewayResourceGroupName": {
+                            "type": "string"
+                        },
+                        "sharedKey": {
+                            "type": "string"
+                        }
+                    },
+                    "resources": [
+                        {
+                            "apiVersion": "2020-05-01",
+                            "type": "Microsoft.Network/connections",
+                            "name": "onprem-to-azure",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "virtualNetworkGateway1": {
+                                    "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('onPremGatewayName'))]"
+                                },
+                                "virtualNetworkGateway2": {
+                                    "id": "[resourceId(parameters('azureGatewayResourceGroupName'), 'Microsoft.Network/virtualNetworkGateways', parameters('azureGatewayName'))]"
+                                },
+                                "connectionType": "Vnet2Vnet",
+                                "routingWeight": 3,
+                                "sharedKey": "[parameters('sharedKey')]"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "name": "OnboardArcMachine",
+            "resourceGroup": "[parameters('onPremRgName')]",
+            "dependsOn": [
+                "ConnectAzureGateway",
+                "ConnectOnPremGateway"
+            ],
+            "properties": {
+                "expressionEvaluationOptions": {
+                    "scope": "Inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    },
+                    "azureRgName": {
+                        "value": "[parameters('azureRgName')]"
+                    },
+                    "appId": {
+                        "value": "[parameters('appId')]"
+                    },
+                    "password": {
+                        "value": "[parameters('password')]"
+                    },
+                    "tenantId": {
+                        "value": "[parameters('tenantId')]"
+                    },
+                    "PLscope": {
+                        "value": "[reference('AzureDeployment').outputs.PLscope.value]"
+                    }, 
+                    "privateEndpoints_name": {
+                        "value": "[parameters('privateEndpoints_name')]"
+                    }, 
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    }
+
+                },
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "vmName": {
+                            "type": "string"
+                        },
+                        "azureRgName": {
+                            "type": "string"
+                        },
+                    "appId": {
+                        "type": "string"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "tenantId": {
+                        "type": "string"
+                    },
+                     "PLscope": {
+                        "type": "string"
+                    },
+                    "privateEndpoints_name": {
+                        "type": "string"
+                    },
+                    "adminUsername": {
+                        "type": "string"
+                    }
+                    },
+                    "variables": {
+                        
+                    },
+                    "resources": [
+                        {
+                            "type": "Microsoft.Compute/virtualMachines/extensions",
+                            "name": "[concat(parameters('vmName'),'/onboardArcMachine')]",
+                            "apiVersion": "2019-07-01",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "publisher": "Microsoft.Compute",
+                                "type": "CustomScriptExtension",
+                                "typeHandlerVersion": "1.10",
+                                "autoUpgradeMinorVersion": true,
+                                "settings": {
+                                    "fileUris": [
+                                        "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/artifacts/bootstrap.ps1"
+                                    ],
+                                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File bootstrap.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('azureRgName'),  ' -subscriptionId ', subscription().subscriptionId, ' -location ', resourceGroup().location, ' -PLscope ', parameters('PLscope'),' -PEname ', parameters('privateEndpoints_name'),' -adminUsername ', parameters('adminUsername') )]"
+                                }
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
