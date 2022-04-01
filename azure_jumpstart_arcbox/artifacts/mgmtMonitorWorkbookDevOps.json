@@ -15,7 +15,7 @@
         "description": "The gallery that the workbook will been shown under. Supported values include workbook, tsg, etc. Usually, this is 'workbook'"
       }
     },
-    "workbookSourceId": {
+    "workbookResourceId": {
       "type": "string",
       "defaultValue": "workbookresourceid-stage",
       "metadata": {
