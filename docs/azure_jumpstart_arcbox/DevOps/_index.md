@@ -4,9 +4,8 @@ linkTitle: "Jumpstart ArcBox for DevOps"
 weight: 3
 ---
 
-## Jumpstart ArcBox for IT Pros
-
-ArcBox for IT Pros is a special "flavor" of ArcBox that is intended for users who want to experience Azure Arc-enabled servers capabilities in a sandbox environment.
+## Jumpstart ArcBox for DevOps
+ArcBox for IT Pros is a special "flavor" of ArcBox that is intended for users who want to experience Azure Arc-enabled Kubernetes capabilities in a sandbox environment.
 
 ![ArcBox architecture diagram](./arch_devops.png)
 
@@ -23,34 +22,36 @@ ArcBox for IT Pros is a special "flavor" of ArcBox that is intended for users wh
 
 ### Azure Arc-enabled Kubernetes
 
-ArcBox deploys two Kubernetes clusters.
+ArcBox for DevOps deploys two Kubernetes clusters.
 
 - One single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource (_ArcBox-K3s_).
-- ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider Azure(CAPZ), and a workload cluster is deployed onto the management cluster.
+- ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider Azure(CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster.
 
-### App
+### Sample applications
 
-ArcBox deploys two applications on the ArcBox-CAPI-Data cluster.
+ArcBox for DevOps deploys two applications on the _ArcBox-CAPI-Data_ cluster.
 
-1. Hello Arc application will deploy 3 replicas of "Hello Arc" web application. Hello Arc application will be in hello-arc namespace.
+- [Hello-arc](https://github.com/microsoft/azure-arc-jumpstart-apps/tree/main/hello-arc) application is a simple web app. ArcBox will deploy 3 replicas of the hello-arc application in the hello-arc namespace.
 
-2. Bookstore application will deploy 5 different pods.
+- [Bookstore](https://release-v0-11.docs.openservicemesh.io/docs/getting_started/quickstart/manual_demo/) application is a sample microservices application. ArcBox will deploy 5 different pods as part of the Bookstore app.
 
-- bookbuyer is an HTTP client making requests to bookstore.
-- bookstore is a server, which responds to HTTP requests. It is also a client making requests to the bookwarehouse service.
-- bookwarehouse is a server and should respond only to bookstore.
-- mysql is a MySQL database only reachable by bookwarehouse.
-- bookstore-v2 - this is the same container as the first bookstore, but for Open Service Mesh traffic split scenario we will assume that it is a new version of the app we need to upgrade to.
+  - _bookbuyer_ is an HTTP client making requests to bookstore.
+  - _bookstore_ is a server, which responds to HTTP requests. It is also a client making requests to the bookwarehouse service.
+  - _bookwarehouse_ is a server and should respond only to bookstore.
+  - _mysql_ is a MySQL database only reachable by bookwarehouse.
+  - _bookstore-v2_ - this is the same container as the first bookstore, but for Open Service Mesh traffic split scenario we will assume that it is a new version of the app we need to upgrade to.
 
-The bookbuyer, bookstore, and bookwarehouse Pods will be in separate Kubernetes Namespaces with the same names. mysql will be in the bookwarehouse namespace. bookstore-v2 will be in the bookstore namespace.
+The _bookbuyer_, _bookstore_, and _bookwarehouse_ pods will be in separate Kubernetes namespaces with the same names. _mysql_ will be in the _bookwarehouse_ namespace. _bookstore-v2_ will be in the _bookstore_ namespace.
 
 ### Open Service Mesh integration
 
-ArcBox deploys Open Service Mesh by installing the [Open Service Mesh extension](https://aka.ms/arc-osm-doc) on the ArcBox-CAPI-Data cluster. Bookstore application namespaces will be added to Open Service Mesh control plane. Each new Pod in the service mesh will be injected with an Envoy sidecar container.
+ArcBox deploys Open Service Mesh by installing the [Open Service Mesh extension](https://aka.ms/arc-osm-doc) on the _ArcBox-CAPI-Data_ cluster. Bookstore application namespaces will be added to Open Service Mesh control plane. Each new Pod in the service mesh will be injected with an Envoy sidecar container.
 
-[Open Service Mesh (OSM)](https://openservicemesh.io/) is a lightweight, extensible, Cloud Native service mesh that allows users to uniformly manage, secure, and get out-of-the-box observability features for highly dynamic microservice environments.
+[Open Service Mesh (OSM)](https://openservicemesh.io/) is a lightweight, extensible, cloud native service mesh that allows users to uniformly manage, secure, and get out-of-the-box observability features for highly dynamic microservice environments.
 
 ### GitOps
+
+GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/). Flux is deployed by installing the [Flux extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-gitops-flux2#flux-cluster-extension) on the Kubernetes cluster. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. Flux provides support for common file sources (Git and Helm repositories, Buckets) and template types (YAML, Helm, and Kustomize).
 
 ArcBox deploys five GitOps configurations on the ArcBox-CAPI-Data cluster:
 
@@ -58,23 +59,21 @@ ArcBox deploys five GitOps configurations on the ArcBox-CAPI-Data cluster:
 - Cluster scope config to deploy the "Bookstore" application.
 - Namespace scope config to deploy the "Bookstore" application RBAC.
 - Namespace scope config to deploy the "Bookstore" application open service mesh traffic split policies.
-- Namespace scope config to deploy the "Hello Arc" web application.
-
-GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/). Flux is deployed by installing the [Flux extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-gitops-flux2#flux-cluster-extension) on the Kubernetes cluster. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. Flux provides support for common file sources (Git and Helm repositories, Buckets) and template types (YAML, Helm, and Kustomize).
+- Namespace scope config to deploy the "Hello-Arc" web application.
 
 ### KeyVault integration
 
-ArcBox deploys Azure Key Vault as part of the infrastructure provisioning. Also, it will hook the ArcBox-CAPI-Data cluster to Azure Key Vault by deploying the [Azure Key Vault Secrets Provider extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/tutorial-akv-secrets-provider).  
-
 The Azure Key Vault Provider for Secrets Store CSI Driver allows for the integration of Azure Key Vault as a secrets store with a Kubernetes cluster via a [CSI volume](https://kubernetes-csi.github.io/docs/).
+
+ArcBox deploys Azure Key Vault as part of the infrastructure provisioning. Also, it will hook the ArcBox-CAPI-Data cluster to Azure Key Vault by deploying the [Azure Key Vault Secrets Provider extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/tutorial-akv-secrets-provider).  
 
 A self signed certificate is synced from the Key Vault and configured as secret for Ingress of Bookstore and Hello-Arc application.
 
 ### Microsoft Defender for Cloud / k8s integration
 
-ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources, one of these services is Microsoft Defender for Cloud that is deployed by installing the [Defender extension](https://docs.microsoft.com/azure/defender-for-cloud/defender-for-containers-enable?tabs=aks-deploy-portal%2Ck8s-deploy-cli%2Ck8s-verify-cli%2Ck8s-remove-arc%2Caks-removeprofile-api#protect-arc-enabled-kubernetes-clusters) on your Kubernetes cluster in order to start collecting security related logs and telemetry.  
-
 Kubernetes extensions are add-ons for Kubernetes clusters. The extensions feature on Azure Arc-enabled Kubernetes clusters enables usage of Azure Resource Manager based APIs, CLI and portal UX for deployment of extension components (Helm charts in initial release) and will also provide lifecycle management capabilities such as auto/manual extension version upgrades for the extensions.
+
+ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources, one of these services is Microsoft Defender for Cloud that is deployed by installing the [Defender extension](https://docs.microsoft.com/azure/defender-for-cloud/defender-for-containers-enable?tabs=aks-deploy-portal%2Ck8s-deploy-cli%2Ck8s-verify-cli%2Ck8s-remove-arc%2Caks-removeprofile-api#protect-arc-enabled-kubernetes-clusters) on your Kubernetes cluster in order to start collecting security related logs and telemetry.  
 
 After you have finished the deployment of ArBox for DevOps, you can verify that Microsoft Defender for Cloud is working properly and alerting on security threats, by running the below command to simulate an alert:
 
