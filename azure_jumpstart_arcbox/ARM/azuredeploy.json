@@ -93,7 +93,7 @@
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
     "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]",
-    "keyVaultTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/key-vault/key-vault.json')]"
+    "keyVaultTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/keyVault/keyVault.json')]"
   },
   "resources": [
     {
