@@ -5,4 +5,4 @@ param (
 )
 
 $skip = $skipTests.split(',')
-Test-AzTemplate -TemplatePath $TemplatePath -Skip $skip -Pester 
+Test-AzTemplate -TemplatePath $TemplatePath -Skip $skip -Pester
