@@ -4,23 +4,20 @@
     "afterScriptExecution": 89,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 6,
-    "workbooksExpected": 1,
-    "countDesktopFilesExpected": 4
+    "workbooksExpected": 1
   },
   "ITPro": {
     "afterDeployResources": 13,
     "afterScriptExecution": 20,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 5,
-    "workbooksExpected": 1,
-    "countDesktopFilesExpected": 4
+    "workbooksExpected": 1
   },
-  "Developer": {
-    "afterDeployResources": 13,
-    "afterScriptExecution": 20,
-    "azureArcMachinesExpected": 5,
+  "DevOps": {
+    "afterDeployResources": 47,
+    "afterScriptExecution": 47,
+    "azureArcMachinesExpected": 0,
     "policiesDeploymentExpected": 1,
-    "workbooksExpected": 1,
-    "countDesktopFilesExpected": 4
+    "workbooksExpected": 0
   }
 }
