@@ -57,7 +57,11 @@
       "metadata": {
         "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
       },
-      "allowedValues": [ "Full", "ITPro", "DevOps" ],
+      "allowedValues": [
+        "Full",
+        "ITPro",
+        "DevOps"
+      ],
       "defaultValue": "Full"
     },
     "githubAccount": {
@@ -88,14 +92,18 @@
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]"
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]",
+    "keyVaultTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/keyVault/keyVault.json')]"
   },
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "ubuntuCAPIDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
+      "dependsOn": [
+        "stagingStorageAccountDeployment",
+        "mgmtArtifactsAndPolicyDeployment"
+      ],
       "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'))]",
       "properties": {
         "mode": "Incremental",
@@ -138,7 +146,10 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "ubuntuRancherDeployment",
-      "dependsOn": [ "stagingStorageAccountDeployment", "mgmtArtifactsAndPolicyDeployment" ],
+      "dependsOn": [
+        "stagingStorageAccountDeployment",
+        "mgmtArtifactsAndPolicyDeployment"
+      ],
       "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'))]",
       "properties": {
         "mode": "Incremental",
@@ -181,7 +192,9 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
-      "dependsOn": [ "mgmtArtifactsAndPolicyDeployment" ],
+      "dependsOn": [
+        "mgmtArtifactsAndPolicyDeployment"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -259,6 +272,27 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "condition": "[equals(parameters('flavor'), 'DevOps')]",
+      "apiVersion": "2019-10-01",
+      "name": "keyVaultDeployment",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('keyVaultTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
           }
         }
       }
