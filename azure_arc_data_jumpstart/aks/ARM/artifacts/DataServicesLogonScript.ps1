@@ -2,7 +2,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = "Arc-Data-AKS"
+$connectedClusterName = "Arc-DataSvc-AKS"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
