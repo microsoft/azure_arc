@@ -34,18 +34,6 @@
       "type": "string",
       "defaultValue": "worker-subnet"
     },
-    "podCidr": {
-      "type": "string",
-      "metadata": {
-        "description": "ARO Pod cidr"
-      }
-    },
-    "serviceCidr": {
-      "type": "string",
-      "metadata": {
-        "description": "ARO service cidr"
-      }
-    },
     "clusterDomain": {
       "type": "string",
       "defaultValue": "[format('arcaro{0}', substring(uniqueString(resourceGroup().id), 0, 5))]"
