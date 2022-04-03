@@ -52,13 +52,6 @@
         "description": "Name for your log analytics workspace"
       }
     },
-    "kubernetesVersion": {
-      "defaultValue": "1.22.6",
-      "type": "string",
-      "metadata": {
-        "description": "The version of Kubernetes"
-      }
-    },
     "clusterName": {
       "type": "string",
       "defaultValue": "Arc-Data-ARO",
@@ -192,9 +185,6 @@
           },
           "servicePrincipalClientSecret": {
             "value": "[parameters('servicePrincipalClientSecret')]"
-          },
-          "kubernetesVersion": {
-            "value": "[parameters('kubernetesVersion')]"
           },
           "AroProviderId": {
             "value": "[parameters('AroProviderId')]"
