@@ -1,37 +1,42 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "vmSize": {
-            "value": "Standard_D4s_v3"
-        },
-        "vmName":{
-            "value": "Arc-Win-Demo"
-        },
-        "adminUsername": {
-          "value": "arcdemo"
-        },
-        "adminPassword": {
-            "value": "ArcPassword123!!"
-        },
-        "resourceGroup": {
-          "value": "Arc-Servers-Win-Demo"
-        },      
-        "appId": {
-            "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
-        },
-        "password": {
-            "value": "33333333-XXXX-YTYT-9c21-7777777777"
-        },
-        "tenantId": {
-            "value": "33333333-XXXX-41af-1111-7777777777"
-        },
-        "subscriptionId": {
-            "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
-        },
-        "location": {
-            "value": "eastus"
-        }
-      }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSize": {
+      "value": "Standard_D4s_v3"
+    },
+    "vmName": {
+      "value": "Arc-Win-Demo"
+    },
+    "adminUsername": {
+      "value": "arcdemo"
+    },
+    "adminPassword": {
+      "value": "ArcPassword123!!"
+    },
+    "resourceGroup": {
+      "value": "Arc-Servers-Win-Demo"
+    },
+    "appId": {
+      "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
+    },
+    "password": {
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
+    },
+    "tenantId": {
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
+    },
+    "subscriptionId": {
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
+    },
+    "location": {
+      "value": "eastus"
+    },
+    "deployBastion": {
+        "value": false
+    },
+    "bastionHostName": {
+      "value": "Arc-Win-Demo-Bastion"
+    }
   }
-  
+}

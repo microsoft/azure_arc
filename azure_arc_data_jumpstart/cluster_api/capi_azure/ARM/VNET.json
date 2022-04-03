@@ -25,7 +25,16 @@
       "metadata": {
         "description": "Subnet CIDR"
       }
+    },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Bastion subnet prefix"
+      }
     }
+  },
+   "variables": {
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]"
   },
   "resources": [
     {
@@ -45,6 +54,12 @@
               "addressPrefix": "[parameters('subnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
             }
           }
         ]

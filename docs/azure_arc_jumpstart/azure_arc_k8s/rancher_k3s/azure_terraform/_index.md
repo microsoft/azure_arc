@@ -86,6 +86,7 @@ The only thing you need to do before executing the Terraform plan is to export t
     export TF_VAR_client_id=<Your Azure service principal App ID>
     export TF_VAR_client_secret=<Your Azure service principal App password>  
     export TF_VAR_tenant_id=<Your Azure service principal Tenant ID>
+    export TF_VAR_my_ip_address=<Your IP address>
     ```
 
     > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**

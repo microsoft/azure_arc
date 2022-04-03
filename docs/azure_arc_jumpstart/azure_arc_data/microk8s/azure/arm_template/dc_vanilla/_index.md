@@ -115,6 +115,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - `deploySQLMI` - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller only scenario we leave it set to _**false**_.
   - `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller only scenario we leave it set to _**false**_.
   - `templateBaseUrl` - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
+  - `deployBastion` - Choice (true | false) to deploy Azure Bastion.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/microk8s/azure/arm_template) and run the below command:
 
@@ -153,7 +154,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that first phase of the automation is completed, it is time to RDP to the Client VM using it's public IP.
+- Now that the first phase of the automation is completed, it is time to RDP to the Client VM using its public IP.
 
   ![Client VM public IP](./05.png)
 

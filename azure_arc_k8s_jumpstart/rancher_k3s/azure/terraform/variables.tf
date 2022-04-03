@@ -12,6 +12,9 @@ variable "client_secret" {
 variable "tenant_id" {
 }
 
+variable "my_ip_address" {
+}
+
 variable "location" {
 }
 
