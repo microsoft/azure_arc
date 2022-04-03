@@ -56,7 +56,9 @@
   },
   "variables": {
     "workerNodesResourceGroup": "[format('/subscriptions/{0}/resourceGroups/arc-aro-{1}', subscription().subscriptionId, parameters('clusterDomain'))]",
-    "contributorRoleId": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]"
+    "contributorRoleId": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]",
+    "podCidr": "10.128.0.0/14",
+    "serviceCidr": "172.30.0.0/16"
   },
   "resources": [
     {
@@ -79,8 +81,8 @@
       "location": "[parameters('location')]",
       "properties": {
         "networkProfile": {
-          "podCidr": "[parameters('podCidr')]",
-          "serviceCidr": "[parameters('serviceCidr')]",
+          "podCidr": "[variables('podCidr')]",
+          "serviceCidr": "[variables('serviceCidr')]",
           "softwareDefinedNetwork": "OpenShiftSDN"
         },
         "clusterProfile": {
