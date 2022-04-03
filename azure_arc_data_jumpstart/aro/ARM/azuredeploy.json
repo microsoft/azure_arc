@@ -28,13 +28,13 @@
         "description": "RSA public key used for securing SSH access to Azure resources"
       }
     },
-    "spnClientId": {
+    "servicePrincipalClientId": {
       "type": "string",
       "metadata": {
         "description": "Azure service principal client id"
       }
     },
-    "spnClientSecret": {
+    "servicePrincipalClientSecret": {
       "type": "securestring",
       "metadata": {
         "description": "Azure service principal client secret"
@@ -114,6 +114,12 @@
       "metadata": {
         "description": "the Azure Bastion host name"
       }
+    },
+    "AroProviderId": {
+      "type": "string",
+      "metadata": {
+        "description": "ARO resource provider Id"
+      }
     }
   },
   "variables": {
@@ -167,6 +173,7 @@
       "comments": "Deploys an ARO Cluster",
       "apiVersion": "2021-04-01",
       "name": "aroDeployment",
+      "dependsOn": ["VNETDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -174,17 +181,23 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "aro_name": {
+            "value": "Arc-Aro-Demo"
+          },
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
           },
-          "spnClientId": {
-            "value": "[parameters('spnClientId')]"
+          "servicePrincipalClientId": {
+            "value": "[parameters('servicePrincipalClientId')]"
           },
-          "spnClientSecret": {
-            "value": "[parameters('spnClientSecret')]"
+          "servicePrincipalClientSecret": {
+            "value": "[parameters('servicePrincipalClientSecret')]"
           },
           "kubernetesVersion": {
             "value": "[parameters('kubernetesVersion')]"
+          },
+          "AroProviderId": {
+            "value": "[parameters('AroProviderId')]"
           }
         }
       }
