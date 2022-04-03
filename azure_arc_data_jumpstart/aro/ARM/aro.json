@@ -1,0 +1,115 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "aro_name": {
+      "type": "string",
+      "defaultValue": "Arc-Aro-Demo"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "Arc-Aro-VNET"
+    },
+    "servicePrincipalClientId": {
+      "type": "string"
+    },
+    "servicePrincipalClientSecret": {
+      "type": "string"
+    },
+    "masterNodesSubnet": {
+      "type": "string",
+      "defaultValue": "master-subnet"
+    },
+    "workerNodesSubnet": {
+      "type": "string",
+      "defaultValue": "worker-subnet"
+    },
+    "podCidr": {
+      "type": "string",
+      "metadata": {
+        "description": "ARO Pod cidr"
+      }
+    },
+    "serviceCidr": {
+      "type": "string",
+      "metadata": {
+        "description": "ARO service cidr"
+      }
+    },
+    "clusterDomain": {
+      "type": "string",
+      "defaultValue": "[format('arcaro{0}', substring(uniqueString(resourceGroup().id), 0, 5))]"
+    },
+    "AroProviderId": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "workerNodesResourceGroup": "[format('/subscriptions/{0}/resourceGroups/arc-aro-{1}', subscription().subscriptionId, parameters('clusterDomain'))]",
+    "contributorRoleId": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2021-04-01-preview",
+      "scope": "[format('Microsoft.Network/virtualNetworks/{0}', parameters('virtualNetworkName'))]",
+      "name": "[guid(subscription().subscriptionId, parameters('AroProviderId'), variables('contributorRoleId'))]",
+      "properties": {
+        "roleDefinitionId": "[variables('contributorRoleId')]",
+        "principalId": "[parameters('AroProviderId')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.RedHatOpenShift/openShiftClusters",
+      "apiVersion": "2021-09-01-preview",
+      "name": "[parameters('aro_name')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "networkProfile": {
+          "podCidr": "[parameters('podCidr')]",
+          "serviceCidr": "[parameters('serviceCidr')]",
+          "softwareDefinedNetwork": "OpenShiftSDN"
+        },
+        "clusterProfile": {
+          "domain": "[parameters('clusterDomain')]",
+          "resourceGroupId": "[variables('workerNodesResourceGroup')]"
+        },
+        "masterProfile": {
+          "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('masterNodesSubnet'))]",
+          "vmSize": "Standard_D8s_v3",
+          "encryptionAtHost": "Disabled"
+        },
+        "workerProfiles": [
+          {
+            "name": "worker",
+            "vmSize": "Standard_D4s_v3",
+            "diskSizeGB": 128,
+            "count": 3,
+            "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('workerNodesSubnet'))]",
+            "encryptionAtHost": "Disabled"
+          }
+        ],
+        "servicePrincipalProfile": {
+          "clientId": "[parameters('servicePrincipalClientId')]",
+          "clientSecret": "[parameters('servicePrincipalClientSecret')]"
+        },
+        "apiserverProfile": {
+          "visibility": "Public"
+        },
+        "ingressProfiles": [
+          {
+            "visibility": "Public",
+            "name": "default"
+          }
+        ]
+      }
+    }
+  ]
+}
