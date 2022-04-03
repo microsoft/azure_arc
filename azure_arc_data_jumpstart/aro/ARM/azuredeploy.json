@@ -177,6 +177,9 @@
           "aro_name": {
             "value": "Arc-Aro-Demo"
           },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
           },

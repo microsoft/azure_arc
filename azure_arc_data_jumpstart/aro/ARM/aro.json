@@ -12,7 +12,7 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "Arc-Aro-VNET"
+      "defaultValue": "Arc-Data-VNet"
     },
     "sshRSAPublicKey": {
       "type": "securestring",
