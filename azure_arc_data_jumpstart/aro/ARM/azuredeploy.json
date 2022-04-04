@@ -28,13 +28,13 @@
         "description": "RSA public key used for securing SSH access to Azure resources"
       }
     },
-    "servicePrincipalClientId": {
+    "spnClientId": {
       "type": "string",
       "metadata": {
         "description": "Azure service principal client id"
       }
     },
-    "servicePrincipalClientSecret": {
+    "spnClientSecret": {
       "type": "securestring",
       "metadata": {
         "description": "Azure service principal client secret"
@@ -175,7 +175,7 @@
         },
         "parameters": {
           "aro_name": {
-            "value": "Arc-Aro-Demo"
+            "value": "Arc-Data-ARO"
           },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
@@ -183,11 +183,11 @@
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
           },
-          "servicePrincipalClientId": {
-            "value": "[parameters('servicePrincipalClientId')]"
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
           },
-          "servicePrincipalClientSecret": {
-            "value": "[parameters('servicePrincipalClientSecret')]"
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
           },
           "AroProviderId": {
             "value": "[parameters('AroProviderId')]"
@@ -215,10 +215,10 @@
             "value": "[parameters('windowsAdminPassword')]"
           },
           "spnClientId": {
-            "value": "[parameters('servicePrincipalClientId')]"
+            "value": "[parameters('spnClientId')]"
           },
           "spnClientSecret": {
-            "value": "[parameters('servicePrincipalClientSecret')]"
+            "value": "[parameters('spnClientSecret')]"
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"

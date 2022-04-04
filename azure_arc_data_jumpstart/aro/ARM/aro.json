@@ -4,7 +4,7 @@
   "parameters": {
     "aro_name": {
       "type": "string",
-      "defaultValue": "Arc-Aro-Demo"
+      "defaultValue": "Arc-Data-ARO"
     },
     "location": {
       "type": "string",
@@ -20,10 +20,10 @@
         "description": "RSA public key used for securing SSH access to Azure resources"
       }
     },
-    "servicePrincipalClientId": {
+    "spnClientId": {
       "type": "string"
     },
-    "servicePrincipalClientSecret": {
+    "spnClientSecret": {
       "type": "string"
     },
     "masterNodesSubnet": {
@@ -152,8 +152,8 @@
           }
         ],
         "servicePrincipalProfile": {
-          "clientId": "[parameters('servicePrincipalClientId')]",
-          "clientSecret": "[parameters('servicePrincipalClientSecret')]"
+          "clientId": "[parameters('spnClientId')]",
+          "clientSecret": "[parameters('spnClientSecret')]"
         },
         "apiserverProfile": {
           "visibility": "Public"
