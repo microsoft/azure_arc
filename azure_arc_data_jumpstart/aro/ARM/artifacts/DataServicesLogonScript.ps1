@@ -2,7 +2,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = "Arc-Data-AKS"
+$connectedClusterName = "Arc-Data-ARO"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -19,6 +19,16 @@ az extension add --name connectedk8s
 az extension add --name k8s-extension
 Write-Host "`n"
 az -v
+
+# Install ARO CLI
+Write-Host "Installing the ARO CLI..."
+Invoke-WebRequest "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz" -OutFile "C:\Temp\openshift-client-linux.tar.gz"
+Write-Host "`n"
+mkdir openshift
+tar -zxvf openshift-client-linux.tar.gz -C openshift
+[Environment]::SetEnvironmentVariable("PATH", $Env:PATH + ";C:\temp\openshift", [EnvironmentVariableTarget]::Machine)
+Write-Host "`n"
+
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
@@ -56,6 +66,7 @@ az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 az provider register --namespace Microsoft.AzureArcData --wait
+az provider register -n Microsoft.RedHatOpenShift --wait
 
 az provider show --namespace Microsoft.Kubernetes -o table
 Write-Host "`n"
@@ -65,30 +76,36 @@ az provider show --namespace Microsoft.ExtendedLocation -o table
 Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
+az provider show --namespace Microsoft.RedHatOpenShift -o table
+Write-Host "`n"
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
-# Getting AKS cluster credentials kubeconfig file
-Write-Host "Getting AKS cluster credentials"
+# Getting ARO cluster credentials kubeconfig file
+Write-Host "Getting ARO cluster credentials"
 Write-Host "`n"
-az aks get-credentials --resource-group $Env:resourceGroup `
-                       --name $Env:clusterName --admin
+kubcepass=$(az aro list-credentials --name $Env:clusterName -g $Env:resourceGroup --query kubeadminPassword -o tsv)
+apiServer=$(az aro show -g $Env:resourceGroup -n $Env:clusterName --query apiserverProfile.url -o tsv)
+oc login $apiServer -u kubeadmin -p $kubcepass
+oc adm policy add-scc-to-user privileged system:serviceaccount:azure-arc:azure-arc-kube-aad-proxy-sa
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
 
-# Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
+# Onboarding the ARO cluster as an Azure Arc-enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
-# Localize kubeconfig
-$Env:KUBECONTEXT = kubectl config current-context
-$Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
+#Getting thre ARO context
+apiServerURI="${apiServer#https://}"
+clusterName="${apiServerURI//[.]/-}"
+user="kube:admin"
+$Env:KUBECONTEXT="default/$clusterName$user"
 Start-Sleep -Seconds 10
 
 # Create Kubernetes - Azure Arc Cluster
@@ -96,7 +113,6 @@ az connectedk8s connect --name $connectedClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $Env:azureLocation `
                         --tags 'Project=jumpstart_azure_arc_data_services' `
-                        --kube-config $Env:KUBECONFIG `
                         --kube-context $Env:KUBECONTEXT
 
 Start-Sleep -Seconds 10
