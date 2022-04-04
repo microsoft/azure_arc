@@ -31,7 +31,7 @@ Set-Content -Path $file -Value $hostfile -Force
 
 ## Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM
 
-Write-Host "Configure the OS to allow Azure Arc Agent to be deploy on an Azure VM"
+Write-Host "Configure the OS to allow Azure Arc connected machine agent to be deploy on an Azure VM"
 Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
 Stop-Service WindowsAzureGuestAgent -Force -Verbose
 New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254 
