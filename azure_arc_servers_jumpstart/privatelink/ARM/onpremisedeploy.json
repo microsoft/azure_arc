@@ -13,7 +13,7 @@
             "type": "string",
             "defaultValue": "Standard_D4s_v4",
             "metadata": {
-                "description": "Size of the Arc-enabled virtual machine."
+                "description": "Size of the Azure Arc-enabled virtual machine."
             }
         },
         "adminUsername": {
