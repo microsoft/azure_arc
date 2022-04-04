@@ -41,7 +41,7 @@
             "type": "string",
             "defaultValue": "AzureGateway",
             "metadata": {
-                "description": "The name of the Virtual Network Gateway in 'Azure'."
+                "description": "The name of the Virtual Network Gateway in Azure."
             }
         },
         "privateLinkScopes_name": {
