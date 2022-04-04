@@ -103,7 +103,7 @@
         "adminPassword": {
             "type": "string",
             "metadata": {
-                "description": "SSH key or password for the Arc-enabled virtual Machine. SSH key is recommended for Linux."
+                "description": "SSH key or password for the Azure Arc-enabled virtual Machine. SSH key is recommended for Linux."
             }
         },
         "onPremVNetName": {
