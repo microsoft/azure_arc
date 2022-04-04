@@ -53,7 +53,7 @@ locals {
           id     = "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c"
           params = {}
           role   = "Log Analytics Contributor"
-          flavor = [ "Full", "DevOps" ]
+          flavor = [ "Full" ]
       },
       {
           name   = "(ArcBox) Tag resources"
