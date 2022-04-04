@@ -3,10 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "azureRgName": {
-            "value": "Arc-Azure-PL-demo1"
+            "value": "Arc-Azure-PL-demo"
         },
         "onPremRgName": {
-            "value": "Arc-Onpremise-PL-Demo1"
+            "value": "Arc-Onpremises-PL-Demo"
         },
         "cloudVNetName": {
             "value": "Cloud-VNET"
@@ -57,13 +57,13 @@
             "value": "192.168.0.64/26"
         },
         "onPremSubnetName": {
-            "value": "Onpremise-Subnet"
+            "value": "Onpremises-Subnet"
         },
         "onPremSubnetPrefix": {
             "value": "192.168.0.128/26"
         },
         "onPremGatewayName": {
-            "value": "OnPremiseGw"
+            "value": "OnPremisesGw"
         },
         "onPremBastionName": {
             "value": "OnPremBastion"

@@ -21,8 +21,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('PLscope', $PLscope,[System.EnvironmentVariableTarget]::Machine)
 
 # Creating Log File
-New-Item -Path "C:\" -Name "tmp" -ItemType "directory" -Force
-Start-Transcript -Path C:\tmp\LogonScript.log
+New-Item -Path "C:\" -Name "Temp" -ItemType "directory" -Force
+Start-Transcript -Path C:\Temp\LogonScript.log
 
 #Install pre-requisites
 workflow ClientTools_01
@@ -57,11 +57,11 @@ workflow ClientTools_01
 ClientTools_01 | Format-Table
 
 #Download and run Arc onboarding script
-Invoke-WebRequest ("https://raw.githubusercontent.com/lanicolas/azure_arc/privatelink/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1") -OutFile C:\tmp\installArcAgent.ps1
+Invoke-WebRequest ("https://raw.githubusercontent.com/microsoft/azure_arc/privatelink/azure_arc_servers_jumpstart/main/artifacts/installArcAgent.ps1") -OutFile C:\Temp\installArcAgent.ps1
 
 # Creating LogonScript Windows Scheduled Task
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\tmp\installArcAgent.ps1'
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\installArcAgent.ps1'
 Register-ScheduledTask -TaskName "LogonScript" -Trigger $Trigger -User "${adminUsername}" -Action $Action -RunLevel "Highest" -Force
 
 # Disabling Windows Server Manager Scheduled Task
