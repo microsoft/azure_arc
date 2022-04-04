@@ -6,7 +6,7 @@ Start-Transcript -Path C:\tmp\ArcInstallScript.log
 az login --service-principal -u $Env:appId -p $Env:password --tenant $Env:tenantId
 az account set -s $Env:SubscriptionId
 
-#Configure hosts file for Private link endpoints resolution
+# Configure hosts file for Private link endpoints resolution
 
 $file = "C:\Windows\System32\drivers\etc\hosts"
 
