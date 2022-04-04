@@ -310,7 +310,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 After deployment, you should see the ArcBox resources inside your resource group.
 
-  ![Screenshot showing all deployed resources in the resource group](./deployedresources.png)
+  ![Screenshot showing all deployed resources in the resource group](./deployedResources.png)
 
   > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (48 total)**
 
