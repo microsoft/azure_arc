@@ -93,7 +93,8 @@
                 "name": "(ArcBox) Enable Microsoft Defender on Kubernetes clusters",
                 "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c",
                 "flavors": [
-                    "Full"
+                    "Full",
+                    "DevOps"
                 ],
                 "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
                 "parameters": {}
