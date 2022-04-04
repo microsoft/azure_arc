@@ -219,7 +219,7 @@
                     "scope": "Inner"
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/azuredeploy.json"
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/cloudDeploy.json"
                 },
                 "mode": "Incremental",
                 "parameters": {
@@ -263,7 +263,7 @@
                     "scope": "Inner"
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/onpremisesdeploy.json"
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/onPremisesdeploy.json"
                 },
                 "mode": "Incremental",
                 "parameters": {
