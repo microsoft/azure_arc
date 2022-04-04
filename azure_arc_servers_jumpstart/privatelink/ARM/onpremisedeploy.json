@@ -20,7 +20,7 @@
             "type": "string",
             "defaultValue": "arcadmin",
             "metadata": {
-                "description": "Admin username for the Arc-enabled virtual machine."
+                "description": "Admin username for the Azure Arc-enabled virtual machine."
             }
         },
         "adminPassword": {
