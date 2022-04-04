@@ -25,17 +25,19 @@ The following README will guide you on how to use the provided [Azure ARM Templa
 
 - Create Azure service principal (SP)
 
-    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
+    To be able to complete the scenario and its related automation, Azure service principal assigned with the “Owner” role, or “Contributor” and “User Access Administrator” roles are required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login
     az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "User Access Administrator"
     ```
 
     For example:
 
     ```shell
     az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    az ad sp create-for-rbac -n "http://AzureArcK8s" --role "User Access Administrator"
     ```
 
     Output should look like this:
