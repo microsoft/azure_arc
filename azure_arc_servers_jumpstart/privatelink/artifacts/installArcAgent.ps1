@@ -1,5 +1,5 @@
 # Creating Log File
-Start-Transcript -Path C:\tmp\ArcInstallScript.log
+Start-Transcript -Path C:\Temp\ArcInstallScript.log
 
 # Azure Login 
 
