@@ -6,7 +6,7 @@
             "type": "string",
             "defaultValue": "ArcDemo-VM",
             "metadata": {
-                "description": "Name of the Virtual Machine that will be onboarded to Arc."
+                "description": "Name of the Virtual Machine that will be onboarded to Azure Arc."
             }
         },
         "vmSize": {
