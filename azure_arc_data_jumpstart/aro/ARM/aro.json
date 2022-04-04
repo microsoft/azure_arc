@@ -125,7 +125,7 @@
       "apiVersion": "2021-09-01-preview",
       "name": "[parameters('aro_name')]",
       "location": "[parameters('location')]",
-      "dependsOn": ["[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"],
+      "dependsOn": ["[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"],
       "properties": {
         "networkProfile": {
           "podCidr": "[variables('podCidr')]",
