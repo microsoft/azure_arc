@@ -20,7 +20,7 @@
             "type": "string",
             "defaultValue": "172.16.0.0/26",
             "metadata": {
-                "description": "CIDR prefix for the cloud Gateway subnet."
+                "description": "CIDR prefix for the cloud gateway subnet."
             }
         },
         "cloudSubnetName": {
