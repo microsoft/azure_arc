@@ -47,27 +47,85 @@
     "contributorRoleId": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]",
     "podCidr": "10.128.0.0/14",
     "serviceCidr": "172.30.0.0/16",
-    "virtualNetworkName" : "[concat(parameters('virtualNetworkName'))]"
+    "masterNodesSubnetPrefix": "10.0.2.0/24",
+    "workerNodesSubnetPrefix": "10.0.3.0/24",
+    "subnetName": "Arc-Data-Subnet",
+    "addressPrefix": "10.0.0.0/16",
+    "subnetAddressPrefix": "10.0.1.0/24",
+    "bastionSubnetPrefix": "10.0.4.64/26"
+
   },
   "resources": [
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2021-04-01-preview",
-      "scope": "[format('Microsoft.Network/virtualNetworks/{0}', variables('virtualNetworkName'))]",
+      "scope": "[format('Microsoft.Network/virtualNetworks/{0}', parameters('virtualNetworkName'))]",
       "name": "[guid(subscription().subscriptionId, parameters('AroProviderId'), variables('contributorRoleId'))]",
       "properties": {
         "roleDefinitionId": "[variables('contributorRoleId')]",
         "principalId": "[parameters('AroProviderId')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
       ]
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "comments": "Deploys a VNET and Subnet for Client and K8s VM",
+      "apiVersion": "2021-05-01",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [ "[variables('addressPrefix')]" ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('subnetAddressPrefix')]",
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "[parameters('masterNodesSubnet')]",
+            "properties": {
+              "addressPrefix": "[variables('masterNodesSubnetPrefix')]",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.ContainerRegistry"
+                }
+              ]
+            }
+          },
+          {
+            "name": "[parameters('workerNodesSubnet')]",
+            "properties": {
+              "addressPrefix": "[variables('workerNodesSubnetPrefix')]",
+              "privateLinkServiceNetworkPolicies": "Disabled",
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.ContainerRegistry"
+                }
+              ]
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[variables('bastionSubnetPrefix')]"
+            }
+          }
+        ]
+      }
     },
     {
       "type": "Microsoft.RedHatOpenShift/openShiftClusters",
       "apiVersion": "2021-09-01-preview",
       "name": "[parameters('aro_name')]",
       "location": "[parameters('location')]",
+      "dependsOn": ["resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))"],
       "properties": {
         "networkProfile": {
           "podCidr": "[variables('podCidr')]",
@@ -79,7 +137,7 @@
           "resourceGroupId": "[variables('workerNodesResourceGroup')]"
         },
         "masterProfile": {
-          "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')), parameters('masterNodesSubnet'))]",
+          "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('masterNodesSubnet'))]",
           "vmSize": "Standard_D8s_v3",
           "encryptionAtHost": "Disabled"
         },
@@ -89,7 +147,7 @@
             "vmSize": "Standard_D4s_v3",
             "diskSizeGB": 128,
             "count": 3,
-            "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')), parameters('workerNodesSubnet'))]",
+            "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('workerNodesSubnet'))]",
             "encryptionAtHost": "Disabled"
           }
         ],
