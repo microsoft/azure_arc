@@ -46,20 +46,21 @@
     "workerNodesResourceGroup": "[format('/subscriptions/{0}/resourceGroups/arc-aro-{1}', subscription().subscriptionId, parameters('clusterDomain'))]",
     "contributorRoleId": "[format('/subscriptions/{0}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c', subscription().subscriptionId)]",
     "podCidr": "10.128.0.0/14",
-    "serviceCidr": "172.30.0.0/16"
+    "serviceCidr": "172.30.0.0/16",
+    "virtualNetworkName" : "[concat(parameters('virtualNetworkName'))]"
   },
   "resources": [
     {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2021-04-01-preview",
-      "scope": "[format('Microsoft.Network/virtualNetworks/{0}', parameters('virtualNetworkName'))]",
+      "scope": "[format('Microsoft.Network/virtualNetworks/{0}', variables('virtualNetworkName'))]",
       "name": "[guid(subscription().subscriptionId, parameters('AroProviderId'), variables('contributorRoleId'))]",
       "properties": {
         "roleDefinitionId": "[variables('contributorRoleId')]",
         "principalId": "[parameters('AroProviderId')]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
       ]
     },
     {
@@ -78,7 +79,7 @@
           "resourceGroupId": "[variables('workerNodesResourceGroup')]"
         },
         "masterProfile": {
-          "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('masterNodesSubnet'))]",
+          "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')), parameters('masterNodesSubnet'))]",
           "vmSize": "Standard_D8s_v3",
           "encryptionAtHost": "Disabled"
         },
@@ -88,7 +89,7 @@
             "vmSize": "Standard_D4s_v3",
             "diskSizeGB": 128,
             "count": 3,
-            "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('workerNodesSubnet'))]",
+            "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName')), parameters('workerNodesSubnet'))]",
             "encryptionAtHost": "Disabled"
           }
         ],
