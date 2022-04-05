@@ -44,6 +44,9 @@ param githubBranch string = 'main'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
+@description('Target GitHub account for DevOps flavor')
+param githubUser string = 'microsoft'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
 module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
@@ -93,6 +96,8 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     flavor: flavor
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
     deployBastion: deployBastion
+    githubUser: githubUser
+    keyVaultName: mgmtArtifactsAndPolicyDeployment.outputs.keyVaultName
   }
 }
 
@@ -107,13 +112,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     workspaceName: logAnalyticsWorkspaceName
     flavor: flavor
     deployBastion: deployBastion
-  }
-}
-
-module keyVaultDeployment 'keyVault/keyVault.bicep' = if (flavor == 'DevOps') {
-  name: 'keyVaultDeployment'
-  params: {
-    spnClientId: spnClientId
     spnTenantId: spnTenantId
   }
 }
+
