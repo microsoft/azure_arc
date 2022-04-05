@@ -155,5 +155,5 @@ output "workspace_id" {
 }
 
 output "keyvault_name" {
-  value = azurerm_key_vault.kv.name
+  value = azurerm_key_vault.kv[0].name
 }
