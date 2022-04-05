@@ -152,7 +152,7 @@ az k8s-configuration flux create `
 
 Write-Host "Generating a TLS Certificate"
 $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
-$certPassword = ConvertTo-SecureString -String “arcbox” -Force –AsPlainText
+$certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
 Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
 Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
