@@ -67,6 +67,12 @@ variable "user_ip_address" {
   description = "Users public IP address, used to RDP to the client VM."
 }
 
+variable "github_username" {
+  type        = string
+  description = "Specify a GitHub username for ArcBox DevOps"
+  default     = "microsoft"
+}
+
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
@@ -192,13 +198,16 @@ module "client_vm" {
   deployment_flavor    = var.deployment_flavor
   admin_username       = var.client_admin_username
   admin_password       = var.client_admin_password
+  github_username      = var.github_username
   github_repo          = var.github_repo
   github_branch        = var.github_branch
   deploy_bastion       = var.deploy_bastion
+  keyvault_name        = module.management_artifacts.keyvault_name
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage
   ]
 }
 
@@ -223,7 +232,8 @@ module "capi_vm" {
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage
   ]
 }
 
@@ -248,6 +258,7 @@ module "rancher_vm" {
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage
   ]
 }
