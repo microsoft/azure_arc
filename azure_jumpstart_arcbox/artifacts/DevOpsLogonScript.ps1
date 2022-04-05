@@ -4,14 +4,14 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 
-$osmRelease = 'v1.0.0'
-$osmMeshName = 'osm'
-$ingressNamespace = 'ingress-nginx'
+$osmRelease = "v1.0.0"
+$osmMeshName = "osm"
+$ingressNamespace = "ingress-nginx"
 
-$certname = 'ingress-cert'
-$certdns = 'arcbox.devops.com'
+$certname = "ingress-cert"
+$certdns = "arcbox.devops.com"
 
-$appClonedRepo = 'https://github.com/$Env:githubUser/azure-arc-jumpstart-apps'
+$appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DevOpsLogonScript.log
 
