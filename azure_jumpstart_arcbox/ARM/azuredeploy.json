@@ -90,7 +90,7 @@
       "metadata": {
         "description": "Target GitHub account for DevOps flavor"
       },
-      "defaultValue": "microsoft"
+      "defaultValue": "your-repository"
     }
   },
   "variables": {
