@@ -61,11 +61,15 @@ Write-Output "Creating ArcBox path"
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
+$Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 $Env:agentScript = "C:\ArcBox\agentScript"
+$Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxVMDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxKVDir -ItemType directory -Force
+New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
 
@@ -155,6 +159,9 @@ workflow ClientTools_01
             # DevOps
             if ($flavor -eq "Full" -Or $flavor -eq "DevOps") {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/DevOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DevOpsLogonScript.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/devops_ingress/bookbuyer.yaml") -OutFile $Env:ArcBoxKVDir\bookbuyer.yaml
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/devops_ingress/bookstore.yaml") -OutFile $Env:ArcBoxKVDir\bookstore.yaml
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/devops_ingress/hello-arc.yaml") -OutFile $Env:ArcBoxKVDir\hello-arc.yaml
             }
 
             # Full
