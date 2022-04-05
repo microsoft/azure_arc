@@ -154,10 +154,12 @@ module "management_artifacts" {
   source = "./modules/mgmt/mgmtArtifacts"
 
   resource_group_name  = azurerm_resource_group.rg.name
+  spn_client_id        = var.spn_client_id
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
+  deployment_flavor    = var.deployment_flavor
 
   depends_on = [azurerm_resource_group.rg]
 }
@@ -169,6 +171,7 @@ module "management_policy" {
   workspace_name      = var.workspace_name
   workspace_id        = module.management_artifacts.workspace_id
   deployment_flavor    = var.deployment_flavor
+
   depends_on = [azurerm_resource_group.rg]
 }
 
