@@ -149,6 +149,11 @@ resource "azurerm_bastion_host" "bastionHost" {
   }
 
 }
+
 output "workspace_id" {
   value = azurerm_log_analytics_workspace.workspace.id
+}
+
+output "keyvault_name" {
+  value = azurerm_key_vault.kv.name
 }
