@@ -45,6 +45,26 @@ $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceTyp
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
+# Downloading Rancher K3s cluster kubeconfig file
+Write-Host "Downloading Rancher K3s cluster kubeconfig file"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
+$context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
+$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
+
+# Merging kubeconfig files from CAPI and Rancher K3s
+Write-Host "Merging kubeconfig files from CAPI and Rancher K3s clusters"
+Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
+$Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;C:\Users\$Env:USERNAME\.kube\config-k3s"
+kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
+kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
+Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
+Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config-k3s"
+Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
+$Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
+kubectx
+
 # "Download OSM binaries"
 Invoke-WebRequest -Uri "https://github.com/openservicemesh/osm/releases/download/$osmRelease/osm-$osmRelease-windows-amd64.zip" -Outfile "$Env:TempDir\osm-$osmRelease-windows-amd64.zip"
 Expand-Archive "$Env:TempDir\osm-$osmRelease-windows-amd64.zip" -DestinationPath $Env:TempDir
@@ -57,7 +77,7 @@ $Env:PATH += ";$Env:ToolsDir"
 az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --secret-permissions get --certificate-permissions get list import
 
 # Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt 2>null
+az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
@@ -171,7 +191,6 @@ Get-ChildItem -Path $Env:ArcBoxKVDir |
         (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:spnTenantId | Set-Content -Path $_.FullName
     }
 
-
 # Deploy Ingress resources for Bookstore and Hello-Arc App
 foreach ($namespace in @('bookstore', 'bookbuyer', 'hello-arc')) {
     # Create the Kubernetes secret with the service principal credentials
@@ -186,6 +205,24 @@ $ip = kubectl get service/ingress-nginx-controller --namespace $ingressNamespace
 
 #Insert into HOSTS file
 Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$ip`t$certdns" -Force
+
+# Disable Edge 'First Run' Setup
+$edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+$desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
+$firstRunRegistryName  = 'HideFirstRunExperience'
+$firstRunRegistryValue = '0x00000001'
+$savePasswordRegistryName = 'PasswordManagerEnabled'
+$savePasswordRegistryValue = '0x00000000'
+$autoArrangeRegistryName = 'FFlags'
+$autoArrangeRegistryValue = '1075839525'
+
+ If (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
+    New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
+}
+
+New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
+New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
+Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
 # Creating ArcBox DevOps Website URL on Desktop
 $shortcutLocation = "$Env:Public\Desktop\DevOps Bookstore.lnk"
