@@ -88,7 +88,7 @@ param flavor string = 'Full'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('GitHub User for devop scenario')
+@description('GitHub User for devops scenario')
 param githubUser string
 
 @description('key vault name, when the key vault is deployed')
