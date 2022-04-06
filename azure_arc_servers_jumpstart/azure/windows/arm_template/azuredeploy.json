@@ -22,12 +22,12 @@
             "metadata": {
                 "description": "Windows password for the Virtual Machine"
             }
-        },       
+        },
         "windowsOSVersion": {
-        "type": "string",
-        "defaultValue": "2022-datacenter-g2",
-        "metadata": {
-            "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+            "type": "string",
+            "defaultValue": "2022-datacenter-g2",
+            "metadata": {
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
             }
         },
         "location": {
@@ -35,6 +35,19 @@
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location for all resources."
+            }
+        },
+        "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            }
+        },
+        "bastionHostName": {
+            "type": "string",
+            "defaultValue": "Arc-Win-Demo-Bastion",
+            "metadata": {
+                "description": "the Azure Bastion host name"
             }
         },
         "vmSize": {
@@ -73,7 +86,7 @@
             "metadata": {
                 "description": "Azure subscription ID"
             }
-        },                            
+        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "Arc-Win-Demo-VNET",
@@ -100,16 +113,23 @@
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_servers"
             }
-        }        
+        }
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
+        "bastionSubnetName": "AzureBastionSubnet",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+        "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "10.1.0.0/24",
-        "addressPrefix": "10.1.0.0/16"
+        "addressPrefix": "10.1.0.0/16",
+        "bastionName" : "[concat(parameters('bastionHostName'))]",
+        "bastionSubnetIpPrefix": "10.1.1.64/26",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
@@ -119,8 +139,8 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-                "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -131,14 +151,12 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIPAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+                    "id" : "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
                 }
             }
         },
@@ -156,12 +174,12 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),'*')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
                         }
-                    }                                                                                                                 
+                    }
                 ]
             }
         },
@@ -184,7 +202,13 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
-                    }
+                    },
+                    {
+                        "name" : "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[variables('bastionSubnetIpPrefix')]"
+                        }
+                     }
                 ]
             }
         },
@@ -199,8 +223,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
-                "tier": "Regional"
+                "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
             }
         },
         {
@@ -208,7 +231,7 @@
             "apiVersion": "2019-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('location')]",
-            "tags": "[parameters('resourceTags')]",            
+            "tags": "[parameters('resourceTags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
             ],
@@ -251,32 +274,60 @@
             }
         },
         {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('vmName'),'/ClientTools')]",
-          "apiVersion": "2019-07-01",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "tags": {
-              "displayName": "Install Arc Agent"
-          },          
-          "properties": {
-            "publisher": "Microsoft.Compute",
-            "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.10",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": [
-                "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/windows/arm_template/scripts/install_arc_agent.ps1"
-              ],
-              "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File install_arc_agent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'),  ' -subscriptionId ', parameters('subscriptionId'), ' -location ', parameters('location'), ' -adminUsername ', parameters('adminUsername'))]" 
-            }            
-          }
-        }                        
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/ClientTools')]",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "tags": {
+                "displayName": "Install Arc Agent"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/azure/windows/arm_template/scripts/install_arc_agent.ps1"
+                    ],
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File install_arc_agent.ps1', ' -appId ', parameters('appId'), ' -password ', parameters('password'), ' -tenantId ', parameters('tenantId'), ' -resourceGroup ', parameters('resourceGroup'),  ' -subscriptionId ', parameters('subscriptionId'), ' -location ', parameters('location'), ' -adminUsername ', parameters('adminUsername'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/bastionHosts",
+            "condition": "[parameters('deployBastion')]",
+            "name": "[variables('bastionName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2020-11-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "IpConf",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('bastionSubnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            }
+                        }
+                     }
+                ]
+            }
+        }
+        
     ],
 
-    
+
     "outputs": {
         "adminUsername": {
             "type": "string",
