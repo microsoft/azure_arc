@@ -225,7 +225,7 @@ New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -
 Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
 # Creating ArcBox DevOps Website URL on Desktop
-$shortcutLocation = "$Env:Public\Desktop\DevOps Bookstore.lnk"
+$shortcutLocation = "$Env:Public\Desktop\DevOps Hello-Arc.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "https://$certdns"
