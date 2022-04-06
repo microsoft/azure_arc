@@ -65,14 +65,14 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },    
+    },
     "deployPostgreSQL": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
         "description": "PostgreSQL Hyperscale deployment"
       }
-    },    
+    },
     "githubAccount": {
       "type": "string",
       "metadata": {
@@ -86,6 +86,20 @@
         "description": "Target GitHub branch"
       },
       "defaultValue": "main"
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "defaultValue": false
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
+      }
     }
   },
   "variables": {
@@ -99,7 +113,10 @@
     "virtualNetworkName": "Arc-Data-VNet",
     "subnetName": "Arc-Data-Subnet",
     "addressPrefix": "172.16.0.0/16",
-    "subnetAddressPrefix": "172.16.1.0/24"
+    "subnetAddressPrefix": "172.16.1.0/24",
+    "bastionSubnetPrefix": "172.16.2.64/26",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
   },
   "resources": [
     {
@@ -125,6 +142,9 @@
           },
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
         }
       }
@@ -165,6 +185,15 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -217,12 +246,24 @@
           },
           "SQLMIHA": {
             "value": "[parameters('SQLMIHA')]"
-          },          
+          },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
-          },       
+          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
           }
         }
       }
