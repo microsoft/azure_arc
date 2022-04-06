@@ -91,7 +91,7 @@ param deployBastion bool = false
 @description('GitHub User for devops scenario')
 param githubUser string
 
-@description('key vault name, when the key vault is deployed')
+@description('Key vault name, when the key vault is deployed')
 param keyVaultName string
 
 var publicIpAddressName = '${vmName}-PIP'
