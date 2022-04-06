@@ -200,7 +200,7 @@
         "githubUser": {
             "type": "string",
             "metadata": {
-                "description": "GitHub User for devops scenario"
+                "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
             }
         },
         "keyVaultName": {
