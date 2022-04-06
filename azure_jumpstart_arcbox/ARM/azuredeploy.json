@@ -88,7 +88,7 @@
     "githubUser": {
       "type": "string",
       "metadata": {
-        "description": "Target GitHub account for DevOps flavor"
+        "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
       "defaultValue": "your-repository"
     }
