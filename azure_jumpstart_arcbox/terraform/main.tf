@@ -67,6 +67,12 @@ variable "user_ip_address" {
   description = "Users public IP address, used to RDP to the client VM."
 }
 
+variable "github_username" {
+  type        = string
+  description = "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
+  default     = "microsoft"
+}
+
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
@@ -154,10 +160,12 @@ module "management_artifacts" {
   source = "./modules/mgmt/mgmtArtifacts"
 
   resource_group_name  = azurerm_resource_group.rg.name
+  spn_client_id        = var.spn_client_id
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
+  deployment_flavor    = var.deployment_flavor
 
   depends_on = [azurerm_resource_group.rg]
 }
@@ -169,6 +177,7 @@ module "management_policy" {
   workspace_name      = var.workspace_name
   workspace_id        = module.management_artifacts.workspace_id
   deployment_flavor    = var.deployment_flavor
+
   depends_on = [azurerm_resource_group.rg]
 }
 
@@ -189,13 +198,16 @@ module "client_vm" {
   deployment_flavor    = var.deployment_flavor
   admin_username       = var.client_admin_username
   admin_password       = var.client_admin_password
+  github_username      = var.github_username
   github_repo          = var.github_repo
   github_branch        = var.github_branch
   deploy_bastion       = var.deploy_bastion
+  keyvault_name        = module.management_artifacts.keyvault_name
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage
   ]
 }
 
@@ -220,7 +232,8 @@ module "capi_vm" {
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage
   ]
 }
 
@@ -245,6 +258,7 @@ module "rancher_vm" {
 
   depends_on = [
     azurerm_resource_group.rg,
-    module.management_artifacts
+    module.management_artifacts,
+    module.management_storage
   ]
 }

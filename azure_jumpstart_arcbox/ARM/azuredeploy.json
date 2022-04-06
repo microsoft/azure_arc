@@ -84,6 +84,13 @@
         "description": "Choice to deploy Bastion to connect to the client VM"
       },
       "defaultValue": false
+    },
+    "githubUser": {
+      "type": "string",
+      "metadata": {
+        "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
+      },
+      "defaultValue": "your-repository"
     }
   },
   "variables": {
@@ -92,8 +99,7 @@
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]",
-    "keyVaultTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/keyVault/keyVault.json')]"
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]"
   },
   "resources": [
     {
@@ -193,7 +199,8 @@
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
       "dependsOn": [
-        "mgmtArtifactsAndPolicyDeployment"
+        "mgmtArtifactsAndPolicyDeployment",
+        "stagingStorageAccountDeployment"
       ],
       "properties": {
         "mode": "Incremental",
@@ -234,6 +241,12 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
+          },
+          "githubUser": {
+            "value": "[parameters('githubUser')]"
+          },
+          "keyVaultName": {
+            "value": "[reference('mgmtArtifactsAndPolicyDeployment').outputs.keyVaultName.value]"
           }
         }
       }
@@ -272,24 +285,6 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
-          }
-        }
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "condition": "[equals(parameters('flavor'), 'DevOps')]",
-      "apiVersion": "2019-10-01",
-      "name": "keyVaultDeployment",
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('keyVaultTemplateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "spnClientId": {
-            "value": "[parameters('spnClientId')]"
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
