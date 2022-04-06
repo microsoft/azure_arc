@@ -8,13 +8,13 @@ description: >
 
 ## Use Azure Private Link to securely connect networks to Azure Arc
 
-The following README will guide you on how to use [Azure Private Link](https://docs.microsoft.com/en-us/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure using a VPN. [This feature](https://docs.microsoft.com/en-us/azure/azure-arc/servers/private-link-security) allows you to connect privately to Azure Arc without opening up public network access but rather using private endpoints over a VPN or ExpressRoute connection, ensuring that all traffic is being sent to Azure privately.
+The following README will guide you on how to use [Azure Private Link](https://docs.microsoft.com/azure/private-link/private-link-overview) to securely connect from an Azure Arc-enabled server to Azure using a VPN. [This feature](https://docs.microsoft.com/azure/azure-arc/servers/private-link-security) allows you to connect privately to Azure Arc without opening up public network access but rather using private endpoints over a VPN or ExpressRoute connection, ensuring that all traffic is being sent to Azure privately.
 
 In this guide, you will emulate a hybrid environment connected to Azure over a VPN with hybrid resources that will be Azure Arc-enabled, and Azure Private Link Scope will be used to connect over a private connection. To complete this process you deploy a single ARM template that will:
 
 - Create two separate resource groups:
 
-  - "On-premises" resource group will contain resources that simulate a private on-premises environment with a Windows virtual machine. This VM will not have a public IP address assigned to it so [Azure Bastion](https://docs.microsoft.com/en-us/azure/bastion/bastion-overview) is deployed to have administrative access to the operating system. The Windows virtual machine is an Azure Arc-enabled server by installing the Azure Arc connected machine agent using Azure Private Link.
+  - "On-premises" resource group will contain resources that simulate a private on-premises environment with a Windows virtual machine. This VM will not have a public IP address assigned to it so [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) is deployed to have administrative access to the operating system. The Windows virtual machine is an Azure Arc-enabled server by installing the Azure Arc connected machine agent using Azure Private Link.
   - "Azure" resource group will contain the Azure Arc-enabled server and its Private Link Scope.
 
 - Both resource groups have their own virtual networks and address spaces, and they are connected via Azure VPN gateways to set up a hybrid private connection.
@@ -59,7 +59,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 2. User deploys the ARM template at subscription level. The ARM template will create two resources groups with:
 
-    - Azure resource group, automated by the template [**cloudDeploy.json**](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/privatelink/ARM/cloudDeploy.parameters.json):
+    - Azure resource group, automated by the template [**cloudDeploy.json**](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/cloudDeploy.json):
         - Azure Arc Private Link Scope
         - Azure Arc-enabled server
         - Azure Private Link Endpoint for the Azure Arc-enabled Server
@@ -67,13 +67,13 @@ For you to get familiar with the automation and deployment flow, below is an exp
         - Azure VPN Gateway and its public IP address
         - Azure VNET
 
-    - On-premises resource group, automated by the template [**onPremisesDeploy.json**](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/privatelink/ARM/onPremisesDeploy.parameters.json):
+    - On-premises resource group, automated by the template [**onPremisesDeploy.json**](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/onPremisesDeploy.json):
         - Azure VNET
         - Azure Bastion
         - Azure VPN Gateway and its public IP address
-        - Azure Windows Virtual Machine with a custom script extension that runs the **Bootstrap.ps1** script
+        - Azure Windows Virtual Machine with a custom script extension that runs the [**Bootstrap.ps1**](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/artifacts/Bootstrap.ps1) script
 
-        > **NOTE: The [*installArcAgent.ps1*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/privatelink/artifacs/installArcAgent.ps1) script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
+        > **NOTE: The [*installArcAgent.ps1*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1) script will enable the OS firewall and set up new rules for incoming and outgoing connections. By default all incoming and outgoing traffic will be allowed, except blocking Azure IMDS outbound traffic to the *169.254.169.254* remote address.**
 
 3. User logs in to the on-premises VM using Azure Bastion to trigger the Azure Arc onboarding script.
 
