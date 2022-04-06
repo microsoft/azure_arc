@@ -90,7 +90,7 @@
       "metadata": {
         "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
-      "defaultValue": "your-repository"
+      "defaultValue": "microsoft"
     }
   },
   "variables": {
