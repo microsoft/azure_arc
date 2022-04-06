@@ -263,7 +263,7 @@
                     "scope": "Inner"
                 },
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/onPremisesdeploy.json"
+                    "uri": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/ARM/onPremisesDeploy.json"
                 },
                 "mode": "Incremental",
                 "parameters": {
