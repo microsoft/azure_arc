@@ -73,13 +73,6 @@
                 "description": "Name of the subnet in the virtual network"
             }
         },
-        "networkSecurityGroupName": {
-            "type": "string",
-            "defaultValue": "ArcBox-NSG",
-            "metadata": {
-                "description": "Name of the Network Security Group"
-            }
-        },
         "resourceTags": {
             "type": "object",
             "defaultValue": {
@@ -200,6 +193,7 @@
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
+        "networkSecurityGroupName": "[concat(parameters('vmName'), '-NSG' )]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
