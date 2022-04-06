@@ -28,8 +28,6 @@ param vmSize string = 'Standard_D16s_v4'
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-@description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'ArcBox-NSG'
 param resourceTags object = {
   Project: 'jumpstart_arcbox'
 }
@@ -88,6 +86,7 @@ param flavor string = 'Full'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
+var networkSecurityGroupName =  '${vmName}-NSG'
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
