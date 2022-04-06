@@ -228,7 +228,7 @@ Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryNa
 $shortcutLocation = "$Env:Public\Desktop\DevOps Bookstore.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "https://arcbox.devops.com"
+$shortcut.TargetPath = "https://$certdns"
 $shortcut.IconLocation="C:\windows\System32\SHELL32.dll, 17"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
