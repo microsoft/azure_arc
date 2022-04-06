@@ -224,7 +224,7 @@ if ($flavor -eq "Full") {
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
-if ($flavor -eq "Full" -Or $flavor -eq "DevOps") {
+if ($flavor -eq "DevOps") {
     # Creating scheduled task for DevOpsLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn 
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
