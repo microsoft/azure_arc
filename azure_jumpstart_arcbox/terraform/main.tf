@@ -69,7 +69,7 @@ variable "user_ip_address" {
 
 variable "github_username" {
   type        = string
-  description = "Specify a GitHub username for ArcBox DevOps"
+  description = "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
   default     = "microsoft"
 }
 
