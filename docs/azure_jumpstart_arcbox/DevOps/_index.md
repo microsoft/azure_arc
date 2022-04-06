@@ -340,13 +340,9 @@ If you have chosen to deploy Azure Bastion in the ARM template, use it to connec
 
 If you already have Microsoft Defender for servers enabled on your subscription and would like to use JIT to access the Client VM. Use the following steps:
 
-  ![Screenshot showing the Microsoft Defender for cloud portal](./mdfc_portal.png)
-
-  ![Screenshot showing the Microsoft Defender for cloud portal, enabling JIT on the client VM](./JIT_select_vm.png)
+In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
   ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./JIT_allowing_RDP.png)
-
-  ![Screenshot showing JIT enabled on the client VM](./JIT_enabled.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
 
