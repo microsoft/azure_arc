@@ -54,12 +54,6 @@
         "description": "Choice to deploy Azure Bastion"
       },
       "defaultValue": false
-    },
-    "spnTenantId": {
-      "type": "string",
-      "metadata": {
-        "description": "Tenant id of the service principal"
-      }
     }
   },
   "variables": {
@@ -84,8 +78,7 @@
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
     "bastionName": "ArcBox-Bastion",
     "bastionSubnetIpPrefix": "172.16.3.64/26",
-    "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]",
-    "keyVaultName": "[format('ArcBox-KV-{0}', uniqueString(resourceGroup().id))]"
+    "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]"
   },
   "resources": [
     {
@@ -294,27 +287,6 @@
           }
         ]
       }
-    },
-    {
-      "type": "Microsoft.KeyVault/vaults",
-      "condition": "[equals(parameters('flavor'), 'DevOps')]",
-      "apiVersion": "2021-11-01-preview",
-      "name": "[variables('keyVaultName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "sku": {
-          "family": "A",
-          "name": "standard"
-        },
-        "tenantId": "[parameters('spnTenantId')]",
-        "accessPolicies": []
-      }
     }
-  ],
-  "outputs": {
-    "keyVaultName": {
-      "type": "string",
-      "value": "[variables('keyVaultName')]"
-    }
-  }
+  ]
 }
