@@ -53,11 +53,6 @@ variable "subnet_name" {
   description = "ArcBox subnet name."
 }
 
-variable "user_ip_address" {
-  type        = string
-  description = "Users public IP address, used to RDP to the client VM."
-}
-
 variable "template_base_url" {
   type        = string
   description = "Base URL for the GitHub repo where the ArcBox artifacts are located."
@@ -236,17 +231,7 @@ resource "azurerm_network_security_group" "nsg" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
-  security_rule {
-    name                       = "allow_RDP_3389"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "3389"
-    source_address_prefix      =  var.deploy_bastion == true ? local.bastionSubnetIpPrefix : var.user_ip_address
-    destination_address_prefix = "*"
-  }
+  security_rule {}
 }
 
 resource "azurerm_network_interface" "nic" {
