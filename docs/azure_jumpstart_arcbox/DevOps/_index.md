@@ -241,7 +241,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local IP address. This is used to allow remote RDP and SSH connections to the Client Windows VM and K3s Rancher VM.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "DevOps" to specify that you want to deploy the DevOps flavor of ArcBox
 
@@ -282,7 +281,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`myIpAddress`_ - Your local IP address. This is used to allow remote RDP and SSH connections to the Client Windows VM and K3s Rancher VM.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "DevOps" to specify that you want to deploy the Devops flavor of ArcBox
 
@@ -315,7 +313,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   spn_client_id     = "1414133c-9786-53a4-b231-f87c143ebdb1"
   spn_client_secret = "fakeSecretValue123458125712ahjeacjh"
   spn_tenant_id     = "33572583-d294-5b56-c4e6-dcf9a297ec17"
-  user_ip_address   = "99.88.99.88"
   client_admin_ssh  = "C:/Temp/rsa.pub"
   deployment_flavor = "Full"
   ```
@@ -326,11 +323,10 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - **_`spn_client_id`_** - Your Azure service principal id
   - **_`spn_client_secret`_** - Your Azure service principal secret
   - **_`spn_tenant_id`_** - Your Azure tenant id
-  - **_`user_ip_address`_** - Your local IP address. This is used to allow remote RDP and SSH connections to the Client Windows VM and K3s Rancher VM. If you don't know your public IP, you can find it [here](https://www.whatismyip.com/)
   - **_`client_admin_ssh`_** - SSH public key path, used for Linux VMs
   - **_`deployment_flavor`_** - Use the value "DevOps" to specify that you want to deploy the DevOps flavor of ArcBox
-  - _`client_admin_username`_ - Admin username for Windows & Linux VMs
-  - _`client_admin_password`_ - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - **_`client_admin_username`_** - Admin username for Windows & Linux VMs
+  - **_`client_admin_password`_** - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - **_`workspace_name`_** - Unique name for the ArcBox Log Analytics workspace
 
   > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
