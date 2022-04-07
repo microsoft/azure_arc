@@ -24,9 +24,6 @@ param sku string = 'pergb2018'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Azure AD tenant id for your service principal')
-param spnTenantId string
-
 var updates = {
   name: 'Updates(${workspaceName})'
   galleryName: 'Updates'
@@ -198,19 +195,6 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBas
   }
 }
 
-resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = if (flavor == 'DevOps') {
-  name: 'ArcBox-KV-${uniqueString(resourceGroup().id)}'
-  location: location
-  properties: {
-    sku: {
-      family: 'A'
-      name: 'standard'
-    }
-    tenantId: spnTenantId
-    accessPolicies: []
-  }
-}
-
 module policyDeployment './policyAzureArc.bicep' = {
   name: 'policyDeployment'
   params: {
@@ -222,4 +206,3 @@ module policyDeployment './policyAzureArc.bicep' = {
 
 output vnetId string = arcVirtualNetwork.id
 output subnetId string = arcVirtualNetwork.properties.subnets[0].id
-output keyVaultName string = keyVault.name

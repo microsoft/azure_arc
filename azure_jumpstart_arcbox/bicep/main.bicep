@@ -97,7 +97,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
     deployBastion: deployBastion
     githubUser: githubUser
-    keyVaultName: mgmtArtifactsAndPolicyDeployment.outputs.keyVaultName
   }
 }
 
@@ -112,7 +111,6 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     workspaceName: logAnalyticsWorkspaceName
     flavor: flavor
     deployBastion: deployBastion
-    spnTenantId: spnTenantId
   }
 }
 
