@@ -75,18 +75,6 @@ resource "azurerm_virtual_network" "vnet" {
   }
 }
 
-resource "azurerm_key_vault" "kv" {
-  count                       = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
-  name                        = "ArcBox-KV-${random_string.random.result}"
-  location                    = data.azurerm_resource_group.rg.location
-  resource_group_name         = data.azurerm_resource_group.rg.name
-  enabled_for_disk_encryption = true
-  tenant_id                   = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days  = 7
-  purge_protection_enabled    = false
-  sku_name                    = "standard"
-}
-
 resource "azurerm_log_analytics_workspace" "workspace" {
   name                = var.workspace_name
   location            = data.azurerm_resource_group.rg.location
@@ -152,8 +140,4 @@ resource "azurerm_bastion_host" "bastionHost" {
 
 output "workspace_id" {
   value = azurerm_log_analytics_workspace.workspace.id
-}
-
-output "keyvault_name" {
-  value = azurerm_key_vault.kv[0].name
 }

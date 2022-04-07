@@ -202,7 +202,6 @@ module "client_vm" {
   github_repo          = var.github_repo
   github_branch        = var.github_branch
   deploy_bastion       = var.deploy_bastion
-  keyvault_name        = module.management_artifacts.keyvault_name
 
   depends_on = [
     azurerm_resource_group.rg,
