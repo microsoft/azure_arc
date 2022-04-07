@@ -81,9 +81,6 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
-az extension add --name k8s-extension
-az extension add --name k8s-configuration
-
 # "Create OSM Kubernetes extension instance"
 az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --release-train pilot --name $osmMeshName
 
@@ -175,6 +172,14 @@ $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength
 $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
 Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
 Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
+
+# Create random 13 character string for KeyVault name
+$strLen = 13
+$randStr = (-join ((0x30..0x39) + (0x61..0x7A) | Get-Random -Count $strLen | ForEach-Object {[char]$_}))
+$Env:keyVaultName = "ArcBox-KV-$randStr"
+
+Write-Host "Creating Azure Key Vault"
+az keyvault create --name $Env:keyVaultName --resource-group $Env:resourceGroup --location $Env:azureLocation
 
 Write-Host "Importing the TLS certificate to Key Vault"
 az keyvault certificate import --vault-name $Env:keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
