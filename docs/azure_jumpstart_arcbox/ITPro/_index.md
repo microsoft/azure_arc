@@ -4,6 +4,8 @@ linkTitle: "Jumpstart ArcBox for IT Pros"
 weight: 2
 ---
 
+> **ADVISORY: An known issue affecting Azure CLI Kubernetes extensions is causing problems with automation in Jumpstart scenarios and ArcBox where the Azure CLI Kubernetes extensions are used. This issue will result result in incomplete or failed deployments. Thank you for your patience as the teams work to address the issue.**
+
 ## Jumpstart ArcBox for IT Pros
 
 ArcBox for IT Pros is a special "flavor" of ArcBox that is intended for users who want to experience Azure Arc-enabled servers capabilities in a sandbox environment.
