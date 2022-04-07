@@ -106,6 +106,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _'deploySQLMI'_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we leave it set to _**false**_.
   - _'SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this scenario we leave it set to _**false**_.
   - _'deployPostgreSQL'_ - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this Azure Arc-enabled PostgreSQL Hyperscale scenario we will set it to _**true**_.
+  - _'deployBastion'_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
+  - _'bastionHostName'_ - Azure Bastion host name.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM) and run the below command:
 
@@ -133,7 +135,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **NOTE: The deployment time for this scenario can take ~15-20min**
 
-- Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **8 various Azure resources** deployed.
+- Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **8 various Azure resources** deployed (If you chose to deploy Azure Bastion, you will have **9 Azure resources**).
 
     ![Screenshot showing ARM template deployment completed](./01.png)
 
@@ -141,15 +143,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that first phase of the automation is completed, it is time to RDP to the client VM using it's public IP.
+- Now that the first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
 
     ![Screenshot showing the Client VM public IP](./03.png)
+
+- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Screenshot showing connecting using Azure Bastion](./04.png)
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and PostgreSQL will be deployed on the cluster and be ready to use.
-
-  ![Screenshot showing the PowerShell logon script run](./04.png)
 
   ![Screenshot showing the PowerShell logon script run](./05.png)
 
@@ -193,7 +197,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing the PowerShell logon script run](./25.png)
 
-  ![Screenshot showing the post-run desktop](./26.png)
+  ![Screenshot showing the PowerShell logon script run](./26.png)
+
+  ![Screenshot showing the post-run desktop](./27.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL Hyperscale instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
 
@@ -205,17 +211,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - Azure Arc-enabled PostgreSQL Hyperscale - The PostgreSQL Hyperscale instance that is now deployed on the Kubernetes cluster.
 
-  ![Screenshot showing additional Azure resources in the resource group](./27.png)
+  ![Screenshot showing additional Azure resources in the resource group](./28.png)
 
 - As part of the automation, Azure Data Studio is installed along with the _Azure Data CLI_, _Azure CLI_, _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see the installed extensions.
 
-  ![Screenshot showing Azure Data Studio shortcut](./28.png)
+  ![Screenshot showing Azure Data Studio shortcut](./29.png)
 
-  ![Screenshot showing Azure Data Studio extensions](./29.png)
+  ![Screenshot showing Azure Data Studio extensions](./30.png)
 
 - Additionally, the PostgreSQL connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
 
-  ![Screenshot showing Azure Data Studio PostgresSQL Hyperscale connection](./30.png)
+  ![Screenshot showing Azure Data Studio PostgresSQL Hyperscale connection](./31.png)
 
 ## Cluster extensions
 
@@ -227,12 +233,12 @@ In this scenario, two Azure Arc-enabled Kubernetes cluster extensions were insta
 
 In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./31.png)
+![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./32.png)
 
-![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./32.png)
+![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./33.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./33.png)
+    ![Screenshot showing Azure resource group deletion](./34.png)
