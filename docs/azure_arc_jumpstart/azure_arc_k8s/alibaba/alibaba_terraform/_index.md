@@ -6,6 +6,8 @@ weight: 1
 description: >
 ---
 
+> **ADVISORY: An known issue affecting Azure CLI Kubernetes extensions is causing problems with automation in Jumpstart Kubernetes scenarios, data and app services scenarios, and ArcBox where the Azure CLI Kubernetes extensions are used. This issue will result result in incomplete or failed deployments. Thank you for your patience as the teams work to address the issue.**
+
 ## Deploy Alibaba Cloud Container Service for Kubernetes cluster and connect it to Azure Arc using Terraform
 
 The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Alibaba Cloud [Container Service for Kubernetes (ACK)](https://www.alibabacloud.com/product/kubernetes) and connect it as an Azure Arc cluster resource.
