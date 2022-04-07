@@ -91,9 +91,6 @@ param deployBastion bool = false
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
 param githubUser string
 
-@description('Key vault name, when the key vault is deployed')
-param keyVaultName string
-
 @description('The name of the K3s cluster')
 param k3sArcClusterName string = 'ArcBox-K3s'
 
@@ -222,7 +219,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -flavor ${flavor} -capiArcDataClusterName ${capiArcDataClusterName} -k3sArcClusterName ${k3sArcClusterName} -githubUser ${githubUser} -keyVaultName ${keyVaultName}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -flavor ${flavor} -capiArcDataClusterName ${capiArcDataClusterName} -k3sArcClusterName ${k3sArcClusterName} -githubUser ${githubUser}'
     }
   }
 }
