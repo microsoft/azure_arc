@@ -39,10 +39,11 @@ resource "aws_iam_role_policy_attachment" "arcdemo-node-AmazonEC2ContainerRegist
 }
 
 resource "aws_eks_node_group" "arcdemo" {
-  cluster_name    = aws_eks_cluster.arcdemo.name
+  cluster_name    = var.cluster_name
   node_group_name = "arcdemo"
   node_role_arn   = aws_iam_role.arcdemo-node.arn
-  subnet_ids      = aws_subnet.arcdemo[*].id
+  subnet_ids      = var.cluster_subnet_ids
+  instance_types  = ["t2.medium"]
 
   scaling_config {
     desired_size = 1
