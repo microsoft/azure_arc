@@ -5,7 +5,7 @@ weight: 3
 ---
 
 ## Jumpstart ArcBox for DevOps
-ArcBox for IT Pros is a special "flavor" of ArcBox that is intended for users who want to experience Azure Arc-enabled Kubernetes capabilities in a sandbox environment.
+ArcBox for DevOps is a special "flavor" of ArcBox that is intended for users who want to experience Azure Arc-enabled Kubernetes capabilities in a sandbox environment.
 
 ![ArcBox architecture diagram](./arch_devops.png)
 
@@ -71,27 +71,7 @@ A self signed certificate is synced from the Key Vault and configured as secret 
 
 ### Microsoft Defender for Cloud / k8s integration
 
-Kubernetes extensions are add-ons for Kubernetes clusters. The extensions feature on Azure Arc-enabled Kubernetes clusters enables usage of Azure Resource Manager based APIs, CLI and portal UX for deployment of extension components (Helm charts in initial release) and will also provide lifecycle management capabilities such as auto/manual extension version upgrades for the extensions.
-
-ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources, one of these services is Microsoft Defender for Cloud that is deployed by installing the [Defender extension](https://docs.microsoft.com/azure/defender-for-cloud/defender-for-containers-enable?tabs=aks-deploy-portal%2Ck8s-deploy-cli%2Ck8s-verify-cli%2Ck8s-remove-arc%2Caks-removeprofile-api#protect-arc-enabled-kubernetes-clusters) on your Kubernetes cluster in order to start collecting security related logs and telemetry.  
-
-After you have finished the deployment of ArBox for DevOps, you can verify that Microsoft Defender for Cloud is working properly and alerting on security threats, by running the below command to simulate an alert:
-
-  ```bash
-  kubectl get pods --namespace=asc-alerttest-662jfi039n --kubeconfig <cluster-name>.kubeconfig
-  ```
-
-Within 30 minutes Microsoft Defender for Cloud will detect this event and trigger a security alert that you wil see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled cluster.
-
-![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert01.png)
-
-![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert02.png)
-
-![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert03.png)
-
-### Cluster connect??
-
-Lorem ipsum dolor whatever
+ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources. One of these services is Microsoft Defender for Cloud that is deployed by installing the [Defender extension](https://docs.microsoft.com/azure/defender-for-cloud/defender-for-containers-enable?tabs=aks-deploy-portal%2Ck8s-deploy-cli%2Ck8s-verify-cli%2Ck8s-remove-arc%2Caks-removeprofile-api#protect-arc-enabled-kubernetes-clusters) on your Kubernetes cluster in order to start collecting security related logs and telemetry.  
 
 ### Hybrid Unified Operations
 
@@ -373,9 +353,27 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the client VM, here are some things to try:
 
-### KeyVault integration
+### Microsoft Defender for Cloud
 
-- You can now see that Azure Key Vault Secrets Provider, Flux (GitOps) and Open Service Mesh extensions are now enabled in the extension tab section of the ArcBox-CAPI-Data cluster resource in Azure.
+After you have finished the deployment of ArcBox, you can verify that Microsoft Defender for Cloud is working properly and alerting on security threats by running the below command to simulate an alert on the _ArcBox-CAPI-Data_ workload cluster:
+
+  ```bash
+  kubectl get pods --namespace=asc-alerttest-662jfi039n --kubeconfig arcbox-capi-data.kubeconfig
+  ```
+
+Within 30 minutes Microsoft Defender for Cloud will detect this event and trigger a security alert that you will see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled cluster.
+
+![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert01.png)
+
+![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert02.png)
+
+![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert03.png)
+
+### Key Vault integration
+
+ ArcBox uses Azure Key Vault to store the TLS certificate used by the sample hello-arc and OSM applications. Here are some things to try to explore this integration with Key Vault further:
+
+- Open the extension tab section of the ArcBox-CAPI-Data cluster resource in Azure portal. You can now see that Azure Key Vault Secrets Provider, Flux (GitOps) and Open Service Mesh extensions are now enabled in the .
 
   ![Screenshot showing Azure Arc extensions ](./keyvault_01.png)
 
@@ -393,7 +391,9 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
 ### GitOps configurations
 
-- You can now see the five GitOps configurations on the ArcBox-CAPI-Data cluster.
+ArcBox deploys multiple GitOps configurations on the _ArcBox-CAPI-Data_ workload cluster. Click on the GitOps tab of the cluster to explore these configurations:
+
+- You can now see the five GitOps configurations on the _ArcBox-CAPI-Data_ cluster.
 
   - config-nginx to deploy NGINX-ingress controller.
   - config-bookstore to deploy the "Bookstore" application.
@@ -420,6 +420,8 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
     ![Screenshot showing Hello-Arc app and shell GitOps](./GitOps_04.png)
 
 ### RBAC configurations
+
+ArcBox deploys Kubernetes RBAC configuration on the bookstore application to limit access to deployed Kubernetes resources. You can explore this configuration by following these steps:
 
 - Show Kubernetes RBAC Role and Role binding applied using GitOps Configuration.
 
@@ -459,7 +461,9 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
 ### OSM Traffic Split
 
-- To show OSM traffic split, open 4 browser windows.
+ArcBox uses a GitOps configuration on the OSM bookstore application to split traffic to the bookstore APIs using weighted load balancing. Follow these steps to explore this capability further:
+
+- To show OSM traffic split, open four browser windows.
 
   - Browse to the bookbuyer application _`https://arcbox.devops.com/bookbuyer`_
   - Browse to the bookstore application _`https://arcbox.devops.com/bookstore`_
@@ -471,7 +475,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
     kubectl --namespace bookbuyer logs $pod bookbuyer -f | grep Identity:
     ```
 
-  - End result should look like that:
+  - End result should look like this:
 
     ![Screenshot showing Bookstore apps and shell](./OSM_01.png)
 
@@ -493,7 +497,7 @@ After deployment is complete, its time to start exploring ArcBox. Most interacti
 
 ### Additional Scenarios on _ArcBox-k3s_ cluster
 
-Optionally, you can try additional GitOps and RBAC scenarios on _ArcBox-k3s_ cluster. When remoted into the _ArcBox-Client_ virtual machine, here are some things to try:
+Optionally, you can explore additional GitOps and RBAC scenarios in a manual fashion using the _ArcBox-K3s_ cluster. When remoted into the _ArcBox-Client_ virtual machine, here are some things to try:
 
 - Configure GitOps flow for Hello-Arc application on the _ArcBox-k3s_ cluster.
 
