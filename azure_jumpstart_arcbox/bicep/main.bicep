@@ -1,6 +1,3 @@
-@description('IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address')
-param myIpAddress string
-
 @description('RSA public key used for securing SSH access to ArcBox resources')
 @secure()
 param sshRSAPublicKey string
@@ -53,7 +50,6 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
   name: 'ubuntuCAPIDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    myIpAddress: myIpAddress
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
@@ -69,7 +65,6 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
   name: 'ubuntuRancherDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    myIpAddress: myIpAddress
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
@@ -89,7 +84,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
-    myIpAddress: myIpAddress
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
