@@ -199,7 +199,6 @@
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
       "dependsOn": [
-        "mgmtArtifactsAndPolicyDeployment",
         "stagingStorageAccountDeployment"
       ],
       "properties": {
@@ -244,9 +243,6 @@
           },
           "githubUser": {
             "value": "[parameters('githubUser')]"
-          },
-          "keyVaultName": {
-            "value": "[reference('mgmtArtifactsAndPolicyDeployment').outputs.keyVaultName.value]"
           }
         }
       }
@@ -285,9 +281,6 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
-          },
-          "spnTenantId": {
-            "value": "[parameters('spnTenantId')]"
           }
         }
       }
