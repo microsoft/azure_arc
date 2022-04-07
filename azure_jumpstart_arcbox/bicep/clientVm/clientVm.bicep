@@ -1,6 +1,3 @@
-@description('Your public IP address, used to RDP to the client VM')
-param myIpAddress string
-
 @description('The name of your Virtual Machine')
 param vmName string = 'ArcBox-Client'
 
@@ -131,21 +128,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   name: networkSecurityGroupName
   location: location
   properties: {
-    securityRules: [
-      {
-        name: 'allow_RDP_3389'
-        properties: {
-          priority: 1001
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: deployBastion == true ? bastionSubnetIpPrefix : myIpAddress
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '3389'
-        }
-      }
-    ]
+    securityRules: []
   }
 }
 

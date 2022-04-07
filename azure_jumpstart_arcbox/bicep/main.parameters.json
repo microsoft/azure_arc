@@ -20,9 +20,6 @@
         "windowsAdminPassword": {
             "value": "<your windows admin password>"
         },
-        "myIpAddress": {
-            "value": "<your IP address>"
-        },
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
         },
@@ -30,7 +27,7 @@
             "value":  "Full"
         },
         "deployBastion": {
-            "value": "<true | false"
+            "value": false
         }
     }
 }
