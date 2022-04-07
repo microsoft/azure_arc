@@ -84,7 +84,7 @@ az keyvault create --name $Env:keyVaultName --resource-group $Env:resourceGroup 
 
 # Allow SPN to import certificates into KeyVault
 Write-Host "Setting Azure Key Vault access policies"
-az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --secret-permissions get --certificate-permissions get list import
+az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --key-permissions --secret-permissions get --certificate-permissions get list import
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
