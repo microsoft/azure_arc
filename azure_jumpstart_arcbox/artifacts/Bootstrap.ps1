@@ -128,11 +128,11 @@ workflow ClientTools_01
                     foreach ($app in $appsToInstall)
                     {
                         Write-Host "Installing $app"
-                        & choco install $app /y -Force| Write-Output
+                        & choco install $app /y -Force | Write-Output
                     }
 
                     # Temporary workaround for issue in 2.35.0 regarsing k8s extension
-                    & choco install azure-cli --version=2.34.1
+                    & choco install azure-cli --version=2.34.1 /y -Force | Write-Output
                 }                        
             }
 
