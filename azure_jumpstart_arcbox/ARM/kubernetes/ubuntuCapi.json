@@ -175,21 +175,7 @@
             "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('azureLocation')]",
             "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_SSH",
-                        "properties": {
-                            "priority": 1001,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),parameters('myIpAddress'))]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "22"
-                        }
-                    }
-                ]
+                "securityRules": []
             }
         },
         {
