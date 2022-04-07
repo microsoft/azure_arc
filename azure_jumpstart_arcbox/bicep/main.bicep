@@ -42,7 +42,7 @@ param githubBranch string = 'main'
 param deployBastion bool = false
 
 @description('Target GitHub account for DevOps flavor')
-param githubUser string = 'your-repository'
+param githubUser string = 'microsoft'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
