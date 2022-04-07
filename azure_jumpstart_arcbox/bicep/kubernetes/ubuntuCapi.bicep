@@ -1,6 +1,3 @@
-@description('Your public IP address, used to RDP to the client VM')
-param myIpAddress string
-
 @description('The name of you Virtual Machine')
 param vmName string = 'ArcBox-CAPI-MGMT'
 
@@ -91,21 +88,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   name: networkSecurityGroupName
   location: azureLocation
   properties: {
-    securityRules: [
-      {
-        name: 'allow_SSH'
-        properties: {
-          priority: 1001
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: deployBastion == true ? bastionSubnetIpPrefix : myIpAddress
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '22'
-        }
-      }
-    ]
+    securityRules: []
   }
 }
 

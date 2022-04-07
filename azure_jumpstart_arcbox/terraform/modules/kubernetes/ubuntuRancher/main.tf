@@ -46,11 +46,6 @@ variable "subnet_name" {
   description = "ArcBox subnet name."
 }
 
-variable "user_ip_address" {
-  type        = string
-  description = "Users public IP address, used to RDP to the client VM."
-}
-
 variable "template_base_url" {
   type        = string
   description = "Base URL for the GitHub repo where the ArcBox artifacts are located."
@@ -93,11 +88,6 @@ locals {
     network_interface_name = "${var.vm_name}-NIC"
     bastionSubnetIpPrefix  = "172.16.3.64/26"
     inbound_tcp_rules      = [
-        {
-            name                   = "allow_SSH"
-            source_address_prefix  = var.deploy_bastion == true ? local.bastionSubnetIpPrefix : var.user_ip_address
-            destination_port_range = "22"
-        },
         {
             name                   = "allow_k8s_6443"
             source_address_prefix  = "*"
