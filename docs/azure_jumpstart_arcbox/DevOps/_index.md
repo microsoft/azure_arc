@@ -363,11 +363,11 @@ After deployment, you should see the ArcBox resources inside your resource group
 
   > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (48 total)**
 
-### Connecting to ArcBox Client VM
+### Connecting to the ArcBox Client VM
 
 You can connect to the Client VM in 3 ways depending on how you've deployed ArcBox.
 
-#### Connecting to the Client VM using RDP
+#### Connect using RDP
 
 - If you have not chosen to deploy Azure Bastion in the ARM template, enable the RDP port in the NSG and RDP to the VM using its public IP.
 
@@ -383,14 +383,14 @@ You can connect to the Client VM in 3 ways depending on how you've deployed ArcB
 
 - Once you log into the client VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
 
-#### Connecting to the Client VM using Azure Bastion
+#### Connect using Azure Bastion
 
 - If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
 
   ![Screenshot showing connecting to the VM using Bastion](./bastion_connect.png)
 
 - Once you log into the client VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
-#### Connecting to the Client VM using just-in-time access(JIT)
+#### Connect using just-in-time access(JIT)
 
 If you already have Microsoft Defender for servers enabled on your subscription and would like to use JIT to access the Client VM. Use the following steps:
 
