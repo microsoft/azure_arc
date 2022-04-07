@@ -81,9 +81,6 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
-az extension add --name k8s-extension
-az extension add --name k8s-configuration
-
 # "Create OSM Kubernetes extension instance"
 az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --release-train pilot --name $osmMeshName
 
