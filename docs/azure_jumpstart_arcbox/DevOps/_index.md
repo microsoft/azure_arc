@@ -22,18 +22,20 @@ ArcBox for DevOps is a special "flavor" of ArcBox that is intended for users who
 
 ### Azure Arc-enabled Kubernetes
 
-ArcBox for DevOps deploys two Kubernetes clusters.
+ArcBox for DevOps deploys two Kubernetes clusters to give you multiple options for exploring Azure Arc-enabled Kubernetes capabilities.
 
 - One single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource (_ArcBox-K3s_).
-- ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider Azure(CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster.
+- ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider Azure (CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster.
 
 ### Sample applications
 
-ArcBox for DevOps deploys two applications on the _ArcBox-CAPI-Data_ cluster.
+ArcBox for DevOps deploys two sample applications on the _ArcBox-CAPI-Data_ cluster. The cluster has multiple GitOps configurations that deploy and configure the sample apps. You can use your own fork of the [sample applications GitHub repo](https://github.com/microsoft/azure-arc-jumpstart-apps) to experiment with GitOps configuration flows.
 
-- [Hello-arc](https://github.com/microsoft/azure-arc-jumpstart-apps/tree/main/hello-arc) application is a simple web app. ArcBox will deploy 3 replicas of the hello-arc application in the hello-arc namespace.
+The sample applications included in ArcBox are:
 
-- [Bookstore](https://release-v0-11.docs.openservicemesh.io/docs/getting_started/quickstart/manual_demo/) application is a sample microservices application. ArcBox will deploy 5 different pods as part of the Bookstore app.
+- [Hello-arc](https://github.com/microsoft/azure-arc-jumpstart-apps/tree/main/hello-arc) - A simple web app. ArcBox will deploy 3 replicas of the hello-arc application in the hello-arc namespace onto the _ArcBox-CAPI-Data_ cluster.
+
+- [Bookstore](https://release-v0-11.docs.openservicemesh.io/docs/getting_started/quickstart/manual_demo/) - A sample microservices application. ArcBox will deploy 5 different pods as part of the Bookstore app. These pods are:
 
   - _bookbuyer_ is an HTTP client making requests to bookstore.
   - _bookstore_ is a server, which responds to HTTP requests. It is also a client making requests to the bookwarehouse service.
@@ -79,7 +81,7 @@ ArcBox deploys several management and operations services that work with ArcBox'
 
 ## ArcBox Azure Consumption Costs
 
-ArcBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxiliary services. Note that Azure consumption costs vary depending the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Users may review cost analysis of ArcBox by using [Azure Cost Analysis](https://docs.microsoft.com/en-us/azure/cost-management-billing/costs/quick-acm-cost-analysis).
+ArcBox resources generate Azure consumption charges from the underlying Azure resources including core compute, storage, networking and auxiliary services. Note that Azure consumption costs vary depending the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Users may review cost analysis of ArcBox by using [Azure Cost Analysis](https://docs.microsoft.com/en-us/azure/cost-management-billing/costs/quick-acm-cost-analysis).
 
 ## Deployment Options and Automation Flow
 
@@ -97,20 +99,20 @@ ArcBox provides multiple paths for deploying and configuring ArcBox resources. D
 ArcBox uses an advanced automation flow to deploy and configure all necessary resources with minimal user interaction. The previous diagrams provide an overview of the deployment flow. A high-level summary of the deployment is:
 
 - User deploys the primary ARM template (_azuredeploy.json_), Bicep file (_main.bicep_), or Terraform plan (_main.tf_). These objects contain several nested objects that will run simultaneously.
-  - ClientVM ARM template/plan - deploys the Client Windows VM. This is the Hyper-V host VM where all user interactions with the environment are made from.
+  - ClientVM ARM template/plan - deploys the Client Windows VM. This is a Windows Server VM that comes preconfigured with kubeconfig files to work with the two Kubernetes clusters, plus mulitple tools such as VSCode to make working with ArcBox simple and easy.
   - Storage account template/plan - used for staging files in automation scripts
   - Management artifacts template/plan - deploys Azure Log Analytics workspace and solutions and Azure Policy artifacts
 - User remotes into Client Windows VM, which automatically kicks off multiple scripts that:
-  - Deploys OSM Extension on the ArcBox-CAPI-Data cluster, create application namespaces and add namespaces to OSM control plane.
-  - Applies five GitOps configurations on the ArcBox-CAPI-Data cluster to deploy nginx-ingress controller, Hello Arc web application, Bookstore application and Bookstore RBAC/OSM configurations.
+  - Deploys OSM Extension on the _ArcBox-CAPI-Data_ cluster, create application namespaces and add namespaces to OSM control plane.
+  - Applies five GitOps configurations on the _ArcBox-CAPI-Data_ cluster to deploy nginx-ingress controller, Hello Arc web application, Bookstore application and Bookstore RBAC/OSM configurations.
   - Creates certificate with DNS name _arcbox.k3sdevops.com_ and imports to Azure Key Vault.
-  - Deploys Azure Key Vault Secrets Provider extension on the ArcBox-CAPI-Data cluster.
-  - Configures Ingress for Hello-Arc and Bookstore application with certificate from the Key Vault.  
+  - Deploys Azure Key Vault Secrets Provider extension on the _ArcBox-CAPI-Data_ cluster.
+  - Configures Ingress for Hello-Arc and Bookstore application with a self-signed TLS certificate from the Key Vault.  
   - Deploy an Azure Monitor workbook that provides example reports and metrics for monitoring ArcBox components
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.35.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -130,7 +132,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - UK South
   - Southeast Asia
 
-- **ArcBox DevOps requires XXXX DSv4-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
+- **ArcBox DevOps requires 52 DSv4-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location <your location> --output table
@@ -628,15 +630,13 @@ The following tools are including on the _ArcBox-Client_ VM.
 - 7zip
 - Terraform
 - Git
-- SqlQueryStress
 
 ### Next steps
   
 ArcBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or a kickstarter for proof of concept projects. Ultimately, you are free to do whatever you wish with ArcBox. Some suggested next steps for you to try in your ArcBox are:
 
-- Deploy sample databases to the PostgreSQL Hyperscale instance or to the SQL Managed Instance
 - Use the included kubectx to switch contexts between the two Kubernetes clusters
-- Deploy GitOps configurations with Azure Arc-enabled Kubernetes
+- Deploy new GitOps configurations with Azure Arc-enabled Kubernetes
 - Build policy initiatives that apply to your Azure Arc-enabled resources
 - Write and test custom policies that apply to your Azure Arc-enabled resources
 - Incorporate your own tooling and automation into the existing automation framework
@@ -668,11 +668,6 @@ Occasionally deployments of ArcBox may fail at various stages. Common reasons fo
 
 - Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least XXXX available. See the [prerequisites](#prerequisites) section for more details.
 - Target Azure region does not support all required Azure services - ensure you are running ArcBox in one of the supported regions listed in the above section "ArcBox Azure Region Compatibility".
-- "BadRequest" error message when deploying - this error returns occasionally when the Log Analytics solutions in the ARM templates are deployed. Typically, waiting a few minutes and re-running the same deployment resolves the issue. Alternatively, you can try deploying to a different Azure region.
-
-  ![Screenshot showing BadRequest errors in Az CLI](./error_badrequest.png)
-
-  ![Screenshot showing BadRequest errors in Azure portal](./error_badrequest2.png)
 
 ### Exploring logs from the _ArcBox-Client_ virtual machine
 
@@ -692,9 +687,7 @@ Occasionally, you may need to review log output from scripts that run on the _Ar
 
 In the case of a failed deployment, pointing to a failure in either the _ubuntuRancherDeployment_ or the _ubuntuCAPIDeployment_ Azure deployments, an easy way to explore the deployment logs is available directly from the associated virtual machines.
 
-  ![Screenshot showing failed deployments](./failed_deployments.png)
-
-- Depends on which deployment failed, connect using SSH to the associated virtual machine public IP:
+- Depending on which deployment failed, connect using SSH to the associated virtual machine public IP:
   - _ubuntuCAPIDeployment_ - _ArcBox-CAPI-MGMT_ virtual machine.
   - _ubuntuRancherDeployment_ - _ArcBox-K3s_ virtual machine.
 
@@ -704,7 +697,7 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
 
       ![Screenshot showing ArcBox-K3s virtual machine public IP](./arcbox_k3s_vm_ip.png)
 
-- As described in the message of the day (motd), depends on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
+- As described in the message of the day (motd), depending on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
   - _ArcBox-CAPI-MGMT_ log path: *jumpstart_logs/installCAPI.log*
   - _ArcBox-K3s_ log path: *jumpstart_logs/installK3s.log*
 
