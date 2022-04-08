@@ -6,8 +6,6 @@ weight: 4
 description: >
 ---
 
-> **ADVISORY: An known issue affecting Azure CLI Kubernetes extensions is causing problems with automation in Jumpstart Kubernetes scenarios, data and app services scenarios, and ArcBox where the Azure CLI Kubernetes extensions are used. This issue will result in incomplete or failed deployments. Thank you for your patience as the teams work to address the issue.**
-
 ## Deploy an Azure API Management gateway on AKS using an ARM Template
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [a self-hosted Azure API Management Gateway](https://docs.microsoft.com/en-us/azure/api-management/how-to-deploy-self-hosted-gateway-azure-arc) deployed on an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster that has been onboarded as an [Azure Arc enabled Kubernetes cluster](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/overview) using an [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).

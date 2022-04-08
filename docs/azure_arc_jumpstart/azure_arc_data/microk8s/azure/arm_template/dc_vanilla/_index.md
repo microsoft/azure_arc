@@ -6,8 +6,6 @@ weight: 1
 description: >
 ---
 
-> **ADVISORY: An known issue affecting Azure CLI Kubernetes extensions is causing problems with automation in Jumpstart Kubernetes scenarios, data and app services scenarios, and ArcBox where the Azure CLI Kubernetes extensions are used. This issue will result in incomplete or failed deployments. Thank you for your patience as the teams work to address the issue.**
-
 ## Deploy a vanilla Azure Arc Data Controller in directly connected mode on a Microk8s Kubernetes cluster in an Azure VM using ARM Templates
 
 The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) deployed on a single-node [Microk8s](https://microk8s.io/) Kubernetes cluster.
