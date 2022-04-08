@@ -105,8 +105,7 @@ workflow ClientTools_01
                 [Parameter (Mandatory = $true)]
                 [string]$flavor
             )
-            # Temporarily removed "azure-cli" from beginning of list due to issue with 2.35.0 regarding k8s extension
-            $chocolateyAppList = 'az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk,setdefaultbrowser'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk,setdefaultbrowser'
             InlineScript {
                 param (
                     [string]$chocolateyAppList
@@ -130,9 +129,6 @@ workflow ClientTools_01
                         Write-Host "Installing $app"
                         & choco install $app /y -Force | Write-Output
                     }
-
-                    # Temporary workaround for issue in 2.35.0 regarsing k8s extension
-                    & choco install azure-cli --version=2.34.1 /y -Force | Write-Output
                 }                        
             }
 
