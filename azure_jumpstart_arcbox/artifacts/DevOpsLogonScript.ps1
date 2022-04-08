@@ -78,6 +78,8 @@ $strLen = 13
 $randStr = (-join ((0x30..0x39) + (0x61..0x7A) | Get-Random -Count $strLen | ForEach-Object {[char]$_}))
 $Env:keyVaultName = "ArcBox-KV-$randStr"
 
+[System.Environment]::SetEnvironmentVariable('keyVaultName', $Env:keyVaultName, [System.EnvironmentVariableTarget]::Machine)
+
 # Create Azure KeyVault
 Write-Host "Creating Azure Key Vault"
 az keyvault create --name $Env:keyVaultName --resource-group $Env:resourceGroup --location $Env:azureLocation
