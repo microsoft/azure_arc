@@ -103,7 +103,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - User remotes into Client Windows VM, which automatically kicks off multiple scripts that:
   - Deploys OSM Extension on the ArcBox-CAPI-Data cluster, create application namespaces and add namespaces to OSM control plane.
   - Applies five GitOps configurations on the ArcBox-CAPI-Data cluster to deploy nginx-ingress controller, Hello Arc web application, Bookstore application and Bookstore RBAC/OSM configurations.
-  - Creates certificate and import to Azure Key Vault.
+  - Creates certificate with DNS name _arcbox.k3sdevops.com_ and imports to Azure Key Vault.
   - Deploys Azure Key Vault Secrets Provider extension on the ArcBox-CAPI-Data cluster.
   - Configures Ingress for Hello-Arc and Bookstore application with certificate from the Key Vault.  
   - Deploy an Azure Monitor workbook that provides example reports and metrics for monitoring ArcBox components
@@ -345,7 +345,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 - Open a remote desktop connection into _ArcBox-Client_. Upon logging in, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
 
-  ![Screenshot showing ArcBox-Client](./automation5.png)
+  ![Screenshot showing ArcBox-Client](./automation.png)
 
   ![Screenshot showing ArcBox resources in Azure portal](./rgarc.png)
 
@@ -373,21 +373,19 @@ Within 30 minutes Microsoft Defender for Cloud will detect this event and trigge
 
  ArcBox uses Azure Key Vault to store the TLS certificate used by the sample hello-arc and OSM applications. Here are some things to try to explore this integration with Key Vault further:
 
-- Open the extension tab section of the ArcBox-CAPI-Data cluster resource in Azure portal. You can now see that Azure Key Vault Secrets Provider, Flux (GitOps) and Open Service Mesh extensions are now enabled in the .
+- Open the extension tab section of the _ArcBox-CAPI-Data_ cluster resource in Azure portal. You can now see that Azure Key Vault Secrets Provider, Flux (GitOps) and Open Service Mesh extensions are enabled.
 
-  ![Screenshot showing Azure Arc extensions ](./keyvault_01.png)
+  ![Screenshot showing Azure Arc extensions ](./capi_keyvault01.png)
 
-- Click on the _DevOps Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate used from Key Vault _`https://arcbox.k3sdevops.com/`_
+- Click on the _DevOps Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.k3sdevops.com_ used from the Key Vault.
 
-  ![Screenshot showing Hello-Arc App](./keyvault_02.png)
+  ![Screenshot showing Hello-Arc desktop Icon](./capi_keyvault02.png)
 
-- Optionally, run curl to validate Ingress certificate details.
+  ![Screenshot showing Hello-Arc App](./capi_keyvault03.png)
 
-  ```shell
-  curl -vk https://arcbox.devops.com/
-  ```
+- Optionally, validate the certificate details.
 
-  ![Screenshot showing Hello-Arc certificate](./keyvault_03.png)
+  ![Screenshot showing Hello-Arc certificate](./capi_keyvault04.png)
 
 ### GitOps configurations
 
@@ -401,7 +399,7 @@ ArcBox deploys multiple GitOps configurations on the _ArcBox-CAPI-Data_ workload
   - config-bookstore-osm to deploy the "Bookstore" application open service mesh traffic split policy.
   - config-helloarc to deploy the "Hello Arc" web application.
 
-  ![Screenshot showing Azure Arc GitOps configurations](./GitOps_01.png)
+  ![Screenshot showing Azure Arc GitOps configurations](./capi_gitops01.png)
 
 - To show the GitOps flow for Hello-Arc application open 2 side-by-side browser windows.
 
@@ -409,15 +407,15 @@ ArcBox deploys multiple GitOps configurations on the _ArcBox-CAPI-Data_ workload
   - Shell running the command _`kubectl get pods -n hello-arc -w`_ command.
   - End result should look like that:
 
-    ![Screenshot showing Hello-Arc app and shell](./GitOps_02.png)
+    ![Screenshot showing Hello-Arc app and shell](./capi_gitops02.png)
 
   - In your fork of the “Azure Arc Jumpstart Apps” repository, open the hello_arc.yaml file (/hello-arc/yaml/hello_arc.yaml). Change the text under the “MESSAGE” section and commit the change.
   
-    ![Screenshot showing hello-arc repo](./GitOps_03.png)
+    ![Screenshot showing hello-arc repo](./capi_gitops03.png)
   
   - Upon committing the changes, notice how the Kubernetes Pod rolling upgrade will start. Once the Pod is up & running, refresh the browser, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
   
-    ![Screenshot showing Hello-Arc app and shell GitOps](./GitOps_04.png)
+    ![Screenshot showing Hello-Arc app and shell GitOps](./capi_gitops04.png)
 
 ### RBAC configurations
 
@@ -425,6 +423,8 @@ ArcBox deploys Kubernetes RBAC configuration on the bookstore application to lim
 
 - Show Kubernetes RBAC Role and Role binding applied using GitOps Configuration.
 
+  - Review the [RBAC configuration](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/k8s-rbac-sample/namespace/namespacerole.yaml) applied to the _ArcBox-CAPI-Data_ cluster  
+  
   - Show the bookstore Namespace Role and Role Binding.
   
   ```shell
@@ -432,7 +432,7 @@ ArcBox deploys Kubernetes RBAC configuration on the bookstore application to lim
   kubectl --namespace bookstore get rolebindings.rbac.authorization.k8s.io
   ```
 
-  ![Screenshot showing bookstore RBAC get pods](./RBAC_01.png)
+  ![Screenshot showing bookstore RBAC get Role](./capi_rbac01.png)
 
   - Validate the RBAC role to get the pods as user Jane.
 
@@ -440,60 +440,71 @@ ArcBox deploys Kubernetes RBAC configuration on the bookstore application to lim
   kubectl --namespace bookstore get pods --as=jane
   ```
 
-  ![Screenshot showing bookstore RBAC get pods](./RBAC_02.png)
+  ![Screenshot showing bookstore RBAC get pods](./capi_rbac02.png)
 
   - Validate the RBAC role to delete the pods as user Jane.
 
   ```shell
-  pod=$(kubectl --namespace bookstore get pods --selector=app=bookstore --output=jsonpath={.items..metadata.name})
+  $pod=kubectl --namespace bookstore get pods --selector=app=bookstore --output="jsonpath={.items..metadata.name}"
   kubectl --namespace bookstore delete pods $pod --as=jane
   ```
 
-   ![Screenshot showing bookstore RBAC delete pods](./RBAC_03.png)
+   ![Screenshot showing bookstore RBAC delete pods](./capi_rbac03.png)
 
-  - Optionally, you can test the access using auth command
+  - Optionally, you can test the access using [auth can-i](https://kubernetes.io/docs/reference/access-authn-authz/authorization/#checking-api-access) command to validate RBAC access
   
   ```shell
+  kubectl --namespace bookstore auth can-i get pods --as=jane
   kubectl --namespace bookstore auth can-i delete pods --as=jane
   ```
   
-  ![Screenshot showing bookstore RBAC delete pods](./RBAC_04.png)
+  ![Screenshot showing bookstore RBAC auth can-i pods](./capi_rbac04.png)
 
 ### OSM Traffic Split
 
 ArcBox uses a GitOps configuration on the OSM bookstore application to split traffic to the bookstore APIs using weighted load balancing. Follow these steps to explore this capability further:
+
+- Review the [OSM Traffic Split Policy](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/bookstore/osm-sample/traffic-split.yaml) applied to the _ArcBox-CAPI-Data_ cluster  
 
 - To show OSM traffic split, open four browser windows.
 
   - Browse to the bookbuyer application _`https://arcbox.devops.com/bookbuyer`_
   - Browse to the bookstore application _`https://arcbox.devops.com/bookstore`_
   - Browse to the bookstore-v2 application _`https://arcbox.devops.com/bookstore-v2`_  
-  - Shell running the below commands.
+  - Shell running the below commands to show the bookbuyer pod logs.
   
     ```shell
-    pod=$(kubectl --namespace bookbuyer get pods --selector=app=bookbuyer --output=jsonpath={.items..metadata.name})
-    kubectl --namespace bookbuyer logs $pod bookbuyer -f | grep Identity:
+    $pod=kubectl --namespace bookbuyer get pods --selector=app=bookbuyer --output="jsonpath={.items..metadata.name}"
+    kubectl --namespace bookbuyer logs $pod bookbuyer -f | Select-String Identity:
     ```
 
-  - End result should look like this:
+  - End result should look like this. The count for the books sold from the bookstore-v2 browser window should remain at 0. This is because the current traffic split policy is currently weighted 100 for bookstore in addition to the fact that bookbuyer is sending traffic to the bookstore service and no application is sending requests to the bookstore-v2 service.
 
-    ![Screenshot showing Bookstore apps and shell](./OSM_01.png)
+    ![Screenshot showing Bookstore apps and shell](./capi_osm01.png)
 
-- In your fork of the “Azure Arc Jumpstart Apps” repository, open the traffic-split.yaml file (/bookstore/osm-sample/traffic-split.yaml). Update the bookstore weight to "25" and bookstore-v2 weight to "75" and commit the change.
+- In your fork of the “Azure Arc Jumpstart Apps” repository, open the traffic-split.yaml file (/bookstore/osm-sample/traffic-split.yaml). Update the bookstore weight to "75" and bookstore-v2 weight to "25" and commit the change.
 
-  ![Screenshot showing Bookstore repo Traffic split 01](./OSM_02.png)
+  ![Screenshot showing Bookstore repo Traffic split 01](./capi_osm02.png)
 
-- Wait for the changes to propagate and observe the counters increment for bookstore-v2 and reduce for bookstore. Also observe the changes on the bookbuyer pod logs.
+- Wait for the changes to propagate and observe the counters increment for bookstore and bookstore-v2 as well. We have updated the SMI Traffic Split policy to direct 75 percent of the traffic sent to the root bookstore service to the bookstore service and 25 perfect to bookstore-v2 service by modifying the weight fields for bookstore-v2 backend. Also, observe the changes on the bookbuyer pod logs in shell.
 
-  ![Screenshot showing Bookstore apps and shell GitOps 01](./OSM_03.png)
+  ![Screenshot showing Bookstore apps and shell GitOps and OSM 01](./capi_osm03.png)
+
+- You can verify the traffic split policy by running the following and viewing the Backends properties.
+
+  ```shell
+  kubectl describe trafficsplit bookstore-split -n bookstore
+  ```
+
+  ![Screenshot showing Bookstore repo Traffic split 02](./capi_osm04.png)
 
 - In your fork of the “Azure Arc Jumpstart Apps” repository, open the traffic-split.yaml file (/bookstore/osm-sample/traffic-split.yaml). Update the bookstore weight to "0" and bookstore weight to "100" and commit the change.
 
-  ![Screenshot showing Bookstore repo Traffic split 02](./OSM_04.png)
+  ![Screenshot showing Bookstore repo Traffic split 02](./capi_osm05.png)
 
-- Wait for the changes to propagate and observe the counters increment for bookstore-v2 and freeze for bookstore. Also observe the changes on the bookbuyer pod logs.
+- Wait for the changes to propagate and observe the counters increment for bookstore-v2 and freeze for bookstore. Also, observe pod logs to validate bookbuyer is sending all the traffic to bookstore-v2.
 
-  ![Screenshot showing Bookstore apps and shell GitOps 02](./OSM_05.png)
+  ![Screenshot showing Bookstore apps and shell GitOps and OSM 02](./capi_osm06.png)
 
 ### Additional Scenarios on _ArcBox-k3s_ cluster
 
@@ -505,7 +516,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
     - Log in to your Azure subscription using the SPN credentials
     - Connect to _ArcBox-k3s_ cluster
     - Create the GitOps configurations to deploy the Flux extension, NGINX ingress controller and the “Hello Arc” application
-    - Create certificate and import to the Key Vault
+    - Create certificate with _arcbox.k3sdevops.com_ dns name and import to the Key Vault
     - Deploy the Azure Key Vault k8s extension instance
     - Create SecretProviderClass to fetch the secrets from Key Vault
     - Deploy an Ingress Resource referencing the Secret created by the CSI driver
@@ -519,18 +530,18 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
   - You can now see that Azure Key Vault Secrets Provider and Flux (GitOps) extensions are now enabled in the extension tab section of the _ArcBox-k3s_ cluster resource in Azure.
 
-    ![Screenshot showing Hello-Arc App](./k3s_GitOps_01.png)
+    ![Screenshot showing Hello-Arc App](./k3s_gitops06.png)
 
   - Click on the _K3s Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate used from Key Vault _`https://arcbox.k3sdevops.com/`_
 
-    ![Screenshot showing Hello-Arc App](./k3s_GitOps_02.png)
+    ![Screenshot showing Hello-Arc App](./k3s_gitops07.png)
 
   - You can can verify below GitOps configurations applied on the _ArcBox-k3s_ cluster.
   
     - config-nginx to deploy NGINX-ingress controller
     - config-helloarc to deploy the "Hello Arc" web application
   
-      ![Screenshot showing Azure Arc GitOps configurations](./k3s_GitOps_03.png)
+      ![Screenshot showing Azure Arc GitOps configurations](./k3s_gitops08.png)
   
   - To show the GitOps flow for Hello-Arc application open 2 side-by-side browser windows.
   
@@ -544,15 +555,15 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
     - End result should look like that:
   
-      ![Screenshot showing Hello-Arc app and shell](./k3s_GitOps_04.png)
+      ![Screenshot showing Hello-Arc app and shell](./k3s_gitops09.png)
   
     - In your fork of the “Azure Arc Jumpstart Apps” repository, open the hello_arc.yaml file (/hello-arc/yaml/hello_arc.yaml). Change the text under the “MESSAGE” section and commit the change.
 
-      ![Screenshot showing hello-arc repo](./k3s_GitOps_05.png)
+      ![Screenshot showing hello-arc repo](./k3s_gitops10.png)
 
     - Upon committing the changes, notice how the Kubernetes Pod rolling upgrade will start. Once the Pod is up & running, refresh the browser, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
 
-      ![Screenshot showing Hello-Arc app and shell GitOps](./k3s_GitOps_06.png)
+      ![Screenshot showing Hello-Arc app and shell GitOps](./k3s_gitops11.png)
 
 - Deploy RBAC configuration for Hello-Arc application on the _ArcBox-k3s_ cluster.
 
@@ -571,7 +582,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
   
     - config-helloarc-rbac to deploy the "Hello-Arc" namespace RBAC.
   
-      ![Screenshot showing Azure Arc GitOps configurations](./k3s_RBAC_01.png)
+      ![Screenshot showing Azure Arc GitOps configurations](./k3s_rbac01.png)
 
   - Show the hello-arc Namespace Role and Role Binding.
   
@@ -581,7 +592,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
     kubectl --namespace hello-arc get rolebindings.rbac.authorization.k8s.io
     ```
 
-    ![Screenshot showing hello-arc RBAC get pods](./k3s_RBAC_02.png)
+    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac02.png)
 
   - Validate the RBAC role to get the pods as user Jane.
 
@@ -589,7 +600,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
     kubectl --namespace hello-arc get pods --as=jane
     ```
 
-    ![Screenshot showing hello-arc RBAC get pods](./k3s_RBAC_03.png)
+    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac03.png)
 
   - Validate the RBAC role to delete the pods as user Jane.
 
@@ -598,7 +609,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
     kubectl --namespace hello-arc delete pods $pod --as=jane
     ```
 
-    ![Screenshot showing hello-arc RBAC delete pods](./k3s_RBAC_04.png)
+    ![Screenshot showing hello-arc RBAC delete pods](./k3s_rbac04.png)
 
 ### ArcBox Azure Monitor workbook
 
