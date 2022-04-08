@@ -29,7 +29,7 @@ echo "Creating GitOps config for NGINX Ingress Controller"
 az k8s-configuration flux create `
     --cluster-name $Env:k3sArcClusterName `
     --resource-group $Env:resourceGroup `
-    --name config-nginx-1 `
+    --name config-nginx `
     --namespace $ingressNamespace `
     --cluster-type connectedClusters `
     --scope cluster `
