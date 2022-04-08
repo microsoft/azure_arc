@@ -3,7 +3,7 @@
   "parameters": {
     "workbookDisplayName": {
       "type": "string",
-      "defaultValue": "Arcbox Workbook",
+      "defaultValue": "Arcbox DevOps Workbook",
       "metadata": {
         "description": "The friendly name for the workbook that is used in the Gallery or Saved List.  This name must be unique within a resource group."
       }
@@ -15,7 +15,7 @@
         "description": "The gallery that the workbook will been shown under. Supported values include workbook, tsg, etc. Usually, this is 'workbook'"
       }
     },
-    "workbookResourceId": {
+    "workbookSourceId": {
       "type": "string",
       "defaultValue": "workbookresourceid-stage",
       "metadata": {
@@ -2917,7 +2917,7 @@
         "displayName": "[parameters('workbookDisplayName')]",
         "serializedData": "[string(variables('workbookContent'))]",
         "version": "1.0",
-        "sourceId": "[parameters('workbookResourceId')]",
+        "sourceId": "[parameters('workbookSourceId')]",
         "category": "[parameters('workbookType')]"
       }
     }
