@@ -425,7 +425,7 @@ ArcBox deploys Kubernetes RBAC configuration on the bookstore application to lim
 
 - Show Kubernetes RBAC Role and Role binding applied using GitOps Configuration.
 
-  - Review the [RBAC configuration](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/k8s-rbac-sample/namespace/namespacerole.yaml) applied to the _ArcBox-CAPI-Data_ cluster  
+  - Review the [RBAC configuration](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/k8s-rbac-sample/namespace/namespacerole.yaml) applied to the _ArcBox-CAPI-Data_ cluster.  
   
   - Show the bookstore Namespace Role and Role Binding.
   
@@ -444,7 +444,7 @@ ArcBox deploys Kubernetes RBAC configuration on the bookstore application to lim
 
   ![Screenshot showing bookstore RBAC get pods](./capi_rbac02.png)
 
-  - Validate the RBAC role to delete the pods as user Jane.
+  - Test the RBAC role assignment, if user Jane can delete the pods. The operation fails, as the user, Jane is assigned to the role of pod-reader. The pod-reader role only allows get, watch and list permissions in the bookstore namespace.
 
   ```shell
   $pod=kubectl --namespace bookstore get pods --selector=app=bookstore --output="jsonpath={.items..metadata.name}"
@@ -453,7 +453,7 @@ ArcBox deploys Kubernetes RBAC configuration on the bookstore application to lim
 
    ![Screenshot showing bookstore RBAC delete pods](./capi_rbac03.png)
 
-  - Optionally, you can test the access using [auth can-i](https://kubernetes.io/docs/reference/access-authn-authz/authorization/#checking-api-access) command to validate RBAC access
+  - Optionally, you can test the access using [auth can-i](https://kubernetes.io/docs/reference/access-authn-authz/authorization/#checking-api-access) command to validate RBAC access.
   
   ```shell
   kubectl --namespace bookstore auth can-i get pods --as=jane
@@ -577,7 +577,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
       ![Screenshot showing Hello-Arc app and shell GitOps](./k3s_gitops11.png)
 
-- Deploy Kubernetes RBAC configuration on the hell-arc application to limit access to deployed Kubernetes resources.
+- Deploy Kubernetes RBAC configuration on the hello-arc application to limit access to deployed Kubernetes resources.
 
   - Browse to the _K3sRBAC.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
     - Log in to your Azure subscription using the SPN credentials
@@ -612,7 +612,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
     ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac04.png)
 
-  - Validate the RBAC role to delete the pods as user Jane.
+  - Test the RBAC role assignment, if user Jane can delete the pods. The operation fails, as the user, Jane is assigned to the role of pod-reader. The pod-reader role only allows get, watch and list permissions in the hello-arc namespace.
 
     ```shell
     $pod=kubectl --namespace hello-arc get pods --selector=app=hello-arc --output="jsonpath={.items..metadata.name}"
