@@ -105,7 +105,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - User remotes into Client Windows VM, which automatically kicks off multiple scripts that:
   - Deploys OSM Extension on the _ArcBox-CAPI-Data_ cluster, create application namespaces and add namespaces to OSM control plane.
   - Applies five GitOps configurations on the _ArcBox-CAPI-Data_ cluster to deploy nginx-ingress controller, Hello Arc web application, Bookstore application and Bookstore RBAC/OSM configurations.
-  - Creates certificate with DNS name _arcbox.k3sdevops.com_ and imports to Azure Key Vault.
+  - Creates certificate with DNS name _arcbox.devops.com_ and imports to Azure Key Vault.
   - Deploys Azure Key Vault Secrets Provider extension on the _ArcBox-CAPI-Data_ cluster.
   - Configures Ingress for Hello-Arc and Bookstore application with a self-signed TLS certificate from the Key Vault.  
   - Deploy an Azure Monitor workbook that provides example reports and metrics for monitoring ArcBox components
@@ -379,7 +379,7 @@ Within 30 minutes Microsoft Defender for Cloud will detect this event and trigge
 
   ![Screenshot showing Azure Arc extensions ](./capi_keyvault01.png)
 
-- Click on the _DevOps Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.k3sdevops.com_ used from the Key Vault.
+- Click on the _DevOps Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.devops.com_ used from the Key Vault.
 
   ![Screenshot showing Hello-Arc desktop Icon](./capi_keyvault02.png)
 
@@ -512,9 +512,15 @@ ArcBox uses a GitOps configuration on the OSM bookstore application to split tra
 
 Optionally, you can explore additional GitOps and RBAC scenarios in a manual fashion using the _ArcBox-K3s_ cluster. When remoted into the _ArcBox-Client_ virtual machine, here are some things to try:
 
-- Configure GitOps flow for Hello-Arc application on the _ArcBox-k3s_ cluster.
+- Browse to the Azure Portal and notice how currently there is no GitOps configuration and Flux extension on _ArcBox-K3s_ cluster.
+  
+  ![Screenshot showing K3s cluster extensions](./k3s_gitops01.png)
 
-  - Browse to the _K3sGitOps.ps1_ script placed under _C:\ArcBox\GitOps_. Optionally you can open with VSCode to review the script. The script will:
+  ![Screenshot showing K3s cluster GitOps](./k3s_gitops02.png)
+
+- Deploy multiple GitOps configurations on the _ArcBox-k3s_ cluster.
+
+  - Browse to the _K3sGitOps.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
     - Log in to your Azure subscription using the SPN credentials
     - Connect to _ArcBox-k3s_ cluster
     - Create the GitOps configurations to deploy the Flux extension, NGINX ingress controller and the “Hello Arc” application
@@ -524,26 +530,30 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
     - Deploy an Ingress Resource referencing the Secret created by the CSI driver
     - Create an icon for the Hello-Arc application on the desktop
   
-  - Execute the script.
+  - Optionally, you can open the script with VSCode to review.
+  
+    ![Screenshot showing Script VSCode](./k3s_gitops03.png)
+  
+  - Right click _K3sGitOps.ps1_ script and select Run with PowerShell to execute the script.
+  
+    ![Screenshot showing Script execution](./k3s_gitops04.png)
 
-    ```shell
-    C:\ArcBox\GitOps\K3sGitOps.ps1
-    ```
+  - You can verify that Azure Key Vault Secrets Provider and Flux (GitOps) extensions are now enabled in the extension tab section of the _ArcBox-k3s_ cluster resource in Azure.
 
-  - You can now see that Azure Key Vault Secrets Provider and Flux (GitOps) extensions are now enabled in the extension tab section of the _ArcBox-k3s_ cluster resource in Azure.
+    ![Screenshot showing K3s cluster extensions](./k3s_gitops05.png)
 
-    ![Screenshot showing Hello-Arc App](./k3s_gitops06.png)
-
-  - Click on the _K3s Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate used from Key Vault _`https://arcbox.k3sdevops.com/`_
-
-    ![Screenshot showing Hello-Arc App](./k3s_gitops07.png)
-
-  - You can can verify below GitOps configurations applied on the _ArcBox-k3s_ cluster.
+  - You can verify below GitOps configurations applied on the _ArcBox-k3s_ cluster.
   
     - config-nginx to deploy NGINX-ingress controller
     - config-helloarc to deploy the "Hello Arc" web application
   
-      ![Screenshot showing Azure Arc GitOps configurations](./k3s_gitops08.png)
+    ![Screenshot showing Azure Arc GitOps configurations](./k3s_gitops06.png)
+
+  - Click on the _K3s Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.k3sdevops.com_ used from Key Vault.
+  
+    ![Screenshot showing Hello-Arc App Icon](./k3s_gitops07.png)
+
+    ![Screenshot showing Hello-Arc App](./k3s_gitops08.png)
   
   - To show the GitOps flow for Hello-Arc application open 2 side-by-side browser windows.
   
@@ -559,7 +569,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
   
       ![Screenshot showing Hello-Arc app and shell](./k3s_gitops09.png)
   
-    - In your fork of the “Azure Arc Jumpstart Apps” repository, open the hello_arc.yaml file (/hello-arc/yaml/hello_arc.yaml). Change the text under the “MESSAGE” section and commit the change.
+    - In your fork of the “Azure Arc Jumpstart Apps” repository, open the hello_arc.yaml file (/hello-arc/yaml/hello_arc.yaml). Change the replica to 2 and text under the “MESSAGE” section and commit the change.
 
       ![Screenshot showing hello-arc repo](./k3s_gitops10.png)
 
@@ -567,24 +577,22 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
       ![Screenshot showing Hello-Arc app and shell GitOps](./k3s_gitops11.png)
 
-- Deploy RBAC configuration for Hello-Arc application on the _ArcBox-k3s_ cluster.
+- Deploy Kubernetes RBAC configuration on the hell-arc application to limit access to deployed Kubernetes resources.
 
-  - Browse to the _K3sRBAC.ps1_ script placed under _C:\ArcBox\GitOps_. you can open with VSCode to review the script. The script will:
+  - Browse to the _K3sRBAC.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
     - Log in to your Azure subscription using the SPN credentials
     - Connect to _ArcBox-k3s_ cluster
     - Create the GitOps configurations to deploy the RBAC configurations for hello-arc namespace
 
-  - Execute the script.
-
-    ```shell
-    C:\ArcBox\GitOps\K3sRBAC.ps1
-    ```
+  - Right click _K3sGitOps.ps1_ script and select Run with PowerShell to execute the script.
+  
+    ![Screenshot showing Hello-Arc App](./k3s_rbac01.png)
 
   - You can can verify below GitOps configurations applied on the _ArcBox-k3s_ cluster.
   
     - config-helloarc-rbac to deploy the "Hello-Arc" namespace RBAC.
   
-      ![Screenshot showing Azure Arc GitOps configurations](./k3s_rbac01.png)
+      ![Screenshot showing Azure Arc GitOps RBAC](./k3s_rbac02.png)
 
   - Show the hello-arc Namespace Role and Role Binding.
   
@@ -594,7 +602,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
     kubectl --namespace hello-arc get rolebindings.rbac.authorization.k8s.io
     ```
 
-    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac02.png)
+    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac03.png)
 
   - Validate the RBAC role to get the pods as user Jane.
 
@@ -602,16 +610,16 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
     kubectl --namespace hello-arc get pods --as=jane
     ```
 
-    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac03.png)
+    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac04.png)
 
   - Validate the RBAC role to delete the pods as user Jane.
 
     ```shell
-    pod=$(kubectl --namespace hello-arc get pods --selector=app=hello-arc --output=jsonpath={.items..metadata.name})
+    $pod=kubectl --namespace hello-arc get pods --selector=app=hello-arc --output="jsonpath={.items..metadata.name}"
     kubectl --namespace hello-arc delete pods $pod --as=jane
     ```
 
-    ![Screenshot showing hello-arc RBAC delete pods](./k3s_rbac04.png)
+    ![Screenshot showing hello-arc RBAC delete pods](./k3s_rbac05.png)
 
 ### ArcBox Azure Monitor workbook
 
