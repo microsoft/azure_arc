@@ -3,7 +3,7 @@ kind: ServiceAccount
 metadata:
   name: sa-arc-controller
 ---
-apiVersion: arcdata.microsoft.com/v3
+apiVersion: arcdata.microsoft.com/v4
 kind: DataController
 metadata:
   generation: 1
