@@ -316,7 +316,46 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (48 total)**
 
-- Open a remote desktop connection into _ArcBox-Client_. Upon logging in, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
+### Connecting to the ArcBox Client VM
+
+You can connect to the Client VM in 3 ways depending on how you've deployed ArcBox.
+
+#### Connect using RDP
+
+- If you have not chosen to deploy Azure Bastion in the ARM template, enable the RDP port in the NSG and RDP to the VM using its public IP.
+
+  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./RdpNsg_blocked.png)
+
+  ![Screenshot showing adding a new inbound security rule](./Nsgb_add_rule.png)
+
+  ![Screenshot showing adding a new allow RDP inbound security rule](./Nsg_add_Rdp_rule.png)
+
+  ![Screenshot showing all inbound security rule](./RdpNsg_all_Rules.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+
+- Once you log into the client VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
+
+#### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./bastion_connect.png)
+
+- Once you log into the client VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
+#### Connect using just-in-time access(JIT)
+
+If you already have Microsoft Defender for servers enabled on your subscription and would like to use JIT to access the Client VM. Use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./JIT_allowing_RDP.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./jit_connect_rdp.png)
+
+- Once you log into _ArcBox-Client_, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
 
   ![Screenshot showing ArcBox-Client](./automation5.png)
 

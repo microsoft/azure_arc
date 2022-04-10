@@ -357,8 +357,6 @@ After deployment, you should see the ArcBox resources inside your resource group
 
   ![Screenshot showing all deployed resources in the resource group](./deployedResources.png)
 
-  > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (48 total)**
-
 ### Connecting to the ArcBox Client VM
 
 You can connect to the Client VM in 3 ways depending on how you've deployed ArcBox.
@@ -398,7 +396,7 @@ If you already have Microsoft Defender for servers enabled on your subscription 
 
   ![Screenshot showing connecting to the VM using JIT](./jit_connect_rdp.png)
 
-- Once you log into the client VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
+- Once you log into _ArcBox-Client_, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
 ## Using ArcBox
 
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the client VM, here are some things to try:
