@@ -19,5 +19,5 @@ jobs:
       - uses: EddieHubCommunity/gh-action-community/src/welcome@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: 'Hey @contributor_name! Thanks for opening this issue. We appreciate your contribution and welcome you to our community! We are glad to have you here and to have your input on the Azure Arc Jumpstart.'
-          pr-message: 'Hi @contributor_name! And thank you for opening your this Pull Request. Someone will review it soon. Thank you for committing to making the Azure Arc Jumpstart better.'
+          issue-message: 'Hey friend! Thanks for opening this issue. We appreciate your contribution and welcome you to our community! We are glad to have you here and to have your input on the Azure Arc Jumpstart.'
+          pr-message: 'Hi friend! Thanks you for opening this Pull Request. Someone will review it soon. Thank you for committing to making the Azure Arc Jumpstart better.'
