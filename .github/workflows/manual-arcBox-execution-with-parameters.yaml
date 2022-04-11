@@ -51,7 +51,7 @@ jobs:
   BashScriptAnalyzerTool:
     runs-on: ubuntu-latest
     env:
-      ExcludeRules: SC2148,SC2116,SC2044
+      ExcludeRules: SC2148,SC2116,SC2044,SC2129
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -147,37 +147,16 @@ jobs:
       - name: Deploy ArcBox - Terraform
         if: github.event.inputs.mechanism == 'Terraform'
         run: |
-          cd azure_jumpstart_arcbox
-          cd terraform
-          echo "${{secrets.SSH_RSA_PUBLIC_KEY}}" > ./rsa.pub
-          path=$(realpath ./rsa.pub)
-
-          > azure_jumpstart_arcbox\terraform\terraform.tfvars
-          echo "resource_group_name=\"${{ github.event.inputs.resourceGroupName }}\"" >> terraform.tfvars
-          echo "azure_location=\"${{ github.event.inputs.location }}\"" >> terraform.tfvars
-          echo "spn_client_id=\"${{secrets.SPN_CLIENT_ID}}\"" >> terraform.tfvars
-          echo "spn_client_secret=\"${{secrets.SPN_CLIENT_SECRET}}\"" >> terraform.tfvars
-          echo "spn_tenant_id=\"${{secrets.SPN_TENANT_ID}}\"" >> terraform.tfvars
-          echo "user_ip_address=\"${{ github.event.inputs.myPublicIp }}\"" >> terraform.tfvars
-          echo "client_admin_ssh=\"$path\"" >> terraform.tfvars
-          echo "client_admin_username=\"${{ github.event.inputs.windowsAdminUsername }}\"" >> terraform.tfvars
-          echo "client_admin_password=\"${{secrets.WINDOWS_ADMIN_PASSWORD}}\"" >> terraform.tfvars
-          echo "deployment_flavor=\"${{ github.event.inputs.flavor }}\"" >> terraform.tfvars
-          echo "workspace_name=\"${{ github.event.inputs.logAnalyticsWorkspaceName }}\"" >>terraform.tfvars
-          echo "github_repo=\"${GITHUB_REPOSITORY_OWNER}\"" >>terraform.tfvars
-          echo "github_branch=\"${{ github.event.inputs.githubBranch }}\"" >>terraform.tfvars
-          echo "deploy_bastion=\"${{ github.event.inputs.deployBastion }}\"" >>terraform.tfvars
-
-          export ARM_CLIENT_ID="${{secrets.SPN_CLIENT_ID}}"
-          export ARM_CLIENT_SECRET="${{secrets.SPN_CLIENT_SECRET}}"
-          export ARM_SUBSCRIPTION_ID="${{secrets.SPN_SUBSCRIPTION_ID}}"
-          export ARM_TENANT_ID="${{secrets.SPN_TENANT_ID}}"
-          terraform init -input=false
-          terraform plan -out=infra.out
-          terraform apply -input=false "infra.out"
-
-          cd ..
-          cd ..
+          chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/TerraformDeploy.sh
+          ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/TerraformDeploy.sh ./azure_jumpstart_arcbox/terraform \
+                 "${{ github.event.inputs.resourceGroupName }}"  "${{ github.event.inputs.location }}" \
+                 "${{secrets.SPN_CLIENT_ID}}" "${{secrets.SPN_CLIENT_SECRET}}" \
+                 "${{secrets.SPN_TENANT_ID}}" "${{ github.event.inputs.myPublicIp }}" \
+                 "${{secrets.SSH_RSA_PUBLIC_KEY}}" "${{ github.event.inputs.windowsAdminUsername }}" \
+                 "${{secrets.WINDOWS_ADMIN_PASSWORD}}" "${{ github.event.inputs.flavor }}" \
+                 "${{ github.event.inputs.logAnalyticsWorkspaceName }}" "${GITHUB_REPOSITORY_OWNER}" \
+                 "${{ github.event.inputs.githubBranch }}" "${{ github.event.inputs.deployBastion }}" \
+                 "${{secrets.SPN_SUBSCRIPTION_ID}}" 
       - name: Add NSG Rule to open our SSH Port (2204) and Run Command requires connectivity to Azure public IP addresses
         uses: Azure/cli@v1.0.6
         with:
@@ -218,42 +197,45 @@ jobs:
         run: |
           plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'powershell -InputFormat None -F C:\ArcBox\MonitorWorkbookLogonScript.ps1'
       - name: Download logs from VM
+        if:  success() || failure()
         run: |
-          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'
+          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'  || echo "Bootstrap.log not able to be downloaded"
           if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'ITPro' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\ArcServersLogonScript.log' '.'
+           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\ArcServersLogonScript.log' '.' || echo "ArcServersLogonScript.log not able to be downloaded"
           fi
           if [ '${{ github.event.inputs.flavor }}' == 'Full' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DataServicesLogonScript.log' '.'
+           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DataServicesLogonScript.log' '.' || echo "DataServicesLogonScript.log not able to be downloaded"
           fi 
           if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'DevOps' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DevOpsLogonScript.log' '.'
+           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DevOpsLogonScript.log' '.' || echo "DevOpsLogonScript.log not able to be downloaded"
           fi           
-          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\MonitorWorkbookLogonScript.log' '.'
+          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\MonitorWorkbookLogonScript.log' '.' || echo "MonitorWorkbookLogonScript.log not able to be downloaded"
       - name: Upload Bootstrap.log File
+        if:  success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: Bootstrap.log
           path: Bootstrap.log
       - name: Upload ArcServersLogonScript.log File
         uses: actions/upload-artifact@v3
-        if: github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'ITPro'
+        if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'ITPro') &&  (success() || failure())
         with:
           name: ArcServersLogonScript.log
           path: ArcServersLogonScript.log
       - name: Upload DataServicesLogonScript.log File
         uses: actions/upload-artifact@v3
-        if: github.event.inputs.flavor == 'Full'
+        if: github.event.inputs.flavor == 'Full' &&  (success() || failure())
         with:
           name: DataServicesLogonScript.log
           path: DataServicesLogonScript.log
       - name: Upload DevOpsLogonScript.log File
         uses: actions/upload-artifact@v3
-        if: github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps'
+        if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: DevOpsLogonScript.log
           path: DevOpsLogonScript.log                
       - name: Upload MonitorWorkbookLogonScript.log File
+        if:  success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: MonitorWorkbookLogonScript.log
