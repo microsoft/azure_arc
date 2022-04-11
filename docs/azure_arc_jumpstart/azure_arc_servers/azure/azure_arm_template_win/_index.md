@@ -102,7 +102,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     3. Disable and prevent Windows Server Manager from running on startup.
 
-4. User RDP to Windows VM which will start the *LogonScript* script execution and will onboard the VM to Azure Arc.
+4. User RDP or connect using Azure Bastion to Windows VM which will start the *LogonScript* script execution and will onboard the VM to Azure Arc.
 
 ## Deployment
 
@@ -144,9 +144,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-* Now that the Windows Server VM is created, it is time to login to it. Using its public IP, RDP to the VM.
+* Now that the Windows Server VM is created, it is time to log in to it. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
 
     ![Screenshot Azure VM public IP address](./03.jpg)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Screenshot Azure VM Bastion connectivity](./04.jpg)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
@@ -154,22 +158,22 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     > **Note: The script run time is ~1-2min long.**
 
-    ![Screenshot script output](./04.jpg)
-
     ![Screenshot script output](./05.jpg)
 
     ![Screenshot script output](./06.jpg)
 
     ![Screenshot script output](./07.jpg)
 
+    ![Screenshot script output](./08.jpg)
+
 * Upon successful run, a new Azure Arc-enabled server will be added to the resource group.
 
-![Screenshot Azure Arc-enabled server on resource group](./08.jpg)
+![Screenshot Azure Arc-enabled server on resource group](./09.jpg)
 
-![Screenshot Azure Arc-enabled server details](./09.jpg)
+![Screenshot Azure Arc-enabled server details](./10.jpg)
 
 ## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
 
-![Screenshot delete resource group](./10.jpg)
+![Screenshot delete resource group](./11.jpg)

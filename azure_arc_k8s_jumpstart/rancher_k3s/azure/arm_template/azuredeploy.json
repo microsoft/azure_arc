@@ -51,7 +51,7 @@
             "metadata": {
                 "description": "Unique SPN tenant ID"
             }
-        },                         
+        },
         "ubuntuOSVersion": {
             "type": "string",
             "defaultValue": "18.04-LTS",
@@ -95,6 +95,12 @@
             "defaultValue": "Arc-K3s-Demo-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
+            }
+        },
+        "myIpAddress": {
+            "type": "string",
+            "metadata": {
+                "description": "Your IP address"
             }
         }
     },
@@ -163,7 +169,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -220,7 +226,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "443"
                         }
-                    }, 
+                    },
                     {
                         "name": "allow_k8s_kubelet",
                         "properties": {
@@ -246,7 +252,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "32323"
                         }
-                    }                                                                                                                       
+                    }
                 ]
             }
         },
@@ -332,27 +338,27 @@
             }
         },
         {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
-          "name": "[concat(variables('vmName'),'/installscript_k3s')]",
-          "apiVersion": "2019-07-01",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.1",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "timestamp": 123456789
-            },
-            "protectedSettings": {
-            "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', parameters('location'))]",
-            "fileUris": ["https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh"]
-            }            
-          }
-        }                                  
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/installscript_k3s')]",
+            "apiVersion": "2019-07-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.1",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "timestamp": 123456789
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', parameters('location'))]",
+                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh" ]
+                }
+            }
+        }
     ],
     "outputs": {
         "adminUsername": {

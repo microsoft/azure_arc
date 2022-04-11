@@ -2,7 +2,7 @@
 type: docs
 title: "Azure Automanage"
 linkTitle: "Azure Automanage"
-weight: 9
+weight: 10
 description: >
 ---
 
