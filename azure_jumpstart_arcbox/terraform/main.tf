@@ -62,11 +62,6 @@ variable "workspace_name" {
   default     = "ArcBox-Workspace"
 }
 
-variable "user_ip_address" {
-  type        = string
-  description = "Users public IP address, used to RDP to the client VM."
-}
-
 variable "github_username" {
   type        = string
   description = "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
@@ -188,7 +183,6 @@ module "client_vm" {
   vm_name              = var.client_vm_name
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
-  user_ip_address      = var.user_ip_address
   template_base_url    = local.template_base_url
   storage_account_name = module.management_storage.storage_account_name
   workspace_name       = var.workspace_name
@@ -218,7 +212,6 @@ module "capi_vm" {
   vm_name              = var.capi_vm_name
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
-  user_ip_address      = var.user_ip_address
   template_base_url    = local.template_base_url
   storage_account_name = module.management_storage.storage_account_name
   spn_client_id        = var.spn_client_id
@@ -244,7 +237,6 @@ module "rancher_vm" {
   vm_name              = var.rancher_vm_name
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
-  user_ip_address      = var.user_ip_address
   template_base_url    = local.template_base_url
   storage_account_name = module.management_storage.storage_account_name
   spn_client_id        = var.spn_client_id
