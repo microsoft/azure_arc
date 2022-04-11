@@ -1,0 +1,19 @@
+vsphereprovider:
+  appliancevm:
+    vmtemplate: arc-appliance-template
+  datacenter: ArcPrivateClouds-67
+  datastore: Shared 15TB-1
+  disksizegib: 25
+  folder: /ArcPrivateClouds-67/vm/JumpBoxFolder
+  memorymib: 16384
+  network:
+    dnsservers:
+    - 10.50.50.50
+    - 10.50.10.50
+    gateway: 10.150.168.1
+    ipaddressprefix: 10.150.169.0/22
+    k8snodeippoolend: 10.150.169.121
+    k8snodeippoolstart: 10.150.169.119
+    segment: VM Network
+  numcpus: 4
+  resourcepool: /ArcPrivateClouds-67/host/Cluster2-Standard/Resources

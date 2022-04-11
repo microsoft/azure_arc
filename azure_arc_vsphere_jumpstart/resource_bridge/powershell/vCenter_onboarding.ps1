@@ -57,7 +57,20 @@ Start-Process powershell.exe -verb runas -ArgumentList "Set-ItemProperty -Path H
 
 py -m venv .temp\.env
 
-log "Installing azure cli."
+
+log "Checking previous installations of Azure CLI"
+
+$AzureCLI = Get-WmiObject -Class Win32_Product  | Where-Object{$_.Name -eq "Microsoft Azure CLI"}
+
+If([string]::IsNullOrWhiteSpace($AzureCLI)) {            
+    log "No previous Azure CLI installation was found"           
+} else {            
+    log "Removing Azure CLI current install"
+    $AzureCLI.uninstall()           
+}  
+
+
+log "Installing 64 bit Azure CLI"
 log "This might take a while..."
 
 .temp\.env\Scripts\python.exe -m pip install --upgrade pip wheel setuptools >> $logFile
@@ -68,7 +81,6 @@ log "This might take a while..."
 
 try {
 
-    ########## Add to docs instead
     az provider register -n Microsoft.ResourceConnector --wait
 
     log "Installing az cli extensions for Arc"
