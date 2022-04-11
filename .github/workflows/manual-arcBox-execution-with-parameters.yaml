@@ -59,8 +59,8 @@ jobs:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Validate Bash Script
         run: |
-          chmod +x ./azure_jumpstart_arcbox/artifacts/GHAction/BashStaticCheck.sh
-          ./azure_jumpstart_arcbox/artifacts/GHAction/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts
+          chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/BashStaticCheck.sh
+          ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts
         continue-on-error: true
 
   PowerShellToolkit:
@@ -74,7 +74,7 @@ jobs:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Validate Power Shell
         run: |
-          .\azure_jumpstart_arcbox\artifacts\GHAction\PowerShellStaticCheck.ps1 $Env:ExcludeRules .\azure_jumpstart_arcbox\artifacts
+          .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\PowerShellStaticCheck.ps1 $Env:ExcludeRules .\azure_jumpstart_arcbox\artifacts
         continue-on-error: true
 
   armTemplateToolkit:
@@ -91,11 +91,11 @@ jobs:
           az bicep build --file "azure_jumpstart_arcbox/bicep/main.bicep"
       - name: Check Bicep
         run: |
-          .\azure_jumpstart_arcbox\artifacts\GHAction\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
+          .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
         continue-on-error: true
       - name: Check ARM
         run: |
-          .\azure_jumpstart_arcbox\artifacts\GHAction\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules
+          .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules
         continue-on-error: true
 
   deployValidateAndClean:
@@ -189,8 +189,8 @@ jobs:
         uses: Azure/cli@v1.0.6
         with:
           inlineScript: |
-            chmod +x ./azure_jumpstart_arcbox/artifacts/GHAction/CountResources.sh
-            ./azure_jumpstart_arcbox/artifacts/GHAction/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./azure_jumpstart_arcbox/DeployTestParameters.json
+            chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/CountResources.sh
+            ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./azure_jumpstart_arcbox/DeployTestParameters.json
       - name: Install Open SSH + execute ArcServersLogonScript
         run: |
           az vm run-command invoke -g  ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --command-id RunPowerShellScript --scripts "C:\ArcBox\GHActionDeploy.ps1"
@@ -262,8 +262,8 @@ jobs:
         uses: Azure/cli@v1.0.6
         with:
           inlineScript: |
-            chmod +x ./azure_jumpstart_arcbox/artifacts/GHAction/FinalValidation.sh
-            ./azure_jumpstart_arcbox/artifacts/GHAction/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./azure_jumpstart_arcbox/DeployTestParameters.json
+            chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/FinalValidation.sh
+            ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./azure_jumpstart_arcbox/DeployTestParameters.json
       - name: Delete Resources
         uses: Azure/cli@v1.0.6
         with:
