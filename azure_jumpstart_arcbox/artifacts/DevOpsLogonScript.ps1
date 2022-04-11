@@ -53,6 +53,18 @@ $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceTyp
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
 
+# Downloading 'installCAPI.log' log file
+Write-Host "Downloading 'installCAPI.log' log file"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
+
+# Downloading 'installK3s.log' log file
+Write-Host "Downloading 'installK3s.log' log file"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s.log"
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installK3s.log"
+
 # Merging kubeconfig files from CAPI and Rancher K3s
 Write-Host "Merging kubeconfig files from CAPI and Rancher K3s clusters"
 Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
