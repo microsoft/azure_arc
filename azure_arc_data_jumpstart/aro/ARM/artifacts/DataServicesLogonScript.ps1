@@ -67,7 +67,7 @@ az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 az provider register --namespace Microsoft.AzureArcData --wait
-az provider register -n Microsoft.RedHatOpenShift --wait
+az provider register --namespace Microsoft.RedHatOpenShift --wait
 
 az provider show --namespace Microsoft.Kubernetes -o table
 Write-Host "`n"
