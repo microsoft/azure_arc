@@ -269,3 +269,13 @@ if(-not $ArcServersLogonScript) {
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Unregister-ScheduledTask -TaskName "DevOpsLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
+
+# Executing the deployment logs bundle PowerShell script in a new window
+Invoke-Expression 'cmd /c start Powershell -Command { 
+    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+    Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
+    Start-Sleep -Seconds 5
+    Write-Host "`n"
+    Write-Host "Creating deployment logs bundle"
+    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
+}'
