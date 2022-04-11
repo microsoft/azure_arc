@@ -444,7 +444,7 @@ ArcBox deploys Kubernetes RBAC configuration on the bookstore application to lim
 
   ![Screenshot showing bookstore RBAC get pods](./capi_rbac02.png)
 
-  - Test the RBAC role assignment, if user Jane can delete the pods. The operation fails, as the user, Jane is assigned to the role of pod-reader. The pod-reader role only allows get, watch and list permissions in the bookstore namespace.
+  - Test the RBAC role assignment. As user "Jane" try to delete the pods. The operation fails, as Jane is assigned to the role of pod-reader. The pod-reader role only allows get, watch and list permissions in the bookstore namespace and not delete permissions.
 
   ```shell
   $pod=kubectl --namespace bookstore get pods --selector=app=bookstore --output="jsonpath={.items..metadata.name}"
