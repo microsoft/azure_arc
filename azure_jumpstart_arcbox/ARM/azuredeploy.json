@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "myIpAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address"
-      }
-    },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
@@ -121,9 +115,6 @@
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
           },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
-          },
           "spnClientId": {
             "value": "[parameters('spnClientId')]"
           },
@@ -166,9 +157,6 @@
         "parameters": {
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
-          },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
           },
           "spnClientId": {
             "value": "[parameters('spnClientId')]"
@@ -222,9 +210,6 @@
           },
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
-          },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
           },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
