@@ -397,6 +397,8 @@ If you already have Microsoft Defender for servers enabled on your subscription 
   ![Screenshot showing connecting to the VM using JIT](./jit_connect_rdp.png)
 
 - Once you log into _ArcBox-Client_, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
+
+    ![Screenshot showing ArcBox-Client](./automation.png)
 ## Using ArcBox
 
 After deployment is complete, its time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the client VM, here are some things to try:
