@@ -28,6 +28,15 @@
         },
         "deployBastion": {
             "value": false
+        },
+        "githubUser": {
+            "value": "microsoft"
+        },
+        "githubAccount": {
+            "value": "microsoft"
+        },
+        "githubBranch": {
+            "value": "arcbox_devops"
         }
     }
 }
