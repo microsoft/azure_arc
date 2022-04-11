@@ -1,3 +1,5 @@
+name: Housekeeping - Issues and PRs auto message
+
 on:
   fork:
   push:
