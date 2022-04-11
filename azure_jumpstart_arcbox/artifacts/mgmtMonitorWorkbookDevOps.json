@@ -352,7 +352,7 @@
                 "content": {
                   "version": "KqlParameterItem/1.0",
                   "crossComponentResources": [
-                    "/subscriptions/<subscriptionId>/resourceGroups/workbook/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                    "{LoganalyticWorkspace}"
                   ],
                   "parameters": [
                     {
@@ -424,7 +424,7 @@
                       "label": "Subscription",
                       "type": 6,
                       "isRequired": true,
-                      "value": "/subscriptions/<subscriptionId>",
+                      "value": "/subscriptions/{Subscription}",
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "includeAll": true,
@@ -446,7 +446,7 @@
                       "crossComponentResources": [
                         "{subscription}"
                       ],
-                      "value": "/subscriptions/<subscriptionId>/resourceGroups/workbook/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>",
+                      "value": "/subscriptions/<subscriptionId>/resourceGroups/<resourceGroup>/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>",
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "showDefault": false
@@ -469,7 +469,6 @@
                       "crossComponentResources": [
                         "{subscription}"
                       ],
-                      "value": "/subscriptions/<subscriptionId>/resourceGroups/workbook/providers/Microsoft.Kubernetes/connectedClusters/ArcBox-K3s",
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "showDefault": false
@@ -671,7 +670,7 @@
                       "isRequired": true,
                       "query": "KubePodInventory\r\n{clusterIdWhereClause}\r\n{namespaceWhereClause}\r\n{workloadKindWhereClause}\r\n| distinct ControllerName\r\n| where isnotempty(ControllerName)\r\n| order by ControllerName asc",
                       "crossComponentResources": [
-                        "/subscriptions/<subscriptionId>/resourceGroups/workbook/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                        "{LoganalyticWorkspace}"
                       ],
                       "typeSettings": {
                         "additionalResourceOptions": [
@@ -914,15 +913,12 @@
                   "size": 0,
                   "aggregation": 5,
                   "showAnalytics": true,
-                  "title": "Azure Arc enabled kubernetes - Pod Restart Trend",
-                  "timeContext": {
-                    "durationMs": 0
-                  },
+                  "title": "Azure Arc-enabled Kubernetes - Pod Restart Trend",
                   "timeContextFromParameter": "timeRange",
                   "queryType": 0,
                   "resourceType": "microsoft.operationalinsights/workspaces",
                   "crossComponentResources": [
-                    "/subscriptions/<subscriptionId>/resourceGroups/workbook/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                    "{LoganalyticWorkspace}"
                   ]
                 },
                 "customWidth": "50",
@@ -940,15 +936,12 @@
                   "size": 0,
                   "aggregation": 5,
                   "showAnalytics": true,
-                  "title": "Azure Arc enabled kubernetes - Container restart trend",
-                  "timeContext": {
-                    "durationMs": 0
-                  },
+                  "title": "Azure Arc-enabled Kubernetes - Container restart trend",
                   "timeContextFromParameter": "timeRange",
                   "queryType": 0,
                   "resourceType": "microsoft.operationalinsights/workspaces",
                   "crossComponentResources": [
-                    "/subscriptions/<subscriptionId>/resourceGroups/workbook/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                    "{LoganalyticWorkspace}"
                   ],
                   "visualization": "timechart"
                 },
@@ -1036,15 +1029,12 @@
                   "size": 0,
                   "aggregation": 5,
                   "showAnalytics": true,
-                  "title": "Azure Arc enabled kubernetes - Container Status for Pods",
-                  "timeContext": {
-                    "durationMs": 0
-                  },
+                  "title": "Azure Arc-enabled Kubernetes - Container Status for Pods",
                   "timeContextFromParameter": "timeRange",
                   "queryType": 0,
                   "resourceType": "microsoft.operationalinsights/workspaces",
                   "crossComponentResources": [
-                    "/subscriptions/<subscriptionId>/resourceGroups/workbook/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                    "{LoganalyticWorkspace}"
                   ],
                   "gridSettings": {
                     "formatters": [
@@ -1266,7 +1256,7 @@
                       "name": "Subscription",
                       "type": 6,
                       "isRequired": true,
-                      "value": "/subscriptions/<subscriptionId>",
+                      "value": null,
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "includeAll": true,
@@ -2917,7 +2907,7 @@
         "displayName": "[parameters('workbookDisplayName')]",
         "serializedData": "[string(variables('workbookContent'))]",
         "version": "1.0",
-        "sourceId": "[parameters('workbookSourceId')]",
+        "sourceId": "[parameters('workbookResourceId')]",
         "category": "[parameters('workbookType')]"
       }
     }

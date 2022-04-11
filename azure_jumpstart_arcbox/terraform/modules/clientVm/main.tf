@@ -53,11 +53,6 @@ variable "subnet_name" {
   description = "ArcBox subnet name."
 }
 
-variable "user_ip_address" {
-  type        = string
-  description = "Users public IP address, used to RDP to the client VM."
-}
-
 variable "template_base_url" {
   type        = string
   description = "Base URL for the GitHub repo where the ArcBox artifacts are located."
@@ -139,11 +134,6 @@ variable "deploy_bastion" {
   type       = bool
   description = "Choice to deploy Bastion to connect to the client VM"
   default = false
-}
-
-variable "keyvault_name" {
-  type       = string
-  description = "Name of the KeyVault used for ArcBox DevOps"
 }
 
 ### THESE ARE LEGACY VARIABLES FOR BACKWARDS COMPATIBILITY WITH LEGACY SCRIPT FUNCTIONS ###
@@ -236,17 +226,7 @@ resource "azurerm_network_security_group" "nsg" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
-  security_rule {
-    name                       = "allow_RDP_3389"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "3389"
-    source_address_prefix      =  var.deploy_bastion == true ? local.bastionSubnetIpPrefix : var.user_ip_address
-    destination_address_prefix = "*"
-  }
+  security_rule {}
 }
 
 resource "azurerm_network_interface" "nic" {
@@ -311,7 +291,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${var.template_base_url}artifacts/Bootstrap.ps1"
       ],
-      "commandToExecute": "powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${var.admin_username} -spnClientId ${var.spn_client_id} -spnClientSecret ${var.spn_client_secret} -spnTenantId ${var.spn_tenant_id} -spnAuthority ${var.spn_authority} -subscriptionId ${data.azurerm_subscription.primary.subscription_id} -resourceGroup ${data.azurerm_resource_group.rg.name} -azdataUsername ${var.data_controller_username} -azdataPassword ${var.data_controller_password} -acceptEula ${var.accept_eula} -registryUsername ${var.registry_username} -registryPassword ${var.registry_password} -arcDcName ${var.data_controller_name} -azureLocation ${data.azurerm_resource_group.rg.location} -mssqlmiName ${var.sql_mi_name} -POSTGRES_NAME ${var.postgres_name} -POSTGRES_WORKER_NODE_COUNT ${var.postgres_worker_node_count} -POSTGRES_DATASIZE ${var.postgres_data_size} -POSTGRES_SERVICE_TYPE ${var.postgres_service_type} -stagingStorageAccountName ${var.storage_account_name} -workspaceName ${var.workspace_name} -templateBaseUrl ${var.template_base_url} -flavor ${var.deployment_flavor} -automationTriggerAtLogon ${var.trigger_at_logon} -capiArcDataClusterName ${var.capi_arc_data_cluster_name} -k3sArcClusterName ${var.k3s_arc_cluster_name} -githubUser ${var.github_username} -keyVaultName ${var.keyvault_name}"
+      "commandToExecute": "powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${var.admin_username} -spnClientId ${var.spn_client_id} -spnClientSecret ${var.spn_client_secret} -spnTenantId ${var.spn_tenant_id} -spnAuthority ${var.spn_authority} -subscriptionId ${data.azurerm_subscription.primary.subscription_id} -resourceGroup ${data.azurerm_resource_group.rg.name} -azdataUsername ${var.data_controller_username} -azdataPassword ${var.data_controller_password} -acceptEula ${var.accept_eula} -registryUsername ${var.registry_username} -registryPassword ${var.registry_password} -arcDcName ${var.data_controller_name} -azureLocation ${data.azurerm_resource_group.rg.location} -mssqlmiName ${var.sql_mi_name} -POSTGRES_NAME ${var.postgres_name} -POSTGRES_WORKER_NODE_COUNT ${var.postgres_worker_node_count} -POSTGRES_DATASIZE ${var.postgres_data_size} -POSTGRES_SERVICE_TYPE ${var.postgres_service_type} -stagingStorageAccountName ${var.storage_account_name} -workspaceName ${var.workspace_name} -templateBaseUrl ${var.template_base_url} -flavor ${var.deployment_flavor} -automationTriggerAtLogon ${var.trigger_at_logon} -capiArcDataClusterName ${var.capi_arc_data_cluster_name} -k3sArcClusterName ${var.k3s_arc_cluster_name} -githubUser ${var.github_username}"
     }
 SETTINGS
 }

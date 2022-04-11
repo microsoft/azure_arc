@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "myIpAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address"
-      }
-    },
     "sshRSAPublicKey": {
       "type": "securestring",
       "metadata": {
@@ -90,7 +84,7 @@
       "metadata": {
         "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
-      "defaultValue": "your-repository"
+      "defaultValue": "microsoft"
     }
   },
   "variables": {
@@ -120,9 +114,6 @@
         "parameters": {
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
-          },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
           },
           "spnClientId": {
             "value": "[parameters('spnClientId')]"
@@ -167,9 +158,6 @@
           "sshRSAPublicKey": {
             "value": "[parameters('sshRSAPublicKey')]"
           },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
-          },
           "spnClientId": {
             "value": "[parameters('spnClientId')]"
           },
@@ -199,7 +187,6 @@
       "apiVersion": "2019-10-01",
       "name": "clientVmDeployment",
       "dependsOn": [
-        "mgmtArtifactsAndPolicyDeployment",
         "stagingStorageAccountDeployment"
       ],
       "properties": {
@@ -224,9 +211,6 @@
           "spnTenantId": {
             "value": "[parameters('spnTenantId')]"
           },
-          "myIpAddress": {
-            "value": "[parameters('myIpAddress')]"
-          },
           "workspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
@@ -244,9 +228,6 @@
           },
           "githubUser": {
             "value": "[parameters('githubUser')]"
-          },
-          "keyVaultName": {
-            "value": "[reference('mgmtArtifactsAndPolicyDeployment').outputs.keyVaultName.value]"
           }
         }
       }
@@ -285,9 +266,6 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
-          },
-          "spnTenantId": {
-            "value": "[parameters('spnTenantId')]"
           }
         }
       }

@@ -1,6 +1,3 @@
-@description('IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address')
-param myIpAddress string
-
 @description('RSA public key used for securing SSH access to ArcBox resources')
 @secure()
 param sshRSAPublicKey string
@@ -44,8 +41,8 @@ param githubBranch string = 'main'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('Target GitHub account for DevOps flavor')
-param githubUser string = 'your-repository'
+@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
+param githubUser string = 'microsoft'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
@@ -53,7 +50,6 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
   name: 'ubuntuCAPIDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    myIpAddress: myIpAddress
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
@@ -69,7 +65,6 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
   name: 'ubuntuRancherDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    myIpAddress: myIpAddress
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
@@ -89,7 +84,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
-    myIpAddress: myIpAddress
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
@@ -97,7 +91,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
     deployBastion: deployBastion
     githubUser: githubUser
-    keyVaultName: mgmtArtifactsAndPolicyDeployment.outputs.keyVaultName
   }
 }
 
@@ -112,7 +105,6 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     workspaceName: logAnalyticsWorkspaceName
     flavor: flavor
     deployBastion: deployBastion
-    spnTenantId: spnTenantId
   }
 }
 

@@ -2,12 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "myIpAddress": {
-            "type": "string",
-            "metadata": {
-                "description": "Your public IP address, used to RDP to the client VM"
-            }
-        },
         "vmName": {
             "type": "string",
             "defaultValue": "ArcBox-CAPI-MGMT",
@@ -175,21 +169,7 @@
             "name": "[parameters('networkSecurityGroupName')]",
             "location": "[parameters('azureLocation')]",
             "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_SSH",
-                        "properties": {
-                            "priority": 1001,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetIpPrefix'),parameters('myIpAddress'))]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "22"
-                        }
-                    }
-                ]
+                "securityRules": []
             }
         },
         {

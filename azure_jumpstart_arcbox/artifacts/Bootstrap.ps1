@@ -23,7 +23,6 @@ param (
     [string]$capiArcDataClusterName,
     [string]$k3sArcClusterName,
     [string]$githubUser,
-    [string]$keyVaultName,
     [string]$templateBaseUrl,
     [string]$flavor,
     [string]$automationTriggerAtLogon
@@ -57,7 +56,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('capiArcDataClusterName', $capiArcDataClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('githubUser', $githubUser,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('keyVaultName', $keyVaultName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('flavor', $flavor,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon,[System.EnvironmentVariableTarget]::Machine)
@@ -129,7 +127,7 @@ workflow ClientTools_01
                     foreach ($app in $appsToInstall)
                     {
                         Write-Host "Installing $app"
-                        & choco install $app /y -Force| Write-Output
+                        & choco install $app /y -Force | Write-Output
                     }
                 }                        
             }
@@ -224,7 +222,7 @@ if ($flavor -eq "Full") {
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
-if ($flavor -eq "Full" -Or $flavor -eq "DevOps") {
+if ($flavor -eq "DevOps") {
     # Creating scheduled task for DevOpsLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn 
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1

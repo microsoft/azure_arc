@@ -150,3 +150,11 @@ Once configured, the report will provide an overview of the secure score, you ca
      ![Resources changed overtime](./security_changes.png)
 
      ![Resources changed overtime selected resources](./security_changes_resource.png)
+
+- _Machines not reporting to Log Analytics workspace_ - this has four lists of machines that are not sending heartbeats to the Log Analytics workspace in different periods of time: 15 minutes, 24 hours, 48 hours and 7 days. Please not that there are no machines listed on the image as all of them are properly sending heartbeats to the workspace.
+
+   ![Machines not reporting](./agentmgmt_machinesnotreport.png)
+
+- _Security status_ - has a full report of Azure VMs and Azure Arc enabled-servers security configurations including its Log Analytics workspace and the agent status.
+
+   ![Security Status](./agentmgmt_securitystatus.png)

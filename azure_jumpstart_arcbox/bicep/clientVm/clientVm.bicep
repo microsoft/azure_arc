@@ -1,6 +1,3 @@
-@description('Your public IP address, used to RDP to the client VM')
-param myIpAddress string
-
 @description('The name of your Virtual Machine')
 param vmName string = 'ArcBox-Client'
 
@@ -88,11 +85,11 @@ param flavor string = 'Full'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('GitHub User for devops scenario')
+@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
 param githubUser string
 
-@description('Key vault name, when the key vault is deployed')
-param keyVaultName string
+@description('The name of the K3s cluster')
+param k3sArcClusterName string = 'ArcBox-K3s'
 
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
@@ -128,21 +125,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   name: networkSecurityGroupName
   location: location
   properties: {
-    securityRules: [
-      {
-        name: 'allow_RDP_3389'
-        properties: {
-          priority: 1001
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: deployBastion == true ? bastionSubnetIpPrefix : myIpAddress
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '3389'
-        }
-      }
-    ]
+    securityRules: []
   }
 }
 
@@ -219,7 +202,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -flavor ${flavor} -capiArcDataClusterName ${capiArcDataClusterName} -githubUser ${githubUser} -keyVaultName ${keyVaultName}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -flavor ${flavor} -capiArcDataClusterName ${capiArcDataClusterName} -k3sArcClusterName ${k3sArcClusterName} -githubUser ${githubUser}'
     }
   }
 }

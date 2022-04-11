@@ -73,16 +73,25 @@ Copy-Item "$Env:TempDir\windows-amd64\osm.exe" -Destination $Env:ToolsDir
 [System.Environment]::SetEnvironmentVariable('PATH', $Env:PATH + ";$Env:ToolsDir" ,[System.EnvironmentVariableTarget]::Machine)
 $Env:PATH += ";$Env:ToolsDir"
 
+# Create random 13 character string for KeyVault name
+$strLen = 13
+$randStr = (-join ((0x30..0x39) + (0x61..0x7A) | Get-Random -Count $strLen | ForEach-Object {[char]$_}))
+$Env:keyVaultName = "ArcBox-KV-$randStr"
+
+[System.Environment]::SetEnvironmentVariable('keyVaultName', $Env:keyVaultName, [System.EnvironmentVariableTarget]::Machine)
+
+# Create Azure KeyVault
+Write-Host "Creating Azure Key Vault"
+az keyvault create --name $Env:keyVaultName --resource-group $Env:resourceGroup --location $Env:azureLocation
+
 # Allow SPN to import certificates into KeyVault
-az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --secret-permissions get --certificate-permissions get list import
+Write-Host "Setting Azure Key Vault access policies"
+az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --key-permissions --secret-permissions get --certificate-permissions get list import
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
-
-az extension add --name k8s-extension
-az extension add --name k8s-configuration
 
 # "Create OSM Kubernetes extension instance"
 az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --release-train pilot --name $osmMeshName
