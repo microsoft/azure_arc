@@ -23,8 +23,6 @@ param vmSize string = 'Standard_D4s_v4'
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-@description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'ArcBox-K3s-NSG'
 param resourceTags object = {
   Project: 'jumpstart_arcbox'
 }
@@ -73,96 +71,6 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
           }
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: deployBastion== false  ? PublicIPNoBastion : json('null')
-        }
-      }
-    ]
-    networkSecurityGroup: {
-      id: networkSecurityGroup.id
-    }
-  }
-}
-
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
-  name: networkSecurityGroupName
-  location: azureLocation
-  properties: {
-    securityRules: [
-      {
-        name: 'allow_k8s_6443'
-        properties: {
-          priority: 1002
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '6443'
-        }
-      }
-      {
-        name: 'allow_k8s_80'
-        properties: {
-          priority: 1003
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '80'
-        }
-      }
-      {
-        name: 'allow_k8s_8080'
-        properties: {
-          priority: 1004
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '8080'
-        }
-      }
-      {
-        name: 'allow_k8s_443'
-        properties: {
-          priority: 1005
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '443'
-        }
-      }
-      {
-        name: 'allow_k8s_kubelet'
-        properties: {
-          priority: 1006
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '10250'
-        }
-      }
-      {
-        name: 'allow_traefik_lb_external'
-        properties: {
-          priority: 1007
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '32323'
         }
       }
     ]

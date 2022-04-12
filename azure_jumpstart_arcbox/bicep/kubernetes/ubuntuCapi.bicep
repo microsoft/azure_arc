@@ -26,8 +26,6 @@ param vmSize string = 'Standard_D4s_v4'
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-@description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'ArcBox-CAPI-MGMT-NSG'
 param resourceTags object = {
   Project: 'jumpstart_arcbox'
 }
@@ -78,17 +76,6 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
         }
       }
     ]
-    networkSecurityGroup: {
-      id: networkSecurityGroup.id
-    }
-  }
-}
-
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
-  name: networkSecurityGroupName
-  location: azureLocation
-  properties: {
-    securityRules: []
   }
 }
 
