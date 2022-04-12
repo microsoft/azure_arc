@@ -34,10 +34,6 @@ on:
         description: "Name of log Analytics Workspace"
         required: true
         default: "MyAnalyticsWorkspace123"
-      myPublicIp:
-        description: "your public ip to allow access by RDP"
-        required: true
-        default: "45.191.156.175"
       windowsAdminUsername:
         description: "Windows admin username"
         required: true
@@ -60,8 +56,13 @@ jobs:
       - name: Validate Bash Script
         run: |
           chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/BashStaticCheck.sh
-          ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts
+          ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts | tee bash-lint-result.txt
         continue-on-error: true
+      - name: Upload Bash Lint Results File
+        uses: actions/upload-artifact@v3
+        with:
+          name: bash-lint-result.txt
+          path: bash-lint-result.txt     
 
   PowerShellToolkit:
     runs-on: windows-latest
@@ -74,8 +75,15 @@ jobs:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Validate Power Shell
         run: |
+          Start-Transcript -path ps-lint-result.txt -append
           .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\PowerShellStaticCheck.ps1 $Env:ExcludeRules .\azure_jumpstart_arcbox\artifacts
+          Stop-Transcript
         continue-on-error: true
+      - name: Upload PowerShell Lint Results File
+        uses: actions/upload-artifact@v3
+        with:
+          name: ps-lint-result.txt
+          path: ps-lint-result.txt    
 
   armTemplateToolkit:
     runs-on: windows-latest
@@ -91,12 +99,27 @@ jobs:
           az bicep build --file "azure_jumpstart_arcbox/bicep/main.bicep"
       - name: Check Bicep
         run: |
+          Start-Transcript -path bicep-lint-result.txt -append
           .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
+          Stop-Transcript
         continue-on-error: true
+      - name: Upload Bicep Lint Results File
+        uses: actions/upload-artifact@v3
+        with:
+          name: bicep-lint-result.txt
+          path: bicep-lint-result.txt    
+
       - name: Check ARM
         run: |
-          .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules
+          Start-Transcript -path arm-lint-result.txt -append
+          .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules | tee arm-lint-result.txt
+          Stop-Transcript
         continue-on-error: true
+      - name: Upload Bicep Lint Results File
+        uses: actions/upload-artifact@v3
+        with:
+          name: arm-lint-result.txt
+          path: arm-lint-result.txt  
 
   deployValidateAndClean:
     runs-on: ubuntu-latest
@@ -110,7 +133,6 @@ jobs:
           echo "resourceGroupName selected: ${{ github.event.inputs.resourceGroupName }}"
           echo "location selected: ${{ github.event.inputs.location }}"
           echo "logAnalyticsWorkspaceName selected: ${{ github.event.inputs.logAnalyticsWorkspaceName }}"
-          echo "myPublicIp selected: ${{ github.event.inputs.myPublicIp }}"
           echo "windowsAdminUsername selected: ${{ github.event.inputs.windowsAdminUsername }}"
           echo "deployBastion selected: ${{ github.event.inputs.deployBastion }}"
       - name: Install package for ssh with password inline
@@ -136,22 +158,21 @@ jobs:
         with:
           inlineScript: |
             az group create --name ${{ github.event.inputs.resourceGroupName }} --location ${{ github.event.inputs.location }}
-            az deployment group create -g  ${{ github.event.inputs.resourceGroupName }} -f "azure_jumpstart_arcbox/ARM/azuredeploy.json" -p sshRSAPublicKey='${{secrets.SSH_RSA_PUBLIC_KEY}}' spnClientId=${{secrets.SPN_CLIENT_ID}} spnClientSecret=${{secrets.SPN_CLIENT_SECRET}} spnTenantId=${{secrets.SPN_TENANT_ID}} windowsAdminUsername=${{ github.event.inputs.windowsAdminUsername }} windowsAdminPassword=${{secrets.WINDOWS_ADMIN_PASSWORD}} myIpAddress=${{ github.event.inputs.myPublicIp }} logAnalyticsWorkspaceName=${{ github.event.inputs.logAnalyticsWorkspaceName }} flavor=${{ github.event.inputs.flavor }} githubAccount="${GITHUB_REPOSITORY_OWNER}" githubBranch=${{github.event.inputs.githubBranch}} deployBastion=${{github.event.inputs.deployBastion}}
+            az deployment group create -g  ${{ github.event.inputs.resourceGroupName }} -f "azure_jumpstart_arcbox/ARM/azuredeploy.json" -p sshRSAPublicKey='${{secrets.SSH_RSA_PUBLIC_KEY}}' spnClientId=${{secrets.SPN_CLIENT_ID}} spnClientSecret=${{secrets.SPN_CLIENT_SECRET}} spnTenantId=${{secrets.SPN_TENANT_ID}} windowsAdminUsername=${{ github.event.inputs.windowsAdminUsername }} windowsAdminPassword=${{secrets.WINDOWS_ADMIN_PASSWORD}} logAnalyticsWorkspaceName=${{ github.event.inputs.logAnalyticsWorkspaceName }} flavor=${{ github.event.inputs.flavor }} githubAccount="${GITHUB_REPOSITORY_OWNER}" githubBranch=${{github.event.inputs.githubBranch}} deployBastion=${{github.event.inputs.deployBastion}}
       - name: Deploy ArcBox - Bicep
         uses: Azure/cli@v1.0.6
         if: github.event.inputs.mechanism == 'Bicep'
         with:
           inlineScript: |
             az group create --name ${{ github.event.inputs.resourceGroupName }} --location ${{ github.event.inputs.location }}
-            az deployment group create -g  ${{ github.event.inputs.resourceGroupName }} -f "azure_jumpstart_arcbox/bicep/main.bicep" -p sshRSAPublicKey='${{secrets.SSH_RSA_PUBLIC_KEY}}' spnClientId=${{secrets.SPN_CLIENT_ID}} spnClientSecret=${{secrets.SPN_CLIENT_SECRET}} spnTenantId=${{secrets.SPN_TENANT_ID}} windowsAdminUsername=${{ github.event.inputs.windowsAdminUsername }} windowsAdminPassword=${{secrets.WINDOWS_ADMIN_PASSWORD}} myIpAddress=${{ github.event.inputs.myPublicIp }} logAnalyticsWorkspaceName=${{ github.event.inputs.logAnalyticsWorkspaceName }} flavor=${{ github.event.inputs.flavor }} githubAccount="${GITHUB_REPOSITORY_OWNER}" githubBranch=${{github.event.inputs.githubBranch}} deployBastion=${{github.event.inputs.deployBastion}}
+            az deployment group create -g  ${{ github.event.inputs.resourceGroupName }} -f "azure_jumpstart_arcbox/bicep/main.bicep" -p sshRSAPublicKey='${{secrets.SSH_RSA_PUBLIC_KEY}}' spnClientId=${{secrets.SPN_CLIENT_ID}} spnClientSecret=${{secrets.SPN_CLIENT_SECRET}} spnTenantId=${{secrets.SPN_TENANT_ID}} windowsAdminUsername=${{ github.event.inputs.windowsAdminUsername }} windowsAdminPassword=${{secrets.WINDOWS_ADMIN_PASSWORD}} logAnalyticsWorkspaceName=${{ github.event.inputs.logAnalyticsWorkspaceName }} flavor=${{ github.event.inputs.flavor }} githubAccount="${GITHUB_REPOSITORY_OWNER}" githubBranch=${{github.event.inputs.githubBranch}} deployBastion=${{github.event.inputs.deployBastion}}
       - name: Deploy ArcBox - Terraform
         if: github.event.inputs.mechanism == 'Terraform'
         run: |
           chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/TerraformDeploy.sh
           ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/TerraformDeploy.sh ./azure_jumpstart_arcbox/terraform \
                  "${{ github.event.inputs.resourceGroupName }}"  "${{ github.event.inputs.location }}" \
-                 "${{secrets.SPN_CLIENT_ID}}" "${{secrets.SPN_CLIENT_SECRET}}" \
-                 "${{secrets.SPN_TENANT_ID}}" "${{ github.event.inputs.myPublicIp }}" \
+                 "${{secrets.SPN_CLIENT_ID}}" "${{secrets.SPN_CLIENT_SECRET}}" "${{secrets.SPN_TENANT_ID}}" \
                  "${{secrets.SSH_RSA_PUBLIC_KEY}}" "${{ github.event.inputs.windowsAdminUsername }}" \
                  "${{secrets.WINDOWS_ADMIN_PASSWORD}}" "${{ github.event.inputs.flavor }}" \
                  "${{ github.event.inputs.logAnalyticsWorkspaceName }}" "${GITHUB_REPOSITORY_OWNER}" \

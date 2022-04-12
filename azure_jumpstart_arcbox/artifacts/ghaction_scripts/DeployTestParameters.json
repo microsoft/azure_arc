@@ -1,7 +1,7 @@
 {
   "Full": {
     "afterDeployResources": 47,
-    "afterScriptExecution": 91,
+    "afterScriptExecution": 92,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 6,
     "workbooksExpected": 1
