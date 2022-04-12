@@ -92,9 +92,9 @@ ArcBox provides multiple paths for deploying and configuring ArcBox resources. D
 - Azure Bicep
 - HashiCorp Terraform
 
-![Deployment flow diagram for ARM-based deployments](./deploymentflow.png)
+![Deployment flow diagram for ARM-based deployments](./deployment_flow.png)
 
-![Deployment flow diagram for Terraform-based deployments](./deploymentflow_tf.png)
+![Deployment flow diagram for Terraform-based deployments](./deployment_flow_tf.png)
 
 ArcBox uses an advanced automation flow to deploy and configure all necessary resources with minimal user interaction. The previous diagrams provide an overview of the deployment flow. A high-level summary of the deployment is:
 
@@ -138,17 +138,17 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az vm list-usage --location <your location> --output table
   ```
 
-  ![Screenshot showing az vm list-usage](./azvmlistusage.png)
+  ![Screenshot showing az vm list-usage](./az_vm_list_usage.png)
 
 - Fork the [sample applications GitHub repo](https://github.com/microsoft/azure-arc-jumpstart-apps) to your own GitHub account. You will use this forked repo to make changes to the sample apps that will be applied using GitOps configurations. The name of your GitHub account is passed as a parameter to the template files so take note of your GitHub user name.
 
-  ![Screenshot showing forking sample apps repo](./apps_fork1.png)
+  ![Screenshot showing forking sample apps repo](./apps_fork01.png)
 
-  ![Screenshot showing forking sample apps repo](./apps_fork2.png)
+  ![Screenshot showing forking sample apps repo](./apps_fork02.png)
 
 - The name of your GitHub account is passed as the _`githubUser`_ parameter to the template files so take note of your GitHub user name in your forked repo.
 
-  ![Screenshot showing forking sample apps repo](./apps_fork3.png)
+  ![Screenshot showing forking sample apps repo](./apps_fork03.png)
 
 - Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access control (RBAC) roles is required:
 
@@ -200,11 +200,11 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 - Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Farcbox_devops%2Fazure_jumpstart_arcbox%2FARM%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploy.png)
+  ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy01.png)
 
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploy2.png)
+  ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy02.png)
 
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploy3.png)
+  ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy03.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -237,9 +237,9 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   --parameters azuredeploy.parameters.json 
   ```
 
-  ![Screenshot showing az group create](./azgroupcreate.png)
+  ![Screenshot showing az group create](./az_group_create.png)
 
-  ![Screenshot showing az deployment group create](./azdeploy.png)
+  ![Screenshot showing az deployment group create](./az_deploy.png)
 
 ## Deployment Option 3: Azure Bicep deployment via Azure CLI
 
@@ -338,7 +338,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 Once your deployment is complete, you can open the Azure portal and see the ArcBox resources inside your resource group. You will be using the _ArcBox-Client_ Azure virtual machine to explore various capabilities of ArcBox such as GitOps configurations and Key Vault integration. You will need to remotely access _ArcBox-Client_.
 
-  ![Screenshot showing all deployed resources in the resource group](./deployedResources.png)
+  ![Screenshot showing all deployed resources in the resource group](./deployed_resources.png)
 
    > **NOTE: For enhanced ArcBox security posture, RDP (3389) and SSH (22) ports are not open by default in ArcBox deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
 
@@ -355,15 +355,15 @@ By design, ArcBox does not open port 3389 on the network security group. Therefo
 
 - Open the _ArcBox-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
-  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./RdpNsg_blocked.png)
+  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./rdp_nsg_blocked.png)
 
-  ![Screenshot showing adding a new inbound security rule](./Nsgb_add_rule.png)
+  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
 
 - Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
 
-  ![Screenshot showing adding a new allow RDP inbound security rule](./Nsg_add_Rdp_rule.png)
+  ![Screenshot showing adding a new allow RDP inbound security rule](./nsg_add_rdp_rule.png)
 
-  ![Screenshot showing all inbound security rule](./RdpNsg_all_Rules.png)
+  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
 
@@ -381,7 +381,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/en
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
-  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./JIT_allowing_RDP.png)
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./jit_allowing_rdp.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
 
@@ -739,9 +739,9 @@ To clean up your deployment, simply delete the resource group using Azure CLI or
 az group delete -n <name of your resource group>
 ```
 
-![Screenshot showing az group delete](./azdelete.png)
+![Screenshot showing az group delete](./az_delete.png)
 
-![Screenshot showing group delete from Azure portal](./portaldelete.png)
+![Screenshot showing group delete from Azure portal](./portal_delete.png)
 
 ## Basic Troubleshooting
 
