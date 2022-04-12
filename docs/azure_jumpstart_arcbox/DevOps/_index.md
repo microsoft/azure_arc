@@ -361,7 +361,7 @@ By design, ArcBox does not open port 3389 on the network security group. Therefo
 
 - Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
 
-  ![Screenshot showing adding a new allow RDP inbound security rule](./nsg_add_rdp_rule.png)
+  <img src="./nsg_add_rdp_rule.png" alt="Screenshot showing adding a new allow RDP inbound security rule" width="400">
 
   ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
 
@@ -782,7 +782,7 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
 
     ![Screenshot showing ArcBox-K3s virtual machine public IP](./arcbox_k3s_vm_ip.png)
 
-    > **NOTE: Port 22 is not open by default in ArcBox deployments. You will need to create an NSG rule to allow network access to port 22, or use Azure Bastion or JIT to connect to the VM.**
+    > **NOTE: Port 22 is not open by default in ArcBox deployments. You will need to [create an NSG rule](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#connecting-directly-with-rdp) to allow network access to port 22, or use Azure Bastion or JIT to connect to the VM.**
 
 - As described in the message of the day (motd), depending on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
   - _ArcBox-CAPI-MGMT_ log path: *jumpstart_logs/installCAPI.log*
