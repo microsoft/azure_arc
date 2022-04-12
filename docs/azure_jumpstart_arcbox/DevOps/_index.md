@@ -63,11 +63,11 @@ ArcBox deploys five GitOps configurations onto the _ArcBox-CAPI-Data_ cluster:
 - Namespace scope config to deploy the "Bookstore" application open service mesh traffic split policies.
 - Namespace scope config to deploy the "Hello-Arc" web application.
 
-### KeyVault integration
+### Key Vault integration
 
 The Azure Key Vault Provider for Secrets Store CSI Driver allows for the integration of Azure Key Vault as a secrets store with a Kubernetes cluster via a [CSI volume](https://kubernetes-csi.github.io/docs/).
 
-ArcBox deploys Azure Key Vault as part of the infrastructure provisioning. Also, it will hook the _ArcBox-CAPI-Data_ cluster to Azure Key Vault by deploying the [Azure Key Vault Secrets Provider extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/tutorial-akv-secrets-provider).  
+ArcBox deploys Azure Key Vault during the automation scripts that run after logging into _ArcBox-Client_ for the first time. The automation configures the _ArcBox-CAPI-Data_ cluster to Azure Key Vault by deploying the [Azure Key Vault Secrets Provider extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/tutorial-akv-secrets-provider).  
 
 A self-signed certificate is synced from the Key Vault and configured as the secret for the Kubernetes ingress for the Bookstore and Hello-Arc applications.
 
@@ -77,7 +77,7 @@ ArcBox deploys several management and operations services that work with ArcBox'
 
 ### Hybrid Unified Operations
 
-ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources. These resources include an an Azure Automation account, an Azure Log Analytics workspace with the Update Management solution, an Azure Monitor workbook, Azure Policy assignments for deploying Log Analytics agents on Windows and Linux Azure Arc-enabled servers, Azure Policy assignment for adding tags to resources, and a storage account used for staging resources needed for the deployment automation.
+ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources. These resources include an an Azure Automation account, an Azure Log Analytics workspace, an Azure Monitor workbook, Azure Policy assignments for deploying Kubernetes cluster monitoring and security extensions on the included clusters, Azure Policy assignment for adding tags to resources, and a storage account used for staging resources needed for the deployment automation.
 
 ## ArcBox Azure Consumption Costs
 
@@ -92,9 +92,9 @@ ArcBox provides multiple paths for deploying and configuring ArcBox resources. D
 - Azure Bicep
 - HashiCorp Terraform
 
-![Deployment flow diagram for ARM-based deployments](./deploymentflow.png)
+![Deployment flow diagram for ARM-based deployments](./deployment_flow.png)
 
-![Deployment flow diagram for Terraform-based deployments](./deploymentflow_tf.png)
+![Deployment flow diagram for Terraform-based deployments](./deployment_flow_tf.png)
 
 ArcBox uses an advanced automation flow to deploy and configure all necessary resources with minimal user interaction. The previous diagrams provide an overview of the deployment flow. A high-level summary of the deployment is:
 
@@ -138,26 +138,17 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az vm list-usage --location <your location> --output table
   ```
 
-  ![Screenshot showing az vm list-usage](./azvmlistusage.png)
-
-- Register necessary Azure resource providers by running the below commands.
-
-  ```shell
-  az provider register --namespace Microsoft.GuestConfiguration --wait
-  az provider register --namespace Microsoft.Kubernetes --wait
-  az provider register --namespace Microsoft.KubernetesConfiguration --wait
-  az provider register --namespace Microsoft.ExtendedLocation --wait
-  ```
+  ![Screenshot showing az vm list-usage](./az_vm_list_usage.png)
 
 - Fork the [sample applications GitHub repo](https://github.com/microsoft/azure-arc-jumpstart-apps) to your own GitHub account. You will use this forked repo to make changes to the sample apps that will be applied using GitOps configurations. The name of your GitHub account is passed as a parameter to the template files so take note of your GitHub user name.
 
-  ![Screenshot showing forking sample apps repo](./apps_fork1.png)
+  ![Screenshot showing forking sample apps repo](./apps_fork01.png)
 
-  ![Screenshot showing forking sample apps repo](./apps_fork2.png)
+  ![Screenshot showing forking sample apps repo](./apps_fork02.png)
 
 - The name of your GitHub account is passed as the _`githubUser`_ parameter to the template files so take note of your GitHub user name in your forked repo.
 
-  ![Screenshot showing forking sample apps repo](./apps_fork3.png)
+  ![Screenshot showing forking sample apps repo](./apps_fork03.png)
 
 - Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access control (RBAC) roles is required:
 
@@ -199,7 +190,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-- [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key)
+- [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
 
   ```shell
   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
@@ -209,11 +200,11 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 - Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Farcbox_devops%2Fazure_jumpstart_arcbox%2FARM%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploy.png)
+  ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy01.png)
 
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploy2.png)
+  ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy02.png)
 
-  ![Screenshot showing Azure portal deployment of ArcBox](./portaldeploy3.png)
+  ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy03.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -233,8 +224,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "DevOps" to specify that you want to deploy the DevOps flavor of ArcBox
   - _`githubUser`_ - Specify the name of your GitHub account where you cloned the Sample Apps repo
-  - _`githubAccount`_ - leave default as "microsoft"
-  - _`githubBranch`_ - leave default as "arcbox_devops"
 
   ![Screenshot showing example parameters](./parameters_bugbash.png)
 
@@ -248,9 +237,9 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   --parameters azuredeploy.parameters.json 
   ```
 
-  ![Screenshot showing az group create](./azgroupcreate.png)
+  ![Screenshot showing az group create](./az_group_create.png)
 
-  ![Screenshot showing az deployment group create](./azdeploy.png)
+  ![Screenshot showing az deployment group create](./az_deploy.png)
 
 ## Deployment Option 3: Azure Bicep deployment via Azure CLI
 
@@ -276,8 +265,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "DevOps" to specify that you want to deploy the Devops flavor of ArcBox
   - _`githubUser`_ - Specify the name of your GitHub account where you cloned the Sample Apps repo
-  - _`githubAccount`_ - leave default as "microsoft"
-  - _`githubBranch`_ - leave default as "arcbox_devops"
 
   ![Screenshot showing example parameters](./parameters_bugbash.png)
 
@@ -324,8 +311,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - **_`client_admin_password`_** - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - **_`workspace_name`_** - Unique name for the ArcBox Log Analytics workspace
   - **_`githubUser`_** - Specify the name of your GitHub account where you cloned the Sample Apps repo
-  - **_`githubAccount`_** - leave default as "microsoft"
-  - **_`githubBranch`_** - leave default as "arcbox_devops"
 
   > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
 
@@ -353,7 +338,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 Once your deployment is complete, you can open the Azure portal and see the ArcBox resources inside your resource group. You will be using the _ArcBox-Client_ Azure virtual machine to explore various capabilities of ArcBox such as GitOps configurations and Key Vault integration. You will need to remotely access _ArcBox-Client_.
 
-  ![Screenshot showing all deployed resources in the resource group](./deployedResources.png)
+  ![Screenshot showing all deployed resources in the resource group](./deployed_resources.png)
 
    > **NOTE: For enhanced ArcBox security posture, RDP (3389) and SSH (22) ports are not open by default in ArcBox deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
 
@@ -370,21 +355,21 @@ By design, ArcBox does not open port 3389 on the network security group. Therefo
 
 - Open the _ArcBox-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
-  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./RdpNsg_blocked.png)
+  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./rdp_nsg_blocked.png)
 
-  ![Screenshot showing adding a new inbound security rule](./Nsgb_add_rule.png)
+  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
 
-- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action.
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
 
-  ![Screenshot showing adding a new allow RDP inbound security rule](./Nsg_add_Rdp_rule.png)
+  ![Screenshot showing adding a new allow RDP inbound security rule](./nsg_add_rdp_rule.png)
 
-  ![Screenshot showing all inbound security rule](./RdpNsg_all_Rules.png)
+  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
 
 #### Connect using Azure Bastion
 
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
 
   ![Screenshot showing connecting to the VM using Bastion](./bastion_connect.png)
 
@@ -392,11 +377,11 @@ By design, ArcBox does not open port 3389 on the network security group. Therefo
 
 #### Connect using just-in-time access (JIT)
 
-If you already have Microsoft Defender for Servers enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
-  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./JIT_allowing_RDP.png)
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./jit_allowing_rdp.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
 
@@ -430,7 +415,7 @@ After deployment is complete, it's time to start exploring ArcBox. Most interact
 
   ![Screenshot showing Hello-Arc App](./capi_keyvault03.png)
 
-- Optionally, validate the certificate details.
+- Validate the certificate details.
 
   ![Screenshot showing Hello-Arc certificate](./capi_keyvault04.png)
 
@@ -754,9 +739,9 @@ To clean up your deployment, simply delete the resource group using Azure CLI or
 az group delete -n <name of your resource group>
 ```
 
-![Screenshot showing az group delete](./azdelete.png)
+![Screenshot showing az group delete](./az_delete.png)
 
-![Screenshot showing group delete from Azure portal](./portaldelete.png)
+![Screenshot showing group delete from Azure portal](./portal_delete.png)
 
 ## Basic Troubleshooting
 
@@ -768,7 +753,7 @@ Occasionally deployments of ArcBox may fail at various stages. Common reasons fo
 
       ![Screenshot showing SSH public key example](./ssh_example.png)
 
-- Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least XXXX available. See the [prerequisites](#prerequisites) section for more details.
+- Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 52 available. See the [prerequisites](#prerequisites) section for more details.
 - Target Azure region does not support all required Azure services - ensure you are running ArcBox in one of the supported regions listed in the above section "ArcBox Azure Region Compatibility".
 
 ### Exploring logs from the _ArcBox-Client_ virtual machine
@@ -812,7 +797,3 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
   ![Screenshot showing az login error](./az_login_error.png)
 
 If you are still having issues deploying ArcBox, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on GitHub and include a detailed description of your issue, the Azure region you are deploying to, the flavor of ArcBox you are trying to deploy. Inside the _C:\ArcBox\Logs_ folder you can also find instructions for uploading your logs to an Azure storage account for review by the Jumpstart team.
-
-## Known issues
-
-- None at this time

@@ -70,7 +70,7 @@
       "metadata": {
         "description": "Target GitHub branch"
       },
-      "defaultValue": "main"
+      "defaultValue": "arcbox_devops"
     },
     "deployBastion": {
       "type": "bool",
