@@ -23,8 +23,6 @@ az k8s-configuration flux create `
     --resource-group $Env:resourceGroup `
     --name config-helloarc-rbac `
     --cluster-type connectedClusters `
-    --scope namespace `
-    --namespace $k3sNamespace `
     --url $appClonedRepo `
     --branch main --sync-interval 3s `
-    --kustomization name=bookstore path=./k8s-rbac-sample/namespace
+    --kustomization name=bookstore path=./k8s-rbac-sample
