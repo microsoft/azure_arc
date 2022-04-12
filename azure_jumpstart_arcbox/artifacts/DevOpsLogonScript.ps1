@@ -3,6 +3,7 @@ $Env:ToolsDir = "C:\Tools"
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
+$Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
 $osmRelease = "v1.0.0"
 $osmMeshName = "osm"
@@ -250,7 +251,7 @@ $shortcutLocation = "$Env:Public\Desktop\DevOps Hello-Arc.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "https://$certdns"
-$shortcut.IconLocation="C:\windows\System32\SHELL32.dll, 17"
+$shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 

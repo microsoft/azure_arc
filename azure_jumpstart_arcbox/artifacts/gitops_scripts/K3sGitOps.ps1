@@ -2,11 +2,14 @@ $Env:TempDir = "C:\Temp"
 $Env:ToolsDir = "C:\Tools"
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+$Env:ArcBoxIconDir = "C:\ArcBox\Icons"
+
+$k3sNamespace = "hello-arc"
+$ingressNamespace = "ingress-nginx"
 
 $certname = "k3s-ingress-cert"
 $certdns = "arcbox.k3sdevops.com"
-$k3sNamespace = "hello-arc"
-$ingressNamespace = "ingress-nginx"
+
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 
 # echo "Login to Az CLI using the service principal"
@@ -170,6 +173,6 @@ $shortcutLocation = "$Env:Public\Desktop\K3s Hello-Arc.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "https://$certdns"
-$shortcut.IconLocation="C:\windows\System32\SHELL32.dll, 130"
+$shortcut.IconLocation="$Env:ArcBoxIconDir\arc.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
