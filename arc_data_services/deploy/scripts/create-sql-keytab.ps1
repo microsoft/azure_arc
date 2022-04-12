@@ -13,7 +13,8 @@ Requirements:
 3. Create a Secure-String object and pass it to the --Password parameter.  Example: $sqlmipassword = Read-Host -AsSecureString
 
 Example Usage:
-.\create-sql-keytab.ps1 -Realm CONTOSO.LOCAL -NetbiosDomainName CONTOSO -Account sqlmi-account -Password <password> -DnsName sqlmi.contoso.local -Port 31433 -KeytabFile mssql.keytab -SecretName sqlmi-keytab-secret -SecretNamespace sqlmi-ns -SecretFile sqlmi-secret.yaml
+$sqlmipassword = Read-Host -AsSecureString
+.\create-sql-keytab.ps1 -Realm CONTOSO.LOCAL -NetbiosDomainName CONTOSO -Account sqlmi-account -Password $sqlmipassword -DnsName sqlmi.contoso.local -Port 31433 -KeytabFile mssql.keytab -SecretName sqlmi-keytab-secret -SecretNamespace sqlmi-ns -SecretFile sqlmi-secret.yaml
 
 Required Parameters:
 
