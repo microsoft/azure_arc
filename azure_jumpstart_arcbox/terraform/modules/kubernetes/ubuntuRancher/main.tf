@@ -87,38 +87,6 @@ locals {
     nsg_name               = "${var.vm_name}-NSG"
     network_interface_name = "${var.vm_name}-NIC"
     bastionSubnetIpPrefix  = "172.16.3.64/26"
-    inbound_tcp_rules      = [
-        {
-            name                   = "allow_k8s_6443"
-            source_address_prefix  = "*"
-            destination_port_range = "6443"
-        },
-        {
-            name                   = "allow_k8s_80"
-            source_address_prefix  = "*"
-            destination_port_range = "80"
-        },
-        {
-            name                   = "allow_k8s_8080"
-            source_address_prefix  = "*"
-            destination_port_range = "8080"
-        },
-        {
-            name                   = "allow_k8s_443"
-            source_address_prefix  = "*"
-            destination_port_range = "443"
-        },
-        {
-            name                   = "allow_k8s_kubelet"
-            source_address_prefix  = "*"
-            destination_port_range = "10250"
-        },
-        {
-            name                   = "allow_traefik_lb_external"
-            source_address_prefix  = "*"
-            destination_port_range = "32323"
-        }
-    ]
 }
 
 data "azurerm_subscription" "primary" {
@@ -141,28 +109,6 @@ resource "azurerm_public_ip" "pip" {
   allocation_method   = "Static"
   count               = var.deploy_bastion == false ? 1: 0
 }
-
-resource "azurerm_network_security_group" "nsg" {
-  name                = local.nsg_name
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
-resource "azurerm_network_security_rule" "nsg_rules" {
-  for_each                    = { for i, v in local.inbound_tcp_rules: i => v }
-  name                        = each.value.name
-  priority                    = (index(local.inbound_tcp_rules, each.value) + 1001)
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = each.value.destination_port_range
-  source_address_prefix       = each.value.source_address_prefix
-  destination_address_prefix  = "*"
-  resource_group_name         = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
-}
-
 resource "azurerm_network_interface" "nic" {
   name                = local.network_interface_name
   location            = data.azurerm_resource_group.rg.location
