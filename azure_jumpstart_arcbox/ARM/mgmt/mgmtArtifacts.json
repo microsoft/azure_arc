@@ -105,7 +105,8 @@
             "properties": {
               "addressPrefix": "[variables('subnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled"
+              "privateLinkServiceNetworkPolicies": "Enabled",
+              "networkSecurityGroupName" : "[parameters('networkSecurityGroupName')]"
             }
           },
           {
