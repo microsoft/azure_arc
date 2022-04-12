@@ -232,11 +232,6 @@ resource "azurerm_network_interface" "nic" {
     public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }
-
-resource "azurerm_network_interface_security_group_association" "nic_nsg" {
-  network_interface_id      = azurerm_network_interface.nic.id
-}
-
 resource "azurerm_virtual_machine" "client" {
   name                  = var.vm_name
   location              = data.azurerm_resource_group.rg.location
