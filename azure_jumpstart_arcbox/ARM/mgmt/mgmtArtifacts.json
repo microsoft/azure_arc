@@ -106,7 +106,9 @@
               "addressPrefix": "[variables('subnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled",
-              "networkSecurityGroupName" : "[parameters('networkSecurityGroupName')]"
+              "networkSecurityGroup" : {
+                "id" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              }
             }
           },
           {
