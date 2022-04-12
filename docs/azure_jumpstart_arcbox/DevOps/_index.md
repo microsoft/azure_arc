@@ -638,7 +638,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
     ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac07.png)
 
-  - Test the RBAC role assignment, if Dave can create the secrets. The operation fails, as the user, Dave is assigned to the role of secret-reader. The secret-reader role only allows get, watch and list permissions.
+  - Test the RBAC role assignment to check if Dave can create the secrets. The operation should fail, as the user Dave is assigned to the role of secret-reader. The secret-reader role only allows get, watch and list permissions.
 
     ```shell
     kubectl create secret generic arcbox-secret --from-literal=username=arcdemo --as=dave
