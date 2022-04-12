@@ -24,6 +24,9 @@ param sku string = 'pergb2018'
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
+@description('Name of the Network Security Group')
+param networkSecurityGroupName string = 'ArcBox-NSG'
+
 var updates = {
   name: 'Updates(${workspaceName})'
   galleryName: 'Updates'
@@ -63,12 +66,102 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
           addressPrefix: subnetAddressPrefix
           privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
+          networkSecurityGroup: {
+            id: networkSecurityGroup.id
+          }
         }
       }
       {
         name: 'AzureBastionSubnet'
         properties: {
           addressPrefix: bastionSubnetIpPrefix
+        }
+      }
+    ]
+  }
+}
+
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
+  name: networkSecurityGroupName
+  location: location
+  properties: {
+    securityRules: [
+      {
+        name: 'allow_k8s_6443'
+        properties: {
+          priority: 1002
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '6443'
+        }
+      }
+      {
+        name: 'allow_k8s_80'
+        properties: {
+          priority: 1003
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '80'
+        }
+      }
+      {
+        name: 'allow_k8s_8080'
+        properties: {
+          priority: 1004
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '8080'
+        }
+      }
+      {
+        name: 'allow_k8s_443'
+        properties: {
+          priority: 1005
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '443'
+        }
+      }
+      {
+        name: 'allow_k8s_kubelet'
+        properties: {
+          priority: 1006
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '10250'
+        }
+      }
+      {
+        name: 'allow_traefik_lb_external'
+        properties: {
+          priority: 1007
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '32323'
         }
       }
     ]
