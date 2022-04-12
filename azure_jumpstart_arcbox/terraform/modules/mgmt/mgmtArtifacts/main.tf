@@ -39,6 +39,7 @@ locals {
   subnet_address_prefix = "172.16.1.0/24"
   solutions             = ["Updates", "VMInsights", "ChangeTracking", "Security"]
   bastionSubnetName     = "AzureBastionSubnet"
+  nsg_name               = "ArcBox-NSG"
   bastionSubnetRef      = "${azurerm_virtual_network.vnet.id}/subnets/${local.bastionSubnetName}"
   bastionName           = "ArcBox-Bastion"
   bastionSubnetIpPrefix = "172.16.3.64/26"
