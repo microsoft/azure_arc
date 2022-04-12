@@ -123,6 +123,9 @@
       "apiVersion": "2019-02-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
       "properties": {
         "securityRules": [
           {
