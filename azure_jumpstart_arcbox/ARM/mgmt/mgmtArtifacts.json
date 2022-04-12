@@ -93,6 +93,9 @@
       "apiVersion": "2019-04-01",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+      ],
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -125,9 +128,6 @@
       "apiVersion": "2019-02-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
-      ],
       "properties": {
         "securityRules": [
           {
