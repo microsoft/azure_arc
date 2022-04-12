@@ -582,7 +582,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
   - Browse to the _K3sRBAC.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
     - Log in to your Azure subscription using the SPN credentials
     - Connect to _ArcBox-k3s_ cluster
-    - Create the GitOps configurations to deploy the RBAC configurations for hello-arc namespace
+    - Create the GitOps configurations to deploy the Namespace and Cluster scope RBAC configurations
 
   - Right click _K3sGitOps.ps1_ script and select Run with PowerShell to execute the script.
   
@@ -604,7 +604,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
     ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac03.png)
 
-  - Validate the RBAC role to get the pods as user Jane.
+  - Validate the namespace RBAC role to get the pods as user Jane.
 
     ```shell
     kubectl --namespace hello-arc get pods --as=jane
@@ -620,6 +620,31 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
     ```
 
     ![Screenshot showing hello-arc RBAC delete pods](./k3s_rbac05.png)
+
+  - Show the Cluster Role and Role Binding.
+  
+    ```shell
+    kubectl get clusterrole | Select-String secret-reader
+    kubectl get clusterrolebinding | Select-String read-secrets-global
+    ```
+
+    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac06.png)
+
+  - Validate the cluster role to get the secrets as user Dave.
+
+    ```shell
+    kubectl get secrets --as=dave
+    ```
+
+    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac07.png)
+
+  - Test the RBAC role assignment, if Dave can create the secrets. The operation fails, as the user, Dave is assigned to the role of secret-reader. The secret-reader role only allows get, watch and list permissions.
+
+    ```shell
+    kubectl create secret generic arcbox-secret --from-literal=username=arcdemo --as=dave
+    ```
+
+    ![Screenshot showing hello-arc RBAC delete pods](./k3s_rbac08.png)
 
 ### ArcBox Azure Monitor workbook
 
