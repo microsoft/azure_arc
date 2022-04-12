@@ -63,14 +63,14 @@
       "metadata": {
         "description": "Target GitHub account"
       },
-      "defaultValue": "microsoft"
+      "defaultValue": "sebassem"
     },
     "githubBranch": {
       "type": "string",
       "metadata": {
         "description": "Target GitHub branch"
       },
-      "defaultValue": "main"
+      "defaultValue": "arcbox_nsg_policy"
     },
     "deployBastion": {
       "type": "bool",
@@ -84,7 +84,7 @@
       "metadata": {
         "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
-      "defaultValue": "microsoft"
+      "defaultValue": "sebassem"
     }
   },
   "variables": {
