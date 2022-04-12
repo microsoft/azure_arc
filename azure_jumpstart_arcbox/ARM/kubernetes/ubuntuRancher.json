@@ -60,6 +60,13 @@
                 "description": "Name of the subnet in the virtual network"
             }
         },
+        "networkSecurityGroupName": {
+            "type": "string",
+            "defaultValue": "ArcBox-K3s-NSG",
+            "metadata": {
+                "description": "Name of the Network Security Group"
+            }
+        },
         "resourceTags": {
             "type": "object",
             "defaultValue": {
@@ -128,6 +135,7 @@
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
             ],
             "properties": {
@@ -140,6 +148,97 @@
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "name": "[parameters('networkSecurityGroupName')]",
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow_k8s_6443",
+                        "properties": {
+                            "priority": 1002,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "6443"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_80",
+                        "properties": {
+                            "priority": 1003,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "80"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_8080",
+                        "properties": {
+                            "priority": 1004,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "8080"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_443",
+                        "properties": {
+                            "priority": 1005,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "443"
+                        }
+                    },
+                    {
+                        "name": "allow_k8s_kubelet",
+                        "properties": {
+                            "priority": 1006,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "10250"
+                        }
+                    },
+                    {
+                        "name": "allow_traefik_lb_external",
+                        "properties": {
+                            "priority": 1007,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "32323"
                         }
                     }
                 ]
