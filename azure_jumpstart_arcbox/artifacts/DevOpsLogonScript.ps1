@@ -85,18 +85,18 @@ Copy-Item "$Env:TempDir\windows-amd64\osm.exe" -Destination $Env:ToolsDir
 [System.Environment]::SetEnvironmentVariable('PATH', $Env:PATH + ";$Env:ToolsDir" ,[System.EnvironmentVariableTarget]::Machine)
 $Env:PATH += ";$Env:ToolsDir"
 
-# Create random 13 character string for KeyVault name
+# Create random 13 character string for Key Vault name
 $strLen = 13
 $randStr = (-join ((0x30..0x39) + (0x61..0x7A) | Get-Random -Count $strLen | ForEach-Object {[char]$_}))
 $Env:keyVaultName = "ArcBox-KV-$randStr"
 
 [System.Environment]::SetEnvironmentVariable('keyVaultName', $Env:keyVaultName, [System.EnvironmentVariableTarget]::Machine)
 
-# Create Azure KeyVault
+# Create Azure Key Vault
 Write-Host "Creating Azure Key Vault"
 az keyvault create --name $Env:keyVaultName --resource-group $Env:resourceGroup --location $Env:azureLocation
 
-# Allow SPN to import certificates into KeyVault
+# Allow SPN to import certificates into Key Vault
 Write-Host "Setting Azure Key Vault access policies"
 az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --key-permissions --secret-permissions get --certificate-permissions get list import
 
