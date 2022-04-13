@@ -648,7 +648,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
         kubectl get pods -n hello-arc -w
         ```
 
-      Result should look like that:
+      The result should look like this:
   
       ![Screenshot showing Hello-Arc app and shell](./k3s_gitops10.png)
   
