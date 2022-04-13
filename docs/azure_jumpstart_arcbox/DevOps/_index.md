@@ -648,7 +648,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
         kubectl get pods -n hello-arc -w
         ```
 
-      Result should look like that:
+      The result should look like this:
   
       ![Screenshot showing Hello-Arc app and shell](./k3s_gitops10.png)
   
@@ -656,7 +656,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
       ![Screenshot showing hello-arc repo](./k3s_gitops11.png)
 
-    - Upon committing the changes, notice how the Kubernetes pods rolling upgrade will begin. Once the pods are up & running, refresh the browser, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
+    - Upon committing the changes, notice how the Kubernetes pods rolling upgrade will begin. Once the pods are up and running, refresh the browser, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
 
       ![Screenshot showing Hello-Arc app and shell GitOps](./k3s_gitops12.png)
 
