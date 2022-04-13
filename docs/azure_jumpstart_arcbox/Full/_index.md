@@ -310,11 +310,15 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Start post-deployment automation
 
+Once your deployment is complete, you can open the Azure portal and see the ArcBox resources inside your resource group. You will be using the _ArcBox-Client_ Azure virtual machine to explore various capabilities of ArcBox. You will need to remotely access _ArcBox-Client_.
+
 - After deployment, you should see the ArcBox resources inside your resource group.
 
-  ![Screenshot showing az deployment group create](./deployedresources.png)
+  ![Screenshot showing az deployment group create](./deployed_resources.png)
 
   > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (48 total)**
+
+  > **NOTE: For enhanced ArcBox security posture, RDP (3389) and SSH (22) ports are not open by default in ArcBox deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
 
 ### Connecting to the ArcBox Client VM
 
@@ -324,13 +328,13 @@ You can connect to the Client VM in 3 ways depending on how you've deployed ArcB
 
 - If you have not chosen to deploy Azure Bastion in the ARM template, enable the RDP port in the NSG and RDP to the VM using its public IP.
 
-  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./RdpNsg_blocked.png)
+  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./rdp_nsg_blocked.png)
 
-  ![Screenshot showing adding a new inbound security rule](./Nsgb_add_rule.png)
+  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
 
-  ![Screenshot showing adding a new allow RDP inbound security rule](./Nsg_add_Rdp_rule.png)
+  ![Screenshot showing adding a new allow RDP inbound security rule](./nsg_add_rdp_rule.png)
 
-  ![Screenshot showing all inbound security rule](./RdpNsg_all_Rules.png)
+  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
 
@@ -359,7 +363,7 @@ If you already have Microsoft Defender for servers enabled on your subscription 
 
   ![Screenshot showing ArcBox-Client](./automation5.png)
 
-  ![Screenshot showing ArcBox resources in Azure portal](./rgarc.png)
+  ![Screenshot showing ArcBox resources in Azure portal](./rg_arc.png)
 
 ## Azure Arc-enabled SQL Server onboarding
 
