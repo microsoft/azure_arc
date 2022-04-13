@@ -55,8 +55,8 @@ jobs:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Validate Bash Script
         run: |
-          chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/BashStaticCheck.sh
-          ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts | tee bash-lint-result.txt
+          chmod +x ./automated_testing/ghaction_scripts/BashStaticCheck.sh
+          ./automated_testing/ghaction_scripts/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts | tee bash-lint-result.txt
         continue-on-error: true
       - name: Upload Bash Lint Results File
         uses: actions/upload-artifact@v3
@@ -76,7 +76,7 @@ jobs:
       - name: Validate Power Shell
         run: |
           Start-Transcript -path ps-lint-result.txt -append
-          .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\PowerShellStaticCheck.ps1 $Env:ExcludeRules .\azure_jumpstart_arcbox\artifacts
+          .\automated_testing\ghaction_scripts\PowerShellStaticCheck.ps1 $Env:ExcludeRules .\azure_jumpstart_arcbox\artifacts
           Stop-Transcript
         continue-on-error: true
       - name: Upload PowerShell Lint Results File
@@ -100,7 +100,7 @@ jobs:
       - name: Check Bicep
         run: |
           Start-Transcript -path bicep-lint-result.txt -append
-          .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
+          .\automated_testing\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
           Stop-Transcript
         continue-on-error: true
       - name: Upload Bicep Lint Results File
@@ -112,7 +112,7 @@ jobs:
       - name: Check ARM
         run: |
           Start-Transcript -path arm-lint-result.txt -append
-          .\azure_jumpstart_arcbox\artifacts\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules | tee arm-lint-result.txt
+          .\automated_testing\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules | tee arm-lint-result.txt
           Stop-Transcript
         continue-on-error: true
       - name: Upload Bicep Lint Results File
@@ -169,8 +169,8 @@ jobs:
       - name: Deploy ArcBox - Terraform
         if: github.event.inputs.mechanism == 'Terraform'
         run: |
-          chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/TerraformDeploy.sh
-          ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/TerraformDeploy.sh ./azure_jumpstart_arcbox/terraform \
+          chmod +x ./automated_testing/ghaction_scripts/TerraformDeploy.sh
+          ./automated_testing/ghaction_scripts/TerraformDeploy.sh ./azure_jumpstart_arcbox/terraform \
                  "${{ github.event.inputs.resourceGroupName }}"  "${{ github.event.inputs.location }}" \
                  "${{secrets.SPN_CLIENT_ID}}" "${{secrets.SPN_CLIENT_SECRET}}" "${{secrets.SPN_TENANT_ID}}" \
                  "${{secrets.SSH_RSA_PUBLIC_KEY}}" "${{ github.event.inputs.windowsAdminUsername }}" \
@@ -189,8 +189,8 @@ jobs:
         uses: Azure/cli@v1.0.6
         with:
           inlineScript: |
-            chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/CountResources.sh
-            ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
+            chmod +x ./automated_testing/ghaction_scripts/CountResources.sh
+            ./automated_testing/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Install Open SSH + execute ArcServersLogonScript
         run: |
           az vm run-command invoke -g  ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --command-id RunPowerShellScript --scripts "C:\ArcBox\GHActionDeploy.ps1"
@@ -265,8 +265,8 @@ jobs:
         uses: Azure/cli@v1.0.6
         with:
           inlineScript: |
-            chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/FinalValidation.sh
-            ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
+            chmod +x ./automated_testing/ghaction_scripts/FinalValidation.sh
+            ./automated_testing/ghaction_scripts/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Delete Resources
         uses: Azure/cli@v1.0.6
         with:
