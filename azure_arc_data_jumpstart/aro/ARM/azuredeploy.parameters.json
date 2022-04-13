@@ -41,8 +41,8 @@
     "deployBastion": {
       "value": "(true/false)"
     },
-    "dnsPrefix": {
-        "value": "<A DNS prefix for the Public IP>"
+    "AroProviderId": {
+        "value": "ARO resource provider Id"
     }
   }
 }

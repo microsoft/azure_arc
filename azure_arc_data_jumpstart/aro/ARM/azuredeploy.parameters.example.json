@@ -41,8 +41,8 @@
     "deployBastion": {
       "value": false
     },
-    "dnsPrefix": {
-      "value": "arcAksdemoXXX"
+    "AroProviderId": {
+      "value": "ARO resource provider Id"
     }
   }
 }
