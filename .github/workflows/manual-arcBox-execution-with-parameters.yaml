@@ -190,7 +190,7 @@ jobs:
         with:
           inlineScript: |
             chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/CountResources.sh
-            ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/DeployTestParameters.json
+            ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Install Open SSH + execute ArcServersLogonScript
         run: |
           az vm run-command invoke -g  ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --command-id RunPowerShellScript --scripts "C:\ArcBox\GHActionDeploy.ps1"
@@ -266,7 +266,7 @@ jobs:
         with:
           inlineScript: |
             chmod +x ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/FinalValidation.sh
-            ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/DeployTestParameters.json
+            ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./azure_jumpstart_arcbox/artifacts/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Delete Resources
         uses: Azure/cli@v1.0.6
         with:

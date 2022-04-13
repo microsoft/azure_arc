@@ -4,20 +4,23 @@
     "afterScriptExecution": 92,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 6,
-    "workbooksExpected": 1
+    "workbooksExpected": 1,
+    "deployBastionDifference":-1
   },
   "ITPro": {
     "afterDeployResources": 13,
     "afterScriptExecution": 20,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 5,
-    "workbooksExpected": 1
+    "workbooksExpected": 1,
+    "deployBastionDifference":-1
   },
   "DevOps": {
     "afterDeployResources": 47,
     "afterScriptExecution": 51,
     "azureArcMachinesExpected": 0,
     "policiesDeploymentExpected": 2,
-    "workbooksExpected": 1
+    "workbooksExpected": 1,
+    "deployBastionDifference":-1
   }
 }

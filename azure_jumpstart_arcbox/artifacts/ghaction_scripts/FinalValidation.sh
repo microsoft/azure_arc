@@ -4,11 +4,18 @@
 ResourceGroup=$1
 Flavor=$2
 DeployTestParametersFile=$3
+deployBastion=$4
 
 validations=true
 config=$(cat "$DeployTestParametersFile")
 jqueryAfterScriptExecution=".$Flavor.afterScriptExecution"
 resourceExpected=$(echo "$config" |  jq "$jqueryAfterScriptExecution")
+if [ "$deployBastion" = "true" ]; then
+  jqueryBastion=".$Flavor.deployBastionDifference"
+  deployBastionDifference=$(echo "$config" |  jq "$jqueryBastion")
+  resourceExpected=$(($resourceExpected+$deployBastionDifference))
+fi
+
 portalResources=$(az resource list -g  "$ResourceGroup"  --query '[].id' -o tsv | grep -v  '/extensions/' -c)
 if [ "$resourceExpected" = "$portalResources" ]; then
    echo "We have $portalResources resources after script execution inside VM"
@@ -59,6 +66,16 @@ if [ "$workbooksExpected" = "$workbooks" ]; then
 else
    echo "Error #  Azure Workbook $workbooks"
    validations=false
+fi
+
+if [ "$deployBastion" = "true" ]; then
+  bastionResource=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -v  '/extensions/' | grep -h 'Microsoft.Network/bastionHosts' -c)
+  if [ "1" = "$bastionResource" ]; then
+     echo "We have $bastionResource Azure Bastion created"
+  else
+     echo "Error #  Azure Bastion $bastionResource"
+     validations=false
+  fi
 fi
 
 if [ "$validations" = "false" ]; then
