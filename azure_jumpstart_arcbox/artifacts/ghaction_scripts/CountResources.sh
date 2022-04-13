@@ -5,10 +5,16 @@ ResourceGroup=$1
 Flavor=$2
 Step=$3
 DeployTestParametersFile=$4
+deployBastion=$5
 
 config=$(cat "$DeployTestParametersFile")
 jquery=".$Flavor.$Step"
 resourceExpected=$(echo "$config" |  jq "$jquery")
+if [ "$deployBastion" = "true" ]; then
+  jqueryBastion=".$Flavor.deployBastionDifference"
+  deployBastionDifference=$(echo "$config" |  jq "$jqueryBastion")
+  resourceExpected=$(($resourceExpected+$deployBastionDifference))
+fi
 portalResources=$(az resource list -g  "$ResourceGroup"  --query '[].id' -o tsv | grep -v  '/extensions/' -c)
 if [ "$resourceExpected" = "$portalResources" ]; then
    echo "We have $portalResources resources"
