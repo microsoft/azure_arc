@@ -191,6 +191,13 @@ jobs:
           inlineScript: |
             chmod +x ./automated_testing/ghaction_scripts/CountResources.sh
             ./automated_testing/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
+      - name: Adding Public Ip to Connect Open SSH when Azure Bastion is selected 
+        uses: Azure/cli@v1.0.6
+        if: github.event.inputs.deployBastion
+        with:
+          inlineScript: |
+            az network public-ip create -g ${{ github.event.inputs.resourceGroupName }} -n 'ArcBox-Client-PIP'
+            az network nic ip-config update --name 'ipconfig1' --nic-name 'ArcBox-Client-NIC' --resource-group ${{ github.event.inputs.resourceGroupName }} --public-ip-address 'ArcBox-Client-PIP'
       - name: Install Open SSH + execute ArcServersLogonScript
         run: |
           az vm run-command invoke -g  ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --command-id RunPowerShellScript --scripts "C:\ArcBox\GHActionDeploy.ps1"

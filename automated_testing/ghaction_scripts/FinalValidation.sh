@@ -13,7 +13,8 @@ resourceExpected=$(echo "$config" |  jq "$jqueryAfterScriptExecution")
 if [ "$deployBastion" = "true" ]; then
   jqueryBastion=".$Flavor.deployBastionDifference"
   deployBastionDifference=$(echo "$config" |  jq "$jqueryBastion")
-  resourceExpected=$(($resourceExpected+$deployBastionDifference))
+  # +1 because we added a public ip to connect OpenSSH
+  resourceExpected=$(($resourceExpected+$deployBastionDifference+1))
 fi
 
 portalResources=$(az resource list -g  "$ResourceGroup"  --query '[].id' -o tsv | grep -v  '/extensions/' -c)
