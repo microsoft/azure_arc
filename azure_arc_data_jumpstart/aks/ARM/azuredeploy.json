@@ -61,13 +61,14 @@
     },
     "clusterName": {
       "type": "string",
-      "defaultValue": "Arc-Data-AKS",
+      "defaultValue": "Arc-DataSvc-AKS",
       "metadata": {
         "description": "The name of the Kubernetes cluster resource"
       }
     },
     "dnsPrefix": {
       "type": "string",
+      "defaultValue": "arcdata",
       "metadata": {
         "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
       }
