@@ -314,7 +314,7 @@ Once your deployment is complete, you can open the Azure portal and see the ArcB
 
 - After deployment, you should see the ArcBox resources inside your resource group.
 
-  ![Screenshot showing az deployment group create](./deployedresources.png)
+  ![Screenshot showing az deployment group create](./deployed_resources.png)
 
   > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (48 total)**
 
@@ -328,13 +328,13 @@ You can connect to the Client VM in 3 ways depending on how you've deployed ArcB
 
 - If you have not chosen to deploy Azure Bastion in the ARM template, enable the RDP port in the NSG and RDP to the VM using its public IP.
 
-  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./RdpNsg_blocked.png)
+  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./rdp_nsg_blocked.png)
 
-  ![Screenshot showing adding a new inbound security rule](./Nsgb_add_rule.png)
+  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
 
-  ![Screenshot showing adding a new allow RDP inbound security rule](./Nsg_add_Rdp_rule.png)
+  ![Screenshot showing adding a new allow RDP inbound security rule](./nsg_add_rdp_rule.png)
 
-  ![Screenshot showing all inbound security rule](./RdpNsg_all_Rules.png)
+  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
 
   ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
 
@@ -363,7 +363,7 @@ If you already have Microsoft Defender for servers enabled on your subscription 
 
   ![Screenshot showing ArcBox-Client](./automation5.png)
 
-  ![Screenshot showing ArcBox resources in Azure portal](./rgarc.png)
+  ![Screenshot showing ArcBox resources in Azure portal](./rg_arc.png)
 
 ## Azure Arc-enabled SQL Server onboarding
 
