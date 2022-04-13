@@ -26,6 +26,7 @@ Invoke-WebRequest "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/lat
 Write-Host "`n"
 mkdir $Env:TempDir\OpenShift
 Expand-Archive -Force -Path "C:\Temp\openshift-client-windows.zip" -DestinationPath $Env:TempDir\OpenShift
+Write-Host "`n"
 Write-Host "Adding ARO Cli to envrionment variables for this session"
 $env:Path += ";$Env:TempDir\OpenShift"
 Write-Host "`n"
