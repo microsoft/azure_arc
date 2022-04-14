@@ -178,7 +178,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
     ```
 
-    Output should look similar to this:
+    Output should look similar to this. Note that if you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.
 
     ```json
     {
