@@ -1,5 +1,9 @@
+$Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+
 $k3sNamespace = "hello-arc"
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
+
+Start-Transcript -Path $Env:ArcBoxLogsDir\K3sRBAC.log
 
 # echo "Login to Az CLI using the service principal"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
