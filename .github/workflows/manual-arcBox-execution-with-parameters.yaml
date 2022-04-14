@@ -193,7 +193,7 @@ jobs:
             ./automated_testing/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Adding Public Ip to Connect Open SSH when Azure Bastion is selected 
         uses: Azure/cli@v1.0.6
-        if: github.event.inputs.deployBastion
+        if: ${{ github.event.inputs.deployBastion == 'true' }}
         with:
           inlineScript: |
             az network public-ip create -g ${{ github.event.inputs.resourceGroupName }} -n 'ArcBox-Client-PIP'
