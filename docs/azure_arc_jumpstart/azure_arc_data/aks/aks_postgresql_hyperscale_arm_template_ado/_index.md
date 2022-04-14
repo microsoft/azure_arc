@@ -121,28 +121,23 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of ARM template config](./11.jpg)
 
-  * *clusterName* - AKS cluster name
-  * *dnsPrefix* - AKS unique DNS prefix
-  * *nodeAdminUsername* - AKS Node Username
   * *sshRSAPublicKey* - Your ssh public key
-  * *SPN_CLIENT_ID* - Your Azure service principal name
-  * *SPN_CLIENT_SECRET* - Your Azure service principal password
-  * *SPN_TENANT_ID* - Azure tenant ID
-  * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
-  * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)  
+  * *spnClientId* - Your Azure service principal name
+  * *spnClientSecret* - Your Azure service principal password
+  * *spnTenantId* - Your Azure tenant ID
+  * *windowsAdminUsername* - Client Windows VM admin username
+  * *windowsAdminPassword* - Client Windows VM admin password
+  * *myIpAddress* - Public IP address of your network
+  * *logAnalyticsWorkspaceName* - Unique Log Analytics workspace name
+  * *deploySQLMI* - SQL Managed Instance deployment (true/false)
+  * *SQLMIHA* - SQL Managed Instance high-availability deployment (true/false)
+  * *deployPostgreSQL* - PostgreSQL Hyperscale deployment (true/false)
+  * *clusterName* - AKS cluster name
+  * *bastionHostName* - Indicate whether to deploy bastion host to manage AKS
+  * *dnsPrefix* - AKS unique DNS prefix
   * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
-  * *adminUsername* - Client Windows VM admin username
-  * *adminPassword* - Client Windows VM admin password
-  * *vmSize* - Client Windows VM size
-  * *resourceGroup* - Azure resource group where all the resources get deploy
-  * *AZDATA_USERNAME* - Azure Arc Data Controller admin username
-  * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
-  * *ACCEPT_EULA* - "yes" **Do not change**
-  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start d end with a alphanumeric character (This name will be used for k8s namespace as well).
-  * *POSTGRES_NAME* - PostgreSQL Hyperscale server group name to be deployed on the Kubernetes cluster. Names must be 10 characters or fewer in length and conform to DNS naming conventions.
-  * *POSTGRES_WORKER_NODE_COUNT* - PostgreSQL Hyperscale server group number of workers
-  * *POSTGRES_DATASIZE* - PostgreSQL Hyperscale size of data volumes in MB (Recommended to use at least 1GB (1024 MB)).*
-  * *POSTGRES_SERVICE_TYPE* - Kubernetes service type i.e ClusterIP/LoadBalancer/NodePort. As AKS supports Load Balancers, leave configured with *LoadBalancer*.
+  * *githubAccount* - Target GitHub account
+  * *githubBranch* - Target GitHub branch
 
     > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
 
@@ -152,11 +147,9 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of ARM template parameters config](./14.jpg)
 
-    ![Screenshot of ARM template parameters config](./15.jpg)
-
 * Provide a deployment name.
 
-    ![Screenshot of deployment name config](./16.jpg)
+    ![Screenshot of ARM template parameters config](./15.jpg)
 
 * Click the save button.
 
