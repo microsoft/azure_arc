@@ -12,6 +12,8 @@ $certdns = "arcbox.k3sdevops.com"
 
 $appClonedRepo = "https://github.com/$Env:githubUser/azure-arc-jumpstart-apps"
 
+Start-Transcript -Path $Env:ArcBoxLogsDir\K3sGitOps.log
+
 # echo "Login to Az CLI using the service principal"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
