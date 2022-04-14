@@ -178,7 +178,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
     ```
 
-    Output should look similar to this. **Note that if you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+    Output should look similar to this.
 
     ```json
     {
@@ -189,6 +189,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
+
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
