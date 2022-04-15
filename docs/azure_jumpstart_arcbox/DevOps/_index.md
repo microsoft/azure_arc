@@ -155,7 +155,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - "Contributor" - Required for provisioning Azure resources
   - "Security admin" - Required for installing Microsoft Defender for Cloud Azure Arc-enabled Kubernetes extension and dismiss alerts
   - "Security reader" - Required for being able to view Azure Arc-enabled Kubernetes Cloud Defender extension findings
-  - **(Optional)** "User Access Administrator" - Required for automatically onboarding the Azure Arc-enabled SQL Server resource
 
     To create it login to your Azure account run the below commands (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
@@ -165,7 +164,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin" --scopes /subscriptions/$subscriptionId
     az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
@@ -175,7 +173,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor" --scopes /subscriptions/$subscriptionId
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin" --scopes /subscriptions/$subscriptionId
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader" --scopes /subscriptions/$subscriptionId
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look similar to this.
@@ -183,8 +180,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcBox",
-    "name": "http://AzureArcBox",
+    "displayName": "JumpstartArcBox",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
@@ -586,10 +582,11 @@ ArcBox uses a GitOps configuration on the OSM bookstore application to split tra
 After you have finished the deployment of ArcBox, you can verify that Microsoft Defender for Cloud is working properly and alerting on security threats by running the below command to simulate an alert on the _ArcBox-CAPI-Data_ workload cluster:
 
   ```bash
-  kubectl get pods --namespace=asc-alerttest-662jfi039n --kubeconfig arcbox-capi-data.kubeconfig
+  kubectx arcbox-capi
+  kubectl get pods --namespace=asc-alerttest-662jfi039n
   ```
 
-Within ~30 minutes, Microsoft Defender for Cloud will detect this event and trigger a security alert that you will see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled Kubernetes cluster.
+Within about 30 minutes, Microsoft Defender for Cloud will detect this event and trigger a security alert that you will see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled Kubernetes cluster.
 
 ![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert01.png)
 
