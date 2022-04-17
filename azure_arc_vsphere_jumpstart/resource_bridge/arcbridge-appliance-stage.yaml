@@ -1,4 +1,0 @@
-applianceClusterConfig:
-  controlPlaneEndpoint: controlPlaneEndpoint-stage
-applianceResourceFilePath: arcbridge001-resource-stage.yaml
-infrastructureConfigPath: arcbridge001-infra-stage.yaml
