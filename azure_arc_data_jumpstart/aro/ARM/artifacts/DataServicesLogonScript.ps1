@@ -14,11 +14,11 @@ az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
 Write-Host "`n"
 Write-Host "Installing Azure CLI extensions"
-az extension add --name arcdata --upgrade
-az extension add --name connectedk8s --upgrade
-az extension add --name k8s-extension --upgrade
-az extension add --name k8s-configuration --upgrade
-az extension add --name customlocation --upgrade
+az extension add --name arcdata
+az extension add --name connectedk8s
+az extension add --name k8s-extension
+az extension add --name k8s-configuration
+az extension add --name customlocation
 Write-Host "`n"
 az -v
 
