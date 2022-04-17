@@ -1,4 +1,0 @@
-applianceClusterConfig:
-  controlPlaneEndpoint: 10.150.169.120
-applianceResourceFilePath: arcbridge001-resource.yaml
-infrastructureConfigPath: arcbridge001-infra.yaml
