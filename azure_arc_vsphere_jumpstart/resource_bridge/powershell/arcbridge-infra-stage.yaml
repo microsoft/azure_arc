@@ -1,0 +1,15 @@
+vsphereprovider:
+  appliancevm:
+    vmtemplate: vmtemplate-stage
+  datacenter: datacenter-stage
+  datastore: dataStore-stage
+  folder: folder-stage
+  network:
+    dnsservers:
+    - dnsServer-stage
+    gateway: gateway-stage
+    ipaddressprefix: ipAddressPrefix-stage
+    k8snodeippoolend: nodeIpPoolEnd-stage
+    k8snodeippoolstart: nodeIpPoolStart-stage
+    segment: VmNetwork-stage
+  resourcepool: resourcePool-stage
