@@ -30,6 +30,31 @@ $controlPlaneEndpoint = '<IP address of the Kubernetes cluster control plane>'
 
 # <--- Change the following environment variables according to your environment --->
 
+# Generating Infra YAML file
+$InfraParams = ".\arcbridge-infra-stage.yaml"
+(Get-Content -Path $InfraParams) -replace 'vmtemplate-stage',$vmtemplate | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'datacenter-stage',$datacenter | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'dataStore-stage',$dataStore | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'folder-stage',$folder | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'dnsServer-stage',$dnsserver | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'gateway-stage',$gateway | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'ipAddressPrefix-stage',$ipaddressprefix | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'nodeIpPoolEnd-stage',$k8snodeippoolend | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'nodeIpPoolStart-stage',$k8snodeippoolstart | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'VmNetwork-stage',$segment | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'resourcePool-stage',$resourcepool | Set-Content -Path $InfraParams
+
+# Generating appliance YAML file
+$InfraParams = ".\arcbridge-appliance-stage.yaml"
+(Get-Content -Path $InfraParams) -replace 'controlPlaneEndpoint-stage',$controlPlaneEndpoint | Set-Content -Path $InfraParams
+
+# Generating resource YAML file
+$InfraParams = ".\arcbridge-resource-stage.yaml"
+(Get-Content -Path $InfraParams) -replace 'location-stage',$location | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'arcbridgeName-stage',$applianceName | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'resourceGroup-stage',$ResourceGroupName | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'subscriptionId-stage',$SubscriptionId | Set-Content -Path $InfraParams
+
 $logFile = "arcvmware-output.log"
 $loginValues = @($vcenterfqdn, $vcenterusername, $vcenterpassword)
 function log($msg) {
