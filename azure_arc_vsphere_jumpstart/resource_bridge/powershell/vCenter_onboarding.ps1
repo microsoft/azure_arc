@@ -13,6 +13,23 @@ $appID = '<Service principal AppID>'
 $password = '<Service principal password>'
 $tenantId = '<Tenant ID>'
 
+## vSphere parameters
+$vmtemplate = '<Arc appliance template name>'
+$datacenter = '<vSphere data center name>'
+$datastore = '<vSphere data store name>'
+$folder = '<vSphere template folder>'
+$dnsserver = '<DNS server to be used for the appliance>'
+$gateway = '<Gateway address to be used for the appliance>'
+$ipaddressprefix = '<Network address in CIDR notation>'
+## Minimum size of two available IP addresses are required. One IP address is for the VM, and the other is reserved for upgrade scenarios
+$k8snodeippoolstart = '<IP range start>'
+$k8snodeippoolend = '<IP range end>'
+$segment = '<Name of the virtual network or segment to which the appliance VM must be connected>'
+$resourcepool = '<Name of the resource pool>'
+$controlPlaneEndpoint = '<IP address of the Kubernetes cluster control plane>'
+
+# <--- Change the following environment variables according to your environment --->
+
 $logFile = "arcvmware-output.log"
 $loginValues = @($vcenterfqdn, $vcenterusername, $vcenterpassword)
 function log($msg) {
