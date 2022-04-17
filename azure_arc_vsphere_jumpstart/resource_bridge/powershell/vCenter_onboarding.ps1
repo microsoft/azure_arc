@@ -151,14 +151,14 @@ try {
     $login_password = $loginValues[2]
 
     log "Validating"
-    $user_in | az arcappliance validate vmware --config-file .\arcbridge001-appliance.yaml 2>> $logFile
+    $user_in | az arcappliance validate vmware --config-file .\arcbridge-appliance-stage.yaml 2>> $logFile
     log "Preparing"
-    $user_in | az arcappliance prepare vmware --config-file .\arcbridge001-appliance.yaml 2>> $logFile
+    $user_in | az arcappliance prepare vmware --config-file .\arcbridge-appliance-stage.yaml 2>> $logFile
     log "Deploying"
-    $user_in | az arcappliance deploy vmware --config-file .\arcbridge001-appliance.yaml 2>> $logFile
+    $user_in | az arcappliance deploy vmware --config-file .\arcbridge-appliance-stage.yaml 2>> $logFile
     sleep -Seconds 20
     log "Creating"
-    $user_in | az arcappliance create vmware --config-file .\arcbridge001-appliance.yaml --kubeconfig .\kubeconfig 2>> $logFile
+    $user_in | az arcappliance create vmware --config-file .\arcbridge-appliance-stage.yaml --kubeconfig .\kubeconfig 2>> $logFile
 
     log "Adding Cluster extension"
 
@@ -179,7 +179,7 @@ try {
     log "Step 3/5: Installing cluster extension"
 
 
-    $VMW_RP_OBJECT_ID = (az ad sp show --id 'ac9dc5fe-b644-4832-9d03-d9f1ab70c5f7' --query objectId -o tsv)
+    $VMW_RP_OBJECT_ID = (az ad sp show --id 'ac9dc5fe-b644-4832-9d03-d9f1ab70c5f7' --query objectId -o tsv 2>> $logFile))
     if (!$VMW_RP_OBJECT_ID) {
         $msg = "The service principal ID was not found for the resource provider Microsoft.ConnectedVMwarevSphere for the subscription '$SubscriptionId'.`n" +
         "Please register the RP with the subscription using the following command and try again after some time.`n`n" +
@@ -220,7 +220,7 @@ try {
     log "`t* These credentials will be used when you perform vCenter operations through Azure."
     log "`t* You can provide the same credentials that you provided for Arc resource bridge earlier."
 
-    az connectedvmware vcenter connect --debug --tags Project=jumpstart_azure_arc_vsphere --subscription $SubscriptionId --resource-group $ResourceGroupName --name $vCenterName --fqdn $vcenterfqdn --username $vcenterusername --password $vcenterpassword --custom-location $customLocationId --location $location --port 443
+    az connectedvmware vcenter connect --debug --tags Project=jumpstart_azure_arc_vsphere --subscription $SubscriptionId --resource-group $ResourceGroupName --name $vCenterName --fqdn $vcenterfqdn --username $vcenterusername --password $vcenterpassword --custom-location $customLocationId --location $location --port 443 2>> $logFile
 
     $vcenterId = (az connectedvmware vcenter show --subscription $SubscriptionId --resource-group $ResourceGroupName --name $vCenterName --query id -o tsv 2>> $logFile)
     if (!$vcenterId) {
