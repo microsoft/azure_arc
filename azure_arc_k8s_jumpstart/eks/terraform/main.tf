@@ -1,16 +1,17 @@
 terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
+  backend "remote" {
+    # The name of your Terraform Cloud organization.
+    organization = "your-terraform-cloud-organization"
+    
+    # The name of the Terraform Cloud workspace to store Terraform state files in.
+    workspaces {
+      name = "your-terraform-cloud-workspace"
     }
   }
 }
 
 # Configure the AWS Provider
 provider "aws" {
-  access_key = var.AWS_ACCESS_KEY_ID
-  secret_key = var.AWS_SECRET_ACCESS_KEY
   region = var.AWS_REGION
 }
 
