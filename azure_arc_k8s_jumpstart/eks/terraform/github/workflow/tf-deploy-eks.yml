@@ -9,7 +9,7 @@ jobs:
     environment: PoC
     defaults:
       run:
-        working-directory: "./azure_arc_k8s_jumpstart/eks/terraform/github"
+        working-directory: "./azure_arc_k8s_jumpstart/eks/terraform"
     
     steps:
       - name: Checkout
