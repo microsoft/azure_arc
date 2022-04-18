@@ -118,7 +118,7 @@ variable "client_admin_ssh" {
 variable "deploy_bastion" {
   type        = bool
   description = "Choice to deploy Azure Bastion"
-  default = false
+  default     = false
 }
 
 ### This should be swapped to a lower-case value to avoid case sensitivity ###
@@ -171,7 +171,7 @@ module "management_policy" {
   resource_group_name = azurerm_resource_group.rg.name
   workspace_name      = var.workspace_name
   workspace_id        = module.management_artifacts.workspace_id
-  deployment_flavor    = var.deployment_flavor
+  deployment_flavor   = var.deployment_flavor
 
   depends_on = [azurerm_resource_group.rg]
 }
