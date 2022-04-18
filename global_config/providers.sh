@@ -1,7 +1,0 @@
-echo Microsoft.Kubernetes
-echo Microsoft.KubernetesConfiguration
-echo Microsoft.ExtendedLocation
-
-Microsoft.Kubernetes
-Microsoft.KubernetesConfiguration
-Microsoft.ExtendedLocation
