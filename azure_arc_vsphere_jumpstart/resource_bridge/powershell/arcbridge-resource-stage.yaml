@@ -1,5 +1,0 @@
-resource:
-  location: location-stage
-  name: arcbridgeName-stage
-  resource_group: resourceGroup-stage
-  subscription: subscriptionId-stage
