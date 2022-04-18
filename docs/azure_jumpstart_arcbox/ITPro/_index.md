@@ -103,9 +103,12 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az provider register --namespace Microsoft.AzureArcData --wait
   ```
 
-- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access controls (RBAC) roles is required:
+- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access control (RBAC) roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
+  - "Security admin" - Required for installing Microsoft Defender for Cloud Azure-Arc enabled Kubernetes extension and dismiss alerts
+  - "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
+  - "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
   - **(optional)** "User Access Administrator" - Required for automatically onboarding the Azure Arc-enabled SQL Server resource
 
     > **NOTE: In the event a Service Principal with Owner cannot be created, the SQL Server can be onboarded to Azure Arc post deployment by following the [Azure Arc-enabled SQL Server onboarding](#azure-arc-enabled-sql-server-onboarding) steps below.**
@@ -114,38 +117,42 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "User Access Administrator"
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Monitoring Metrics Publisher"
-    az ad sp create-for-rbac -n "JumpstartArcBox" --role "User Access Administrator"
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "User Access Administrator" --scopes /subscriptions/$subscriptionId
     ```
 
-    Output should look like this:
+    Output should look similar to this:
 
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcBox",
-    "name": "http://AzureArcBox",
+    "displayName": "JumpstartArcBox",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
 
-    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.**.
 
-- [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key)
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
+
+- [Generate SSH Key](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/) (or use existing ssh key). The SSH key is used to configure secure access to the Linux virtual machines that are used to run the Kubernetes clusters.
 
   ```shell
   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"

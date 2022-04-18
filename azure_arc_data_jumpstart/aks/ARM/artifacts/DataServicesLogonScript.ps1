@@ -2,7 +2,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = "Arc-Data-AKS"
+$connectedClusterName = "Arc-DataSvc-AKS"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -101,9 +101,9 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+# Enabling Container Insights cluster extension
 Write-Host "`n"
-Write-Host "Enabling Container Insights cluster extensions"
+Write-Host "Enabling Container Insights cluster extension"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
 Write-Host "`n"
 

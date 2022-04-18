@@ -1,36 +1,42 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "vmSize": {
-        "value": "Standard_D4s_v3"
-      },
-      "vmName": {
-          "value": "Arc-Linux-Demo"
-      },
-      "adminUsername": {
-        "value": "arcdemo"
-      },
-      "adminPasswordOrKey": {
-        "value": "ArcPassword123!!"
-      },
-      "dnsLabelPrefix": {
-        "value": "arclinuxdemoXXX"
-      },
-      "subscriptionID": {
-        "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
-      },
-      "servicePrincipalClient": {
-        "value": "3333333-XXXX-YYYY-XXXX-YTYTYTYT"
-      }, 
-      "servicePrincipalClientSecret": {
-        "value": "33333333-XXXX-YTYT-9c21-7777777777"
-      }, 
-      "tenantID": {
-        "value": "33333333-XXXX-41af-1111-7777777777"
-      }, 
-      "resourceGroup": {
-        "value": "Arc-Servers-Linux-Demo"
-      }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSize": {
+      "value": "Standard_D4s_v3"
+    },
+    "vmName": {
+      "value": "Arc-Linux-Demo"
+    },
+    "adminUsername": {
+      "value": "arcdemo"
+    },
+    "adminPasswordOrKey": {
+      "value": "ArcPassword123!!"
+    },
+    "dnsLabelPrefix": {
+      "value": "arclinuxdemoXXX"
+    },
+    "subscriptionID": {
+      "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
+    },
+    "servicePrincipalClient": {
+      "value": "3333333-XXXX-YYYY-XXXX-YTYTYTYT"
+    },
+    "servicePrincipalClientSecret": {
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
+    },
+    "tenantID": {
+      "value": "33333333-XXXX-41af-1111-7777777777"
+    },
+    "resourceGroup": {
+      "value": "Arc-Servers-Linux-Demo"
+    },
+    "deployBastion": {
+      "value": false
+    },
+    "bastionHostName": {
+      "value": "Arc-Linux-Demo-Bastion"
     }
+  }
 }

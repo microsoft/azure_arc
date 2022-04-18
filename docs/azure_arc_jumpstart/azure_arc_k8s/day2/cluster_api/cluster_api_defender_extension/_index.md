@@ -40,17 +40,20 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Contributor"
-    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Security admin"
-    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Security reader"
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Security reader" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look like this:
@@ -58,14 +61,15 @@ Kubernetes extensions are add-ons for Kubernetes clusters. The extensions featur
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcAppK8s",
-    "name": "http://AzureArcAppK8s",
+    "displayName": "JumpstartArcK8s",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
 
-    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 ## Automation Flow
 

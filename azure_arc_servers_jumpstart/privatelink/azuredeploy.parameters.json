@@ -1,0 +1,78 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "azureRgName": {
+            "value": "<Cloud resource group name>"
+        },
+        "onPremRgName": {
+            "value": "<Onpremise resource group name>"
+        },
+        "cloudVNetName": {
+            "value": "<Cloud VNET Name> "
+        },
+        "cloudVNetPrefix": {
+            "value": "<Cloud VNET IP CIDR>"
+        },
+        "cloudSubnetName": {
+            "value": "<Cloud subnet name>"
+        },
+        "cloudGatewaySubnetPrefix": {
+            "value": "<Cloud Gw subnet IP CIDR>"
+        },
+        "cloudSubnetPrefix": {
+            "value": "<Cloud subnet IP CIDR>"
+        },
+        "cloudGatewayName": {
+            "value": "<Cloud VPN Gw name>"
+        },
+        "vmName": {
+            "value": "<Windows Azure VM Name>"
+        },
+        "vmSize": {
+            "value": "<Windows Azure VM size>"
+        },
+        "adminUsername": {
+            "value": "<Azure VM admin username>"
+        },
+        "adminPassword": {
+            "value": "<Azure VM admin password>"
+        },
+        "onPremVNetName": {
+            "value": "<Onpremise VNET Name>"
+        },
+        "onPremVNetPrefix": {
+            "value": "<Onpremise VNET IP CIDR>"
+        },
+        "onPremGatewaySubnetPrefix": {
+            "value": "<Onpremise GW subnet IP CIDR>"
+        },
+        "onPremBastionSubnetPrefix": {
+            "value": "<Onpremise Azure Bastion subnet IP CIDR>"
+        },
+        "onPremSubnetName": {
+            "value": "<Onpremise subnet name>"
+        },
+        "onPremSubnetPrefix": {
+            "value": "<Onpremise subnet IP CIDR>"
+        },
+        "onPremGatewayName": {
+            "value": "<Onpremise VPN Gw name>"
+        },
+        "onPremBastionName": {
+            "value": "<Onpremise Azure Bastion Name>"
+        },
+        "sharedKey": {
+            "value": "<VPN shared Key>"
+        },
+        "appId": {
+            "value": "<Service Principal AppId>"
+        },
+        "password": {
+            "value": "<Service Principal password>"
+        },
+        "tenantId": {
+            "value": "<Tenant ID>"
+        }
+    }
+}

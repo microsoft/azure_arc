@@ -34,6 +34,12 @@
     },
     "templateBaseUrl": {
       "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/"
+    },
+    "deployBastion": {
+      "value": "(true/false)"
+    },
+    "bastionHostName": {
+      "value": "<Azure Bastion Hostname>"
     }
   }
 }

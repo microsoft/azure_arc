@@ -43,19 +43,22 @@ By the end of this guide, you will have a Microk8s Kubernetes cluster deployed w
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher"
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor"
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin"
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader"
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher"
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look like this:
@@ -63,14 +66,15 @@ By the end of this guide, you will have a Microk8s Kubernetes cluster deployed w
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcData",
-    "name": "http://AzureArcData",
+    "displayName": "JumpstartArcDataSvc",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
 
-  > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 ## Architecture (In a nutshell)
 
@@ -115,6 +119,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - `deploySQLMI` - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller only scenario we leave it set to _**false**_.
   - `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller only scenario we leave it set to _**false**_.
   - `templateBaseUrl` - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
+  - `deployBastion` - Choice (true | false) to deploy Azure Bastion.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/microk8s/azure/arm_template) and run the below command:
 
@@ -153,7 +158,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that first phase of the automation is completed, it is time to RDP to the Client VM using it's public IP.
+- Now that the first phase of the automation is completed, it is time to RDP to the Client VM using its public IP.
 
   ![Client VM public IP](./05.png)
 

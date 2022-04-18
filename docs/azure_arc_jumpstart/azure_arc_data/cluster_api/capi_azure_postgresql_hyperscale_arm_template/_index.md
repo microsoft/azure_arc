@@ -41,19 +41,22 @@ By the end of this guide, you will have a CAPI Kubernetes cluster deployed with 
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader"
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher"
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor"
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin"
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader"
-    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher"
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look like this:
@@ -61,14 +64,15 @@ By the end of this guide, you will have a CAPI Kubernetes cluster deployed with 
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcData",
-    "name": "http://AzureArcData",
+    "displayName": "JumpstartArcDataSvc",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
 
-    > **NOTE: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest).**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 ## Architecture (In a nutshell)
 
@@ -113,6 +117,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _'deploySQLMI'_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we leave it set to _**false**_.
   - _'SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this scenario we leave it set to _**false**_.
   - _'deployPostgreSQL'_ - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this Azure Arc-enabled PostgreSQL Hyperscale scenario we will set it to _**true**_.
+  - _'deployBastion'_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
+  - _'bastionHostName'_ - Azure Bastion host name.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM) and run the below command:
 
@@ -150,15 +156,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-- Now that first phase of the automation is completed, it is time to RDP to the sidecar VM using it's public IP.
+- Now that the first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
 
     ![Screenshot showing Client VM public IP](./04.png)
+
+- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Screenshot showing connecting using Azure Bastion](./05.png)
 
 - At first login, as mentioned in the "Automation Flow" section above, the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell logon script will start it's run.
 
 - Let the script to run its course and **do not close** the PowerShell session, this will be done for you once completed. Once the script will finish it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change and both the Azure Arc Data Controller and PostgreSQL will be deployed on the cluster and be ready to use.
-
-  ![Screenshot showing the PowerShell logon script run](./05.png)
 
   ![Screenshot showing the PowerShell logon script run](./06.png)
 
@@ -194,7 +202,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Screenshot showing the PowerShell logon script run](./22.png)
 
-  ![Screenshot showing the post-run desktop](./23.png)
+  ![Screenshot showing the PowerShell logon script run](./23.png)
+
+  ![Screenshot showing the post-run desktop](./24.png)
 
 - Since this scenario is deploying the Azure Arc Data Controller, you will also notice additional newly deployed Azure resources in the resources group. The important ones to notice are:
 
@@ -204,17 +214,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - Azure Arc-enabled PostgreSQL Hyperscale - The PostgreSQL Hyperscale instance that is now deployed on the Kubernetes cluster.
 
-  ![Screenshot showing additional Azure resources in the resource group](./24.png)
+  ![Screenshot showing additional Azure resources in the resource group](./25.png)
 
 - As part of the automation, Azure Data Studio is installed along with the _Azure Data CLI_, _Azure CLI_, _Azure Arc_ and the _PostgreSQL_ extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see the installed extensions.
 
-    ![Screenshot showing Azure Data Studio shortcut](./25.png)
+    ![Screenshot showing Azure Data Studio shortcut](./26.png)
 
-    ![Screenshot showing Azure Data Studio extensions](./26.png)
+    ![Screenshot showing Azure Data Studio extensions](./27.png)
 
 - Additionally, the PostgreSQL connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
 
-  ![Screenshot showing Azure Data Studio PostgresSQL Hyperscale connection](./27.png)
+  ![Screenshot showing Azure Data Studio PostgresSQL Hyperscale connection](./28.png)
 
 ## Cluster extensions
 
@@ -230,9 +240,9 @@ In this scenario, four Azure Arc-enabled Kubernetes cluster extensions were inst
 
 - In order to view these cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./28.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes cluster extensions settings](./29.png)
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./29.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes installed extensions](./30.png)
 
 ### Exploring logs from the Client virtual machine
 
@@ -245,10 +255,10 @@ Occasionally, you may need to review log output from scripts that run on the _Ar
 | _C:\Temp\DeployPostgreSQL.log_ | Output of _deployPostgreSQL.ps1_ which deploys and configures PostgreSQL Hyperscale with Azure Arc. |
 | _C:\Temp\installCAPI.log_ | Output from the custom script extension which runs on _Arc-Data-CAPI-MGMT_ and configures the Cluster API for Azure cluster and onboards it as an Azure Arc-enabled Kubernetes cluster. If you encounter ARM deployment issues with _ubuntuCapi.json_ then review this log. |
 
-![Screenshot showing the Temp folder with deployment logs](./30.png)
+![Screenshot showing the Temp folder with deployment logs](./31.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Delete Azure resource group](./31.png)
+    ![Delete Azure resource group](./32.png)

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sshRSAPublicKey": {
+      "value": "ssh-rsaxx33333333-XXXX-YYYY-XXXX-YTYTYTYT"
+    },
+    "spnClientId": {
+      "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
+    },
+    "spnClientSecret": {
+      "value": "33333333-XXXX-YTYT-9c21-7777777777"
+    },
+    "spnTenantId": {
+      "value": "33333333-XXXX-41af-1111-7777777777"
+    },
+    "windowsAdminUsername": {
+      "value": "arcdemo"
+    },
+    "windowsAdminPassword": {
+      "value": "ArcPassword123!!"
+    },
+    "myIpAddress": {
+      "value": "192.168.10.10"
+    },
+    "logAnalyticsWorkspaceName": {
+      "value": "rg-la-arc"
+    },
+    "deploySQLMI": {
+      "value": true
+    },
+    "deployPostgreSQL": {
+      "value": false
+    },
+    "templateBaseUrl": {
+      "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/microk8s/azure/arm_template/"
+    },
+    "deployBastion": {
+      "value": true
+    },
+    "bastionHostName": {
+      "value": "Arc-Data-Demo-Bastion"
+    }
+  }
+}
