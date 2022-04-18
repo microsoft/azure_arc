@@ -30,6 +30,11 @@ $controlPlaneEndpoint = '<IP address of the Kubernetes cluster control plane>'
 
 # <--- Change the following environment variables according to your environment --->
 
+#Copying the config files
+Copy-Item .\config\arcbridge-appliance-stage.yaml -Force -Destination .
+Copy-Item .\config\arcbridge-infra-stage.yaml -Force -Destination .
+Copy-Item .\config\arcbridge-resource-stage.yaml -Force -Destination .
+
 # Generating Infra YAML file
 $InfraParams = ".\arcbridge-infra-stage.yaml"
 (Get-Content -Path $InfraParams) -replace 'vmtemplate-stage',$vmtemplate | Set-Content -Path $InfraParams
