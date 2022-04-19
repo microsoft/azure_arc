@@ -24,8 +24,8 @@ ArcBox for DevOps is a special "flavor" of ArcBox that is intended for users who
 
 ArcBox for DevOps deploys two Kubernetes clusters to give you multiple options for exploring Azure Arc-enabled Kubernetes capabilities and potential integrations.
 
-- One single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource (_ArcBox-K3s_).
-- ArcBox deploys one single-node Rancher K3s cluster (_ArcBox-CAPI-MGMT_), which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider for Azure (CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster.
+- _**ArcBox-CAPI-Data**_ - A single-node Rancher K3s cluster which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider for Azure (CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster. The workload cluster is onboarded as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys multiple [GitOps configurations](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#gitops-configurations) on this cluster for you, so you have an easy way to get started exploring GitOps capabilities.
+- _**ArcBox-K3s**_ - One single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox provides the user with [PowerShell scripts](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#additional-optional-scenarios-on-the-arcbox-k3s-cluster) that can be manually run to apply GitOps configurations on this cluster.
 
 ### Sample applications
 
@@ -598,7 +598,7 @@ After you have finished the deployment of ArcBox, you can verify that Microsoft 
   kubectl get pods --namespace=asc-alerttest-662jfi039n
   ```
 
-Within about 30 minutes, Microsoft Defender for Cloud will detect this event and trigger a security alert that you will see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled Kubernetes cluster.
+After a period of time (typically less than an hour), Microsoft Defender for Cloud will detect this event and trigger a security alert that you will see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled Kubernetes cluster.
 
 ![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert01.png)
 
@@ -634,7 +634,7 @@ Optionally, you can explore additional GitOps and RBAC scenarios in a manual fas
 
     ![Screenshot showing Script VSCode](./k3s_gitops04.png)
   
-  - Right click _K3sGitOps.ps1_ script and select Run with PowerShell to execute the script.
+  - Right click _K3sGitOps.ps1_ script and select Run with PowerShell to execute the script. This will take about 5-10 minutes to run.
   
     ![Screenshot showing Script execution](./k3s_gitops05.png)
 
