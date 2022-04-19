@@ -5,7 +5,7 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$osmRelease = "v1.0.0"
+$osmRelease = "v1.1.0"
 $osmMeshName = "osm"
 $ingressNamespace = "ingress-nginx"
 
