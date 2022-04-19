@@ -7,7 +7,7 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
 $osmRelease = "v1.1.0"
 $osmMeshName = "osm"
-$osmExtension = "v1.0.0"
+$osmExtension = "1.0.0"
 $ingressNamespace = "ingress-nginx"
 
 $certname = "ingress-cert"
