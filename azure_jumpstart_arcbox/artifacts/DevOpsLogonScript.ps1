@@ -34,11 +34,6 @@ $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
-# Register Azure providers
-#az provider register --namespace Microsoft.HybridCompute --wait
-#az provider register --namespace Microsoft.GuestConfiguration --wait
-#az provider register --namespace Microsoft.AzureArcData --wait
-
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
