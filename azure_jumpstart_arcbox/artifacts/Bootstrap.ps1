@@ -71,7 +71,6 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:agentScript = "C:\ArcBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
-$winTerminalVersion = "1.7.1091.0" # Pindown Windows Terminal version 
 
 New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
@@ -136,18 +135,19 @@ workflow ClientTools_01
             }
 
             # All flavors
-            Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/arcbox_wallpaper.png" -OutFile "$Env:ArcBoxDir\wallpaper.png"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "$Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "$Env:ArcBoxDir\mgmtMonitorWorkbook.parameters.json"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile "$Env:ArcBoxDir\DeploymentStatus.ps1"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile "$Env:ArcBoxLogsDir\LogInstructions.txt"
+            Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/arcbox_wallpaper.png" -OutFile "C:\ArcBox\wallpaper.png"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "C:\ArcBox\MonitorWorkbookLogonScript.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile "C:\ArcBox\DeploymentStatus.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
 
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLIcon.ico") -OutFile "$Env:ArcBoxDir\ArcSQLIcon.ico"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile "$Env:ArcBoxDir\ArcSQLManualOnboarding.ps1"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile "$Env:ArcBoxDir\installArcAgentSQLUser.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLIcon.ico") -OutFile "C:\ArcBox\ArcSQLIcon.ico"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile "C:\ArcBox\ArcSQLManualOnboarding.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile "C:\ArcBox\installArcAgentSQLUser.ps1"
 
+            $winTerminalVersion = "1.7.1091.0"
             Invoke-WebRequest "https://github.com/microsoft/terminal/releases/download/v"$winTerminalVersion"/Microsoft.WindowsTerminal_"$winTerminalVersion"_8wekyb3d8bbwe.msixbundle" -OutFile "$Env:ArcBoxDir\WindowsTerminal.msixbundle"
-            Add-AppxPackage -Path "$Env:ArcBoxDir\WindowsTerminal.msixbundle"
+            Add-AppxPackage -Path "C:\ArcBox\WindowsTerminal.msixbundle"
 
             # Workbook template
             if ($flavor -eq "ITPro") {
