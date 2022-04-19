@@ -7,6 +7,7 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
 $osmRelease = "v1.1.0"
 $osmMeshName = "osm"
+$osmExtension = "v1.0.0"
 $ingressNamespace = "ingress-nginx"
 
 $certname = "ingress-cert"
@@ -107,7 +108,7 @@ Write-Host "`n"
 az -v
 
 # "Create OSM Kubernetes extension instance"
-az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --release-train pilot --name $osmMeshName
+az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --release-train pilot --name $osmMeshName --version 
 
 # Create Kubernetes Namespaces
 foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse', 'hello-arc', 'ingress-nginx')) {
