@@ -62,16 +62,18 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc-enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* Enable subscription for the *Microsoft.AzureArcData* and *Microsoft.HybridCompute* resource providers for Azure Arc-enabled SQL Server. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.AzureArcData
+  az provider register --namespace Microsoft.HybridCompute
   ```
 
   You can monitor the registration process with the following commands:
 
   ```shell
   az provider show -n Microsoft.AzureArcData -o table
+  az provider show -n Microsoft.HybridCompute -o table
   ```
 
 ## Create a new AWS IAM Role & Key
