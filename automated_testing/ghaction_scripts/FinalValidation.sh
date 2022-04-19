@@ -1,10 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 # It is required to be have azure cli log in
 
 ResourceGroup=$1
 Flavor=$2
 DeployTestParametersFile=$3
 deployBastion=$4
+
+az config set extension.use_dynamic_install=yes_without_prompt
 
 validations=true
 config=$(cat "$DeployTestParametersFile")
@@ -78,6 +80,27 @@ if [ "$deployBastion" = "true" ]; then
      validations=false
   fi
 fi
+
+for val in $(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.Kubernetes/connectedClusters')
+do
+  readarray -d / -t resourceArray <<< "$val"
+  name="${resourceArray[${#resourceArray[*]}-1]}"
+  name=${name//[$'\t\r\n']}
+  count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'azuredefender' -c)
+  if [ "$count" = "1" ]; then
+    echo "Kubernetes Cluster has defender extension: $name"
+  else
+    echo "Defender extention not found on $name"
+    validations=false
+  fi
+  count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'azuremonitor' -c)
+  if [ "$count" = "1" ]; then
+    echo "Kubernetes Cluster has Azure Monitor extension: $name"
+  else
+    echo "Azure Monitor extention not found on $name"
+    validations=false
+  fi
+done
 
 if [ "$validations" = "false" ]; then
    echo "Something was wrong. Failing"
