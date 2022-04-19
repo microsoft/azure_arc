@@ -145,8 +145,8 @@ workflow ClientTools_01
             Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile $Env:ArcBoxDir\ArcSQLManualOnboarding.ps1
             Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile $Env:ArcBoxDir\installArcAgentSQLUser.ps1
 
-            # $winTerminalVersion = "1.7.1091.0"
-            # Invoke-WebRequest "https://github.com/microsoft/terminal/releases/download/v"$winTerminalVersion"/Microsoft.WindowsTerminal_"$winTerminalVersion"_8wekyb3d8bbwe.msixbundle" -OutFile $Env:ArcBoxDir\WindowsTerminal.msixbundle
+            $Env:winTerminalVersion = "1.7.1091.0"
+            Invoke-WebRequest "https://github.com/microsoft/terminal/releases/download/v"$Env:winTerminalVersion"/Microsoft.WindowsTerminal_"$Env:winTerminalVersion"_8wekyb3d8bbwe.msixbundle" -OutFile $Env:ArcBoxDir\WindowsTerminal.msixbundle
 
             # Workbook template
             if ($flavor -eq "ITPro") {
