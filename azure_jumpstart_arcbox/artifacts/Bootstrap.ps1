@@ -135,7 +135,7 @@ workflow ClientTools_01
             }
 
             # All flavors
-            Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/arcbox_devops/img/arcbox_wallpaper.png" -OutFile "C:\ArcBox\wallpaper.png"
+            Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/arcbox_wallpaper.png" -OutFile "C:\ArcBox\wallpaper.png"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "C:\ArcBox\MonitorWorkbookLogonScript.ps1"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
             Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile "C:\ArcBox\DeploymentStatus.ps1"
