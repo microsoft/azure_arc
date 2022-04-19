@@ -1,12 +1,12 @@
 ---
 type: docs
-title: "Managing Calico Network Policy using GitOps in an Azure Arc connected cluster"
-linkTitle: "Managing Calico Network Policy using GitOps in an Azure Arc connected cluster"
+title: "Managing Calico Network Policy using GitOps in an Azure Arc-enabled Kubernetes cluster"
+linkTitle: "Managing Calico Network Policy using GitOps in an Azure Arc-enabled Kubernetes cluster"
 weight: 1
 description: >
 ---
 
-## Use GitOps in an Azure Arc connected Kubernetes cluster for managing Calico Network Policy
+## Use GitOps in an Azure Arc-enabled Kubernetes cluster for managing Calico Network Policy
 
  > **Disclaimer: This scenario was contributed by the Tigera Project Calico team as part of the "Jumpstart Friends" program**
 

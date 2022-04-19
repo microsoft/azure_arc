@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Use Azure Policy on an Azure Arc connected Kubernetes cluster to audit pods' labels for use with  Calico network policy
+## Use Azure Policy on an Azure Arc-enabled Kubernetes cluster to audit pods' labels for use with  Calico network policy
 
  > **Disclaimer: This scenario was contributed by the Tigera Project Calico team as part of the "Jumpstart Friends" program**
 
@@ -82,7 +82,7 @@ The Azure Policy will be set to “Audit” mode to check the configuration of e
 
     ![AzResourceProvider Bash](./04.png)
 
-- Check whether Azure Policy is installed in an Azure Arc connected cluster
+- Check whether Azure Policy is installed in an Azure Arc-enabled Kubernetes cluster
 
   > by running the ```kubectl get pods -n gatekeeper-system``` command.
   
@@ -185,7 +185,7 @@ The Azure Policy will be set to “Audit” mode to check the configuration of e
 
 Complete the following steps to clean up your environment.
 
-- From each Azure Arc connected cluster under your resource group, click the _Azure Policy_ page, and disable the extension of Azure policy under `Onboard to Azure Policy for Azure Arc enabled Kubernetes cluster`
+- From each Azure Arc-enabled Kubernetes cluster under your resource group, click the _Azure Policy_ page, and disable the extension of Azure policy under `Onboard to Azure Policy for Azure Arc-enabled Kubernetes cluster`
 
     ![Disable Azure Policy addon](./17.png)
 
