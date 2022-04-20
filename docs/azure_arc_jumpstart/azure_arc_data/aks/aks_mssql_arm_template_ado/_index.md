@@ -12,9 +12,9 @@ The following README will guide you on how to use [Azure DevOps (ADO) Release pi
 
 By the end of this guide, you will have an Azure DevOps Release pipeline to deploy AKS cluster with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity), Azure SQL MI with a sample database and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
-> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
-> **Note: The following scenario is focusing the Azure DevOps Release pipeline creation. Once the pipeline has been created and the environment deployment has finished, the automation flow and next steps are as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)**
+> **NOTE: The following scenario is focusing the Azure DevOps Release pipeline creation. Once the pipeline has been created and the environment deployment has finished, the automation flow and next steps are as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)**
 
 ## Prerequisites
 
@@ -59,19 +59,7 @@ By the end of this guide, you will have an Azure DevOps Release pipeline to depl
     }
     ```
 
-    > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
-
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc-enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
-
-  ```shell
-  az provider register --namespace Microsoft.AzureArcData
-  ```
-
-  You can monitor the registration process with the following commands:
-
-  ```shell
-  az provider show -n Microsoft.AzureArcData -o table
-  ```
+    > **NOTE: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
 
 ## Deployment
 
@@ -103,7 +91,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of Azure Resource Manager connection config](./08.jpg)
 
-  > **Note: For new ADO project, you will be asked to click the authorization button**
+  > **NOTE: For new ADO project, you will be asked to click the authorization button**
 
     ![Screenshot of Azure subscription config](./09.jpg)
 
@@ -136,14 +124,14 @@ In this scenario, you will create a new Release pipeline to deploy the environme
   * *bastionHostName* - Indicate whether to deploy bastion host to manage AKS
   * *dnsPrefix* - AKS unique DNS prefix
   * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
-  * *githubAccount* - Target GitHub account
-  * *githubBranch* - Target GitHub branch
   
-    > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
+    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
 
     ![Screenshot of ARM template parameters config](./12.jpg)
 
     ![Screenshot of ARM template parameters config](./13.jpg)
+
+    ![Screenshot of ARM template parameters config](./14.jpg)
 
     ![Screenshot of ARM template parameters config](./15.jpg)
 
@@ -179,7 +167,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
 * Once completed, all the deployment resources will be available in the Azure portal.
 
-  > **Note: Deployment time of the Azure resources (AKS + Windows VM) can take ~25-30 minutes.**
+  > **NOTE: Deployment time of the Azure resources (AKS + Windows VM) can take ~25-30 minutes.**
 
     ![Screenshot of deployment completed](./27.jpg)
 
