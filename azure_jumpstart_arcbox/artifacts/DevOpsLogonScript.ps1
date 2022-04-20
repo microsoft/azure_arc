@@ -5,8 +5,9 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$osmRelease = "v1.0.0"
+$osmRelease = "v1.1.0"
 $osmMeshName = "osm"
+$osmExtension = "1.0.0"
 $ingressNamespace = "ingress-nginx"
 
 $certname = "ingress-cert"
@@ -32,11 +33,6 @@ az login --service-principal --username $Env:spnClientID --password $Env:spnClie
 $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
-
-# Register Azure providers
-#az provider register --namespace Microsoft.HybridCompute --wait
-#az provider register --namespace Microsoft.GuestConfiguration --wait
-#az provider register --namespace Microsoft.AzureArcData --wait
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
@@ -107,7 +103,7 @@ Write-Host "`n"
 az -v
 
 # "Create OSM Kubernetes extension instance"
-az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --release-train pilot --name $osmMeshName
+az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --release-train pilot --name $osmMeshName --version $osmExtension
 
 # Create Kubernetes Namespaces
 foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse', 'hello-arc', 'ingress-nginx')) {
