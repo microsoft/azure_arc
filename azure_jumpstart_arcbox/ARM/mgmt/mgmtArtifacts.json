@@ -109,8 +109,8 @@
               "addressPrefix": "[variables('subnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled",
-              "networkSecurityGroup" : {
-                "id" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
               }
             }
           },
@@ -131,83 +131,196 @@
       "properties": {
         "securityRules": [
           {
-                        "name": "allow_k8s_6443",
-                        "properties": {
-                            "priority": 1002,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "6443"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_80",
-                        "properties": {
-                            "priority": 1003,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "80"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_8080",
-                        "properties": {
-                            "priority": 1004,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "8080"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_443",
-                        "properties": {
-                            "priority": 1005,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "443"
-                        }
-                    },
-                    {
-                        "name": "allow_k8s_kubelet",
-                        "properties": {
-                            "priority": 1006,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "10250"
-                        }
-                    },
-                    {
-                        "name": "allow_traefik_lb_external",
-                        "properties": {
-                            "priority": 1007,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "32323"
-                        }
-                    }
+            "name": "allow_k8s_6443",
+            "properties": {
+              "priority": 1002,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "6443"
+            }
+          },
+          {
+            "name": "allow_k8s_80",
+            "properties": {
+              "priority": 1003,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "80"
+            }
+          },
+          {
+            "name": "allow_k8s_8080",
+            "properties": {
+              "priority": 1004,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "8080"
+            }
+          },
+          {
+            "name": "allow_k8s_443",
+            "properties": {
+              "priority": 1005,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "allow_k8s_kubelet",
+            "properties": {
+              "priority": 1006,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "10250"
+            }
+          },
+          {
+            "name": "allow_traefik_lb_external",
+            "properties": {
+              "priority": 1007,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "32323"
+            }
+          },
+          {
+            "name": "bastion_allow_https_inbound",
+            "properties": {
+              "priority": 1008,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "Internet",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "bastion_allow_gateway_manager_inbound",
+            "properties": {
+              "priority": 1009,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "GatewayManager",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "bastion_allow_load_balancer_inbound",
+            "properties": {
+              "priority": 1010,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "443"
+            }
+          },
+          {
+            "name": "bastion_allow_bastion_host_comms",
+            "properties": {
+              "priority": 1011,
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "destinationPortRanges": [
+                "8080",
+                "5701"
+              ]
+            }
+          },
+          {
+            "name": "bastion_allow_ssh_rdp_outbound",
+            "properties": {
+              "priority": 1012,
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Outbound",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "destinationPortRange": [
+                "22",
+                "3389"
+              ]
+            }
+          },
+          {
+            "name": "bastion_allow_azure_cloud_outbound",
+            "properties": {
+              "priority": 1013,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Outbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "AzureCloud",
+              "destinationPortRanges": "443"
+            }
+          },
+          {
+            "name": "bastion_allow_bastion_comms",
+            "properties": {
+              "priority": 1014,
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Outbound",
+              "sourceAddressPrefix": "VirtualNetwork",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
+              "destinationPortRange": [
+                "8080",
+                "5701"
+              ]
+            }
+          },
+          {
+            "name": "bastion_allow_get_session_info",
+            "properties": {
+              "priority": 1015,
+              "protocol": "*",
+              "access": "Allow",
+              "direction": "Outbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "Internet",
+              "destinationPortRanges": "80"
+            }
+          }
         ]
       }
     },
