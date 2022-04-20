@@ -109,23 +109,23 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of ARM template config](./11.jpg)
 
-  * *sshRSAPublicKey* - Your ssh public key
-  * *spnClientId* - Your Azure service principal name
-  * *spnClientSecret* - Your Azure service principal password
-  * *spnTenantId* - Your Azure tenant ID
-  * *windowsAdminUsername* - Client Windows VM admin username
-  * *windowsAdminPassword* - Client Windows VM admin password
-  * *myIpAddress* - Public IP address of your network
-  * *logAnalyticsWorkspaceName* - Unique Log Analytics workspace name
-  * *deploySQLMI* - SQL Managed Instance deployment (true/false)
-  * *SQLMIHA* - SQL Managed Instance high-availability deployment (true/false)
-  * *deployPostgreSQL* - PostgreSQL Hyperscale deployment (true/false)
-  * *clusterName* - AKS cluster name
-  * *bastionHostName* - Indicate whether to deploy bastion host to manage AKS
-  * *dnsPrefix* - AKS unique DNS prefix
-  * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
+  * _`sshRSAPublicKey`_ - Your ssh public key
+  * _`spnClientId`_ - Your Azure service principal name
+  * _`spnClientSecret`_ - Your Azure service principal password
+  * _`spnTenantId`_ - Your Azure tenant ID
+  * _`windowsAdminUsername`_ - Client Windows VM admin username
+  * _`windowsAdminPassword`_ - Client Windows VM admin password
+  * _`myIpAddress`_ - Public IP address of your network
+  * _`logAnalyticsWorkspaceName`_ - Unique Log Analytics workspace name
+  * _`deploySQLMI`_ - SQL Managed Instance deployment (true/false)
+  * _`SQLMIHA`_ - SQL Managed Instance high-availability deployment (true/false)
+  * _`deployPostgreSQL`_ - PostgreSQL Hyperscale deployment (true/false)
+  * _`clusterName`_ - AKS cluster name
+  * _`bastionHostName`_ - Indicate whether to deploy bastion host to manage AKS
+  * _`dnsPrefix`_ - AKS unique DNS prefix
+  * _`kubernetesVersion`_ - AKS Kubernetes Version (See previous prerequisite)
 
-    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
+    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the _`azuredeploy.parameters.json`_ file**
 
     ![Screenshot of ARM template parameters config](./12.jpg)
 
