@@ -108,9 +108,14 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
 
     ```shell
     sudo snap install microk8s --classic
+    sudo usermod -a -G microk8s <username>
+    sudo chown -f -R <username> ~/.kube
+    newgrp microk8s
     microk8s status --wait-ready
     microk8s enable dns
     ```
+
+    ![linux install microk8s](./01.png)
 
   MacOS:
 
@@ -153,7 +158,7 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
   az login --service-principal -u appId -p password --tenant tenant
   ```
 
-  ![Authenticate Azure CLI](./01.png)
+  ![Authenticate Azure CLI](./02.png)
 
 * Create a resource group
 
@@ -161,9 +166,9 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
   az group create -n Arc-MicroK8s-Demo -l EastUS
   ```
 
-  ![Create new Azure resource group](./02.png)
-
   ![Create new Azure resource group](./03.png)
+
+  ![Create new Azure resource group](./04.png)
 
 * Connect the cluster to Azure Arc
 
@@ -179,13 +184,13 @@ The following README will guide you on how to use [MicroK8s](https://microk8s.io
   az connectedk8s connect --name Arc-MicroK8s-Demo --resource-group Arc-MicroK8s-Demo  --kube-config ~/.kube/microk8s --kube-context microk8s --tags 'Project=jumpstart_azure_arc_k8s'
   ```
 
-  ![New Azure Arc-enabled Kubernetes cluster](./04.png)
+  ![New Azure Arc-enabled Kubernetes cluster](./05.png)
 
 * Upon completion, you will have your MicroK8s cluster connected as a new Azure Arc Kubernetes cluster resource in a new resource group.
 
-  ![New Azure Arc-enabled Kubernetes cluster](./05.png)
-
   ![New Azure Arc-enabled Kubernetes cluster](./06.png)
+
+  ![New Azure Arc-enabled Kubernetes cluster](./07.png)
 
 ## Optional - Day 2 Operations
 
@@ -201,7 +206,7 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
   az group delete --name Arc-MicroK8s-Demo
   ```
 
-  ![Delete Azure resource group](./07.png)
+  ![Delete Azure resource group](./08.png)
 
 * To stop the MicroK8s cluster locally, use the following command:
 
@@ -221,7 +226,7 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
 
     Launch `Add or Remove Programs` and uninstall MicroK8s.
 
-    ![Uninstall MicroK8s from Windows](./08.png)
+    ![Uninstall MicroK8s from Windows](./09.png)
 
     ```shell
     multipass delete microk8s-vm
@@ -230,7 +235,7 @@ Now that your Kubernetes cluster is connected to Azure Arc, you might want to ex
 
     If you want to completely uninstall Multipass, launch `Add or Remove Programs` and uninstall Multipass.
 
-    ![Uninstall Multipass from Windows](./09.png)
+    ![Uninstall Multipass from Windows](./10.png)
 
   Linux:
 
