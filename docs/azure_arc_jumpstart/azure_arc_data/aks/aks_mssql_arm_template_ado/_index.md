@@ -12,9 +12,9 @@ The following README will guide you on how to use [Azure DevOps (ADO) Release pi
 
 By the end of this guide, you will have an Azure DevOps Release pipeline to deploy AKS cluster with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity), Azure SQL MI with a sample database and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
-> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
 
-> **Note: The following scenario is focusing the Azure DevOps Release pipeline creation. Once the pipeline has been created and the environment deployment has finished, the automation flow and next steps are as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)**
+> **NOTE: The following scenario is focusing the Azure DevOps Release pipeline creation. Once the pipeline has been created and the environment deployment has finished, the automation flow and next steps are as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)**
 
 ## Prerequisites
 
@@ -71,18 +71,6 @@ By the end of this guide, you will have an Azure DevOps Release pipeline to depl
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* Enable subscription for the *Microsoft.AzureArcData* resource provider for Azure Arc-enabled data services. Registration is an asynchronous process, and registration may take approximately 10 minutes.
-
-  ```shell
-  az provider register --namespace Microsoft.AzureArcData
-  ```
-
-  You can monitor the registration process with the following commands:
-
-  ```shell
-  az provider show -n Microsoft.AzureArcData -o table
-  ```
-
 ## Deployment
 
 In this scenario, you will create a new Release pipeline to deploy the environment ARM template for this Jumpstart scenario.
@@ -113,7 +101,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of Azure Resource Manager connection config](./08.jpg)
 
-  > **Note: For new ADO project, you will be asked to click the authorization button**
+  > **NOTE: For new ADO project, you will be asked to click the authorization button**
 
     ![Screenshot of Azure subscription config](./09.jpg)
 
@@ -121,38 +109,33 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of resource group and location config](./10.jpg)
 
-* As mentioned, the task will deployed the existing ARM template for deploying Azure Arc-enabled data services with SQL Managed Instance that in the Azure Arc Jumpstart GitHub repository.
+* As mentioned, the task will use the existing ARM template for deploying Azure Arc-enabled data services with SQL Managed Instance that in the Azure Arc Jumpstart GitHub repository.
 
   * Change the Template location to "URL of the file"
 
-  * Copy the raw URLs for both the [template](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.json) and the [parameters](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/mssql_mi/azuredeploy.parameters.json) json files and paste it in it's the proper field.
+  * Copy the raw URLs for both the [template](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/ARM/azuredeploy.json) and the [parameters](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/ARM/azuredeploy.parameters.json) json files and paste it in it's the proper field.
 
-  * The deployment ARM template requires you provide parameters values. Click on the _Edit Override template parameters_ to add your parameters values.
+  * The deployment ARM template requires you to provide parameters values. Click on the _Edit Override template parameters_ button to add the values of your parameters.
 
     ![Screenshot of ARM template config](./11.jpg)
 
-  * *clusterName* - AKS cluster name
-  * *dnsPrefix* - AKS unique DNS prefix
-  * *nodeAdminUsername* - AKS Node Username
-  * *sshRSAPublicKey* - Your ssh public key
-  * *SPN_CLIENT_ID* - Your Azure service principal name
-  * *SPN_CLIENT_SECRET* - Your Azure service principal password
-  * *SPN_TENANT_ID* - Your Azure tenant ID
-  * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
-  * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)  
-  * *SPN_AUTHORITY* - *https://login.microsoftonline.com* **Do not change**
-  * *kubernetesVersion* - AKS Kubernetes Version (See previous prerequisite)
-  * *adminUsername* - Client Windows VM admin username
-  * *adminPassword* - Client Windows VM admin password
-  * *vmSize* - Client Windows VM size
-  * *resourceGroup* - Azure resource group where all the resources get deploy
-  * *AZDATA_USERNAME* - Azure Arc Data Controller admin username.  DO NOT USE 'sa' or 'admin'!!
-  * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
-  * *ACCEPT_EULA* - "yes" **Do not change**
-  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start d end with a alphanumeric character (This name will be used for k8s namespace as well).
-  * *MSSQL_MI_NAME* - SQL Managed Instance name to be deployed on the Kubernetes cluster
-
-    > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
+  * _`sshRSAPublicKey`_ - Your ssh public key
+  * _`spnClientId`_ - Your Azure service principal name
+  * _`spnClientSecret`_ - Your Azure service principal password
+  * _`spnTenantId`_ - Your Azure tenant ID
+  * _`windowsAdminUsername`_ - Client Windows VM admin username
+  * _`windowsAdminPassword`_ - Client Windows VM admin password
+  * _`myIpAddress`_ - Public IP address of your network
+  * _`logAnalyticsWorkspaceName`_ - Unique Log Analytics workspace name
+  * _`deploySQLMI`_ - SQL Managed Instance deployment (true/false)
+  * _`SQLMIHA`_ - SQL Managed Instance high-availability deployment (true/false)
+  * _`deployPostgreSQL`_ - PostgreSQL Hyperscale deployment (true/false)
+  * _`clusterName`_ - AKS cluster name
+  * _`bastionHostName`_ - Indicate whether to deploy bastion host to manage AKS
+  * _`dnsPrefix`_ - AKS unique DNS prefix
+  * _`kubernetesVersion`_ - AKS Kubernetes Version (See previous prerequisite)
+  
+    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the _`azuredeploy.parameters.json`_ file**
 
     ![Screenshot of ARM template parameters config](./12.jpg)
 
@@ -166,7 +149,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of deployment name config](./16.jpg)
 
-* Click the save button.
+* Provide pipeline name and click the save button.
 
     ![Screenshot of config save](./17.jpg)
 
@@ -186,16 +169,18 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of pipeline deployment](./23.jpg)
 
-    ![Screenshot of deployment progress logs](./24.jpg)
+    ![Screenshot of pipeline deployment](./24.jpg)
 
     ![Screenshot of deployment progress logs](./25.jpg)
 
+    ![Screenshot of deployment progress logs](./26.jpg)
+
 * Once completed, all the deployment resources will be available in the Azure portal.
 
-  > **Note: Deployment time of the Azure resources (AKS + Windows VM) can take ~25-30 minutes.**
+  > **NOTE: Deployment time of the Azure resources (AKS + Windows VM) can take ~25-30 minutes.**
 
-    ![Screenshot of deployment completed](./26.jpg)
+    ![Screenshot of deployment completed](./27.jpg)
 
-    ![Screenshot of Azure resources](./27.jpg)
+    ![Screenshot of Azure resources](./28.jpg)
 
 * As mentioned, this scenario is focusing on the Azure DevOps Release pipeline creation. At this point, now that you have the Azure resources created, continue to the next steps as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/#windows-login--post-deployment).
