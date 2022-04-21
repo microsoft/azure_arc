@@ -20,7 +20,7 @@ if [ "$deployBastion" = "true" ]; then
 fi
 
 portalResources=$(az resource list -g  "$ResourceGroup"  --query '[].id' -o tsv | grep -v  '/extensions/' -c)
-if [ "$resourceExpected" = "$portalResources" ]; then
+if [ "$portalResources" -ge "$resourceExpected" ]; then
    echo "We have $portalResources resources after script execution inside VM"
 else
    echo "Error # resources $portalResources"

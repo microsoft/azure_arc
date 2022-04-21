@@ -16,7 +16,7 @@ if [ "$deployBastion" = "true" ]; then
   resourceExpected=$(($resourceExpected+$deployBastionDifference))
 fi
 portalResources=$(az resource list -g  "$ResourceGroup"  --query '[].id' -o tsv | grep -v  '/extensions/' -c)
-if [ "$resourceExpected" = "$portalResources" ]; then
+if [ "$portalResources" -ge "$resourceExpected" ]; then
    echo "We have $portalResources resources"
 else
    echo "Error # resources $portalResources"
