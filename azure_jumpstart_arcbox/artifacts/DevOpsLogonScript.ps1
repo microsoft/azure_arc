@@ -242,13 +242,27 @@ New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Valu
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
 Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
-# Creating ArcBox DevOps Website URL on Desktop
-$shortcutLocation = "$Env:Public\Desktop\DevOps Hello-Arc.lnk"
+# Tab Auto-Refresh Extension
+New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist -Force
+New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist -Name 1 -Value odiofbnciojkpogljollobmhplkhmofe -Force
+
+# Creating CAPI Hello Arc Icon on Desktop
+$shortcutLocation = "$Env:Public\Desktop\CAPI Hello-Arc.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
 $shortcut.TargetPath = "https://$certdns"
-$shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
+$shortcut.IconLocation="$Env:ArcBoxIconDir\arc.ico, 0"
 $shortcut.WindowStyle = 3
+$shortcut.Save()
+
+# Creating CAPI BookStore Icon on Desktop
+$shortcutLocation = "$Env:Public\Desktop\CAPI Bookstore.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "powershell.exe"
+$shortcut.Arguments =  "-ExecutionPolicy Bypass -File $Env:ArcBoxDir\BookStoreLaunch.ps1"
+$shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
+$shortcut.WindowStyle = 7
 $shortcut.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
