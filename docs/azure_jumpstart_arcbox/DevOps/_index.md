@@ -443,7 +443,7 @@ After deployment is complete, it's time to start exploring ArcBox. Most interact
 
   ![Screenshot showing Azure Arc extensions ](./capi_keyvault05.png)
 
-- Click on the _DevOps Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.devops.com_ used from the Key Vault.
+- Click on the _CAPI Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.devops.com_ used from the Key Vault.
 
   ![Screenshot showing Hello-Arc desktop Icon](./capi_keyvault06.png)
 
@@ -479,22 +479,28 @@ ArcBox deploys multiple GitOps configurations on the _ArcBox-CAPI-Data_ workload
 
   ![Screenshot showing Azure Arc GitOps configurations](./capi_gitops01.png)
 
+- We have installed the “Tab Auto Refresh” extension for the browser. This will help you to show the real-time changes on the application in an automated way. Open "CAPI Hello-Arc" application to configure the “Tab Auto Refresh” extension for the browser to refresh every 3 seconds.
+
+  ![Screenshot showing Hello-Arc app](./capi_gitops02.png)
+
+  ![Screenshot showing Tab Auto Refresh ](./capi_gitops03.png)
+
 - To show the GitOps flow for the Hello-Arc application open two side-by-side windows.
 
   - A browser window with the open Hello-Arc application _`https://arcbox.devops.com/`_ URL.
   - PowerShell running the command _`kubectl get pods -n hello-arc -w`_ command.
   
-  Result should look like that:
+    The result should look like this:
 
-    ![Screenshot showing Hello-Arc app and shell](./capi_gitops02.png)
+    ![Screenshot showing Hello-Arc app and shell](./capi_gitops04.png)
 
 - In [your fork](#sample-applications) of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`hello_arc.yaml`_ file (_`/hello-arc/yaml/hello_arc.yaml`_), change the text under the “MESSAGE” section and commit the change.
   
-    ![Screenshot showing hello-arc repo](./capi_gitops03.png)
+    ![Screenshot showing hello-arc repo](./capi_gitops05.png)
   
 - Upon committing the changes, notice how the Kubernetes pods rolling upgrade will begin. Once the pods are up & running, refresh the browser, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
   
-    ![Screenshot showing Hello-Arc app and shell GitOps](./capi_gitops04.png)
+    ![Screenshot showing Hello-Arc app and shell GitOps](./capi_gitops06.png)
 
 ### RBAC configurations
 
@@ -547,11 +553,8 @@ ArcBox uses a GitOps configuration on the OSM bookstore application to split tra
 
 - Review the [OSM Traffic Split Policy](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/bookstore/osm-sample/traffic-split.yaml) applied to the _ArcBox-CAPI-Data_ cluster  
 
-- To show OSM traffic split, open four browser windows.
+- To show OSM traffic split, open below windows.
 
-  - Browse to the bookbuyer application _`https://arcbox.devops.com/bookbuyer`_
-  - Browse to the bookstore application _`https://arcbox.devops.com/bookstore`_
-  - Browse to the bookstore-v2 application _`https://arcbox.devops.com/bookstore-v2`_  
   - PowerShell running the below commands to show the bookbuyer pod logs.
   
     ```powershell
@@ -559,19 +562,29 @@ ArcBox uses a GitOps configuration on the OSM bookstore application to split tra
     kubectl --namespace bookbuyer logs $pod bookbuyer -f | Select-String Identity:
     ```
 
+  - Click on the _CAPI Bookstore_ icon on the desktop to open bookstore applications.
+
+    ![Screenshot showing Bookstore desktop Icon](./capi_osm01.png)
+
+    ![Screenshot showing Bookstore Apps](./capi_osm02.png)
+
+  - Move the browser tabs and PowerShell window, so the end result should look like this:
+  
+    ![Screenshot showing Bookstore Apps and shell 01](./capi_osm03.png)
+
   - The count for the books sold from the bookstore-v2 browser window should remain at 0. This is because the current traffic split policy is configured as weighted 100 for bookstore as well because the bookbuyer client is sending traffic to the bookstore service and no application is sending requests to the bookstore-v2 service.
 
-    ![Screenshot showing Bookstore apps and shell](./capi_osm01.png)
+    ![Screenshot showing Bookstore apps and shell 02](./capi_osm04.png)
 
 - In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`traffic-split.yaml`_ file (_`/bookstore/osm-sample/traffic-split.yaml`_), update the bookstore weight to "75" and bookstore-v2 weight to "25" and commit the change.
 
-  ![Screenshot showing Bookstore repo Traffic split 01](./capi_osm02.png)
+  ![Screenshot showing Bookstore repo Traffic split 01](./capi_osm05.png)
 
 - Wait for the changes to propagate and observe the counters increment for bookstore and bookstore-v2 as well. 
 
   We have updated the Service Mesh Interface (SMI) Traffic Split policy to direct 75 percent of the traffic sent to the root bookstore service and 25 percent to the bookstore-v2 service by modifying the weight fields for the bookstore-v2 backend. Also, observe the changes on the bookbuyer pod logs in the PowerShell window.
 
-  ![Screenshot showing Bookstore apps and shell GitOps and OSM 01](./capi_osm03.png)
+  ![Screenshot showing Bookstore apps and shell GitOps and OSM 01](./capi_osm06.png)
 
 - You can verify the traffic split policy by running the below command and examine the Backends properties.
 
@@ -579,15 +592,15 @@ ArcBox uses a GitOps configuration on the OSM bookstore application to split tra
   kubectl describe trafficsplit bookstore-split -n bookstore
   ```
 
-  ![Screenshot showing Bookstore repo Traffic split 02](./capi_osm04.png)
+  ![Screenshot showing Bookstore repo Traffic split 02](./capi_osm07.png)
 
 - In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`traffic-split.yaml`_ file (_`/bookstore/osm-sample/traffic-split.yaml`_), update the bookstore weight to "0" and bookstore weight to "100" and commit the change.
 
-  ![Screenshot showing Bookstore repo Traffic split 02](./capi_osm05.png)
+  ![Screenshot showing Bookstore repo Traffic split 02](./capi_osm08.png)
 
 - Wait for the changes to propagate and observe the counters increment for bookstore-v2 and freeze for bookstore. Also, observe pod logs to validate bookbuyer is sending all the traffic to bookstore-v2.
 
-  ![Screenshot showing Bookstore apps and shell GitOps and OSM 02](./capi_osm06.png)
+  ![Screenshot showing Bookstore apps and shell GitOps and OSM 02](./capi_osm09.png)
 
 ### Microsoft Defender for Cloud
 
