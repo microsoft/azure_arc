@@ -131,19 +131,6 @@
       "properties": {
         "securityRules": [
           {
-            "name": "allow_k8s_6443",
-            "properties": {
-              "priority": 1002,
-              "protocol": "TCP",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "*",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
-              "destinationPortRange": "6443"
-            }
-          },
-          {
             "name": "allow_k8s_80",
             "properties": {
               "priority": 1003,
