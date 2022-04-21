@@ -81,25 +81,74 @@ if [ "$deployBastion" = "true" ]; then
   fi
 fi
 
+countConnectedK8sClusters=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.Kubernetes/connectedClusters' -c)
+jqueryCountConnectedK8sClusters=".$Flavor.countConnectedK8sClusters"
+countConnectedK8sClustersExpected=$(echo "$config" |  jq "$jqueryCountConnectedK8sClusters")
+if [ "$countConnectedK8sClustersExpected" = "$countConnectedK8sClusters" ]; then
+   echo "We have $countConnectedK8sClusters connected k8s clusters"
+else
+   echo "Error # connected k8s clusters $countConnectedK8sClusters"
+   validations=false
+fi
+
 for val in $(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.Kubernetes/connectedClusters')
 do
   readarray -d / -t resourceArray <<< "$val"
   name="${resourceArray[${#resourceArray[*]}-1]}"
   name=${name//[$'\t\r\n']}
+  echo "------ Processiong $name Kubernetes Connected Cluster ---------"
+  connected=$(az resource show -g "$ResourceGroup" --resource-type 'Microsoft.Kubernetes/connectedClusters' -n $name --query properties.connectivityStatus -o tsv)
+  if [ "Connected" = "$connected" ]; then
+     echo "Status Connected"
+  else
+     echo "Error status: $connected"
+     validations=false
+  fi
   count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'azuredefender' -c)
   if [ "$count" = "1" ]; then
-    echo "Kubernetes Cluster has defender extension: $name"
+    echo "Defender extension on: $name"
   else
-    echo "Defender extention not found on $name"
+    echo "Defender extention not found on: $name"
     validations=false
   fi
   count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'azuremonitor' -c)
   if [ "$count" = "1" ]; then
-    echo "Kubernetes Cluster has Azure Monitor extension: $name"
+    echo "Azure Monitor extension on: $name"
   else
-    echo "Azure Monitor extention not found on $name"
+    echo "Azure Monitor extention not found on: $name"
     validations=false
   fi
+  count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'policyinsights' -c)
+  if [ "$count" = "1" ]; then
+    echo "policyinsights extension on: $name"
+  else
+    echo "policyinsights extension not found on: $name"
+    validations=false
+  fi
+  if [ "$name" = "ArcBox-CAPI-Data" ]; then
+      count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'azurekeyvaultsecretsprovider' -c)
+      if [ "$count" = "1" ]; then
+         echo "azurekeyvaultsecretsprovider extension on: $name"
+      else
+         echo "azurekeyvaultsecretsprovider extention not found on: $name"
+         validations=false
+      fi
+      count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'openservicemesh' -c)
+      if [ "$count" = "1" ]; then
+         echo "openservicemesh extension on: $name"
+      else
+         echo "openservicemesh extention not found on: $name"
+         validations=false
+      fi 
+      count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'flux' -c)
+      if [ "$count" = "1" ]; then
+         echo "flux extension on: $name"
+      else
+         echo "flux extention not found on: $name"
+         validations=false
+      fi   
+  fi    
+  echo "------ End Processiong $name Kubernetes Connected Cluster ---------"
 done
 
 if [ "$validations" = "false" ]; then

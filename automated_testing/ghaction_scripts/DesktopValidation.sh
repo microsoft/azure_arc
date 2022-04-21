@@ -19,10 +19,11 @@ countDesktopFilesArcDemo=${countDesktopFilesArcDemo//[$'\t\r\n']}
 countDesktopFiles=$(( $countDesktopFilesPublic + $countDesktopFilesArcDemo))
 jqueryDesktopElementsExpected=".$Flavor.desktopElementsExpected"
 desktopElementsExpected=$(echo "$config" |  jq "$jqueryDesktopElementsExpected")
-if [ "$countDesktopFiles" = "$desktopElementsExpected" ]; then
+if [ "$countDesktopFiles" -ge "$desktopElementsExpected" ]; then
   echo "Number of element on Desktop: $countDesktopFiles"
 else
   echo "Unexpected number of element on Desktop: $countDesktopFiles"
+  validations=false
 fi
 
 if [ "$validations" = "false" ]; then
