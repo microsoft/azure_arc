@@ -257,10 +257,7 @@
               "sourceAddressPrefix": "VirtualNetwork",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": [
-                "8080",
-                "5701"
-              ]
+              "destinationPortRanges": ["8080","5701"]
             }
           },
           {
@@ -273,10 +270,7 @@
               "sourceAddressPrefix": "AzureLoadBalancer",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": [
-                "22",
-                "3389"
-              ]
+              "destinationPortRanges": ["22","3389"]
             }
           },
           {
@@ -302,10 +296,7 @@
               "sourceAddressPrefix": "VirtualNetwork",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": [
-                "8080",
-                "5701"
-              ]
+              "destinationPortRanges": ["8080","5701"]
             }
           },
           {
