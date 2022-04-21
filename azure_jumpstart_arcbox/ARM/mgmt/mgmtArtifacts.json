@@ -248,19 +248,6 @@
             }
           },
           {
-            "name": "bastion_allow_bastion_host_comms",
-            "properties": {
-              "priority": 1011,
-              "protocol": "*",
-              "access": "Allow",
-              "direction": "Inbound",
-              "sourceAddressPrefix": "VirtualNetwork",
-              "sourcePortRange": "*",
-              "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRange": "*"
-            }
-          },
-          {
             "name": "bastion_allow_ssh_rdp_outbound",
             "properties": {
               "priority": 1012,
