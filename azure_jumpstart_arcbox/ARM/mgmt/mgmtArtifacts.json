@@ -289,7 +289,7 @@
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "AzureCloud",
-              "destinationPortRanges": "443"
+              "destinationPortRange": "443"
             }
           },
           {
@@ -318,7 +318,7 @@
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "Internet",
-              "destinationPortRanges": "80"
+              "destinationPortRange": "80"
             }
           }
         ]
