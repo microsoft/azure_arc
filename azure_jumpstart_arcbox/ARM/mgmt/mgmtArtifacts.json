@@ -273,7 +273,7 @@
               "sourceAddressPrefix": "AzureLoadBalancer",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRange": [
+              "destinationPortRanges": [
                 "22",
                 "3389"
               ]
@@ -302,7 +302,7 @@
               "sourceAddressPrefix": "VirtualNetwork",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRange": [
+              "destinationPortRanges": [
                 "8080",
                 "5701"
               ]
