@@ -32,10 +32,10 @@ By the end of this guide, you will have an AKS cluster deployed with an Azure Ar
 
 - Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
 
-  - "Contributor" - Required for provisioning Azure resources
-  - "Security admin" - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
-  - "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
-  - "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
+  - _Contributor_ - Required for provisioning Azure resources
+  - _Security admin_ - Required for installing Cloud Defender Azure-Arc enabled Kubernetes extension and dismiss alerts
+  - _Security reader_ - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
+  - _Monitoring Metrics Publisher_ - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
 
     To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
@@ -97,19 +97,19 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/ARM/artifacts/azuredeploy.parameters.example.json).
 
-  - _'sshRSAPublicKey'_ - Your SSH public key
-  - _'spnClientId'_ - Your Azure service principal id
-  - _'spnClientSecret'_ - Your Azure service principal secret
-  - _'spnTenantId'_ - Your Azure tenant id
-  - _'windowsAdminUsername'_ - Client Windows VM Administrator name
-  - _'windowsAdminPassword'_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _'myIpAddress'_ - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and AKS cluster.
-  - _'logAnalyticsWorkspaceName'_ - Unique name for the deployment log analytics workspace.
-  - _'deploySQLMI'_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this Azure Arc-enabled SQL Managed Instance scenario we will set it to _**true**_.
-  - _'SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, set this to either _**true**_ or _**false**_.
-  - _'deployPostgreSQL'_ - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this scenario we leave it set to _**false**_.
-  - _'deployBastion'_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
-  - _'bastionHostName'_ - Azure Bastion host name.
+  - _`sshRSAPublicKey`_ - Your SSH public key
+  - _`spnClientId`_ - Your Azure service principal id
+  - _`spnClientSecret`_ - Your Azure service principal secret
+  - _`spnTenantId`_ - Your Azure tenant id
+  - _`windowsAdminUsername`_ - Client Windows VM Administrator name
+  - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - _`myIpAddress`_ - Your local public IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and AKS cluster.
+  - _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
+  - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this Azure Arc-enabled SQL Managed Instance scenario we will set it to _**true**_.
+  - _`SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, set this to either _**true**_ or _**false**_.
+  - _`deployPostgreSQL`_ - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this scenario we leave it set to _**false**_.
+  - _`deployBastion`_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
+  - _`bastionHostName`_ - Azure Bastion host name.
 
     > **NOTE: In case you decided to deploy SQL Managed Instance in an highly-available fashion, refer to the ["High Availability"](##-High-Availability-with-Always-On-availability-groups) section in this readme. Also note that this capability is currently in [preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
@@ -124,7 +124,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the _azuredeploy.parameters.json_ file**
+    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the _`azuredeploy.parameters.json`_ file**
 
     For example:
 
@@ -209,13 +209,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Since this scenario is deploying the Azure Arc Data Controller and SQL Managed Instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **12 various Azure resources deployed**. The important ones to notice are:
 
-  - Azure Arc-enabled Kubernetes cluster - Azure Arc-enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
+  - _Azure Arc-enabled Kubernetes cluster_ - Azure Arc-enabled data services deployed in directly connected are using this type of resource in order to deploy the data services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions) as well as for using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
-  - Custom location - provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as target locations for deploying Azure services instances.
+  - _Custom location_ - provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as target locations for deploying Azure services instances.
 
-  - Azure Arc Data Controller - The data controller that is now deployed on the Kubernetes cluster.
+  - _Azure Arc Data Controller_ - The data controller that is now deployed on the Kubernetes cluster.
 
-  - Azure Arc-enabled SQL Managed Instance - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
+  - _Azure Arc-enabled SQL Managed Instance_ - The SQL Managed Instance that is now deployed on the Kubernetes cluster.
 
     ![Screenshot showing additional Azure resources in the resource group](./29.png)
 
@@ -301,7 +301,7 @@ When deploying Azure Arc-enabled data services, a [Grafana](https://grafana.com/
 
   ![Screenshot showing Grafana "SQL Managed Instance Metrics" dashboard](./44.png)
 
-- Change the dashboard time range to "Last 5 minutes" and re-run the stress test using _SqlQueryStress_ (in case it was already finished).
+- Change the dashboard time range to "Last 5 minutes" and re-run the stress test using _`SqlQueryStress`_ (in case it was already finished).
 
   ![Screenshot showing "Last 5 minutes" time range](./45.png)
 
