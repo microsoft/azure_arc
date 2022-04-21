@@ -255,7 +255,7 @@ $shortcut.IconLocation="$Env:ArcBoxIconDir\arc.ico, 0"
 $shortcut.WindowStyle = 3
 $shortcut.Save()
 
-# Creating CAPI BookStore Icon on Desktop
+# Creating CAPI Bookstore Icon on Desktop
 $shortcutLocation = "$Env:Public\Desktop\CAPI Bookstore.lnk"
 $wScriptShell = New-Object -ComObject WScript.Shell
 $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
