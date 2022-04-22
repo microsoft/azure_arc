@@ -75,7 +75,7 @@ resource "azurerm_virtual_network" "vnet" {
   subnet {
     name           = "AzureBastionSubnet"
     address_prefix = local.bastionSubnetIpPrefix
-    security_group = var.deploy_bastion ? azurerm_network_security_group.bastion_nsg.id : null
+    security_group =  azurerm_network_security_group.bastion_nsg.id
   }
 }
 

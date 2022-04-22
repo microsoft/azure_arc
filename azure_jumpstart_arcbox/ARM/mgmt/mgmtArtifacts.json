@@ -126,7 +126,7 @@
             "name": "AzureBastionSubnet",
             "properties": {
               "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
-              "networkSecurityGroup" : "[if(parameters('deployBastion'), createObject('id', resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))), null())]"
+              "networkSecurityGroup" :  "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
             }
           }
         ]
@@ -211,7 +211,6 @@
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2019-02-01",
       "name": "[parameters('bastionNetworkSecurityGroupName')]",
-      "condition": "[parameters('deployBastion')]",
       "location": "[parameters('location')]",
       "properties": {
         "securityRules": [

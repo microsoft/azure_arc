@@ -78,9 +78,9 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         name: 'AzureBastionSubnet'
         properties: {
           addressPrefix: bastionSubnetIpPrefix
-          networkSecurityGroup: deployBastion ? {
+          networkSecurityGroup: {
             id: bastionNetworkSecurityGroup.id
-          } : null
+          }
         }
       }
     ]
@@ -161,7 +161,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   }
 }
 
-resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = if (deployBastion == true){
+resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = {
   name: bastionNetworkSecurityGroupName
   location: location
   properties: {
