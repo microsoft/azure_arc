@@ -228,7 +228,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
-          sourceAddressPrefix: 'AzureLoadBalancer'
+          sourceAddressPrefix: '*'
           sourcePortRange: '*'
           destinationAddressPrefix: 'VirtualNetwork'
           destinationPortRanges: [
