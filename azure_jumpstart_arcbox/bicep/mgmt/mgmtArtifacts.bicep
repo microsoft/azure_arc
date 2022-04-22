@@ -27,6 +27,9 @@ param deployBastion bool = false
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'ArcBox-NSG'
 
+@description('Name of the Bastion Network Security Group')
+param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
+
 var updates = {
   name: 'Updates(${workspaceName})'
   galleryName: 'Updates'
@@ -75,6 +78,9 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         name: 'AzureBastionSubnet'
         properties: {
           addressPrefix: bastionSubnetIpPrefix
+          networkSecurityGroup: {
+            id: bastionNetworkSecurityGroup.id
+          }
         }
       }
     ]
@@ -151,6 +157,15 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           destinationPortRange: '32323'
         }
       }
+    ]
+  }
+}
+
+resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = if (deployBastion == true){
+  name: bastionNetworkSecurityGroupName
+  location: location
+  properties: {
+    securityRules: [
       {
         name: 'bastion_allow_https_inbound'
         properties: {
@@ -191,9 +206,25 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
         }
       }
       {
-        name: 'bastion_allow_ssh_rdp_outbound'
+        name: 'bastion_allow_host_comms'
         properties: {
           priority: 1011
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'VirtualNetwork'
+          sourcePortRange: '*'
+          destinationAddressPrefix: 'VirtualNetwork'
+          destinationPortRanges: [
+            '8080'
+            '5701'
+          ]
+        }
+      }
+      {
+        name: 'bastion_allow_ssh_rdp_outbound'
+        properties: {
+          priority: 1012
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -209,7 +240,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
       {
         name: 'bastion_allow_azure_cloud_outbound'
         properties: {
-          priority: 1012
+          priority: 1013
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Outbound'
@@ -245,7 +276,10 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           sourceAddressPrefix: '*'
           sourcePortRange: '*'
           destinationAddressPrefix: 'Internet'
-          destinationPortRange: '80'
+          destinationPortRanges: [
+            '80'
+            '443'
+          ]
         }
       }
     ]
