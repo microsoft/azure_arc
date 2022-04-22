@@ -279,7 +279,7 @@
               "protocol": "*",
               "access": "Allow",
               "direction": "Outbound",
-              "sourceAddressPrefix": "AzureLoadBalancer",
+              "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
               "destinationPortRanges": ["22","3389"]
