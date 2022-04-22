@@ -24,9 +24,9 @@ variable "workspace_name" {
 }
 
 variable "deploy_bastion" {
-  type       = bool
+  type        = bool
   description = "Choice to deploy Bastion to connect to the client VM"
-  default = false
+  default     = false
 }
 
 variable "deployment_flavor" {
@@ -35,134 +35,15 @@ variable "deployment_flavor" {
 }
 
 locals {
-  vnet_address_space    = ["172.16.0.0/16"]
-  subnet_address_prefix = "172.16.1.0/24"
-  solutions             = ["Updates", "VMInsights", "ChangeTracking", "Security"]
-  bastionSubnetName     = "AzureBastionSubnet"
-  nsg_name               = "ArcBox-NSG"
-  bastionSubnetRef      = "${azurerm_virtual_network.vnet.id}/subnets/${local.bastionSubnetName}"
-  bastionName           = "ArcBox-Bastion"
-  bastionSubnetIpPrefix = "172.16.3.64/26"
+  vnet_address_space         = ["172.16.0.0/16"]
+  subnet_address_prefix      = "172.16.1.0/24"
+  solutions                  = ["Updates", "VMInsights", "ChangeTracking", "Security"]
+  bastionSubnetName          = "AzureBastionSubnet"
+  nsg_name                   = "ArcBox-NSG"
+  bastionSubnetRef           = "${azurerm_virtual_network.vnet.id}/subnets/${local.bastionSubnetName}"
+  bastionName                = "ArcBox-Bastion"
+  bastionSubnetIpPrefix      = "172.16.3.64/26"
   bastionPublicIpAddressName = "${local.bastionName}-PIP"
-  nsg_rules      = [
-        {
-            name                   = "allow_k8s_6443"
-            source_address_prefix  = "*"
-            destination_port_range = "6443"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "allow_k8s_80"
-            source_address_prefix  = "*"
-            destination_port_range = "80"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "allow_k8s_8080"
-            source_address_prefix  = "*"
-            destination_port_range = "8080"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "allow_k8s_443"
-            source_address_prefix  = "*"
-            destination_port_range = "443"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "allow_k8s_kubelet"
-            source_address_prefix  = "*"
-            destination_port_range = "10250"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "allow_traefik_lb_external"
-            source_address_prefix  = "*"
-            destination_port_range = "32323"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "bastion_allow_https_inbound"
-            source_address_prefix  = "Internet"
-            destination_port_range = "443"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "bastion_allow_gateway_manager_inbound"
-            source_address_prefix  = "GatewayManager"
-            destination_port_range = "443"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "bastion_allow_load_balancer_inbound"
-            source_address_prefix  = "AzureLoadBalancer"
-            destination_port_range = "443"
-            protocol               = "TCP"
-            direction              = "Inbound"
-            destination_address_prefix = "*"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "bastion_allow_ssh_rdp_outbound"
-            source_address_prefix  = "AzureLoadBalancer"
-            destination_port_range = "443"
-            protocol               = "*"
-            direction              = "Outbound"
-            destination_address_prefix = "VirtualNetwork"
-            destination_port_ranges  = ["22","3389"]
-        },
-        {
-            name                   = "bastion_allow_azure_cloud_outbound"
-            source_address_prefix  = "*"
-            destination_port_range = "443"
-            protocol               = "TCP"
-            direction              = "Outbound"
-            destination_address_prefix = "AzureCloud"
-            destination_port_ranges  = []
-        },
-        {
-            name                   = "bastion_allow_bastion_comms"
-            source_address_prefix  = "VirtualNetwork"
-            destination_port_range = "443"
-            protocol               = "*"
-            direction              = "Outbound"
-            destination_address_prefix = "VirtualNetwork"
-            destination_port_ranges  = ["8080","5701"]
-        },
-        {
-            name                   = "bastion_allow_get_session_info"
-            source_address_prefix  = "*"
-            destination_port_range = "80"
-            protocol               = "*"
-            direction              = "Outbound"
-            destination_address_prefix = "Internet"
-            destination_port_ranges  = []
-        }
-    ]
 }
 
 resource "random_string" "random" {
@@ -201,21 +82,172 @@ resource "azurerm_network_security_group" "nsg" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 }
+resource "azurerm_network_security_rule" "allow_k8s_80" {
+  name                       = "allow_k8s_80"
+  access                     = "Allow"
+  priority                   = 1003
+  source_address_prefix      = "*"
+  destination_port_range     = "80"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
 
-resource "azurerm_network_security_rule" "nsg_rules" {
-  for_each                    = { for i, v in local.nsg_rules: i => v }
-  name                        = each.value.name
-  priority                    = (index(local.nsg_rules, each.value) + 1001)
-  direction                   = each.value.direction
-  access                      = "Allow"
-  protocol                    = each.value.protocol
-  source_port_range           = each.value.source_port_range
-  destination_port_range      = each.value.destination_port_range
-  destination_port_ranges     = each.value.destination_port_ranges
-  source_address_prefix       = each.value.source_address_prefix
-  destination_address_prefix  = each.value.destination_address_prefix
-  resource_group_name         = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+resource "azurerm_network_security_rule" "allow_k8s_8080" {
+  name                       = "allow_k8s_8080"
+  access                     = "Allow"
+  priority                   = 1004
+  source_address_prefix      = "*"
+  destination_port_range     = "8080"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "allow_k8s_443" {
+  name                       = "allow_k8s_443"
+  access                     = "Allow"
+  priority                   = 1005
+  source_address_prefix      = "*"
+  destination_port_range     = "443"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "allow_k8s_kubelet" {
+  name                       = "allow_k8s_kubelet"
+  access                     = "Allow"
+  priority                   = 1006
+  source_address_prefix      = "*"
+  destination_port_range     = "10250"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "allow_traefik_lb_external" {
+  name                       = "allow_traefik_lb_external"
+  access                     = "Allow"
+  priority                   = 1007
+  source_address_prefix      = "*"
+  destination_port_range     = "32323"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "bastion_allow_https_inbound" {
+  name                       = "bastion_allow_https_inbound"
+  access                     = "Allow"
+  priority                   = 1008
+  source_address_prefix      = "Internet"
+  destination_port_range     = "443"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "bastion_allow_gateway_manager_inbound" {
+  name                       = "bastion_allow_gateway_manager_inbound"
+  access                     = "Allow"
+  priority                   = 1009
+  source_address_prefix      = "GatewayManager"
+  destination_port_range     = "443"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "bastion_allow_load_balancer_inbound" {
+  name                       = "bastion_allow_load_balancer_inbound"
+  access                     = "Allow"
+  priority                   = 1010
+  source_address_prefix      = "AzureLoadBalancer"
+  destination_port_range     = "443"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "bastion_allow_ssh_rdp_outbound" {
+  name                       = "bastion_allow_ssh_rdp_outbound"
+  access                     = "Allow"
+  priority                   = 1011
+  source_address_prefix      = "AzureLoadBalancer"
+  source_port_range          = "*"
+  protocol                   = "*"
+  direction                  = "Outbound"
+  destination_address_prefix = "VirtualNetwork"
+  destination_port_ranges    = ["22", "3389"]
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "bastion_allow_azure_cloud_outbound" {
+  name                       = "bastion_allow_azure_cloud_outbound"
+  access                     = "Allow"
+  priority                   = 1012
+  source_address_prefix      = "*"
+  destination_port_range     = "443"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Outbound"
+  destination_address_prefix = "AzureCloud"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "bastion_allow_get_session_info" {
+  name                       = "bastion_allow_get_session_info"
+  access                     = "Allow"
+  priority                   = 1014
+  source_address_prefix      = "*"
+  destination_port_range     = "80"
+  source_port_range          = "*"
+  protocol                   = "*"
+  direction                  = "Outbound"
+  destination_address_prefix = "Internet"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
+}
+
+resource "azurerm_network_security_rule" "bastion_allow_bastion_comms" {
+  name                       = "bastion_allow_bastion_comms"
+  access                     = "Allow"
+  priority                   = 1013
+  source_address_prefix      = "VirtualNetwork"
+  source_port_range          = "*"
+  protocol                   = "*"
+  direction                  = "Outbound"
+  destination_address_prefix = "VirtualNetwork"
+  destination_port_ranges    = ["8080", "5701"]
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = local.nsg_name
 }
 
 resource "azurerm_log_analytics_workspace" "workspace" {
@@ -228,7 +260,7 @@ resource "azurerm_log_analytics_workspace" "workspace" {
 
 resource "azurerm_log_analytics_solution" "update_solution" {
   for_each              = toset(local.solutions)
-  solution_name         = "${each.value}"
+  solution_name         = each.value
   location              = data.azurerm_resource_group.rg.location
   resource_group_name   = data.azurerm_resource_group.rg.name
   workspace_resource_id = azurerm_log_analytics_workspace.workspace.id
@@ -254,14 +286,14 @@ resource "azurerm_log_analytics_linked_service" "linked_service" {
 }
 
 resource "azurerm_public_ip" "publicIpAddress" {
-  count               = var.deploy_bastion == true ? 1: 0
-  resource_group_name = data.azurerm_resource_group.rg.name
-  name                = local.bastionPublicIpAddressName
-  location            = data.azurerm_resource_group.rg.location
-  allocation_method   = "Static"
-  ip_version          = "IPv4"
+  count                   = var.deploy_bastion == true ? 1 : 0
+  resource_group_name     = data.azurerm_resource_group.rg.name
+  name                    = local.bastionPublicIpAddressName
+  location                = data.azurerm_resource_group.rg.location
+  allocation_method       = "Static"
+  ip_version              = "IPv4"
   idle_timeout_in_minutes = 4
-  sku                 = "Standard"
+  sku                     = "Standard"
 
 }
 
@@ -269,14 +301,14 @@ resource "azurerm_bastion_host" "bastionHost" {
   name                = local.bastionName
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  count               = var.deploy_bastion == true ? 1: 0
+  count               = var.deploy_bastion == true ? 1 : 0
   depends_on = [
     azurerm_public_ip.publicIpAddress
   ]
   ip_configuration {
-    name = "IpConf"
+    name                 = "IpConf"
     public_ip_address_id = azurerm_public_ip.publicIpAddress[0].id
-    subnet_id = local.bastionSubnetRef
+    subnet_id            = local.bastionSubnetRef
   }
 
 }
