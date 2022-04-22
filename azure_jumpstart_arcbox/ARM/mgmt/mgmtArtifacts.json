@@ -126,7 +126,9 @@
             "name": "AzureBastionSubnet",
             "properties": {
               "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
-              "networkSecurityGroup" :  "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
+              "networkSecurityGroup" :  {
+                "id" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
+              }
             }
           }
         ]
