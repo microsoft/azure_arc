@@ -78,7 +78,7 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_network_security_group" "nsg" {
-  name                = local.nsg_name
+  name                = azurerm_network_security_group.nsg.name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 }
@@ -93,7 +93,7 @@ resource "azurerm_network_security_rule" "allow_k8s_80" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "allow_k8s_8080" {
@@ -107,7 +107,7 @@ resource "azurerm_network_security_rule" "allow_k8s_8080" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "allow_k8s_443" {
@@ -121,7 +121,7 @@ resource "azurerm_network_security_rule" "allow_k8s_443" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "allow_k8s_kubelet" {
@@ -135,7 +135,7 @@ resource "azurerm_network_security_rule" "allow_k8s_kubelet" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "allow_traefik_lb_external" {
@@ -149,7 +149,7 @@ resource "azurerm_network_security_rule" "allow_traefik_lb_external" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_https_inbound" {
@@ -163,7 +163,7 @@ resource "azurerm_network_security_rule" "bastion_allow_https_inbound" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_gateway_manager_inbound" {
@@ -177,7 +177,7 @@ resource "azurerm_network_security_rule" "bastion_allow_gateway_manager_inbound"
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_load_balancer_inbound" {
@@ -191,7 +191,7 @@ resource "azurerm_network_security_rule" "bastion_allow_load_balancer_inbound" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_ssh_rdp_outbound" {
@@ -205,7 +205,7 @@ resource "azurerm_network_security_rule" "bastion_allow_ssh_rdp_outbound" {
   destination_address_prefix = "VirtualNetwork"
   destination_port_ranges    = ["22", "3389"]
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_azure_cloud_outbound" {
@@ -219,7 +219,7 @@ resource "azurerm_network_security_rule" "bastion_allow_azure_cloud_outbound" {
   direction                  = "Outbound"
   destination_address_prefix = "AzureCloud"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_get_session_info" {
@@ -233,7 +233,7 @@ resource "azurerm_network_security_rule" "bastion_allow_get_session_info" {
   direction                  = "Outbound"
   destination_address_prefix = "Internet"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_bastion_comms" {
@@ -247,7 +247,7 @@ resource "azurerm_network_security_rule" "bastion_allow_bastion_comms" {
   destination_address_prefix = "VirtualNetwork"
   destination_port_ranges    = ["8080", "5701"]
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = local.nsg_name
+  network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
 resource "azurerm_log_analytics_workspace" "workspace" {
