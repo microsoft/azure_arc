@@ -87,19 +87,6 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   properties: {
     securityRules: [
       {
-        name: 'allow_k8s_6443'
-        properties: {
-          priority: 1002
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '6443'
-        }
-      }
-      {
         name: 'allow_k8s_80'
         properties: {
           priority: 1003
@@ -162,6 +149,103 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '32323'
+        }
+      }
+      {
+        name: 'bastion_allow_https_inbound'
+        properties: {
+          priority: 1008
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'Internet'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '443'
+        }
+      }
+      {
+        name: 'bastion_allow_gateway_manager_inbound'
+        properties: {
+          priority: 1009
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'GatewayManager'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '443'
+        }
+      }
+      {
+        name: 'bastion_allow_load_balancer_inbound'
+        properties: {
+          priority: 1010
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: 'AzureLoadBalancer'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '443'
+        }
+      }
+      {
+        name: 'bastion_allow_ssh_rdp_outbound'
+        properties: {
+          priority: 1011
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Outbound'
+          sourceAddressPrefix: 'AzureLoadBalancer'
+          sourcePortRange: '*'
+          destinationAddressPrefix: 'VirtualNetwork'
+          destinationPortRanges: [
+            '22'
+            '3389'
+          ]
+        }
+      }
+      {
+        name: 'bastion_allow_azure_cloud_outbound'
+        properties: {
+          priority: 1012
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Outbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: 'AzureCloud'
+          destinationPortRange: '443'
+        }
+      }
+      {
+        name: 'bastion_allow_bastion_comms'
+        properties: {
+          priority: 1014
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Outbound'
+          sourceAddressPrefix: 'VirtualNetwork'
+          sourcePortRange: '*'
+          destinationAddressPrefix: 'VirtualNetwork'
+          destinationPortRanges: [
+            '8080'
+            '5701'
+          ]
+        }
+      }
+      {
+        name: 'bastion_allow_get_session_info'
+        properties: {
+          priority: 1015
+          protocol: '*'
+          access: 'Allow'
+          direction: 'Outbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: 'Internet'
+          destinationPortRange: '80'
         }
       }
     ]
