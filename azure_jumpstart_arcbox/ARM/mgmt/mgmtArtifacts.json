@@ -321,7 +321,7 @@
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "Internet",
-              "destinationPortRange": "80"
+              "destinationPortRanges": ["80","443"]
             }
           }
         ]
