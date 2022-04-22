@@ -260,12 +260,12 @@
             "name": "bastion_allow_host_comms",
             "properties": {
               "priority": 1011,
-              "protocol": "TCP",
+              "protocol": "*",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "AzureLoadBalancer",
+              "sourceAddressPrefix": "VirtualNetwork",
               "sourcePortRange": "*",
-              "destinationAddressPrefix": "*",
+              "destinationAddressPrefix": "VirtualNetwork",
               "destinationPortRanges": [
                 "8080",
                 "5701"
