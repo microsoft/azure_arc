@@ -62,7 +62,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         addressPrefix
       ]
     }
-    subnets: [
+    subnets: deployBastion == true ? [
       {
         name: subnetName
         properties: {
@@ -80,6 +80,18 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
           addressPrefix: bastionSubnetIpPrefix
           networkSecurityGroup: {
             id: bastionNetworkSecurityGroup.id
+          }
+        }
+      }
+    ] : [
+      {
+        name: subnetName
+        properties: {
+          addressPrefix: subnetAddressPrefix
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+          networkSecurityGroup: {
+            id: networkSecurityGroup.id
           }
         }
       }
@@ -161,7 +173,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   }
 }
 
-resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = {
+resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = if (deployBastion == true) {
   name: bastionNetworkSecurityGroupName
   location: location
   properties: {
