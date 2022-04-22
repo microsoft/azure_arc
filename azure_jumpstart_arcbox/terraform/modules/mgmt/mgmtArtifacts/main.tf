@@ -40,6 +40,7 @@ locals {
   solutions                  = ["Updates", "VMInsights", "ChangeTracking", "Security"]
   bastionSubnetName          = "AzureBastionSubnet"
   nsg_name                   = "ArcBox-NSG"
+  bastion_nsg_name           = "ArcBox-Bastion-NSG"
   bastionSubnetRef           = "${azurerm_virtual_network.vnet.id}/subnets/${local.bastionSubnetName}"
   bastionName                = "ArcBox-Bastion"
   bastionSubnetIpPrefix      = "172.16.3.64/26"
@@ -74,11 +75,18 @@ resource "azurerm_virtual_network" "vnet" {
   subnet {
     name           = "AzureBastionSubnet"
     address_prefix = local.bastionSubnetIpPrefix
+    security_group = var.deploy_bastion ? azurerm_network_security_group.bastion_nsg.id : null
   }
 }
 
 resource "azurerm_network_security_group" "nsg" {
   name                = local.nsg_name
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+resource "azurerm_network_security_group" "bastion_nsg" {
+  name                = local.bastion_nsg_name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 }
@@ -163,7 +171,7 @@ resource "azurerm_network_security_rule" "bastion_allow_https_inbound" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+  network_security_group_name = azurerm_network_security_group.bastion_nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_gateway_manager_inbound" {
@@ -177,7 +185,7 @@ resource "azurerm_network_security_rule" "bastion_allow_gateway_manager_inbound"
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+  network_security_group_name = azurerm_network_security_group.bastion_nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_load_balancer_inbound" {
@@ -191,13 +199,27 @@ resource "azurerm_network_security_rule" "bastion_allow_load_balancer_inbound" {
   direction                  = "Inbound"
   destination_address_prefix = "*"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+  network_security_group_name = azurerm_network_security_group.bastion_nsg.name
+}
+
+resource "azurerm_network_security_rule" "bastion_allow_host_comms" {
+  name                       = "bastion_allow_host_comms"
+  access                     = "Allow"
+  priority                   = 1011
+  source_address_prefix      = "VirtualNetwork"
+  destination_port_ranges    = ["8080","5701"]
+  source_port_range          = "*"
+  protocol                   = "*"
+  direction                  = "Inbound"
+  destination_address_prefix = "VirtualNetwork"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = azurerm_network_security_group.bastion_nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_ssh_rdp_outbound" {
   name                       = "bastion_allow_ssh_rdp_outbound"
   access                     = "Allow"
-  priority                   = 1011
+  priority                   = 1012
   source_address_prefix      = "AzureLoadBalancer"
   source_port_range          = "*"
   protocol                   = "*"
@@ -205,13 +227,13 @@ resource "azurerm_network_security_rule" "bastion_allow_ssh_rdp_outbound" {
   destination_address_prefix = "VirtualNetwork"
   destination_port_ranges    = ["22", "3389"]
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+  network_security_group_name = azurerm_network_security_group.bastion_nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_azure_cloud_outbound" {
   name                       = "bastion_allow_azure_cloud_outbound"
   access                     = "Allow"
-  priority                   = 1012
+  priority                   = 1013
   source_address_prefix      = "*"
   destination_port_range     = "443"
   source_port_range          = "*"
@@ -219,7 +241,7 @@ resource "azurerm_network_security_rule" "bastion_allow_azure_cloud_outbound" {
   direction                  = "Outbound"
   destination_address_prefix = "AzureCloud"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+  network_security_group_name = azurerm_network_security_group.bastion_nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_get_session_info" {
@@ -227,19 +249,19 @@ resource "azurerm_network_security_rule" "bastion_allow_get_session_info" {
   access                     = "Allow"
   priority                   = 1014
   source_address_prefix      = "*"
-  destination_port_range     = "80"
+  destination_port_ranges    = ["80","443"]
   source_port_range          = "*"
   protocol                   = "*"
   direction                  = "Outbound"
   destination_address_prefix = "Internet"
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+  network_security_group_name = azurerm_network_security_group.bastion_nsg.name
 }
 
 resource "azurerm_network_security_rule" "bastion_allow_bastion_comms" {
   name                       = "bastion_allow_bastion_comms"
   access                     = "Allow"
-  priority                   = 1013
+  priority                   = 1015
   source_address_prefix      = "VirtualNetwork"
   source_port_range          = "*"
   protocol                   = "*"
@@ -247,7 +269,7 @@ resource "azurerm_network_security_rule" "bastion_allow_bastion_comms" {
   destination_address_prefix = "VirtualNetwork"
   destination_port_ranges    = ["8080", "5701"]
   resource_group_name        = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
+  network_security_group_name = azurerm_network_security_group.bastion_nsg.name
 }
 
 resource "azurerm_log_analytics_workspace" "workspace" {
