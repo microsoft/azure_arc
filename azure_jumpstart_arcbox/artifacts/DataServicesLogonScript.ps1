@@ -23,11 +23,6 @@ Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincip
 # Required for CLI commands
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
-# Installing Azure CLI arcdata extension
-Write-Host "`n"
-Write-Host "Installing Azure CLI arcdata extension"
-az extension add --name arcdata
-
 # Installing Azure Data Studio extensions
 Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
@@ -40,6 +35,14 @@ $Env:argument4="Microsoft.arc"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
 
+# Installing Azure CLI arcdata extension
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
+Write-Host "`n"
+Write-Host "Installing Azure CLI arcdata extension"
+az extension add --name arcdata
+az -v
+
 # Create Azure Data Studio desktop shortcut
 Write-Host "`n"
 Write-Host "Creating Azure Data Studio Desktop shortcut"
@@ -50,11 +53,6 @@ $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
-
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-az -v
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
