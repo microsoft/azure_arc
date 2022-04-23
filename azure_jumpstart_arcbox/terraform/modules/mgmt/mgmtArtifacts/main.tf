@@ -235,7 +235,7 @@ resource "azurerm_network_security_rule" "bastion_allow_ssh_rdp_outbound" {
   name                       = "bastion_allow_ssh_rdp_outbound"
   access                     = "Allow"
   priority                   = 1012
-  source_address_prefix      = "AzureLoadBalancer"
+  source_address_prefix      = "*"
   source_port_range          = "*"
   protocol                   = "*"
   direction                  = "Outbound"
