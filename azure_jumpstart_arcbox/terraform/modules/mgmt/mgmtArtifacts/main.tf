@@ -79,9 +79,14 @@ resource "azurerm_subnet" "AzureBastionSubnet" {
    name                 = "AzureBastionSubnet"
    resource_group_name  = data.azurerm_resource_group.rg.name
    virtual_network_name = azurerm_virtual_network.vnet.name
-   security_group       = azurerm_network_security_group.bastion_nsg.id
    address_prefixes     = [local.bastionSubnetIpPrefix]
  }
+
+resource "azurerm_subnet_network_security_group_association" "BastionSubnetNsg" {
+  count                     = var.deploy_bastion == true ? 1 : 0
+  subnet_id                 = azurerm_subnet.AzureBastionSubnet[0].id
+  network_security_group_id = azurerm_network_security_group.bastion_nsg[0].id
+}
 
 resource "azurerm_network_security_group" "nsg" {
   name                = local.nsg_name
