@@ -79,6 +79,7 @@ resource "azurerm_subnet" "AzureBastionSubnet" {
    name                 = "AzureBastionSubnet"
    resource_group_name  = data.azurerm_resource_group.rg.name
    virtual_network_name = azurerm_virtual_network.vnet.name
+   security_group       = azurerm_network_security_group.bastion_nsg.id
    address_prefixes     = [local.bastionSubnetIpPrefix]
  }
 
