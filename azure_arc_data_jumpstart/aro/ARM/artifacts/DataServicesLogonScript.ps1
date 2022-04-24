@@ -121,6 +121,9 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
+# Deploying security context
+kubectl apply -f $Env:TempDir\arc-scc.yaml
+
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
 Write-Host "`n"
 Write-Host "Enabling Container Insights cluster extensions"
