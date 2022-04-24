@@ -31,6 +31,10 @@ Expand-Archive -Force -Path "C:\Temp\openshift-client-windows.zip" -DestinationP
 Write-Host "`n"
 Write-Host "Adding ARO Cli to envrionment variables for this session"
 $env:Path += ";$Env:TempDir\OpenShift"
+[Environment]::SetEnvironmentVariable(
+    "Path",
+    [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine) + ";$Env:TempDir\OpenShift",
+    [EnvironmentVariableTarget]::Machine)
 Write-Host "`n"
 
 
