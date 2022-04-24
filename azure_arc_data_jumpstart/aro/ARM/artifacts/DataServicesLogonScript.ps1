@@ -128,7 +128,7 @@ Start-Sleep -Seconds 10
 # Deploying security context
 Write-Host "Adding security context for ARO"
 Write-Host "`n"
-kubectl apply -f $Env:TempDir\arc-scc.yaml
+kubectl apply -f $Env:TempDir\arc-scc.yaml --namespace arc
 Write-Host "`n"
 
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
