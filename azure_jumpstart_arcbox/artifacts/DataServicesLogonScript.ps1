@@ -43,6 +43,7 @@ $Env:argument4="Microsoft.arc"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
+& "C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd" extension add --name arcdata
 
 # Create Azure Data Studio desktop shortcut
 Write-Host "`n"
