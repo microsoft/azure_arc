@@ -23,6 +23,15 @@ Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincip
 # Required for CLI commands
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
+Write-Host "`n"
+Write-Host "Installing Azure CLI extensions"
+az extension add --name arcdata
+Write-Host "`n"
+az -v
+
 # Installing Azure Data Studio extensions
 Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
@@ -34,14 +43,6 @@ $Env:argument4="Microsoft.arc"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
-
-# Installing Azure CLI arcdata extension
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-Write-Host "Installing Azure CLI arcdata extension"
-az extension add --name arcdata
-az -v
 
 # Create Azure Data Studio desktop shortcut
 Write-Host "`n"
