@@ -137,6 +137,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl ge
 # Deploying security context
 Write-Host "Adding security context for ARO"
 Write-Host "`n"
+kubectl create namespace arc
 kubectl apply -f $Env:TempDir\arc-scc.yaml --namespace arc
 Write-Host "`n"
 
