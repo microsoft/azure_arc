@@ -125,12 +125,6 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Deploying security context
-Write-Host "Adding security context for ARO"
-Write-Host "`n"
-kubectl apply -f $Env:TempDir\arc-scc.yaml --namespace arc
-Write-Host "`n"
-
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
 Write-Host "`n"
 Write-Host "Enabling Container Insights cluster extensions"
@@ -139,6 +133,14 @@ Write-Host "`n"
 
 # Monitor pods across arc namespace
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
+
+# Deploying security context
+Write-Host "Adding security context for ARO"
+Write-Host "`n"
+kubectl apply -f $Env:TempDir\arc-scc.yaml --namespace arc
+Write-Host "`n"
+
+Start-Sleep -Seconds 10
 
 # Installing Azure Arc-enabled data services extension
 Write-Host "`n"
