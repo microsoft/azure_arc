@@ -236,6 +236,8 @@ jobs:
           fi 
           if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'DevOps' ]; then
            sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DevOpsLogonScript.log' '.' || echo "DevOpsLogonScript.log not able to be downloaded"
+           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\installCAPI.log' '.' || echo "installCAPI.log not able to be downloaded"
+           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\installK3s.log' '.' || echo "installK3s.log not able to be downloaded"
           fi           
           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\MonitorWorkbookLogonScript.log' '.' || echo "MonitorWorkbookLogonScript.log not able to be downloaded"
       - name: Upload Bootstrap.log File
@@ -261,7 +263,19 @@ jobs:
         if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: DevOpsLogonScript.log
-          path: DevOpsLogonScript.log                
+          path: DevOpsLogonScript.log        
+      - name: Upload installCAPI.log File
+        uses: actions/upload-artifact@v3
+        if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
+        with:
+          name: installCAPI.log
+          path: installCAPI.log      
+      - name: Upload installCAPI.log File
+        uses: actions/upload-artifact@v3
+        if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
+        with:
+          name: installK3s.log
+          path: installK3s.log        
       - name: Upload MonitorWorkbookLogonScript.log File
         if:  success() || failure()
         uses: actions/upload-artifact@v3
