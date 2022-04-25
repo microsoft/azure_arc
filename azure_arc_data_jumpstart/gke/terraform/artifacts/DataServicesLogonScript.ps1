@@ -28,9 +28,9 @@ Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
 $Env:argument1="--install-extension"
-$Env:argument2="Microsoft.arc"
+$Env:argument2="microsoft.azcli"
 $Env:argument3="microsoft.azuredatastudio-postgresql"
-$Env:argument4="microsoft.azdata"
+$Env:argument4="Microsoft.arc"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
