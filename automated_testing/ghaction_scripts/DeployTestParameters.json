@@ -7,7 +7,8 @@
     "workbooksExpected": 1,
     "deployBastionDifference": -1,
     "desktopElementsExpected": 9,
-    "countConnectedK8sClusters": 2
+    "countConnectedK8sClusters": 2,
+    "countKeyVault": 1
   },
   "ITPro": {
     "afterDeployResources": 13,
@@ -17,7 +18,8 @@
     "workbooksExpected": 1,
     "deployBastionDifference": 1,
     "desktopElementsExpected": 2,
-    "countConnectedK8sClusters": 0
+    "countConnectedK8sClusters": 0,
+    "countKeyVault": 0
   },
   "DevOps": {
     "afterDeployResources": 47,
@@ -27,6 +29,7 @@
     "workbooksExpected": 1,
     "deployBastionDifference": -1,
     "desktopElementsExpected": 3,
-    "countConnectedK8sClusters": 2
+    "countConnectedK8sClusters": 2,
+    "countKeyVault": 1
   }
 }

@@ -151,6 +151,16 @@ do
   echo "------ End Processiong $name Kubernetes Connected Cluster ---------"
 done
 
+countKeyVaults=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.KeyVault/vaults' -c)
+jquerycountKeyVaults=".$Flavor.countKeyVault"
+countcountKeyVaultExpected=$(echo "$config" |  jq "$jquerycountKeyVaults")
+if [ "$countcountKeyVaultExpected" = "$countKeyVaults" ]; then
+   echo "We have $countKeyVaults Key Vault resources"
+else
+   echo "Error # Key Vault resources $countKeyVaults"
+   validations=false
+fi
+
 if [ "$validations" = "false" ]; then
    echo "Something was wrong. Failing"
    exit 1
