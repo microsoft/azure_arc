@@ -290,6 +290,6 @@ Stop-Process -Id $kubectlMonShell.Id
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
-#Stop-Process -Name powershell -Force
+Stop-Process -Name powershell -Force
 
 Stop-Transcript
