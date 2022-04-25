@@ -602,6 +602,25 @@ ArcBox uses a GitOps configuration on the OSM bookstore application to split tra
 
   ![Screenshot showing Bookstore apps and shell GitOps and OSM 02](./capi_osm09.png)
 
+- Optional, do you want to reset the traffic split demo? If yes, follow the below steps to reset bookstore counters.
+  
+  - Browse to the _ResetBookstore.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
+    - Connect to _ArcBox-CAPI-Data_ cluster
+    - Deploy a Kubernetes Ingress resource for each bookstore apps reset API
+    - Invoke bookstore apps rest API to reset the counter
+  
+  - Before we run the reset script, did you update the Traffic split on GitHub? In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`traffic-split.yaml`_ file (_`/bookstore/osm-sample/traffic-split.yaml`_), update the bookstore weight to "100" and bookstore weight to "0" and commit the change.
+
+    ![Screenshot showing Bookstore repo Traffic split rest](./capi_osm10.png)
+
+  - Right click _ResetBookstore.ps1_ script and select Run with PowerShell to execute the script.
+  
+    ![Screenshot showing Script execution reset](./capi_osm11.png)
+
+  - Counters for Bookbuyer, Bookstore-v1, and Bookstore-v2 will reset.
+
+    ![Screenshot showing Bookstore apps and shell GitOps and OSM reset](./capi_osm12.png)
+
 ### Microsoft Defender for Cloud
 
 After you have finished the deployment of ArcBox, you can verify that Microsoft Defender for Cloud is working properly and alerting on security threats by running the below command to simulate an alert on the _ArcBox-CAPI-Data_ workload cluster:
