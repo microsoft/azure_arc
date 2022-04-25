@@ -189,7 +189,7 @@ resource "azurerm_network_security_rule" "allow_Postgresql_traffic" {
   access                     = "Allow"
   priority                   = 1009
   source_address_prefix      = "*"
-  destination_port_range     = "5432"
+  destination_port_range     = "15432"
   source_port_range          = "*"
   protocol                   = "TCP"
   direction                  = "Inbound"
