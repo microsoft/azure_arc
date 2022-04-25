@@ -55,30 +55,34 @@ To demonstrate the various architecture components, the ML pipeline we deploy is
 
   To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
-  ```shell
-  az login
-  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
-  ```
+    ```shell
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    ```
 
-  For example:
+    For example:
 
-  ```shell
-  az ad sp create-for-rbac -n "http://AzureArcML" --role contributor
-  ```
+    ```shell
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArcML" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    ```
 
-  Output should look like this:
+    Output should look like this:
 
-  ```json
-  {
+    ```json
+    {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcML",
-    "name": "http://AzureArcML",
+    "displayName": "JumpstartArcML",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  }
-  ```
+    }
+    ```
 
-  > **Note: It is optional, but highly recommended, to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 ## Automation Flow
 

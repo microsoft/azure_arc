@@ -148,6 +148,32 @@
       "metadata": {
         "description": "Base URL for ARM template"
       }
+    },
+    "bastionSubnetRef": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet reference"
+      }
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "defaultValue": false
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-Win-Demo-Bastion",
+      "metadata": {
+        "description": "Azure Bastion host name"
+      }
+    },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet IP prefix"
+      }
     }
   },
   "variables": {
@@ -155,12 +181,17 @@
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-    "osDiskType": "Premium_LRS"
+    "osDiskType": "Premium_LRS",
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+    "bastionSubnetRef": "[concat(parameters('bastionSubnetRef'))]",
+    "PublicIPNoBastion": {
+      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+    }
   },
   "resources": [
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2018-10-01",
+      "apiVersion": "2021-05-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -176,9 +207,7 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
-              "publicIpAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-              }
+              "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ],
@@ -201,7 +230,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[parameters('myIpAddress')]",
+              "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"
@@ -221,7 +250,7 @@
         "idleTimeoutInMinutes": 4
       },
       "sku": {
-        "name": "Basic",
+        "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
         "tier": "Regional"
       }
     },
@@ -295,6 +324,31 @@
           ],
           "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('location'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
+      }
+    },
+    {
+      "type": "Microsoft.Network/bastionHosts",
+      "condition": "[parameters('deployBastion')]",
+      "name": "[parameters('bastionHostName')]",
+      "location": "[parameters('location')]",
+      "apiVersion": "2020-11-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "IpConf",
+            "properties": {
+              "subnet": {
+                "id": "[variables('bastionSubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              }
+            }
+          }
+        ]
       }
     }
   ],

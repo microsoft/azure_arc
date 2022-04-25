@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "aro_name": {
+            "value": "<Azure Red Hat OpenShift cluster name>"
+        },
+        "location": {
+            "value": "<Azure Region>"
+        },
+        "servicePrincipalClientId": {
+            "value": "<Azure service principal Id>"
+        },
+        "servicePrincipalClientSecret": {
+            "value": "<Azure service principal password>"
+        },
+        "AroProviderId": {
+            "value": "<Azure Red Hat OpenShift resource provider Id>"
+        }
+    }
+}
