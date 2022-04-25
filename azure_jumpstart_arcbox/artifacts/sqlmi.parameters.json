@@ -47,17 +47,11 @@
         "dataLogsStorageClassName": {
             "value": "dataLogStorageClassName-stage"
         },
-        "backupsStorageClassName": {
-            "value": "backupsStorageClassName-stage"
-        },
         "logsStorageSize": {
             "value": "logsSize-stage"
         },
         "dataLogsStorageSize": {
             "value": "dataLogSize-stage"
-        },
-        "backupsStorageSize": {
-            "value": "backupsSize-stage"
         },
         "replicas": {
             "value": replicasStage
