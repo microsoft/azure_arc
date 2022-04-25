@@ -204,7 +204,7 @@ clusterctl get kubeconfig $CLUSTER_NAME > /home/${adminUsername}/.kube/config
 
 sudo service sshd restart
 
-# Creating Storage Class with azure-managed-disk for the CAPI cluster using 
+# Creating Storage Class with azure-managed-disk for the CAPI cluster
 echo ""
 sudo -u $adminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml
 
