@@ -219,6 +219,32 @@
               "destinationAddressPrefix": "*",
               "destinationPortRange": "32323"
             }
+          },
+          {
+            "name": "allow_SQLMI_traffic",
+            "properties": {
+              "priority": 1016,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "11433 "
+            }
+          },
+          {
+            "name": "allow_Postgresql_traffic",
+            "properties": {
+              "priority": 1017,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "5432"
+            }
           }
         ]
       }
