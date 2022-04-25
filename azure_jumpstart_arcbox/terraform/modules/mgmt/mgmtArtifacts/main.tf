@@ -170,11 +170,39 @@ resource "azurerm_network_security_rule" "allow_traefik_lb_external" {
   network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
+resource "azurerm_network_security_rule" "allow_SQLMI_traffic" {
+  name                       = "allow_SQLMI_traffic"
+  access                     = "Allow"
+  priority                   = 1008
+  source_address_prefix      = "*"
+  destination_port_range     = "11433"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = azurerm_network_security_group.nsg.name
+}
+
+resource "azurerm_network_security_rule" "allow_Postgresql_traffic" {
+  name                       = "allow_Postgresql_traffic"
+  access                     = "Allow"
+  priority                   = 1009
+  source_address_prefix      = "*"
+  destination_port_range     = "5432"
+  source_port_range          = "*"
+  protocol                   = "TCP"
+  direction                  = "Inbound"
+  destination_address_prefix = "*"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  network_security_group_name = azurerm_network_security_group.nsg.name
+}
+
 resource "azurerm_network_security_rule" "bastion_allow_https_inbound" {
   count                      = var.deploy_bastion == true ? 1 : 0
   name                       = "bastion_allow_https_inbound"
   access                     = "Allow"
-  priority                   = 1008
+  priority                   = 1010
   source_address_prefix      = "Internet"
   destination_port_range     = "443"
   source_port_range          = "*"
@@ -189,7 +217,7 @@ resource "azurerm_network_security_rule" "bastion_allow_gateway_manager_inbound"
   count                      = var.deploy_bastion == true ? 1 : 0
   name                       = "bastion_allow_gateway_manager_inbound"
   access                     = "Allow"
-  priority                   = 1009
+  priority                   = 1011
   source_address_prefix      = "GatewayManager"
   destination_port_range     = "443"
   source_port_range          = "*"
@@ -204,7 +232,7 @@ resource "azurerm_network_security_rule" "bastion_allow_load_balancer_inbound" {
   count                      = var.deploy_bastion == true ? 1 : 0
   name                       = "bastion_allow_load_balancer_inbound"
   access                     = "Allow"
-  priority                   = 1010
+  priority                   = 1012
   source_address_prefix      = "AzureLoadBalancer"
   destination_port_range     = "443"
   source_port_range          = "*"
@@ -219,7 +247,7 @@ resource "azurerm_network_security_rule" "bastion_allow_host_comms" {
   count                      = var.deploy_bastion == true ? 1 : 0
   name                       = "bastion_allow_host_comms"
   access                     = "Allow"
-  priority                   = 1011
+  priority                   = 1013
   source_address_prefix      = "VirtualNetwork"
   destination_port_ranges    = ["8080","5701"]
   source_port_range          = "*"
@@ -234,7 +262,7 @@ resource "azurerm_network_security_rule" "bastion_allow_ssh_rdp_outbound" {
   count                      = var.deploy_bastion == true ? 1 : 0
   name                       = "bastion_allow_ssh_rdp_outbound"
   access                     = "Allow"
-  priority                   = 1012
+  priority                   = 1014
   source_address_prefix      = "*"
   source_port_range          = "*"
   protocol                   = "*"
@@ -249,7 +277,7 @@ resource "azurerm_network_security_rule" "bastion_allow_azure_cloud_outbound" {
   count                      = var.deploy_bastion == true ? 1 : 0
   name                       = "bastion_allow_azure_cloud_outbound"
   access                     = "Allow"
-  priority                   = 1013
+  priority                   = 1015
   source_address_prefix      = "*"
   destination_port_range     = "443"
   source_port_range          = "*"
@@ -264,7 +292,7 @@ resource "azurerm_network_security_rule" "bastion_allow_get_session_info" {
   count                      = var.deploy_bastion == true ? 1 : 0
   name                       = "bastion_allow_get_session_info"
   access                     = "Allow"
-  priority                   = 1014
+  priority                   = 1016
   source_address_prefix      = "*"
   destination_port_ranges    = ["80","443"]
   source_port_range          = "*"
@@ -279,7 +307,7 @@ resource "azurerm_network_security_rule" "bastion_allow_bastion_comms" {
   count                      = var.deploy_bastion == true ? 1 : 0
   name                       = "bastion_allow_bastion_comms"
   access                     = "Allow"
-  priority                   = 1015
+  priority                   = 1017
   source_address_prefix      = "VirtualNetwork"
   source_port_range          = "*"
   protocol                   = "*"

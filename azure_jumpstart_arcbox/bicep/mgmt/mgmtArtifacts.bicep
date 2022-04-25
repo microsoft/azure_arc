@@ -169,6 +169,32 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           destinationPortRange: '32323'
         }
       }
+      {
+        name: 'allow_SQLMI_traffic'
+        properties: {
+          priority: 1008
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '11433'
+        }
+      }
+      {
+        name: 'allow_Postgresql_traffic'
+        properties: {
+          priority: 1009
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '5432'
+        }
+      }
     ]
   }
 }
@@ -181,7 +207,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_https_inbound'
         properties: {
-          priority: 1008
+          priority: 1010
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -194,7 +220,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_gateway_manager_inbound'
         properties: {
-          priority: 1009
+          priority: 1011
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -207,7 +233,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_load_balancer_inbound'
         properties: {
-          priority: 1010
+          priority: 1012
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Inbound'
@@ -220,7 +246,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_host_comms'
         properties: {
-          priority: 1011
+          priority: 1013
           protocol: '*'
           access: 'Allow'
           direction: 'Inbound'
@@ -236,7 +262,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_ssh_rdp_outbound'
         properties: {
-          priority: 1012
+          priority: 1014
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -252,7 +278,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_azure_cloud_outbound'
         properties: {
-          priority: 1013
+          priority: 1015
           protocol: 'Tcp'
           access: 'Allow'
           direction: 'Outbound'
@@ -265,7 +291,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_bastion_comms'
         properties: {
-          priority: 1014
+          priority: 1016
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
@@ -281,7 +307,7 @@ resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@20
       {
         name: 'bastion_allow_get_session_info'
         properties: {
-          priority: 1015
+          priority: 1017
           protocol: '*'
           access: 'Allow'
           direction: 'Outbound'
