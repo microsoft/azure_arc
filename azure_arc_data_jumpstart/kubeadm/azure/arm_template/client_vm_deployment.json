@@ -176,6 +176,26 @@
             "defaultValue": {
                 "Project": "jumpstart_azure_arc_data"
             }
+        },
+        "deployBastion": {
+            "type": "bool",
+            "metadata": {
+                "description": "Choice to deploy Bastion to connect to the client VM"
+            },
+            "defaultValue" : false
+        },
+        "bastionHostName": {
+            "type": "string",
+            "defaultValue": "Arc-Win-Demo-Bastion",
+            "metadata": {
+                "description": "Azure Bastion host name"
+            }
+        },
+        "bastionSubnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Azure Bastion subnet IP prefix"
+            }
         }
     },
     "variables": {
@@ -185,12 +205,16 @@
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
         "subnetAddressPrefix": "10.1.0.0/24",
-        "addressPrefix": "10.1.0.0/16"
+        "addressPrefix": "10.1.0.0/16",
+        "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+        "PublicIPNoBastion": {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+        }
     },
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2021-05-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -207,9 +231,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -232,7 +254,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "*",
+                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),'*')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "3389"
@@ -269,7 +291,7 @@
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2019-04-01",
+            "apiVersion": "2021-05-01",
             "name": "[parameters('virtualNetworkName')]",
             "location": "[parameters('location')]",
             "properties": {
@@ -286,6 +308,12 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                            "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+                        }
                     }
                 ]
             }
@@ -301,7 +329,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },

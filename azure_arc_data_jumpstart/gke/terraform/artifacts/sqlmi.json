@@ -67,13 +67,6 @@
         "dataLogsStorageClassName": {
             "type": "String"
         },
-        "backupsStorageSize": {
-            "type": "String",
-            "defaultValue": "5"
-        },
-        "backupsStorageClassName": {
-            "type": "String"
-        },
         "replicas": {
             "type": "Int"
         },
@@ -159,14 +152,6 @@
                                     {
                                         "className": "[parameters('dataLogsStorageClassName')]",
                                         "size": "[parameters('dataLogsStorageSize')]"
-                                    }
-                                ]
-                            },
-                            "backups": {
-                                "volumes": [
-                                    {
-                                        "className": "[parameters('backupsStorageClassName')]",
-                                        "size": "[parameters('backupsStorageSize')]"
                                     }
                                 ]
                             }

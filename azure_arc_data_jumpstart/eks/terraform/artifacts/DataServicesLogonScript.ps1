@@ -12,20 +12,28 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 # Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
+# Installing Azure CLI arcdata extension
+Write-Host "`n"
+Write-Host "Installing Azure CLI arcdata extension"
+az extension add --name arcdata
+
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
 # subscription user deployed ARM template to. This is needed in case Service 
 # Principal has access to multiple subscriptions, which can break the automation logic
 az account set --subscription $env:subscriptionId
 
-# Install Azure Data Studio extensions
+# Installing Azure Data Studio extensions
+Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
-$env:argument1="--install-extension"
-$env:argument2="Microsoft.arc"
-$env:argument3="microsoft.azuredatastudio-postgresql"
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument2
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $env:argument1 $env:argument3
+$Env:argument1="--install-extension"
+$Env:argument2="Microsoft.arc"
+$Env:argument3="microsoft.azuredatastudio-postgresql"
+$Env:argument4="microsoft.azdata"
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
 
 # Create Azure Data Studio desktop shortcut
 Write-Host "Creating Azure Data Studio Desktop shortcut"
@@ -84,8 +92,8 @@ Write-Host "`n"
 
 Start-Sleep -Seconds 10
 
-# Onboarding the EKS cluster as an Azure Arc enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# Onboarding the EKS cluster as an Azure Arc-enabled Kubernetes cluster
+Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Monitor pods across namespaces
@@ -105,7 +113,7 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Create Azure Arc enabled Data Services extension
+# Create Azure Arc-enabled Data Services extension
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
@@ -115,7 +123,6 @@ az k8s-extension create --name arc-data-services `
                         --scope cluster `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
-                        --version 1.1.18031001
 
 Do {
     Write-Host "Waiting for bootstrapper pod, hold tight..."

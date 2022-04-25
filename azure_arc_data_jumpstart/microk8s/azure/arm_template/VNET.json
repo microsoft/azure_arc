@@ -25,13 +25,22 @@
       "metadata": {
         "description": "Subnet CIDR"
       }
+    },
+     "bastionSubnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Bastion subnet prefix"
+      }
     }
+  },
+    "variables": {
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]"
   },
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
       "comments": "Deploys a VNET and Subnet for Client and K8s VM",
-      "apiVersion": "2019-04-01",
+      "apiVersion": "2021-05-01",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[resourceGroup().location]",
       "properties": {
@@ -45,6 +54,12 @@
               "addressPrefix": "[parameters('subnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
             }
           }
         ]
