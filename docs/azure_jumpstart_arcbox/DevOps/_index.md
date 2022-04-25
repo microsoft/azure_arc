@@ -602,7 +602,7 @@ ArcBox uses a GitOps configuration on the OSM bookstore application to split tra
 
   ![Screenshot showing Bookstore apps and shell GitOps and OSM 02](./capi_osm09.png)
 
-- Optional, do you want to reset the traffic split demo? If yes, follow the below steps to reset bookstore counters.
+- Optional, you may want to reset the traffic split demo to start over with the counters at zero. If so, follow the below steps to reset the bookstore counters.
   
   - Browse to the _ResetBookstore.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
     - Connect to _ArcBox-CAPI-Data_ cluster
