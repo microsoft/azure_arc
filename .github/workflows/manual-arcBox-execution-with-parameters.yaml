@@ -88,7 +88,7 @@ jobs:
   armTemplateToolkit:
     runs-on: windows-latest
     env:
-      ExcludeRules: "Secure-String-Parameters-Cannot-Have-Default,CommandToExecute-Must-Use-ProtectedSettings-For-Secrets"
+      ExcludeRules: "Secure-String-Parameters-Cannot-Have-Default,CommandToExecute-Must-Use-ProtectedSettings-For-Secrets,URIs-Should-Be-Properly-Constructed,Template-Should-Not-Contain-Blanks,Location-Should-Not-Be-Hardcoded"
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
