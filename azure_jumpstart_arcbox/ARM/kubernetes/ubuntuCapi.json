@@ -130,7 +130,6 @@
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
-        "bastionSubnetIpPrefix": "172.16.3.64/26",
         "PublicIPNoBastion": {
             "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
         }
@@ -138,7 +137,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2018-10-01",
+            "apiVersion": "2021-03-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
@@ -165,16 +164,13 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-02-01",
+            "apiVersion": "2021-03-01",
             "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('azureLocation')]",
-            "properties": {
-                "securityRules": []
-            }
+            "location": "[parameters('azureLocation')]"
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2019-02-01",
+            "apiVersion": "2021-03-01",
             "name": "[variables('publicIpAddressName')]",
             "condition": "[not(parameters('deployBastion'))]",
             "location": "[parameters('azureLocation')]",
@@ -190,7 +186,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2019-03-01",
+            "apiVersion": "2021-07-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('azureLocation')]",
             "tags": "[parameters('resourceTags')]",
@@ -244,10 +240,10 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/installscript_CAPI')]",
-            "apiVersion": "2019-07-01",
+            "apiVersion": "2021-07-01",
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+                "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
