@@ -104,8 +104,8 @@
     "resources": [
         {
             "type": "Microsoft.Authorization/policyAssignments",
+            "apiVersion": "2021-06-01",
             "name": "[variables('policies')[copyIndex()].name]",
-            "apiVersion": "2019-09-01",
             "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
             "location": "[parameters('azureLocation')]",
             "identity": {
@@ -123,15 +123,15 @@
         },
         {
             "type": "Microsoft.Authorization/roleAssignments",
+            "apiVersion": "2020-10-01-preview",
             "name": "[guid(variables('policies')[copyIndex()].name, resourceGroup().id)]",
             "condition": "[contains(variables('policies')[copyIndex()].flavors, parameters('flavor'))]",
             "dependsOn": [
                 "[variables('policies')[copyIndex()].name]"
             ],
-            "apiVersion": "2020-04-01-preview",
             "properties": {
                 "roleDefinitionId": "[variables('policies')[copyIndex()].roleDefinition]",
-                "principalId": "[if(contains(variables('policies')[copyIndex()].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[copyIndex()].name), '2019-09-01', 'full').identity.principalId, guid(format('policies_name_id{0}', copyIndex())))]",
+                "principalId": "[if(contains(variables('policies')[copyIndex()].flavors, parameters('flavor')), reference(resourceId('Microsoft.Authorization/policyAssignments', variables('policies')[copyIndex()].name), '2021-06-01', 'full').identity.principalId, guid(format('policies_name_id{0}', copyIndex())))]",
                 "principalType": "ServicePrincipal"
             },
             "copy": {
