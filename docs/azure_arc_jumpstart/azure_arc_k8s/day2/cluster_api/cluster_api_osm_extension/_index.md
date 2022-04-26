@@ -148,6 +148,6 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
     az k8s-extension delete --cluster-type connectedClusters --cluster-name <name of the cluster> --resource-group <name of the resource group> --name <name of the extension> -y
     ```
 
-- You can also delete the extensions from the Azure Portal under the extensions section of Azure Arc-enabled Kubernetes cluster resource.
+- You can also delete the extensions from the Azure portal under the extensions section of the Azure Arc-enabled Kubernetes cluster resource.
 
   ![Screenshot showing uninstalling of the extension](./08.png)
