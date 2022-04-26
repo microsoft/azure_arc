@@ -237,8 +237,8 @@ Write-Host "Enabling data controller auto metrics & logs upload to log analytics
 Write-Host "`n"
 $Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --auto-upload-metrics true
+az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --auto-upload-logs true --use-k8s --k8s-namespace arc
+az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --auto-upload-metrics true --use-k8s --k8s-namespace arc
 
 # Applying Azure Data Studio settings template file and operations url shortcut
 if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
