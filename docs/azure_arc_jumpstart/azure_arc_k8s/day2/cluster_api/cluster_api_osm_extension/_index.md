@@ -134,7 +134,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
   - Verify if monitoring working correctly by query the logs for pulling the data from the InsightsMetrics schema. Browse to the logs query under monitoring and run below query.
   
-    ```console
+    ```shell
     InsightsMetrics | where Name contains "envoy" | extend t=parse_json(Tags) | where t.app == "bookstore"
     ```
 
