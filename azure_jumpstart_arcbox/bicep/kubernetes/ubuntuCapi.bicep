@@ -86,9 +86,6 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
   name: networkSecurityGroupName
   location: azureLocation
-  properties: {
-    securityRules: []
-  }
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if(deployBastion == false){
