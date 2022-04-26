@@ -23,7 +23,7 @@
   },
   "DevOps": {
     "afterDeployResources": 47,
-    "afterScriptExecution": 51,
+    "afterScriptExecution": 50,
     "azureArcMachinesExpected": 0,
     "policiesDeploymentExpected": 2,
     "workbooksExpected": 1,
