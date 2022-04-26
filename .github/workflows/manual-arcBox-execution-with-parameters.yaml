@@ -99,27 +99,27 @@ jobs:
           az bicep build --file "azure_jumpstart_arcbox/bicep/main.bicep"
       - name: Check Bicep
         run: |
-          Start-Transcript -path bicep-lint-result.txt -append
+          Start-Transcript -path bicep-lint-results.txt -append
           .\automated_testing\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
           Stop-Transcript
         continue-on-error: true
       - name: Upload Bicep Lint Results File
         uses: actions/upload-artifact@v3
         with:
-          name: bicep-lint-result.txt
-          path: bicep-lint-result.txt    
+          name: bicep-lint-results.txt
+          path: bicep-lint-results.txt    
 
       - name: Check ARM
         run: |
-          Start-Transcript -path arm-lint-result.txt -append
-          .\automated_testing\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules | tee arm-lint-result.txt
+          Start-Transcript -path arm-lint-results.txt -append
+          .\automated_testing\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules
           Stop-Transcript
         continue-on-error: true
       - name: Upload Bicep Lint Results File
         uses: actions/upload-artifact@v3
         with:
-          name: arm-lint-result.txt
-          path: arm-lint-result.txt  
+          name: arm-lint-results.txt
+          path: arm-lint-results.txt  
 
   deployValidateAndClean:
     runs-on: ubuntu-latest
