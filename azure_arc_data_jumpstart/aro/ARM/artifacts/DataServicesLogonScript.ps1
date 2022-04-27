@@ -99,8 +99,7 @@ $kubcepass=(az aro list-credentials --name $connectedClusterName --resource-grou
 $apiServer=(az aro show -g $Env:resourceGroup -n $Env:clusterName --query apiserverProfile.url -o tsv)
 oc login $apiServer -u kubeadmin -p $kubcepass
 oc adm policy add-scc-to-user privileged system:serviceaccount:azure-arc:azure-arc-kube-aad-proxy-sa
-oc adm policy add-scc-to-user hostpath system:serviceaccount:azure-arc-data:sa-arc-metricsdc-reader
-oc adm policy add-scc-to-user hostpath system:serviceaccount:arc:sa-arc-metricsdc-reader
+oc adm policy add-scc-to-user hostaccess system:serviceaccount:azure-arc-data:sa-arc-metricsdc-reader
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
