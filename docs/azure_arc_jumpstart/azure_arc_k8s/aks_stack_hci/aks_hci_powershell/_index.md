@@ -71,9 +71,11 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
 * Perform a clean installation of the AksHci PowerShell module. To install the AksHci PowerShell module remove any previous versions by running the below commands:
 
   ```powershell
-  Install-Module -Name Az.Accounts -Repository PSGallery -RequiredVersion 2.2.4
-  Install-Module -Name Az.Resources -Repository PSGallery -RequiredVersion 3.2.0
-  Install-Module -Name AzureAD -Repository PSGallery -RequiredVersion 2.0.2.128
+  Install-PackageProvider -Name NuGet -Force 
+  Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
+  Install-Module -Name Az.Accounts -Repository PSGallery 
+  Install-Module -Name Az.Resources -Repository PSGallery 
+  Install-Module -Name AzureAD -Repository PSGallery 
   Install-Module -Name AksHci -Repository PSGallery
   Import-Module Az.Accounts
   Import-Module Az.Resources
@@ -129,9 +131,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * **imageDir:** path to the directory where AKS on Azure Stack HCI will store its VHD images, provide a shared path or SMB for multinode
   * **cloudConfigLocation:** path to the directory where the cloud agent will store its configuration, provide a shared path or SMB for multi-node.
   * **clusterName:** a name for your AKS cluster, **must be lowercase**.
-  * **controlPlaneNodeCount:** number of nodes for your control plane, should be an odd number 1, 3 or 5.
   * **linuxNodeCount:** number of Linux node VMs for your cluster.
-  * **windowsNodeCount:** number of Windows node VMs for your cluster, if you do not need Windows nodes input 0.
   * **resourceGroup:** resource group to connect your Azure Arc-enabled Kubernetes cluster.
   * **location:** Azure region to connect your Azure Arc-enabled Kubernetes cluster.
   * **subscriptionId:** subscription to connect your Azure Arc-enabled Kubernetes cluster.
@@ -151,17 +151,16 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * **ipAddressPrefix** '192.168.0.0/16'
   * **gateway** '192.168.0.1'
   * **dnsServers** '192.168.0.1'
-  * **cloudConfigLocation:** "C:\AKS-HCI\Config"
-  * **clusterName:** "archcidemo"
-  * **controlPlaneNodeCount:** 1
+  * **imageDir** 'C:\AKS-HCI\Image'
+  * **cloudConfigLocation:** 'C:\AKS-HCI\Config'
+  * **clusterName:** 'archcidemo'
   * **linuxNodeCount:** 1
-  * **windowsNodeCount:** 0
-  * **resourceGroup:** "Arc-AKS-HCI-Demo"
+  * **resourceGroup:** 'Arc-AKS-HCI-Demo'
   * **location:** eastus
-  * **subscriptionId:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
-  * **appId:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"
-  * **password:** "XXXXXXXXXX"
-  * **tenant:** "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX"  
+  * **subscriptionId:** 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX'
+  * **appId:** 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX'
+  * **password:** 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX'
+  * **tenant:** 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX'
 
 * Note that the script will deploy a simple static IP address based cluster on your Azure Stack HCI and there are additional optional parameters that you could use to customize the deployment to your own environment as described [here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-walkthrough-powershell).
 
