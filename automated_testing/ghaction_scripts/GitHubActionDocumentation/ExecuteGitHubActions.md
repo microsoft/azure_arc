@@ -1,6 +1,6 @@
 # ArcBox automatic deploy and test
 
-The goal is to provide automation to deploy and test of the arc box scenarios.  
+The goal is to provide automation to deploy and test arcbox scenarios.  
 We decided to use [GitHub Actions](https://docs.github.com/actions).
 
 The workflow is a manual one, you need to execute it when you consider it is proper.
@@ -47,19 +47,18 @@ You need to define SSH_RSA_PUBLIC_KEY (look here [Azure Arc Box deploys](https:/
 
 ## Execute the workflow
 
-We are ready, we need to go to the Action Tab and select our workflow (Manual ArcBox Execution with parameters)
+We are ready, we need to go to the Action Tab and select our workflow (Manual ArcBox Execution with parameters). The workflow file is on `.\.github\workflows\manual-arcBox-execution-with-parameters.yaml` and github is going to read the files in order to give the workflow as option.
 ![image](./GHActionExecution.PNG)
 
 Selecting **Run Workflow**, the parameters will be present.
 
-- The first parameter is which workflow definition we are you going to use
+- The first parameter is which workflow definition we are you going to use (you can have different workflow versions on differs branches)
 - Flavor to be executed, so far Full, ITPro or DevOps
 - Kind of deploy: ARM, Bicep or Terraform
-- Which branch you are going to use to read the scripts
+- Which branch you are going to use to read the arcbox's scripts
 - Resource group name
 - Location
 - Name of log analytic
-- Your public IP v4
 - Windows VM admin username
 - Choice if you like to deploy Bastion to connect to the client VM
 
@@ -85,7 +84,10 @@ On the deploy workflow there are deploy validation that you could check
 
 ![image](./deployValidations.PNG)
 
-After finishing the logs from inside the vm are available
+Final Validation DevOps Scenario Example
+![image](./FinalValidationDevopsScenario.PNG)
+
+After finishing the logs from inside the vm and lint code results are available 
 
 ![image](./logsToDownload.PNG)
 
@@ -93,12 +95,12 @@ After finishing the logs from inside the vm are available
 
 We need to execute 4 script inside the VM on a full deploy to simulate what it happens at LogOn:
 
-- ArcServersLogonScript.ps1, this script is block when execute using OpenSSH, but when we run it using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) it works.
+- ArcServersLogonScript.ps1, this script is block when execute using OpenSSH, but when we run it using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), it works.
 - DataServicesLogonScript.ps1, this script is block when execute using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), so we installed and use OpenSSH to execute it
 - DevOpsLogonScript.ps1, is executed using OpenSSH.
-- MonitorWorkbookLogonScript.ps1, execute in both approaches.
+- MonitorWorkbookLogonScript.ps1, execute in both approaches. It currently is running with OpenSSH
 
-After the incorporation of some security polices to the subscription, the [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) start to fail randomly, the failure is described on the note:
+After the incorporation of some security polices to the subscription, the [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) start to fail randomly, the failure is described on the note inside the documentation:
 
 "To function correctly, Run Command requires connectivity (port 443) to Azure public IP addresses. If the extension doesn't have access to these endpoints, **the scripts might run successfully but not return the results**. If you're blocking traffic on the virtual machine, you can use service tags to allow traffic to Azure public IP addresses by using the AzureCloud tag."
 
@@ -106,6 +108,6 @@ We were able to check from the log that the command execute correctly, but the a
 
 The ITPro flavor usually works and the Full flavor usually fails. We spouse it is related to the time that the police spent before applying to ClientVM. On ITPro scenario the deploy finish as soon the ClientVM finish, and not in the another case.
 
-We added a kind or "continue on error", and we check a file generated that indicate the script finished the execution. Then it will succeed even after time out. The only secondary effect is the time increase.
+We added a kind or "continue on error", and we check a file generated that indicate the script finished the execution. Then it will succeed even after time out. The only secondary effect is the execution time increase.
 
 [Open SSH](https://docs.microsoft.com/windows-server/administration/openssh/openssh_install_firstuse) is installed using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), and for subscription security polices was moved to port 2204
