@@ -1,7 +1,7 @@
 apiVersion: security.openshift.io/v1
 kind: SecurityContextConstraints
 metadata:
-  name: arc-data-scc
+  name: hostpath
 allowHostDirVolumePlugin: true
 allowHostIPC: false
 allowHostNetwork: false
