@@ -144,7 +144,7 @@
         "workerProfiles": [
           {
             "name": "worker",
-            "vmSize": "Standard_D8s_v3",
+            "vmSize": "Standard_D8as_v4",
             "diskSizeGB": 128,
             "count": 3,
             "subnetId": "[format('{0}/subnets/{1}', resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), parameters('workerNodesSubnet'))]",
