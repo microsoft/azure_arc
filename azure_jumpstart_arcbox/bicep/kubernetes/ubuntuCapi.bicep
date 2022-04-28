@@ -57,9 +57,8 @@ param deployBastion bool = false
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
-var bastionSubnetIpPrefix = '172.16.3.64/26'
 var PublicIPNoBastion = {
-  id: '${publicIpAddress.id}'
+  id: publicIpAddress.id
 }
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
@@ -87,9 +86,6 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
   name: networkSecurityGroupName
   location: azureLocation
-  properties: {
-    securityRules: []
-  }
 }
 
 resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if(deployBastion == false){
