@@ -80,25 +80,34 @@
         "description": "Azure API Management deployment"
       }
     },
-    "templateBaseUrl": {
-      "type": "string",
-      "metadata": {
-        "description": "The base URL used for accessing templates and automation artifacts. Typically inherited from parent ARM template."
-      }
-    },
     "adminEmail": {
       "type": "string",
       "metadata": {
         "description": "Email address used on the Azure API Management deployment to receive all system notifications"
       }
-    }
+    },
+    "githubAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub account"
+      },
+      "defaultValue": "microsoft"
+    },
+    "githubBranch": {
+      "type": "string",
+      "metadata": {
+        "description": "Target GitHub branch"
+      },
+      "defaultValue": "main"
+    }    
   },
   "variables": {
-    "capiTemplateUrl": "[uri(parameters('templateBaseUrl'), 'ubuntuCapi.json')]",
-    "clientVmTemplateUrl": "[uri(parameters('templateBaseUrl'), 'clientVm.json')]",
-    "mgmtStagingStorageUrl": "[uri(parameters('templateBaseUrl'), 'mgmtStagingStorage.json')]",
-    "logAnalyticsUrl": "[uri(parameters('templateBaseUrl'), 'logAnalytics.json')]",
-    "VNETUrl": "[uri(parameters('templateBaseUrl'), 'VNET.json')]",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/')]",
+    "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuCapi.json')]",
+    "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'mgmtStagingStorage.json')]",
+    "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
+    "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
     // Virtual Network configuration
     "virtualNetworkName": "Arc-App-CAPI-VNet",
     "subnetName": "Arc-App-CAPI-Subnet",
@@ -109,7 +118,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys a VNET and Subnet for Client and K8s VM",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "VNETDeployment",
       "properties": {
         "mode": "Incremental",
@@ -136,7 +145,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploy the CAPI environment",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "ubuntuCAPIDeployment",
       "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
       "properties": {
@@ -165,7 +174,7 @@
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
           "templateBaseUrl": {
-            "value": "[parameters('templateBaseUrl')]"
+            "value": "[variables('templateBaseUrl')]"
           },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
@@ -179,7 +188,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys the Client Windows VM",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
       "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
       "properties": {
@@ -232,7 +241,7 @@
             "value": "[parameters('deployLogicApp')]"
           },
           "templateBaseUrl": {
-            "value": "[parameters('templateBaseUrl')]"
+            "value": "[variables('templateBaseUrl')]"
           },
           "adminEmail": {
             "value": "[parameters('adminEmail')]"
@@ -243,7 +252,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Storage Account used for staging kubectl config and staging scripts",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "stagingStorageAccountDeployment",
       "properties": {
         "mode": "Incremental",
@@ -256,7 +265,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "comments": "Deploys Azure Log Analytics workspace to support Azure Arc-enabled app services logs upload",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "logAnalyticsDeployment",
       "properties": {
         "mode": "Incremental",

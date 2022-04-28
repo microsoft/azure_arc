@@ -24,19 +24,28 @@
             "value": "88.88.88.88"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "Arc-App-LA"
+            "value": "Arc-AppSvc-LA"
         },
         "deployAppService": {
-            "value": false
+            "value": true
         },
         "deployFunction": {
+            "value": false
+        },
+        "deployApiMgmt": {
             "value": false
         },
         "deployLogicApp": {
             "value": false
         },
-        "templateBaseUrl": {
-            "value": "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure_/arm_template/"
+        "adminEmail": {
+            "value": "youremail@yourdomain.com"
+        },
+        "githubAccount": {
+            "value": "microsoft"
+        },
+        "githubBranch": {
+            "value": "main"
         }
     }
 }

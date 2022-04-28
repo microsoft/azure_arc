@@ -1,16 +1,27 @@
 Start-Transcript -Path C:\Temp\AppServicesLogonScript.log
 
-$connectedClusterName = "Arc-App-CAPI"
-
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+# Login as service principal
+az login --service-principal --username $Env:spnClientId --password $Env:spnClientSecret --tenant $Env:spnTenantId
+
+# Deployment environment variables
+$Env:TempDir = "C:\Temp"
+$connectedClusterName = "Arc-AppSvc-CAPI"
+$namespace="appservices"
+$extensionName = "arc-app-services"
+$extensionVersion = "0.12.2"
+$apiVersion = "2020-07-01-preview"
+$kubeEnvironmentName=$Env:clusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
+$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+$logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
+$logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
 # Required for azcopy
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
-
-# Login as service principal
-az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
@@ -18,12 +29,12 @@ az login --service-principal --username $env:spnClientId --password $env:spnClie
 # Principal has access to multiple subscriptions, which can break the automation logic
 az account set --subscription $env:subscriptionId
 
-# Creating Azure Public IP resource to be used by the Azure Arc app service
-Write-Host "`n"
-Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
-Write-Host "`n"
-az network public-ip create --resource-group $env:resourceGroup --name "Arc-App-PIP" --sku STANDARD
-$staticIp = $(az network public-ip show --resource-group $env:resourceGroup --name "Arc-App-PIP" --output tsv --query ipAddress)
+# # Creating Azure Public IP resource to be used by the Azure Arc app service
+# Write-Host "`n"
+# Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
+# Write-Host "`n"
+# az network public-ip create --resource-group $env:resourceGroup --name "Arc-App-PIP" --sku STANDARD
+# $staticIp = $(az network public-ip show --resource-group $env:resourceGroup --name "Arc-App-PIP" --output tsv --query ipAddress)
 
 # Registering Azure Arc providers
 Write-Host "`n"
@@ -50,8 +61,8 @@ az extension add --name "connectedk8s" -y
 az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
-az extension add --yes --source "https://aka.ms/appsvc/appservice_kube-latest-py2.py3-none-any.whl"
-az extension add --yes --source "https://aka.ms/logicapp-latest-py2.py3-none-any.whl"
+az extension add --name "appservice-kube" -y
+az extension add --source "https://aka.ms/logicapp-latest-py2.py3-none-any.whl" -y
 
 Write-Host "`n"
 az -v
@@ -65,31 +76,31 @@ $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
 kubectl config rename-context "arc-app-capi-k8s-admin@arc-app-capi-k8s" "arc-app-capi-k8s"
 
-# Creating Storage Class with azure-managed-disk for the CAPI cluster
-Write-Host "`n"
-Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
-kubectl apply -f "C:\Temp\capiStorageClass.yaml"
-$storageClassName = "managed-premium"
+# # Creating Storage Class with azure-managed-disk for the CAPI cluster
+# Write-Host "`n"
+# Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
+# kubectl apply -f "C:\Temp\capiStorageClass.yaml"
+# $storageClassName = "managed-premium"
 
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
 kubectl get nodes
 Write-Host "`n"
 
-Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-Write-Host "`n"
+# Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
+# Write-Host "`n"
 
-# Localize kubeconfig
-$env:KUBECONTEXT = kubectl config current-context
-$env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
+# # Localize kubeconfig
+# $env:KUBECONTEXT = kubectl config current-context
+# $env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
 
-# Create Kubernetes - Azure Arc Cluster
-az connectedk8s connect --name $connectedClusterName `
-                        --resource-group $env:resourceGroup `
-                        --location $env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_app_services' `
-                        --kube-config $env:KUBECONFIG `
-                        --kube-context $env:KUBECONTEXT
+# # Create Kubernetes - Azure Arc Cluster
+# az connectedk8s connect --name $connectedClusterName `
+#                         --resource-group $env:resourceGroup `
+#                         --location $env:azureLocation `
+#                         --tags 'Project=jumpstart_azure_arc_app_services' `
+#                         --kube-config $env:KUBECONFIG `
+#                         --kube-context $env:KUBECONTEXT
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
@@ -99,43 +110,42 @@ Write-Host "`n"
 Write-Host "Deploying Azure App Service Kubernetes environment"
 Write-Host "`n"
 
-$namespace="appservices"
-$extensionName = "arc-app-services"
-$apiVersion = "2020-07-01-preview"
-$kubeEnvironmentName=$connectedClusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
-$workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
-$logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
-$logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
+# $namespace="appservices"
+# $extensionName = "arc-app-services"
+# $apiVersion = "2020-07-01-preview"
+# $kubeEnvironmentName=$connectedClusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
+# $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+# $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
+# $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
+# $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
 az k8s-extension create `
-   --resource-group $env:resourceGroup `
+   --resource-group $Env:resourceGroup `
    --name $extensionName `
+   --version $extensionVersion `
    --cluster-type connectedClusters `
-   --cluster-name $connectedClusterName `
+   --cluster-name $Env:clusterName `
    --extension-type 'Microsoft.Web.Appservice' `
    --release-train stable `
-   --version "0.10.0" `
    --auto-upgrade-minor-version false `
    --scope cluster `
    --release-namespace $namespace `
    --configuration-settings "Microsoft.CustomLocation.ServiceAccount=default" `
    --configuration-settings "appsNamespace=${namespace}" `
    --configuration-settings "clusterName=${kubeEnvironmentName}" `
-   --configuration-settings "loadBalancerIp=${staticIp}" `
    --configuration-settings "keda.enabled=true" `
-   --configuration-settings "buildService.storageClassName=${storageClassName}" `
-   --configuration-settings "buildService.storageAccessMode=ReadWriteOnce" `
+   --configuration-settings "buildService.storageClassName=default"  `
+   --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
    --configuration-settings "customConfigMap=${namespace}/kube-environment-config" `
    --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=${connectedClusterName}" `
    --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
 
-$extensionId=$(az k8s-extension show `
+   $extensionId=$(az k8s-extension show `
    --cluster-type connectedClusters `
-   --cluster-name $connectedClusterName `
-   --resource-group $env:resourceGroup `
+   --cluster-name $Env:clusterName `
+   --resource-group $Env:resourceGroup `
    --name $extensionName `
    --query id `
    --output tsv)
@@ -188,19 +198,6 @@ if ( $env:deployApiMgmt -eq $true )
 {
     & "C:\Temp\deployApiMgmt.ps1"
 }
-
-
-# Deploying Azure Monitor for containers Kubernetes extension instance
-Write-Host "`n"
-Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
-Write-Host "`n"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
-
-# Deploying Azure Defender Kubernetes extension instance
-Write-Host "`n"
-Write-Host "Create Azure Defender Kubernetes extension instance"
-Write-Host "`n"
-az k8s-extension create --name "azure-defender" --cluster-name $connectedClusterName --resource-group $env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes
 
 # Changing to Client VM wallpaper
 $imgPath="C:\Temp\wallpaper.png"
