@@ -12,6 +12,8 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an ARO cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services:
 
+  ![Screenshot showing the deployed architecture](./diagram.png)
+
 > **NOTE: Currently, Azure Arc-enabled PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Prerequisites

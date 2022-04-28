@@ -12,6 +12,8 @@ The following README will guide you on how to deploy a "Ready to Go" environment
 
 By the end of this guide, you will have an ARO cluster deployed with an Azure Arc Data Controller, SQL Managed Instance, and a Microsoft Windows Server 2022 (Datacenter) Azure client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
+  ![Screenshot showing the deployed architecture](./diagram.png)
+
 ## Prerequisites
 
 - Clone the Azure Arc Jumpstart repository
