@@ -10,11 +10,18 @@
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "Arc-App-CAPI-K8s",
+            "defaultValue": "Arc-App-CAPI-MGMT",
             "metadata": {
                 "description": "The name of you Virtual Machine."
             }
         },
+        "ArcK8sClusterName": {
+            "type": "string",
+            "defaultValue": "Arc-AppSvc-CAPI",
+            "metadata": {
+                "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
+            }
+        },        
         "adminUsername": {
             "type": "string",
             "defaultValue": "arcdemo",
@@ -30,12 +37,12 @@
         },
         "ubuntuOSVersion": {
             "type": "string",
-            "defaultValue": "18.04-LTS",
+            "defaultValue": "20_04-lts-gen2",
             "allowedValues": [
-                "18.04-LTS"
+                "20_04-lts-gen2"
             ],
             "metadata": {
-                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
             }
         },
         "azureLocation": {
@@ -68,7 +75,7 @@
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "Arc-App-CAPI-K8s-NSG",
+            "defaultValue": "Arc-App-CAPI-MGMT-NSG",
             "metadata": {
                 "description": "Name of the Network Security Group"
             }
@@ -101,6 +108,12 @@
             "type": "string",
             "metadata": {
                 "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
+            }
+        },
+        "logAnalyticsWorkspaceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the Log Analytics workspace used with cluster extensions"
             }
         },
         "templateBaseUrl": {
@@ -279,7 +292,7 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'))]",
+                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('ArcK8sClusterName'), ' ',parameters('templateBaseUrl'))]",
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]"
                     ]
