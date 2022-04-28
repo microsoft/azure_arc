@@ -15,6 +15,13 @@
         "description": "The name of your Virtual Machine"
       }
     },
+    "ArcK8sClusterName": {
+      "type": "string",
+      "defaultValue": "Arc-AppSvc-CAPI",
+      "metadata": {
+      "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
+      }
+    },    
     "windowsAdminUsername": {
       "type": "string",
       "defaultValue": "arcdemo",
@@ -103,11 +110,11 @@
         "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
       }
     },
-    "workspaceName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name for the environment Azure Log Analytics workspace"
-      }
+    "logAnalyticsWorkspaceName": {
+        "type": "string",
+        "metadata": {
+            "description": "Name of the Log Analytics workspace used with cluster extensions"
+        }
     },
     "deployAppService": {
       "type": "bool",
@@ -293,7 +300,7 @@
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'), ' -templateBaseUrl ', parameters('templateBaseUrl'),' -adminEmail ', parameters('adminEmail'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azureLocation ', parameters('location'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -logAnalyticsWorkspaceName ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('ArcK8sClusterName'), ' ', ' -deployAppService ', parameters('deployAppService'), ' -deployFunction ', parameters('deployFunction'), ' -deployApiMgmt ', parameters('deployApiMgmt'), ' -deployLogicApp ', parameters('deployLogicApp'),' -adminEmail ', parameters('adminEmail'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
       }
     }
