@@ -226,7 +226,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2021-05-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('azureLocation')]",
       "properties": {
@@ -264,7 +264,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2019-03-01",
+      "apiVersion": "2021-11-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('azureLocation')]",
       "tags": "[parameters('resourceTags')]",
@@ -313,7 +313,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(variables('vmName'),'/Bootstrap')]",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2021-11-01",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
@@ -339,7 +339,7 @@
       "condition": "[parameters('deployBastion')]",
       "name": "[parameters('bastionHostName')]",
       "location": "[parameters('azureLocation')]",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2021-05-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIpAddressName'))]"
       ],
