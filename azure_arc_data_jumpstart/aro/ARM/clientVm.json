@@ -249,7 +249,7 @@
     },
     {
       "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2021-05-01",
       "name": "[variables('publicIpAddressName')]",
       "location": "[parameters('azureLocation')]",
       "properties": {
