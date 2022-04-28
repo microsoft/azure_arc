@@ -58,7 +58,7 @@
   "resources": [
     {
       "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2021-04-01-preview",
+      "apiVersion": "2020-10-01-preview",
       "scope": "[format('Microsoft.Network/virtualNetworks/{0}', parameters('virtualNetworkName'))]",
       "name": "[guid(subscription().subscriptionId, parameters('AroProviderId'), variables('contributorRoleId'))]",
       "properties": {
