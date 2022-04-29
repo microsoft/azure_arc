@@ -7,14 +7,14 @@ az login --service-principal --username $Env:spnClientId --password $Env:spnClie
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = "Arc-AppSvc-CAPI"
+# $connectedClusterName = "Arc-AppSvc-CAPI"
 $namespace="appservices"
 $extensionName = "arc-app-services"
 $extensionVersion = "0.12.2"
 $apiVersion = "2020-07-01-preview"
 $kubeEnvironmentName=$Env:clusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
-$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:logAnalyticsWorkspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:logAnalyticsWorkspaceName --query primarySharedKey -o tsv)
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
@@ -76,31 +76,15 @@ $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
 kubectl config rename-context "arc-app-capi-k8s-admin@arc-app-capi-k8s" "arc-app-capi-k8s"
 
-# # Creating Storage Class with azure-managed-disk for the CAPI cluster
-# Write-Host "`n"
-# Write-Host "Creating Storage Class with azure-managed-disk for the CAPI cluster"
-# kubectl apply -f "C:\Temp\capiStorageClass.yaml"
-# $storageClassName = "managed-premium"
-
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
+Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
 
-# Write-Host "Onboarding the cluster as an Azure Arc enabled Kubernetes cluster"
-# Write-Host "`n"
-
-# # Localize kubeconfig
-# $env:KUBECONTEXT = kubectl config current-context
-# $env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
-
-# # Create Kubernetes - Azure Arc Cluster
-# az connectedk8s connect --name $connectedClusterName `
-#                         --resource-group $env:resourceGroup `
-#                         --location $env:azureLocation `
-#                         --tags 'Project=jumpstart_azure_arc_app_services' `
-#                         --kube-config $env:KUBECONFIG `
-#                         --kube-context $env:KUBECONTEXT
+# Localize kubeconfig
+$env:KUBECONTEXT = kubectl config current-context
+$env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
@@ -110,21 +94,12 @@ Write-Host "`n"
 Write-Host "Deploying Azure App Service Kubernetes environment"
 Write-Host "`n"
 
-# $namespace="appservices"
-# $extensionName = "arc-app-services"
-# $apiVersion = "2020-07-01-preview"
-# $kubeEnvironmentName=$connectedClusterName + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
-# $workspaceId = $(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-# $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName --query primarySharedKey -o tsv)
-# $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
-# $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
-
 az k8s-extension create `
    --resource-group $Env:resourceGroup `
    --name $extensionName `
    --version $extensionVersion `
    --cluster-type connectedClusters `
-   --cluster-name $Env:clusterName `
+   --cluster-name $Env:connectedClusterName `
    --extension-type 'Microsoft.Web.Appservice' `
    --release-train stable `
    --auto-upgrade-minor-version false `
@@ -137,7 +112,6 @@ az k8s-extension create `
    --configuration-settings "buildService.storageClassName=default"  `
    --configuration-settings "buildService.storageAccessMode=ReadWriteOnce"  `
    --configuration-settings "customConfigMap=${namespace}/kube-environment-config" `
-   --configuration-settings "envoy.annotations.service.beta.kubernetes.io/azure-load-balancer-resource-group=${connectedClusterName}" `
    --configuration-settings "logProcessor.appLogs.destination=log-analytics" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.customerId=${logAnalyticsWorkspaceIdEnc}" `
    --configuration-protected-settings "logProcessor.appLogs.logAnalyticsConfig.sharedKey=${logAnalyticsKeyEnc}"
