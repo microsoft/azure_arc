@@ -8,6 +8,9 @@ sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/s
 sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
+# Creating login message of the day (motd)
+sudo curl -o /etc/profile.d/welcomeCAPI.sh https://raw.githubusercontent.com/likamrat/azure_arc/app_svc_aks_refactor/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/artifacts/welcomeCAPI.sh
+
 # Injecting environment variables from Azure deployment
 echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
@@ -34,9 +37,6 @@ sed -i '11s/^/export templateBaseUrl=/' vars.sh
 chmod +x vars.sh
 . ./vars.sh
 
-# Creating login message of the day (motd)
-sudo curl -o /etc/profile.d/welcomeCAPI.sh ${templateBaseUrl}artifacts/welcomeCAPI.sh
-
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI.log; done &
@@ -44,6 +44,7 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
+az config set extension.use_dynamic_install=yes_without_prompt
 sudo -u $adminUsername az extension add --name connectedk8s
 sudo -u $adminUsername az extension add --name k8s-configuration
 sudo -u $adminUsername az extension add --name k8s-extension
@@ -226,7 +227,7 @@ sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluste
 echo ""
 sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 echo ""
-sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $connectedClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --debug
+sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $connectedClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # Copying workload CAPI kubeconfig file to staging storage account
 echo ""

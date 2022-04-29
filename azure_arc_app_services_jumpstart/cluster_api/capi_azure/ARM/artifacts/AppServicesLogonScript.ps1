@@ -54,11 +54,10 @@ Write-Host "`n"
 az provider show --namespace Microsoft.Web -o table
 Write-Host "`n"
 
-# Adding Azure Arc CLI extensions
-Write-Host "Adding Azure Arc CLI extensions"
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
 Write-Host "`n"
-az extension add --name "connectedk8s" -y
-az extension add --name "k8s-configuration" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
 az extension add --name "appservice-kube" -y
@@ -69,12 +68,11 @@ az -v
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
-$sourceFile = "https://$env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config.arc-app-capi-k8s"
-$context = (Get-AzStorageAccount -ResourceGroupName $env:resourceGroup).Context
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
+$context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$env:USERNAME\.kube\config"
-kubectl config rename-context "arc-app-capi-k8s-admin@arc-app-capi-k8s" "arc-app-capi-k8s"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
