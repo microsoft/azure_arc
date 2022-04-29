@@ -72,7 +72,7 @@ az k8s-extension create `
     --name $extensionName `
     --version $extensionVersion `
     --cluster-type connectedClusters `
-    --cluster-name $Env:clusterName `
+    --cluster-name $Env:connectedClusterName `
     --extension-type 'Microsoft.Web.Appservice' `
     --release-train stable `
     --auto-upgrade-minor-version false `

@@ -219,7 +219,7 @@
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
-          "workspaceName": {
+          "logAnalyticsWorkspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
           "virtualNetworkName": {
@@ -274,7 +274,7 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "workspaceName": {
+          "logAnalyticsWorkspaceName": {
             "value": "[parameters('logAnalyticsWorkspaceName')]"
           }
         }
