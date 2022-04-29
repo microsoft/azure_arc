@@ -7,7 +7,7 @@ az login --service-principal --username $Env:spnClientId --password $Env:spnClie
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = "Arc-AppSvc-AKS"
+# $connectedClusterName = "Arc-AppSvc-AKS"
 $namespace="appservices"
 $extensionName = "arc-app-services"
 $extensionVersion = "0.12.2"
@@ -53,7 +53,7 @@ $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
 Start-Sleep -Seconds 10
 
 # Create Kubernetes - Azure Arc Cluster
-az connectedk8s connect --name $connectedClusterName `
+az connectedk8s connect --name $Env:connectedClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $Env:azureLocation `
                         --tags "jumpstart_azure_arc_app_services" `
@@ -117,7 +117,7 @@ Write-Host "`n"
 Write-Host "Deploying App Service Kubernetes Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 $connectedClusterId = az connectedk8s show --name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
-# $extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:clusterName --resource-group $Env:resourceGroup --query id -o tsv
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $Env:resourceGroup --namespace $namespace --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" --query id -o tsv)
 az appservice kube create --resource-group $Env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $Env:azureLocation --output none
 
