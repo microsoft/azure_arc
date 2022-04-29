@@ -5,7 +5,7 @@
     "workspaceName": {
       "type": "string",
       "metadata": {
-        "description": "Name for your log analytics workspace"
+        "description": "Name for your Azure Log Analytics workspace"
       }
     },
     "location": {
