@@ -34,7 +34,7 @@ Do {
 Do {
     Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
-    $logProcessorStatus = $(if(kubectl describe daemonset ($extensionName + "-k8se-log-processor") -n appservices | Select-String "Pods Status:  3 Running" -Quiet){"Ready!"}Else{"Nope"})
+    $logProcessorStatus = $(if(kubectl describe daemonset ($extensionName + "-k8se-log-processor") -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($logProcessorStatus -eq "Nope")
    
 
@@ -76,7 +76,7 @@ $Env:AZURE_STORAGE_CONNECTION_STRING = $string
 
 # Publishing the Azure Function application to Azure
 Write-Host "`n"
-Write-Host "Publishing the Azure Function application to Azure"
+Write-Host "Publishing the Azure Function application to Azure. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 func azure functionapp publish $functionAppName | Out-File C:\Temp\funcPublish.txt
 Start-Sleep -Seconds 60
