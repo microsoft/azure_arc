@@ -29,12 +29,12 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 # Principal has access to multiple subscriptions, which can break the automation logic
 az account set --subscription $env:subscriptionId
 
-# # Creating Azure Public IP resource to be used by the Azure Arc app service
-# Write-Host "`n"
-# Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
-# Write-Host "`n"
-# az network public-ip create --resource-group $env:resourceGroup --name "Arc-App-PIP" --sku STANDARD
-# $staticIp = $(az network public-ip show --resource-group $env:resourceGroup --name "Arc-App-PIP" --output tsv --query ipAddress)
+# Creating Azure Public IP resource to be used by the Azure Arc app service
+Write-Host "`n"
+Write-Host "Creating Azure Public IP resource to be used by the Azure Arc app service"
+Write-Host "`n"
+az network public-ip create --resource-group $env:resourceGroup --name "Arc-App-PIP" --sku STANDARD
+$staticIp = $(az network public-ip show --resource-group $env:resourceGroup --name "Arc-App-PIP" --output tsv --query ipAddress)
 
 # Registering Azure Arc providers
 Write-Host "`n"
