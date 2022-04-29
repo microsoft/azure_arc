@@ -45,9 +45,9 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
 az config set extension.use_dynamic_install=yes_without_prompt
-sudo -u $adminUsername az extension add --name connectedk8s
-sudo -u $adminUsername az extension add --name k8s-configuration
-sudo -u $adminUsername az extension add --name k8s-extension
+sudo -u $adminUsername az extension add --name connectedk8s -y
+sudo -u $adminUsername az extension add --name k8s-configuration -y
+sudo -u $adminUsername az extension add --name k8s-extension -y
 
 az -v
 
