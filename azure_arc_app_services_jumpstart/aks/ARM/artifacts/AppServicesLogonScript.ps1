@@ -7,7 +7,6 @@ az login --service-principal --username $Env:spnClientId --password $Env:spnClie
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-# $connectedClusterName = "Arc-AppSvc-AKS"
 $namespace="appservices"
 $extensionName = "arc-app-services"
 $extensionVersion = "0.12.2"
@@ -19,15 +18,45 @@ $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.Ge
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
 # Running Jumpstart global config automation
-Write-Host "`n"
-Write-Host "Running Jumpstart global config automation"
-& "C:\Temp\globalConfig.ps1"
+# Write-Host "`n"
+# Write-Host "Running Jumpstart global config automation"
+# & "C:\Temp\globalConfig.ps1"
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
 # subscription user deployed ARM template to. This is needed in case Service 
 # Principal has access to multiple subscriptions, which can break the automation logic
 az account set --subscription $Env:subscriptionId
+
+# Registering Azure Arc providers
+Write-Host "`n"
+Write-Host "Registering Azure Arc providers, hold tight..."
+Write-Host "`n"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.Web --wait
+
+az provider show --namespace Microsoft.Kubernetes -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.KubernetesConfiguration -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.ExtendedLocation -o table
+Write-Host "`n"
+az provider show --namespace Microsoft.Web -o table
+Write-Host "`n"
+
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
+Write-Host "`n"
+az extension add --name "k8s-extension" -y
+az extension add --name "customlocation" -y
+az extension add --name "appservice-kube" -y
+az extension add --source "https://aka.ms/logicapp-latest-py2.py3-none-any.whl" -y
+
+Write-Host "`n"
+az -v
 
 $aksClusterGroupName = $(az aks show --resource-group $Env:resourceGroup --name $Env:clusterName -o tsv --query nodeResourceGroup)
 
