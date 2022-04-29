@@ -49,8 +49,6 @@ sudo -u $adminUsername az extension add --name connectedk8s -y
 sudo -u $adminUsername az extension add --name k8s-configuration -y
 sudo -u $adminUsername az extension add --name k8s-extension -y
 
-az -v
-
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
 subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
