@@ -110,7 +110,7 @@
                 "description": "Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json"
             }
         },
-        "logAnalyticsWorkspaceName": {
+        "workspaceName": {
             "type": "string",
             "metadata": {
                 "description": "Name of the Log Analytics workspace used with cluster extensions"
@@ -292,7 +292,7 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('connectedClusterName'), ' ',parameters('templateBaseUrl'))]",
+                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('workspaceName'), ' ', parameters('connectedClusterName'), ' ',parameters('templateBaseUrl'))]",
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]"
                     ]

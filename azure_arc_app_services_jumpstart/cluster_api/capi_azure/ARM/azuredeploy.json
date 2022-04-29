@@ -173,6 +173,9 @@
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
+          "workspaceName": {
+              "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           },
@@ -219,8 +222,8 @@
           "stagingStorageAccountName": {
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
-          "logAnalyticsWorkspaceName": {
-            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          "workspaceName": {
+              "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
@@ -245,7 +248,7 @@
           },
           "adminEmail": {
             "value": "[parameters('adminEmail')]"
-          }
+          }          
         }
       }
     },
