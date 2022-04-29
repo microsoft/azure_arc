@@ -15,7 +15,7 @@ on:
         description: "Kind of deploy tool"
         required: true
         options:
-          - Arm
+          - ARM
           - Bicep
           - Terraform
       githubBranch:
@@ -42,7 +42,7 @@ on:
         type: boolean
         description: "Choice to deploy Bastion to connect to the client VM"
         required: true
-        default: false       
+        default: false
 jobs:
   BashScriptAnalyzerTool:
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: bash-lint-result.txt
-          path: bash-lint-result.txt     
+          path: bash-lint-result.txt
 
   PowerShellToolkit:
     runs-on: windows-latest
@@ -83,7 +83,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ps-lint-result.txt
-          path: ps-lint-result.txt    
+          path: ps-lint-result.txt
 
   armTemplateToolkit:
     runs-on: windows-latest
@@ -107,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: bicep-lint-results.txt
-          path: bicep-lint-results.txt    
+          path: bicep-lint-results.txt
 
       - name: Check ARM
         run: |
@@ -119,7 +119,38 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: arm-lint-results.txt
-          path: arm-lint-results.txt  
+          path: arm-lint-results.txt
+
+  TerraformAnalyzerTool:
+    runs-on: ubuntu-latest
+    env:
+      TFSecExcludeRules:
+      ChecovExcludeRules: CKV2_AZURE_10
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.githubBranch }}
+      - name: Install tfsec and checkov
+        run: |
+          brew install tfsec
+          brew install checkov
+      - name: Validate Terraform Script
+        run: |
+          cd ./azure_jumpstart_arcbox/terraform
+          tfsec -f json --exclude "$TFSecExcludeRules" | tee terraform-lint-tfsec-results.txt
+          checkov  --directory . --skip-check "$ChecovExcludeRules" | tee terraform-lint-checov-results.txt
+        continue-on-error: true
+      - name: Upload Terraform tfsec Lint Results File
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-lint-tfsec-results.txt
+          path: ./azure_jumpstart_arcbox/terraform/terraform-lint-tfsec-results.txt  
+      - name: Upload Terraform Checov Lint Results File
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-lint-checov-results.txt
+          path: ./azure_jumpstart_arcbox/terraform/terraform-lint-checov-results.txt  
 
   deployValidateAndClean:
     runs-on: ubuntu-latest
@@ -154,7 +185,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Deploy ArcBox - Arm
         uses: Azure/cli@v1.0.6
-        if: github.event.inputs.mechanism == 'Arm'
+        if: github.event.inputs.mechanism == 'ARM'
         with:
           inlineScript: |
             az group create --name ${{ github.event.inputs.resourceGroupName }} --location ${{ github.event.inputs.location }}
@@ -177,7 +208,7 @@ jobs:
                  "${{secrets.WINDOWS_ADMIN_PASSWORD}}" "${{ github.event.inputs.flavor }}" \
                  "${{ github.event.inputs.logAnalyticsWorkspaceName }}" "${GITHUB_REPOSITORY_OWNER}" \
                  "${{ github.event.inputs.githubBranch }}" "${{ github.event.inputs.deployBastion }}" \
-                 "${{secrets.SPN_SUBSCRIPTION_ID}}" 
+                 "${{secrets.SPN_SUBSCRIPTION_ID}}"
       - name: Add NSG Rule to open our SSH Port (2204) and Run Command requires connectivity to Azure public IP addresses
         uses: Azure/cli@v1.0.6
         with:
@@ -191,7 +222,7 @@ jobs:
           inlineScript: |
             chmod +x ./automated_testing/ghaction_scripts/CountResources.sh
             ./automated_testing/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
-      - name: Adding Public Ip to Connect Open SSH when Azure Bastion is selected 
+      - name: Adding Public Ip to Connect Open SSH when Azure Bastion is selected
         uses: Azure/cli@v1.0.6
         if: ${{ github.event.inputs.deployBastion == 'true' }}
         with:
@@ -225,7 +256,7 @@ jobs:
         run: |
           plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'powershell -InputFormat None -F C:\ArcBox\MonitorWorkbookLogonScript.ps1'
       - name: Download logs from VM
-        if:  success() || failure()
+        if: success() || failure()
         run: |
           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'  || echo "Bootstrap.log not able to be downloaded"
           if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'ITPro' ]; then
@@ -241,7 +272,7 @@ jobs:
           fi           
           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\MonitorWorkbookLogonScript.log' '.' || echo "MonitorWorkbookLogonScript.log not able to be downloaded"
       - name: Upload Bootstrap.log File
-        if:  success() || failure()
+        if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: Bootstrap.log
@@ -263,29 +294,29 @@ jobs:
         if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: DevOpsLogonScript.log
-          path: DevOpsLogonScript.log        
+          path: DevOpsLogonScript.log
       - name: Upload installCAPI.log File
         uses: actions/upload-artifact@v3
         if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: installCAPI.log
-          path: installCAPI.log      
+          path: installCAPI.log
       - name: Upload installCAPI.log File
         uses: actions/upload-artifact@v3
         if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: installK3s.log
-          path: installK3s.log        
+          path: installK3s.log
       - name: Upload MonitorWorkbookLogonScript.log File
-        if:  success() || failure()
+        if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: MonitorWorkbookLogonScript.log
           path: MonitorWorkbookLogonScript.log
       - name: Desktop Validation
         run: |
-            chmod +x ./automated_testing/ghaction_scripts/DesktopValidation.sh
-            ./automated_testing/ghaction_scripts/DesktopValidation.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{github.event.inputs.deployBastion}} ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
+          chmod +x ./automated_testing/ghaction_scripts/DesktopValidation.sh
+          ./automated_testing/ghaction_scripts/DesktopValidation.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{github.event.inputs.deployBastion}} ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
       - name: Final Deploy Validation
         uses: Azure/cli@v1.0.6
         with:
