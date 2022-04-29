@@ -4,7 +4,7 @@ Start-Transcript -Path C:\Temp\globalConfig.log
 $deploymentEnvironment = ($Env:templateBaseUrl | Select-String "microsoft/azure_arc/main")
 
 # Declaring if this is a Jumpstart scenario or ArcBox deployment
-if ($Env:flavor -eq $null -eq $true){
+if ($null -eq $Env:flavor -eq $true){
     $jumpstartDeployment = "Jumpstart scenario"
 } else {
     $jumpstartDeployment = "Jumpstart ArcBox"
@@ -14,7 +14,7 @@ if ($Env:flavor -eq $null -eq $true){
 $jumpstartAppConfigProduction = "Endpoint=https://jumpstart-prod.azconfig.io;Id=xcEf-l6-s0:Fn+IoFEzNKvm/Bo0+W1I;Secret=dkuO3eUhqccYw6YWkFYNcPMZ/XYQ4r9B/4OhrWTLtL0="
 $jumpstartAppConfigDev = "Endpoint=https://jumpstart-dev.azconfig.io;Id=5xh8-l6-s0:q89J0MWp2twZnTsqoiLQ;Secret=y5UFAWzPNdJsPcRlKC538DimC4/nb1k3bKuzaLC90f8="
 
-if ($deploymentEnvironment -eq $null -eq $false){
+if ($null -eq $deploymentEnvironment -eq $false){
     $Env:AZURE_APPCONFIG_CONNECTION_STRING = $jumpstartAppConfigProduction
     $deploymentEnvironment = "Production"
     Write-Host "`n"
@@ -206,7 +206,7 @@ if ($jumpstartDeployment -eq "Jumpstart scenario"){
 # Required for Jumpstart scenarios which are based on ##EITHER OF## the following Kubernetes distributions:
 #   - Azure Kubernetes Service (AKS)
 #   - Azure RedHat OpenShift (ARO)
-if ($jumpstartDeployment -eq "Jumpstart scenario" -and $Env:clusterName -eq $null -eq $false -and $clusterTypeAKS -eq $null -eq $false -or $clusterTypeARO -eq $null -eq $false){
+if ($jumpstartDeployment -eq "Jumpstart scenario" -and $null -eq $Env:clusterName -eq $false -and $null -eq $clusterTypeAKS -eq $false -or $null -eq $clusterTypeARO -eq $false){
     # Installing needed providers and CLI extensions for all Azure Arc-enabled Kubernetes-based automations
     $service = "Azure Arc-enabled Kubernetes"
     Register-ArcKubernetesProviders
@@ -216,7 +216,7 @@ if ($jumpstartDeployment -eq "Jumpstart scenario" -and $Env:clusterName -eq $nul
 # Required for Jumpstart scenarios which are based on Kubernetes distribution ##that is NOT## one the following Kubernetes distributions:
 #   - Azure Kubernetes Service (AKS)
 #   - Azure RedHat OpenShift (ARO)
-if ($jumpstartDeployment -eq "Jumpstart scenario" -and $Env:clusterName -eq $null -eq $false -and $clusterTypeAKS -eq $null -eq $true -or $clusterTypeARO -eq $null -eq $true){
+if ($jumpstartDeployment -eq "Jumpstart scenario" -and $null -eq $Env:clusterName -eq $false -and $null -eq $clusterTypeAKS -eq $true -or $null -eq $clusterTypeARO -eq $true){
     # Installing Azure CLI extensions
     Install-ArcK8sCLIExtensions
 }

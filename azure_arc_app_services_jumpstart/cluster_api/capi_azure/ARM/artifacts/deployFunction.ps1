@@ -76,7 +76,7 @@ $Env:AZURE_STORAGE_CONNECTION_STRING = $string
 
 # Publishing the Azure Function application to Azure
 Write-Host "`n"
-Write-Host "Publishing the Azure Function application to Azure"
+Write-Host "Publishing the Azure Function application to Azure. Hold tight, this might take a few minutes..."
 Write-Host "`n"
 func azure functionapp publish $functionAppName | Out-File C:\Temp\funcPublish.txt
 Start-Sleep -Seconds 60
