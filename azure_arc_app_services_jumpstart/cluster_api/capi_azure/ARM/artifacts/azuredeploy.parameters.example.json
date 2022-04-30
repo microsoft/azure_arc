@@ -40,12 +40,6 @@
         },
         "adminEmail": {
             "value": "youremail@yourdomain.com"
-        },
-        "githubAccount": {
-            "value": "microsoft"
-        },
-        "githubBranch": {
-            "value": "main"
         }
     }
 }

@@ -9,7 +9,7 @@ sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --d
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 # Creating login message of the day (motd)
-sudo curl -o /etc/profile.d/welcomeCAPI.sh https://raw.githubusercontent.com/likamrat/azure_arc/app_svc_aks_refactor/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/artifacts/welcomeCAPI.sh
+sudo curl -o /etc/profile.d/welcomeCAPI.sh https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/artifacts/welcomeCAPI.sh
 
 # Injecting environment variables from Azure deployment
 echo '#!/bin/bash' >> vars.sh
