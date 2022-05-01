@@ -44,10 +44,27 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
+# Registering Azure Arc providers
+echo "Registering Azure Arc providers"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.Web --wait
+
+az provider show --namespace Microsoft.Kubernetes -o table
+az provider show --namespace Microsoft.KubernetesConfiguration -o table
+az provider show --namespace Microsoft.ExtendedLocation -o table
+az provider show --namespace Microsoft.Web -o table
+echo ""
+
+# Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
+echo "Installing Azure CLI extensions"
 sudo -u $adminUsername az extension add --name connectedk8s -y
 sudo -u $adminUsername az extension add --name k8s-configuration -y
 sudo -u $adminUsername az extension add --name k8s-extension -y
+echo ""
 
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
