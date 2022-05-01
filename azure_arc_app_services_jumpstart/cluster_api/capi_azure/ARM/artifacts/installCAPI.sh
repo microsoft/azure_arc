@@ -62,15 +62,15 @@ echo ""
 
 # Registering Azure Arc providers
 echo "Registering Azure Arc providers"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.Web --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.Kubernetes --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.KubernetesConfiguration --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.ExtendedLocation --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.Web --wait
 
-az provider show --namespace Microsoft.Kubernetes -o table
-az provider show --namespace Microsoft.KubernetesConfiguration -o table
-az provider show --namespace Microsoft.ExtendedLocation -o table
-az provider show --namespace Microsoft.Web -o table
+sudo -u $adminUsername az provider show --namespace Microsoft.Kubernetes -o table
+sudo -u $adminUsername az provider show --namespace Microsoft.KubernetesConfiguration -o table
+sudo -u $adminUsername az provider show --namespace Microsoft.ExtendedLocation -o table
+sudo -u $adminUsername az provider show --namespace Microsoft.Web -o table
 echo ""
 
 # Installing snap
