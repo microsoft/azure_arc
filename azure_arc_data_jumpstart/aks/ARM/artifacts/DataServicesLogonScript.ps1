@@ -66,11 +66,6 @@ Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
 
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-az -v
-
 # Getting AKS cluster credentials kubeconfig file
 Write-Host "Getting AKS cluster credentials"
 Write-Host "`n"

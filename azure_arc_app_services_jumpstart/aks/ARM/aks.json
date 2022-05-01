@@ -4,7 +4,7 @@
   "parameters": {
     "clusterName": {
       "type": "string",
-      "defaultValue": "Arc-DataSvc-AKS",
+      "defaultValue": "Arc-AppSvc-AKS",
       "metadata": {
         "description": "The name of the Kubernetes cluster resource"
       }
@@ -18,7 +18,7 @@
     },
     "dnsPrefix": {
       "type": "string",
-      "defaultValue": "arcdata",
+      "defaultValue": "arcappsvc",
       "metadata": {
         "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
       }
@@ -58,7 +58,7 @@
     "sshRSAPublicKey": {
       "type": "string",
       "metadata": {
-        "description": "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
+        "description": "Configure all Linux machines with the SSH RSA public key string. Your key should include three parts, for example 'ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm'"
       }
     },
     "spnClientId": {
@@ -83,7 +83,7 @@
     "osType": {
       "type": "string",
       "defaultValue": "Linux",
-      "allowedValues": ["Linux"],
+      "allowedValues": [ "Linux" ],
       "metadata": {
         "description": "The type of operating system"
       }
@@ -97,13 +97,13 @@
     "resourceTags": {
       "type": "object",
       "defaultValue": {
-        "Project": "jumpstart_azure_arc_data_services"
+        "Project": "jumpstart_azure_arc_app_services"
       }
     }
   },
   "resources": [
     {
-      "apiVersion": "2022-01-02-preview",
+      "apiVersion": "2022-02-01",
       "type": "Microsoft.ContainerService/managedClusters",
       "location": "[parameters('location')]",
       "name": "[parameters('clusterName')]",
@@ -112,10 +112,9 @@
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
         "enableRBAC": "[parameters('enableRBAC')]",
         "dnsPrefix": "[parameters('dnsPrefix')]",
-        "aadProfile": 
-          {
-            "managed": true
-          },
+        "aadProfile": {
+          "managed": true
+        },
         "agentPoolProfiles": [
           {
             "name": "agentpool",
@@ -128,10 +127,9 @@
             "type": "VirtualMachineScaleSets"
           }
         ],
-        "networkProfile": 
-          {
-            "networkPlugin": "azure"
-          },
+        "networkProfile": {
+          "networkPlugin": "azure"
+        },
         "linuxProfile": {
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
