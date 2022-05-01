@@ -117,6 +117,7 @@ az k8s-extension create `
 
 az resource wait --ids $extensionId --custom "properties.installState!='Pending'" --api-version $apiVersion
 
+Write-Host "`n"
 Do {
    Write-Host "Waiting for build service to become available. Hold tight, this might take a few minutes..."
    Start-Sleep -Seconds 15
@@ -137,6 +138,7 @@ $extensionId = az k8s-extension show --name $extensionName --cluster-type connec
 $customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config" --query id -o tsv)
 az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $env:azureLocation --output none
 
+Write-Host "`n"
 Do {
    Write-Host "Waiting for kube environment to become available. Hold tight, this might take a few minutes..."
    Start-Sleep -Seconds 15
