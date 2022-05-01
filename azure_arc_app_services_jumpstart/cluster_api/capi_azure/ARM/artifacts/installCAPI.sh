@@ -44,19 +44,6 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# Registering Azure Arc providers
-echo "Registering Azure Arc providers"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.Web --wait
-
-az provider show --namespace Microsoft.Kubernetes -o table
-az provider show --namespace Microsoft.KubernetesConfiguration -o table
-az provider show --namespace Microsoft.ExtendedLocation -o table
-az provider show --namespace Microsoft.Web -o table
-echo ""
-
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
@@ -71,6 +58,19 @@ sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --
 subscriptionId=$(sudo -u $adminUsername az account show --query id --output tsv)
 export AZURE_RESOURCE_GROUP=$(sudo -u $adminUsername az resource list --query "[?name=='$stagingStorageAccountName']".[resourceGroup] --resource-type "Microsoft.Storage/storageAccounts" -o tsv)
 az -v
+echo ""
+
+# Registering Azure Arc providers
+echo "Registering Azure Arc providers"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.Web --wait
+
+az provider show --namespace Microsoft.Kubernetes -o table
+az provider show --namespace Microsoft.KubernetesConfiguration -o table
+az provider show --namespace Microsoft.ExtendedLocation -o table
+az provider show --namespace Microsoft.Web -o table
 echo ""
 
 # Installing snap
