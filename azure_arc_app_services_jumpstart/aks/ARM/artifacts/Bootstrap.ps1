@@ -14,7 +14,6 @@ param (
     [string]$deployApiMgmt,
     [string]$deployLogicApp,
     [string]$adminEmail,
-    [string]$globalConfigBaseUrl,
     [string]$templateBaseUrl
 )
 
@@ -33,7 +32,6 @@ param (
 [System.Environment]::SetEnvironmentVariable('deployApiMgmt', $deployApiMgmt,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployLogicApp', $deployLogicApp,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('adminEmail', $adminEmail,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('globalConfigBaseUrl', $globalConfigBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
@@ -65,7 +63,6 @@ Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 # Downloading global Jumpstart artifacts
-Invoke-WebRequest ($globalConfigBaseUrl + "globalConfig.ps1") -OutFile "C:\Temp\globalConfig.ps1"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Downloading GitHub artifacts for AppServicesLogonScript.ps1

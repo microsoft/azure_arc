@@ -17,11 +17,6 @@ $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
-# Running Jumpstart global config automation
-# Write-Host "`n"
-# Write-Host "Running Jumpstart global config automation"
-# & "C:\Temp\globalConfig.ps1"
-
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
 # subscription user deployed ARM template to. This is needed in case Service 
