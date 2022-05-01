@@ -8,7 +8,7 @@ description: >
 
 ## Deploy an App Service app using custom container on Cluster API using an ARM Template
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled app services](https://docs.microsoft.com/azure/app-service/overview-arc-integration) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/) cluster using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
+The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled app services](https://docs.microsoft.com/azure/app-service/overview-arc-integration) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/) cluster using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
 By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an App Service plan, a sample Web Application (Web App) and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled app services.
 
@@ -136,13 +136,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters azuredeploy.parameters.json
     ```
 
-    > **NOTE: The deployment time for this scenario can take ~10-20min**
+    > **NOTE: The deployment time for this scenario can take ~15-25min**
 
     > **NOTE: Since Azure Arc-enabled app services is [currently in preview](https://docs.microsoft.com/azure/app-service/overview-arc-integration#public-preview-limitations), deployment regions availability is limited to East US and West Europe.**
 
-- Once Azure resources has been provisioned, you will be able to see it in Azure portal. At this point, the resource group should have **37 various Azure resources** deployed.
-
-- Included in this part of the automation, is also the onboarding of the cluster as an Azure Arc-enabled Kubernetes resource. Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations) which will be deployed later, in the next phase of the scenario automation.
+- Once Azure resources has been provisioned, you will be able to see it in Azure portal. Included in this part of the automation, is also the onboarding of the cluster as an Azure Arc-enabled Kubernetes resource. Azure Arc-enabled app services are using this resource to deploy the app services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations) which will be deployed later, in the next phase of the scenario automation.
 
     ![Screenshot showing the ARM template deployment completed](./01.png)
 
@@ -182,19 +180,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     ![Screenshot showing PowerShell logon script run](./14.png)
 
-    ![Screenshot showing PowerShell logon script run](./15.png)
-
-    ![Screenshot showing PowerShell logon script run](./16.png)
-
-    ![Screenshot showing PowerShell logon script run](./17.png)
-
-    ![Screenshot showing PowerShell logon script run](./18.png)
-
-    ![Screenshot showing PowerShell logon script run](./19.png)
-
   Once the script finishes it's run, the logon script PowerShell session will be closed, the Windows wallpaper will change, and both the app service plan and the sample web application deployed on the cluster will be ready.
 
-    ![Screenshot showing desktop wallpaper change](./20.png)
+    ![Screenshot showing desktop wallpaper change](./16.png)
 
 - Since this scenario is deploying both the app service plan and a sample web application, you will also notice additional, newly deployed Azure resources in the resources group. The important ones to notice are:
 
@@ -206,28 +194,28 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - [**App Service**](https://docs.microsoft.com/azure/app-service/overview) - Azure App Service is an HTTP-based service for hosting web applications, REST APIs, and mobile back ends.
 
-  ![Screenshot showing additional Azure resources in the resource group](21.png)
+  ![Screenshot showing additional Azure resources in the resource group](17.png)
 
 - In this scenario, **a Docker, custom container Linux-based** sample Jumpstart web application was deployed. To open the deployed web application in your web browser, simply click the App Service resource and the Browse button.
 
-  ![Screenshot showing App Service resource in a resource group](./22.png)
+  ![Screenshot showing App Service resource in a resource group](./18.png)
 
-  ![Screenshot showing the web application URL](./23.png)
+  ![Screenshot showing the web application URL](./19.png)
 
-  ![Screenshot showing the web application open in a web browser](./24.png)
+  ![Screenshot showing the web application open in a web browser](./20.png)
 
 ## Cluster extensions
 
-In this scenario, the Azure Arc-enabled app services cluster extension was deployed and used throughout this scenario in order to deploy the app services infrastructure. In addition, both the Azure Monitor for Containers and the Azure Defender extensions were also installed on the cluster.
+In this scenario, the Azure Arc-enabled app services cluster extension was deployed and used throughout this scenario in order to deploy the app services infrastructure. In addition, the Azure Monitor for Containers, Microsoft Cloud Defender and the Azure Policy extensions were also installed on the cluster.
 
 - In order to view cluster extensions, click on the Azure Arc-enabled Kubernetes resource Extensions settings.
 
-  ![Screenshot showing the Azure Arc-enabled Kubernetes resource](./25.png)
+  ![Screenshot showing the Azure Arc-enabled Kubernetes resource](./21.png)
 
-  ![Screenshot showing Azure Arc-enabled Kubernetes cluster extensions settings](./26.png)
+  ![Screenshot showing Azure Arc-enabled Kubernetes cluster extensions settings](./22.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployed resource group from the Azure portal.
 
-  ![Screenshot showing the Delete Azure resource group button](./27.png)
+  ![Screenshot showing the Delete Azure resource group button](./23.png)

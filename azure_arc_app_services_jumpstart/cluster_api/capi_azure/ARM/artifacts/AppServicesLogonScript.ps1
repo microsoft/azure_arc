@@ -29,24 +29,6 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 # Principal has access to multiple subscriptions, which can break the automation logic
 az account set --subscription $env:subscriptionId
 
-# # Registering Azure Arc providers
-# Write-Host "`n"
-# Write-Host "Registering Azure Arc providers, hold tight..."
-# Write-Host "`n"
-# az provider register --namespace Microsoft.Kubernetes --wait
-# az provider register --namespace Microsoft.KubernetesConfiguration --wait
-# az provider register --namespace Microsoft.ExtendedLocation --wait
-# az provider register --namespace Microsoft.Web --wait
-
-# az provider show --namespace Microsoft.Kubernetes -o table
-# Write-Host "`n"
-# az provider show --namespace Microsoft.KubernetesConfiguration -o table
-# Write-Host "`n"
-# az provider show --namespace Microsoft.ExtendedLocation -o table
-# Write-Host "`n"
-# az provider show --namespace Microsoft.Web -o table
-# Write-Host "`n"
-
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
