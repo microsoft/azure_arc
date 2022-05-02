@@ -8,7 +8,7 @@ description: >
 
 ## Connect an existing Windows server to Azure Arc
 
-The following README will guide you on how to connect an Windows machine to Azure Arc using a simple PowerShell script.
+The following Jumpstart scenario will guide you on how to connect an Windows machine to Azure Arc using a simple PowerShell script.
 
 ## Prerequisites
 

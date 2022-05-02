@@ -8,7 +8,7 @@ description: >
 
 ## Integrate Open Service Mesh (OSM) with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions
 
-The following README will guide you on how to enable [Open Service Mesh](https://openservicemesh.io/) for a Cluster API that is projected as an Azure Arc connected cluster. Open Service Mesh (OSM) is a lightweight, extensible, Cloud Native service mesh that allows users to uniformly manage, secure, and get out-of-the-box observability features for highly dynamic microservice environments.
+The following Jumpstart scenario will guide you on how to enable [Open Service Mesh](https://openservicemesh.io/) for a Cluster API that is projected as an Azure Arc connected cluster. Open Service Mesh (OSM) is a lightweight, extensible, Cloud Native service mesh that allows users to uniformly manage, secure, and get out-of-the-box observability features for highly dynamic microservice environments.
 
 In this guide, you will hook the Cluster API to Open Service Mesh by deploying the [Open Service Mesh extension](https://aka.ms/arc-osm-doc) on your Kubernetes cluster in order to start collecting security-related logs and telemetry. Arc-enabled Open Service Mesh will have deep integrations into Azure monitor, and provide a seamless Azure experience for viewing and responding to critical KPIs provided by OSM metrics. This guide also provides you the automation to test Azure monitor integration with Arc-enabled Open Service Mesh.
 

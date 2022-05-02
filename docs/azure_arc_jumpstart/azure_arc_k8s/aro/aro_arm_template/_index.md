@@ -8,7 +8,7 @@ description: >
 
 ## Deploy an Azure Red Hat OpenShift cluster and connect it to Azure Arc using an Azure ARM template
 
-The following README will guide you on how to use the provided [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) to deploy an [Azure Red Hat OpenShift](https://docs.microsoft.com/azure/openshift/intro-openshift) cluster and connected it as an Azure Arc cluster resource.
+The following Jumpstart scenario will guide you on how to use the provided [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) to deploy an [Azure Red Hat OpenShift](https://docs.microsoft.com/azure/openshift/intro-openshift) cluster and connected it as an Azure Arc cluster resource.
 ## Prerequisites
 
 - Clone the Azure Arc Jumpstart repository

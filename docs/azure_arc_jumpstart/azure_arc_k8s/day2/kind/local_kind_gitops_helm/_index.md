@@ -8,7 +8,7 @@ description: >
 
 ## Deploy GitOps configurations and perform Helm-based GitOps flow on kind as an Azure Arc Connected Cluster
 
-The following README will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on a [kind (Kubernetes in Docker)](https://kind.sigs.k8s.io/) cluster which is projected as an Azure Arc connected cluster resource.
+The following Jumpstart scenario will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on a [kind (Kubernetes in Docker)](https://kind.sigs.k8s.io/) cluster which is projected as an Azure Arc connected cluster resource.
 
 In this guide, you will first deploy a nginx ingress controller to your cluster. Then you will deploy & attach a GitOps configuration to your cluster. This will be a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster.
 

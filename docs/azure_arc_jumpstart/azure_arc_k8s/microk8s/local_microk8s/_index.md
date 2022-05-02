@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a local Kubernetes Cluster using MicroK8s and connect it to Azure Arc
 
-The following README will guide you on how to use [MicroK8s](https://microk8s.io/) to run a Kubernetes cluster locally and connect it as an Azure Arc-enabled Kubernetes cluster resource.
+The following Jumpstart scenario will guide you on how to use [MicroK8s](https://microk8s.io/) to run a Kubernetes cluster locally and connect it as an Azure Arc-enabled Kubernetes cluster resource.
 
 ## Prerequisites
 

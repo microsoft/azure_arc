@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a local Kubernetes Cluster using kind and connect it to Azure Arc
 
-The following README will guide you on how to use [kind](https://kind.sigs.k8s.io/) to run a Kubernetes cluster locally and connect it as an Azure Arc-enabled Kubernetes cluster resource.
+The following Jumpstart scenario will guide you on how to use [kind](https://kind.sigs.k8s.io/) to run a Kubernetes cluster locally and connect it as an Azure Arc-enabled Kubernetes cluster resource.
 
 ## Prerequisites
 

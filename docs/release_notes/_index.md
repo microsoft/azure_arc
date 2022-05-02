@@ -9,7 +9,58 @@ weight: 3
 
 **Release notes will be released around the first week of each month and will cover the previous month.**
 
-## March 2022
+## April 2022
+
+### Release highlights and general Jumpstart enhancements
+
+- [Refreshed Azure Arc Jumpstart Scenario Write-up Guidelines](https://azurearcjumpstart.io/scenario_guidelines/)
+- New and updated Azure Arc-enabled servers scenarios
+- New and updated Azure Arc-enabled Kubernetes scenarios
+- New and updated Azure Arc-enabled data servers scenarios
+- Updated Azure Arc-enabled app services scenarios
+
+### Azure Arc-enabled servers scenarios
+
+- [New Scenario: Use Azure Private Link to securely connect networks to Azure Arc](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_privatelink/)
+
+### Azure Arc-enabled SQL Server scenarios
+
+- [Bug fix: Arc enabled SQL Servers - missing registration for Microsoft.HybridCompute #1105](https://github.com/microsoft/azure_arc/issues/1105)
+- [Bug fix: Arc enables SQL Server - missing --scopes from az ad sp create-for-rbac #1106](https://github.com/microsoft/azure_arc/issues/1106)
+
+### Azure Arc-enabled Kubernetes scenarios
+
+- [New Scenario: Use GitOps in an Azure Arc-enabled Kubernetes cluster for managing Calico Network Policy](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/gitops/)
+- [Updated Scenario: Integrate Open Service Mesh (OSM) with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_osm_extension/)
+- [Updated Scenario: Deploy AKS cluster on Azure Stack HCI and connect it to Azure Arc using PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_stack_hci/aks_hci_powershell/)
+- [Bug fix: az connectedk8s fails on Ubuntu20.04 (Microk8s) - InternalError: Unable to install helm release: WARNING: Kubernetes configuration file is group-readable #1047](https://github.com/microsoft/azure_arc/issues/1047)
+- [Bug fix: Missing RBAC permission in docs for ARO #1052](https://github.com/microsoft/azure_arc/issues/1052)
+
+### Azure Arc-enabled data services
+
+- [New Scenario: Deploy a vanilla Azure Arc Data Controller in a directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_dc_vanilla_arm_template/)
+- [New Scenario: Deploy Azure SQL Managed Instance in directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_mssql_mi_arm_template/)
+- [New Scenario: Deploy Azure PostgreSQL Hyperscale in directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_postgresql_hyperscale_arm_template/)
+- [Updated Scenario: Deploy Azure SQL Managed Instance on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_arm_template_ado/)
+- [Updated Scenario: Deploy Azure PostgreSQL Hyperscale on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_hyperscale_arm_template_ado/)
+- [Bug fix: The post deployment scripts inside the VM fails with the following error : "The resource 'Arc-Data-AKS' under the resource group 'Arc-Data-Demo' NOT FOUND #1050](https://github.com/microsoft/azure_arc/issues/1050)
+
+### Azure Arc-enabled app services scenarios
+
+- [Updated Scenario: Deploy an App Service app using custom container on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_app_service_arm_template/)
+- [Updated Scenario: Deploy Azure Function application on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_azure_function_arm_template/)
+- [Updated Scenario: Deploy an App Service app using custom container on Cluster API using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/apps_service_arm_template/)
+- [Updated Scenario: Deploy an App Service app using custom container on Cluster API using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/azure_function_arm_template/)
+
+### Jumpstart ArcBox
+
+- [Bump clusterctl to v1.1.3](https://github.com/microsoft/azure_arc/pull/1126)
+- [Bump CAPZ to v1.2.1](https://github.com/microsoft/azure_arc/pull/1126)
+- [Bump CAPI to 1.22.8](https://github.com/microsoft/azure_arc/pull/1126)
+- [Updating storageclass provisioner](https://github.com/microsoft/azure_arc/pull/1126)
+- [Remove debug flag](https://github.com/microsoft/azure_arc/pull/1126)
+
+- ## March 2022
 
 ### Release highlights and general Jumpstart enhancements
 

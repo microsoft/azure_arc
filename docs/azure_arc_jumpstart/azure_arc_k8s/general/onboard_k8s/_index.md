@@ -8,7 +8,7 @@ description: >
 
 ## Connect an existing Kubernetes cluster to Azure Arc
 
-The following README will guide you on how to connect an existing Kubernetes cluster to Azure Arc using a simple shell script.
+The following Jumpstart scenario will guide you on how to connect an existing Kubernetes cluster to Azure Arc using a simple shell script.
 
 ## Prerequisites
 

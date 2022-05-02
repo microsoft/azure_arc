@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a local Windows server hosted with Vagrant and connect it to Azure Arc
 
-The following README will guide you on how to deploy a local **Windows 10** virtual machine using [Vagrant](https://www.vagrantup.com/) and connect it as an Azure Arc-enabled server resource.
+The following Jumpstart scenario will guide you on how to deploy a local **Windows 10** virtual machine using [Vagrant](https://www.vagrantup.com/) and connect it as an Azure Arc-enabled server resource.
 
 ## Prerequisites
 

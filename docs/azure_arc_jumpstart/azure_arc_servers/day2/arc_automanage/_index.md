@@ -8,7 +8,7 @@ description: >
 
 ## Enable Azure Automanage on an Azure Arc-enabled servers using an ARM Template
 
-The following README will guide you on how to onboard an Azure Arc-enabled server on to [Azure Automanage](https://docs.microsoft.com/en-us/azure/automanage/automanage-virtual-machines#prerequisites), so you can follow best practices in reliability, security and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) and [Azure Backup](https://docs.microsoft.com/en-us/azure/backup/backup-overview).
+The following Jumpstart scenario will guide you on how to onboard an Azure Arc-enabled server on to [Azure Automanage](https://docs.microsoft.com/en-us/azure/automanage/automanage-virtual-machines#prerequisites), so you can follow best practices in reliability, security and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) and [Azure Backup](https://docs.microsoft.com/en-us/azure/backup/backup-overview).
 
 Azure Automanage removes the need to discover virtual machines manually and automatically onboards and configures certain services in Azure following best practices as defined in [Microsoft Cloud Adoption Framework for Azure](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/manage/best-practices). Azure services included in Azure Automanage are:
 

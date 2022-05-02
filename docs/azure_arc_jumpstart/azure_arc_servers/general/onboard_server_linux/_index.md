@@ -8,7 +8,7 @@ description: >
 
 ## Connect an existing Linux server to Azure Arc
 
-The following README will guide you on how to connect an Linux server to Azure Arc using a simple shell script.
+The following Jumpstart scenario will guide you on how to connect an Linux server to Azure Arc using a simple shell script.
 
 ## Prerequisites
 

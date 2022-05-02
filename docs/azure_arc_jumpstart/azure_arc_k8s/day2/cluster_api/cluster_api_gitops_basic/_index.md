@@ -8,7 +8,7 @@ description: >
 
 ## Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster (Flux v2)
 
-The following README will guide you on how to create GitOps configuration on a Cluster API which is projected as an Azure Arc-connected cluster resource.
+The following Jumpstart scenario will guide you on how to create GitOps configuration on a Cluster API which is projected as an Azure Arc-connected cluster resource.
 
 In this guide, you will deploy & attach GitOps configuration to your cluster which will also include deploying an "Hello World" Azure Arc web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
