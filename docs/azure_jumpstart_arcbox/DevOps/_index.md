@@ -198,7 +198,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     }
     ```
 
-    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password.**
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
@@ -637,6 +637,8 @@ After a period of time (typically less than an hour), Microsoft Defender for Clo
 ![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert02.png)
 
 ![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert03.png)
+
+> **NOTE: This feature requires Microsoft Defender for Cloud to be [enabled on your Azure subscription](https://docs.microsoft.com/en-us/azure/defender-for-cloud/enable-enhanced-security).**
 
 ### Additional optional scenarios on the _ArcBox-K3s_ cluster
 
