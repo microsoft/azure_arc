@@ -92,9 +92,8 @@ param k3sArcClusterName string = 'ArcBox-K3s'
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
-var bastionSubnetIpPrefix = '172.16.3.64/26'
 var PublicIPNoBastion = {
-  id: '${publicIpAddress.id}'
+  id: publicIpAddress.id
 }
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {

@@ -403,7 +403,7 @@ resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' 
   ]
 }
 
-resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedServices@2015-11-01-preview' = {
+resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedServices@2020-08-01' = {
   parent: workspace
   name: 'Automation'
   properties: {
@@ -433,7 +433,7 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBas
         name: 'IpConf'
         properties: {
           publicIPAddress: {
-            id: '${publicIpAddress.id}'
+            id: publicIpAddress.id
           }
           subnet: {
             id: bastionSubnetRef
