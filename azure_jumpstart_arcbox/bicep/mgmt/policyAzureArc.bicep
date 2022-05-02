@@ -86,20 +86,19 @@ var policies = [
   }
 ]
 
-resource policies_name 'Microsoft.Authorization/policyAssignments@2019-09-01' = [for item in policies: if (contains(item.flavors, flavor)) {
+resource policies_name 'Microsoft.Authorization/policyAssignments@2021-06-01' = [for item in policies: if (contains(item.flavors, flavor)) {
   name: item.name
   location: azureLocation
   identity: {
     type: 'SystemAssigned'
   }
   properties: {
-    scope: resourceGroup().id
     policyDefinitionId: item.definitionId
     parameters: item.parameters
   }
 }]
 
-resource policies_name_id 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' =  [for (item,i) in policies: if (contains(item.flavors, flavor)) {
+resource policies_name_id 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' =  [for (item,i) in policies: if (contains(item.flavors, flavor)) {
   name: guid( item.name, resourceGroup().id)
   properties: {
     roleDefinitionId: item.roleDefinition

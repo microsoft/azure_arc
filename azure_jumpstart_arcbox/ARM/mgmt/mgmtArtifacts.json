@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
     "virtualNetworkName": {
@@ -132,7 +132,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2019-04-01",
+      "apiVersion": "2021-05-01",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -369,7 +369,7 @@
     },
     {
       "type": "Microsoft.OperationalInsights/workspaces",
-      "apiVersion": "2020-03-01-preview",
+      "apiVersion": "2021-12-01-preview",
       "name": "[parameters('workspaceName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -379,13 +379,12 @@
       }
     },
     {
+      "type": "Microsoft.OperationsManagement/solutions",
       "apiVersion": "2015-11-01-preview",
       "location": "[parameters('location')]",
       "name": "[variables('Updates').name]",
-      "type": "Microsoft.OperationsManagement/solutions",
-      "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.OperationsManagement/solutions/', variables('Updates').name)]",
       "dependsOn": [
-        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
       ],
       "properties": {
         "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
@@ -398,11 +397,11 @@
       }
     },
     {
-      "apiVersion": "2015-11-01-preview",
       "type": "Microsoft.OperationsManagement/solutions",
+      "apiVersion": "2015-11-01-preview",
       "location": "[parameters('location')]",
       "dependsOn": [
-        "[concat('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
       ],
       "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
       "properties": {
@@ -453,7 +452,7 @@
     },
     {
       "type": "Microsoft.Automation/automationAccounts",
-      "apiVersion": "2020-01-13-preview",
+      "apiVersion": "2021-06-22",
       "name": "[variables('automationAccountName')]",
       "location": "[variables('automationAccountLocation')]",
       "dependsOn": [
@@ -467,7 +466,7 @@
     },
     {
       "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
-      "apiVersion": "2020-03-01-preview",
+      "apiVersion": "2020-08-01",
       "name": "[concat(parameters('workspaceName'), '/' , 'Automation')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -480,10 +479,10 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "policyDeployment",
       "dependsOn": [
-        "[concat(parameters('workspaceName'))]"
+        "[parameters('workspaceName')]"
       ],
       "properties": {
         "mode": "Incremental",
@@ -506,7 +505,7 @@
     },
     {
       "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2021-05-01",
       "name": "[variables('bastionPublicIpAddressName')]",
       "condition": "[parameters('deployBastion')]",
       "location": "[parameters('location')]",
@@ -524,7 +523,7 @@
       "condition": "[parameters('deployBastion')]",
       "name": "[variables('bastionName')]",
       "location": "[parameters('location')]",
-      "apiVersion": "2020-11-01",
+      "apiVersion": "2021-05-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"

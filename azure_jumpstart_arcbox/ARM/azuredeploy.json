@@ -98,7 +98,7 @@
   "resources": [
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
@@ -141,7 +141,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "ubuntuRancherDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
@@ -184,7 +184,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment"
@@ -234,7 +234,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "stagingStorageAccountDeployment",
       "properties": {
         "mode": "Incremental",
@@ -246,7 +246,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2019-10-01",
+      "apiVersion": "2021-04-01",
       "name": "mgmtArtifactsAndPolicyDeployment",
       "properties": {
         "mode": "Incremental",
