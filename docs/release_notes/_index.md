@@ -18,6 +18,7 @@ weight: 3
 - New and updated Azure Arc-enabled Kubernetes scenarios
 - New and updated Azure Arc-enabled data servers scenarios
 - Updated Azure Arc-enabled app services scenarios
+- Multiple Jumpstart ArcBox optimizations, enhancements and bug fixes
 
 ### Azure Arc-enabled servers scenarios
 
@@ -60,7 +61,7 @@ weight: 3
 - [Updating storageclass provisioner](https://github.com/microsoft/azure_arc/pull/1126)
 - [Remove debug flag](https://github.com/microsoft/azure_arc/pull/1126)
 
-- ## March 2022
+## March 2022
 
 ### Release highlights and general Jumpstart enhancements
 
