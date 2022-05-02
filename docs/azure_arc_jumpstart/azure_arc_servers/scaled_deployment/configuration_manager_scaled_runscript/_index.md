@@ -9,13 +9,13 @@ description: >
 
 The following Jumpstart scenario will guide you on how to connect a Windows machine to Azure Arc with a PowerShell script using Configuration Manager.
 
-This guide assumes that you already have an installation of [Microsoft Configuration Manager](https://docs.microsoft.com/en-us/mem/configmgr/core/understand/introduction), at least one active Windows server client, and a basic understanding of the product.
+This guide assumes that you already have an installation of [Microsoft Configuration Manager](https://docs.microsoft.com/mem/configmgr/core/understand/introduction), at least one active Windows server client, and a basic understanding of the product.
 
 ## Prerequisites
 
 - Make sure you have met all the Configuration Manager [prerequisites](https://docs.microsoft.com/mem/configmgr/apps/deploy-use/create-deploy-scripts#prerequisites) in order to use the "Run Script" feature.
 
-- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -85,13 +85,13 @@ This guide assumes that you already have an installation of [Microsoft Configura
 
 In order for Configuration Manager to run the PowerShell script in this scenario, we will need to set the PowerShell execution policy and allow the script authors to approve their own scripts.
 
-   > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is recommended to follow the security recommendations in your organization when it comes to PowerShell scripts execution policy and approvals**
+   > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is recommended to follow the security recommendations in your organization when it comes to PowerShell scripts execution policy and approvals**
 
 - Login to the Configuration Manager console.
 
 - After logging in, go to the “Administration” workspace. Under “Site Configuration”, select “Client Settings” and open the properties of the "Default Client Settings".
 
-   > **Note: You might have different client settings, choose the appropriate one that is deployed to the servers you are onboarding to Azure Arc**
+   > **NOTE: You might have different client settings, choose the appropriate one that is deployed to the servers you are onboarding to Azure Arc**
 
     ![Screenshot showing client settings in the configuration manager console](./03.png)
 

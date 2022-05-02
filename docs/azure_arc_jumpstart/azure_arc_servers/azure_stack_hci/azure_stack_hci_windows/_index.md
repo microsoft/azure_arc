@@ -8,7 +8,7 @@ description: >
 
 ## Deploy a Windows Server virtual machine in Azure Stack HCI and connect it to Azure Arc using PowerShell
 
-The following Jumpstart scenario will guide you on how to use the provided PowerShell script to deploy a Windows Server Virtual Machine on an [Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/hci/overview) cluster and connect it as an Azure Arc-enabled server.
+The following Jumpstart scenario will guide you on how to use the provided PowerShell script to deploy a Windows Server Virtual Machine on an [Azure Stack HCI](https://docs.microsoft.com/azure-stack/hci/overview) cluster and connect it as an Azure Arc-enabled server.
 
 This guide will **not** provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have it provisioned. If you don't have any Azure Stack HCI cluster created, please have a look at the following [Azure Stack HCI 20H2 Evaluation Guide](https://github.com/Azure/AzureStackHCI-EvalGuide).
 
@@ -68,11 +68,11 @@ The commands below and the Powershell script described in this guide should be r
 
     Copy and save the Service Principal ApplicationId and Secret as you will need it for later on in the automation.
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
+    > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 
 * Enable CredSSP in the Host Server
 
-    The PowerShell script leverages [CredSSP](https://docs.microsoft.com/en-us/windows/win32/secauthn/credential-security-support-provider) to delegate credentials from the management server to the target server for remote authentication. It's required to allow the host server to receive credentials from a remote computer.
+    The PowerShell script leverages [CredSSP](https://docs.microsoft.com/windows/win32/secauthn/credential-security-support-provider) to delegate credentials from the management server to the target server for remote authentication. It's required to allow the host server to receive credentials from a remote computer.
 
     ```powershell
     Enable-WSManCredSSP -Role Server
@@ -105,7 +105,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
- > **Note: Once more, please make sure all the steps mentioned below are done in your management server.**
+ > **NOTE: Once more, please make sure all the steps mentioned below are done in your management server.**
 
 As mentioned, this deployment will leverage this [PowerShell script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azure_stack_hci/powershell/azstack_hci_vm_deploy.ps1) to deploy all the needed componenets. Before running the script, it's important to edit the script variables for matching the parameters of your environment. We can split it in three sets of variables:
 
@@ -176,11 +176,11 @@ As mentioned, this deployment will leverage this [PowerShell script](https://git
   .\azstack_hci_vm_deploy.ps1
   ```
 
-  > **Note: The script takes some minutes to deploy, specially during the .VHDX download**  
+  > **NOTE: The script takes some minutes to deploy, specially during the .VHDX download**  
 
     ![Screenshot showing the download of the VHDX file](./06.png)
 
-  > **Note: You'll be asked to provide the credentials for accessing your host server. If prompted with any other authorization requests (CredSSP, networking related, etc), please answer _Yes_ to all of them.**
+  > **NOTE: You'll be asked to provide the credentials for accessing your host server. If prompted with any other authorization requests (CredSSP, networking related, etc), please answer _Yes_ to all of them.**
 
     ![Screenshot showing the credentials prompt](./07.png)
 

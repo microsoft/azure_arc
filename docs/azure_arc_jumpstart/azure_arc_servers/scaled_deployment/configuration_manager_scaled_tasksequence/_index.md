@@ -9,11 +9,11 @@ description: >
 
 The following Jumpstart scenario will guide you on how to connect a Windows machine to Azure Arc with a Task Sequence using Configuration Manager.
 
-This guide assumes that you already have an installation of [Microsoft Configuration Manager](https://docs.microsoft.com/en-us/mem/configmgr/core/understand/introduction) and a basic understanding of the product, at least one active Windows server client, an active distribution point.
+This guide assumes that you already have an installation of [Microsoft Configuration Manager](https://docs.microsoft.com/mem/configmgr/core/understand/introduction) and a basic understanding of the product, at least one active Windows server client, an active distribution point.
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version

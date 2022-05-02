@@ -18,14 +18,14 @@ This guide provides an overview of how managed service providers or any multi-te
 
 ### Management across tenants
 
-[Azure Lighthouse](https://docs.microsoft.com/en-us/azure/lighthouse/overview) is an Azure service that enables cross and multi-tenant management providing greater visibility and scale into operations. Azure Lighthouse uses an Azure Resource Provider that brings the Azure Delegated Resource Management capability by logically projecting resources from one tenant onto another and unlocking cross-tenant management without the need to do context switching.
+[Azure Lighthouse](https://docs.microsoft.com/azure/lighthouse/overview) is an Azure service that enables cross and multi-tenant management providing greater visibility and scale into operations. Azure Lighthouse uses an Azure Resource Provider that brings the Azure Delegated Resource Management capability by logically projecting resources from one tenant onto another and unlocking cross-tenant management without the need to do context switching.
 
 This service is very valuable for service providers as they can realize efficiencies in their offerings using Azure’s operations and management tools for multiple customers, however, it is as useful to customers that may have multiple Azure AD tenants (e.g. multiple subsidiaries or geographies in separate tenants).
 
 To get started with Azure Lighthouse you can onboard a managed tenant using the Azure Delegated resource management. The onboarding process can be done in two different ways:
 
-- [Using an ARM template](https://docs.microsoft.com/en-us/azure/lighthouse/how-to/onboard-customer#create-an-azure-resource-manager-template)
-- [Publishing a Managed Service offer to the Azure Marketplace](https://docs.microsoft.com/en-us/azure/lighthouse/how-to/publish-managed-services-offers)
+- [Using an ARM template](https://docs.microsoft.com/azure/lighthouse/how-to/onboard-customer#create-an-azure-resource-manager-template)
+- [Publishing a Managed Service offer to the Azure Marketplace](https://docs.microsoft.com/azure/lighthouse/how-to/publish-managed-services-offers)
 
 After you finish the onboarding process you will have a central management tenant, in this scenario Contoso, that will aggregate the information from multiple customers: Microsoft, Fabrikam, and Fourth Coffee.
 
@@ -94,7 +94,7 @@ In the Contoso scenario, you will centrally manage at scale infrastructure and s
 - Using Azure Policy and its remediation tasks
 - Azure Arc’s extension management capabilities
 
-The extension management feature for [Azure Arc-enabled servers](https://docs.microsoft.com/en-us/azure/azure-arc/servers/manage-vm-extensions) and [Azure Arc-enabled Kubernetes](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/extensions) provides the same post-deployment configuration and automation tasks that you have for Azure VMs or Azure Kubernetes Service. With this feature, you can deploy small pieces of software to your Arc-enabled resources in an automated fashion, onboarding to Azure Monitor, Azure Defender, DSC, or even deploy a custom script on your VMs.
+The extension management feature for [Azure Arc-enabled servers](https://docs.microsoft.com/azure/azure-arc/servers/manage-vm-extensions) and [Azure Arc-enabled Kubernetes](https://docs.microsoft.com/azure/azure-arc/kubernetes/extensions) provides the same post-deployment configuration and automation tasks that you have for Azure VMs or Azure Kubernetes Service. With this feature, you can deploy small pieces of software to your Arc-enabled resources in an automated fashion, onboarding to Azure Monitor, Azure Defender, DSC, or even deploy a custom script on your VMs.
 
 ![Azure Arc extension management](./08.png)
 
@@ -125,7 +125,7 @@ Contoso can use configuration as code and uniformly govern and deploy containeri
 
 ![Azure Arc GitOps](./11.png)
 
-Azure Arc-enabled data services to allow Contoso to run Azure data services like Azure SQL Managed Instance and Azure Database for PostgreSQL Hyperscale on any Kubernetes cluster with unified management and familiar tools. With Azure Arc and Azure Lighthouse, Contoso is empowered to create cloud-native management operations with no location boundaries.
+Azure Arc-enabled data services to allow Contoso to run Azure data services like Azure SQL Managed Instance and Azure Database for PostgreSQL on any Kubernetes cluster with unified management and familiar tools. With Azure Arc and Azure Lighthouse, Contoso is empowered to create cloud-native management operations with no location boundaries.
 
 All of these data and application deployments can be done across organizations by using Azure Lighthouse delegated management features.
 

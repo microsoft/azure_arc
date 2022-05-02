@@ -14,7 +14,7 @@ In this guide, you will first deploy a nginx ingress controller to your cluster.
 
 By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-> **Note: This guide assumes you already deployed MicroK8s and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [MicroK8s onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/).**
+> **NOTE: This guide assumes you already deployed MicroK8s and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [MicroK8s onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/).**
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
   * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-  * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+  * [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected MicroK8s cluster to Azure Arc.
 
@@ -40,7 +40,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -145,7 +145,7 @@ The demo application that will be deployed later in this guide relies on an ingr
 
 With Cluster-level GitOps config, the goal is to have "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Meshes, Security products, Monitoring solutions, etc.
 
-> **Note: You will not be creating a cluster-level config in this guide. For an example of a cluster-level configuration please refer to either the [Helm-based GitOps on AKS scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks/aks_gitops_helm/) or the [GKE one](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_helm/).**
+> **NOTE: You will not be creating a cluster-level config in this guide. For an example of a cluster-level configuration please refer to either the [Helm-based GitOps on AKS scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks/aks_gitops_helm/) or the [GKE one](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_helm/).**
 
 ### Namespace-level Config
 
@@ -183,7 +183,7 @@ To create the GitOps configuration and it's respective Kubernetes resources, we'
     . ./az_k8sconfig_helm_microk8s.sh
     ```
 
-    > **Note: The extra dot is due to the script having an *export* function and that needs to have the vars exported in the same shell session as the rest of the commands.**
+    > **NOTE: The extra dot is due to the script having an *export* function and that needs to have the vars exported in the same shell session as the rest of the commands.**
 
 * Windows
 
@@ -198,7 +198,7 @@ The `az_k8sconfig_helm_microk8s` and `az_k8sconfig_helm_microk8s_windows` script
 
 * Once the script will complete its run, you will have the GitOps configuration created and all the resources deployed in your local MicroK8s Kubernetes cluster.
 
-    > **Note: it can take a few minutes for the configuration to change its Operator state status from "Pending" to "Installed".**
+    > **NOTE: it can take a few minutes for the configuration to change its Operator state status from "Pending" to "Installed".**
 
     ![New GitOps configuration created](./10.png)
 

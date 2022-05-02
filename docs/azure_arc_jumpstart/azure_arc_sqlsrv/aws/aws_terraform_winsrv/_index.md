@@ -19,7 +19,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
     ```shell
     az --version
@@ -123,10 +123,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
             * Install SQL Server Developer Edition
             * Enable SQL TCP protocol on the default instance
             * Create SQL Server Management Studio Desktop shortcut
-            * Restore [*AdventureWorksLT2019*](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) Sample Database
+            * Restore [*AdventureWorksLT2019*](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) Sample Database
             * Onboard both the server and SQL to Azure Arc
             * Deploy Azure Log Analytics and a workspace
-            * Install the [Microsoft Monitoring Agent (MMA) agent](https://docs.microsoft.com/en-us/services-hub/health/mma-setup)
+            * Install the [Microsoft Monitoring Agent (MMA) agent](https://docs.microsoft.com/services-hub/health/mma-setup)
             * Enable Log Analytics Solutions
             * Deploy MMA Azure Extension ARM Template from within the VM
             * Configure SQL Azure Assessment
@@ -165,7 +165,7 @@ Before executing the Terraform plan, you must set the environment variables whic
 
     ![Export terraform variables](./07.png)
 
-    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+    > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
 
     ```powershell
     Set-Item -Path env:TF_VAR_AWS_ACCESS_KEY_ID
@@ -192,7 +192,7 @@ Before executing the Terraform plan, you must set the environment variables whic
 
     ![Connect to AWS EC2 instance](./12.png)
 
-    > **Note: The script runtime will take ~10-15min to complete**
+    > **NOTE: The script runtime will take ~10-15min to complete**
 
     ![PowerShell LogonScript run](./13.png)
 

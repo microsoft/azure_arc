@@ -18,7 +18,7 @@ The following Jumpstart scenario will guide you on how to use [kind](https://kin
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -69,7 +69,7 @@ The following Jumpstart scenario will guide you on how to use [kind](https://kin
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -92,7 +92,7 @@ The following Jumpstart scenario will guide you on how to use [kind](https://kin
   az extension add --name k8s-configuration
   ```
 
-  > **Note: If you already used this guide before and/or have the extensions installed, use the below commands:**
+  > **NOTE: If you already used this guide before and/or have the extensions installed, use the below commands:**
 
   ```shell
   az extension update --name connectedk8s
@@ -137,7 +137,7 @@ The following Jumpstart scenario will guide you on how to use [kind](https://kin
 
   ![kind create cluster](./01.png)
 
-  > **Note: By default, kind will store the kubeconfig file used to connect to your cluster in the ~/.kube directory. If you want to use a custom directory to store the kubeconfig file, use the `--kube-config` flag.**
+  > **NOTE: By default, kind will store the kubeconfig file used to connect to your cluster in the ~/.kube directory. If you want to use a custom directory to store the kubeconfig file, use the `--kube-config` flag.**
 
   If you chose a specific location for the cluster's *kubeconfig* file, make sure you export its location as an environment variable using the `export KUBECONFIG=/path/to/kubeconfig` location or in Windows, add this location to your PATH.
 
@@ -163,7 +163,7 @@ The following Jumpstart scenario will guide you on how to use [kind](https://kin
   az group create --name Arc-kind-Demo -l EastUS -o table
   ```
 
-   > Note:  Before deploying, make sure to check the Azure Arc-enabled Kubernetes region availability [page](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc).
+   > Note:  Before deploying, make sure to check the Azure Arc-enabled Kubernetes region availability [page](https://azure.microsoft.com/global-infrastructure/services/?products=azure-arc).
 
   ![Create Azure resource group](./03.png)
 

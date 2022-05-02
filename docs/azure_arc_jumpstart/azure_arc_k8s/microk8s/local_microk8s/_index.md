@@ -18,7 +18,7 @@ The following Jumpstart scenario will guide you on how to use [MicroK8s](https:/
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -61,7 +61,7 @@ The following Jumpstart scenario will guide you on how to use [MicroK8s](https:/
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -84,7 +84,7 @@ The following Jumpstart scenario will guide you on how to use [MicroK8s](https:/
   az extension add --name k8s-configuration
   ```
 
-  > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
+  > **NOTE: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
   ```shell
   az extension update --name connectedk8s

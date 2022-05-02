@@ -4,9 +4,9 @@ Start-Transcript -Path C:\Temp\DeployPostgreSQL.log
 $Env:TempDir = "C:\Temp"
 $controllerName = "jumpstart-dc"
 
-# Deploying Azure Arc PostgreSQL Hyperscale
+# Deploying Azure Arc PostgreSQL
 Write-Host "`n"
-Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
+Write-Host "Deploying Azure Arc PostgreSQL"
 Write-Host "`n"
 
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
@@ -64,13 +64,13 @@ $pgWorkerPodName = "jumpstartpsw0-0"
 
 Write-Host "`n"
     Do {
-        Write-Host "Waiting for PostgreSQL Hyperscale. Hold tight, this might take a few minutes...(45s sleeping loop)"
+        Write-Host "Waiting for PostgreSQL. Hold tight, this might take a few minutes...(45s sleeping loop)"
         Start-Sleep -Seconds 45
         $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
 
 Write-Host "`n"
-Write-Host "Azure Arc-enabled PostgreSQL Hyperscale is ready!"
+Write-Host "Azure Arc-enabled PostgreSQL is ready!"
 Write-Host "`n"
 
 Start-Sleep -Seconds 60

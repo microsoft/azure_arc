@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to create an Ubuntu Serve
 
 ## Prerequisites
 
-> **Note: This guide assumes that you have some VMware vSphere familiarity. It is also does not designed to go over either VMware and/or Ubuntu best-practices.**
+> **NOTE: This guide assumes that you have some VMware vSphere familiarity. It is also does not designed to go over either VMware and/or Ubuntu best-practices.**
 
 - [Download the latest Ubuntu Server 18.04 ISO file](https://releases.ubuntu.com/18.04/)
 

@@ -8,7 +8,7 @@ description: >
 
 ## Connect Azure Arc-enabled servers to Microsoft Defender for Cloud
 
-The following Jumpstart scenario will guide you on how to onboard an Azure Arc-enabled server on to [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/), so you can start collecting security-related configurations as well as event logs to recommend actions and improve your overall Azure security posture.
+The following Jumpstart scenario will guide you on how to onboard an Azure Arc-enabled server on to [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/), so you can start collecting security-related configurations as well as event logs to recommend actions and improve your overall Azure security posture.
 
 Microsoft Defender for Cloud is Microsoft's integrated cloud workload protection platform, it provides advance thread protection for Azure and hybrid resources. To access Microsoft Defender for Cloud you need to enable the plan on Microsoft Defender for Cloud.
 
@@ -24,7 +24,7 @@ In this guide, you will enable and configure Microsoft Defender for Cloud on you
 
 * Apply recommended configurations on Azure Arc-enabled servers using the ***Quick Fix*** remediations.
 
-> **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
+> **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
 * **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
 * **[GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
@@ -51,7 +51,7 @@ In this guide, you will enable and configure Microsoft Defender for Cloud on you
 
     ![Screenshot of Azure Portal showing Azure Arc-enabled server detail](./02.png)
 
-* [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
+* [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7** or later. Use ```az --version``` to check your current installed version.
 
 * Create Azure service principal (SP)
 
@@ -127,7 +127,7 @@ Now that you have successfully onboarded Microsoft Defender for Cloud, you will 
 
 Microsoft Defender for Cloud will collect data from your Arc-enabled servers to monitor for security vulnerabilities and threats. The data collection will allow greater visibility into missing updates, non-secure OS settings, endpoint protection status, health and threat protection. You will get recommendations even if you do not provision an agent, however to fully benefit it is recommended to install the Log Analytics agent. The agent will read security-related configurations and event logs from the Arc-enabled server and send the data to the corresponding Log Analytics workspace where you enabled Microsoft Defender for Cloud. To install the agent on your Arc-enabled server you can use the extension management feature as it is described [here](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_mma_arm/_index.md) or by configuring policies as shown [here](https://github.com/microsoft/azure_arc/blob/main/docs/azure_arc_jumpstart/azure_arc_servers/day2/arc_policies_mma/_index.md)
 
->**Note: it may take upto 30 minutes for your Azure Arc-enabled server to be shown in Microsoft Defender for Cloud Dashboard**
+>**NOTE: it may take upto 30 minutes for your Azure Arc-enabled server to be shown in Microsoft Defender for Cloud Dashboard**
 
 * Once you have configured your workspace and deployed the MMA agent, using the [Azure Portal](https://portal.azure.com/) navigate to Microsoft Defender for Cloud. In the "Inventory" section under "VM and Servers", Defender will provide you with an overview of all the discovered security recommendations for your VMs and computers, including Azure VMs, Azure Classic VMs, servers and **Azure Arc Machines**.
 
@@ -152,7 +152,7 @@ Microsoft Defender for Cloud will collect data from your Arc-enabled servers to 
 
     ![Screenshot showing healthy Azure Arc-enabled server](./08.png)
 
-> **Note:It can take several minutes after remediation completes to see the resources in the 'healthy resources' tab**
+> **NOTE:It can take several minutes after remediation completes to see the resources in the 'healthy resources' tab**
 
 ## Clean up environment
 

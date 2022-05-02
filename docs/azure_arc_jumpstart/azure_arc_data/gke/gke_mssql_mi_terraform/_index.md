@@ -10,11 +10,11 @@ description: >
 
 The following scanario will guide you on how to deploy a "Ready to Go" environment so you can deploy Azure Arc-enabled data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster using [Terraform](https://www.terraform.io/).
 
-By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)), Azure SQL MI with a sample database and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM installed and pre-configured with all the required tools needed to work with Azure Arc data services:
+By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity)), Azure SQL MI with a sample database and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM installed and pre-configured with all the required tools needed to work with Azure Arc data services:
 
 ![Deployed Architecture](./57.png)
 
-> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Deployment Process Overview
 
@@ -38,7 +38,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
-* [Install or update Azure CLI to version 2.20.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.20.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -152,7 +152,7 @@ Read the below explanation to get familiar with the automation and deployment fl
 
 * In addition, the plan will copy the *local_ssd_sc.yaml* file which will be used to create a Kubernetes Storage Class backed by SSD disks. These disks will be used by Azure Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
 
-  > **Note: Depending on the GCP region, make sure you do not have any [SSD quota limit in the region](https://cloud.google.com/compute/quotas), otherwise, the Azure Arc Data Controller kubernetes resources will fail to deploy.**
+  > **NOTE: Depending on the GCP region, make sure you do not have any [SSD quota limit in the region](https://cloud.google.com/compute/quotas), otherwise, the Azure Arc Data Controller kubernetes resources will fail to deploy.**
 
 * As part of the Windows Server 2019 VM deployment, there are 4 script executions:
 
@@ -201,7 +201,7 @@ As mentioned, the Terraform plan and automation scripts will deploy a GKE cluste
   * *export TF_VAR_SPN_CLIENT_ID*='Your Azure service principal name'
   * *export TF_VAR_SPN_CLIENT_SECRET*='Your Azure service principal password'
   * *export TF_VAR_SPN_TENANT_ID*='Your Azure tenant ID'
-  * *export TF_VAR_SPN_AUTHORITY*=*https://login.microsoftonline.com* **Do not change**
+  * *export TF_VAR_SPN_AUTHORITY*=_https://login.microsoftonline.com_ **Do not change**
   * *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
   * *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
   * *export TF_VAR_ARC_DC_NAME*='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
@@ -209,10 +209,10 @@ As mentioned, the Terraform plan and automation scripts will deploy a GKE cluste
   * *export TF_VAR_ARC_DC_RG*='Azure resource group where all future Azure Arc resources will be deployed'
   * *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
   * *export TF_VAR_deploy_SQLMI*='Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we leave it set to true'
-  * *export TF_VAR_deploy_PostgreSQL*='Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this scenario we leave it set to false'
+  * *export TF_VAR_deploy_PostgreSQL*='Boolean that sets whether or not to deploy PostgreSQL, for this scenario we leave it set to false'
   * *export TF_VAR_templateBaseUrl*='GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well - e.g. `https://raw.githubusercontent.com/your--github--account/azure_arc/your--branch/azure_arc_data_jumpstart/gke/terraform/`.'
 
-    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables see example below**
+    > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables see example below**
 
     ```powershell
     $env:TF_VAR_gcp_project_id='azure-arc-demo-xxxxxx'
@@ -308,7 +308,7 @@ Included in this scenario, is a dedicated SQL stress simulation tool named _SqlQ
 
   ![SQLMI Endpoints text file](./44.png)
 
-> **Note: Secondary SQL Managed Instance endpoint will be available only when using the HA deployment model ("Business Critical").**
+> **NOTE: Secondary SQL Managed Instance endpoint will be available only when using the HA deployment model ("Business Critical").**
 
 * To connect, use "SQL Server Authentication" and select the deployed sample _AdventureWorks_ database (you can use the "Test" button to check the connection).
 

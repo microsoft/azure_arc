@@ -14,7 +14,7 @@ This guide assumes that you have a basic understanding of Ansible. A basic Ansib
 
 This guide can be used even if you do not already have an existing Ansible test environment and includes a Terraform plan that will create a sample AWS EC2 server inventory comprised of four (4) Windows Server 2019 servers and four (4) Ubuntu servers along with a basic CentOS 7 Ansible control server with a simple configuration.
 
-***Warning***: *The provided Ansible sample workbook uses WinRM with password authentication and HTTP to configure Windows-based servers. This is not advisable for production environments. If you are planning to use Ansible with Windows hosts in a production environment then you should use [WinRM over HTTPS](https://docs.microsoft.com/en-us/troubleshoot/windows-client/system-management-components/configure-winrm-for-https) with a certificate.*
+***Warning***: *The provided Ansible sample workbook uses WinRM with password authentication and HTTP to configure Windows-based servers. This is not advisable for production environments. If you are planning to use Ansible with Windows hosts in a production environment then you should use [WinRM over HTTPS](https://docs.microsoft.com/troubleshoot/windows-client/system-management-components/configure-winrm-for-https) with a certificate.*
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ This guide can be used even if you do not already have an existing Ansible test 
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -124,7 +124,7 @@ In order for Terraform to create resources in AWS, we will need to create a new 
 
 ## Option 1- Creating a sample AWS server inventory and Ansible control server using Terraform and onboarding the servers to Azure Arc
 
-**Note: If you already have an existing AWS server inventory and Ansible server, skip below to Option 2.**
+**NOTE: If you already have an existing AWS server inventory and Ansible server, skip below to Option 2.**
 
 ### Configure Terraform
 
@@ -206,7 +206,7 @@ To delete all the resources you created as part of this demo use the ```terrafor
 
 ## Option 2 - Onboarding an existing AWS server inventory to Azure Arc using your own Ansible control server
 
-> **Note: If you do not have an existing AWS server inventory and Ansible server, navigate back to Option 1**
+> **NOTE: If you do not have an existing AWS server inventory and Ansible server, navigate back to Option 1**
 
 ### Review provided Ansible configuration and playbook
 

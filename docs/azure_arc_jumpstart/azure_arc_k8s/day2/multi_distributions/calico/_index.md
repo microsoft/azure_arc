@@ -12,7 +12,7 @@ description: >
 
 <p align="center"><img src="/img/jumpstart_friends_logo.png" alt="jumpstart-friends-logo" width="250"></p>
 
-The following Jumpstart scenario will guide you how to use Azure Policy [Azure Policy for Kubernetes](https://docs.microsoft.com/en-us/azure/governance/policy/concepts/policy-for-kubernetes#:~:text=Azure%20Policy%20extends%20Gatekeeper%20v3,Kubernetes%20clusters%20from%20one%20place.) on an Azure Arc connected Kubernetes cluster to audit/enforce labels for pods. [Network policy](https://projectcalico.docs.tigera.io/about/about-network-policy) is applied to pods using label selectors.
+The following Jumpstart scenario will guide you how to use Azure Policy [Azure Policy for Kubernetes](https://docs.microsoft.com/azure/governance/policy/concepts/policy-for-kubernetes#:~:text=Azure%20Policy%20extends%20Gatekeeper%20v3,Kubernetes%20clusters%20from%20one%20place.) on an Azure Arc connected Kubernetes cluster to audit/enforce labels for pods. [Network policy](https://projectcalico.docs.tigera.io/about/about-network-policy) is applied to pods using label selectors.
 
 > **NOTE: This guide assumes you already deployed an Amazon Elastic Kubernetes Service (EKS) or Google Kubernetes Engine (GKE) cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these Jumpstart scenarios:**
 
@@ -38,7 +38,7 @@ The Azure Policy will be set to “Audit” mode to check the configuration of e
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
+- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
 
   ```shell
   az --version

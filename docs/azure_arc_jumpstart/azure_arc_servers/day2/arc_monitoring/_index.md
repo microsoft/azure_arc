@@ -8,7 +8,7 @@ description: >
 
 ## Monitoring, Alerting, and Visualization on Azure Arc-enabled servers
 
-The scenario will show you how to onboard Azure Arc-enabled servers to [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/overview), so you can monitor your Linux and Windows servers running on-premises or at other cloud providers.
+The scenario will show you how to onboard Azure Arc-enabled servers to [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/overview), so you can monitor your Linux and Windows servers running on-premises or at other cloud providers.
 
 In this guide, you will create the following Azure resources that support this Azure Monitor scenario:
 
@@ -34,7 +34,7 @@ In this guide, you will create the following Azure resources that support this A
 
   - Configure Dependency agent on Azure Arc enabled Linux server.
 
-> **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion:**
+> **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion:**
 
 - **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
 - **[GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
@@ -59,9 +59,9 @@ In this guide, you will create the following Azure resources that support this A
 
     ![Screenshot showing AWS cloud console with EC2 instance](./01.png)
 
-    > **Note: Ensure that the servers you will use for this scenario are running an [OS supported by the Log Analytics Agent and the Dependency Agent](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/agents-overview#supported-operating-systems) and meets the [firewall requirements](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/log-analytics-agent#firewall-requirements).**
+    > **NOTE: Ensure that the servers you will use for this scenario are running an [OS supported by the Log Analytics Agent and the Dependency Agent](https://docs.microsoft.com/azure/azure-monitor/agents/agents-overview#supported-operating-systems) and meets the [firewall requirements](https://docs.microsoft.com/azure/azure-monitor/agents/log-analytics-agent#firewall-requirements).**
 
-- [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
+- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
 
 ## Onboarding Azure Monitor
 
@@ -139,11 +139,11 @@ In this guide, you will create the following Azure resources that support this A
 
     ![Screenshot showing created alerts](./18.png)
 
-    > **Note: This is just a small example of Azure Monitor alerts, which are based on log queries and log analytics workspace metrics. You may need to adjust alerts thresholds to your environment expected behaviour.**
+    > **NOTE: This is just a small example of Azure Monitor alerts, which are based on log queries and log analytics workspace metrics. You may need to adjust alerts thresholds to your environment expected behaviour.**
 
 ## Deploying the Log Analytics Agent and the Dependency Agent
 
-This scenario is mainly based on the data collected from the Azure Arc-enabled servers into the Log Analytics workspace. Therefore, it is required to deploy on these servers the [Log Analytics Agent](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/agents-overview#log-analytics-agent) and the [Dependency Agent](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/agents-overview#dependency-agent). There are multiple [methods](https://docs.microsoft.com/en-us/azure/azure-monitor/agents/log-analytics-agent#installation-options) to deploy these agents. In this scenario, Azure Policies are used to deploy both agents in Windows and Linux.
+This scenario is mainly based on the data collected from the Azure Arc-enabled servers into the Log Analytics workspace. Therefore, it is required to deploy on these servers the [Log Analytics Agent](https://docs.microsoft.com/azure/azure-monitor/agents/agents-overview#log-analytics-agent) and the [Dependency Agent](https://docs.microsoft.com/azure/azure-monitor/agents/agents-overview#dependency-agent). There are multiple [methods](https://docs.microsoft.com/azure/azure-monitor/agents/log-analytics-agent#installation-options) to deploy these agents. In this scenario, Azure Policies are used to deploy both agents in Windows and Linux.
 
 For **new** Azure Arc-enabled servers connected within the scope of the policies assignments, the policies will deploy the agents automatically.
 
@@ -155,7 +155,7 @@ For **existing** Azure Arc-enabled servers connected within the scope of the pol
 
 - Click on the **Remediation** tab. Check if any of the policies that deploy the agents have resources to remediate. If so, click on the **Remediate** button:
 
-    > **Note: The following steps must be followed for each policy with resources pending to be remediated. Please, start with the remediation of the Log Analytics agent policies followed by the remediation of the Dependency Agent policies.**
+    > **NOTE: The following steps must be followed for each policy with resources pending to be remediated. Please, start with the remediation of the Log Analytics agent policies followed by the remediation of the Dependency Agent policies.**
 
     ![Screenshot showing how to start Azure policy remediation](./20.png)
 

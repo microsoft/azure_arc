@@ -20,7 +20,7 @@ By the end of the guide, you will have a GCP VM instance installed with Windows 
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -143,10 +143,10 @@ For you to get familiar with the automation and deployment flow, below is an exp
             * Install SQL Server Developer Edition
             * Enable SQL TCP protocol on the default instance
             * Create SQL Server Management Studio Desktop shortcut
-            * Restore [*AdventureWorksLT2019*](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) Sample Database
+            * Restore [*AdventureWorksLT2019*](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) Sample Database
             * Onboard both the server and SQL to Azure Arc
             * Deploy Azure Log Analytics and a workspace
-            * Install the [Microsoft Monitoring Agent (MMA) agent](https://docs.microsoft.com/en-us/services-hub/health/mma-setup)
+            * Install the [Microsoft Monitoring Agent (MMA) agent](https://docs.microsoft.com/services-hub/health/mma-setup)
             * Enable Log Analytics Solutions
             * Deploy MMA Azure Extension ARM Template from within the VM
             * Configure SQL Azure Assessment
@@ -182,13 +182,13 @@ Before executing the Terraform plan, you must set the environment variables whic
   export TF_VAR_admin_password='Guest OS Admin Password'
   ```
 
-    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+    > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
 
     ```powershell
     Set-Item -Path env:TF_VAR_gcp_project_id
     ```
 
-    > **Note: Do not set the TF_VAR_admin_user variable to "Administrator". GCP Windows images have the administrator account [disabled by default](https://cloud.google.com/compute/docs/images/os-details#windows_server). Therefore, you must use a different username for your TF_VAR_admin_user (e.g., "arcdemo")**
+    > **NOTE: Do not set the TF_VAR_admin_user variable to "Administrator". GCP Windows images have the administrator account [disabled by default](https://cloud.google.com/compute/docs/images/os-details#windows_server). Therefore, you must use a different username for your TF_VAR_admin_user (e.g., "arcdemo")**
 
   ![Screenshot showing exporting environment variables in shell](./19.png)
 
@@ -211,7 +211,7 @@ Before executing the Terraform plan, you must set the environment variables whic
 
   ![Screenshot showing link to download RDP file in GCP cloud console](./23.png)
 
-  > **Note: The script runtime will take ~10-15min to complete**
+  > **NOTE: The script runtime will take ~10-15min to complete**
 
   ![Screenshot showing PowerShell script being run in server](./24.png)
 

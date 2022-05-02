@@ -20,7 +20,7 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -28,7 +28,7 @@ This guide assumes you already have an exiting inventory of VMware Virtual Machi
 
 * Install VMware PowerCLI
 
-  > **Note: This guide was tested with the latest version of PowerCLI as of date (12.0.0) but earlier versions are expected to work as well**
+  > **NOTE: This guide was tested with the latest version of PowerCLI as of date (12.0.0) but earlier versions are expected to work as well**
 
   * Supported PowerShell Versions - VMware PowerCLI 12.0.0 is compatible with the following PowerShell versions:
     * Windows PowerShell 5.1

@@ -1,20 +1,20 @@
 ---
 type: docs
-title: "PostgreSQL Hyperscale Terraform Plan"
-linkTitle: "PostgreSQL Hyperscale Terraform Plan"
+title: "PostgreSQL Terraform Plan"
+linkTitle: "PostgreSQL Terraform Plan"
 weight: 3
 description: >
 ---
 
-## Deploy an Azure PostgreSQL Hyperscale Deployment on EKS using Terraform
+## Deploy an Azure PostgreSQL Deployment on EKS using Terraform
 
-The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services with PostgreSQL Hyperscale on an [Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks/) cluster using [Terraform](https://www.terraform.io/).
+The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services with PostgreSQL on an [Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks/) cluster using [Terraform](https://www.terraform.io/).
 
-By the end of this guide, you will have an EKS cluster deployed with an Azure Arc Data Controller running PostgreSQL Hyperscale, and a Microsoft Windows Server 2019 (Datacenter) AWS EC2 instance VM, installed and pre-configured with all the required tools needed to work with Azure Arc Data Services:
+By the end of this guide, you will have an EKS cluster deployed with an Azure Arc Data Controller running PostgreSQL, and a Microsoft Windows Server 2019 (Datacenter) AWS EC2 instance VM, installed and pre-configured with all the required tools needed to work with Azure Arc Data Services:
 
 ![Deployed Architecture](./40.png)
 
-> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Deployment Process Overview
 
@@ -38,7 +38,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 * [Install AWS IAM Authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -92,7 +92,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* Follow the steps [here](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/custom-locations#enable-custom-locations-on-cluster) or run the command below to retrieve your AAD Tenant Specific ObjectID for the "Custom Locations RP" Enterprise Application needed to onboard Custom Locations on EKS:
+* Follow the steps [here](https://docs.microsoft.com/azure/azure-arc/kubernetes/custom-locations#enable-custom-locations-on-cluster) or run the command below to retrieve your AAD Tenant Specific ObjectID for the "Custom Locations RP" Enterprise Application needed to onboard Custom Locations on EKS:
   
   ```shell
   # Note that the APPLICATION ID: bc313c14-388c-4e7d-a58e-70017303ee3b is constant across all tenants
@@ -151,7 +151,7 @@ Create AWS User IAM Key. An access key grants programmatic access to your resour
 
   ![Create EC2 Key Pair](./13.png)
 
-  > **Note: EC2 Key Pairs are regional.**
+  > **NOTE: EC2 Key Pairs are regional.**
 
 ## Automation Flow
 
@@ -182,7 +182,7 @@ Read the below explanation to get familiar with the automation and deployment fl
       * Apply the *configmap.yml* file on the EKS cluster
       * Use Azure CLI to connect the EKS cluster to Azure as an Azure Arc-enabled Kubernetes cluster
       * Create a custom location for use with the Azure Arc-enabled Kubernetes cluster
-      * Deploy ARM templates that will deploy the Azure Arc data controller and PostgreSQL Hyperscale on the EKS cluster
+      * Deploy ARM templates that will deploy the Azure Arc data controller and PostgreSQL on the EKS cluster
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       * Unregister the logon script Windows schedule task so it will not run after first login
 
@@ -215,12 +215,12 @@ As mentioned, the Terraform plan will deploy an EKS cluster, the Azure Arc Data 
   * *export TF_VAR_SPN_CLIENT_SECRET*='Your Azure service principal password'
   * *export TF_VAR_SPN_TENANT_ID*='Your Azure tenant ID'
   * *export TF_VAR_CUSTOM_LOCATION_OID*='Your AAD tenant specific Custom Locations RP Object ID'
-  * *export TF_VAR_SPN_AUTHORITY*=*https://login.microsoftonline.com* **Do not change**
+  * *export TF_VAR_SPN_AUTHORITY*=_https://login.microsoftonline.com_ **Do not change**
   * *export TF_VAR_deploy_SQLMI*=*'Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we set to false’
-  * *export TF_VAR_deploy_PostgreSQL*=*'Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this scenario we set to true'
+  * *export TF_VAR_deploy_PostgreSQL*=*'Boolean that sets whether or not to deploy PostgreSQL, for this scenario we set to true'
   * *export TF_VAR_templateBaseUrl*=*'GitHub URL to the deployment template - filled in by default to point to Microsoft/Azure Arc repository, but you can point this to your forked repo as well - e.g. `https://raw.githubusercontent.com/your--github--account/azure_arc/your--branch/azure_arc_data_jumpstart/eks/terraform/.`'
   
-    > **Note: If you are running in a Windows environment and need a Linux shell, check out Ubuntu from the Microsoft Store [here](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6#activetab=pivot:overviewtab) to get a Linux terminal on your Windows Machine.**
+    > **NOTE: If you are running in a Windows environment and need a Linux shell, check out Ubuntu from the Microsoft Store [here](https://www.microsoft.com/p/ubuntu/9nblggh4msv6#activetab=pivot:overviewtab) to get a Linux terminal on your Windows Machine.**
 
 * Navigate to the folder that has Terraform binaries.
 
@@ -274,7 +274,7 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
 * Let the script to run it's course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the EKS cluster. **The logon script run time is approximately 10min long**.
 
-    Once the script will finish it's run, the logon script PowerShell session will be close and the Azure Arc Data Controller and PostgreSQL Hyperscale will be deployed on the EKS cluster and be ready to use.
+    Once the script will finish it's run, the logon script PowerShell session will be close and the Azure Arc data controller and PostgreSQL will be deployed on the EKS cluster and be ready to use.
 
     ![PowerShell login script run](./27.png)
 
@@ -302,7 +302,7 @@ Now that we have both the EKS cluster and the Windows Server Client instance cre
 
 To completely delete the environment, follow the below steps.
 
-* Delete any Database resources (e.g. SQL Managed Instance, PostgreSQL Hyperscale), followed by the Data Controller Resource from the Azure Resource Group (i.e. via the Portal)
+* Delete any Database resources (e.g. SQL Managed Instance, PostgreSQL), followed by the Data Controller Resource from the Azure Resource Group (i.e. via the Portal)
 * Delete any remaining resources (Custom Location, Kubernetes - Azure Arc) from the Azure Resource Group (i.e. via the Portal)
 * Use terraform to delete all of the AWS resources as well as the Azure resource group. **The `terraform destroy` run time is approximately ~5-6min long**.
 
@@ -312,7 +312,7 @@ To completely delete the environment, follow the below steps.
 
   ![terraform destroy](./36.png)
 
-  > **Note: Because the following resources were created by EKS that creates internal AWS dependencies that Terraform has no knowledge of from our plan, we need to delete the resources from AWS console as `terraform destroy` is cleaning up - this allows us to avoid dependency conflicts and ongoing billing from orphaned resources such as EKS Volumes.**
+  > **NOTE: Because the following resources were created by EKS that creates internal AWS dependencies that Terraform has no knowledge of from our plan, we need to delete the resources from AWS console as `terraform destroy` is cleaning up - this allows us to avoid dependency conflicts and ongoing billing from orphaned resources such as EKS Volumes.**
 
 * While the `destroy` command is running, delete any new Load Balancers created as EKS Services (`EC2 > Load Balancing > Load Balancers`) that are deployed in AWS from the Console:
 

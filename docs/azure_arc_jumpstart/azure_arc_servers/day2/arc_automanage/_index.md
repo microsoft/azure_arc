@@ -8,14 +8,14 @@ description: >
 
 ## Enable Azure Automanage on an Azure Arc-enabled servers using an ARM Template
 
-The following Jumpstart scenario will guide you on how to onboard an Azure Arc-enabled server on to [Azure Automanage](https://docs.microsoft.com/en-us/azure/automanage/automanage-virtual-machines#prerequisites), so you can follow best practices in reliability, security and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) and [Azure Backup](https://docs.microsoft.com/en-us/azure/backup/backup-overview).
+The following Jumpstart scenario will guide you on how to onboard an Azure Arc-enabled server on to [Azure Automanage](https://docs.microsoft.com/azure/automanage/automanage-virtual-machines#prerequisites), so you can follow best practices in reliability, security and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Backup](https://docs.microsoft.com/azure/backup/backup-overview).
 
-Azure Automanage removes the need to discover virtual machines manually and automatically onboards and configures certain services in Azure following best practices as defined in [Microsoft Cloud Adoption Framework for Azure](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/manage/best-practices). Azure services included in Azure Automanage are:
+Azure Automanage removes the need to discover virtual machines manually and automatically onboards and configures certain services in Azure following best practices as defined in [Microsoft Cloud Adoption Framework for Azure](https://docs.microsoft.com/azure/cloud-adoption-framework/manage/best-practices). Azure services included in Azure Automanage are:
 
-- [Azure Backup](https://docs.microsoft.com/en-us/azure/backup/backup-overview)
-- [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction)
-- [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/overview)
-- [Azure Automation](https://docs.microsoft.com/en-us/azure/automation/automation-intro)
+- [Azure Backup](https://docs.microsoft.com/azure/backup/backup-overview)
+- [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/defender-for-cloud-introduction)
+- [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/overview)
+- [Azure Automation](https://docs.microsoft.com/azure/automation/automation-intro)
 
 By the end of this guide, you will have an Azure Arc-enabled server with Azure Automanage enabled and configured following Microsoft Cloud Adoption Framework best practices for Dev/Test or Production environments.
 
@@ -47,7 +47,7 @@ By the end of this guide, you will have an Azure Arc-enabled server with Azure A
 
     ![Screenshot of Azure Portal showing Azure Arc-enabled server detail](./02.png)
 
-- [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7*- or later. Use ```az --version``` to check your current installed version.
+- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7*- or later. Use ```az --version``` to check your current installed version.
 
 - Create Azure service principal (SP)
 
@@ -115,7 +115,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   ![Azure Automanage search](./06.png)
   ![Azure Arc-enabled server in Azure Automanage](./07.png)
 
-  > **Note: it may take upto 30 minutes for the script to finish its run**
+  > **NOTE: it may take upto 30 minutes for the script to finish its run**
 
 ## Clean up environment
 

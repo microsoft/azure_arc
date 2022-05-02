@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to create GitOps configur
 
 In this guide, you will deploy & attach GitOps configuration to your cluster which will also include deploying an "Hello World" Azure Arc web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-> **Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/) or [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/).**
+> **NOTE: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/) or [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/).**
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
   * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-  * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+  * [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
 
@@ -38,7 +38,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -79,11 +79,11 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 ## Azure Arc Kubernetes GitOps Configuration
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_k8sconfig_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_k8sconfig_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
 
 * Edit the environment variables in the [*az_k8sconfig_aks*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/basic/az_k8sconfig_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_aks.sh``` command.
 
-    > **Note: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+    > **NOTE: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
     ![Open Azure Cloud Shell](./03.png)
 
@@ -105,7 +105,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * Once the script will complete it's run, you will have the GitOps configuration created and all the resources deployed in your Kubernetes cluster.
 
-    > **Note: that it takes few min for the configuration change it's Operator state status from "Pending" to Install.**
+    > **NOTE: that it takes few min for the configuration change it's Operator state status from "Pending" to Install.**
 
     ![New GitOps configurations](./07.png)
 
