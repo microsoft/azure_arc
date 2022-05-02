@@ -140,7 +140,7 @@
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "PostgreSQL Hyperscale deployment"
+        "description": "PostgreSQL deployment"
       }
     },
     "templateBaseUrl": {
