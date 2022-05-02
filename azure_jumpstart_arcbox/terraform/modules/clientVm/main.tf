@@ -163,7 +163,7 @@ variable "postgres_name" {
 
 variable "postgres_worker_node_count" {
   type        = number
-  description = "Number of PostgreSQL Hyperscale worker nodes."
+  description = "Number of PostgreSQL worker nodes."
   default     = 3
 }
 
