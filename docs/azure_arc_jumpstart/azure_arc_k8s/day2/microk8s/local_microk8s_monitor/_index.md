@@ -8,11 +8,11 @@ description: >
 
 ## Integrate Azure Monitor for Containers with MicroK8s as an Azure Arc Connected Cluster
 
-The following Jumpstart scenario will guide you on how to onboard an microK8s cluster which is projected an Azure Arc connected cluster resource on to [Azure Monitor for Containers](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-overview).
+The following Jumpstart scenario will guide you on how to onboard an microK8s cluster which is projected an Azure Arc connected cluster resource on to [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview).
 
-In this guide, you will hook the microK8s cluster to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster to start collecting telemetry.  
+In this guide, you will hook the microK8s cluster to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) on your Kubernetes cluster to start collecting telemetry.  
 
-> **Note: This guide assumes you already deployed MicroK8s and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [MicroK8s onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/).**
+> **NOTE: This guide assumes you already deployed MicroK8s and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [MicroK8s onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/).**
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ In this guide, you will hook the microK8s cluster to Azure Monitor by deploying 
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -95,7 +95,7 @@ In this guide, you will hook the microK8s cluster to Azure Monitor by deploying 
   
 At the end of its run, the script will generate a URL for you to click on, this URL will open a new browser tab leading to the Azure Monitor for Containers Insights page.
 
-  > **Note: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
+  > **NOTE: As the OMS start collecting telemetry from the cluster nodes and pods, it will take 5-10min for data to start show up in the Azure Portal.**
 
   ![Installing the OMS agent on the cluster](./03.png)
 

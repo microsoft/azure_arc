@@ -8,11 +8,11 @@ description: >
 
 ## Deploy an Azure Arc Data Controller (Vanilla) on Kubeadm cluster in an Azure VM using ARM Template
 
-The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on single-node Kubernetes cluster deployed with [Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) in az Azure Ubuntu VM, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
+The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on single-node Kubernetes cluster deployed with [Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) in az Azure Ubuntu VM, using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
 By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
-> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -73,7 +73,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 * User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
-* Main ARM template will deploy an Ubuntu VM. The ARM template will call the the Azure [Linux Custom Script Extension](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/custom-script-linux) to:
+* Main ARM template will deploy an Ubuntu VM. The ARM template will call the the Azure [Linux Custom Script Extension](https://docs.microsoft.com/azure/virtual-machines/extensions/custom-script-linux) to:
 
 * Deploy a single-node Kubernetes cluster using Kubeadm.
 * Deploy the Azure Arc Data Controller on that cluster.
@@ -115,11 +115,11 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *SPN_CLIENT_ID* - Your Azure service principal name
   * *SPN_CLIENT_SECRET* - Your Azure service principal password
   * *SPN_TENANT_ID* - Your Azure tenant ID
-  * *SPN_AUTHORITY* - *https://login.microsoftonline.com* **Do not change**
+  * *SPN_AUTHORITY* - _https://login.microsoftonline.com_ **Do not change**
   * *AZDATA_USERNAME* - Azure Arc Data Controller
   * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
   * *ACCEPT_EULA* - "yes" **Do not change**
-  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for *s namespace as well).
+  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for namespace name as well).
   * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
   * *ARC_DC_RG* - Azure resource group where all the resources get deploy
   * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
@@ -137,7 +137,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
+    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
 
     For example:
 
@@ -150,9 +150,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters azuredeploy.parameters.json
     ```
 
-    > **Note: Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20 minutes.**
+    > **NOTE: Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20 minutes.**
 
-* Once Azure resources have been provisioned, you will be able to see it in Azure portal with the Azure Arc Data Controller included. 
+* Once Azure resources have been provisioned, you will be able to see it in Azure portal with the Azure Arc Data Controller included.
 
     ![A successful ARM deployment](./01.png)
 

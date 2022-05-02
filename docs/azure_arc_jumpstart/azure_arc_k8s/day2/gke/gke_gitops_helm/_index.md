@@ -14,7 +14,7 @@ In this guide, you will deploy & attach 2 GitOps configuration to your cluster, 
 
 By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-**Note: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).**
+**NOTE: This guide assumes you already deployed a GKE cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/).**
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
   * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-  * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+  * [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tab-auto-refresh/)
 
 * As mentioned, this guide starts at the point where you already have a connected GKE cluster to Azure Arc.
 
@@ -40,7 +40,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -119,7 +119,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
 * Edit the environment variables in the [*az_k8sconfig_helm_gke*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/gitops/helm/az_k8sconfig_helm_gke.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_helm_gke``` command.
 
-    > **Note: The extra dot is due to the script has an *export* function and needs to have the variables exported in the same shell session as the rest of the commands.**
+    > **NOTE: The extra dot is due to the script has an *export* function and needs to have the variables exported in the same shell session as the rest of the commands.**
 
     ![Export environment variables](./05.png)
 
@@ -146,7 +146,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
 * Once the script will complete it's run, you will have 2 GitOps configuration created and all the resources deployed in your Kubernetes cluster.
 
-    > **Note: that it takes few min for the configuration change it's Operator state status from "Pending" to Install.**
+    > **NOTE: that it takes few min for the configuration change it's Operator state status from "Pending" to Install.**
 
     ![Cluster-level GitOps configurations](./11.png)
 

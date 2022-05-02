@@ -8,29 +8,29 @@ description: >
 
 ## Deploy Azure SQL Managed Instance on AKS using Azure DevOps Release Pipeline
 
-The following Jumpstart scenario will guide you on how to use [Azure DevOps (ADO) Release pipelines](https://docs.microsoft.com/en-us/azure/devops/pipelines/release/?view=azure-devops) to deploy a "Ready to Go" environment so you can start using Azure Arc-enabled data services on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
+The following Jumpstart scenario will guide you on how to use [Azure DevOps (ADO) Release pipelines](https://docs.microsoft.com/azure/devops/pipelines/release/?view=azure-devops) to deploy a "Ready to Go" environment so you can start using Azure Arc-enabled data services on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will have an Azure DevOps Release pipeline to deploy AKS cluster with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity), Azure SQL MI with a sample database and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this guide, you will have an Azure DevOps Release pipeline to deploy AKS cluster with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity), Azure SQL MI with a sample database and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
-> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 > **NOTE: The following scenario is focusing the Azure DevOps Release pipeline creation. Once the pipeline has been created and the environment deployment has finished, the automation flow and next steps are as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)**
 
 ## Prerequisites
 
-* [Azure DevOps account](https://azure.microsoft.com/en-us/services/devops/) set up with your organization and ready for project creation.
+* [Azure DevOps account](https://azure.microsoft.com/services/devops/) set up with your organization and ready for project creation.
 
-  * (Optional) [Create new Azure DevOps organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
+  * (Optional) [Create new Azure DevOps organization](https://docs.microsoft.com/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
-  * (Optional) [Create new Azure DevOps project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops&tabs=preview-page).
+  * (Optional) [Create new Azure DevOps project](https://docs.microsoft.com/azure/devops/organizations/projects/create-project?view=azure-devops&tabs=preview-page).
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-* [Generate SSH Key](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
+* [Generate SSH Key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
 
 * Create Azure service principal (SP)
 
@@ -105,7 +105,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of Azure subscription config](./09.jpg)
 
-* Provide the Azure resource group and location where all the resources will be deployed. Make sure to validate if the service is [currently available in your Azure region](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc).
+* Provide the Azure resource group and location where all the resources will be deployed. Make sure to validate if the service is [currently available in your Azure region](https://azure.microsoft.com/global-infrastructure/services/?products=azure-arc).
 
     ![Screenshot of resource group and location config](./10.jpg)
 
@@ -129,7 +129,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
   * _`logAnalyticsWorkspaceName`_ - Unique Log Analytics workspace name
   * _`deploySQLMI`_ - SQL Managed Instance deployment (true/false)
   * _`SQLMIHA`_ - SQL Managed Instance high-availability deployment (true/false)
-  * _`deployPostgreSQL`_ - PostgreSQL Hyperscale deployment (true/false)
+  * _`deployPostgreSQL`_ - PostgreSQL deployment (true/false)
   * _`clusterName`_ - AKS cluster name
   * _`bastionHostName`_ - Indicate whether to deploy bastion host to manage AKS
   * _`dnsPrefix`_ - AKS unique DNS prefix

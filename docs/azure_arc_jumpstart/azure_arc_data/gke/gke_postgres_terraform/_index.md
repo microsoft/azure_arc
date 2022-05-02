@@ -1,20 +1,20 @@
 ---
 type: docs
-title: "PostgreSQL Hyperscale Terraform Plan"
-linkTitle: "PostgreSQL Hyperscale Terraform Plan"
+title: "PostgreSQL Terraform Plan"
+linkTitle: "PostgreSQL Terraform Plan"
 weight: 3
 description: >
 ---
 
-## Deploy an Azure PostgreSQL Hyperscale Deployment on GKE using a Terraform plan
+## Deploy an Azure PostgreSQL Deployment on GKE using a Terraform plan
 
 The following scanario will guide you on how to deploy a "Ready to Go" environment so you can deploy Azure Arc-enabled data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster using [Terraform](https://www.terraform.io/).
 
-By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity)), Azure PostgreSQL Hyperscale with a sample database and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM installed & pre-configured with all the required tools needed to work with Azure Arc data services:
+By the end of this guide, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity)), Azure PostgreSQL with a sample database and a Microsoft Windows Server 2019 (Datacenter) GKE compute instance VM installed & pre-configured with all the required tools needed to work with Azure Arc data services:
 
 ![Deployed Architecture](./51.png)
 
-> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Deployment Process Overview
 
@@ -38,7 +38,7 @@ By the end of this guide, you will have a GKE cluster deployed with an Azure Arc
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
-* [Install or update Azure CLI to version 2.20.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.20.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -160,11 +160,11 @@ Read the below explanation to get familiar with the automation and deployment fl
 
 * User edits and exports *TF_VAR* Terraform runtime environment variables (1-time edit). The variable values are used throughout the deployment.
 
-* User deploys the Terraform plan which will deploy a GKE cluster and compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc-enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and the PostgreSQL Hyperscale database service.
+* User deploys the Terraform plan which will deploy a GKE cluster and compute instance VM as well as an Azure resource group. The Azure resource group is required to host the Azure Arc services such as the Azure Arc-enabled Kubernetes cluster, the custom location, the Azure Arc data controller, and the PostgreSQL database service.
 
 * In addition, the plan will copy the *local_ssd_sc.yaml* file which will be used to create a Kubernetes Storage Class backed by SSD disks. These disks will be used by Azure Arc Data Controller to create [persistent volume claims (PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).
 
-  > **Note: Depending on the GCP region, make sure you do not have any [SSD quota limit in the region](https://cloud.google.com/compute/quotas), otherwise, the Azure Arc Data Controller kubernetes resources will fail to deploy.**
+  > **NOTE: Depending on the GCP region, make sure you do not have any [SSD quota limit in the region](https://cloud.google.com/compute/quotas), otherwise, the Azure Arc Data Controller kubernetes resources will fail to deploy.**
 
 * As part of the Windows Server 2019 VM deployment, there are 4 script executions:
 
@@ -189,12 +189,12 @@ Read the below explanation to get familiar with the automation and deployment fl
       * Create a custom location for use with the Azure Arc-enabled Kubernetes cluster
       * Open another Powershell session which will execute a command to watch the deployed Azure Arc Data Controller Kubernetes pods
       * Deploy an ARM template that will deploy the Azure Arc data controller on the GKE cluster
-      * Execute a secondary *DeployPostgreSQL.ps1* script which will configure the PostgreSQL Hyperscale instance, download and install the sample Adventureworks database, and configure Azure Data Studio to connect to the PostgreSQL Hyperscale database instance
+      * Execute a secondary *DeployPostgreSQL.ps1* script which will configure the PostgreSQL instance, download and install the sample Adventureworks database, and configure Azure Data Studio to connect to the PostgreSQL database instance
       * Unregister the logon script Windows scheduler task so it will not run after first login
 
 ## Deployment
 
-As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data Controller on that cluster, a Postgres Hyperscale instance with sample database, and a Windows Server 2019 Client GCP compute instance.
+As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data Controller on that cluster, a Postgres instance with sample database, and a Windows Server 2019 Client GCP compute instance.
 
 * Before running the Terraform plan, edit the below *TF_VAR* values and export it (simply copy/paste it after you finished edit these). An example *TF_VAR* shell script file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/terraform/example/TF_VAR_datacontroller_postgresql_example.sh)
 
@@ -213,7 +213,7 @@ As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data C
   * *export TF_VAR_SPN_CLIENT_ID*='Your Azure service principal name'
   * *export TF_VAR_SPN_CLIENT_SECRET*='Your Azure service principal password'
   * *export TF_VAR_SPN_TENANT_ID*='Your Azure tenant ID'
-  * *export TF_VAR_SPN_AUTHORITY*=*https://login.microsoftonline.com* **Do not change**
+  * *export TF_VAR_SPN_AUTHORITY*=_https://login.microsoftonline.com_ **Do not change**
   * *export TF_VAR_AZDATA_USERNAME*='Azure Arc Data Controller admin username'
   * *export TF_VAR_AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
   * *export TF_VAR_ARC_DC_NAME*='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
@@ -221,10 +221,10 @@ As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data C
   * *export TF_VAR_ARC_DC_RG*='Azure resource group where all future Azure Arc resources will be deployed'
   * *export TF_VAR_ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
   * *export TF_VAR_deploy_SQLMI*='Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we leave it set to false'
-  * *export TF_VAR_deploy_PostgreSQL*='Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this scenario we leave it set to true'
+  * *export TF_VAR_deploy_PostgreSQL*='Boolean that sets whether or not to deploy PostgreSQL, for this scenario we leave it set to true'
   * *export TF_VAR_templateBaseUrl*='GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well - e.g. `https://raw.githubusercontent.com/your--github--account/azure_arc/your--branch/azure_arc_data_jumpstart/gke/terraform/`.'
 
-    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables see example below**
+    > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables see example below**
 
     ```powershell
     $env:TF_VAR_gcp_project_id='azure-arc-demo-xxxxxx'

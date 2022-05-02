@@ -12,7 +12,7 @@ description: >
 
 <p align="center"><img src="/img/jumpstart_friends_logo.png" alt="jumpstart-friends-logo" width="250"></p>
 
-The following Jumpstart scenario will guide you how to use GitOps [GitOps for Azure Arc](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/tutorial-use-gitops-connected-cluster) in an Azure Arc connected Kubernetes cluster to manage Calico Network Policy [Network Policy](https://projectcalico.docs.tigera.io/about/about-network-policy).
+The following Jumpstart scenario will guide you how to use GitOps [GitOps for Azure Arc](https://docs.microsoft.com/azure/azure-arc/kubernetes/tutorial-use-gitops-connected-cluster) in an Azure Arc connected Kubernetes cluster to manage Calico Network Policy [Network Policy](https://projectcalico.docs.tigera.io/about/about-network-policy).
 
 > **NOTE: This guide assumes you already deployed an Amazon Elastic Kubernetes Service (EKS) or Google Kubernetes Engine (GKE) cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these Jumpstart scenarios:**
 
@@ -38,7 +38,7 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
 
 - Fork the [Tigera Azure-arc-demo repository](https://github.com/tigera-solutions/Azure-arc-demo)
 
-- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
+- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the following command to check your current installed version.
 
   ```shell
   az --version
@@ -59,8 +59,8 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
 
 * Edit the environment variables in the [*calico_k8sconfig_gitops*](https://github.com/microsoft/azure_arc/tree/main/docs/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/gitops/calico_k8sconfig_gitops.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./calico_k8sconfig_gitops.sh``` command to create the GitOps configuration.
 
-    > **Note: The extra dot is due to the script having an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
-    > **Note: The default branch is `master`. Newer repositories have a root branch named main, in which case you need to set `--git-branch=main` in operator params.**
+    > **NOTE: The extra dot is due to the script having an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+    > **NOTE: The default branch is `master`. Newer repositories have a root branch named main, in which case you need to set `--git-branch=main` in operator params.**
 
     ![Upload a file to Cloud Shell](./03.png)
 

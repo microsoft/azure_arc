@@ -1,18 +1,18 @@
 ---
 type: docs
-title: "PostgreSQL Hyperscale ARM Template"
-linkTitle: "PostgreSQL Hyperscale ARM Template"
+title: "PostgreSQL ARM Template"
+linkTitle: "PostgreSQL ARM Template"
 weight: 3
 description: >
 ---
 
-## Deploy Azure Arc-enabled PostgreSQL Hyperscale in directly connected mode on Cluster API Kubernetes cluster with Azure provider using an ARM Template
+## Deploy Azure Arc-enabled PostgreSQL in directly connected mode on Cluster API Kubernetes cluster with Azure provider using an ARM Template
 
-The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/azure/azure-arc/data/overview) and [PostgreSQL Hyperscale](https://docs.microsoft.com/azure/azure-arc/data/what-is-azure-arc-enabled-postgres-hyperscale) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
+The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/azure/azure-arc/data/overview) and [PostgreSQL](https://docs.microsoft.com/azure/azure-arc/data/what-is-azure-arc-enabled-postgres-hyperscale) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
 
-By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an Azure Arc Data Controller, PostgreSQL Hyperscale instance (with a sample database), and a Microsoft Windows Server 2022 (Datacenter) Azure sidecar VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services.
+By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an Azure Arc Data Controller, PostgreSQL instance (with a sample database), and a Microsoft Windows Server 2022 (Datacenter) Azure sidecar VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services.
 
-> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Prerequisites
 
@@ -98,7 +98,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User remotes into client Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploy and configure Azure Arc-enabled data services on the CAPI workload cluster including the data controller.
 
-- In addition to deploying the data controller and PostgreSQL Hyperscale, the sample [_AdventureWorks_](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will restored automatically for you as well.
+- In addition to deploying the data controller and PostgreSQL, the sample [_AdventureWorks_](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will restored automatically for you as well.
 
 ## Deployment
 
@@ -116,7 +116,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _'logAnalyticsWorkspaceName'_ - Unique name for the deployment log analytics workspace.
   - _'deploySQLMI'_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this scenario we leave it set to _**false**_.
   - _'SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this scenario we leave it set to _**false**_.
-  - _'deployPostgreSQL'_ - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this Azure Arc-enabled PostgreSQL Hyperscale scenario we will set it to _**true**_.
+  - _'deployPostgreSQL'_ - Boolean that sets whether or not to deploy PostgreSQL, for this Azure Arc-enabled PostgreSQL scenario we will set it to _**true**_.
   - _'deployBastion'_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
   - _'bastionHostName'_ - Azure Bastion host name.
 
@@ -212,7 +212,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   - Azure Arc Data Controller - The data controller that is now deployed on the Kubernetes cluster.
 
-  - Azure Arc-enabled PostgreSQL Hyperscale - The PostgreSQL Hyperscale instance that is now deployed on the Kubernetes cluster.
+  - Azure Arc-enabled PostgreSQL - The PostgreSQL instance that is now deployed on the Kubernetes cluster.
 
   ![Screenshot showing additional Azure resources in the resource group](./25.png)
 
@@ -224,7 +224,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Additionally, the PostgreSQL connection will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation.
 
-  ![Screenshot showing Azure Data Studio PostgresSQL Hyperscale connection](./28.png)
+  ![Screenshot showing Azure Data Studio PostgresSQL connection](./28.png)
 
 ## Cluster extensions
 
@@ -252,7 +252,7 @@ Occasionally, you may need to review log output from scripts that run on the _Ar
 | ------- | ----------- |
 | _C:\Temp\Bootstrap.log_ | Output from the initial bootstrapping script that runs on _Arc-Data-Client_. |
 | _C:\Temp\DataServicesLogonScript.log_ | Output of _DataServicesLogonScript.ps1_ which configures Azure Arc-enabled data services baseline capability. |
-| _C:\Temp\DeployPostgreSQL.log_ | Output of _deployPostgreSQL.ps1_ which deploys and configures PostgreSQL Hyperscale with Azure Arc. |
+| _C:\Temp\DeployPostgreSQL.log_ | Output of _deployPostgreSQL.ps1_ which deploys and configures PostgreSQL with Azure Arc. |
 | _C:\Temp\installCAPI.log_ | Output from the custom script extension which runs on _Arc-Data-CAPI-MGMT_ and configures the Cluster API for Azure cluster and onboards it as an Azure Arc-enabled Kubernetes cluster. If you encounter ARM deployment issues with _ubuntuCapi.json_ then review this log. |
 
 ![Screenshot showing the Temp folder with deployment logs](./31.png)

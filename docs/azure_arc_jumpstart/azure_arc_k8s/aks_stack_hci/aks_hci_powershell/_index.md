@@ -8,7 +8,7 @@ description: >
 
 ## Deploy AKS cluster on Azure Stack HCI and connect it to Azure Arc using PowerShell
 
-The following Jumpstart scenario will guide you on how to use the provided PowerShell script to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster on [Azure Stack HCI](https://docs.microsoft.com/en-us/azure-stack/hci/overview) and connected it as an Azure Arc cluster resource.
+The following Jumpstart scenario will guide you on how to use the provided PowerShell script to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster on [Azure Stack HCI](https://docs.microsoft.com/azure-stack/hci/overview) and connected it as an Azure Arc cluster resource.
 
 Azure Kubernetes Service on Azure Stack HCI is an implementation of AKS on-premises using hyperconverged infrastructure operating system that is delivered as an Azure service.  
 
@@ -58,7 +58,7 @@ This guide will not provide instructions on how to deploy and set up Azure Stack
 
     Copy the Service Principal ApplicationId and Secret as you will need it for later on in the automation.
 
-    > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
+    > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 
 - Enable your subscription with the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
@@ -162,7 +162,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - **password:** 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX'
   - **tenant:** 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXX'
 
-- Note that the script will deploy a simple static IP address based cluster on your Azure Stack HCI and there are additional optional parameters that you could use to customize the deployment to your own environment as described [here](https://docs.microsoft.com/en-us/azure-stack/aks-hci/kubernetes-walkthrough-powershell).
+- Note that the script will deploy a simple static IP address based cluster on your Azure Stack HCI and there are additional optional parameters that you could use to customize the deployment to your own environment as described [here](https://docs.microsoft.com/azure-stack/aks-hci/kubernetes-walkthrough-powershell).
 
 - To run the script open PowerShell as an administrator, navigate to the [script folder](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks_stack_hci/powershell/) and run:
 

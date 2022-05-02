@@ -1,20 +1,20 @@
 ---
 type: docs
-title: "PostgreSQL Hyperscale ARM Template"
-linkTitle: "PostgreSQL Hyperscale ARM Template"
+title: "PostgreSQL ARM Template"
+linkTitle: "PostgreSQL ARM Template"
 weight: 3
 description: >
 ---
 
-## Deploy Azure Arc-enabled PostgreSQL Hyperscale in directly connected mode on a Microk8s Kubernetes cluster in an Azure VM using ARM Templates
+## Deploy Azure Arc-enabled PostgreSQL in directly connected mode on a Microk8s Kubernetes cluster in an Azure VM using ARM Templates
 
-The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/en-us/azure/azure-arc/data/overview) and [PostgreSQL Hyperscale](https://docs.microsoft.com/en-us/azure/azure-arc/data/what-is-azure-arc-enabled-postgres-hyperscale) deployed on a single-node [Microk8s](https://microk8s.io/) Kubernetes cluster.
+The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/azure/azure-arc/data/overview) and [PostgreSQL](https://docs.microsoft.com/azure/azure-arc/data/what-is-azure-arc-enabled-postgres-hyperscale) deployed on a single-node [Microk8s](https://microk8s.io/) Kubernetes cluster.
 
-By the end of this guide, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller & PostgreSQL Hyperscale instance (with a sample database), and a Microsoft Windows Server 2022 (Datacenter) Azure Client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
+By the end of this guide, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller & PostgreSQL instance (with a sample database), and a Microsoft Windows Server 2022 (Datacenter) Azure Client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
 ![Deployed Architecture](./01.png)
 
-> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Prerequisites
 
@@ -24,13 +24,13 @@ By the end of this guide, you will have a Microk8s Kubernetes cluster deployed w
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
-- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-- [Generate SSH Key](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
+- [Generate SSH Key](https://docs.microsoft.com/azure/virtual-machines/linux/create-ssh-keys-detailed) (or use existing ssh key).
 
 - Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with multiple RBAC roles is required:
 
@@ -84,7 +84,7 @@ _"Microk8s is a single-package, fully conformant, lightweight Kubernetes that wo
 
 In this guide, we automate the installation of Microk8s on an Ubuntu 18.04 VM running on Azure using a few simple commands to install from the [Snap Store](https://snapcraft.io/microk8s), before proceeding to onboard it as an Azure Arc-enabled Kubernetes Cluster.
 
-Once our K8s Cluster is onboarded, we proceed to create a [Custom Location](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/custom-locations), and deploy an Azure Arc Data Controller in [Directly Connected mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity#connectivity-modes).
+Once our K8s Cluster is onboarded, we proceed to create a [Custom Location](https://docs.microsoft.com/azure/azure-arc/kubernetes/custom-locations), and deploy an Azure Arc Data Controller in [Directly Connected mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity#connectivity-modes).
 
 ## Automation Flow
 
@@ -116,8 +116,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - `windowsAdminPassword` - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - `myIpAddress` - Your local IP address/CIDR range. This is used to allow remote RDP and SSH connections to the Client Windows VM and Microk8s VM.
   - `logAnalyticsWorkspaceName` - Unique name for log analytics workspace deployment.
-  - `deploySQLMI` - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure PostgreSQL Hyperscale scenario, we will set it to _**false**_.
-  - `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller and Azure PostgreSQL Hyperscale scenario , we leave it set to _**true**_.
+  - `deploySQLMI` - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller and Azure PostgreSQL scenario, we will set it to _**false**_.
+  - `deployPostgreSQL` - Boolean that sets whether or not to deploy PostgreSQL, for this data controller and Azure PostgreSQL scenario, we leave it set to _**true**_.
   - `templateBaseUrl` - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well.
   - `deployBastion` - Choice (true | false) to deploy Azure Bastion.
 
@@ -132,7 +132,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   --parameters <The *azuredeploy.parameters.json* parameters file location>
   ```
 
-  > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the `azuredeploy.parameters.json` file**
+  > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the `azuredeploy.parameters.json` file**
 
   For example:
 
@@ -146,7 +146,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   --parameters templateBaseUrl="https://raw.githubusercontent.com/your--github--handle/azure_arc/microk8s-data/azure_arc_data_jumpstart/microk8s/azure/arm_template/"
   ```
 
-  > **Note: The deployment time for this scenario can take ~15-20min**
+  > **NOTE: The deployment time for this scenario can take ~15-20min**
 
   ![Deployment time](./02.png)
 
@@ -172,15 +172,15 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Wallpaper Change](./06.png)
 
-- Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL Hyperscale instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **17 various Azure resources deployed**. The important ones to notice are:
+- Since this scenario is deploying the Azure Arc Data Controller and PostgreSQL instance, you will also notice additional newly deployed Azure resources in the resources group (at this point you should have **17 various Azure resources deployed**. The important ones to notice are:
 
-  - **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled data services deployed in directly connected mode is using this resource to deploy the data services [cluster extension](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/conceptual-custom-locations).
+  - **Azure Arc-enabled Kubernetes cluster** - Azure Arc-enabled data services deployed in directly connected mode is using this resource to deploy the data services [cluster extension](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-extensions), as well as using Azure Arc [Custom locations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-custom-locations).
 
   - **Custom location** - provides a way for tenant administrators to use their Azure Arc-enabled Kubernetes clusters as a target location for deploying Azure services.
 
   - **Azure Arc Data Controller** - The data controller that is now deployed on the Kubernetes cluster.
 
-  - **Azure Arc-enabled PostgreSQL Hyperscale** - The PostgreSQL Hyperscale that is now deployed on the Kubernetes cluster.
+  - **Azure Arc-enabled PostgreSQL** - The PostgreSQL that is now deployed on the Kubernetes cluster.
 
   ![Addtional Azure resources in the resource group](./07.png)
 
@@ -188,9 +188,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
   ![Azure Data Studio shortcut](./08.png)
 
-- Additionally, the PostgreSQL Hyperscale connection will be configured within Data Studio, as well as the sample [_AdventureWorks_](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will be restored automatically for you.
+- Additionally, the PostgreSQL connection will be configured within Data Studio, as well as the sample [_AdventureWorks_](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will be restored automatically for you.
 
-  ![Configured PostgreSQL Hyperscale connection](./09.png)
+  ![Configured PostgreSQL connection](./09.png)
 
 ## Cluster extensions
 

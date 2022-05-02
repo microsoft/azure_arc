@@ -10,9 +10,9 @@ description: >
 
 This scenario allows us to see how Azure IoT Edge and Azure Arc services complement each other in an easy and simple way, providing mechanisms for AKS cluster operators to configure the fundamental components of an AKS cluster and apply policies by monitoring its supervision, through Azure Arc. Furthermore, from Azure IoT Edge, application operators can remotely deploy and manage workloads at scale with convenient ingest from the cloud and in a bi-directional way.
 
-  > **Note: Azure Kubernetes Service is now in preview on Azure IoT Edge. You can find more details about this service in the [IoT Edge's support for Kubernetes document](https://microsoft.github.io/iotedge-k8s-doc/)**
+  > **NOTE: Azure Kubernetes Service is now in preview on Azure IoT Edge. You can find more details about this service in the [IoT Edge's support for Kubernetes document](https://microsoft.github.io/iotedge-k8s-doc/)**
 
-The following Jumpstart scenario will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/en-us/azure/aks/intro-kubernetes) cluster and connect it as an Azure Arc-enabled Kubernetes resource.
+The following Jumpstart scenario will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster and connect it as an Azure Arc-enabled Kubernetes resource.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -63,7 +63,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-* [Enable subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
+* [Enable subscription with](https://docs.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes.
 
   ```shell
   az provider register --namespace Microsoft.Kubernetes
@@ -116,7 +116,7 @@ In case the AKS service is not available in your region, you can change the AKS 
     export TF_VAR_client_secret=<Your Azure service principal App Password>
     ```
 
-    > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
+    > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
 
     ```powershell
     Set-Item -Path env:TF_VAR_client_id
@@ -138,7 +138,7 @@ In case the AKS service is not available in your region, you can change the AKS 
 
 * In this scenario we will use a VM to "simulate" an IoT Edge device. To do this, we must register a new Edge device in our IoT Hub that we will later configure.
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the next commands:
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the next commands:
 
     ![Screenshot showing how to access Cloud Shell in Visual Studio Code](./05.png)
 
@@ -181,7 +181,7 @@ sudo iotedge config apply
 
 * Once the file is uploaded, execute the following command:
 
-> **Note: You can see an example of the [deployment.json](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_iot_edge/terraform/scripts/edge/deployment.json) file that we use.**
+> **NOTE: You can see an example of the [deployment.json](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks_iot_edge/terraform/scripts/edge/deployment.json) file that we use.**
 
 ```shell
 az iot edge set-modules --hub-name k8sedgejumpstart --device-id "EdgeDeviceSim" --content ./deployment.json

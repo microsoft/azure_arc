@@ -18,7 +18,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -84,7 +84,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
 
 Before using the below guide to deploy an Ubuntu Server VM and connect it to Azure Arc, a VMware vSphere Template is required. [The following README](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/vmware/vmware_terraform_ubuntu/vmware_ubuntu_template/) will instruct you how to easily create such a template using VMware vSphere 6.5 and above.
 
-> **Note: If you already have an Ubuntu Server VM template it is still recommended to use the guide as a reference.**
+> **NOTE: If you already have an Ubuntu Server VM template it is still recommended to use the guide as a reference.**
 
 ## Deployment
 

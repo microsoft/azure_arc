@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to connect an Linux serve
 
 ## Prerequisites
 
-* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -86,7 +86,7 @@ The following Jumpstart scenario will guide you on how to connect an Linux serve
 
 Run the script using the ```. ./az_connect_linux.sh``` command.
 
-> **Note: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+> **NOTE: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
 Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your resource group.
 

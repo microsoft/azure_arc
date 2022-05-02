@@ -41,9 +41,9 @@ weight: 3
 
 - [New Scenario: Deploy a vanilla Azure Arc Data Controller in a directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_dc_vanilla_arm_template/)
 - [New Scenario: Deploy Azure SQL Managed Instance in directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_mssql_mi_arm_template/)
-- [New Scenario: Deploy Azure PostgreSQL Hyperscale in directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_postgresql_hyperscale_arm_template/)
+- [New Scenario: Deploy Azure PostgreSQL in directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_postgresql_arm_template/)
 - [Updated Scenario: Deploy Azure SQL Managed Instance on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_arm_template_ado/)
-- [Updated Scenario: Deploy Azure PostgreSQL Hyperscale on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_hyperscale_arm_template_ado/)
+- [Updated Scenario: Deploy Azure PostgreSQL on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_arm_template_ado/)
 - [Bug fix: The post deployment scripts inside the VM fails with the following error : "The resource 'Arc-Data-AKS' under the resource group 'Arc-Data-Demo' NOT FOUND #1050](https://github.com/microsoft/azure_arc/issues/1050)
 
 ### Azure Arc-enabled app services scenarios
@@ -236,7 +236,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 ### Azure Arc-enabled data services scenarios
 
-- [Bug fix: PostgreSQL Hyperscale ARM Template failing #765](https://github.com/microsoft/azure_arc/issues/765)
+- [Bug fix: PostgreSQL ARM Template failing #765](https://github.com/microsoft/azure_arc/issues/765)
 
 - [Bug fix: az cli 2.25 bump](https://github.com/microsoft/azure_arc/issues/805)
 
@@ -274,7 +274,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Enhancement: Benchmarking tools for Azure Arc-enabled data services scenarios #739](https://github.com/microsoft/azure_arc/issues/739)
 
-- [Bug fix: PostgreSQL Hyperscale Deployment on EKS - data controller deployment failure #743](https://github.com/microsoft/azure_arc/issues/743)
+- [Bug fix: PostgreSQL Deployment on EKS - data controller deployment failure #743](https://github.com/microsoft/azure_arc/issues/743)
 
 ### Azure Arc-enabled app service
 
@@ -390,25 +390,25 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Updated Scenario: Deploying SQLMI Azure Arc-enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/mssql_mi/)
 
-- [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc-enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/postgresql_hyperscale/)
+- [Updated Scenario: Deploying PostgreSQL Azure Arc-enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure_postgresql_arm_template/)
 
 - [Updated Scenario: Deploying vanilla Azure Arc-enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/dc_vanilla/)
 
 - [Updated Scenario: Deploying SQLMI Azure Arc-enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/mssql_mi/)
 
-- [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc-enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/postgresql_hyperscale/)
+- [Updated Scenario: Deploying PostgreSQL Azure Arc-enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/postgresql/)
 
 - [Updated Scenario: Deploying vanilla Azure Arc-enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_dc_vanilla_arm_template/)
 
 - [Updated Scenario: Deploying SQLMI Azure Arc-enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)
 
-- [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc-enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_hyperscale_arm_template/)
+- [Updated Scenario: Deploying PostgreSQL Azure Arc-enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_arm_template/)
 
 - [Updated Scenario: Deploying vanilla Azure Arc-enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_dc_vanilla_terraform/)
 
 - [Updated Scenario: Deploying SQLMI Azure Arc-enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_mssql_mi_terraform/)
 
-- [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc-enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_hs_terraform/)
+- [Updated Scenario: Deploying PostgreSQL Azure Arc-enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_terraform/)
 
 - [Bug fix: Data Controller ARM Template - Failure when using a service principal scoped to a resource group #624](https://github.com/microsoft/azure_arc/issues/624)
 
@@ -467,31 +467,31 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [New Scenario: Deploying SQLMI Azure Arc-enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/mssql_mi/)
 
-- [New Scenario: Deploying PostgreSQL Hyperscale Azure Arc-enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/postgresql_hyperscale/)
+- [New Scenario: Deploying PostgreSQL Azure Arc-enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure_postgresql_arm_template/)
 
 - [New Scenario: Deploying vanilla Azure Arc-enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/dc_vanilla/)
 
 - [New Scenario: Deploying SQLMI Azure Arc-enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/mssql_mi/)
 
-- [New Scenario: Deploying PostgreSQL Hyperscale Azure Arc-enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/postgresql_hyperscale/)
+- [New Scenario: Deploying PostgreSQL Azure Arc-enabled data services in directly connected mode using MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/microk8s/azure/arm_template/postgresql/)
 
 - [Updated Scenario: Deploying vanilla Azure Arc-enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_dc_vanilla_arm_template/)
 
 - [Updated Scenario: Deploying SQLMI Azure Arc-enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)
 
-- [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc-enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_hyperscale_arm_template/)
+- [Updated Scenario: Deploying PostgreSQL Azure Arc-enabled data services in directly connected mode using AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_arm_template/)
 
 - [Updated Scenario: Deploying vanilla Azure Arc-enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_dc_vanilla_terraform/)
 
 - [Updated Scenario: Deploying SQLMI Azure Arc-enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_mssql_mi_terraform/)
 
-- [Updated Scenario: Deploying PostgreSQL Hyperscale Azure Arc-enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_hs_terraform/)
+- [Updated Scenario: Deploying PostgreSQL Azure Arc-enabled data services in directly connected mode using GKE](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_terraform/)
 
 - [Bug fix: SQL MI Server alias for connection contains wrong value #561](https://github.com/microsoft/azure_arc/issues/561)
 
 ### Jumpstart ArcBox
 
-- Azure Arc-enabled data services components of ArcBox have been updated to use [directly connected mode](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity#connectivity-modes).
+- Azure Arc-enabled data services components of ArcBox have been updated to use [directly connected mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity#connectivity-modes).
 - Required resource providers are now enabled automatically as part of the automation scripts.
 - Per updated Azure Arc-enabled data services requirements, ArcBox region support is restricted to East US, Northern Europe, and Western Europe.
 - Incorporated streamlined modular automation approach for Azure Arc-enabled data services used by the primary Jumpstart data services scenarios.
@@ -562,7 +562,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [New Scenario: Deploy Azure SQL Managed Instance on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_arm_template_ado/)
 
-- [New Scenario: Deploy Azure PostgreSQL Hyperscale on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_hyperscale_arm_template_ado/)
+- [New Scenario: Deploy Azure PostgreSQL on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_arm_template_ado/)
 
 - [New Scenario: Deploy a SQL Managed Instance on EKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_mssql_mi/)
 
@@ -620,7 +620,7 @@ In this milestone, we launched our new YouTube channel.
 
 - [New Demo: Azure Arc-enabled Kubernetes with Cluster API and the Azure provider](https://youtu.be/mhHELY6O3VI)
 
-- [New Demo: PostgreSQL Hyperscale on AKS with Azure Arc-enabled data services](https://youtu.be/jSogdbDRcpw)
+- [New Demo: PostgreSQL on AKS with Azure Arc-enabled data services](https://youtu.be/jSogdbDRcpw)
 
 - [New Demo: Inventory management with Azure Arc-enabled servers](https://youtu.be/fM0WW08LUoQ)
 
@@ -654,7 +654,7 @@ In this milestone, we launched our new YouTube channel.
 
 ### Azure Arc-enabled data services scenarios
 
-- [New Scenario: Deploy an Azure PostgreSQL Hyperscale Deployment on GKE using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_hs_terraform/)
+- [New Scenario: Deploy an Azure PostgreSQL Deployment on GKE using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_terraform/)
 
 ## January 2021
 
@@ -676,7 +676,7 @@ In this milestone, we launched our new YouTube channel.
 
 ### Azure Arc-enabled data services scenarios
 
-- [All the scenarios](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/) in this section were updated to support ["Directly connected"](https://docs.microsoft.com/en-us/azure/azure-arc/data/connectivity) mode
+- [All the scenarios](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/) in this section were updated to support ["Directly connected"](https://docs.microsoft.com/azure/azure-arc/data/connectivity) mode
 
 - [New Scenario: Deploy an Azure SQL Managed Instance on GKE using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_mssql_mi_terraform/)
 

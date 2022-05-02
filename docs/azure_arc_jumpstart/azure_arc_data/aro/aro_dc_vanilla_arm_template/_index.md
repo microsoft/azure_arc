@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to deploy a "Ready to Go"
 
 By the end of this guide, you will have an ARO cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
-> **NOTE: Currently, Azure Arc-enabled PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Prerequisites
 
@@ -92,6 +92,7 @@ By the end of this guide, you will have an ARO cluster deployed with an Azure Ar
   ```
 
   ![Screenshot of Azure resource provider for Aro](./02.png)
+
 ## Automation Flow
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
@@ -123,7 +124,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   - _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
   - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller vanilla scenario we leave it set to _**false**_.
   - _`SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this data controller vanilla scenario we leave it set to _**false**_.
-  - _`deployPostgreSQL`_ - Boolean that sets whether or not to deploy PostgreSQL Hyperscale, for this data controller vanilla scenario we leave it set to _**false**_.
+  - _`deployPostgreSQL`_ - Boolean that sets whether or not to deploy PostgreSQL, for this data controller vanilla scenario we leave it set to _**false**_.
   - _`deployBastion`_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
   - _`bastionHostName`_ - Azure Bastion host name.
   - _`AroProviderId`_ - ARO resource provider Id.
