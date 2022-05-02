@@ -14,7 +14,7 @@ rules:
       resources: ["sqlmanagedinstances"]
       verbs: ["get", "list", "watch"]
 ---
-# This role provides read access to Azure SQL Managed Instance & PostgreSQL Hyperscale resources
+# This role provides read access to Azure SQL Managed Instance & PostgreSQL resources
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -56,11 +56,11 @@ rules:
       resources: ["sqlmanagedinstances"]
       verbs: ["get", "list", "watch"]
 ---
-# This role provides read access to Azure PostgreSQL Hyperscale resources
+# This role provides read access to Azure PostgreSQL resources
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-    name: azure-arc-data:postgresql-hyperscale:reader
+    name: azure-arc-data:postgresql:reader
     namespace: azure-arc-data
     labels:
       arcdata.microsoft.com/role: "true"
