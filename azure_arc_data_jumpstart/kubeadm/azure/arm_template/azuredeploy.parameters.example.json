@@ -52,6 +52,12 @@
         },
         "ARC_DC_REGION": {
             "value": "eastus"
-        }               
+        },
+        "deployBastion": {
+            "value": false
+          },
+          "bastionHostName": {
+            "value": "Azure-Data-bastion"
+          }
     }
 }
