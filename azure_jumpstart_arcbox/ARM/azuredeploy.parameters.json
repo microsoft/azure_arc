@@ -20,14 +20,23 @@
         "windowsAdminPassword": {
             "value": "ArcPassword123!!"
         },
-        "myIpAddress": {
-            "value": "<your IP address>"
-        },
         "logAnalyticsWorkspaceName": {
             "value": "<your unique Log Analytics workspace name>"
         },
         "flavor": {
             "value": "Full"
+        },
+        "deployBastion": {
+            "value": false
+        },
+        "githubUser": {
+            "value": "microsoft"
+        },
+        "githubAccount": {
+            "value": "microsoft"
+        },
+        "githubBranch": {
+            "value": "arcbox_devops"
         }
     }
 }

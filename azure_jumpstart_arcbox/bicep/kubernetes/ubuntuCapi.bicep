@@ -1,6 +1,3 @@
-@description('Your public IP address, used to RDP to the client VM')
-param myIpAddress string
-
 @description('The name of you Virtual Machine')
 param vmName string = 'ArcBox-CAPI-MGMT'
 
@@ -29,8 +26,6 @@ param vmSize string = 'Standard_D4s_v4'
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
-@description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'ArcBox-CAPI-MGMT-NSG'
 param resourceTags object = {
   Project: 'jumpstart_arcbox'
 }
@@ -54,9 +49,15 @@ param logAnalyticsWorkspace string
 @description('The base URL used for accessing artifacts and automation artifacts')
 param templateBaseUrl string
 
+@description('Choice to deploy Bastion to connect to the client VM')
+param deployBastion bool = false
+
 var publicIpAddressName = '${vmName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
+var PublicIPNoBastion = {
+  id: publicIpAddress.id
+}
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   name: networkInterfaceName
@@ -70,41 +71,14 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIpAddress.id
-          }
-        }
-      }
-    ]
-    networkSecurityGroup: {
-      id: networkSecurityGroup.id
-    }
-  }
-}
-
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
-  name: networkSecurityGroupName
-  location: azureLocation
-  properties: {
-    securityRules: [
-      {
-        name: 'allow_SSH'
-        properties: {
-          priority: 1001
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: myIpAddress
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '22'
+          publicIPAddress: deployBastion== false  ? PublicIPNoBastion : json('null')
         }
       }
     ]
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if(deployBastion == false){
   name: publicIpAddressName
   location: azureLocation
   properties: {
