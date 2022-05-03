@@ -1,11 +1,11 @@
 {
   "Full": {
-    "afterDeployResources": 47,
-    "afterScriptExecution": 92,
+    "afterDeployResources": 45,
+    "afterScriptExecution": 90,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 6,
     "workbooksExpected": 1,
-    "deployBastionDifference": -1,
+    "deployBastionDifference": 0,
     "desktopElementsExpected": 9,
     "countConnectedK8sClusters": 2,
     "countKeyVault": 1
@@ -22,12 +22,12 @@
     "countKeyVault": 0
   },
   "DevOps": {
-    "afterDeployResources": 47,
-    "afterScriptExecution": 50,
+    "afterDeployResources": 45,
+    "afterScriptExecution": 48,
     "azureArcMachinesExpected": 0,
     "policiesDeploymentExpected": 2,
     "workbooksExpected": 1,
-    "deployBastionDifference": -1,
+    "deployBastionDifference": 0,
     "desktopElementsExpected": 3,
     "countConnectedK8sClusters": 2,
     "countKeyVault": 1
