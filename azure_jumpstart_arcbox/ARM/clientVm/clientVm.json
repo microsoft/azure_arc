@@ -134,7 +134,7 @@
             "type": "int",
             "defaultValue": 3,
             "metadata": {
-                "description": "Number of PostgreSQL Hyperscale worker nodes"
+                "description": "Number of PostgreSQL worker nodes"
             }
         },
         "postgresDatasize": {

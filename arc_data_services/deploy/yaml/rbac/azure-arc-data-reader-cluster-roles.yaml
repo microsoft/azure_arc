@@ -51,11 +51,11 @@ rules:
       resources: ["sqlmanagedinstances"]
       verbs: ["get", "list", "watch"]
 ---
-# This cluster role provides read access to Azure PostgreSQL HyperScale resource
+# This cluster role provides read access to Azure PostgreSQL resource
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-    name: azure-arc-data:postgresql-hyperscale:reader
+    name: azure-arc-data:postgresql:reader
     labels:
       arcdata.microsoft.com/cluster-role: "true"
       arcdata.microsoft.com/aggregate-to-reader: "true"

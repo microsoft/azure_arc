@@ -6,9 +6,9 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\DeployPostgreSQL.log
 # Deployment environment variables
 $controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
 
-# Deploying Azure Arc PostgreSQL Hyperscale
+# Deploying Azure Arc PostgreSQL
 Write-Host "`n"
-Write-Host "Deploying Azure Arc PostgreSQL Hyperscale"
+Write-Host "Deploying Azure Arc PostgreSQL"
 Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)

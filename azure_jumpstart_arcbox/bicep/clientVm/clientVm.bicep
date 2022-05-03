@@ -54,7 +54,7 @@ param mssqlmiName string = 'arcsqlmidemo'
 @description('Name of PostgreSQL server group')
 param postgresName string = 'arcpg'
 
-@description('Number of PostgreSQL Hyperscale worker nodes')
+@description('Number of PostgreSQL worker nodes')
 param postgresWorkerNodeCount int = 3
 
 @description('Size of data volumes in MB')

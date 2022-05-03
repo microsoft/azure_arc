@@ -30,7 +30,6 @@ $StorageClassName = "managed-premium"
 $dataStorageSize = "5"
 $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
-$backupsStorageSize = "5"
 
 # High Availability
 $replicas = 3 # Deploy SQL MI "Business Critical" tier
