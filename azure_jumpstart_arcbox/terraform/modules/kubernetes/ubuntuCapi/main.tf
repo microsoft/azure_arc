@@ -47,11 +47,6 @@ variable "subnet_name" {
   description = "ArcBox subnet name"
 }
 
-variable "user_ip_address" {
-  type        = string
-  description = "Users public IP address, used to RDP to the client VM"
-}
-
 variable "template_base_url" {
   type        = string
   description = "Base URL for the GitHub repo where the ArcBox artifacts are located"
@@ -82,10 +77,15 @@ variable "workspace_name" {
   description = "Log Analytics workspace name"
 }
 
+variable "deploy_bastion" {
+  type       = bool
+  description = "Choice to deploy Bastion to connect to the client VM"
+  default = false
+}
 locals {
     public_ip_name         = "${var.vm_name}-PIP"
-    nsg_name               = "${var.vm_name}-NSG"
     network_interface_name = "${var.vm_name}-NIC"
+    bastionSubnetIpPrefix  = "172.16.3.64/26"
 }
 
 data "azurerm_subscription" "primary" {
@@ -106,24 +106,7 @@ resource "azurerm_public_ip" "pip" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   allocation_method   = "Static"
-}
-
-resource "azurerm_network_security_group" "nsg" {
-  name                = local.nsg_name
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-
-  security_rule {
-    name                       = "allow_SSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = var.user_ip_address
-    destination_address_prefix = "*"
-  }
+  count               = var.deploy_bastion == false ? 1: 0
 }
 
 resource "azurerm_network_interface" "nic" {
@@ -135,15 +118,9 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pip.id
+    public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }
-
-resource "azurerm_network_interface_security_group_association" "nic_nsg" {
-  network_interface_id      = azurerm_network_interface.nic.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
-
 resource "azurerm_virtual_machine" "client" {
   name                  = var.vm_name
   location              = data.azurerm_resource_group.rg.location
