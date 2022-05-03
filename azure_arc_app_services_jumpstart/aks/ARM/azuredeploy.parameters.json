@@ -45,7 +45,7 @@
             "value": false
         },
         "bastionHostName": {
-            "value": "Arc-Data-Demo-Bastion"
-        }
+          "value": "Arc-App-Demo-Bastion"
+      }
     }
 }
