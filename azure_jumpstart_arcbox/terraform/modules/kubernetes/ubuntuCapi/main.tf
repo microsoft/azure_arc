@@ -84,7 +84,6 @@ variable "deploy_bastion" {
 }
 locals {
     public_ip_name         = "${var.vm_name}-PIP"
-    nsg_name               = "${var.vm_name}-NSG"
     network_interface_name = "${var.vm_name}-NIC"
     bastionSubnetIpPrefix  = "172.16.3.64/26"
 }
@@ -110,12 +109,6 @@ resource "azurerm_public_ip" "pip" {
   count               = var.deploy_bastion == false ? 1: 0
 }
 
-resource "azurerm_network_security_group" "nsg" {
-  name                = local.nsg_name
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
 resource "azurerm_network_interface" "nic" {
   name                = local.network_interface_name
   location            = data.azurerm_resource_group.rg.location
@@ -128,12 +121,6 @@ resource "azurerm_network_interface" "nic" {
     public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }
-
-resource "azurerm_network_interface_security_group_association" "nic_nsg" {
-  network_interface_id      = azurerm_network_interface.nic.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
-
 resource "azurerm_virtual_machine" "client" {
   name                  = var.vm_name
   location              = data.azurerm_resource_group.rg.location

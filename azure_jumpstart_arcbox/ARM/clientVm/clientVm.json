@@ -67,13 +67,6 @@
                 "description": "Name of the subnet in the virtual network"
             }
         },
-        "networkSecurityGroupName": {
-            "type": "string",
-            "defaultValue": "ArcBox-NSG",
-            "metadata": {
-                "description": "Name of the Network Security Group"
-            }
-        },
         "resourceTags": {
             "type": "object",
             "defaultValue": {
@@ -222,7 +215,6 @@
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
             ],
             "properties": {
@@ -237,17 +229,8 @@
                             "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
-                ],
-                "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
-                }
+                ]
             }
-        },
-        {
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2021-03-01",
-            "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('location')]"
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
