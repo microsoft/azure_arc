@@ -221,6 +221,7 @@ module "capi_vm" {
   admin_ssh_key        = var.client_admin_ssh
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
+  deployment_flavor    = var.deployment_flavor
 
   depends_on = [
     azurerm_resource_group.rg,
