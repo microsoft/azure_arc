@@ -12,11 +12,11 @@
   },
   "ITPro": {
     "afterDeployResources": 13,
-    "afterScriptExecution": 20,
+    "afterScriptExecution": 21,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 5,
     "workbooksExpected": 1,
-    "deployBastionDifference": 1,
+    "deployBastionDifference": 2,
     "desktopElementsExpected": 2,
     "countConnectedK8sClusters": 0,
     "countKeyVault": 0
