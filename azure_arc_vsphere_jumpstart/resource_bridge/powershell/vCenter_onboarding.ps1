@@ -12,6 +12,7 @@ $vcenterpassword = '<vCenter Password>'
 $appID = '<Service principal AppID>'
 $password = '<Service principal password>'
 $tenantId = '<Tenant ID>'
+$vSphereRP = '<ConnectedVMwarevSphere resource provider Id>'
 
 ## vSphere parameters
 $vmtemplate = '<Arc appliance template name>'
@@ -110,11 +111,11 @@ log "Checking previous installations of Azure CLI"
 $AzureCLI = Get-WmiObject -Class Win32_Product  | Where-Object{$_.Name -eq "Microsoft Azure CLI"}
 
 If([string]::IsNullOrWhiteSpace($AzureCLI)) {            
-    log "No previous Azure CLI installation was found"           
-} else {            
+    log "No previous Azure CLI installation was found"
+} else {
     log "Removing Azure CLI current install"
-    $AzureCLI.uninstall()           
-}  
+    $AzureCLI.uninstall()
+}
 
 
 log "Installing 64 bit Azure CLI"
@@ -129,12 +130,13 @@ log "This might take a while..."
 try {
 
     az provider register -n Microsoft.ResourceConnector --wait
+    az provider register -n Microsoft.ConnectedVMwarevSphere --wait
 
     log "Installing az cli extensions for Arc"
-    az extension add --upgrade --name arcappliance
-    az extension add --upgrade --name k8s-extension
-    az extension add --upgrade --name customlocation
-    az extension add --upgrade --name connectedvmware
+    az extension add --name arcappliance
+    az extension add --name k8s-extension
+    az extension add --name customlocation
+    az extension add --name connectedvmware
 
     log "Logging into azure"
 
@@ -184,7 +186,7 @@ try {
     log "Step 3/5: Installing cluster extension"
 
 
-    $VMW_RP_OBJECT_ID = (az ad sp show --id 'ac9dc5fe-b644-4832-9d03-d9f1ab70c5f7' --query objectId -o tsv 2>> $logFile))
+    $VMW_RP_OBJECT_ID = $vSphereRP
     if (!$VMW_RP_OBJECT_ID) {
         $msg = "The service principal ID was not found for the resource provider Microsoft.ConnectedVMwarevSphere for the subscription '$SubscriptionId'.`n" +
         "Please register the RP with the subscription using the following command and try again after some time.`n`n" +
