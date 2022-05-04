@@ -55,8 +55,8 @@ jobs:
           ref: ${{ github.event.inputs.githubBranch }}
       - name: Validate Bash Script
         run: |
-          chmod +x ./automated_testing/ghaction_scripts/BashStaticCheck.sh
-          ./automated_testing/ghaction_scripts/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts | tee bash-lint-result.txt
+          chmod +x ./tests/BashStaticCheck.sh
+          ./tests/BashStaticCheck.sh $ExcludeRules ./azure_jumpstart_arcbox/artifacts | tee bash-lint-result.txt
         continue-on-error: true
       - name: Upload Bash Lint Results File
         uses: actions/upload-artifact@v3
@@ -76,7 +76,7 @@ jobs:
       - name: Validate Power Shell
         run: |
           Start-Transcript -path ps-lint-result.txt -append
-          .\automated_testing\ghaction_scripts\PowerShellStaticCheck.ps1 $Env:ExcludeRules .\azure_jumpstart_arcbox\artifacts
+          .\tests\PowerShellStaticCheck.ps1 $Env:ExcludeRules .\azure_jumpstart_arcbox\artifacts
           Stop-Transcript
         continue-on-error: true
       - name: Upload PowerShell Lint Results File
@@ -100,7 +100,7 @@ jobs:
       - name: Check Bicep
         run: |
           Start-Transcript -path bicep-lint-results.txt -append
-          .\automated_testing\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
+          .\tests\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\bicep\main.json" $Env:ExcludeRules
           Stop-Transcript
         continue-on-error: true
       - name: Upload Bicep Lint Results File
@@ -112,7 +112,7 @@ jobs:
       - name: Check ARM
         run: |
           Start-Transcript -path arm-lint-results.txt -append
-          .\automated_testing\ghaction_scripts\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules
+          .\tests\ArmTemplateCheck.ps1 ".\azure_jumpstart_arcbox\ARM\azuredeploy.json" $Env:ExcludeRules
           Stop-Transcript
         continue-on-error: true
       - name: Upload Bicep Lint Results File
@@ -166,6 +166,30 @@ jobs:
           echo "logAnalyticsWorkspaceName selected: ${{ github.event.inputs.logAnalyticsWorkspaceName }}"
           echo "windowsAdminUsername selected: ${{ github.event.inputs.windowsAdminUsername }}"
           echo "deployBastion selected: ${{ github.event.inputs.deployBastion }}"
+      - name: Expected Time Execution
+        run: |
+          if [ '${{ github.event.inputs.flavor }}' == 'DevOps' ]; then
+           if [ '${{ github.event.inputs.deployBastion }}' == 'true' ]; then
+              echo "Expected Time Execution 60 min"
+           else
+              echo "Expected Time Execution 50 min"
+           fi
+          fi
+          if [ '${{ github.event.inputs.flavor }}' == 'ITPro' ]; then
+           if [ '${{ github.event.inputs.deployBastion }}' == 'true' ]; then
+              echo "Expected Time Execution 70 min"
+           else
+              echo "Expected Time Execution 60 min"
+           fi
+          fi
+          if [ '${{ github.event.inputs.flavor }}' == 'Full' ]; then
+           if [ '${{ github.event.inputs.deployBastion }}' == 'true' ]; then
+              echo "Expected Time Execution 90 min"
+           else
+              echo "Expected Time Execution 80 min"
+           fi
+          fi          
+          echo "if Widows Run Command not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs. "          
       - name: Install package for ssh with password inline
         run: |
           sudo apt-get -y install putty-tools
@@ -200,8 +224,8 @@ jobs:
       - name: Deploy ArcBox - Terraform
         if: github.event.inputs.mechanism == 'Terraform'
         run: |
-          chmod +x ./automated_testing/ghaction_scripts/TerraformDeploy.sh
-          ./automated_testing/ghaction_scripts/TerraformDeploy.sh ./azure_jumpstart_arcbox/terraform \
+          chmod +x ./tests/TerraformDeploy.sh
+          ./tests/TerraformDeploy.sh ./azure_jumpstart_arcbox/terraform \
                  "${{ github.event.inputs.resourceGroupName }}"  "${{ github.event.inputs.location }}" \
                  "${{secrets.SPN_CLIENT_ID}}" "${{secrets.SPN_CLIENT_SECRET}}" "${{secrets.SPN_TENANT_ID}}" \
                  "${{secrets.SSH_RSA_PUBLIC_KEY}}" "${{ github.event.inputs.windowsAdminUsername }}" \
@@ -220,8 +244,8 @@ jobs:
         uses: Azure/cli@v1.0.6
         with:
           inlineScript: |
-            chmod +x ./automated_testing/ghaction_scripts/CountResources.sh
-            ./automated_testing/ghaction_scripts/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
+            chmod +x ./tests/CountResources.sh
+            ./tests/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./tests/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Adding Public Ip to Connect Open SSH when Azure Bastion is selected
         uses: Azure/cli@v1.0.6
         if: ${{ github.event.inputs.deployBastion == 'true' }}
@@ -315,14 +339,14 @@ jobs:
           path: MonitorWorkbookLogonScript.log
       - name: Desktop Validation
         run: |
-          chmod +x ./automated_testing/ghaction_scripts/DesktopValidation.sh
-          ./automated_testing/ghaction_scripts/DesktopValidation.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{github.event.inputs.deployBastion}} ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
+          chmod +x ./tests/DesktopValidation.sh
+          ./tests/DesktopValidation.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./tests/DeployTestParameters.json ${{github.event.inputs.deployBastion}} ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
       - name: Final Deploy Validation
         uses: Azure/cli@v1.0.6
         with:
           inlineScript: |
-            chmod +x ./automated_testing/ghaction_scripts/FinalValidation.sh
-            ./automated_testing/ghaction_scripts/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./automated_testing/ghaction_scripts/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
+            chmod +x ./tests/FinalValidation.sh
+            ./tests/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./tests/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Delete Resources
         uses: Azure/cli@v1.0.6
         with:
