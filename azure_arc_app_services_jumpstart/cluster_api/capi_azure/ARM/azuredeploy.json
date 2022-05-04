@@ -109,7 +109,7 @@
     },
     "bastionHostName": {
       "type": "string",
-      "defaultValue": "Arc-Data-Demo-Bastion",
+      "defaultValue": "Arc-AppSvc-Demo-Bastion",
       "metadata": {
         "description": "the Azure Bastion host name"
       }
