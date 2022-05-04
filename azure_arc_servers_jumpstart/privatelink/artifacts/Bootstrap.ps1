@@ -57,7 +57,7 @@ workflow ClientTools_01
 ClientTools_01 | Format-Table
 
 #Download and run Arc onboarding script
-Invoke-WebRequest ("https://raw.githubusercontent.com/microsoft/azure_arc/privatelink/azure_arc_servers_jumpstart/main/artifacts/installArcAgent.ps1") -OutFile C:\Temp\installArcAgent.ps1
+Invoke-WebRequest ("https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/artifacts/installArcAgent.ps1") -OutFile C:\Temp\installArcAgent.ps1
 
 # Creating LogonScript Windows Scheduled Task
 $Trigger = New-ScheduledTaskTrigger -AtLogOn

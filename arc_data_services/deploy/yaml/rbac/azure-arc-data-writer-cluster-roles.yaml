@@ -57,12 +57,12 @@ rules:
       resources: ["secrets"]
       verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
-# This cluster role provides write access to Azure PostgreSQL HyperScale resource
-# Write access implies create, edit & delete of Azure PostgreSQL HyperScale instances
+# This cluster role provides write access to Azure PostgreSQL resource
+# Write access implies create, edit & delete of Azure PostgreSQL instances
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-    name: azure-arc-data:postgresql-hyperscale:writer
+    name: azure-arc-data:postgresql:writer
     labels:
       arcdata.microsoft.com/cluster-role: "true"
       arcdata.microsoft.com/aggregate-to-database-writer: "true"
