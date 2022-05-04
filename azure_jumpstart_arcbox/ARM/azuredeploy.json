@@ -135,6 +135,9 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
           }
         }
       }
