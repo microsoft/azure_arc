@@ -86,8 +86,7 @@ export AZURE_TENANT_ID=$SPN_TENANT_ID
 export AZURE_CLIENT_ID=$SPN_CLIENT_ID
 export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v4"
-if [[ $flavor -eq "DevOps" ]]
-then
+if [ $flavor = "DevOps" ]; then
   export AZURE_NODE_MACHINE_TYPE="Standard_D2s_v4"
 else
   export AZURE_NODE_MACHINE_TYPE="Standard_D8s_v4"
