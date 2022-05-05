@@ -15,18 +15,18 @@ $spnTenantId = '<Service principal Tenant ID>'
 $vSphereRP = '<Connected VMware vSphere resource provider Id>'
 
 ## vSphere parameters
-$vmtemplate = '<Arc appliance template name>'
+$vmTemplate = '<Arc appliance template name>'
 $datacenter = '<vSphere datacenter name>'
 $datastore = '<vSphere datastore name>'
 $folder = '<vSphere template folder>'
-$dnsserver = '<DNS server to be used for the appliance>'
+$dnsServer = '<DNS server to be used for the appliance>'
 $gateway = '<Gateway address to be used for the appliance>'
-$ipaddressprefix = '<Network address in CIDR notation>'
+$ipAddressPrefix = '<Network address in CIDR notation>'
 ## Minimum size of two available IP addresses are required. One IP address is for the VM, and the other is reserved for upgrade scenarios
-$k8snodeippoolstart = '<IP range start>'
-$k8snodeippoolend = '<IP range end>'
+$k8sNodeIpPoolStart = '<IP range start>'
+$k8sNodeIpPoolEnd = '<IP range end>'
 $segment = '<Name of the virtual network or segment to which the appliance VM must be connected>'
-$resourcepool = '<Name of the resource pool>'
+$resourcePool = '<Name of the resource pool>'
 $controlPlaneEndpoint = '<IP address of the Kubernetes cluster control plane>'
 
 # <--- Change the following environment variables according to your environment --->
@@ -38,17 +38,17 @@ Copy-Item .\config\arcbridge-resource-stage.yaml -Force -Destination .
 
 # Generating Infra YAML file
 $InfraParams = ".\arcbridge-infra-stage.yaml"
-(Get-Content -Path $InfraParams) -replace 'vmtemplate-stage',$vmtemplate | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'vmTemplate-stage',$vmTemplate | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'datacenter-stage',$datacenter | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'dataStore-stage',$dataStore | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'datastore',$datastore | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'folder-stage',$folder | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'dnsServer-stage',$dnsserver | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'dnsServer-stage',$dnsServer | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'gateway-stage',$gateway | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'ipAddressPrefix-stage',$ipaddressprefix | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'nodeIpPoolEnd-stage',$k8snodeippoolend | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'nodeIpPoolStart-stage',$k8snodeippoolstart | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'ipAddressPrefix-stage',$ipAddressPrefix | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'nodeIpPoolEnd-stage',$k8sNodeIpPoolEnd | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'nodeIpPoolStart-stage',$k8sNodeIpPoolStart | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'VmNetwork-stage',$segment | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'resourcePool-stage',$resourcepool | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'resourcePool-stage',$resourcePool | Set-Content -Path $InfraParams
 
 # Generating appliance YAML file
 $InfraParams = ".\arcbridge-appliance-stage.yaml"
