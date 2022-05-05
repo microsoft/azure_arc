@@ -99,7 +99,21 @@
         "description": "Target GitHub branch"
       },
       "defaultValue": "main"
-    }    
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Bastion to connect to the client VM"
+      },
+      "defaultValue": false
+    },
+    "bastionHostName": {
+      "type": "string",
+      "defaultValue": "Arc-AppSvc-Demo-Bastion",
+      "metadata": {
+        "description": "the Azure Bastion host name"
+      }
+    }
   },
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/')]",
@@ -112,7 +126,10 @@
     "virtualNetworkName": "Arc-App-CAPI-VNet",
     "subnetName": "Arc-App-CAPI-Subnet",
     "addressPrefix": "172.16.0.0/16",
-    "subnetAddressPrefix": "172.16.1.0/24"
+    "subnetAddressPrefix": "172.16.1.0/24",
+    "bastionSubnetPrefix": "172.16.2.64/26",
+    "bastionSubnetName": "AzureBastionSubnet",
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
   },
   "resources": [
     {
@@ -138,6 +155,12 @@
           },
           "subnetAddressPrefix": {
             "value": "[variables('subnetAddressPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
         }
       }
@@ -147,7 +170,7 @@
       "comments": "Deploy the CAPI environment",
       "apiVersion": "2021-04-01",
       "name": "ubuntuCAPIDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -174,7 +197,7 @@
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
           "logAnalyticsWorkspaceName": {
-              "value": "[parameters('logAnalyticsWorkspaceName')]"
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
@@ -184,7 +207,23 @@
           },
           "subnetName": {
             "value": "[variables('subnetName')]"
+          },
+          "subnetAddressPrefix": {
+            "value": "[variables('subnetAddressPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
+
         }
       }
     },
@@ -193,7 +232,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["stagingStorageAccountDeployment", "VNETDeployment"],
+      "dependsOn": [ "stagingStorageAccountDeployment", "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -223,7 +262,7 @@
             "value": "[reference('stagingStorageAccountDeployment').outputs.storageAccountName.value]"
           },
           "workspaceName": {
-              "value": "[parameters('logAnalyticsWorkspaceName')]"
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
           },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
@@ -248,7 +287,19 @@
           },
           "adminEmail": {
             "value": "[parameters('adminEmail')]"
-          }          
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "bastionHostName": {
+            "value": "[parameters('bastionHostName')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          }
         }
       }
     },
