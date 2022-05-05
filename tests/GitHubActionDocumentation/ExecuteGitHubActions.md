@@ -157,8 +157,8 @@ _Note:_ `success() || failure()` means to run this step even if fails some previ
 | DevOps | yes     | 60 min    |
 | ITPro  | no      | 60 min    |
 | ITPro  | yes     | 70 min    |
-| Full   | no      | 80 min    |
-| Full   | yes     | 90 min    |
+| Full   | no      | 110 min   |
+| Full   | yes     | 120 min   |
 
 if [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs.
 
@@ -183,7 +183,7 @@ Many validations depends on the scenario, for example the number of resources. W
        - Azure Defender, policyinsights, and Azure Monitor extensions for each one
        - For 'ArcBox-CAPI-Data' also check key Vault, Open Service Mesh and Flux extension
 
-## Declaimer
+## Disclaimer
 
 We need to execute 4 script inside the VM on a full deploy to simulate what it happens at LogOn:
 
