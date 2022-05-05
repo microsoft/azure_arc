@@ -82,6 +82,12 @@ variable "deploy_bastion" {
   description = "Choice to deploy Bastion to connect to the client VM"
   default = false
 }
+
+variable "deployment_flavor" {
+  type        = string
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', and 'DevOps'."
+}
+
 locals {
     public_ip_name         = "${var.vm_name}-PIP"
     network_interface_name = "${var.vm_name}-NIC"
@@ -168,7 +174,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${var.template_base_url}artifacts/installCAPI.sh"
       ],
-      "commandToExecute": "bash installCAPI.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name} ${var.capi_arc_data_cluster_name} ${var.template_base_url}"
+      "commandToExecute": "bash installCAPI.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name} ${var.capi_arc_data_cluster_name} ${var.template_base_url} ${var.deployment_flavor}"
     }
 PROTECTED_SETTINGS
 }

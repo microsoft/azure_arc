@@ -20,12 +20,6 @@ variable "k3s_arc_cluster_name" {
   default     = "ArcBox-K3s"
 }
 
-variable "vm_size" {
-  type        = string
-  description = "The size of the client virtual machine."
-  default     = "Standard_D16s_v4"
-}
-
 variable "os_sku" {
   type        = string
   description = "The Windows version for the client VM."
@@ -237,7 +231,7 @@ resource "azurerm_virtual_machine" "client" {
   location              = data.azurerm_resource_group.rg.location
   resource_group_name   = data.azurerm_resource_group.rg.name
   network_interface_ids = [ azurerm_network_interface.nic.id ]
-  vm_size               = var.vm_size
+  vm_size               = var.deployment_flavor == "DevOps" ? "Standard_D4s_v4" : "Standard_D16s_v4"
 
   storage_image_reference {
     publisher = "MicrosoftWindowsServer"
