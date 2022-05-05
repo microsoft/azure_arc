@@ -21,7 +21,7 @@
             "value": "<Your Azure service principal password>"
         },
         "kubernetesVersion": {
-            "value": "<Kubernetes Version, e.g. 1.18.2>"
+            "value": "<Kubernetes Version, e.g. 1.23.5>"
         }
     }
 }
