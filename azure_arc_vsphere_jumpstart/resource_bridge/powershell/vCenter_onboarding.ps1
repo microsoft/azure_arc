@@ -176,8 +176,8 @@ try {
 
     # Waiting for the resource bridge to be in a running state
     Do {
-        Write-Host "Waiting for the resource bridge to be in a running state, hold tight..."
-        Start-Sleep -Seconds 20
+        Write-Host "Waiting for the resource bridge to be in a running state, hold tight... (30 seconds loop)""
+        Start-Sleep -Seconds 30
         $applianceStatus = (az resource show --debug --ids "$applianceId" --query 'properties.status' -o tsv 2>> $logFile)
         $status = $(if($applianceStatus -eq 'Running'){"Ready!"}Else{"Nope"})
         } while ($status -eq "Nope")
