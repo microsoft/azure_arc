@@ -3,7 +3,7 @@
 $location = '<Azure region>'
 $SubscriptionId = '<Subscription ID>'
 $ResourceGroupName = '<Azure Resource Group Name>'
-$applianceName = '<bridge appliance name>'
+$applianceName = '<resource bridge appliance name>'
 $customLocationName = '<Custom Location name>'
 $vCenterName = '<vCenter name>'
 $vcenterfqdn = '<vCenter FQDN>'
