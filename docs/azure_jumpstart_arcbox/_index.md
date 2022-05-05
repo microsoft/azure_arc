@@ -21,7 +21,7 @@ ArcBox is a solution that provides an easy to deploy sandbox for all things Azur
 ArcBox comes in multiple "flavors", or configurations, which can be selected to best suit your needs. Currently, the available flavors are:
 
 - [ArcBox "Full"](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full)
-    As the name implies, this flavor includes all ArcBox features including Azure Arc-enabled servers, Azure Arc-enabled Kubernetes basic functionality, and Azure Arc-enabled data services. Use this flavor if you want to experience everything ArcBox has to offer.
+    The Full flavor includes Azure Arc-enabled servers, Azure Arc-enabled Kubernetes basic functionality, and Azure Arc-enabled data services. Use this flavor if you want to experience common Azure Arc use cases in a single lab environment.
 
     ![ArcBox architecture diagram](./arch_full.png)
 

@@ -132,7 +132,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - UK South
   - Southeast Asia
 
-- **ArcBox DevOps requires 52 DSv4-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
+- **ArcBox DevOps requires 22 DSv4-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location <your location> --output table
@@ -143,6 +143,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - Some Azure subscriptions may also have SKU restrictions that prevent deployment of specific Azure VM sizes. You can check for SKU restrictions used by ArcBox by using the below command:
 
   ```shell
+  az vm list-skus --location <your location> --size Standard_D2s --all --output table
   az vm list-skus --location <your location> --size Standard_D4s --all --output table
   ```
 
