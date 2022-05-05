@@ -1,18 +1,18 @@
 # <--- Change the following environment variables according to your environment --->
 
 $location = '<Azure region>'
-$SubscriptionId = '<Subscription ID>'
-$ResourceGroupName = '<Azure Resource Group Name>'
+$subscriptionId = '<Subscription Id>'
+$resourceGroupName = '<Azure Resource Group Name>'
 $applianceName = '<resource bridge appliance name>'
 $customLocationName = '<Custom Location name>'
-$vCenterName = '<vCenter name>'
-$vcenterfqdn = '<vCenter FQDN>'
-$vcenterusername = '<vCenter Username>'
-$vcenterpassword = '<vCenter Password>'
-$appID = '<Service principal AppID>'
-$password = '<Service principal password>'
-$tenantId = '<Tenant ID>'
-$vSphereRP = '<ConnectedVMwarevSphere resource provider Id>'
+$vcenterName = '<vCenter name>'
+$vcenterFqdn = '<vCenter FQDN>'
+$vcenterUsername = '<vCenter Username>'
+$vcenterPassword = '<vCenter Password>'
+$spnClientId = '<Service principal appId>'
+$spnClientSecret = '<Service principal password>'
+$spnTenantId = '<Service principal Tenant ID>'
+$vSphereRP = '<Connected VMware vSphere resource provider Id>'
 
 ## vSphere parameters
 $vmtemplate = '<Arc appliance template name>'
@@ -58,11 +58,11 @@ $InfraParams = ".\arcbridge-appliance-stage.yaml"
 $InfraParams = ".\arcbridge-resource-stage.yaml"
 (Get-Content -Path $InfraParams) -replace 'location-stage',$location | Set-Content -Path $InfraParams
 (Get-Content -Path $InfraParams) -replace 'arcbridgeName-stage',$applianceName | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'resourceGroup-stage',$ResourceGroupName | Set-Content -Path $InfraParams
-(Get-Content -Path $InfraParams) -replace 'subscriptionId-stage',$SubscriptionId | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'resourceGroup-stage',$resourceGroupName | Set-Content -Path $InfraParams
+(Get-Content -Path $InfraParams) -replace 'subscriptionId-stage',$subscriptionId | Set-Content -Path $InfraParams
 
 $logFile = "arcvmware-output.log"
-$loginValues = @($vcenterfqdn, $vcenterusername, $vcenterpassword)
+$loginValues = @($vcenterFqdn, $vcenterUsername, $vcenterPassword)
 function log($msg) {
     Write-Host $msg
     Write-Output $msg >> $logFile
@@ -140,9 +140,9 @@ try {
 
     log "Logging into azure"
 
-    az login --service-principal -u $appID -p $password --tenant $tenantId
+    az login --service-principal -u $spnClientId -p $spnClientSecret --tenant $spnTenantId
 
-    az account set -s $SubscriptionId
+    az account set -s $subscriptionId
     if ($LASTEXITCODE) {
         $Error[0] | Out-String >> $logFile
         throw "The default subscription for the az cli context could not be set."
@@ -169,7 +169,7 @@ try {
 
     log "Adding Cluster extension"
 
-    $applianceId = (az arcappliance show --subscription $SubscriptionId --resource-group $ResourceGroupName --name $applianceName --query id -o tsv 2>> $logFile)
+    $applianceId = (az arcappliance show --subscription $subscriptionId --resource-group $resourceGroupName --name $applianceName --query id -o tsv 2>> $logFile)
     if (!$applianceId) {
         throw "Appliance creation has failed."
     }
@@ -188,15 +188,15 @@ try {
 
     $VMW_RP_OBJECT_ID = $vSphereRP
     if (!$VMW_RP_OBJECT_ID) {
-        $msg = "The service principal ID was not found for the resource provider Microsoft.ConnectedVMwarevSphere for the subscription '$SubscriptionId'.`n" +
+        $msg = "The service principal ID was not found for the resource provider Microsoft.ConnectedVMwarevSphere for the subscription '$subscriptionId'.`n" +
         "Please register the RP with the subscription using the following command and try again after some time.`n`n" +
-        "`taz provider register --wait --namespace Microsoft.ConnectedVMwarevSphere --subscription '$SubscriptionId'`n"
+        "`taz provider register --wait --namespace Microsoft.ConnectedVMwarevSphere --subscription '$subscriptionId'`n"
         throw $msg
     }
 
-    az k8s-extension create --debug --subscription $SubscriptionId --resource-group $ResourceGroupName --name azure-vmwareoperator --extension-type 'Microsoft.vmware' --scope cluster --cluster-type appliances --cluster-name $applianceName --config Microsoft.CustomLocation.ServiceAccount=azure-vmwareoperator --config global.rpObjectId="$VMW_RP_OBJECT_ID" 2>> $logFile
+    az k8s-extension create --debug --subscription $subscriptionId --resource-group $resourceGroupName --name azure-vmwareoperator --extension-type 'Microsoft.vmware' --scope cluster --cluster-type appliances --cluster-name $applianceName --config Microsoft.CustomLocation.ServiceAccount=azure-vmwareoperator --config global.rpObjectId="$VMW_RP_OBJECT_ID" 2>> $logFile
 
-    $clusterExtensionId = (az k8s-extension show --subscription $SubscriptionId --resource-group $ResourceGroupName --name azure-vmwareoperator --cluster-type appliances --cluster-name $applianceName --query id -o tsv 2>> $logFile)
+    $clusterExtensionId = (az k8s-extension show --subscription $subscriptionId --resource-group $resourceGroupName --name azure-vmwareoperator --cluster-type appliances --cluster-name $applianceName --query id -o tsv 2>> $logFile)
     if (!$clusterExtensionId) {
         throw "Cluster extension installation failed."
     }
@@ -209,9 +209,9 @@ try {
     log "Step 4/5: Creating custom location"
 
     $customLocationNamespace = ("$customLocationName".ToLower() -replace '[^a-z0-9-]', '')
-    az customlocation create --debug --tags Project=jumpstart_azure_arc_vsphere --subscription $SubscriptionId --resource-group $ResourceGroupName --name $customLocationName --location $location --namespace $customLocationNamespace --host-resource-id $applianceId --cluster-extension-ids $clusterExtensionId 2>> $logFile
+    az customlocation create --debug --tags Project=jumpstart_azure_arc_vsphere --subscription $subscriptionId --resource-group $resourceGroupName --name $customLocationName --location $location --namespace $customLocationNamespace --host-resource-id $applianceId --cluster-extension-ids $clusterExtensionId 2>> $logFile
 
-    $customLocationId = (az customlocation show --subscription $SubscriptionId --resource-group $ResourceGroupName --name $customLocationName --query id -o tsv 2>> $logFile)
+    $customLocationId = (az customlocation show --subscription $subscriptionId --resource-group $resourceGroupName --name $customLocationName --query id -o tsv 2>> $logFile)
     if (!$customLocationId) {
         throw "Custom location creation failed."
     }
@@ -227,9 +227,9 @@ try {
     log "`t* These credentials will be used when you perform vCenter operations through Azure."
     log "`t* You can provide the same credentials that you provided for Arc resource bridge earlier."
 
-    az connectedvmware vcenter connect --debug --tags Project=jumpstart_azure_arc_vsphere --subscription $SubscriptionId --resource-group $ResourceGroupName --name $vCenterName --fqdn $vcenterfqdn --username $vcenterusername --password $vcenterpassword --custom-location $customLocationId --location $location --port 443 2>> $logFile
+    az connectedvmware vcenter connect --debug --tags Project=jumpstart_azure_arc_vsphere --subscription $subscriptionId --resource-group $resourceGroupName --name $vcenterName --fqdn $vcenterFqdn --username $vcenterUsername --password $vcenterPassword --custom-location $customLocationId --location $location --port 443 2>> $logFile
 
-    $vcenterId = (az connectedvmware vcenter show --subscription $SubscriptionId --resource-group $ResourceGroupName --name $vCenterName --query id -o tsv 2>> $logFile)
+    $vcenterId = (az connectedvmware vcenter show --subscription $subscriptionId --resource-group $resourceGroupName --name $vcenterName --query id -o tsv 2>> $logFile)
     if (!$vcenterId) {
         throw "Connect vCenter failed."
     }
