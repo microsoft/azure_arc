@@ -16,8 +16,8 @@ $vSphereRP = '<ConnectedVMwarevSphere resource provider Id>'
 
 ## vSphere parameters
 $vmtemplate = '<Arc appliance template name>'
-$datacenter = '<vSphere data center name>'
-$datastore = '<vSphere data store name>'
+$datacenter = '<vSphere datacenter name>'
+$datastore = '<vSphere datastore name>'
 $folder = '<vSphere template folder>'
 $dnsserver = '<DNS server to be used for the appliance>'
 $gateway = '<Gateway address to be used for the appliance>'
