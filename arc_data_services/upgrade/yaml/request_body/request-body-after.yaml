@@ -27,7 +27,7 @@
         },
         "docker": {
           "imagePullPolicy": "Always",
-          "imageTag": "v1.1.0_2021-11-02",
+          "imageTag": "v1.6.0_2022-05-02",
           "registry": "<registry>",
           "repository": "<repository>"
         },
