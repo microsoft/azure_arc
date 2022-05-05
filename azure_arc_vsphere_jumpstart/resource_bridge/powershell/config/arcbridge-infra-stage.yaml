@@ -1,8 +1,8 @@
 vsphereprovider:
   appliancevm:
-    vmtemplate: vmtemplate-stage
+    vmtemplate: vmTemplate-stage
   datacenter: datacenter-stage
-  datastore: dataStore-stage
+  datastore: datastore-stage
   folder: folder-stage
   network:
     dnsservers:
