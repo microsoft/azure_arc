@@ -445,6 +445,7 @@ Open the [data services operations page](https://azurearcjumpstart.io/azure_jump
 The following tools are including on the _ArcBox-Client_ VM.
 
 - Azure Data Studio with Arc and PostgreSQL extensions
+- Microsoft SQL Server Management Studio (SSMS)
 - kubectl, kubectx, helm
 - Chocolatey
 - Visual Studio Code

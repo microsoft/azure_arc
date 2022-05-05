@@ -44,7 +44,6 @@ $Env:argument4="Microsoft.arc"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
-# & "C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd" extension add --name arcdata
 
 # Create Azure Data Studio desktop shortcut
 Write-Host "`n"
@@ -52,6 +51,17 @@ Write-Host "Creating Azure Data Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Azure Data Studio.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+# Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut
+Write-Host "`n"
+Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
