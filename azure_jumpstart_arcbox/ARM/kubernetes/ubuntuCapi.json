@@ -114,7 +114,18 @@
             "metadata": {
                 "description": "Choice to deploy Azure Bastion"
             },
-            "defaultValue" : false
+            "defaultValue": false
+        },
+        "flavor": {
+            "type": "string",
+            "metadata": {
+                "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
+            },
+            "allowedValues": [
+                "Full",
+                "ITPro",
+                "DevOps"
+            ]
         }
     },
     "variables": {
@@ -236,7 +247,7 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspace'), ' ', parameters('capiArcDataClusterName'), ' ',parameters('templateBaseUrl'))]",
+                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspace'), ' ', parameters('capiArcDataClusterName'), ' ', parameters('templateBaseUrl'), ' ', parameters('flavor'))]",
                     "fileUris": [ "[concat(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]" ]
                 }
             }
