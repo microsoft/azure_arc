@@ -9,7 +9,10 @@ deployBastion=$4
 az config set extension.use_dynamic_install=yes_without_prompt
 
 validations=true
+# Getting expected values
 config=$(cat "$DeployTestParametersFile")
+
+# Resource Count Validation after scripts were executed on the VM
 jqueryAfterScriptExecution=".$Flavor.afterScriptExecution"
 resourceExpected=$(echo "$config" |  jq "$jqueryAfterScriptExecution")
 if [ "$deployBastion" = "true" ]; then
@@ -18,7 +21,6 @@ if [ "$deployBastion" = "true" ]; then
   # +1 because we added a public ip to connect OpenSSH
   resourceExpected=$(($resourceExpected+$deployBastionDifference+1))
 fi
-
 portalResources=$(az resource list -g  "$ResourceGroup"  --query '[].id' -o tsv | grep -v  '/extensions/' -c)
 if [ "$portalResources" -ge "$resourceExpected" ]; then
    echo "We have $portalResources resources after script execution inside VM"
@@ -27,6 +29,7 @@ else
    validations=false
 fi
 
+# Validate Arc enable server amount
 azureArcMachines=$(az resource list -g  "$ResourceGroup" --query '[].id' -o tsv | grep -v  '/extensions/' | grep -h '/Microsoft.HybridCompute/machines/' -c) 
 jqueryAzureArcMachinesExpected=".$Flavor.azureArcMachinesExpected"
 azureArcMachinesExpected=$(echo "$config" |  jq "$jqueryAzureArcMachinesExpected")
@@ -36,7 +39,8 @@ else
    echo "Error # Azure Arc Machine $azureArcMachines" 
    validations=false
 fi
-            
+
+# Validate Arc enable status if there are expected servers      
 if [ "$azureArcMachinesExpected" = "5" ]; then
   ArcBoxWin2K19=$(az resource show -g "$ResourceGroup" -n ArcBox-Win2K19 --resource-type 'Microsoft.HybridCompute/machines' --query properties.status -o tsv) || ArcBoxWin2K19="NoConnected"
   ArcBoxWin2K22=$(az resource show -g "$ResourceGroup" -n ArcBox-Win2K22 --resource-type 'Microsoft.HybridCompute/machines' --query properties.status -o tsv) || ArcBoxWin2K22="NoConnected"
@@ -51,6 +55,7 @@ if [ "$azureArcMachinesExpected" = "5" ]; then
    fi
 fi
 
+# Validate number of policies expected to be deployed
 policiesDeployment=$(az policy assignment list  -g "$ResourceGroup" --query '[].id' -o tsv | wc -l)
 jqueryPoliciesDeploymentExpected=".$Flavor.policiesDeploymentExpected"
 policiesDeploymentExpected=$(echo "$config" |  jq "$jqueryPoliciesDeploymentExpected")
@@ -61,6 +66,7 @@ else
    validations=false
 fi
 
+# Validate number of Workbooks expected to be deployed
 workbooks=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -v  '/extensions/' | grep -h '/microsoft.insights/workbooks/' -c)
 jqueryWorkbooksExpected=".$Flavor.workbooksExpected"
 workbooksExpected=$(echo "$config" |  jq "$jqueryWorkbooksExpected")
@@ -71,6 +77,7 @@ else
    validations=false
 fi
 
+# Validate number of Azure Bastion expected to be deployed
 if [ "$deployBastion" = "true" ]; then
   bastionResource=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -v  '/extensions/' | grep -h 'Microsoft.Network/bastionHosts' -c)
   if [ "1" = "$bastionResource" ]; then
@@ -81,6 +88,7 @@ if [ "$deployBastion" = "true" ]; then
   fi
 fi
 
+# Validate number of k8s Connected Clusters expected to be deployed
 countConnectedK8sClusters=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.Kubernetes/connectedClusters' -c)
 jqueryCountConnectedK8sClusters=".$Flavor.countConnectedK8sClusters"
 countConnectedK8sClustersExpected=$(echo "$config" |  jq "$jqueryCountConnectedK8sClusters")
@@ -91,6 +99,7 @@ else
    validations=false
 fi
 
+# Validate k8s Connected Clusters status and extensions expected
 for val in $(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.Kubernetes/connectedClusters')
 do
   readarray -d / -t resourceArray <<< "$val"
@@ -151,6 +160,7 @@ do
   echo "------ End Processiong $name Kubernetes Connected Cluster ---------"
 done
 
+# Validate number of Key Vault expected to be deployed
 countKeyVaults=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.KeyVault/vaults' -c)
 jquerycountKeyVaults=".$Flavor.countKeyVault"
 countcountKeyVaultExpected=$(echo "$config" |  jq "$jquerycountKeyVaults")
