@@ -1,35 +1,35 @@
 {
   "Full": {
-    "afterDeployResources": 45,
-    "afterScriptExecution": 90,
+    "initialResourceAmount": 45,
+    "resourcesAfterScriptExecution": 91,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 6,
     "workbooksExpected": 1,
     "deployBastionDifference": 0,
-    "desktopElementsExpected": 9,
-    "countConnectedK8sClusters": 2,
-    "countKeyVault": 1
+    "desktopElementsExpected": 10,
+    "connectedK8sClustersExpected": 2,
+    "keyVaultsExpected": 1
   },
   "ITPro": {
-    "afterDeployResources": 13,
-    "afterScriptExecution": 21,
+    "initialResourceAmount": 13,
+    "resourcesAfterScriptExecution": 21,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 5,
     "workbooksExpected": 1,
     "deployBastionDifference": 2,
     "desktopElementsExpected": 2,
-    "countConnectedK8sClusters": 0,
-    "countKeyVault": 0
+    "connectedK8sClustersExpected": 0,
+    "keyVaultsExpected": 0
   },
   "DevOps": {
-    "afterDeployResources": 45,
-    "afterScriptExecution": 48,
+    "initialResourceAmount": 45,
+    "resourcesAfterScriptExecution": 48,
     "azureArcMachinesExpected": 0,
     "policiesDeploymentExpected": 2,
     "workbooksExpected": 1,
     "deployBastionDifference": 0,
     "desktopElementsExpected": 3,
-    "countConnectedK8sClusters": 2,
-    "countKeyVault": 1
+    "connectedK8sClustersExpected": 2,
+    "keyVaultsExpected": 1
   }
 }

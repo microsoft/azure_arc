@@ -73,23 +73,23 @@ We take a look to the quality of the code
 
 - Bash script by **shellcheck**
 - Powershell script by **Invoke-ScriptAnalyzer**
-- Arm template validation and we are generating arm from bicep script by **ARM-TTK and Pester**  
+- Arm template validation and we are generating arm from bicep script by **ARM-TTK and Pester**
 - Terraform validation. It is done by **tfsec** and **checov**
 
-  The validations are configure to continue on error, then they will be always succeed, but you will be able to see the recommendations.  
+  The validations are configure to continue on error, then they will be always succeed, but you will be able to see the recommendations.
 
 ![image](./scriptValidation.PNG)
 
 ![image](./powershellExample.PNG)
 
-On the deploy workflow there are deploy validation that you could check  
+On the deploy workflow there are deploy validation that you could check
 
 ![image](./deployValidations.PNG)
 
 Final Validation DevOps Scenario Example  
 ![image](./FinalValidationDevopsScenario.PNG)
 
-After finishing the logs from inside the vm and lint code results are available  
+After finishing the logs from inside the vm and lint code results are available
 
 ![image](./logsToDownload.PNG)
 
@@ -113,26 +113,15 @@ Let see:
 ```
 
 2. Download the execution log  
-   Go to the download file step and put your line in the correct place. It also depends on the flavor. Each line is a OpenSSH conection (using scp protocol) which download a specific log and close.  
+   Go to the download file step and put your line in the correct place. It also depends on the flavor. Each line is a OpenSSH conection (using scp protocol) which download a specific log and close. Code on `DownloadLogs.sh`  
    The important part is the location of the log inisde the vm starting on the user forlder. Example, `..\..\ArcBox\Logs\Bootstrap.log`. Then the `||` is only in case the previous sentence fails, the script is going to put a note for the workflow user
 
 ```
-      - name: Download logs from VM
-        if: success() || failure()
-        run: |
-          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'  || echo "Bootstrap.log not able to be downloaded"
-          if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'ITPro' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\ArcServersLogonScript.log' '.' || echo "ArcServersLogonScript.log not able to be downloaded"
-          fi
-          if [ '${{ github.event.inputs.flavor }}' == 'Full' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DataServicesLogonScript.log' '.' || echo "DataServicesLogonScript.log not able to be downloaded"
-          fi
-          if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'DevOps' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DevOpsLogonScript.log' '.' || echo "DevOpsLogonScript.log not able to be downloaded"
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\installCAPI.log' '.' || echo "installCAPI.log not able to be downloaded"
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\installK3s.log' '.' || echo "installK3s.log not able to be downloaded"
-          fi
-          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\MonitorWorkbookLogonScript.log' '.' || echo "MonitorWorkbookLogonScript.log not able to be downloaded"
+#Example
+sshpass -p "$secret" scp -o 'StrictHostKeyChecking no' -P 2204 -T $windowsAdminUsername@$(az vm show -d -g $resourceGroupName -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'  || echo "Bootstrap.log not able to be downloaded"
+if [ $flavor == 'Full' ] || [ $flavor == 'ITPro' ]; then
+  sshpass -p "$secret" scp -o 'StrictHostKeyChecking no' -P 2204 -T $windowsAdminUsername@$(az vm show -d -g $resourceGroupName -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\ArcServersLogonScript.log' '.' || echo "ArcServersLogonScript.log not able to be downloaded"
+fi
 ```
 
 3.  Upload the log as workflow artifact  
@@ -175,21 +164,21 @@ Many validations depends on the scenario, for example the number of resources. W
       - If it is needed, it is also check the status 'connected' for each one
     - Check the number of polices deployed
     - Check expected number of
-       - Workbooks
-       - Azure Bastion
-       - KeyVault
+      - Workbooks
+      - Azure Bastion
+      - KeyVault
     - Check number of Kubernetes Connected Clusters
-       - Status 'connected' for each one
-       - Azure Defender, policyinsights, and Azure Monitor extensions for each one
-       - For 'ArcBox-CAPI-Data' also check key Vault, Open Service Mesh and Flux extension
+      - Status 'connected' for each one
+      - Azure Defender, policyinsights, and Azure Monitor extensions for each one
+      - For 'ArcBox-CAPI-Data' also check key Vault, Open Service Mesh and Flux extension
 
 ## Disclaimer
 
 We need to execute 4 script inside the VM on a full deploy to simulate what it happens at LogOn:
 
-- ArcServersLogonScript.ps1, this script is block when execute using OpenSSH, but when we run it using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), it works.
-- DataServicesLogonScript.ps1, this script is block when execute using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), so we installed and use OpenSSH to execute it. Running through OpenSSH the last log entry is `Installing SQL Server - Azure Arc extension. This may take 5+ minutes.`, then I suppose the block is executing `$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer"...`
+- ArcServersLogonScript.ps1, this script is block when execute using OpenSSH, but when we run it using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), it works. Running through OpenSSH the last log entry is `Installing SQL Server - Azure Arc extension. This may take 5+ minutes.`, then I suppose the block is executing `$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer"...`
 - DevOpsLogonScript.ps1, is executed using OpenSSH.
+- DataServicesLogonScript.ps1, this script is block when execute using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), so we installed and use OpenSSH to execute it. 
 - MonitorWorkbookLogonScript.ps1, execute in both approaches. It currently is running with OpenSSH
 
 After the incorporation of some security polices to the subscription, the [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) start to fail randomly, the failure is described on the note inside the documentation:

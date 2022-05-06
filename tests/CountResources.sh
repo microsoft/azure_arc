@@ -5,7 +5,7 @@ ResourceGroup=$1
 Flavor=$2
 Step=$3
 DeployTestParametersFile=$4
-deployBastion=$5
+DeployBastion=$5
 
 # Getting config values
 config=$(cat "$DeployTestParametersFile")
@@ -15,7 +15,7 @@ jquery=".$Flavor.$Step"
 resourceExpected=$(echo "$config" |  jq "$jquery")
 
 # Apply Bastion difference if needed  
-if [ "$deployBastion" = "true" ]; then
+if [ "$DeployBastion" = "true" ]; then
   jqueryBastion=".$Flavor.deployBastionDifference"
   deployBastionDifference=$(echo "$config" |  jq "$jqueryBastion")
   resourceExpected=$(($resourceExpected+$deployBastionDifference))

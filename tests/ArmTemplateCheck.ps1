@@ -1,5 +1,6 @@
 $ArmFile=$args[0]
 $ExcludeRules=$args[1]
+
 git clone https://github.com/Azure/arm-ttk.git --quiet .\arm-ttk
 Import-Module .\arm-ttk\arm-ttk
 Install-Module Pester -AllowClobber -RequiredVersion 4.10.1 -Force -SkipPublisherCheck -Scope CurrentUser
