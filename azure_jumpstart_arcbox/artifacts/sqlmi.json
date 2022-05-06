@@ -34,17 +34,20 @@
     "serviceType": {
       "type": "String"
     },
+    "readableSecondaries": {
+      "type": "String"
+    },
     "vCoresRequest": {
       "type": "String"
     },
     "memoryRequest": {
-        "type": "String"
+      "type": "String"
     },
     "vCoresLimit": {
-        "type": "String"
+      "type": "String"
     },
     "memoryLimit": {
-        "type": "String"
+      "type": "String"
     },
     "dataStorageSize": {
       "type": "String",
@@ -113,23 +116,26 @@
             "services": {
               "primary": {
                 "type": "[parameters('serviceType')]"
+              },
+              "readableSecondaries": {
+                "type": "[parameters('readableSecondaries')]"
               }
             },
             "replicas": "[parameters('replicas')]",
             "scheduling": {
               "default": {
-                  "resources": {
-                      "requests": {
-                          "cpu": "[parameters('vCoresRequest')]",
-                          "memory": "[parameters('memoryRequest')]"
-                      },
-                      "limits": {
-                          "cpu": "[parameters('vCoresLimit')]",
-                          "memory": "[parameters('memoryLimit')]"
-                      }
+                "resources": {
+                  "requests": {
+                    "cpu": "[parameters('vCoresRequest')]",
+                    "memory": "[parameters('memoryRequest')]"
+                  },
+                  "limits": {
+                    "cpu": "[parameters('vCoresLimit')]",
+                    "memory": "[parameters('memoryLimit')]"
                   }
+                }
               }
-          },
+            },
             "storage": {
               "data": {
                 "volumes": [
