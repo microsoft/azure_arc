@@ -282,21 +282,8 @@ jobs:
       - name: Download logs from VM
         if: success() || failure()
         run: |
-          plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch '7z a c:\ArcBox\logs\LogsBundle.zip c:\ArcBox\logs\*.log'
-          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'c:\ArcBox\logs\LogsBundle.zip' '.'  || echo "LogsBundle.zip not able to be downloaded"
-          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'  || echo "Bootstrap.log not able to be downloaded"
-          if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'ITPro' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\ArcServersLogonScript.log' '.' || echo "ArcServersLogonScript.log not able to be downloaded"
-          fi
-          if [ '${{ github.event.inputs.flavor }}' == 'Full' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DataServicesLogonScript.log' '.' || echo "DataServicesLogonScript.log not able to be downloaded"
-          fi 
-          if [ '${{ github.event.inputs.flavor }}' == 'Full' ] || [ '${{ github.event.inputs.flavor }}' == 'DevOps' ]; then
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\DevOpsLogonScript.log' '.' || echo "DevOpsLogonScript.log not able to be downloaded"
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\installCAPI.log' '.' || echo "installCAPI.log not able to be downloaded"
-           sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\installK3s.log' '.' || echo "installK3s.log not able to be downloaded"
-          fi           
-          sshpass -p '${{secrets.WINDOWS_ADMIN_PASSWORD}}' scp -o 'StrictHostKeyChecking no' -P 2204 -T ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }} -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\MonitorWorkbookLogonScript.log' '.' || echo "MonitorWorkbookLogonScript.log not able to be downloaded"
+           chmod +x ./tests/DownloadLogs.sh
+           ./tests/DownloadLogs.sh ${{ github.event.inputs.windowsAdminUsername }} ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
       - name: Upload LogsBundle.zip File
         if: success() || failure()
         uses: actions/upload-artifact@v3
@@ -339,7 +326,7 @@ jobs:
         with:
           name: installK3s.log
           path: installK3s.log
-      - name: Upload MonitorWorkbookLogonScript.log File
+      - name: Upload MonitorWorkbookLogonScript.log File 
         if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
