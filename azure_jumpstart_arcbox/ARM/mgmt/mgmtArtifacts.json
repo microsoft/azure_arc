@@ -150,7 +150,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2021-05-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -251,7 +251,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2021-05-01",
       "name": "[parameters('bastionNetworkSecurityGroupName')]",
       "condition": "[parameters('deployBastion')]",
       "location": "[parameters('location')]",
