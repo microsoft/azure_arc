@@ -4,7 +4,7 @@
 ResourceGroup=$1
 Flavor=$2
 DeployTestParametersFile=$3
-deployBastion=$4
+DeployBastion=$4
 
 az config set extension.use_dynamic_install=yes_without_prompt
 
@@ -13,9 +13,9 @@ validations=true
 config=$(cat "$DeployTestParametersFile")
 
 # Resource Count Validation after scripts were executed on the VM
-jqueryAfterScriptExecution=".$Flavor.afterScriptExecution"
-resourceExpected=$(echo "$config" |  jq "$jqueryAfterScriptExecution")
-if [ "$deployBastion" = "true" ]; then
+jqueryresourcesAfterScriptExecution=".$Flavor.resourcesAfterScriptExecution"
+resourceExpected=$(echo "$config" |  jq "$jqueryresourcesAfterScriptExecution")
+if [ "$DeployBastion" = "true" ]; then
   jqueryBastion=".$Flavor.deployBastionDifference"
   deployBastionDifference=$(echo "$config" |  jq "$jqueryBastion")
   # +1 because we added a public ip to connect OpenSSH
@@ -89,13 +89,13 @@ if [ "$deployBastion" = "true" ]; then
 fi
 
 # Validate number of k8s Connected Clusters expected to be deployed
-countConnectedK8sClusters=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.Kubernetes/connectedClusters' -c)
-jqueryCountConnectedK8sClusters=".$Flavor.countConnectedK8sClusters"
-countConnectedK8sClustersExpected=$(echo "$config" |  jq "$jqueryCountConnectedK8sClusters")
-if [ "$countConnectedK8sClustersExpected" = "$countConnectedK8sClusters" ]; then
-   echo "We have $countConnectedK8sClusters connected k8s clusters"
+connectedK8sClustersExpected=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.Kubernetes/connectedClusters' -c)
+jqueryconnectedK8sClustersExpected=".$Flavor.connectedK8sClustersExpected"
+connectedK8sClustersExpectedExpected=$(echo "$config" |  jq "$jqueryconnectedK8sClustersExpected")
+if [ "$connectedK8sClustersExpectedExpected" = "$connectedK8sClustersExpected" ]; then
+   echo "We have $connectedK8sClustersExpected connected k8s clusters"
 else
-   echo "Error # connected k8s clusters $countConnectedK8sClusters"
+   echo "Error # connected k8s clusters $connectedK8sClustersExpected"
    validations=false
 fi
 
@@ -161,13 +161,13 @@ do
 done
 
 # Validate number of Key Vault expected to be deployed
-countKeyVaults=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.KeyVault/vaults' -c)
-jquerycountKeyVaults=".$Flavor.countKeyVault"
-countcountKeyVaultExpected=$(echo "$config" |  jq "$jquerycountKeyVaults")
-if [ "$countcountKeyVaultExpected" = "$countKeyVaults" ]; then
-   echo "We have $countKeyVaults Key Vault resources"
+keyVaultsExpecteds=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -h 'Microsoft.KeyVault/vaults' -c)
+jquerykeyVaultsExpecteds=".$Flavor.keyVaultsExpected"
+countkeyVaultsExpectedExpected=$(echo "$config" |  jq "$jquerykeyVaultsExpecteds")
+if [ "$countkeyVaultsExpectedExpected" = "$keyVaultsExpecteds" ]; then
+   echo "We have $keyVaultsExpecteds Key Vault resources"
 else
-   echo "Error # Key Vault resources $countKeyVaults"
+   echo "Error # Key Vault resources $keyVaultsExpecteds"
    validations=false
 fi
 

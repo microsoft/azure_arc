@@ -1,29 +1,28 @@
 #!/bin/bash
-ResourceGroup=${1}
-Flavor=${2}
-DeployTestParametersFile=${3}
-deployBastion=${4}
-vmUser=${5}
-vmPassword=${6}
+resourceGroup=${1}
+flavor=${2}
+deployTestParametersFile=${3}
+windowsAdminUsername=${4}
+windowsAdminSecret=${5}
 
 validations=true
 
 # Getting expected values
-config=$(cat "$DeployTestParametersFile")
+config=$(cat "$deployTestParametersFile")
 
 # Count element on  C:\Users\Public\Desktop
-countDesktopFilesPublic=$(plink -ssh -P 2204 $vmUser@$(az vm show -d -g "$ResourceGroup" -n ArcBox-Client --query publicIps -o tsv)   -pw "$vmPassword" -batch   'dir C:\Users\Public\Desktop /b | find /v /c "::"') || countDesktopFilesPublic=0
+countDesktopFilesPublic=$(plink -ssh -P 2204 $windowsAdminUsername@$(az vm show -d -g "$resourceGroup" -n ArcBox-Client --query publicIps -o tsv)   -pw "$windowsAdminSecret" -batch   'dir C:\Users\Public\Desktop /b | find /v /c "::"') || countDesktopFilesPublic=0
 countDesktopFilesPublic=${countDesktopFilesPublic//[$'\t\r\n']}
 
 # Count element on user Desktop
-countDesktopFilesArcDemo=$(plink -ssh -P 2204 $vmUser@$(az vm show -d -g "$ResourceGroup" -n ArcBox-Client --query publicIps -o tsv)   -pw "$vmPassword" -batch   'dir c:\Users\'$vmUser'\Desktop /b | find /v /c "::"') || countDesktopFilesArcDemo=0
+countDesktopFilesArcDemo=$(plink -ssh -P 2204 $windowsAdminUsername@$(az vm show -d -g "$resourceGroup" -n ArcBox-Client --query publicIps -o tsv)   -pw "$windowsAdminSecret" -batch   'dir c:\Users\'$windowsAdminUsername'\Desktop /b | find /v /c "::"') || countDesktopFilesArcDemo=0
 countDesktopFilesArcDemo=${countDesktopFilesArcDemo//[$'\t\r\n']}
 
 # Real Desktop elements
 countDesktopFiles=$(( $countDesktopFilesPublic + $countDesktopFilesArcDemo))
 
 # Get expected result
-jqueryDesktopElementsExpected=".$Flavor.desktopElementsExpected"
+jqueryDesktopElementsExpected=".$flavor.desktopElementsExpected"
 desktopElementsExpected=$(echo "$config" |  jq "$jqueryDesktopElementsExpected")
 
 # Do the validation

@@ -245,7 +245,7 @@ jobs:
         with:
           inlineScript: |
             chmod +x ./tests/CountResources.sh
-            ./tests/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} afterDeployResources ./tests/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
+            ./tests/CountResources.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} initialResourceAmount ./tests/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
       - name: Adding Public Ip to Connect Open SSH when Azure Bastion is selected
         uses: Azure/cli@v1.0.6
         if: ${{ github.event.inputs.deployBastion == 'true' }}
@@ -335,7 +335,7 @@ jobs:
       - name: Desktop Validation
         run: |
           chmod +x ./tests/DesktopValidation.sh
-          ./tests/DesktopValidation.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./tests/DeployTestParameters.json ${{github.event.inputs.deployBastion}} ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
+          ./tests/DesktopValidation.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./tests/DeployTestParameters.json ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
       - name: Final Deploy Validation
         uses: Azure/cli@v1.0.6
         with:
