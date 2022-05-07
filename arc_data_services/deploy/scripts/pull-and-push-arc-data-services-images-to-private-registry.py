@@ -80,7 +80,8 @@ images = [  'arc-bootstrapper',
             'arc-ha-orchestrator',
             'arc-ha-supervisor',
             'arc-postgres-11',
-            'arc-postgres-12'
+            'arc-postgres-12',
+            'arc-security-support'
         ]
 
 taggedimages = [image + ":" + SOURCE_DOCKER_TAG for image in images]
