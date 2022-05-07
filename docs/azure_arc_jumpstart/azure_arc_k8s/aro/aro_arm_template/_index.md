@@ -154,7 +154,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   ![Screenshot of az_connect_aro shell script](./06.png)
 
-- In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aro* shell script against the Aro cluster. **Make sure Cloud Shell is configured to use Bash.**
+- In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the *az_connect_aro* shell script against the Aro cluster. **Make sure Cloud Shell is configured to use Bash.**
 
   ![Screenshot of Azure Cloud Shell button in Visual Studio Code](./07.png)
 

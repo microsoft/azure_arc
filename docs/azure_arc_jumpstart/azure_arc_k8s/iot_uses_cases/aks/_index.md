@@ -138,7 +138,7 @@ In case the AKS service is not available in your region, you can change the AKS 
 
 * In this scenario we will use a VM to "simulate" an IoT Edge device. To do this, we must register a new Edge device in our IoT Hub that we will later configure.
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the next commands:
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the next commands:
 
     ![Screenshot showing how to access Cloud Shell in Visual Studio Code](./05.png)
 
