@@ -123,7 +123,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
 
   ![Screenshot of az_connect_aks shell script](./04.png)
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. **Make sure Cloud Shell is configured to use Bash.**
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. **Make sure Cloud Shell is configured to use Bash.**
 
   ![Screenshot of Azure Cloud Shell button in Visual Studio Code](./05.png)
 

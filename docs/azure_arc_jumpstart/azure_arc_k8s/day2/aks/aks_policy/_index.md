@@ -105,7 +105,7 @@ The following Jumpstart scenario will guide you on how to enable [Azure Policy f
 
 ## Azure Policy for Azure Arc Connected Cluster Integration
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *aks_policy_onboarding* script against the AKS connected cluster. For your convenient, shell script is [provided to you](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/azure_policy/aks_policy_onboarding.sh).
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the *aks_policy_onboarding* script against the AKS connected cluster. For your convenient, shell script is [provided to you](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/azure_policy/aks_policy_onboarding.sh).
 
 * Edit the environment variables in the script to match your environment parameters, upload it to the Cloud Shell environment and run it using the ```. ./aks_policy_onboarding.sh``` command. **If you decided to use the 'Policy Insights Data Writer (Preview)' role assignment as described in the perquisites section, make sure to use it's respective *appId*, *password* and *tenantId***
 

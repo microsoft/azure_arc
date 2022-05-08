@@ -115,7 +115,7 @@ For our scenario, notice we have in two Helm charts in the "Hello Arc" repositor
 
 ## Deployment
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_k8sconfig_helm_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
+* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the *az_k8sconfig_helm_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
 
 * Edit the environment variables in the [*az_k8sconfig_helm_aks*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/helm/az_k8sconfig_helm_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_helm_aks``` command.
 
