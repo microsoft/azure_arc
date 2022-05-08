@@ -34,6 +34,9 @@
         "serviceType": {
             "type": "String"
         },
+        "readableSecondaries": {
+        "type": "String"
+        },        
         "vCoresRequest": {
             "type": "String"
         },
@@ -113,6 +116,9 @@
                         "services": {
                             "primary": {
                                 "type": "[parameters('serviceType')]"
+                            },
+                            "readableSecondaries": {
+                                "type": "[parameters('readableSecondaries')]"
                             }
                         },
                         "replicas": "[parameters('replicas')]",

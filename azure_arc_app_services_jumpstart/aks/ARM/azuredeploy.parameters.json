@@ -40,6 +40,12 @@
         },
         "adminEmail": {
             "value": "<youremail@email.com>"
-        }
+        },
+        "deployBastion": {
+            "value": false
+        },
+        "bastionHostName": {
+          "value": "Arc-App-Demo-Bastion"
+      }
     }
 }
