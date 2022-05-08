@@ -190,13 +190,13 @@ Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 
 $ubuntuSession = New-SSHSession -ComputerName $UbuntuVmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
-$(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 60 -WarningAction SilentlyContinue).Output
+$(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 360 -WarningAction SilentlyContinue).Output
 
 # Onboarding nested CentOS server VM
 Start-Sleep -Seconds 20
 $centosSession = New-SSHSession -ComputerName $CentOSVmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
-$(Invoke-SSHCommand -SSHSession $centosSession -Command $Command -TimeOut 60 -WarningAction SilentlyContinue).Output
+$(Invoke-SSHCommand -SSHSession $centosSession -Command $Command -TimeOut 360 -WarningAction SilentlyContinue).Output
 
 # Creating Hyper-V Manager desktop shortcut
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
