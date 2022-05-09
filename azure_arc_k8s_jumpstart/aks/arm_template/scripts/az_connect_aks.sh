@@ -9,7 +9,7 @@ export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
-# Login to Azure
+# Log in to Azure
 echo "Log in to Azure with Service Principle"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
