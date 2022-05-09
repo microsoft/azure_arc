@@ -18,7 +18,7 @@
         },
         "dnsPrefix": {
             "type": "string",
-            "defaultValue":"arc-aks-demo",
+            "defaultValue":"arck8s",
             "metadata": {
                 "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
             }
