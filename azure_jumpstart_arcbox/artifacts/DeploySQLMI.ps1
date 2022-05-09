@@ -18,6 +18,7 @@ $customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group
 # Localize ARM template
 ################################################
 $ServiceType = "LoadBalancer"
+$readableSecondaries = $ServiceType
 
 # Resource Requests
 $vCoresRequest = "2"
@@ -44,6 +45,7 @@ $SQLParams = "$Env:ArcBoxDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage',$Env:AZDATA_USERNAME | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage',$Env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage',$readableSecondaries | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage',$vCoresRequest | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'memoryRequest-stage',$memoryRequest | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresLimit-stage',$vCoresLimit | Set-Content -Path $SQLParams
