@@ -12,7 +12,7 @@ The following README will guide you on how to use the provided PowerShell script
 
 > **NOTE:  This Jumpstart scenario assumes you already have a working VMware vSphere environment and is not covering VMware-specific best practices and design recommendations.**
 
-> **NOTE: Azure Arc-enabled VMware vSphere is in Preview and as a result, versions captured in the scenario's various screenshots are subject to change.
+> **NOTE: Azure Arc-enabled VMware vSphere is currently in Preview and as a result, versions captured in the scenario's various screenshots are subject to change.
 
 
 ## Prerequisites
