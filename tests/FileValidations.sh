@@ -33,6 +33,31 @@ else
   validations=false
 fi
 
+# validate Azuredatastudio Setting 
+
+# Get expected result
+jqueryAzuredatastudioSettingExpected=".$flavor.azuredatastudioSettingExpected"
+azuredatastudioSettingExpected=$(echo "$config" |  jq "$jqueryAzuredatastudioSettingExpected")
+
+if [ $azuredatastudioSettingExpected -gt 0 ]; then
+  countAzuredatastudioSetting=$(plink -ssh -P 2204 $windowsAdminUsername@$(az vm show -d -g "$resourceGroup" -n ArcBox-Client --query publicIps -o tsv)   -pw "$windowsAdminSecret" -batch   'dir C:\Users\'$windowsAdminUsername'\AppData\Roaming\azuredatastudio\User\settings.json /b | find /v /c "::"') || countAzuredatastudioSetting=0
+  countAzuredatastudioSetting=${countAzuredatastudioSetting//[$'\t\r\n']}
+
+  countAzuredatastudioSettingSize=$(plink -ssh -P 2204 $windowsAdminUsername@$(az vm show -d -g "$resourceGroup" -n ArcBox-Client --query publicIps -o tsv)   -pw "$windowsAdminSecret" -batch  'forfiles /p C:\Users\'$windowsAdminUsername'\AppData\Roaming\azuredatastudio\User /m settings.json /c "cmd /c echo @fsize"')
+  countAzuredatastudioSettingSize=${countAzuredatastudioSettingSize//[$'\t\r\n']}
+
+  if [ $countAzuredatastudioSetting -gt 0 ]; then
+    if [ $countAzuredatastudioSettingSize -gt 0 ]; then
+      echo "Azuredatastudio Setting exists and size is bigger than 1, see the downloaded file later on"
+    else
+       echo "Unexpected size of element on AzuredatastudioSetting: $countAzuredatastudioSettingSize"
+    fi
+  else
+    echo "Unexpected number of element on AzuredatastudioSetting: $countAzuredatastudioSetting"
+    validations=false
+  fi
+fi
+
 # fail if some validation was not reach
 if [ "$validations" = "false" ]; then
    echo "Something was wrong. Failing"
