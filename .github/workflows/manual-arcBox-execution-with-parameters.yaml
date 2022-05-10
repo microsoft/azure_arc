@@ -145,12 +145,12 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: terraform-lint-tfsec-results.txt
-          path: ./azure_jumpstart_arcbox/terraform/terraform-lint-tfsec-results.txt  
+          path: ./azure_jumpstart_arcbox/terraform/terraform-lint-tfsec-results.txt
       - name: Upload Terraform Checov Lint Results File
         uses: actions/upload-artifact@v3
         with:
           name: terraform-lint-checov-results.txt
-          path: ./azure_jumpstart_arcbox/terraform/terraform-lint-checov-results.txt  
+          path: ./azure_jumpstart_arcbox/terraform/terraform-lint-checov-results.txt
 
   deployValidateAndClean:
     runs-on: ubuntu-latest
@@ -189,7 +189,7 @@ jobs:
               echo "Expected Time Execution 110 min"
            fi
           fi          
-          echo "if Widows Run Command not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs. "          
+          echo "if Widows Run Command not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs. "
       - name: Install package for ssh with password inline
         run: |
           sudo apt-get -y install putty-tools
@@ -282,8 +282,8 @@ jobs:
       - name: Download logs from VM
         if: success() || failure()
         run: |
-           chmod +x ./tests/DownloadLogs.sh
-           ./tests/DownloadLogs.sh ${{ github.event.inputs.windowsAdminUsername }} ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
+          chmod +x ./tests/DownloadLogs.sh
+          ./tests/DownloadLogs.sh ${{ github.event.inputs.windowsAdminUsername }} ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
       - name: Upload LogsBundle.zip File
         if: success() || failure()
         uses: actions/upload-artifact@v3
@@ -326,16 +326,22 @@ jobs:
         with:
           name: installK3s.log
           path: installK3s.log
-      - name: Upload MonitorWorkbookLogonScript.log File 
+      - name: Upload MonitorWorkbookLogonScript.log File
         if: success() || failure()
         uses: actions/upload-artifact@v3
         with:
           name: MonitorWorkbookLogonScript.log
           path: MonitorWorkbookLogonScript.log
-      - name: Desktop Validation
+      - name: Upload azuredatastudioSettings.json File
+        if: (github.event.inputs.flavor == 'Full') &&  (success() || failure())
+        uses: actions/upload-artifact@v3
+        with:
+          name: azuredatastudioSettings.json
+          path: settings.json
+      - name: File Validation
         run: |
-          chmod +x ./tests/DesktopValidation.sh
-          ./tests/DesktopValidation.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./tests/DeployTestParameters.json ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
+          chmod +x ./tests/FileValidations.sh
+          ./tests/FileValidations.sh ${{github.event.inputs.resourceGroupName}} ${{github.event.inputs.flavor}} ./tests/DeployTestParameters.json ${{github.event.inputs.windowsAdminUsername}} "${{secrets.WINDOWS_ADMIN_PASSWORD}}"
       - name: Final Deploy Validation
         uses: Azure/cli@v1.0.6
         with:

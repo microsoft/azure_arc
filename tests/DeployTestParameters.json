@@ -8,7 +8,8 @@
     "deployBastionDifference": 0,
     "desktopElementsExpected": 10,
     "connectedK8sClustersExpected": 2,
-    "keyVaultsExpected": 1
+    "keyVaultsExpected": 1,
+    "azuredatastudioSettingExpected": 1
   },
   "ITPro": {
     "initialResourceAmount": 13,
@@ -19,7 +20,8 @@
     "deployBastionDifference": 2,
     "desktopElementsExpected": 2,
     "connectedK8sClustersExpected": 0,
-    "keyVaultsExpected": 0
+    "keyVaultsExpected": 0,
+    "azuredatastudioSettingExpected": 0
   },
   "DevOps": {
     "initialResourceAmount": 45,
@@ -30,6 +32,7 @@
     "deployBastionDifference": 0,
     "desktopElementsExpected": 3,
     "connectedK8sClustersExpected": 2,
-    "keyVaultsExpected": 1
+    "keyVaultsExpected": 1,
+    "azuredatastudioSettingExpected": 0
   }
 }
