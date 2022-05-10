@@ -211,7 +211,7 @@ The only thing you need to do before executing the Terraform plan is to export t
 
 * Upload the *az_connect_gke* shell script and run it using the ```. ./az_connect_gke.sh``` command.
 
-  > **NOTE: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+  > **NOTE: The extra dot is due to the script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
   ![Upload a file to Cloud Shell](./27.png)
 
