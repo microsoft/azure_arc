@@ -8,7 +8,8 @@ export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
-export appClonedRepo='<The URL for the "Hello Arc" cloned GitHub repository>'
+export appClonedRepo='<The URL for the "Azure Arc Jumpstart" forked GitHub repository>'
+export appNnamespace='hello-arc'
 
 # Getting AKS credentials
 echo "Log in to Azure with Service Principal & Getting AKS credentials (kubeconfig)"
@@ -25,13 +26,15 @@ helm repo update
 # Use Helm to deploy an NGINX ingress controller
 helm install nginx ingress-nginx/ingress-nginx -n cluster-mgmt
 
-kubectl create ns hello-arc
-
-az k8s-configuration create \
+# Create GitOps config
+echo "Creating GitOps config"
+az k8s-configuration flux create \
 --cluster-name $arcClusterName \
 --resource-group $resourceGroup \
 --name cluster-config \
---operator-instance-name cluster-config --operator-namespace cluster-config \
---repository-url $appClonedRepo \
---scope cluster --cluster-type connectedClusters \
---operator-params="--git-poll-interval 3s --git-readonly"
+--namespace $appNamespace \
+--cluster-type connectedClusters \
+--scope cluster \
+--url $appClonedRepo \
+--branch main --sync-interval 3s \
+--kustomization name=app path=./hello-arc/yaml
