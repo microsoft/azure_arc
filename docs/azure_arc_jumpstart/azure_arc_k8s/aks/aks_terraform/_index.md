@@ -26,7 +26,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
   az --version
   ```
 
-- [Install Terraform >=1.1.0](https://learn.hashicorp.com/terraform/getting-started/install.html)
+- [Install Terraform >=1.1.9](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 - Create Azure service principal (SP)
 
@@ -76,8 +76,10 @@ In case the AKS service is not available in your region, you can change the AKS 
 - Export the environment variables needed for the Terraform plan.
 
     ```shell
-    export TF_VAR_client_id=<Your Azure service principal App ID>
-    export TF_VAR_client_secret=<Your Azure service principal App Password>
+    export ARM_CLIENT_ID=<Your Azure service principal App ID>
+    export ARM_CLIENT_SECRET=<Your Azure service principal App Password>
+    export ARM_SUBSCRIPTION_ID=<Your Azure subscription ID>
+    export ARM_TENANT_ID=<Your Azure tenant ID>
     ```
 
     > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
