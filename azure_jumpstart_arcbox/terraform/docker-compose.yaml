@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  terraform:
+    image: hashicorp/terraform
+    volumes:
+      - .:/infra
+      - "~/.terraform.d:/root/.terraform.d"
+    working_dir: /infra
+#    entrypoint: /bin/sh
+    environment: 
+      - ARM_CLIENT_ID=${ARM_CLIENT_ID}
+      - ARM_CLIENT_SECRET=${ARM_CLIENT_SECRET}
+      - ARM_SUBSCRIPTION_ID=${ARM_SUBSCRIPTION_ID}
+      - ARM_TENANT_ID=${ARM_TENANT_ID} 
+      - TF_VAR_spn_client_id=${ARM_CLIENT_ID}
+      - TF_VAR_spn_client_secret=${ARM_CLIENT_SECRET}
+      - TF_VAR_spn_tenant_id=${ARM_TENANT_ID}
+
+  azure-cli:
+      image: mcr.microsoft.com/azure-cli
+      volumes:
+      - .:/infra
+      - "~/.terraform.d:/root/.terraform.d"
+      working_dir: /infra

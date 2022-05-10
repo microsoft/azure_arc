@@ -1,0 +1,7 @@
+# Rename this template to variables.tfvars
+
+deployment_flavor   = "ITPro"
+client_admin_ssh    = ""
+user_ip_address     = ""
+azure_location      = ""
+client_admin_username = ""
