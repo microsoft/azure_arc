@@ -99,7 +99,7 @@ To create a new extension Instance, we will use the _k8s-extension create_ comma
 
     ![Screenshot parameter examples](./03.png)
 
-    > **NOTE: The extra dot is due to the shell script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+    > **NOTE: The extra dot is due to the shell script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
    The script will:
 

@@ -73,7 +73,7 @@ In this guide, you will hook the GKE cluster to Azure Monitor by deploying the [
 
 * Edit the environment variables in the script to match your environment parameters, upload it to the Cloud Shell environment and run it using the ```. ./gke_monitor_onboarding.sh``` command.
 
-    > **NOTE: The extra dot is due to the shell script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+    > **NOTE: The extra dot is due to the shell script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
     ![Screenshot showing GKE cluster in GCP console](./03.png)
 

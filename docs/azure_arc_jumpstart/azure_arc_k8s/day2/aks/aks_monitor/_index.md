@@ -73,7 +73,7 @@ In this guide, you will hook the AKS cluster to Azure Monitor by deploying the [
 
 * Edit the environment variables in either of the scripts to match your environment parameters, upload it to the Cloud Shell environment and run it using the ```. ./aks_monitor_onboarding.sh``` (Bash) or ```./aks_monitor_onboarding.ps1``` (PowerShell) command.
 
-    > **NOTE: The extra dot is due to the shell script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+    > **NOTE: The extra dot is due to the shell script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
     ![Open Azure Cloud Shell](./03.png)
 

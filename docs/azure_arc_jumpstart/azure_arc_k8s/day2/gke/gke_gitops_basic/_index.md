@@ -83,7 +83,7 @@ In this guide, you will deploy & attach GitOps configuration to your cluster whi
 
 * Edit the environment variables in the [*az_k8sconfig_gke*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/gke/gitops/basic/az_k8sconfig_gke.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_gke.sh``` command.
 
-    > **NOTE: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+    > **NOTE: The extra dot is due to the script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
     ![Open Google Cloud Shell session and authenticate against the GKE cluster](./03.png)
 

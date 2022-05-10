@@ -86,7 +86,7 @@ The following Jumpstart scenario will guide you on how to connect an Linux serve
 
 Run the script using the ```. ./az_connect_linux.sh``` command.
 
-> **NOTE: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+> **NOTE: The extra dot is due to the script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
 Upon completion, you will have your Linux server, connected as a new Azure Arc resource inside your resource group.
 
