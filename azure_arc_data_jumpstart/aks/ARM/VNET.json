@@ -55,7 +55,7 @@
           "addressPrefixes": [ "[parameters('addressPrefix')]" ]
         },
         "dhcpOptions": {
-          "dnsServers": [ "[parameters('dnsServers')]" ]
+          "dnsServers": "[parameters('dnsServers')]"
         },
         "subnets": [
           {
