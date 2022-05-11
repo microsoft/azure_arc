@@ -181,10 +181,43 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Updates VNet DNS servers after ADDS VM is deployed",
+      "apiVersion": "2021-04-01",
+      "name": "updateVNetDNSServers",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('VNETUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "addressPrefix": {
+            "value": "[variables('addressPrefix')]"
+          },
+          "subnetAddressPrefix": {
+            "value": "[variables('subnetAddressPrefix')]"
+          },
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "dnsServers": {
+            "value": "[variables('addsPrivateIPAddres')]"
+          }
+        }
+      }
+    },    
+    {
+      "type": "Microsoft.Resources/deployments",
       "comments": "Deploys an AKS Cluster",
       "apiVersion": "2021-04-01",
       "name": "aksDeployment",
-      "dependsOn": ["VNETDeployment", "addsVmDeployment"],
+      "dependsOn": ["VNETDeployment", "addsVmDeployment", "updateVNetDNSServers"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -261,7 +294,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["VNETDeployment", "addsVmDeployment"],
+      "dependsOn": ["VNETDeployment", "addsVmDeployment", "updateVNetDNSServers"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {

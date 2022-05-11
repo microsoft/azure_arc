@@ -31,7 +31,14 @@
       "metadata": {
         "description": "Bastion subnet prefix"
       }
-    }
+    },
+    "dnsServers": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Bastion subnet prefix"
+      }
+    }    
   },
   "variables": {
     "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]"
@@ -46,6 +53,9 @@
       "properties": {
         "addressSpace": {
           "addressPrefixes": [ "[parameters('addressPrefix')]" ]
+        },
+        "dhcpOptions": {
+          "dnsServers": "[if(parameters('dnsServers'), parameters('dnsServers'), '')]"
         },
         "subnets": [
           {
