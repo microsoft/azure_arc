@@ -193,7 +193,8 @@
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
-        "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
+        "bastionName": "ArcBox-Bastion",
+        "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
