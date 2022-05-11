@@ -76,10 +76,8 @@ In case the AKS service is not available in your region, you can change the AKS 
 - Export the environment variables needed for the Terraform plan.
 
     ```shell
-    export ARM_CLIENT_ID=<Your Azure service principal App ID>
-    export ARM_CLIENT_SECRET=<Your Azure service principal App Password>
-    export ARM_SUBSCRIPTION_ID=<Your Azure subscription ID>
-    export ARM_TENANT_ID=<Your Azure tenant ID>
+    export TF_VAR_client_id=<Your Azure service principal App ID>
+    export TF_VAR_client_secret=<Your Azure service principal App Password>
     ```
 
     > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
@@ -150,8 +148,6 @@ The most straightforward way is to delete the Azure Arc-enabled Kubernetes resou
 
 ![Screenshot showing delete function in Azure portal](./13.png)
 
-If you want to nuke the entire environment, run the below command.
+If you want to nuke the entire environment, delete the resource group.
 
-```shell
-terraform destroy -auto-approve
-```
+![Screenshot showing delete function in Azure portal](./14.png)
