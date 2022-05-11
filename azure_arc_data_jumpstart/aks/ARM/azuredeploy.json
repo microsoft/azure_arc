@@ -250,8 +250,8 @@
           "deployBastion":{
             "value": "[parameters('deployBastion')]"
           },
-          "bastionSubnetRef": {
-            "value": "[variables('bastionSubnetRef')]"
+          "bastionSubnetPrefix": {
+            "value": "[variables('bastionSubnetPrefix')]"
           }
         }
       }
