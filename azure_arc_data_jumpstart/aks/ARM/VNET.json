@@ -33,8 +33,8 @@
       }
     },
     "dnsServers": {
-      "type": "string",
-      "defaultValue": "",
+      "type": "array",
+      "defaultValue": [],
       "metadata": {
         "description": "Bastion subnet prefix"
       }
