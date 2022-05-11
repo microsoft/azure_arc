@@ -82,9 +82,16 @@
     },
     "templateBaseUrl": {
       "type": "string",
-      "defaultValue": "https://msspobackuppoc.blob.core.windows.net/",
+      "defaultValue": "",
       "metadata": {
         "description": "Base URL for ARM template"
+      }
+    },
+    "networkSecurityGroupName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Client-NSG",
+      "metadata": {
+        "description": "Name of the Network Security Group"
       }
     }
   },
@@ -102,7 +109,8 @@
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
          ],
       "properties": {
         "ipConfigurations": [
@@ -119,7 +127,10 @@
               }
             }
           }
-        ]        
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+        }       
       }
     },
     {
