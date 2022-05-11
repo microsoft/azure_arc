@@ -79,7 +79,7 @@
                     "ITPro",
                     "DevOps"
                 ],
-                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '1bcecb6d-1b38-1a84-f775-07977738fbdb')]",
+                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
                 "parameters": {
                     "tagName": {
                         "value": "Project"
