@@ -86,7 +86,9 @@ param githubUser string
 @description('The name of the K3s cluster')
 param k3sArcClusterName string = 'ArcBox-K3s'
 
-var publicIpAddressName = '${vmName}-PIP'
+
+var bastionName = 'ArcBox-Bastion'
+var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
 var PublicIPNoBastion = {
