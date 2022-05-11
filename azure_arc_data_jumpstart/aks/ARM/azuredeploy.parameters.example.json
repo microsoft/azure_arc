@@ -43,6 +43,9 @@
     },
     "dnsPrefix": {
       "value": "arcAksdemoXXX"
+    },
+    "addsDomainName": {
+      "value": "contoso.local"
     }
   }
 }

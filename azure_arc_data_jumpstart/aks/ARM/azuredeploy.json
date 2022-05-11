@@ -16,6 +16,13 @@
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
       }
     },
+    "addsDomainName": {
+      "type": "string",
+      "defaultValue": "contoso.local",
+      "metadata": {
+        "description": "The name of your Virtual Machine"
+      }
+    },    
     "myIpAddress": {
       "type": "string",
       "metadata": {
@@ -124,17 +131,20 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/ARM/')]",
+    //"templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/ARM/')]",
+    "templateBaseUrl": "https://msspobackuppoc.blob.core.windows.net/arm/",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
+    "addsVMTemplateUrl": "[uri(variables('templateBaseUrl'), 'addsVm.json')]",
     // Virtual Network configuration
     "virtualNetworkName": "Arc-Data-VNet",
     "subnetName": "Arc-Data-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24",
     "bastionSubnetPrefix": "172.16.2.64/26",
+    "addsPrivateIPAddres": "172.16.1.100",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
   },
@@ -174,6 +184,7 @@
       "comments": "Deploys an AKS Cluster",
       "apiVersion": "2021-04-01",
       "name": "aksDeployment",
+      "dependsOn": ["VNETDeployment", "addsVmDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -201,10 +212,44 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys Active Directory Domain Services Windows VM",
+      "apiVersion": "2021-04-01",
+      "name": "addsVmDeployment",
+      "dependsOn": ["VNETDeployment"],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('addsVMTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "windowsAdminUsername": {
+            "value": "[parameters('windowsAdminUsername')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "addsDomainName": {
+            "value": "[parameters('addsDomainName')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
+          },
+          "addsPrivateIPAddres":{
+            "value": "[variables('addsPrivateIPAddres')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["VNETDeployment"],
+      "dependsOn": ["VNETDeployment", "addsVmDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {

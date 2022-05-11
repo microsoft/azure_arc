@@ -43,6 +43,9 @@
     },
     "dnsPrefix": {
         "value": "<A DNS prefix for the Public IP>"
+    },
+    "addsDomainName": {
+      "value": "contoso.local"
     }
   }
 }
