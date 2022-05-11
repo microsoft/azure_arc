@@ -128,11 +128,25 @@
       "metadata": {
         "description": "the Azure Bastion host name"
       }
+    },
+    "networkSecurityGroupName": {
+      "type": "string",
+      "defaultValue": "Arc-Data-Client-NSG",
+      "metadata": {
+        "description": "Name of the Network Security Group"
+      }
+    },
+    "azureLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
     }
   },
   "variables": {
-    //"templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/ARM/')]",
-    "templateBaseUrl": "https://msspobackuppoc.blob.core.windows.net/arm/",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/ARM/')]",
+    //"templateBaseUrl": "https://msspobackuppoc.blob.core.windows.net/arm/",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
@@ -240,6 +254,9 @@
           },
           "addsPrivateIPAddres":{
             "value": "[variables('addsPrivateIPAddres')]"
+          },
+          "templateBaseUrl":{
+            "value": "[variables('templateBaseUrl')]"
           }
         }
       }
@@ -312,6 +329,29 @@
             "value": "[variables('bastionSubnetRef')]"
           }
         }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2019-02-01",
+      "name": "[parameters('networkSecurityGroupName')]",
+      "location": "[parameters('azureLocation')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "allow_RDP_3389",
+            "properties": {
+              "priority": 1001,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "3389"
+            }
+          }
+        ]
       }
     },
     {
