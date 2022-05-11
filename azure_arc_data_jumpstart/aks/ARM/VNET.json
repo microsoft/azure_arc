@@ -33,10 +33,10 @@
       }
     },
     "dnsServers": {
-      "type": "array",
-      "defaultValue": ["168.63.129.16"],
+      "type": "string",
+      "defaultValue": "168.63.129.16",
       "metadata": {
-        "description": "Bastion subnet prefix"
+        "description": "DNS Server configuration"
       }
     }    
   },
