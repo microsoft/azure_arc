@@ -224,7 +224,7 @@
         }
       }
     },
-    /*{
+    {
       "type": "Microsoft.Network/networkSecurityGroups",
       "apiVersion": "2019-02-01",
       "name": "[parameters('networkSecurityGroupName')]",
@@ -246,7 +246,7 @@
           }
         ]
       }
-    },*/
+    },
     {
       "type": "Microsoft.Network/publicIpAddresses",
       "apiVersion": "2019-02-01",

@@ -223,6 +223,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "myIpAddress": {
+            "value": "[parameters('myIpAddress')]"
+          },
           "windowsAdminUsername": {
             "value": "[parameters('windowsAdminUsername')]"
           },
@@ -246,6 +249,9 @@
           },
           "deployBastion":{
             "value": "[parameters('deployBastion')]"
+          },
+          "bastionSubnetRef": {
+            "value": "[variables('bastionSubnetRef')]"
           }
         }
       }
