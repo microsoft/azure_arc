@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "myIpAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "Your public IP address, used to RDP to the client VM"
+      }
+    },    
     "addsDomainName": {
       "type": "string",
       "defaultValue": "contoso.local",
@@ -89,11 +95,17 @@
     },
     "networkSecurityGroupName": {
       "type": "string",
-      "defaultValue": "Arc-Data-Client-NSG",
+      "defaultValue": "Arc-Data-ADDS-NSG",
       "metadata": {
         "description": "Name of the Network Security Group"
       }
     },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Azure Bastion subnet IP prefix"
+      }
+    },   
     "deployBastion": {
       "type": "bool",
       "metadata": {
@@ -239,7 +251,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
+              "sourceAddressPrefix": "[if(parameters('deployBastion'),parameters('bastionSubnetPrefix'), parameters('myIpAddress'))]",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "3389"
@@ -247,7 +259,7 @@
           }
         ]
       }
-    },  
+    }
   ],
   "outputs": {
     "scriptfile": {
