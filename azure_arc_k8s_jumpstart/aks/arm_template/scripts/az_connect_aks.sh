@@ -9,11 +9,25 @@ export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 
-# Getting AKS credentials
-echo "Log in to Azure with Service Principle & Getting AKS credentials (kubeconfig)"
+# Log in to Azure
+echo "Log in to Azure with Service Principle"
 az login --service-principal --username $appId --password $password --tenant $tenantId
+
+# Registering Azure Arc providers
+echo "Registering Azure Arc providers"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+
+az provider show -n Microsoft.Kubernetes -o table
+az provider show -n Microsoft.KubernetesConfiguration -o table
+az provider show -n Microsoft.ExtendedLocation -o table
+
+# Getting AKS credentials
+echo "Getting AKS credentials (kubeconfig)"
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 
+echo "Clear cached helm Azure Arc Helm Charts"
 rm -rf ~/.azure/AzureArcCharts
 
 # Installing Azure Arc k8s CLI extensions
