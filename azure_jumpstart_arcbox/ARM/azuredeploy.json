@@ -63,7 +63,7 @@
       "metadata": {
         "description": "Target GitHub account"
       },
-      "defaultValue": "sebassem"
+      "defaultValue": "microsoft"
     },
     "githubBranch": {
       "type": "string",
