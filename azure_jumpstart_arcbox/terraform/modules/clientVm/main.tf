@@ -188,7 +188,7 @@ variable "postgres_service_type" {
 ###########################################################################################
 
 locals {
-    bastion_name           = "Arcbox-Bastion"
+    bastion_name           = "ArcBox-Bastion"
     public_ip_name         = var.deploy_bastion == false ? "${var.vm_name}-PIP" : "${local.bastion_name}-PIP"
     network_interface_name = "${var.vm_name}-NIC"
     bastionSubnetIpPrefix  = "172.16.3.64/26"
