@@ -3,8 +3,8 @@
 # Environment variables edit to match your enviroment
 
 export subscription=<your subscription ID>
-export resourcegroup=<your Resource Group where your Azure Arc-enabled server is registered to>
-export arc_server=<your Azure Arc-enabled server>
+export resourceGroup=<your Resource Group where your Azure Arc-enabled server is registered to>
+export arcServer=<your Azure Arc-enabled server>
 
 ## Main Script -- Do not change
 
