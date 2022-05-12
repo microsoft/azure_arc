@@ -342,4 +342,9 @@ jobs:
           inlineScript: |
             chmod +x ./tests/FinalValidation.sh
             ./tests/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./tests/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
+      - name: Delete Resources
+        uses: Azure/cli@v1.0.6
+        with:
+          inlineScript: |
+            az group delete -n ${{ github.event.inputs.resourceGroupName }} -y
 
