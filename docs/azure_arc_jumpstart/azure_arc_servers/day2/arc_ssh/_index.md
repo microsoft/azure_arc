@@ -135,7 +135,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     ![Test SSH connection](./04.png)
 
-  > **NOTE: if your Arc-enabled server uses other authentication methods make sure to review the [_az ssh arc_ documentation].(https://docs.microsoft.com/cli/azure/ssh?view=azure-cli-latest#az-ssh-arc)**
+  > **NOTE: if your Arc-enabled server uses other authentication methods make sure to review the [_az ssh arc_ documentation](https://docs.microsoft.com/cli/azure/ssh?view=azure-cli-latest#az-ssh-arc)**
 
 ## Cleanup
 
