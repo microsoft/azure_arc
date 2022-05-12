@@ -19,21 +19,21 @@ cd "$terraformFolder" || exit
 
 terraformVasrs=./terraform.tfvars
 
-echo "$client_admin_ssh" > ./rsa.pub
+echo "$client_admin_ssh" >./rsa.pub
 path=$(realpath ./rsa.pub)
-echo "" > "$terraformVasrs"
-echo "resource_group_name=\"$resource_group_name\"" >> "$terraformVasrs"
-echo "azure_location=\"$azure_location\"" >> "$terraformVasrs"
-echo "spn_client_id=\"$spn_client_id\"" >> "$terraformVasrs"
-echo "spn_client_secret=\"$spn_client_secret\"" >> "$terraformVasrs"
-echo "spn_tenant_id=\"$spn_tenant_id\"" >> "$terraformVasrs"
-echo "client_admin_ssh=\"$path\"" >> "$terraformVasrs"
-echo "client_admin_username=\"$client_admin_username\"" >> "$terraformVasrs"
-echo "client_admin_password=\"$client_admin_password\"" >> "$terraformVasrs"
-echo "deployment_flavor=\"$deployment_flavor\"" >> "$terraformVasrs"
-echo "workspace_name=\"$workspace_name\"" >> "$terraformVasrs"
+echo "" >"$terraformVasrs"
+echo "resource_group_name=\"$resource_group_name\"" >>"$terraformVasrs"
+echo "azure_location=\"$azure_location\"" >>"$terraformVasrs"
+echo "spn_client_id=\"$spn_client_id\"" >>"$terraformVasrs"
+echo "spn_client_secret=\"$spn_client_secret\"" >>"$terraformVasrs"
+echo "spn_tenant_id=\"$spn_tenant_id\"" >>"$terraformVasrs"
+echo "client_admin_ssh=\"$path\"" >>"$terraformVasrs"
+echo "client_admin_username=\"$client_admin_username\"" >>"$terraformVasrs"
+echo "client_admin_password=\"$client_admin_password\"" >>"$terraformVasrs"
+echo "deployment_flavor=\"$deployment_flavor\"" >>"$terraformVasrs"
+echo "workspace_name=\"$workspace_name\"" >>"$terraformVasrs"
 echo "github_repo=\"$github_repo\"" >>terraform.tfvars
-echo "github_branch=\"$github_branch\"" >> "$terraformVasrs"
+echo "github_branch=\"$github_branch\"" >>"$terraformVasrs"
 echo "deploy_bastion=\"$deploy_bastion\"" >>"$terraformVasrs"
 
 export ARM_CLIENT_ID="$spn_client_id"
