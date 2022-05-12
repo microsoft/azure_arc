@@ -33,7 +33,7 @@ fi
 azureArcMachines=$(az resource list -g  "$ResourceGroup" --query '[].id' -o tsv | grep -v  '/extensions/' | grep -h '/Microsoft.HybridCompute/machines/' -c) 
 jqueryAzureArcMachinesExpected=".$Flavor.azureArcMachinesExpected"
 azureArcMachinesExpected=$(echo "$config" |  jq "$jqueryAzureArcMachinesExpected")
-if [ "$azureArcMachinesExpected" = "$azureArcMachines" ]; then
+if [ "$azureArcMachines" -ge "$azureArcMachinesExpected" ]; then
    echo "We have $azureArcMachines Azure Arc Machines"
 else
    echo "Error # Azure Arc Machine $azureArcMachines" 
@@ -41,7 +41,7 @@ else
 fi
 
 # Validate Arc enable status if there are expected servers      
-if [ "$azureArcMachinesExpected" = "5" ]; then
+if [ "$azureArcMachinesExpected" -ge "5" ]; then
   ArcBoxWin2K19=$(az resource show -g "$ResourceGroup" -n ArcBox-Win2K19 --resource-type 'Microsoft.HybridCompute/machines' --query properties.status -o tsv) || ArcBoxWin2K19="NoConnected"
   ArcBoxWin2K22=$(az resource show -g "$ResourceGroup" -n ArcBox-Win2K22 --resource-type 'Microsoft.HybridCompute/machines' --query properties.status -o tsv) || ArcBoxWin2K22="NoConnected"
   ArcBoxSQL=$(az resource show -g "$ResourceGroup" -n ArcBox-SQL --resource-type 'Microsoft.HybridCompute/machines' --query properties.status -o tsv) || ArcBoxSQL="NoConnected"
