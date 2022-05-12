@@ -189,7 +189,7 @@ jobs:
               echo "Expected Time Execution 110 min"
            fi
           fi          
-          echo "if Windowss Run Command not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs. "
+          echo "if Windows Run Command not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs. "
       - name: Install package for ssh with password inline
         run: |
           sudo apt-get -y install putty-tools
@@ -342,8 +342,4 @@ jobs:
           inlineScript: |
             chmod +x ./tests/FinalValidation.sh
             ./tests/FinalValidation.sh ${{ github.event.inputs.resourceGroupName }} ${{ github.event.inputs.flavor }} ./tests/DeployTestParameters.json ${{ github.event.inputs.deployBastion }}
-      - name: Delete Resources
-        uses: Azure/cli@v1.0.6
-        with:
-          inlineScript: |
-            az group delete -n ${{ github.event.inputs.resourceGroupName }} -y
+
