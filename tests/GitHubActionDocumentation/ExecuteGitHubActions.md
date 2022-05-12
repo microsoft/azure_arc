@@ -158,7 +158,7 @@ Many validations depends on the scenario, for example the number of resources. W
 - We are counting resources just after the resource deployments. Step name `name: Count Resources pre vm Script execution`. The code is on the `CountResources.sh` script.
 - After the LogOn script executions
   - We count the number of elements on the Desktop (mainly links). We look into the `C:\Users\Public\Desktop` and `C:\Users\${user}\Desktop` folders. The code is on the `FileValidations.sh` script.
-  - If check Azure Data Studio setting file exist and the size is bigger than 0 byte. The code is on the `FileValidations.sh` script.
+  - Check Azure Data Studio setting file exist (depending on the flavor) and the size is bigger than 0 byte. Also parsing a testing that includes two connection descriptor, and both have port assigned (depending on the connection descriptor type). The code is on the `FileValidations.sh` script.
   - Finally, The `FinalValidation.sh` includes may other validations:
     - Count resources again
     - Check Azure Arc enable machines amount

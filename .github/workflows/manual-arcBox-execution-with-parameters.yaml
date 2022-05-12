@@ -347,4 +347,3 @@ jobs:
         with:
           inlineScript: |
             az group delete -n ${{ github.event.inputs.resourceGroupName }} -y
-

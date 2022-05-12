@@ -12,17 +12,17 @@ config=$(cat "$DeployTestParametersFile")
 
 # Getting expected result from config. It depends on the flavor.
 jquery=".$Flavor.$Step"
-resourceExpected=$(echo "$config" |  jq "$jquery")
+resourceExpected=$(echo "$config" | jq "$jquery")
 
-# Apply Bastion difference if needed  
+# Apply Bastion difference if needed
 if [ "$DeployBastion" = "true" ]; then
-  jqueryBastion=".$Flavor.deployBastionDifference"
-  deployBastionDifference=$(echo "$config" |  jq "$jqueryBastion")
-  resourceExpected=$(($resourceExpected+$deployBastionDifference))
+   jqueryBastion=".$Flavor.deployBastionDifference"
+   deployBastionDifference=$(echo "$config" | jq "$jqueryBastion")
+   resourceExpected=$(($resourceExpected + $deployBastionDifference))
 fi
 
 # Count real resurces
-portalResources=$(az resource list -g  "$ResourceGroup"  --query '[].id' -o tsv | grep -v  '/extensions/' -c)
+portalResources=$(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep -v '/extensions/' -c)
 
 # Do the validation
 if [ "$portalResources" -ge "$resourceExpected" ]; then
