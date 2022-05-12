@@ -189,7 +189,7 @@ jobs:
               echo "Expected Time Execution 110 min"
            fi
           fi          
-          echo "if Widows Run Command not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs. "
+          echo "if Windowss Run Command not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs. "
       - name: Install package for ssh with password inline
         run: |
           sudo apt-get -y install putty-tools

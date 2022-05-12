@@ -149,7 +149,7 @@ _Note:_ `success() || failure()` means to run this step even if fails some previ
 | Full   | no      | 110 min   |
 | Full   | yes     | 120 min   |
 
-if [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs.
+if [Windowss Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs.
 
 ## Automatic Validations
 
@@ -177,12 +177,12 @@ Many validations depends on the scenario, for example the number of resources. W
 
 We need to execute 4 script inside the VM on a full deploy to simulate what it happens at LogOn:
 
-- ArcServersLogonScript.ps1, this script is block when execute using OpenSSH, but when we run it using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), it works. Running through OpenSSH the last log entry is `Installing SQL Server - Azure Arc extension. This may take 5+ minutes.`, then I suppose the block is executing `$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer"...`
+- ArcServersLogonScript.ps1, this script is block when execute using OpenSSH, but when we run it using [Windowss Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), it works. Running through OpenSSH the last log entry is `Installing SQL Server - Azure Arc extension. This may take 5+ minutes.`, then I suppose the block is executing `$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer"...`
 - DevOpsLogonScript.ps1, is executed using OpenSSH.
-- DataServicesLogonScript.ps1, this script is block when execute using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), so we installed and use OpenSSH to execute it. 
+- DataServicesLogonScript.ps1, this script is block when execute using [Windowss Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), so we installed and use OpenSSH to execute it. 
 - MonitorWorkbookLogonScript.ps1, execute in both approaches. It currently is running with OpenSSH
 
-After the incorporation of some security polices to the subscription, the [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) start to fail randomly, the failure is described on the note inside the documentation:
+After the incorporation of some security polices to the subscription, the [Windowss Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) start to fail randomly, the failure is described on the note inside the documentation:
 
 "To function correctly, Run Command requires connectivity (port 443) to Azure public IP addresses. If the extension doesn't have access to these endpoints, **the scripts might run successfully but not return the results**. If you're blocking traffic on the virtual machine, you can use service tags to allow traffic to Azure public IP addresses by using the AzureCloud tag."
 
@@ -192,4 +192,4 @@ The ITPro flavor usually works and the Full flavor usually fails. We spouse it i
 
 We added a kind or "continue on error", and we check a file generated that indicate the script finished the execution. Then it will succeed even after time out. The only secondary effect is the execution time increase.
 
-[Open SSH](https://docs.microsoft.com/windows-server/administration/openssh/openssh_install_firstuse) is installed using [Widows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), and for subscription security polices was moved to port 2204
+[Open SSH](https://docs.microsoft.com/windows-server/administration/openssh/openssh_install_firstuse) is installed using [Windowss Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), and for subscription security polices was moved to port 2204
