@@ -332,12 +332,6 @@ jobs:
         with:
           name: MonitorWorkbookLogonScript.log
           path: MonitorWorkbookLogonScript.log
-      - name: Upload azuredatastudioSettings.json File
-        if: (github.event.inputs.flavor == 'Full') &&  (success() || failure())
-        uses: actions/upload-artifact@v3
-        with:
-          name: azuredatastudioSettings.json
-          path: settings.json
       - name: File Validation
         run: |
           chmod +x ./tests/FileValidations.sh
