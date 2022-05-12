@@ -11,7 +11,7 @@ export arcServer=<your Azure Arc-enabled server>
 # Add Azure CLI extensions
 
 echo  "Adding Azure CLI extensions"
-az extension add --name ssh
+sudo az extension add --name ssh
 
 # Create default connectivity endpoint
 
