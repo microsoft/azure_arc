@@ -77,11 +77,11 @@ GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a p
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-- User has deployed the AKS cluster using and has it connected as Azure Arc-enabled Kubernetes cluster.
+- User has deployed the AKS cluster and has it connected as Azure Arc-enabled Kubernetes cluster.
 
 - User is editing the environment variables in the Shell script file (1-time edit) which then be used throughout the GitOps configuration.
 
-- User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Flux extension and create a GitOps configuration on the Azure Arc-connected Kubernetes cluster.
+- User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Flux extension and create GitOps configurations on the Azure Arc-connected Kubernetes cluster.
 
 - The script will also create a namespace and deploy Nginx Ingress Controller.
 
@@ -109,7 +109,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 - In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the *az_k8sconfig_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
 
-- Download [the script](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks/gitops/basic/az_k8sconfig_aks.sh) using below command
+- Download [the script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/basic/az_k8sconfig_aks.sh) using below command
 
     ```shell
     curl -L https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks/gitops/basic/az_k8sconfig_aks.sh -o ~/az_k8sconfig_aks.sh
@@ -119,7 +119,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
     ![Download the script](./05.png)
 
-- Edit the environment variables in the [*az_k8sconfig_aks*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/basic/az_k8sconfig_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the _`. ./az_k8sconfig_aks.sh`_ command.
+- Edit the environment variables in the [*az_k8sconfig_aks*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/basic/az_k8sconfig_aks.sh) shell script to match your parameters and run it using the _`. ./az_k8sconfig_aks.sh`_ command.
 
     ![Parameter](./06.png)
 
@@ -133,7 +133,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
   - Login to your Azure subscription using the SPN credentials
   - Retrieve the cluster credentials (KUBECONFIG)
-  - Will use Helm to deploy NGINX ingress controller
+  - Use Helm to deploy NGINX ingress controller
   - Create the GitOps configurations and deploy the Flux controllers on the Azure Arc connected cluster
   - Deploy the ["Hello Arc"](https://github.com/microsoft/azure-arc-jumpstart-apps/tree/main/hello-arc/yaml) application alongside an Ingress rule to make it available from outside the cluster
 
@@ -155,7 +155,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 - Before kicking the GitOps flow, let's verify and "zoom in" to the Kubernetes resources deployed by running a few _kubectl_ commands.
 
-- Show the Flux operator pods.
+- Show the Flux agent and controller pods.
 
     ```shell
     kubectl get pods -n flux-system 
@@ -189,9 +189,9 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 - The GitOps flow works as follow:
 
-    1. The Flux operator holds the "desired state" of the "Hello Arc" application, this is the configuration we deployed against the Azure Arc connected cluster. The operator "polls" the state of the ["Hello Arc"](https://github.com/microsoft/azure-arc-jumpstart-apps/tree/main/hello-arc/yaml) application repository.
+    1. The Flux controllers holds the "desired state" of the "Hello Arc" application, this is the configuration we deployed against the Azure Arc connected cluster. The controllers "polls" the state of the ["Hello Arc"](https://github.com/microsoft/azure-arc-jumpstart-apps/tree/main/hello-arc/yaml) application repository.
 
-    2. Changing the application, which is considered to be a new version of it, will trigger the Flux operator to kick in the GitOps flow.
+    2. Changing the application, which is considered to be a new version of it, will trigger the Flux controllers to kick in the GitOps flow.
 
     3. A new Kubernetes pod with the new version of the application will be deployed on the cluster. Once the new pods are successfully deployed, the old one will be terminated (rolling upgrade).
 
