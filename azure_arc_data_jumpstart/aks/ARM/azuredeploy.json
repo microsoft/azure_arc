@@ -208,7 +208,7 @@
             "value": "[variables('bastionSubnetPrefix')]"
           },
           "dnsServers": {
-            "value": "[array(variables('addsPrivateIPAddres'))]"
+            "value": "[variables('addsPrivateIPAddres')]"
           }
         }
       }
