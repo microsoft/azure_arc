@@ -4,7 +4,7 @@ on:
     inputs:
       flavor:
         type: choice
-        description: "Flavor to be executed"
+        description: "ArcBox flavor to deploy"
         required: true
         options:
           - Full
@@ -12,26 +12,26 @@ on:
           - DevOps
       mechanism:
         type: choice
-        description: "Kind of deploy tool"
+        description: "Deployment option"
         required: true
         options:
           - ARM
           - Bicep
           - Terraform
       githubBranch:
-        description: "git hub branch to take the scripts"
+        description: "Repo branch where the scripts are located"
         required: true
         default: "main"
       resourceGroupName:
-        description: "resource group where we will deploy"
+        description: "Resource group name"
         required: true
         default: "arcbox-test-rg"
       location:
-        description: "location where we will deploy"
+        description: "Resource group location"
         required: true
         default: "westus2"
       logAnalyticsWorkspaceName:
-        description: "Name of log Analytics Workspace"
+        description: "Analytics Workspace name"
         required: true
         default: "MyAnalyticsWorkspace123"
       windowsAdminUsername:
@@ -40,7 +40,7 @@ on:
         default: "arcdemo"
       deployBastion:
         type: boolean
-        description: "Choice to deploy Bastion to connect to the client VM"
+        description: "Deploy Bastion?"
         required: true
         default: false
 jobs:
@@ -49,7 +49,7 @@ jobs:
     env:
       ExcludeRules: SC2148,SC2116,SC2044,SC2129
     steps:
-      - name: Check out repository code
+      - name: Check out repo
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.inputs.githubBranch }}
@@ -69,7 +69,7 @@ jobs:
     env:
       ExcludeRules: "PSAvoidUsingInvokeExpression,PSAvoidTrailingWhitespace"
     steps:
-      - name: Check out repository code
+      - name: Check out repo
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.inputs.githubBranch }}
@@ -90,7 +90,7 @@ jobs:
     env:
       ExcludeRules: "Secure-String-Parameters-Cannot-Have-Default,CommandToExecute-Must-Use-ProtectedSettings-For-Secrets,URIs-Should-Be-Properly-Constructed,Template-Should-Not-Contain-Blanks,Location-Should-Not-Be-Hardcoded"
     steps:
-      - name: Check out repository code
+      - name: Check out repo
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.inputs.githubBranch }}
@@ -127,7 +127,7 @@ jobs:
       TFSecExcludeRules:
       ChecovExcludeRules: CKV2_AZURE_10
     steps:
-      - name: Check out repository code
+      - name: Check out repo
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.inputs.githubBranch }}
@@ -157,15 +157,15 @@ jobs:
     steps:
       - name: Check inputs values
         run: |
-          echo "flavor selected: ${{ github.event.inputs.flavor }}"
-          echo "mechanism selected: ${{ github.event.inputs.mechanism }}" 
-          echo "githubAccount selected: ${GITHUB_REPOSITORY_OWNER}"
-          echo "githubBranch selected: ${{ github.event.inputs.githubBranch }}"
-          echo "resourceGroupName selected: ${{ github.event.inputs.resourceGroupName }}"
-          echo "location selected: ${{ github.event.inputs.location }}"
-          echo "logAnalyticsWorkspaceName selected: ${{ github.event.inputs.logAnalyticsWorkspaceName }}"
-          echo "windowsAdminUsername selected: ${{ github.event.inputs.windowsAdminUsername }}"
-          echo "deployBastion selected: ${{ github.event.inputs.deployBastion }}"
+          echo "Flavor: ${{ github.event.inputs.flavor }}"
+          echo "Deployment option: ${{ github.event.inputs.mechanism }}" 
+          echo "GitHub account: ${GITHUB_REPOSITORY_OWNER}"
+          echo "Scripts branch: ${{ github.event.inputs.githubBranch }}"
+          echo "Resource group: ${{ github.event.inputs.resourceGroupName }}"
+          echo "Location: ${{ github.event.inputs.location }}"
+          echo "Log Analytics Workspace: ${{ github.event.inputs.logAnalyticsWorkspaceName }}"
+          echo "Windows admin user name: ${{ github.event.inputs.windowsAdminUsername }}"
+          echo "Bastion deployment: ${{ github.event.inputs.deployBastion }}"
       - name: Expected Time Execution
         run: |
           if [ '${{ github.event.inputs.flavor }}' == 'DevOps' ]; then
@@ -199,7 +199,7 @@ jobs:
         if: github.event.inputs.mechanism == 'Terraform'
         with:
           terraform_version: 1.0.11
-      - name: Check out repository code
+      - name: Check out repo
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.inputs.githubBranch }}
@@ -257,7 +257,7 @@ jobs:
         run: |
           az vm run-command invoke -g  ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --command-id RunPowerShellScript --scripts "C:\ArcBox\GHActionDeploy.ps1"
         continue-on-error: true
-      - name: Auto-storing server host key in cache and Create directory
+      - name: Store server host key in cache and create directory
         run: |
           echo y | plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' "exit"
           plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'cd'
