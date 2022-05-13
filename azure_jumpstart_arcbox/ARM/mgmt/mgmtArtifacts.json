@@ -383,6 +383,7 @@
       "apiVersion": "2015-11-01-preview",
       "location": "[parameters('location')]",
       "name": "[variables('Updates').name]",
+      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
       ],
@@ -403,6 +404,7 @@
       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
       ],
+      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
       "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
       "properties": {
         "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
@@ -419,6 +421,7 @@
       "apiVersion": "2015-11-01-preview",
       "name": "[variables('ChangeTracking').name]",
       "location": "[parameters('location')]",
+      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
       ],
