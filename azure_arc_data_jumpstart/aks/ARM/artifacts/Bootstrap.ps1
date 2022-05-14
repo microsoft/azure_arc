@@ -22,6 +22,7 @@ param (
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminPassword', $adminPassword,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
@@ -148,7 +149,7 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-# If AD Auth is required join computer to ADDS domain and restart computer
+<# If AD Auth is required join computer to ADDS domain and restart computer
 if ($addsDomainName.Length -gt 0)
 {
     # Install Install-WindowsFeature RSAT-AD-PowerShell windows feature to setup OU and User Accounts in ADDS
@@ -177,3 +178,4 @@ if ($addsDomainName.Length -gt 0)
     Write-Host "Joined Client VM to $addsDomainName domain."
     Restart-Computer
 }
+#>
