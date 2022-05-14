@@ -18,9 +18,9 @@
     },
     "addsDomainName": {
       "type": "string",
-      "defaultValue": "contoso.local",
+      "defaultValue": "",
       "metadata": {
-        "description": "The name of your Virtual Machine"
+        "description": "Active Direcotory domain name ot support AD Auth. Empty value indicates AD auth not required in SQLMI."
       }
     },    
     "myIpAddress": {
@@ -87,14 +87,7 @@
         "description": "SQL Managed Instance deployment"
       }
     },
-    "supportADAuth": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "Deploy ADDS and support AD auth in SQL Managed Instance"
-      }
-    },    
-    "SQLMIHA": {
+     "SQLMIHA": {
       "type": "bool",
       "defaultValue": false,
       "metadata": {
