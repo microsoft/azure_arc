@@ -364,6 +364,9 @@
           },
           "bastionSubnetRef": {
             "value": "[variables('bastionSubnetRef')]"
+          },
+          "supportADAuth": {
+            "value": "[parameters('supportADAuth')]"
           }
         }
       }
