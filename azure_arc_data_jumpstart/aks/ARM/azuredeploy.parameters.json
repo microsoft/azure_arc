@@ -46,6 +46,9 @@
     },
     "addsDomainName": {
       "value": "contoso.local"
+    },
+    "enableADAuth": {
+      "value": "(true/false)"
     }
   }
 }
