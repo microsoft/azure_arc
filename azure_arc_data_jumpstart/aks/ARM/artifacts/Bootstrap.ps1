@@ -1,5 +1,6 @@
 param (
     [string]$adminUsername,
+    [string]$adminPassword,
     [string]$spnClientId,
     [string]$spnClientSecret,
     [string]$spnTenantId,
@@ -16,7 +17,8 @@ param (
     [string]$deploySQLMI,
     [string]$SQLMIHA,    
     [string]$deployPostgreSQL,
-    [string]$templateBaseUrl
+    [string]$templateBaseUrl,
+    [string]$addsDomainName
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -144,3 +146,22 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+
+# If AD Auth is required join computer to ADDS domain and restart computer
+if ($addsDomainName.Length -gt 0)
+{
+    Write-Host "Joining computer to Active Directory domain $addsDomainName. Computer will be rebooted after joining domain."
+    # Get NitBios name from FQDN
+    $netbiosname = $addsDomainName.Split(".")[0]
+    $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
+        UserName = "$netbiosname\$adminUsername"
+        Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
+    })
+    
+    $localCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
+        UserName = "$hostname\$adminUsername"
+        Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
+    })
+    
+    Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred -Restart
+}
