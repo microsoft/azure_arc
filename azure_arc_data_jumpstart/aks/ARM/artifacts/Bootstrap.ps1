@@ -154,9 +154,12 @@ if ($addsDomainName.Length -gt 0)
     # Install Install-WindowsFeature RSAT-AD-PowerShell windows feature to setup OU and User Accounts in ADDS
     Install-WindowsFeature -Name RSAT-AD-PowerShell
 
+    Write-Host "Installed RSAT-AD-PowerShell windows feature"
+
     Write-Host "Joining computer to Active Directory domain $addsDomainName. Computer will be rebooted after joining domain."
     # Get NitBios name from FQDN
     $netbiosname = $addsDomainName.Split(".")[0]
+    $hostname = $env:COMPUTERNAME
     $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
         UserName = "$netbiosname\$adminUsername"
         Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
@@ -167,5 +170,7 @@ if ($addsDomainName.Length -gt 0)
         Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
     })
     
-    Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred -Restart
+    Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
+    Write-Host "Joined Cliemt VM to $addsDomainName domain."
+    Restart-Computer
 }
