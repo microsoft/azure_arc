@@ -156,21 +156,24 @@ if ($addsDomainName.Length -gt 0)
 
     Write-Host "Installed RSAT-AD-PowerShell windows feature"
 
-    Write-Host "Joining computer to Active Directory domain $addsDomainName. Computer will be rebooted after joining domain."
+    Write-Host "Joining computer to Active Directory domain ${addsDomainName}. Computer will be rebooted after joining domain."
     # Get NitBios name from FQDN
     $netbiosname = $addsDomainName.Split(".")[0]
-    $hostname = $env:COMPUTERNAME
+    $computername = $env:COMPUTERNAME
+
     $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
-        UserName = "$netbiosname\$adminUsername"
+        UserName = "${netbiosname}\${adminUsername}"
         Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
     })
     
     $localCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
-        UserName = "$hostname\$adminUsername"
+        UserName = "${computername}\${adminUsername}"
         Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
     })
+ 
+    Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
     
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
-    Write-Host "Joined Cliemt VM to $addsDomainName domain."
+    Write-Host "Joined Client VM to $addsDomainName domain."
     Restart-Computer
 }
