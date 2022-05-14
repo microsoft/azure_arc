@@ -150,6 +150,9 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 # If AD Auth is required join computer to ADDS domain and restart computer
 if ($addsDomainName.Length -gt 0)
 {
+    # Install Install-WindowsFeature RSAT-AD-PowerShell windows feature to setup OU and User Accounts in ADDS
+    Install-WindowsFeature -Name RSAT-AD-PowerShell
+
     Write-Host "Joining computer to Active Directory domain $addsDomainName. Computer will be rebooted after joining domain."
     # Get NitBios name from FQDN
     $netbiosname = $addsDomainName.Split(".")[0]
