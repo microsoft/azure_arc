@@ -18,7 +18,7 @@
     },
     "addsDomainName": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "contoso.local",
       "metadata": {
         "description": "Active Direcotory domain name ot support AD Auth. Empty value indicates AD auth not required in SQLMI."
       }
@@ -85,6 +85,13 @@
       "defaultValue": false,
       "metadata": {
         "description": "SQL Managed Instance deployment"
+      }
+    },
+    "enableADAuth": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Indicate whethe to support AD authentication in SQLMI"
       }
     },
      "SQLMIHA": {
@@ -218,6 +225,7 @@
       "comments": "Deploys an AKS Cluster",
       "apiVersion": "2021-04-01",
       "name": "aksDeployment",
+      "condition": false,
       "dependsOn": ["VNETDeployment", "addsVmDeployment", "updateVNetDNSServers"],
       "properties": {
         "mode": "Incremental",
@@ -249,6 +257,7 @@
       "comments": "Deploys Active Directory Domain Services Windows VM",
       "apiVersion": "2021-04-01",
       "name": "addsVmDeployment",
+      "condition": "[parameters('enableADAuth')]",
       "dependsOn": ["VNETDeployment"],
       "properties": {
         "mode": "Incremental",
@@ -338,6 +347,10 @@
           },
           "SQLMIHA": {
             "value": "[parameters('SQLMIHA')]"
+          },
+          "enableADAuth":
+          {
+            "value": "[parameters('enableADAuth')]"
           },
           "deployPostgreSQL": {
             "value": "[parameters('deployPostgreSQL')]"
