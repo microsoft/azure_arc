@@ -136,7 +136,14 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },    
+    },
+    "enableADAuth": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Indicate whethe to support AD authentication in SQLMI"
+      }
+    },
     "deployPostgreSQL": {
       "type": "bool",
       "defaultValue": false,
@@ -339,7 +346,7 @@
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
           ],
-          "commandToExecute": "[if(empty(parameters('addsDomainName')), variables('commandToExecuteNoADDS'), variables('commandToExecuteWithADDS'))]"
+          "commandToExecute": "[if(parameters('enableADAuth'), variables('commandToExecuteWithADDS'), variables('commandToExecuteNoADDS'))]"
         }
       }
     },
