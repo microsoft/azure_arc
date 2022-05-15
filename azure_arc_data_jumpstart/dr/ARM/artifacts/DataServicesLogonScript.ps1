@@ -299,6 +299,7 @@ $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-
 $dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace $primaryCustomLocationId,$secondaryCustomLocationId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace $primaryDcName,$secondaryDcName | Set-Content -Path $dataControllerParams
 
 az deployment group create --resource-group $Env:resourceGroup `
                            --template-file "$Env:TempDir\dataController.json" `

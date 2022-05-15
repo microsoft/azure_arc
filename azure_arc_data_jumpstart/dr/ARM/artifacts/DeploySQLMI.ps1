@@ -2,15 +2,19 @@ Start-Transcript -Path C:\Temp\DeploySQLMI.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$controllerName = "jumpstart-dc"
+$primaryControllerName = "jumpstart-primary-dc"
+$secondaryControllerName = "jumpstart-secondary-dc"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "`n"
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
-$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
-$dataControllerId = $(az resource show --resource-group $env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+$primaryCustomLocationId = $(az customlocation show --name "jumpstart-primary-cl" --resource-group $env:resourceGroup --query id -o tsv)
+$primaryDataControllerId = $(az resource show --resource-group $env:resourceGroup --name $primaryControllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+
+$secondaryCustomLocationId = $(az customlocation show --name "jumpstart-secondary-cl" --resource-group $env:resourceGroup --query id -o tsv)
+$secondaryDataControllerId = $(az resource show --resource-group $env:resourceGroup --name $secondaryControllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 
 ################################################
 # Localize ARM template
@@ -46,11 +50,12 @@ if ( $env:SQLMIHA -eq $true )
 
 ################################################
 
+## Deploying primary SQL MI
 $SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'customLocation-stage',$customLocationId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataControllerId-stage',$primaryDataControllerId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'customLocation-stage',$primaryCustomLocationId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'subscriptionId-stage',$env:subscriptionId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
@@ -81,10 +86,32 @@ Do {
     } while ($dcStatus -eq "Nope")
 
 Write-Host "`n"
-Write-Host "Azure Arc SQL Managed Instance is ready!"
+Write-Host "Primary Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
-# Update Service Port from 1433 to Non-Standard
+## Deploying Secondary SQL MI
+$SQLParams = "$Env:TempDir\SQLMI.parameters.json"
+
+(Get-Content -Path $SQLParams) -replace $primaryDataControllerId,$secondaryDataControllerId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace $primaryCustomLocationId,$secondaryCustomLocationId | Set-Content -Path $SQLParams
+
+az deployment group create --resource-group $env:resourceGroup `
+                           --template-file "$Env:TempDir\SQLMI.json" `
+                           --parameters "$Env:TempDir\SQLMI.parameters.json"
+
+Write-Host "`n"
+Do {
+    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
+    Start-Sleep -Seconds 45
+    $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($dcStatus -eq "Nope")
+
+Write-Host "`n"
+Write-Host "Secondary Azure Arc SQL Managed Instance is ready!"
+Write-Host "`n"
+
+# Update Service Port from 1433 to Non-Standard on primary cluster
+kubectx primary
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
 kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 5 # To allow the CRD to update
@@ -98,6 +125,29 @@ if ( $env:SQLMIHA -eq $true )
 }
 
 # Downloading demo database and restoring onto SQL MI
+$podname = "jumpstart-sql-0"
+Write-Host "`n"
+Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+
+# Update Service Port from 1433 to Non-Standard on secondary cluster
+kubectx secondary
+$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
+kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
+Start-Sleep -Seconds 5 # To allow the CRD to update
+
+if ( $env:SQLMIHA -eq $true )
+{
+    # Update Service Port from 1433 to Non-Standard
+    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
+    kubectl patch svc jumpstart-sql-secondary-external-svc -n arc --type merge --patch $payload
+    Start-Sleep -Seconds 5 # To allow the CRD to update
+}
+
+# Downloading demo database and restoring onto primarySQL MI
+kubectx primary
 $podname = "jumpstart-sql-0"
 Write-Host "`n"
 Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
