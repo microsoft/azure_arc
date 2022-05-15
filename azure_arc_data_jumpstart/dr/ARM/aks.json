@@ -147,52 +147,6 @@
           "Secret": "[parameters('spnClientSecret')]"
         }
       }
-    },
-    {
-      "apiVersion": "2022-03-02-preview",
-      "type": "Microsoft.ContainerService/managedClusters",
-      "location": "[parameters('location')]",
-      "name": "[concat(parameters('clusterName'),'-Secondary')]",
-      "tags": "[parameters('resourceTags')]",
-      "properties": {
-        "kubernetesVersion": "[parameters('kubernetesVersion')]",
-        "enableRBAC": "[parameters('enableRBAC')]",
-        "dnsPrefix": "[concat(parameters('dnsPrefix'),'sd')]",
-        "aadProfile": 
-          {
-            "managed": true
-          },
-        "agentPoolProfiles": [
-          {
-            "name": "agentpool",
-            "mode": "System",
-            "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
-            "count": "[parameters('agentCount')]",
-            "vmSize": "[parameters('agentVMSize')]",
-            "osType": "[parameters('osType')]",
-            "storageProfile": "ManagedDisks",
-            "type": "VirtualMachineScaleSets"
-          }
-        ],
-        "networkProfile": 
-          {
-            "networkPlugin": "azure"
-          },
-        "linuxProfile": {
-          "adminUsername": "[parameters('linuxAdminUsername')]",
-          "ssh": {
-            "publicKeys": [
-              {
-                "keyData": "[parameters('sshRSAPublicKey')]"
-              }
-            ]
-          }
-        },
-        "servicePrincipalProfile": {
-          "clientId": "[parameters('spnClientId')]",
-          "Secret": "[parameters('spnClientSecret')]"
-        }
-      }
     }
   ]
 }
