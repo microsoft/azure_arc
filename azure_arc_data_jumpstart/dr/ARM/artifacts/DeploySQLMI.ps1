@@ -75,8 +75,7 @@ $SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'dataLogseSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'pricingTier-stage' ,$pricingTier | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'sqlMIInstance-stage' ,$primarySqlMIInstance | Set-Content -Path $SQLParams
-
+(Get-Content -Path $SQLParams) -replace 'sqlMIName-stage' ,$primarySqlMIInstance | Set-Content -Path $SQLParams
 
 az deployment group create --resource-group $env:resourceGroup `
                            --template-file "$Env:TempDir\SQLMI.json" `
