@@ -106,7 +106,7 @@
       "apiVersion": "2022-01-02-preview",
       "type": "Microsoft.ContainerService/managedClusters",
       "location": "[parameters('location')]",
-      "name": "[parameters('clusterName')]",
+      "name": "[concat(parameters('clusterName'),'-Primary')]",
       "tags": "[parameters('resourceTags')]",
       "properties": {
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
