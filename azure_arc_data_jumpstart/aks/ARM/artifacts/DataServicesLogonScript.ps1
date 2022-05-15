@@ -256,8 +256,7 @@ Stop-Process -Id $kubectlMonShell.Id
 Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
-
-# If AD Auth is required join computer to ADDS domain and restart computer
+<# If AD Auth is required join computer to ADDS domain and restart computer
 $addsDomainName = $Env:addsDomainName
 $adminUsername = $Env:adminUsername
 
@@ -288,7 +287,7 @@ if ($addsDomainName.Length -gt 0)
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
     Restart-Computer
-}
+}#>
 
 Stop-Process -Name powershell -Force
 
