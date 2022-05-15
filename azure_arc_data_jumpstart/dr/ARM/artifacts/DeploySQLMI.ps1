@@ -21,6 +21,8 @@ $secondaryDataControllerId = $(az resource show --resource-group $env:resourceGr
 ################################################
 $ServiceType = "LoadBalancer"
 $readableSecondaries = $ServiceType
+$primarySqlMIInstance = "jumpstart-sql-primary"
+$secondarySqlMIInstance = "jumpstart-sql-secondary"
 
 # Resource Requests
 $vCoresRequest = "2"
@@ -73,6 +75,8 @@ $SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'dataLogseSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'pricingTier-stage' ,$pricingTier | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'sqlMIInstance-stage' ,$primarySqlMIInstance | Set-Content -Path $SQLParams
+
 
 az deployment group create --resource-group $env:resourceGroup `
                            --template-file "$Env:TempDir\SQLMI.json" `
@@ -87,27 +91,6 @@ Do {
 
 Write-Host "`n"
 Write-Host "Primary Azure Arc SQL Managed Instance is ready!"
-Write-Host "`n"
-
-## Deploying Secondary SQL MI
-$SQLParams = "$Env:TempDir\SQLMI.parameters.json"
-
-(Get-Content -Path $SQLParams) -replace $primaryDataControllerId,$secondaryDataControllerId | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace $primaryCustomLocationId,$secondaryCustomLocationId | Set-Content -Path $SQLParams
-
-az deployment group create --resource-group $env:resourceGroup `
-                           --template-file "$Env:TempDir\SQLMI.json" `
-                           --parameters "$Env:TempDir\SQLMI.parameters.json"
-
-Write-Host "`n"
-Do {
-    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
-    Start-Sleep -Seconds 45
-    $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($dcStatus -eq "Nope")
-
-Write-Host "`n"
-Write-Host "Secondary Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on primary cluster
@@ -132,6 +115,52 @@ kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/s
 Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
 kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
 
+# Retrieving SQL MI connection endpoint
+kubectx primary
+$sqlstringPrimary = kubectl get sqlmanagedinstances jumpstart-sql-primary -n arc -o=jsonpath='{.status.endpoints.primary}'
+
+# Replace placeholder values in settingsTemplate.json
+(Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi_primary',$sqlstringPrimary | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
+
+## Deploying Secondary SQL MI
+$SQLParams = "$Env:TempDir\SQLMI.parameters.json"
+
+(Get-Content -Path $SQLParams) -replace $primaryDataControllerId,$secondaryDataControllerId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace $primaryCustomLocationId,$secondaryCustomLocationId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace $primarySqlMIInstance ,$secondarySqlMIInstance | Set-Content -Path $SQLParams
+
+az deployment group create --resource-group $env:resourceGroup `
+                           --template-file "$Env:TempDir\SQLMI.json" `
+                           --parameters "$Env:TempDir\SQLMI.parameters.json"
+
+Write-Host "`n"
+Do {
+    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
+    Start-Sleep -Seconds 45
+    $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($dcStatus -eq "Nope")
+
+Write-Host "`n"
+Write-Host "Secondary Azure Arc SQL Managed Instance is ready!"
+Write-Host "`n"
+
+# Update Service Port from 1433 to Non-Standard on primary cluster
+kubectx secondary
+$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
+kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
+Start-Sleep -Seconds 5 # To allow the CRD to update
+
+if ( $env:SQLMIHA -eq $true )
+{
+    # Update Service Port from 1433 to Non-Standard
+    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
+    kubectl patch svc jumpstart-sql-secondary-external-svc -n arc --type merge --patch $payload
+    Start-Sleep -Seconds 5 # To allow the CRD to update
+}
+
 # Update Service Port from 1433 to Non-Standard on secondary cluster
 kubectx secondary
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
@@ -146,42 +175,16 @@ if ( $env:SQLMIHA -eq $true )
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
 
-# Downloading demo database and restoring onto primarySQL MI
-kubectx primary
-$podname = "jumpstart-sql-0"
-Write-Host "`n"
-Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
-kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
-Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
-
 # Creating Azure Data Studio settings for SQL Managed Instance connection
 Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
 $settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving SQL MI connection endpoint
-$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
+$sqlstringSecondary = kubectl get sqlmanagedinstances jumpstart-sql-secondary -n arc -o=jsonpath='{.status.endpoints.primary}'
 
 # Replace placeholder values in settingsTemplate.json
-(Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
-
-# Unzip SqlQueryStress
-Expand-Archive -Path $Env:TempDir\SqlQueryStress.zip -DestinationPath $Env:TempDir\SqlQueryStress
-
-# Create SQLQueryStress desktop shortcut
-Write-Host "`n"
-Write-Host "Creating SQLQueryStress Desktop shortcut"
-Write-Host "`n"
-$TargetFile = "$Env:TempDir\SqlQueryStress\SqlQueryStress.exe"
-$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SqlQueryStress.lnk"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-$Shortcut.TargetPath = $TargetFile
-$Shortcut.Save()
+(Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi_secondary',$sqlstringSecondary | Set-Content -Path $settingsTemplate
 
 # Creating SQLMI Endpoints data
 & "$Env:TempDir\SQLMIEndpoints.ps1"
