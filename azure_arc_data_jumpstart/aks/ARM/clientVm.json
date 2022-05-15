@@ -47,7 +47,7 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_D8s_v4",
+      "defaultValue": "Standard_D4s_v4",
       "metadata": {
         "description": "The size of the VM"
       }
@@ -299,7 +299,7 @@
             "managedDisk": {
               "storageAccountType": "[variables('osDiskType')]"
             },
-            "diskSizeGB": 1024
+            "diskSizeGB": 256
           },
           "imageReference": {
             "publisher": "MicrosoftWindowsServer",
