@@ -74,7 +74,7 @@ Write-Host "`n"
 Write-Host "Getting AKS cluster credentials for the primary cluster"
 Write-Host "`n"
 az aks get-credentials --resource-group $Env:resourceGroup `
-                       --name primaryClusterName --admin
+                       --name $primaryClusterName --admin
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -85,7 +85,7 @@ kubectx $secondaryClusterName
                        Write-Host "Getting AKS cluster credentials for the secondary cluster"
 Write-Host "`n"
 az aks get-credentials --resource-group $Env:resourceGroup `
-                       --name secondaryClusterName --admin
+                       --name $secondaryClusterName --admin
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
