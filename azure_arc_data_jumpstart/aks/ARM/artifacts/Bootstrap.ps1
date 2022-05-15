@@ -141,13 +141,13 @@ ClientTools_02 | Format-Table
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
+# Disabling Windows Server Manager Scheduled Task
+Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+
+<# Action when all if and elseif conditions are false #>
 # Creating scheduled task for DataServicesLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\DataServicesLogonScript.ps1'
-Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
-
-# Disabling Windows Server Manager Scheduled Task
-Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # If AD Auth is required join computer to ADDS domain and restart computer
 if ($addsDomainName.Length -gt 0)
@@ -172,9 +172,16 @@ if ($addsDomainName.Length -gt 0)
         Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
     })
  
+    # Register schedule run under domain account
+    Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User "${netbiosname}\${adminUsername}" -Action $Action -RunLevel "Highest" -Force
+
     Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
     
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
     Restart-Computer
+}
+else {
+    # Register schedule task under local account
+    Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
