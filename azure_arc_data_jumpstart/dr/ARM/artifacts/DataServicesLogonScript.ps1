@@ -217,9 +217,6 @@ Write-Host "Enabling Container Insights cluster extension"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $secondaryConnectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
 Write-Host "`n"
 
-# Monitor pods across arc namespace
-$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-
 # Installing Azure Arc-enabled data services extension
 Write-Host "`n"
 Write-Host "Installing Azure Arc-enabled data services extension"

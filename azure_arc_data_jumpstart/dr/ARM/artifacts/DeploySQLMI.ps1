@@ -21,8 +21,8 @@ $secondaryDataControllerId = $(az resource show --resource-group $env:resourceGr
 ################################################
 $ServiceType = "LoadBalancer"
 $readableSecondaries = $ServiceType
-$primarySqlMIInstance = "jumpstart-sql-primary"
-$secondarySqlMIInstance = "jumpstart-sql-secondary"
+$primarySqlMIInstance = "js-sql-pr"
+$secondarySqlMIInstance = "js-sql-dr"
 
 # Resource Requests
 $vCoresRequest = "2"
