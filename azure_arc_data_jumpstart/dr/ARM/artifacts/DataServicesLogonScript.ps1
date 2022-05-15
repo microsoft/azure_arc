@@ -168,7 +168,7 @@ Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
 $primaryCustomLocationId = $(az customlocation show --name "jumpstart-primary-cl" --resource-group $Env:resourceGroup --query id -o tsv)
-$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
 $dataControllerParams = "$Env:TempDir\dataController.parameters.json"
@@ -233,13 +233,6 @@ az k8s-extension create --name arc-data-services `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
 
-Write-Host "`n"
-Do {
-    Write-Host "Waiting for bootstrapper pod, hold tight...(20s sleeping loop)"
-    Start-Sleep -Seconds 20
-    $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($podStatus -eq "Nope")
-
 $secondaryConnectedClusterId = az connectedk8s show --name $secondaryConnectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 
 $secondaryExtensionId = az k8s-extension show --name arc-data-services `
@@ -264,7 +257,7 @@ Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
 $secondaryCustomLocationId = $(az customlocation show --name "jumpstart-secondary-cl" --resource-group $Env:resourceGroup --query id -o tsv)
-$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
 $dataControllerParams = "$Env:TempDir\dataController.parameters.json"

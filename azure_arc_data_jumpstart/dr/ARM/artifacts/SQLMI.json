@@ -85,11 +85,8 @@
     "licenseType": {
       "type": "String"
     },
-    "sqlMIInstance": {
-      "type": "string",
-      "metadata": {
-        "description": "SQL MI instance name"
-      }
+    "sqlMIName": {
+      "type": "String"
     }
   },
   "variables": {},
@@ -98,7 +95,7 @@
     {
       "type": "Microsoft.AzureArcData/sqlManagedInstances",
       "apiVersion": "[parameters('apiVersion')]",
-      "name": "[parameters('sqlMIInstance')]",
+      "name": "[parameters('sqlMIName')]",
       "location": "[parameters('location')]",
       "extendedLocation": {
         "type": "CustomLocation",
