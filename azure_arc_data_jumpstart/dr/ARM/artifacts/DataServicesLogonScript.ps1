@@ -23,6 +23,7 @@ Write-Host "Installing Azure CLI extensions"
 az extension add --name arcdata
 az extension add --name connectedk8s
 az extension add --name k8s-extension
+az extension add --name customlocation
 Write-Host "`n"
 az -v
 
@@ -96,23 +97,26 @@ Write-Host "`n"
 # Creating Kubect aliases
 kubectx primary="$primaryConnectedClusterName-admin"
 kubectx secondary="$secondaryConnectedClusterName-admin"
-
+Write-Host "`n"
 
 # Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
-Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
+Write-Host "Onboarding the primary cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
 # Localize kubeconfig
 #$Env:KUBECONTEXT = kubectl config current-context
-#$Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
-Start-Sleep -Seconds 10
+$Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
+
 
 # Create Kubernetes - Azure Arc Cluster for the primary cluster
 kubectx primary
+Write-Host "`n"
 az connectedk8s connect --name $primaryConnectedClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $Env:azureLocation `
                         --tags 'Project=jumpstart_azure_arc_data_services'
+
+Start-Sleep -Seconds 10
 
 # Enabling Container Insights cluster extension on primary cluster
 Write-Host "`n"
@@ -158,7 +162,8 @@ az customlocation create --name 'jumpstart-primary-cl' `
                          --resource-group $Env:resourceGroup `
                          --namespace arc `
                          --host-resource-id $primaryConnectedClusterId `
-                         --cluster-extension-ids $primaryExtensionId
+                         --cluster-extension-ids $primaryExtensionId `
+                         --kubeconfig $Env:KUBECONFIG
 
 # Deploying Azure Arc Data Controller
 Write-Host "`n"
@@ -220,9 +225,14 @@ az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup -
 az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
 
 
+# Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
+Write-Host "Onboarding the secondary cluster as an Azure Arc-enabled Kubernetes cluster"
+Write-Host "`n"
 
 # Create Kubernetes - Azure Arc Cluster for the secondary cluster
+Write-Host "`n"
 kubectx secondary
+Write-Host "`n"
 az connectedk8s connect --name $secondaryConnectedClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $Env:azureLocation `
@@ -274,7 +284,8 @@ az customlocation create --name 'jumpstart-secondary-cl' `
                          --resource-group $Env:resourceGroup `
                          --namespace arc `
                          --host-resource-id $secondaryConnectedClusterId `
-                         --cluster-extension-ids $secondaryExtensionId
+                         --cluster-extension-ids $secondaryExtensionId `
+                         --kubeconfig $Env:KUBECONFIG
 
 # Deploying Azure Arc Data Controller
 Write-Host "`n"
