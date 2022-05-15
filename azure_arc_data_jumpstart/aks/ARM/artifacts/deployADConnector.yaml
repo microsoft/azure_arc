@@ -3,7 +3,7 @@ kind: Secret
 type: Opaque 
 metadata: 
   name: adarc-dsa-secret
-  namespace: {{ARC_NAMESPACE}}
+  namespace: arc
 data: 
   password: {{ADMIN_PASSWORD}}
   username: {{ADMIN_USER}}
@@ -12,7 +12,7 @@ apiVersion: arcdata.microsoft.com/v1beta2
 kind: ActiveDirectoryConnector
 metadata:
   name: adarc
-  namespace: {{ARC_NAMESPACE}}
+  namespace: arc
 spec:
   activeDirectory:
     realm: {{ADDS_DOMAIN_NAME}}
