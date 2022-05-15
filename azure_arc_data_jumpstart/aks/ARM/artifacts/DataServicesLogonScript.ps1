@@ -258,7 +258,9 @@ Start-Sleep -Seconds 5
 
 
 # If AD Auth is required join computer to ADDS domain and restart computer
-$addsDomainName = $Env.addsDomainName
+$addsDomainName = $Env:addsDomainName
+$adminUsername = $Env:adminUsername
+
 if ($addsDomainName.Length -gt 0)
 {
     # Install Install-WindowsFeature RSAT-AD-PowerShell windows feature to setup OU and User Accounts in ADDS
@@ -272,12 +274,12 @@ if ($addsDomainName.Length -gt 0)
     $computername = $env:COMPUTERNAME
 
     $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
-        UserName = "${netbiosname}\${Env:adminUsername}"
+        UserName = "${netbiosname}\${adminUsername}"
         Password = (ConvertTo-SecureString -String $Env:adminPassword -AsPlainText -Force)[0]
     })
     
     $localCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
-        UserName = "${computername}\${env:adminUsername}"
+        UserName = "${computername}\${adminUsername}"
         Password = (ConvertTo-SecureString -String $Env:adminPassword -AsPlainText -Force)[0]
     })
  
