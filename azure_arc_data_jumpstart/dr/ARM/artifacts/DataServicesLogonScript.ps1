@@ -99,16 +99,13 @@ kubectx primary="$primaryConnectedClusterName-admin"
 kubectx secondary="$secondaryConnectedClusterName-admin"
 Write-Host "`n"
 
-# Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
-Write-Host "Onboarding the primary cluster as an Azure Arc-enabled Kubernetes cluster"
+# Localize kubeconfig
+$Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
 Write-Host "`n"
 
-# Localize kubeconfig
-#$Env:KUBECONTEXT = kubectl config current-context
-$Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
-
-
 # Create Kubernetes - Azure Arc Cluster for the primary cluster
+Write-Host "Onboarding the primary cluster as an Azure Arc-enabled Kubernetes cluster"
+Write-Host "`n"
 kubectx primary
 Write-Host "`n"
 az connectedk8s connect --name $primaryConnectedClusterName `
@@ -203,32 +200,6 @@ Write-Host "`n"
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
-# If flag set, deploy SQL MI
-if ( $Env:deploySQLMI -eq $true )
-{
-& "$Env:TempDir\DeploySQLMI.ps1"
-}
-
-# If flag set, deploy PostgreSQL
-if ( $Env:deployPostgreSQL -eq $true )
-{
-& "$Env:TempDir\DeployPostgreSQL.ps1"
-}
-
-# Enabling data controller auto metrics & logs upload to log analytics
-Write-Host "`n"
-Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
-Write-Host "`n"
-$Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
-
-
-# Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
-Write-Host "Onboarding the secondary cluster as an Azure Arc-enabled Kubernetes cluster"
-Write-Host "`n"
-
 # Create Kubernetes - Azure Arc Cluster for the secondary cluster
 Write-Host "`n"
 kubectx secondary
@@ -316,21 +287,25 @@ Write-Host "`n"
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
+
 # If flag set, deploy SQL MI
 if ( $Env:deploySQLMI -eq $true )
 {
 & "$Env:TempDir\DeploySQLMI.ps1"
 }
 
-# If flag set, deploy PostgreSQL
-if ( $Env:deployPostgreSQL -eq $true )
-{
-& "$Env:TempDir\DeployPostgreSQL.ps1"
-}
-
-# Enabling data controller auto metrics & logs upload to log analytics
+# Enabling data controller auto metrics & logs upload to log analytics on the primary cluster
 Write-Host "`n"
-Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
+Write-Host "Enabling data controller auto metrics & logs upload to log analytics on the primary cluster"
+Write-Host "`n"
+$Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
+az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-logs true
+az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
+
+# Enabling data controller auto metrics & logs upload to log analytics on the secondary cluster
+Write-Host "`n"
+Write-Host "Enabling data controller auto metrics & logs upload to log analytics on the secondary cluster"
 Write-Host "`n"
 $Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)

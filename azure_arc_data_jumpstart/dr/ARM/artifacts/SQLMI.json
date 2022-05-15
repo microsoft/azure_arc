@@ -84,6 +84,12 @@
     },
     "licenseType": {
       "type": "String"
+    },
+    "sqlMIInstance": {
+      "type": "string",
+      "metadata": {
+        "description": "SQL MI instance name"
+      }
     }
   },
   "variables": {},
@@ -92,7 +98,7 @@
     {
       "type": "Microsoft.AzureArcData/sqlManagedInstances",
       "apiVersion": "[parameters('apiVersion')]",
-      "name": "jumpstart-sql",
+      "name": "[parameters('sqlMIInstance')]",
       "location": "[parameters('location')]",
       "extendedLocation": {
         "type": "CustomLocation",

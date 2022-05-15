@@ -72,6 +72,9 @@
         },
         "licenseType": {
             "value": "LicenseIncluded"
+        },
+        "sqlMIInstance": {
+            "value": "sqlMIInstance-stage"
         }
     }
 }
