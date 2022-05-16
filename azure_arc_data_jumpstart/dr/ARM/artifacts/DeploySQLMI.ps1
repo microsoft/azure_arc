@@ -96,7 +96,7 @@ Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on primary cluster
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-kubectl patch svc js-sql-pr -n arc --type merge --patch $payload
+kubectl patch svc js-sql-pr-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 5 # To allow the CRD to update
 
 if ( $env:SQLMIHA -eq $true )
@@ -137,7 +137,7 @@ $SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace $primaryDataControllerId,$secondaryDataControllerId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace $primaryCustomLocationId,$secondaryCustomLocationId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace $primarySqlMIInstance ,$secondarySqlMIInstance | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'LicenseIncluded' ,"DisasterRecovery " | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'LicenseIncluded' ,'DisasterRecovery' | Set-Content -Path $SQLParams
 
 az deployment group create --resource-group $env:resourceGroup `
                            --template-file "$Env:TempDir\SQLMI.json" `
