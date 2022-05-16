@@ -1,28 +1,29 @@
-# ArcBox automatic deploy and test
+# ArcBox automatic deployment and testing
 
-The goal is to provide automation to deploy and test arcbox scenarios.  
-We decided to use [GitHub Actions](https://docs.github.com/actions).
+The goal of the scripts in this folder is to enable the automated deployment and testing of ArcBox in a Continuous Integration / Continuous Deployment (CI/CD) model.
 
-The workflow is a manual one, you need to execute it when you consider it is proper.
+The solution is implemented using [GitHub Actions](https://docs.github.com/actions), and is currently configured to run only when manually invoked.
 
 ## Prepare the repo
 
-You need to have enough permission on the repo, it is true when you work on your own fork.  
-First you need to create a sequence of secrets.
+You need to have permissions to run workflows on the repo where the automation workflow is going to run. You should already have the right level of permissions if you are working on your own fork.
+
+First you need to register some secrets the workflow will consume at run-time.
 
 ![image](./secret.PNG)
 
-AZURE_CREDENTIALS is needed for the [Azure Login GitHub Action](https://github.com/marketplace/actions/azure-login#configure-deployment-credentials).  
-The other variables are the secret variables defined on [Azure Arc Box deploys](https://azurearcjumpstart.io/azure_jumpstart_arcbox/).  
-AZURE_CREDENTIALS Example (--sdk-auth is important):
+AZURE_CREDENTIALS is the Azure Service Principal [deployment credentials](https://github.com/marketplace/actions/azure-login#configure-deployment-credentials) the scripts will use to deploy ArcBox to your subscription.  
+The other variables are the secret variables defined on the [Azure Arc Box deployment scripts](https://azurearcjumpstart.io/azure_jumpstart_arcbox/).  
+
+The example below illustrates how to user the Azure CLI to create the service principal (--sdk-auth is important):
 
 ```azurecli
 az ad sp create-for-rbac -n "jumpstartArcBox" --role "User Access Administrator" --scopes /subscriptions/xxx --sdk-auth
 ```
 
-See possible roles on [Azure Arc Box deploys](https://azurearcjumpstart.io/azure_jumpstart_arcbox/).
+See possible values for the role parameter on [Azure Arc Box deploys](https://azurearcjumpstart.io/azure_jumpstart_arcbox/).
 
-The complete json result must be inside the AZURE_CREDENTIALS secret
+The complete JSON result must be stored as the value of the AZURE_CREDENTIALS secret
 
 ```json
 {
@@ -39,93 +40,89 @@ The complete json result must be inside the AZURE_CREDENTIALS secret
 }
 ```
 
-You can complete the following variables based on the same output: SPN_CLIENT_ID, SPN_CLIENT_SECRET,SPN_SUBSCRIPTION_ID, SPN_TENANT_ID.
+You can set the following secrets with the values from the JSON output: SPN_CLIENT_ID, SPN_CLIENT_SECRET,SPN_SUBSCRIPTION_ID, and SPN_TENANT_ID. The ArcBox resources resources will be created using this account.
 
-_Note:_ The resources will be created using this account
-
-You need to define SSH_RSA_PUBLIC_KEY (look here [Azure Arc Box deploys](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) how to do it), and WINDOWS_ADMIN_PASSWORD (Any valid Azure VM password)
+You also need to define the secrets SSH_RSA_PUBLIC_KEY (instructions are provided in [Azure Arc Box deploys](https://azurearcjumpstart.io/azure_jumpstart_arcbox/)), and WINDOWS_ADMIN_PASSWORD (any valid Azure VM password)
 
 ## Execute the workflow
 
-We are ready, we need to go to the Action Tab and select our workflow (Manual ArcBox Execution with parameters). The workflow file is on `.\.github\workflows\manual-arcBox-execution-with-parameters.yaml` and github is going to read the files in order to give the workflow as option.  
+After setting the secrets we are ready to invoke the workflow. Go to the action tab and select the workflow **Manual ArcBox execution with parameters**. The workflow file can be found at `.\.github\workflows\manual-arcBox-execution-with-parameters.yaml`.
+
 ![image](./GHActionExecution.PNG)
 
-Selecting **Run Workflow**, the parameters will be present.
+After selecting **Run Workflow** in the dropdown, as illustrated in the image above, the following parameters will be shown.
 
-- The first parameter is which workflow definition we are you going to use (you can have different workflow versions on differs branches)
-- Flavor to be executed, so far Full, ITPro or DevOps
-- Kind of deploy: ARM, Bicep or Terraform
-- Which branch you are going to use to read the arcbox's scripts
-- Resource group name
-- Location
-- Name of log analytic
-- Windows VM admin username
-- Choice if you like to deploy Bastion to connect to the client VM
+- The first parameter lets you chose the branch containing the definition of the version of the workflow you would like to invoke.
+- ArcBox flavor to deploy. At this point the options are: **Full, ITPro, and DevOps**.
+- Type of deployment: **ARM, Bicep, or Terraform**.
+- Branch containing the ArcBox's scripts to execute.
+- Resource group name.
+- Resource group location.
+- Name of the Log Analytics Workspace.
+- Windows VM admin username.
+- Select if you would like to deploy Azure Bastion to connect to the client VM.
 
-Then you could follow the execution, and on each step there is information about what is going on.  
+Once all parameters values have been set, you can click the **Run Workflow** button to begin the deployment. During deployment, each step displays information about what is going on.
 ![image](./Execution.PNG)
 
-On the file DeployTestParameters.json are defined the parameters which every flavor has to reach
+## Information generated by the workflow
 
-## Information Generated
+### Code analysis tools
 
-We take a look to the quality of the code
+One aspect of the workflow focuses on code analysis using a variety of code validators and linters. The code analysis steps of the workflow are configured to **continue on error** to prevent code analysis errors from interrupting the execution of the script. You can always have access to the recommendations generated by the code analysis tools.
 
-- Bash script by **shellcheck**
-- Powershell script by **Invoke-ScriptAnalyzer**
-- Arm template validation and we are generating arm from bicep script by **ARM-TTK and Pester**
-- Terraform validation. It is done by **tfsec** and **checov**
-
-  The validations are configure to continue on error, then they will be always succeed, but you will be able to see the recommendations.
+- **[ShellCheck](https://github.com/koalaman/shellcheck)** is used to validate Bash scripts.
+- **[ScriptAnalyzer](https://docs.microsoft.com/powershell/utility-modules/psscriptanalyzer/overview?view=ps-modules)** validates Powershell scripts.
+- The **[ARM template test toolkit](https://docs.microsoft.com/azure/azure-resource-manager/templates/test-toolkit)** and **[Pester](https://github.com/pester/Pester)** are used to validate ARM templates.
+- **[tfsec](https://github.com/aquasecurity/tfsec)** and **[checov](https://www.checkov.io/)** support the validation of the Terraform codebase.
 
 ![image](./scriptValidation.PNG)
 
 ![image](./powershellExample.PNG)
 
-On the deploy workflow there are deploy validation that you could check
+### Deployment validation
+
+As the ArcBox deployment progresses, the workflow validates the output of each step and generate informational messages so you can follow along.
 
 ![image](./deployValidations.PNG)
 
-Final Validation DevOps Scenario Example  
-![image](./FinalValidationDevopsScenario.PNG)
+### Downloadable logs
 
-After finishing the logs from inside the vm and lint code results are available
+All the log files generated during the deployment of ArcBox are uploaded to the workflow results folder and made available for download, together with the output of the code analysis tools.
 
 ![image](./logsToDownload.PNG)
 
-## How to add a new LogOn Script
+## Adding support to validate new "LogOn" scripts
 
-It is expected the new script is able to run perfect throught OpenSSH. If that is not the case, we need to work on the root cause and evaluate alternatives.  
-We need to add the script execution, then download the log of the execution and finally upload the log as workflow artifact.  
-Let see:
+As the ArcBox continues to evolve, we are expecting new ArcBox flavors or variants to appear. Each new ArcBox flavor would likely introduce a new "LogOn" script as a key component of the deployment. Updating the workflow to support a new LogOn script would require adding steps to invoke the LogOn script, download the log file it generates in the "ClientVM", and uploading the log file as a workflow artifact.  
 
-1. Add the script execution Step  
-   Copy another step and change the script name (and step name). The another point to pay attention is the flavor selection, the script executes when certain conditions are met.
+1. Invoke the LogOn script
+
+    Add a workflow step to invoke the new LogOn script. Pay attention to the flavor reference, the script is only invoked when certain conditions are met.
 
 ```
-      - name: Open SSH, execute DataServicesLogonScript   //Step Name
-        if: github.event.inputs.flavor == 'Full'  // condition, this step only will execute on Full scenarios
+
+      - name: Open SSH, execute DataServicesLogonScript    // Step Name
+        if: github.event.inputs.flavor == 'Full'           // Invoke only if we are deploying the "Full" flavor 
+
+        // Command to execute. The command opens an ssh connection to the ClientVM and executes a script inside the VM
+        // normally, you would only need to change the script name here
         run: |
           plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'powershell -InputFormat None -F C:\ArcBox\DataServicesLogonScript.ps1'
-
-          // Command to execute. The command is a ssh conection and execute a script inside the VM, we only need to change the script name
-
 ```
 
-2. Download the execution log  
-   Go to the download file step and put your line in the correct place. It also depends on the flavor. Each line is a OpenSSH conection (using scp protocol) which download a specific log and close. Code on `DownloadLogs.sh`  
-   The important part is the location of the log inisde the vm starting on the user forlder. Example, `..\..\ArcBox\Logs\Bootstrap.log`. Then the `||` is only in case the previous sentence fails, the script is going to put a note for the workflow user
+2. Download the execution log.
+
+   Go to the download file step and add your code in the correct place, which also depends on the target ArcBox flavor. As shown in the example below, the command opens an OpenSSH connection, using the scp protocol, to download a specific log file. Pay attention to the way the location of the log inside the vm is specified as relative to the user folder, for example: `..\..\ArcBox\Logs\Bootstrap.log`.
 
 ```
-#Example
-sshpass -p "$secret" scp -o 'StrictHostKeyChecking no' -P 2204 -T $windowsAdminUsername@$(az vm show -d -g $resourceGroupName -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'  || echo "Bootstrap.log not able to be downloaded"
+sshpass -p "$secret" scp -o 'StrictHostKeyChecking no' -P 2204 -T $windowsAdminUsername@$(az vm show -d -g $resourceGroupName -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\Bootstrap.log' '.'  || echo "Bootstrap.log cannot be downloaded"
 if [ $flavor == 'Full' ] || [ $flavor == 'ITPro' ]; then
-  sshpass -p "$secret" scp -o 'StrictHostKeyChecking no' -P 2204 -T $windowsAdminUsername@$(az vm show -d -g $resourceGroupName -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\ArcServersLogonScript.log' '.' || echo "ArcServersLogonScript.log not able to be downloaded"
+  sshpass -p "$secret" scp -o 'StrictHostKeyChecking no' -P 2204 -T $windowsAdminUsername@$(az vm show -d -g $resourceGroupName -n ArcBox-Client --query publicIps -o tsv):'..\..\ArcBox\Logs\ArcServersLogonScript.log' '.' || echo "ArcServersLogonScript.log cannot be downloaded"
 fi
 ```
 
-3.  Upload the log as workflow artifact  
-    Copy a step that already exist and rename properly for your file. Please, pay attention to the condition related to the flavor.
+3. Upload the log file as workflow artifact so it can be later analyzed in the context of the workflow run.
 
 ```
       - name: Upload ArcServersLogonScript.log File
@@ -136,7 +133,7 @@ fi
          path: ArcServersLogonScript.log
 ```
 
-_Note:_ `success() || failure()` means to run this step even if fails some previous step. The idea is to have the failure logs available
+_Note:_ It is expected that the new LogOn script is able to run under an OpenSSH connection without errors. If that is not the case, we need evaluate alternatives.
 
 ## Workflows execution duration
 
@@ -149,47 +146,39 @@ _Note:_ `success() || failure()` means to run this step even if fails some previ
 | Full   | no      | 110 min   |
 | Full   | yes     | 120 min   |
 
-if [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) not detect the end, it will finish by time out on 90 min. The scripts might run successfully but not return the results. In this cases the workflow execution time increase in about 1hs.
+_Note:_ There is a known issue that causes the [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) to not being able to detect the end of the execution of a script under some conditions. Usually the script invoked by that step actually runs successfully to completion but the workflow fails to properly collect the results. When that happens, the workflow step will timeout after 90 minutes and the total workflow execution time increases in about 1 hour for every script execution step that ends via timeout.
 
 ## Automatic Validations
 
-Many validations depends on the scenario, for example the number of resources. We have a set of value configure for each flavor on `DeployTestParameters.json`
+Below is a list of the types of validations the workflow performs. Keep in mind that many of these validations are driven by criteria that is flavor-specific. For example the number of resources created before the LogOn script is invoked varies depending on the ArcBox flavor being deployed. The configuration file `DeployTestParameters.json` defines the various flavor-specific settings used for validation.
 
-- We are counting resources just after the resource deployments. Step name `name: Count Resources pre vm Script execution`. The code is on the `CountResources.sh` script.
-- After the LogOn script executions
-  - We count the number of elements on the Desktop (mainly links). We look into the `C:\Users\Public\Desktop` and `C:\Users\${user}\Desktop` folders. The code is on the `FileValidations.sh` script.
-  - Check Azure Data Studio setting file exist (depending on the flavor) and the size is bigger than 0 byte. Also parsing a testing that includes two connection descriptor, and both have port assigned (depending on the connection descriptor type). The code is on the `FileValidations.sh` script.
-  - Finally, The `FinalValidation.sh` includes may other validations:
-    - Count resources again
-    - Check Azure Arc enable machines amount
-      - If it is needed, it is also check the status 'connected' for each one
-    - Check the number of polices deployed
-    - Check expected number of
-      - Workbooks
-      - Azure Bastion
-      - KeyVault
-    - Check number of Kubernetes Connected Clusters
-      - Status 'connected' for each one
-      - Azure Defender, policyinsights, and Azure Monitor extensions for each one
-      - For 'ArcBox-CAPI-Data' also check key Vault, Open Service Mesh and Flux extension
+- We are counting resources just after the initial resource deployment, before the LogOn script is invoked. The actual functionality is implemented in `CountResources.sh`.
+- After the LogOn script executes, we count the number of elements on the Desktop (mainly links). We look into BOTH, the `C:\Users\Public\Desktop` and `C:\Users\${user}\Desktop` folders. This functionality is implemented in `FileValidations.sh`.
+- Verify the Azure Data Studio setting file exist and is properly configured. The code is on the `FileValidations.sh` script.
+- Finally, `FinalValidation.sh` implements a few other validations:
+  - Count again the number of resources in the resource group.
+  - Count the number of Arc-enabled machines and validates each one is in a 'connected' status.
+  - Check the number of polices deployed.
+  - Check expected number of these type of resources:
+    - Log Analytics Workbooks
+    - Azure Bastion
+    - Azure KeyVault
+  - Check the number of Kubernetes clusters
+    - Validates 'connected' status for each one
+    - Validates these extensions are configured on each cluster: Azure Defender, policyinsights, and Azure Monitor.
+    - For the 'ArcBox-CAPI-Data' cluster, it also verifies the extensions KeyVault, Open Service Mesh, and Flux are configured.
 
 ## Disclaimer
 
-We need to execute 4 script inside the VM on a full deploy to simulate what it happens at LogOn:
+We are executing four scripts inside the ClientVM on a full deploy to simulate what happens when the user logs on interactively:
+  - **ArcServersLogonScript.ps1** This script is remotely invoked through the [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command). This is a different approach from the rest of the scripts, which are all invoked using OpenSSH. When trying to run it under an ssh session, we observed the execution will come to a halt when reaching the statement `$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer".
+  - **DataServicesLogonScript.ps1** This script blocks when invoked using **Windows Run Command**, so it is invoked remotely via OpenSSH.
+  - **DevOpsLogonScript.ps1** and **MonitorWorkbookLogonScript.ps1** work well when invoked either through OpenSSH or the **Windows Run Command**.
 
-- ArcServersLogonScript.ps1, this script is block when execute using OpenSSH, but when we run it using [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), it works. Running through OpenSSH the last log entry is `Installing SQL Server - Azure Arc extension. This may take 5+ minutes.`, then I suppose the block is executing `$result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer"...`
-- DevOpsLogonScript.ps1, is executed using OpenSSH.
-- DataServicesLogonScript.ps1, this script is block when execute using [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), so we installed and use OpenSSH to execute it. 
-- MonitorWorkbookLogonScript.ps1, execute in both approaches. It currently is running with OpenSSH
+In some cases, while the ArcBox scripts are still in the process of creating and configuring its resources, Azure will start applying subscription policies that may interfere with the the correct execution of the deployment script. For example, in subscriptions under the Microsoft tenant we noticed that some times the [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) would start to fail randomly. We were able verify from the logs that the command had executed successfully, but the azure cli command would finish with a timeout after 90 minutes. The reason for this failure is described on a note inside the documentation:
 
-After the incorporation of some security polices to the subscription, the [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command) start to fail randomly, the failure is described on the note inside the documentation:
+    "To function correctly, Run Command requires connectivity (port 443) to Azure public IP addresses. If the extension doesn't have access to these endpoints, **the scripts might run successfully but not return the results**. If you're blocking traffic on the virtual machine, you can use service tags to allow traffic to Azure public IP addresses by using the AzureCloud tag."
 
-"To function correctly, Run Command requires connectivity (port 443) to Azure public IP addresses. If the extension doesn't have access to these endpoints, **the scripts might run successfully but not return the results**. If you're blocking traffic on the virtual machine, you can use service tags to allow traffic to Azure public IP addresses by using the AzureCloud tag."
+As a workaround we are ignoring timeout errors on that step, and explicitly checking environmental conditions that indicate the script finished the execution successfully. The only secondary effect is that the execution time is increased in those situations.
 
-We were able to check from the log that the command execute correctly, but the azure cli command finish with timeout at 90 min.
-
-The ITPro flavor usually works and the Full flavor usually fails. We spouse it is related to the time that the police spent before applying to ClientVM. On ITPro scenario the deploy finish as soon the ClientVM finish, and not in the another case.
-
-We added a kind or "continue on error", and we check a file generated that indicate the script finished the execution. Then it will succeed even after time out. The only secondary effect is the execution time increase.
-
-[Open SSH](https://docs.microsoft.com/windows-server/administration/openssh/openssh_install_firstuse) is installed using [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), and for subscription security polices was moved to port 2204
+[Open SSH](https://docs.microsoft.com/windows-server/administration/openssh/openssh_install_firstuse) is installed using [Windows Run Command](https://docs.microsoft.com/azure/virtual-machines/windows/run-command), and it listens on port 2204 because of subscription security polices.
