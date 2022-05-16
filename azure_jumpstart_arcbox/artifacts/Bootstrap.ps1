@@ -86,6 +86,10 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
+# Copy PowerShell Profile and Reload
+Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile $PsHome\Profile.ps1
+.$PsHome\Profile.ps1
+
 # Extending C:\ partition to the maximum size
 Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
@@ -107,6 +111,7 @@ workflow ClientTools_01
                 [Parameter (Mandatory = $true)]
                 [string]$flavor
             )
+            Write-Header "Installing Chocolatey Apps"
             $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
             InlineScript {
                 param (
@@ -205,6 +210,7 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 workflow ClientTools_02
 {
     InlineScript {
+        Write-Header "Installing Azure Data Studio"
         Expand-Archive $Env:ArcBoxDir\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
         Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\AZDataCLI.msi /quiet"
     }
@@ -213,6 +219,8 @@ workflow ClientTools_02
 if ($flavor -eq "Full") {
     ClientTools_02 | Format-Table 
 }
+
+Write-Header "Configuring Logon Scripts"
 
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
@@ -242,6 +250,8 @@ Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger 
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+
+Write-Header "Installing Hyper-V"
 
 # Install Hyper-V and reboot
 Write-Host "Installing Hyper-V and restart"
