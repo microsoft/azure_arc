@@ -75,6 +75,7 @@ $SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'dataLogseSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'pricingTier-stage' ,$pricingTier | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'licenceType-stage' ,"LicenseIncluded" | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'sqlMIName-stage' ,$primarySqlMIInstance | Set-Content -Path $SQLParams
 
 kubectx primary
@@ -136,6 +137,7 @@ $SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace $primaryDataControllerId,$secondaryDataControllerId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace $primaryCustomLocationId,$secondaryCustomLocationId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace $primarySqlMIInstance ,$secondarySqlMIInstance | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'LicenseIncluded' ,"DisasterRecovery " | Set-Content -Path $SQLParams
 
 az deployment group create --resource-group $env:resourceGroup `
                            --template-file "$Env:TempDir\SQLMI.json" `
@@ -175,11 +177,36 @@ $sqlstringSecondary = kubectl get sqlmanagedinstances $secondarySqlMIInstance -n
 & "$Env:TempDir\SQLMIEndpoints.ps1"
 
 # If PostgreSQL isn't being deployed, clean up settings file
-if ( $env:deployPostgreSQL -eq $false )
+<#if ( $env:deployPostgreSQL -eq $false )
 {
     $string = Get-Content $settingsTemplate
     $string[25] = $string[25] -replace ",",""
     $string | Set-Content $settingsTemplate
     $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
     $string | Set-Content -Path $settingsTemplate
-}
+}#>
+
+# Editing registry to allow Unicode
+Write-Host "`n"
+Write-Host "Editing registry to allow Unicode"
+Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'ACP' -value '65001'
+Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'OEMCP' -value '65001'
+Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'MACCP' -value '65001'
+Write-Host "`n"
+
+# Creating distributed DAG
+Write-Host "Configuring the primary cluster"
+Write-Host "`n"
+kubectx primary
+mkdir $Env:TempDir/sqlcerts
+az sql mi-arc get-mirroring-cert --name $primarySqlMIInstance --cert-file $Env:TempDir/sqlcerts/sqlprimary.pem​ --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name jumpstartDAG --name primarycr --mi $primarySqlMIInstance --role primary --partner-mi js-sql-dr  --partner-mirroring-url tcp://10.20.5.20:970 --partner-mirroring-cert-file $Env:TempDir/sqlcerts/sqlsecondary.pem --k8s-namespace arc --use-k8s
+Write-Host "`n"
+
+Write-Host "Configuring the secondary cluster"
+Write-Host "`n"
+kubectx secondary
+az sql mi-arc get-mirroring-cert --name $secondarySqlMIInstance --cert-file $Env:TempDir/sqlcerts/sqlsecondary.pem --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name jumpstartDAG --name secondarycr --mi $secondarySqlMIInstance --role secondary --partner-mi js-sql-pr  --partner-mirroring-url tcp://10.10.5.20:970 --partner-mirroring-cert-file $Env:TempDir/sqlcerts/sqlprimary.pem​ --k8s-namespace arc --use-k8s
+Write-Host "`n"
+
