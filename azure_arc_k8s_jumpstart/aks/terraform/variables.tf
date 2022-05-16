@@ -10,7 +10,7 @@ variable "aks_name" {
 
 variable "prefix" {
   description = "A prefix used for all resources for this AKS Managed Kubernetes Cluster"
-  default     = "arcaksdemo"
+  default     = "arck8s"
 }
 
 variable "location" {
@@ -20,7 +20,7 @@ variable "location" {
 
 variable "kubernetes_version" {
   description = "Kubernetes version deployed"
-  default     = "1.18.14"
+  default     = "1.23.5"
 }
 
 variable "node_count" {
