@@ -95,14 +95,14 @@ Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on primary cluster
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
+kubectl patch svc js-sql-pr -n arc --type merge --patch $payload
 Start-Sleep -Seconds 5 # To allow the CRD to update
 
 if ( $env:SQLMIHA -eq $true )
 {
     # Update Service Port from 1433 to Non-Standard
     $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-    kubectl patch svc jumpstart-sql-secondary-external-svc -n arc --type merge --patch $payload
+    kubectl patch svc js-sql-pr-secondary-external-svc -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
 
@@ -113,6 +113,12 @@ Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
 kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
 Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
 kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+
+
+# Creating Azure Data Studio settings for SQL Managed Instance connection
+Write-Host "`n"
+Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
+$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving SQL MI connection endpoint
 $sqlstringPrimary = kubectl get sqlmanagedinstances $primarySqlMIInstance -n arc -o=jsonpath='{.status.endpoints.primary}'
@@ -146,37 +152,18 @@ Write-Host "`n"
 Write-Host "Secondary Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
-# Update Service Port from 1433 to Non-Standard on primary cluster
-$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
-Start-Sleep -Seconds 5 # To allow the CRD to update
-
-if ( $env:SQLMIHA -eq $true )
-{
-    # Update Service Port from 1433 to Non-Standard
-    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-    kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
-    Start-Sleep -Seconds 5 # To allow the CRD to update
-}
-
 # Update Service Port from 1433 to Non-Standard on secondary cluster
-kubectx secondary
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
+kubectl patch svc js-sql-dr-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 5 # To allow the CRD to update
 
 if ( $env:SQLMIHA -eq $true )
 {
     # Update Service Port from 1433 to Non-Standard
     $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-    kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
+    kubectl patch svc js-sql-dr-external-svc -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
-
-# Creating Azure Data Studio settings for SQL Managed Instance connection
-Write-Host "`n"
-Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving SQL MI connection endpoint
 $sqlstringSecondary = kubectl get sqlmanagedinstances $secondarySqlMIInstance -n arc -o=jsonpath='{.status.endpoints.primary}'
