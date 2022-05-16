@@ -86,13 +86,6 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },    
-    "deployPostgreSQL": {
-      "type": "bool",
-      "defaultValue": false,
-      "metadata": {
-        "description": "PostgreSQL deployment"
-      }
     },
     "githubAccount": {
       "type": "string",
@@ -247,9 +240,6 @@
           },
           "SQLMIHA": {
             "value": "[parameters('SQLMIHA')]"
-          },
-          "deployPostgreSQL": {
-            "value": "[parameters('deployPostgreSQL')]"
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
