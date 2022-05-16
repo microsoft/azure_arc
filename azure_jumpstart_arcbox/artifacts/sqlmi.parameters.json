@@ -25,7 +25,7 @@
         },
         "readableSecondaries": {
             "value": "readableSecondaries-stage"
-        },        
+        }, 
         "vCoresRequest": {
             "value": "vCoresRequest-stage"
         },
