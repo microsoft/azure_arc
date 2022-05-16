@@ -334,7 +334,7 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   }
 }
 
-resource updatesWorkpace 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+resource updatesWorkpace 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
   location: location
   name: updates.name
   properties: {
@@ -348,7 +348,7 @@ resource updatesWorkpace 'Microsoft.OperationsManagement/solutions@2015-11-01-pr
   }
 }
 
-resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
   location: location
   name: 'VMInsights(${split(workspace.id, '/')[8]})'
   properties: {
@@ -362,7 +362,7 @@ resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/
   }
 }
 
-resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
+resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
   name: changeTracking.name
   location: location
   properties: {
