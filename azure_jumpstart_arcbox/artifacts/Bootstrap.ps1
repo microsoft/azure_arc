@@ -111,8 +111,10 @@ workflow ClientTools_01
                 [Parameter (Mandatory = $true)]
                 [string]$flavor
             )
+
             Write-Header "Installing Chocolatey Apps"
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
+
             InlineScript {
                 param (
                     [string]$chocolateyAppList
@@ -149,7 +151,9 @@ workflow ClientTools_01
             Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLIcon.ico") -OutFile $Env:ArcBoxDir\ArcSQLIcon.ico
             Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile $Env:ArcBoxDir\ArcSQLManualOnboarding.ps1
             Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile $Env:ArcBoxDir\installArcAgentSQLUser.ps1
-
+            Invoke-WebRequest ($templateBaseUrl + "../tests/GHActionDeploy.ps1") -OutFile "C:\ArcBox\GHActionDeploy.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "C:\ArcBox\OpenSSHDeploy.ps1"
+          
             # Workbook template
             if ($flavor -eq "ITPro") {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookITPro.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
@@ -171,7 +175,7 @@ workflow ClientTools_01
             }
 
             # DevOps
-            if ($flavor -eq "Full" -Or $flavor -eq "DevOps") {
+            if ($flavor -eq "DevOps") {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/DevOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DevOpsLogonScript.ps1
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/BookStoreLaunch.ps1") -OutFile $Env:ArcBoxDir\BookStoreLaunch.ps1
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/devops_ingress/bookbuyer.yaml") -OutFile $Env:ArcBoxKVDir\bookbuyer.yaml

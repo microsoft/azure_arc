@@ -20,12 +20,6 @@ variable "k3s_arc_cluster_name" {
   default     = "ArcBox-K3s"
 }
 
-variable "vm_size" {
-  type        = string
-  description = "The size of the client virtual machine."
-  default     = "Standard_D16s_v4"
-}
-
 variable "os_sku" {
   type        = string
   description = "The Windows version for the client VM."
@@ -194,7 +188,8 @@ variable "postgres_service_type" {
 ###########################################################################################
 
 locals {
-    public_ip_name         = "${var.vm_name}-PIP"
+    bastion_name           = "ArcBox-Bastion"
+    public_ip_name         = var.deploy_bastion == false ? "${var.vm_name}-PIP" : "${local.bastion_name}-PIP"
     network_interface_name = "${var.vm_name}-NIC"
     bastionSubnetIpPrefix  = "172.16.3.64/26"
 }
@@ -237,7 +232,7 @@ resource "azurerm_virtual_machine" "client" {
   location              = data.azurerm_resource_group.rg.location
   resource_group_name   = data.azurerm_resource_group.rg.name
   network_interface_ids = [ azurerm_network_interface.nic.id ]
-  vm_size               = var.vm_size
+  vm_size               = var.deployment_flavor == "DevOps" ? "Standard_D4s_v4" : "Standard_D16s_v4"
 
   storage_image_reference {
     publisher = "MicrosoftWindowsServer"

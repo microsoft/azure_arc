@@ -46,13 +46,6 @@
                 "description": "Location for all resources"
             }
         },
-        "vmSize": {
-            "type": "string",
-            "defaultValue": "Standard_D16s_v4",
-            "metadata": {
-                "description": "The size of the VM"
-            }
-        },
         "virtualNetworkName": {
             "type": "string",
             "defaultValue": "ArcBox-Vnet",
@@ -200,7 +193,8 @@
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
-        "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
+        "bastionName": "ArcBox-Bastion",
+        "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
@@ -259,7 +253,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
+                    "vmSize": "[if(equals(parameters('flavor'),'DevOps'),'Standard_D4s_v4','Standard_D16s_v4')]"
                 },
                 "storageProfile": {
                     "osDisk": {
