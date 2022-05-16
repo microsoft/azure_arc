@@ -285,6 +285,7 @@ if ( $Env:deploySQLMI -eq $true )
 }
 
 # Enabling data controller auto metrics & logs upload to log analytics on the primary cluster
+kubectx primary
 Write-Host "`n"
 Write-Host "Enabling data controller auto metrics & logs upload to log analytics on the primary cluster"
 Write-Host "`n"
@@ -294,6 +295,7 @@ az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup -
 az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
 
 # Enabling data controller auto metrics & logs upload to log analytics on the secondary cluster
+kubectx secondary
 Write-Host "`n"
 Write-Host "Enabling data controller auto metrics & logs upload to log analytics on the secondary cluster"
 Write-Host "`n"
@@ -303,7 +305,7 @@ az arcdata dc update --name $secondaryDcName --resource-group $Env:resourceGroup
 az arcdata dc update --name $secondaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
 
 # Applying Azure Data Studio settings template file and operations url shortcut
-if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
+if ( $Env:deploySQLMI -eq $true){
     Write-Host "`n"
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
