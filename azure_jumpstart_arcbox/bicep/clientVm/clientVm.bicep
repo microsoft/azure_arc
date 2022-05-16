@@ -19,9 +19,6 @@ param windowsOSVersion string = '2022-datacenter-g2'
 @description('Location for all resources')
 param location string = resourceGroup().location
 
-@description('The size of the VM')
-param vmSize string = 'Standard_D16s_v4'
-
 @description('Resource Id of the subnet in the virtual network')
 param subnetId string
 
@@ -89,7 +86,9 @@ param githubUser string
 @description('The name of the K3s cluster')
 param k3sArcClusterName string = 'ArcBox-K3s'
 
-var publicIpAddressName = '${vmName}-PIP'
+
+var bastionName = 'ArcBox-Bastion'
+var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'
 var PublicIPNoBastion = {
@@ -134,7 +133,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
   tags: resourceTags
   properties: {
     hardwareProfile: {
-      vmSize: vmSize
+      vmSize: flavor == 'DevOps' ? 'Standard_D4s_v4' : 'Standard_D16s_v4' 
     }
     storageProfile: {
       osDisk: {
