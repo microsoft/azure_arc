@@ -122,11 +122,14 @@
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
-    // Virtual Network configuration
     "virtualNetworkName": "Arc-Data-VNet",
     "subnetName": "Arc-Data-Subnet",
-    "addressPrefix": "172.16.0.0/16",
-    "subnetAddressPrefix": "172.16.1.0/24",
+    "addressPrefix": "172.0.0.0/8",
+    "subnetAddressPrefix": "172.240.0.0/16",
+    "ClientSubnetAddressPrefix": "172.10.0.0/24",
+    "secondaryClusterVnetName" : "Arc-Secondary-Vnet",
+    "secondaryAddressPrefix": "192.0.0.0/8",
+    "secondarySubnetAddressPrefix": "192.240.0.0/16",
     "bastionSubnetPrefix": "172.16.2.64/26",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
@@ -158,6 +161,18 @@
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "ClientSubnetAddressPrefix": {
+            "value": "[variables('ClientSubnetAddressPrefix')]"
+          },
+          "secondaryClusterVnetName": {
+            "value": "[variables('secondaryClusterVnetName')]"
+          },
+          "secondaryAddressPrefix": {
+            "value": "[variables('secondaryAddressPrefix')]"
+          },
+          "secondarySubnetAddressPrefix": {
+            "value": "[variables('secondarySubnetAddressPrefix')]"
           }
         }
       }
@@ -188,6 +203,9 @@
           },
           "dnsPrefix": {
             "value": "[parameters('dnsPrefix')]"
+          },
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
           }
         }
       }
@@ -233,7 +251,7 @@
             "value": "[variables('virtualNetworkName')]"
           },
           "subnetName": {
-            "value": "[variables('subnetName')]"
+            "value": "[variables('ClientSubnetAddressPrefix')]"
           },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"

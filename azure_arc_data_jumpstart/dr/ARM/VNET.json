@@ -31,6 +31,30 @@
       "metadata": {
         "description": "Bastion subnet prefix"
       }
+    },
+    "ClientSubnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Client VM subnet"
+      }
+    },
+    "secondaryClusterVnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Secondary cluster Vnet name"
+      }
+    },
+    "secondaryAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Secondary cluster Vnet address range"
+      }
+    },
+    "secondarySubnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Secondary cluster subnet prefix"
+      }
     }
   },
   "variables": {
@@ -49,6 +73,14 @@
         },
         "subnets": [
           {
+            "name": "ClientVM-Subnet",
+            "properties": {
+              "addressPrefix": "[parameters('ClientSubnetAddressPrefix')]",
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          },
+          {
             "name": "[parameters('subnetName')]",
             "properties": {
               "addressPrefix": "[parameters('subnetAddressPrefix')]",
@@ -60,6 +92,28 @@
             "name": "AzureBastionSubnet",
             "properties": {
               "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "comments": "Deploys a VNET and Subnet for the secondary cluster",
+      "apiVersion": "2021-05-01",
+      "name": "[parameters('secondaryClusterVnetName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [ "[parameters('secondaryAddressPrefix')]" ]
+        },
+        "subnets": [
+          {
+            "name": "cluster-subnet",
+            "properties": {
+              "addressPrefix": "[parameters('secondarySubnetAddressPrefix')]",
+              "privateEndpointNetworkPolicies": "Enabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
             }
           }
         ]
