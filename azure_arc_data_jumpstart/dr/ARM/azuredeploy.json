@@ -251,7 +251,7 @@
             "value": "[variables('virtualNetworkName')]"
           },
           "subnetName": {
-            "value": "[variables('ClientSubnetAddressPrefix')]"
+            "value": "[variables('subnetName')]"
           },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
