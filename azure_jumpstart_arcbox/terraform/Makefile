@@ -1,3 +1,29 @@
+# COLORS
+GREEN  := $(shell tput -Txterm setaf 2)
+YELLOW := $(shell tput -Txterm setaf 3)
+WHITE  := $(shell tput -Txterm setaf 7)
+RESET  := $(shell tput -Txterm sgr0)
+
+TARGET_MAX_CHAR_NUM=20
+## Show help
+help:
+	@echo ''
+	@echo 'Usage:'
+	@echo '  ${YELLOW}make${RESET} ${GREEN}<target> DEPLOYMENT=${YELLOW}testbed1${RESET} '
+	@echo ''
+	@echo 'Targets:'
+	@awk '/^[a-zA-Z\-\_0-9]+:/ { \
+		helpMessage = match(lastLine, /^## (.*)/); \
+		if (helpMessage) { \
+			helpCommand = substr($$1, 0, index($$1, ":")-1); \
+			helpMessage = substr(lastLine, RSTART + 3, RLENGTH); \
+			printf "  ${YELLOW}%-$(TARGET_MAX_CHAR_NUM)s${RESET} ${GREEN}%s${RESET}\n", helpCommand, helpMessage; \
+		} \
+	} \
+	{ lastLine = $$0 }' $(MAKEFILE_LIST)
+
+.PHONY:	init
+## Terraform init
 init:
 	docker-compose run --rm terraform init -input=false
 
@@ -10,6 +36,8 @@ format_check:
 validate:
 	docker-compose run --rm terraform validate
 
+.PHONY:	plan
+## Terraform plan
 plan:
 	docker-compose run --rm terraform plan -var-file=deployments/${DEPLOYMENT}/variables.tfvars
 
@@ -22,23 +50,12 @@ state-rm:
 output:
 	docker-compose run --rm terraform output
 
+.PHONY:	apply
+## Terraform apply
 apply:
 	docker-compose run --rm terraform apply --auto-approve -var-file=deployments/${DEPLOYMENT}/variables.tfvars
 
-destroy-plan:
-	docker-compose run --rm terraform workspace select ${OpGroup}
-	docker-compose run --rm terraform plan -destroy -var-file=configuration/${OpGroup}/${OpGroup}.tfvars
 
 destroy:
-	docker-compose run --rm terraform workspace select ${OpGroup}
-	docker-compose run --rm terraform destroy --auto-approve -var-file=configuration/${OpGroup}/${OpGroup}.tfvars
+	docker-compose run --rm terraform destroy --auto-approve -var-file=deployments/${DEPLOYMENT}/variables.tfvars
 
-login:
-	docker-compose run --rm terraform login iac.wpp.cloud
-
-debug1:
-	@echo 'var-file: ${OpGroup}'
-	debug: ## terraform debug: Enters the docker container for you so you can run commands and/or check configurations
-
-debug: 
-	docker-compose run --rm --entrypoint /bin/sh terraform

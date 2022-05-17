@@ -184,6 +184,7 @@ if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
     ClientTools_02 | Format-Table 
 }
 
+
 if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     # Creating scheduled task for ArcServersLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn
