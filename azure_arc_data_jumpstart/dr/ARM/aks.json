@@ -111,6 +111,12 @@
       "metadata": {
         "description": "Seconday cluster vnet"
       }
+    },
+    "subnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Primary cluster subnet"
+      }
     }
   },
   "variables": {
@@ -146,7 +152,7 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "vnetSubnetID" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),'ClientVM-Subnet')]"
+            "vnetSubnetID" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),parameters('subnetName')]"
           }
         ],
         "networkProfile": 
