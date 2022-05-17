@@ -137,7 +137,7 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "vnetSubnetID" : "[resourceId('Microsoft.Network/subnets', parameters('virtualNetworkName'),'ClientVM-Subnet')]",
+            "vnetSubnetID" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),'ClientVM-Subnet')]",
             "serviceCidr": "[variables('serviceCidr-primary')]",
             "dnsServiceIP": "[variables('dnsServiceIP-primary')]",
             "dockerBridgeCidr": "[variables('dockerBridgeCidr-primary')]"
