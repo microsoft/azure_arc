@@ -117,8 +117,8 @@
    "serviceCidr-primary": "10.0.0.0/16",
    "dnsServiceIP-primary": "10.0.0.10",
    "dockerBridgeCidr-primary" : "172.17.0.1/16",
-   "serviceCidr-secondary": "192.168.0.0/16",
-   "dnsServiceIP-secondary": "192.168.0.10",
+   "serviceCidr-secondary": "192.0.0.0/16",
+   "dnsServiceIP-secondary": "192.0.0.10",
    "dockerBridgeCidr-secondary" : "173.17.0.1/16"
   },
   "resources": [
