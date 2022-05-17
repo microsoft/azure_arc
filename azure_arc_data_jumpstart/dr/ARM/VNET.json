@@ -180,7 +180,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-secondary-vnet', parameters('virtualNetworkName'))]",
+      "name": "[format('{0}/peering-to-client-vnet', parameters('virtualNetworkName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
@@ -216,7 +216,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-secondary-vnet', parameters('secondaryClusterVnetName'))]",
+      "name": "[format('{0}/peering-to-client-vnet', parameters('secondaryClusterVnetName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryClusterVnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
@@ -234,7 +234,7 @@
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-primary-vnet', 'clientVM-Vnet')]",
+      "name": "[format('{0}/peering-to-secondary-vnet', 'clientVM-Vnet')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryClusterVnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
