@@ -246,7 +246,7 @@ if(-not $hasPermission) {
     $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
     $shortcut.TargetPath = "powershell.exe"
     $shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
-    $shortcut.IconLocation="${$Env:ArcBoxIconDir}\arcsql.ico, 0"
+    $shortcut.IconLocation="${Env:ArcBoxIconDir}\arcsql.ico, 0"
     $shortcut.WindowStyle = 3
     $shortcut.Save()
 }
