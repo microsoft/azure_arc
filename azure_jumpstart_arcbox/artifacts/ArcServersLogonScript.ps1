@@ -126,7 +126,7 @@ $winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindows
 $secLinuxPassword = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
 $linCreds = New-Object System.Management.Automation.PSCredential ($nestedLinuxUsername, $secLinuxPassword)
 
-# Expand Windows partition sizes
+# Restarting Windows VM Network Adapters
 Write-Header "Restarting Network Adapters"
 Start-Sleep -Seconds 20
 Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
