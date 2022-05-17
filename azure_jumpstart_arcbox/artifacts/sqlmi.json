@@ -41,13 +41,13 @@
       "type": "String"
     },
     "memoryRequest": {
-        "type": "String"
+      "type": "String"
     },
     "vCoresLimit": {
-        "type": "String"
+      "type": "String"
     },
     "memoryLimit": {
-        "type": "String"
+      "type": "String"
     },
     "dataStorageSize": {
       "type": "String",
@@ -124,18 +124,18 @@
             "replicas": "[parameters('replicas')]",
             "scheduling": {
               "default": {
-                  "resources": {
-                      "requests": {
-                          "cpu": "[parameters('vCoresRequest')]",
-                          "memory": "[parameters('memoryRequest')]"
-                      },
-                      "limits": {
-                          "cpu": "[parameters('vCoresLimit')]",
-                          "memory": "[parameters('memoryLimit')]"
-                      }
+                "resources": {
+                  "requests": {
+                    "cpu": "[parameters('vCoresRequest')]",
+                    "memory": "[parameters('memoryRequest')]"
+                  },
+                  "limits": {
+                    "cpu": "[parameters('vCoresLimit')]",
+                    "memory": "[parameters('memoryLimit')]"
                   }
+                }
               }
-          },
+            },
             "storage": {
               "data": {
                 "volumes": [
