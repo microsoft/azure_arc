@@ -152,7 +152,7 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "vnetSubnetID" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),parameters('subnetName')]"
+            "vnetSubnetID" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),parameters('subnetName'))]"
           }
         ],
         "networkProfile": 
