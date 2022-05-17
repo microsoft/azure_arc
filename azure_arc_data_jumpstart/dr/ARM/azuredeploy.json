@@ -209,6 +209,9 @@
           },
           "secondaryClusterVnetName": {
             "value": "[variables('secondaryClusterVnetName')]"
+          },
+          "subnetName": {
+            "value": "[variables('subnetName')]"
           }
         }
       }
