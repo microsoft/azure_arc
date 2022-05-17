@@ -151,7 +151,7 @@
             "value": "[variables('virtualNetworkName')]"
           },
           "subnetName": {
-            "value": "ClientVM-Subnet"
+            "value": "Arc-Data-Subnet"
           },
           "addressPrefix": {
             "value": "[variables('addressPrefix')]"
