@@ -195,14 +195,15 @@ Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Na
 Write-Host "`n"
 
 # Creating distributed DAG
-Write-Host "Configuring the primary cluster"
+Write-Host "Configuring the primary cluster DAG"
+New-Item -Path "$Env:TempDir/sqlcerts" -ItemType Directory
 Write-Host "`n"
 kubectx primary
 $primaryMirroringEndpoint = $(az sql mi-arc show $primarySqlMIInstance --k8s-namespace arc --use-k8s -o=jsonpath='{.status.mirroringEndpoint}')
 az sql mi-arc get-mirroring-cert --name $primarySqlMIInstance --cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
 
-Write-Host "Configuring the secondary cluster"
+Write-Host "Configuring the secondary cluster DAG"
 Write-Host "`n"
 kubectx secondary
 $secondaryMirroringEndpoint = $(az sql mi-arc show $secondarySqlMIInstance --k8s-namespace arc --use-k8s -o=jsonpath='{.status.mirroringEndpoint}')
