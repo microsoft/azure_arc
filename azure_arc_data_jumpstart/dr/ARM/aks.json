@@ -99,7 +99,18 @@
       "defaultValue": {
         "Project": "jumpstart_azure_arc_data_services"
       }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "primary vnet"
+      }
     }
+  },
+  "variables": {
+   "serviceCidr-primary": "10.0.0.0/16",
+   "dnsServiceIP-primary": "10.0.0.10",
+   "dockerBridgeCidr-primary" : "172.17.0.1/16"
   },
   "resources": [
     {
@@ -125,7 +136,11 @@
             "vmSize": "[parameters('agentVMSize')]",
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
-            "type": "VirtualMachineScaleSets"
+            "type": "VirtualMachineScaleSets",
+            "vnetSubnetID" : "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName')), '/subnets/', 'ClientVM-Subnet')]",
+            "serviceCidr": "[variables('serviceCidr-primary')]",
+            "dnsServiceIP": "[variables('dnsServiceIP-primary')]",
+            "dockerBridgeCidr": "[variables('dockerBridgeCidr-primary')]"
           }
         ],
         "networkProfile": 
