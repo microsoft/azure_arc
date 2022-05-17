@@ -182,6 +182,7 @@
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+    "clientVMSubnetRef" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'clientVM-Vnet', 'default')]",
     "osDiskType": "Premium_LRS",
     "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
     "bastionSubnetRef": "[concat(parameters('bastionSubnetRef'))]",
@@ -205,7 +206,7 @@
             "name": "ipconfig1",
             "properties": {
               "subnet": {
-                "id": "[variables('subnetRef')]"
+                "id": "[variables('clientVMSubnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
               "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
