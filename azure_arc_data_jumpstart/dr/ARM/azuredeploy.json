@@ -128,8 +128,8 @@
     "subnetAddressPrefix": "172.240.0.0/16",
     "ClientSubnetAddressPrefix": "172.10.0.0/24",
     "secondaryClusterVnetName" : "Arc-Secondary-Vnet",
-    "secondaryAddressPrefix": "192.0.0.0/8",
-    "secondarySubnetAddressPrefix": "192.240.0.0/16",
+    "secondaryAddressPrefix": "20.0.0.0/8",
+    "secondarySubnetAddressPrefix": "20.240.0.0/16",
     "bastionSubnetPrefix": "172.16.2.64/26",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
