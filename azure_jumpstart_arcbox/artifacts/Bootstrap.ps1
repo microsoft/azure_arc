@@ -106,26 +106,22 @@ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 Write-Header "Installing Chocolatey Apps"
 $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
 
-if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
-{
-    try{
-        choco config get cacheLocation
-    }catch{
-        Write-Output "Chocolatey not detected, trying to install now"
-        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    }
+try {
+    choco config get cacheLocation
+}
+catch {
+    Write-Output "Chocolatey not detected, trying to install now"
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
 
-if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-    Write-Host "Chocolatey Apps Specified"  
-    
-    $appsToInstall = $using:chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+Write-Host "Chocolatey Apps Specified"
 
-    foreach ($app in $appsToInstall)
-    {
-        Write-Host "Installing $app"
-        & choco install $app /y -Force | Write-Output
-    }
+$appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+
+foreach ($app in $appsToInstall)
+{
+    Write-Host "Installing $app"
+    & choco install $app /y -Force | Write-Output
 }
 
 Write-Header "Fetching GitHub Artifacts"
