@@ -151,7 +151,7 @@
             "value": "[variables('virtualNetworkName')]"
           },
           "subnetName": {
-            "value": "[variables('subnetName')]"
+            "value": "ClientVM-Subnet"
           },
           "addressPrefix": {
             "value": "[variables('addressPrefix')]"
@@ -206,6 +206,9 @@
           },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
+          },
+          "secondaryClusterVnetName": {
+            "value": "[variables('secondaryClusterVnetName')]"
           }
         }
       }
