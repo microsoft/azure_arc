@@ -355,7 +355,7 @@ resource "azurerm_log_analytics_solution" "update_solution" {
 
   plan {
     publisher = "Microsoft"
-    product   = "OMSGallery/${each.value}"
+    product   = "OMSGallery/${each.value.name}"
   }
 }
 
