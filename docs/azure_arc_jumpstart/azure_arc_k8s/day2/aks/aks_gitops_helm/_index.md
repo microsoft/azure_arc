@@ -224,9 +224,9 @@ For our scenario, notice we have two Helm charts in the "Azure Arc Jumpstart App
 
   - In **your fork** of the "Azure Arc Jumpstart App" repository, open the *hello_arc.yaml* file (/hello-arc/releases/app/hello_arc.yaml).
 
-  - The external IP address of the Kubernetes Service is seen using the _`kubectl get svc -n hello-arc`_ command.
+  - The external IP address of the Kubernetes Service is seen using the _`kubectl get svc -n ingress-nginx`_ command.
 
-    ![kubectl get svc -n hello-arc](./21.png)
+    ![kubectl get svc -n ingress-nginx](./21.png)
 
   - End result should look like that:
 
