@@ -167,7 +167,7 @@ if ( $env:SQLMIHA -eq $true )
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
 
-# Downloading demo database and restoring onto SQL MI secondary
+# Downloading demo database and restoring onto SQL MI
 $podname = "js-sql-dr-0"
 Write-Host "`n"
 Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
