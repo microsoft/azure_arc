@@ -120,7 +120,7 @@ Now that we have applied tags to our resources that are hosted in multiple cloud
 
 * In the query window, enter the following query:
 
-    ```kusto
+    ```console
     Resources
     | where type =~ 'Microsoft.HybridCompute/machines'
     | where isnotempty(tags['Hosting Platform'])
