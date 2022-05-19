@@ -28,7 +28,7 @@ az k8s-configuration flux create \
 --scope cluster \
 --url $appClonedRepo \
 --branch main --sync-interval 3s \
---kustomization name=nginx path=./nginx/release
+--kustomization name=nginx prune=true path=./nginx/release
 
 # Checking if Ingress Controller is ready
 until kubectl get service/ingress-nginx-controller --namespace $ingressNamespace --output=jsonpath='{.status.loadBalancer}' | grep "ingress"; do echo "Waiting for NGINX Ingress controller external IP..." && sleep 20 ; done
@@ -44,4 +44,4 @@ az k8s-configuration flux create \
 --scope namespace \
 --url $appClonedRepo \
 --branch main --sync-interval 3s \
---kustomization name=app path=./hello-arc/releases/app
+--kustomization name=app prune=true path=./hello-arc/releases/app
