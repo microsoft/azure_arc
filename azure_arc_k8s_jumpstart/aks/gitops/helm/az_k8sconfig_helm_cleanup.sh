@@ -18,24 +18,10 @@ az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --
 
 # Deleting GitOps Configurations from Azure Arc Kubernetes cluster
 echo "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
-az k8s-configuration flux delete --name config-nginx --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
-az k8s-configuration flux delete --name config-helloarc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
+az k8s-configuration flux delete --name config-nginx --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --force -y
+az k8s-configuration flux delete --name config-helloarc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --force -y
 
 # Deleting GitOps Flux extension
 echo "Deleting GitOps Flux extension"
+az config set extension.use_dynamic_install=yes_without_prompt
 az k8s-extension delete --name flux --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
-
-# Cleaning Kubernetes cluster
-echo "Cleaning Kubernetes cluster. You can safely ignore non-existing resources"
-kubectl delete ns $ingressNamespace
-kubectl delete ns $namespace
-
-kubectl delete clusterrole cluster-mgmt-helm-cluster-mgmt-helm-operator
-kubectl delete clusterrole hello-arc-helm-prod-helm-operator-crd
-kubectl delete clusterrole nginx-ingress
-
-kubectl delete clusterrolebinding cluster-mgmt-helm-cluster-mgmt-helm-operator
-kubectl delete clusterrolebinding hello-arc-helm-prod-helm-operator
-kubectl delete clusterrolebinding nginx-ingress
-
-kubectl delete secret sh.helm.release.v1.azure-arc.v1 -n default
