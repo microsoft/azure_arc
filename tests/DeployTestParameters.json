@@ -1,14 +1,14 @@
 {
   "Full": {
-    "initialResourceAmount": 42,
-    "resourcesAfterScriptExecution": 89,
+    "initialResourceAmount": 45,
+    "resourcesAfterScriptExecution": 87,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 6,
     "workbooksExpected": 1,
     "deployBastionDifference": 0,
-    "desktopElementsExpected": 8,
+    "desktopElementsExpected": 9,
     "connectedK8sClustersExpected": 2,
-    "keyVaultsExpected": 1,
+    "keyVaultsExpected": 0,
     "azuredatastudioSettingExpected": 1
   },
   "ITPro": {
@@ -17,8 +17,8 @@
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 5,
     "workbooksExpected": 1,
-    "deployBastionDifference": 2,
-    "desktopElementsExpected": 2,
+    "deployBastionDifference": 1,
+    "desktopElementsExpected": 3,
     "connectedK8sClustersExpected": 0,
     "keyVaultsExpected": 0,
     "azuredatastudioSettingExpected": 0

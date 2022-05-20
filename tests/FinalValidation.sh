@@ -133,7 +133,7 @@ for val in $(az resource list -g "$ResourceGroup" --query '[].id' -o tsv | grep 
       echo "policyinsights extension not found on: $name"
       validations=false
    fi
-   if [ "$name" = "ArcBox-CAPI-Data" ]; then
+   if [ "$name" = "ArcBox-CAPI-Data" ] && [ "$Flavor" = "DevOps" ]; then
       count=$(az k8s-extension list --cluster-name $name --cluster-type connectedClusters --resource-group "$ResourceGroup" --query '[].extensionType' -o tsv | grep -h 'azurekeyvaultsecretsprovider' -c)
       if [ "$count" = "1" ]; then
          echo "azurekeyvaultsecretsprovider extension on: $name"
