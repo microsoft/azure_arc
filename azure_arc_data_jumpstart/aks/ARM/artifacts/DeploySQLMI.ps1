@@ -4,6 +4,80 @@ Start-Transcript -Path C:\Temp\DeploySQLMI.log
 $Env:TempDir = "C:\Temp"
 $controllerName = "jumpstart-dc"
 
+# Deploy AD Connector
+# Prior to deploying prepare YAML file to update with Domain information
+Import-Module ActiveDirectory
+Import-Module DnsServer
+
+# Get Activectory Information
+$dcInfo = Get-ADDomainController
+$sqlmiouName = "ARCSQLMI"
+$sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
+
+# Setup reverse lookup zone
+Add-DnsServerPrimaryZone -NetworkID "172.16.1.0/24" -ReplicationScope "Forest" -ComputerName $dcInfo.HostName
+
+# Create ArcSQLMi OU
+try
+{
+    $ou = Get-ADOrganizationalUnit -Identity $sqlmiOUDN
+    if ($null -ne $ou -and $ou.Name.Length -gt 0)
+    {
+        Write-Host "Organization Unit $sqlmiouName already exist. Skipping this step."
+    }
+    else
+    {
+        Write-Host "Organization Unit $sqlmiouName does not exist. Creating new OU."
+        New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
+    }
+}
+catch
+{
+    Write-Host "Organization Unit $sqlmiOu does not exist. Creating new OU."
+    New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
+}
+
+# Create dedicated service account for AD connector
+$arcdsaname = "dsa-arcsqlmi"
+$arcdsapass = "ArcDSA#Pwd123$" | ConvertTo-SecureString -AsPlainText -Force
+$dsaupn = $arcdsaname + "@" + $dcInfo.domain
+
+try
+{
+    New-ADUser -Name $arcdsaname `
+           -UserPrincipalName $dsaupn `
+           -Path $sqlmiOUDN `
+           -AccountPassword $arcdsapass `
+           -Enabled $true `
+           -ChangePasswordAtLogon $false `
+           -PasswordNeverExpires $true
+}
+catch
+{
+    # User already exists
+}
+
+# Grant permission to DSA account on SQLMI OU 
+
+# Create service account for SQL MI
+$b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($arcdsaname))
+$b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($arcdsapass))
+
+# Read YAML file and replace values
+$adConectorYAMLFile = "C:\Temp\deployADConnector.yaml"
+$adConnectorContent = Get-Content $adConectorYAMLFile
+$adConnectorContent = $adConnectorContent.Replace("{{ARC_DSA_USER}}", $b64UserName)
+$adConnectorContent = $adConnectorContent.Replace("{{ARC_DSA_USER_PASSWORD}}", $b64Password)
+$adConnectorContent = $adConnectorContent.Replace("{{ADDS_DOMAIN_NAME}}", $dcInfo.domain.ToUpper())
+$adConnectorContent = $adConnectorContent.Replace("{{SQLMI_OU}}", $sqlmiOU.ToUpper())
+$adConnectorContent = $adConnectorContent.Replace("{{ADDS_DC_NAME}}", $dcInfo.HostName.ToUpper())
+$adConnectorContent = $adConnectorContent.Replace("{{ADDS_IP_ADDRESS}}", $dcInfo.IPv4Address)
+Set-Content -Path $adConectorYAMLFile -Value $adConnectorContent
+
+# Now deploy AD connector in AKS
+kubectl apply -f $adConectorYAMLFile
+
+
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "`n"
 Write-Host "Deploying Azure Arc SQL Managed Instance"
@@ -142,4 +216,27 @@ if ( $env:deployPostgreSQL -eq $false )
     $string | Set-Content $settingsTemplate
     $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
     $string | Set-Content -Path $settingsTemplate
+}
+
+###########################
+# Enableld AD authentication in SQL MI
+###########################
+# Create dedicated service account for AD authentication
+$arcsaname = "sa-sqlmi-jumpstart"
+$arcsapass = "ArcDSA#Pwd123$" | ConvertTo-SecureString -AsPlainText -Force
+$saupn = $arcsaname + "@" + $dcInfo.domain
+
+try
+{
+    New-ADUser -Name $arcdsaname `
+           -UserPrincipalName $saupn `
+           -Path $sqlmiOUDN `
+           -AccountPassword $arcsapass `
+           -Enabled $true `
+           -ChangePasswordAtLogon $false `
+           -PasswordNeverExpires $true
+}
+catch
+{
+    # User already exists
 }

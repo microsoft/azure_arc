@@ -5,10 +5,10 @@ metadata:
   name: adarc-dsa-secret
   namespace: arc
 data: 
-  password: {{ADMIN_PASSWORD}}
-  username: {{ADMIN_USER}}
+  password: {{ARC_DSA_USER_PASSWORD}}
+  username: {{ARC_DSA_USER}}
 ---
-apiVersion: arcdata.microsoft.com/v1beta2
+apiVersion: {{arcdata.microsoft.com/v1beta2}}
 kind: ActiveDirectoryConnector
 metadata:
   name: adarc

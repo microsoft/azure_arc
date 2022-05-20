@@ -153,8 +153,9 @@ $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\D
 # If AD Auth is required join computer to ADDS domain and restart computer
 if ($addsDomainName.Length -gt 0)
 {
-    # Install Install-WindowsFeature RSAT-AD-PowerShell windows feature to setup OU and User Accounts in ADDS
+    # Install Windows Feature RSAT-AD-PowerShell windows feature to setup OU and User Accounts in ADDS
     Install-WindowsFeature -Name RSAT-AD-PowerShell
+    Install-WindowsFeature -Name RSAT-DNS-Server
 
     Write-Host "Installed RSAT-AD-PowerShell windows feature"
 
@@ -174,6 +175,7 @@ if ($addsDomainName.Length -gt 0)
     })
  
     # Register schedule run under domain account
+    # Use $env:username
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User "${netbiosname}\${adminUsername}" -Action $Action -RunLevel "Highest" -Force
 
     Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
