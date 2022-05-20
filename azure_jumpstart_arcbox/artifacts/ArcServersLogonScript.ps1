@@ -61,7 +61,7 @@ Set-VMHost -EnableEnhancedSessionMode $true
 
 Write-Header "Fetching Nested VMs"
 $sourceFolder = 'https://jumpstart.blob.core.windows.net/testimages'
-$sas = "?sp=rl&st=2022-05-19T19:07:08Z&se=2022-05-20T03:07:08Z&spr=https&sv=2020-08-04&sr=c&sig=CuFF3rycQY1q6vKko46y3zRjXaeWjJsCeHPLj49ukMU%3D"
+$sas = "?sp=rl&st=2022-05-20T13:30:06Z&se=2025-05-20T21:30:06Z&spr=https&sv=2020-08-04&sr=c&sig=ZsPweQIFV5Kg2Hk1xoZH0W8yn0x%2FnoVPHuiwkQEIux4%3D"
 $Env:AZCOPY_BUFFER_GB=4
 if ($Env:flavor -eq "Full") {
     # The "Full" ArcBox flavor has an azcopy network throughput capping
