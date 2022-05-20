@@ -18,7 +18,7 @@
     },
     "addsDomainName": {
       "type": "string",
-      "defaultValue": "contoso.local",
+      "defaultValue": "jumpstart.local",
       "metadata": {
         "description": "Active Direcotory domain name ot support AD Auth. Empty value indicates AD auth not required in SQLMI."
       }
@@ -148,6 +148,7 @@
     // Virtual Network configuration
     "virtualNetworkName": "Arc-Data-VNet",
     "subnetName": "Arc-Data-Subnet",
+    "akssubnetName": "Aks-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24",
     "bastionSubnetPrefix": "172.16.2.64/26",
@@ -225,7 +226,6 @@
       "comments": "Deploys an AKS Cluster",
       "apiVersion": "2021-04-01",
       "name": "aksDeployment",
-      "condition": false,
       "dependsOn": ["VNETDeployment", "addsVmDeployment", "updateVNetDNSServers"],
       "properties": {
         "mode": "Incremental",
@@ -248,6 +248,9 @@
           },
           "dnsPrefix": {
             "value": "[parameters('dnsPrefix')]"
+          },
+          "vnetSubnetID": {
+            "value": ""
           }
         }
       }

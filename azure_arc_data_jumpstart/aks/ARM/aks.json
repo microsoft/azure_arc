@@ -16,6 +16,12 @@
         "description": "The location of the Managed Cluster resource"
       }
     },
+    "vnetSubnetID": {
+      "type": "string",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+      }
+    },
     "dnsPrefix": {
       "type": "string",
       "metadata": {
@@ -124,7 +130,8 @@
             "vmSize": "[parameters('agentVMSize')]",
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
-            "type": "VirtualMachineScaleSets"
+            "type": "VirtualMachineScaleSets",
+            "vnetSubnetID": "[parameters('vnetSubnetID')]"
           }
         ],
         "networkProfile": 

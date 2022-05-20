@@ -16,6 +16,13 @@
         "description": "Name of the subnet in the virtual network"
       }
     },
+    "aksSubnetName": {
+      "type": "string",
+      "defaultValue": "Aks-Subnet",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network"
+      }
+    },
     "addressPrefix": {
       "type": "string",
       "defaultValue": "172.16.0.0/16",
@@ -33,6 +40,13 @@
     "bastionSubnetPrefix": {
       "type": "string",
       "defaultValue": "172.16.2.64/26",
+      "metadata": {
+        "description": "Bastion subnet prefix"
+      }
+    },
+    "aksSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "172.16.8.0/22",
       "metadata": {
         "description": "Bastion subnet prefix"
       }
@@ -73,9 +87,21 @@
             "properties": {
               "addressPrefix": "[parameters('bastionSubnetPrefix')]"
             }
+          },
+          {
+            "name": "[parameters('aksSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('aksSubnetPrefix')]"
+            }
           }
         ]
       }
     }
-  ]
+  ],
+  "outputs": {
+    "aksVnetSubnetId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('aksSubnetName')).resourceId]"
+    }
+  }
 }
