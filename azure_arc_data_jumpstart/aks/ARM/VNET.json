@@ -48,7 +48,7 @@
  "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "comments": "Deploys a VNET and Subnet for Client and K8s VM",
+      "comments": "Deploys a VNET and Subnet for Client VM",
       "apiVersion": "2021-05-01",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[resourceGroup().location]",

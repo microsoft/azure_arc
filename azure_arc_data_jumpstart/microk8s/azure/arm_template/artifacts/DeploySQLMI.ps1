@@ -14,6 +14,7 @@ $dataControllerId = $(az resource show --resource-group $env:resourceGroup --nam
 # Localize ARM template
 ################################################
 $ServiceType = "NodePort"
+$readableSecondaries = $ServiceType
 
 # Resource Requests
 $vCoresRequest = "2"
@@ -41,6 +42,7 @@ $SQLParams = "C:\Temp\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage',$readableSecondaries | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage',$vCoresRequest | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'memoryRequest-stage',$memoryRequest | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresLimit-stage',$vCoresLimit | Set-Content -Path $SQLParams

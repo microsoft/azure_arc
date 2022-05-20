@@ -31,9 +31,9 @@ Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
 $Env:argument1="--install-extension"
-$Env:argument2="Microsoft.arc"
+$Env:argument2="microsoft.azcli"
 $Env:argument3="microsoft.azuredatastudio-postgresql"
-$Env:argument4="microsoft.azdata"
+$Env:argument4="Microsoft.arc"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
@@ -65,11 +65,6 @@ az provider show --namespace Microsoft.ExtendedLocation -o table
 Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
-
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-az -v
 
 # Getting AKS cluster credentials kubeconfig file
 Write-Host "Getting AKS cluster credentials"
