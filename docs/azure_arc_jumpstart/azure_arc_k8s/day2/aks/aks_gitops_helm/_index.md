@@ -77,7 +77,7 @@ GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a p
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-- User has deployed the AKS cluster and has it connected as Azure Arc-enabled Kubernetes cluster.
+- User has deployed the AKS cluster and has it connected as an Azure Arc-enabled Kubernetes cluster.
 
 - User is editing the environment variables in the Shell script file (1-time edit) which then be used throughout the GitOps configuration.
 
