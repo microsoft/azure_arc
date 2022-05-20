@@ -154,7 +154,7 @@ For our scenario, notice we have two Helm charts in the "Azure Arc Jumpstart App
   - Create the GitOps configuration to deploy the Flux controllers and NGINX ingress controller on the Azure Arc-connected cluster
   - Create the GitOps configuration to deploy the ["Hello Arc"](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/hello-arc) application alongside an Ingress rule to make it available from outside the cluster
 
-    > **Disclaimer: For the purpose of this guide, notice how the "_sync-interval 3s_" is set. The 3 seconds interval is useful for demo purposes since it will make the sync interval rapidly track changes on the repository but it is recommended to have a longer interval in your production environment (default value is 5min)**
+    > **Disclaimer: For the purpose of this guide, notice how the "_sync-interval 3s_" is set. The 3 seconds interval is useful for demo purposes since it will make the sync interval rapidly track changes on the repository but it is recommended to have a longer interval in your production environment (the default value is 5min)**
 
 - Once the script will complete it's run, you will have the GitOps configuration create all the resources deployed in your Kubernetes cluster. **NOTE:** that it takes a few min for the configuration change status from "Pending" to Install.
 
