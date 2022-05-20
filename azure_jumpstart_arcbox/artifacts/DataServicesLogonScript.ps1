@@ -23,19 +23,24 @@ Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincip
 # Required for CLI commands
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
-# Installing Azure CLI arcdata extension
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
 Write-Host "`n"
-Write-Host "Installing Azure CLI arcdata extension"
-az extension add --name arcdata
+Write-Host "Installing Azure CLI extensions"
+az extension add --name arcdata --system
+Write-Host "`n"
+az -v
 
 # Installing Azure Data Studio extensions
 Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
 $Env:argument1="--install-extension"
-$Env:argument2="Microsoft.arc"
+$Env:argument2="microsoft.azcli"
 $Env:argument3="microsoft.azuredatastudio-postgresql"
-$Env:argument4="microsoft.azdata"
+$Env:argument4="Microsoft.arc"
+
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
@@ -51,10 +56,16 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
+# Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut
 Write-Host "`n"
-az -v
+Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"

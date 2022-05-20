@@ -60,7 +60,7 @@
       }
     },
     "kubernetesVersion": {
-      "defaultValue": "1.22.6",
+      "defaultValue": "1.23.3",
       "type": "string",
       "metadata": {
         "description": "The version of Kubernetes"
@@ -105,7 +105,7 @@
       "type": "bool",
       "defaultValue": false,
       "metadata": {
-        "description": "PostgreSQL Hyperscale deployment"
+        "description": "PostgreSQL deployment"
       }
     },
     "githubAccount": {
