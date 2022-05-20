@@ -26,7 +26,6 @@ resource "azurerm_kubernetes_cluster" "arcdemo" {
     Project = "jumpstart_azure_arc_k8s"
   }
 
-  role_based_access_control {
-    enabled = true
-  }
+  role_based_access_control_enabled = true
+  
 }

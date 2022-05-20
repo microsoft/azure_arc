@@ -21,6 +21,8 @@ param (
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
     [string]$capiArcDataClusterName,
+    [string]$k3sArcClusterName,
+    [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$flavor,
     [string]$automationTriggerAtLogon
@@ -52,6 +54,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('capiArcDataClusterName', $capiArcDataClusterName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('githubUser', $githubUser,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('flavor', $flavor,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon,[System.EnvironmentVariableTarget]::Machine)
@@ -61,11 +65,20 @@ Write-Output "Creating ArcBox path"
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "C:\ArcBox\Virtual Machines"
+$Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
+$Env:ArcBoxGitOpsDir = "C:\ArcBox\GitOps"
+$Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:agentScript = "C:\ArcBox\agentScript"
+$Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
+
 New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxVMDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxKVDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxGitOpsDir -ItemType directory -Force
+New-Item -Path $Env:ArcBoxIconDir -ItemType directory -Force
+New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
 
@@ -94,7 +107,9 @@ workflow ClientTools_01
                 [Parameter (Mandatory = $true)]
                 [string]$flavor
             )
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,dotnetcore-3.1-sdk,setdefaultbrowser'
+
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
+
             InlineScript {
                 param (
                     [string]$chocolateyAppList
@@ -116,25 +131,28 @@ workflow ClientTools_01
                     foreach ($app in $appsToInstall)
                     {
                         Write-Host "Installing $app"
-                        & choco install $app /y -Force| Write-Output
+                        & choco install $app /y -Force | Write-Output
                     }
                 }                        
             }
 
             # All flavors
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C:\ArcBox\wallpaper.png"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile "C:\ArcBox\MonitorWorkbookLogonScript.ps1"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile "C:\ArcBox\mgmtMonitorWorkbook.parameters.json"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile "C:\ArcBox\DeploymentStatus.ps1"
+            Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/arcbox_wallpaper.png" -OutFile $Env:ArcBoxDir\wallpaper.png
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/MonitorWorkbookLogonScript.ps1") -OutFile $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbook.parameters.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.parameters.json
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:ArcBoxDir\DeploymentStatus.ps1
             Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:ArcBoxLogsDir\LogInstructions.txt
 
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLIcon.ico") -OutFile "C:\ArcBox\ArcSQLIcon.ico"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile "C:\ArcBox\ArcSQLManualOnboarding.ps1"
-            Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile "C:\ArcBox\installArcAgentSQLUser.ps1"
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLIcon.ico") -OutFile $Env:ArcBoxDir\ArcSQLIcon.ico
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/ArcSQLManualOnboarding.ps1") -OutFile $Env:ArcBoxDir\ArcSQLManualOnboarding.ps1
+            Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentSQLUser.ps1") -OutFile $Env:ArcBoxDir\installArcAgentSQLUser.ps1
 
             # Workbook template
             if ($flavor -eq "ITPro") {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookITPro.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
+            }
+            elseif ($flavor -eq "DevOps") {
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookDevOps.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
             }
             else {
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookFull.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
@@ -149,8 +167,22 @@ workflow ClientTools_01
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/installArcAgentCentOS.sh") -OutFile $Env:ArcBoxDir\agentScript\installArcAgentCentOS.sh
             }
 
-            # Developers
-            if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+            # DevOps
+            if ($flavor -eq "DevOps") {
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/DevOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DevOpsLogonScript.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/BookStoreLaunch.ps1") -OutFile $Env:ArcBoxDir\BookStoreLaunch.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/devops_ingress/bookbuyer.yaml") -OutFile $Env:ArcBoxKVDir\bookbuyer.yaml
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/devops_ingress/bookstore.yaml") -OutFile $Env:ArcBoxKVDir\bookstore.yaml
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/devops_ingress/hello-arc.yaml") -OutFile $Env:ArcBoxKVDir\hello-arc.yaml
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/gitops_scripts/K3sGitOps.ps1") -OutFile $Env:ArcBoxGitOpsDir\K3sGitOps.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/gitops_scripts/K3sRBAC.ps1") -OutFile $Env:ArcBoxGitOpsDir\K3sRBAC.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/gitops_scripts/ResetBookstore.ps1") -OutFile $Env:ArcBoxGitOpsDir\ResetBookstore.ps1
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/arc.ico") -OutFile $Env:ArcBoxIconDir\arc.ico
+                Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/bookstore.ico") -OutFile $Env:ArcBoxIconDir\bookstore.ico
+            }
+
+            # Full
+            if ($flavor -eq "Full") {
                 Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile $Env:ArcBoxDir\azuredatastudio.zip
                 Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile $Env:ArcBoxDir\AZDataCLI.msi
                 Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile $Env:ArcBoxDir\settingsTemplate.json
@@ -180,7 +212,7 @@ workflow ClientTools_02
     }
 }
         
-if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+if ($flavor -eq "Full") {
     ClientTools_02 | Format-Table 
 }
 
@@ -191,11 +223,18 @@ if ($flavor -eq "Full" -Or $flavor -eq "ITPro") {
     Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
-if ($flavor -eq "Full" -Or $flavor -eq "Developer") {
+if ($flavor -eq "Full") {
     # Creating scheduled task for DataServicesLogonScript.ps1
     $Trigger = New-ScheduledTaskTrigger -AtLogOn 
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DataServicesLogonScript.ps1
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+}
+
+if ($flavor -eq "DevOps") {
+    # Creating scheduled task for DevOpsLogonScript.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn 
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
+    Register-ScheduledTask -TaskName "DevOpsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
