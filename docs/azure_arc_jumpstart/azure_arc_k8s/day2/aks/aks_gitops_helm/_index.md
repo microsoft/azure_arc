@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on an Azure Kubernetes Service (AKS) cluster which is projected as an Azure Arc connected cluster resource.
 
-In this guide, you will deploy & attach two GitOps configuration to your cluster, a cluster-level config to deploy [nginx-ingress controller](https://kubernetes.github.io/ingress-nginx/) and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
+In this guide, you will deploy & attach two GitOps configurations to your cluster, a cluster-level config to deploy [nginx-ingress controller](https://kubernetes.github.io/ingress-nginx/) and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
 GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a popular open-source toolset. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. The Flux toolkit component Helm Controller is a Kubernetes operator, allowing one to declaratively manage Helm chart releases with Kubernetes manifests. The Operator is aware of the “HelmRelease” Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart.
 
