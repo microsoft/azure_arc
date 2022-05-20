@@ -18,7 +18,7 @@ rules:
       resources: ["secrets"]
       verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
-# This role provides writer access to Azure Arc SQL Managed Instance and PostgreSQL Hyperscale resources
+# This role provides writer access to Azure Arc SQL Managed Instance and PostgreSQL resources
 # Write access implies create, edit & delete of the resources
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -72,12 +72,12 @@ rules:
       resources: ["secrets"]
       verbs: ["get", "list", "watch", "create", "edit", "update", "patch", "delete", "deletecollection"]
 ---
-# This role provides write access to Azure PostgreSQL Hyperscale resource
-# Write access implies create, edit & delete of Azure PostgreSQL Hyperscale instances
+# This role provides write access to Azure PostgreSQL resource
+# Write access implies create, edit & delete of Azure PostgreSQL instances
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-    name: azure-arc-data:postgresql-hyperscale:writer
+    name: azure-arc-data:postgresql:writer
     namespace: azure-arc-data
     labels:
       arcdata.microsoft.com/role: "true"
