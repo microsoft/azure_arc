@@ -1,12 +1,12 @@
 {
   "Full": {
-    "initialResourceAmount": 45,
-    "resourcesAfterScriptExecution": 91,
+    "initialResourceAmount": 42,
+    "resourcesAfterScriptExecution": 89,
     "azureArcMachinesExpected": 5,
     "policiesDeploymentExpected": 6,
     "workbooksExpected": 1,
     "deployBastionDifference": 0,
-    "desktopElementsExpected": 10,
+    "desktopElementsExpected": 8,
     "connectedK8sClustersExpected": 2,
     "keyVaultsExpected": 1,
     "azuredatastudioSettingExpected": 1
@@ -24,8 +24,8 @@
     "azuredatastudioSettingExpected": 0
   },
   "DevOps": {
-    "initialResourceAmount": 45,
-    "resourcesAfterScriptExecution": 48,
+    "initialResourceAmount": 42,
+    "resourcesAfterScriptExecution": 46,
     "azureArcMachinesExpected": 0,
     "policiesDeploymentExpected": 2,
     "workbooksExpected": 1,
