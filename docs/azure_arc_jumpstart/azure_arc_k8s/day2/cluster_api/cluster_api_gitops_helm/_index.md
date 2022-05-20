@@ -220,7 +220,7 @@ For our scenario, notice we have two Helm charts in the "Azure Arc Jumpstart App
   
     ![kubectl get pods -n hello-arc -w](./19.png)
 
-  - In **your fork** of the "Azure Arc Jumpstart App" repository, open the *hello_arc.yaml* file (/hello-arc/releases/app/hello_arc.yaml).
+  - In **your fork** of the "Azure Arc Jumpstart App" repository, open the *hello-arc.yaml* file (/hello-arc/releases/app/hello-arc.yaml).
 
   - The external IP address of the Kubernetes Service is seen using the _`kubectl get svc -n ingress-nginx`_ command.
 
@@ -234,7 +234,7 @@ For our scenario, notice we have two Helm charts in the "Azure Arc Jumpstart App
 
     ![Tab Auto Refresh](./22.png)
 
-- In the repository window showing the _hello_arc.yaml_ file, change the text under the "MESSAGE" section commit the change. Alternatively, you can open your cloned repository in your IDE, make the change, commit and push it.
+- In the repository window showing the _hello-arc.yaml_ file, change the text under the "MESSAGE" section commit the change. Alternatively, you can open your cloned repository in your IDE, make the change, commit and push it.
 
     ![Making a change to the replica count and the "MESSAGE" section](./23.png)
 
