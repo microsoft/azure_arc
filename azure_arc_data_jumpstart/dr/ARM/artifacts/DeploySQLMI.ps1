@@ -211,8 +211,8 @@ Write-Host "`n"
 
 Write-Host "`n"
 kubectx primary
-az sql instance-failover-group-arc create --shared-name jumpstartDAG --name primarycr --mi $primarySqlMIInstance --role primary --partner-mi $secondarySqlMIInstance  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name jumpstartDAG --name primarycr --mi $primarySqlMIInstance --role primary --partner-mi $secondarySqlMIInstance  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
 kubectx secondary
-az sql instance-failover-group-arc create --shared-name jumpstartDAG --name secondarycr --mi $secondarySqlMIInstance --role secondary --partner-mi $primarySqlMIInstance  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name jumpstartDAG --name secondarycr --mi $secondarySqlMIInstance --role secondary --partner-mi $primarySqlMIInstance  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
 
