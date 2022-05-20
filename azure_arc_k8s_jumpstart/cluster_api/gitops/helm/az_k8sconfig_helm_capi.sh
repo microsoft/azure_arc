@@ -9,6 +9,7 @@ export tenantId='<Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export arcClusterName='<Azure Arc-enabled Kubernetes cluster resource name>'
 export appClonedRepo='<The URL for the "Azure Arc Jumpstart App" forked GitHub repository>'
+export ingressNamespace='ingress-nginx'
 export namespace='hello-arc'
 
 # Installing Azure CLI
