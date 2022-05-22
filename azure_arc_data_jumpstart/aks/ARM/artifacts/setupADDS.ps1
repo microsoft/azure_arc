@@ -1,3 +1,7 @@
+##############################################################
+# This script will install ADDS window feature and promote windows server
+# as a domain controller and restarts to finish AD setup
+##############################################################
 # Configure the Domain Controller
 param (
     [string]$domainName,
@@ -5,9 +9,13 @@ param (
     [string]$domainAdminPassword
 )
 
+# Convert plain text password to secure string
 $secureDomainAdminPassword = $domainAdminPassword | ConvertTo-SecureString -AsPlainText -Force
 
+# Enable ADDS windows feature to setup domain forest
 Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
+
+Write-Host "Finished enabling ADDS windows feature."
 
 # Create Active Directory Forest
 Install-ADDSForest `
@@ -24,7 +32,7 @@ Install-ADDSForest `
     -Force:$true `
     -SafeModeAdministratorPassword $secureDomainAdminPassword
 
-Write-Host "ADDS Deployment successful. No rebooting computer."
+Write-Host "ADDS Deployment successful. Now rebooting computer to finsih setup."
 
 # Reboot computer
 Restart-Computer
