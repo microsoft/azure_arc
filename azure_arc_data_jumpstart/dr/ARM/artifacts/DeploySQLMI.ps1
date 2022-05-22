@@ -193,6 +193,7 @@ Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Na
 Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'OEMCP' -value '65001'
 Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'MACCP' -value '65001'
 Write-Host "`n"
+#>
 
 # Creating distributed DAG
 Write-Host "Configuring the primary cluster DAG"
@@ -212,9 +213,7 @@ Write-Host "`n"
 
 Write-Host "`n"
 kubectx primary
-az sql instance-failover-group-arc create --shared-name jumpstartDAG --name primarycr --mi $primarySqlMIInstance --role primary --partner-mi $secondarySqlMIInstance  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name jumpstartDAG --name jumpstartDAG --mi $primarySqlMIInstance --role primary --partner-mi $secondarySqlMIInstance  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
 kubectx secondary
-az sql instance-failover-group-arc create --shared-name jumpstartDAG --name secondarycr --mi $secondarySqlMIInstance --role secondary --partner-mi $primarySqlMIInstance  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
-
-#>
+az sql instance-failover-group-arc create --shared-name jumpstartDAG --name jumpstartDAG --mi $secondarySqlMIInstance --role secondary --partner-mi $primarySqlMIInstance  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
