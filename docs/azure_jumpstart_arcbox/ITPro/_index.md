@@ -12,7 +12,7 @@ ArcBox for IT Pros is a special "flavor" of ArcBox that is intended for users wh
 
 ### Use cases
 
-- Sandbox environment for getting hands-on with Azure Arc technologies and [Azure Arc-enabled servers landing zone accelerator](https://aka.ms/ArcSrvLZSandbox)
+- Sandbox environment for getting hands-on with Azure Arc technologies
 - Accelerator for Proof-of-concepts or pilots
 - Training tool for Azure Arc skills development
 - Demo environment for customer presentations or events
@@ -43,8 +43,8 @@ ArcBox provides multiple paths for deploying and configuring ArcBox resources. D
 
 - Azure portal
 - ARM template via Azure CLI
-- Azure Bicep
-- HashiCorp Terraform
+- Bicep
+- Terraform
 
 ![Deployment flow diagram for ARM-based deployments](./deploymentflow.png)
 
@@ -67,7 +67,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -77,7 +77,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 - Ensure that you have selected the correct subscription you want to deploy ArcBox to by using the ```az account list --query "[?isDefault]"``` command. If you need to adjust the active subscription used by Az CLI, follow [this guidance](https://docs.microsoft.com/cli/azure/manage-azure-subscriptions-azure-cli#change-the-active-subscription).
 
-- ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected behavior or deployment errors.**
+- ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
 
   - East US
   - East US 2
@@ -95,32 +95,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing az vm list-usage](./azvmlistusage.png)
 
-- Some Azure subscriptions may also have SKU restrictions that prevent deployment of specific Azure VM sizes. You can check for SKU restrictions used by ArcBox by using the below command:
-
-  ```shell
-  az vm list-skus --location <your location> --size Standard_D2s --all --output table
-  az vm list-skus --location <your location> --size Standard_D4s --all --output table
-  ```
-
-  In the screenshots below, the first screenshot shows a subscription with no SKU restrictions in West US 2. The second shows a subscription with SKU restrictions on D4s_v4 in the East US 2 region. In this case, ArcBox will not be able to deploy due to the restriction.
-
-  ![Screenshot showing az vm list-skus with no restrictions](./list_skus_unrestricted.png)
-
-  ![Screenshot showing az vm list-skus with restrictions](./list_skus.png)
-
-- Some Azure subscriptions may also have SKU restrictions that prevent deployment of specific Azure VM sizes. You can check for SKU restrictions used by ArcBox by using the below command:
-
-  ```shell
-  az vm list-skus --location <your location> --size Standard_D2s --all --output table
-  az vm list-skus --location <your location> --size Standard_D4s --all --output table
-  ```
-
-  In the screenshots below, the first screenshot shows a subscription with no SKU restrictions in West US 2. The second shows a subscription with SKU restrictions on D4s_v4 in the East US 2 region. In this case, ArcBox will not be able to deploy due to the restriction.
-
-  ![Screenshot showing az vm list-skus with no restrictions](./list_skus_unrestricted.png)
-
-  ![Screenshot showing az vm list-skus with restrictions](./list_skus.png)
-
 - Register necessary Azure resource providers by running the following commands.
 
   ```shell
@@ -129,10 +103,13 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az provider register --namespace Microsoft.AzureArcData --wait
   ```
 
-- Create an Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access control (RBAC) roles is required:
+- Create Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access control (RBAC) roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
-  - **(Optional)** "User Access Administrator" - Required for automatically onboarding the Azure Arc-enabled SQL Server resource
+  - "Security admin" - Required for installing Microsoft Defender for Cloud Azure-Arc enabled Kubernetes extension and dismiss alerts
+  - "Security reader" - Required for being able to view Azure-Arc enabled Kubernetes Cloud Defender extension findings
+  - "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
+  - **(optional)** "User Access Administrator" - Required for automatically onboarding the Azure Arc-enabled SQL Server resource
 
     > **NOTE: In the event a Service Principal with Owner cannot be created, the SQL Server can be onboarded to Azure Arc post deployment by following the [Azure Arc-enabled SQL Server onboarding](#azure-arc-enabled-sql-server-onboarding) steps below.**
 
@@ -181,6 +158,18 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
   ```
 
+## ArcBox Azure Region Compatibility
+
+ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
+
+- East US
+- East US 2
+- West US 2
+- North Europe
+- France Central
+- UK South
+- Southeast Asia
+
 ## Deployment Option 1: Azure portal
 
 - Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_jumpstart_arcbox%2FARM%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
@@ -206,10 +195,10 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - _`myIpAddress`_ - Your local IP address. This is used to allow remote RDP connections to the Client Windows VM.
   - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "ITPro" to specify that you want to deploy ArcBox for IT Pros
-  - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
-  
+
   ![Screenshot showing example parameters](./parameters.png)
 
 - Now you will deploy the ARM template. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/ARM) and run the below command:
@@ -226,7 +215,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing az deployment group create](./azdeploy.png)
 
-## Deployment Option 3: Azure Bicep deployment via Azure CLI
+## Deployment Option 3: Bicep deployment via Azure CLI
 
 - Clone the Azure Arc Jumpstart repository
 
@@ -247,10 +236,9 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`spnTenantId`_ - Your Azure tenant id
   - _`windowsAdminUsername`_ - Client Windows VM Administrator name
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`logAnalyticsWorkspaceName`_ - Name for the ArcBox Log Analytics workspace
+  - _`myIpAddress`_ - Your local IP address. This is used to allow remote RDP connections to the Client Windows VM.
+  - _`logAnalyticsWorkspaceName`_ - Unique name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "ITPro" to specify that you want to deploy ArcBox for IT Pros
-  - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
-  - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
 
   ![Screenshot showing example parameters](./parameters_bicep.png)
 
@@ -262,7 +250,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
 
-## Deployment Option 4: HashiCorp Terraform Deployment
+## Deployment Option 4: Terraform Deployment
 
 - Clone the Azure Arc Jumpstart repository
 
@@ -281,9 +269,9 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   spn_client_id     = "1414133c-9786-53a4-b231-f87c143ebdb1"
   spn_client_secret = "fakeSecretValue123458125712ahjeacjh"
   spn_tenant_id     = "33572583-d294-5b56-c4e6-dcf9a297ec17"
+  user_ip_address   = "99.88.99.88"
   client_admin_ssh  = "C:/Temp/rsa.pub"
   deployment_flavor = "ITPro"
-  deploy_bastion      = false
   ```
 
 - Variable Reference:
@@ -292,16 +280,16 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - **_`spn_client_id`_** - Your Azure service principal id
   - **_`spn_client_secret`_** - Your Azure service principal secret
   - **_`spn_tenant_id`_** - Your Azure tenant id
+  - **_`user_ip_address`_** - Your local IP address. This is used to allow remote RDP connections to the Client Windows VM. If you don't know your public IP, you can find it [here](https://www.whatismyip.com/)
   - **_`client_admin_ssh`_** - SSH public key path, used for Linux VMs
-  - _`deployment_flavor`_ - Use the value "DevOps" to specify that you want to deploy the DevOps flavor of ArcBox
-  - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
+  - **_`deployment_flavor`_** - Use the value "ITPro" to specify that you want to deploy ArcBox for IT Pros
   - _`client_admin_username`_ - Admin username for Windows & Linux VMs
   - _`client_admin_password`_ - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _`workspace_name`_ - Unique name for the ArcBox Log Analytics workspace
+  - **_`workspace_name`_** - Unique name for the ArcBox Log Analytics workspace
 
   > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
 
-- Now you will deploy the Terraform file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/terraform) and run the commands below:
+- Now you will deploy the Terraform file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/bicep) and run the commands below:
 
   ```shell
   terraform init
@@ -323,56 +311,13 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Start post-deployment automation
 
-Once your deployment is complete, you can open the Azure portal and see the ArcBox resources inside your resource group. You will be using the _ArcBox-Client_ Azure virtual machine to explore various capabilities of ArcBox such as Azure Policy, automation and Key Vault integration. You will need to remotely access _ArcBox-Client_.
-
 - After deployment, you should see the ArcBox resources inside your resource group.
 
   ![Screenshot showing az deployment group create](./deployed_resources.png)
 
   > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (14 total)**
 
-  > **NOTE: For enhanced ArcBox security posture, RDP (3389) and SSH (22) ports are not open by default in ArcBox deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
-
-### Connecting to the ArcBox Client VM
-
-You can connect to the Client VM in 3 ways depending on how you've deployed ArcBox.
-
-#### Connect using RDP
-
-- If you have not chosen to deploy Azure Bastion in the ARM template, enable the RDP port in the NSG and RDP to the VM using its public IP.
-
-  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./rdp_nsg_blocked.png)
-
-  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
-
-  ![Screenshot showing adding a new allow RDP inbound security rule](./nsg_add_rdp_rule.png)
-
-  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
-
-  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
-
-- Once you log into the client VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
-
-#### Connect using Azure Bastion
-
-- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
-
-  ![Screenshot showing connecting to the VM using Bastion](./bastion_connect.png)
-
-- Once you log into the client VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
-#### Connect using just-in-time access(JIT)
-
-If you already have Microsoft Defender for servers enabled on your subscription and would like to use JIT to access the Client VM. Use the following steps:
-
-- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
-
-  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./JIT_allowing_RDP.png)
-
-  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
-
-  ![Screenshot showing connecting to the VM using JIT](./jit_connect_rdp.png)
-
-- Once you log into the _ArcBox-Client_, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
+- Open a remote desktop connection into _ArcBox-Client_. Upon logging in, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
 
   ![Screenshot showing ArcBox-Client](./automation5.png)
 
@@ -436,7 +381,6 @@ The following tools are including on the _ArcBox-Client_ VM.
 - 7zip
 - Terraform
 - Git
-- ZoomIt
 
 ### Next steps
   
