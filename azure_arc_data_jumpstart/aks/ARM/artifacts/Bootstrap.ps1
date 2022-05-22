@@ -150,6 +150,11 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\DataServicesLogonScript.ps1'
 
+##############################################################################
+# Following code is support AD authentication in SQL MI. This code is executed
+# when user sets enableADAuth=true. When this flag is set true 'addsDomainName' parameter
+# is supplied to this script setup ADDS domain.
+##############################################################################
 # If AD Auth is required join computer to ADDS domain and restart computer
 if ($addsDomainName.Length -gt 0)
 {
@@ -174,8 +179,9 @@ if ($addsDomainName.Length -gt 0)
         Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
     })
  
-    # Register schedule run under domain account
-    # Use $env:username
+    # Register schedule task to run under domain account to launch script setup all dependent
+    # services
+    # Use $env:username to run task under domain user
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User "${netbiosname}\${adminUsername}" -Action $Action -RunLevel "Highest" -Force
 
     Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
