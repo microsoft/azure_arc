@@ -97,11 +97,5 @@
         ]
       }
     }
-  ],
-  "outputs": {
-    "aksVnetSubnetId": {
-      "type": "string",
-      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('aksSubnetName')).resourceId]"
-    }
-  }
+  ]
 }

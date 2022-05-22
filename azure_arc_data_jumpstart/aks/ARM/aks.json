@@ -18,6 +18,7 @@
     },
     "vnetSubnetID": {
       "type": "string",
+      "defaultValue": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'Arc-Data-VNet', 'Aks-Subnet')]",
       "metadata": {
         "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
       }
@@ -140,6 +141,7 @@
             "networkPlugin": "azure"
           },
         "linuxProfile": {
+          "condition": "[greater(length(parameters('sshRSAPublicKey')), 0)]",
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
             "publicKeys": [
