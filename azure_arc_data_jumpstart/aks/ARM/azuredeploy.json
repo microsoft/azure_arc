@@ -250,7 +250,7 @@
             "value": "[parameters('dnsPrefix')]"
           },
           "vnetSubnetID": {
-            "value": ""
+            "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('aksSubnetName'))]"
           }
         }
       }
