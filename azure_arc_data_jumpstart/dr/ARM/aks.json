@@ -83,7 +83,7 @@
     "osType": {
       "type": "string",
       "defaultValue": "Linux",
-      "allowedValues": ["Linux"],
+      "allowedValues": [ "Linux" ],
       "metadata": {
         "description": "The type of operating system"
       }
@@ -120,12 +120,12 @@
     }
   },
   "variables": {
-   "serviceCidr-primary": "10.2.0.0/24",
-   "dnsServiceIP-primary": "10.2.0.10",
-   "dockerBridgeCidr-primary" : "173.17.0.1/16",
-   "serviceCidr-secondary": "172.2.0.0/16",
-   "dnsServiceIP-secondary": "172.2.0.10",
-   "dockerBridgeCidr-secondary" : "173.17.0.1/16"
+    "serviceCidr-primary": "10.20.64.0/19",
+    "dnsServiceIP-primary": "10.20.64.10",
+    "dockerBridgeCidr-primary": "172.17.0.1/16",
+    "serviceCidr-secondary": "192.168.64.0/19",
+    "dnsServiceIP-secondary": "192.168.64.10",
+    "dockerBridgeCidr-secondary": "172.17.0.1/16"
   },
   "resources": [
     {
@@ -138,10 +138,9 @@
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
         "enableRBAC": "[parameters('enableRBAC')]",
         "dnsPrefix": "[concat(parameters('dnsPrefix'),'pr')]",
-        "aadProfile": 
-          {
-            "managed": true
-          },
+        "aadProfile": {
+          "managed": true
+        },
         "agentPoolProfiles": [
           {
             "name": "agentpool",
@@ -152,16 +151,15 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "vnetSubnetID" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),parameters('subnetName'))]"
+            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),parameters('subnetName'))]"
           }
         ],
-        "networkProfile": 
-          {
-            "networkPlugin": "azure",
-            "serviceCidr": "[variables('serviceCidr-primary')]",
-            "dnsServiceIP": "[variables('dnsServiceIP-primary')]",
-            "dockerBridgeCidr": "[variables('dockerBridgeCidr-primary')]"
-          },
+        "networkProfile": {
+          "networkPlugin": "azure",
+          "serviceCidr": "[variables('serviceCidr-primary')]",
+          "dnsServiceIP": "[variables('dnsServiceIP-primary')]",
+          "dockerBridgeCidr": "[variables('dockerBridgeCidr-primary')]"
+        },
         "linuxProfile": {
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
@@ -175,6 +173,9 @@
         "servicePrincipalProfile": {
           "clientId": "[parameters('spnClientId')]",
           "Secret": "[parameters('spnClientSecret')]"
+        },
+        "identity": {
+          "type": "SystemAssigned"
         }
       }
     },
@@ -188,10 +189,9 @@
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
         "enableRBAC": "[parameters('enableRBAC')]",
         "dnsPrefix": "[concat(parameters('dnsPrefix'),'sd')]",
-        "aadProfile": 
-          {
-            "managed": true
-          },
+        "aadProfile": {
+          "managed": true
+        },
         "agentPoolProfiles": [
           {
             "name": "agentpool",
@@ -202,16 +202,15 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "vnetSubnetID" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('secondaryClusterVnetName'),'cluster-subnet')]"
+            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('secondaryClusterVnetName'),'cluster-subnet')]"
           }
         ],
-        "networkProfile": 
-          {
-            "networkPlugin": "azure",
-            "serviceCidr": "[variables('serviceCidr-secondary')]",
-            "dnsServiceIP": "[variables('dnsServiceIP-secondary')]",
-            "dockerBridgeCidr": "[variables('dockerBridgeCidr-secondary')]"
-          },
+        "networkProfile": {
+          "networkPlugin": "azure",
+          "serviceCidr": "[variables('serviceCidr-secondary')]",
+          "dnsServiceIP": "[variables('dnsServiceIP-secondary')]",
+          "dockerBridgeCidr": "[variables('dockerBridgeCidr-secondary')]"
+        },
         "linuxProfile": {
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
@@ -225,6 +224,9 @@
         "servicePrincipalProfile": {
           "clientId": "[parameters('spnClientId')]",
           "Secret": "[parameters('spnClientSecret')]"
+        },
+        "identity": {
+          "type": "SystemAssigned"
         }
       }
     }
