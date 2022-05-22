@@ -185,6 +185,7 @@ $sqlstringSecondary = kubectl get sqlmanagedinstances $secondarySqlMIInstance -n
     $string | Set-Content -Path $settingsTemplate
 }#>
 
+<#
 # Editing registry to allow Unicode
 Write-Host "`n"
 Write-Host "Editing registry to allow Unicode"
@@ -216,3 +217,4 @@ Write-Host "`n"
 kubectx secondary
 az sql instance-failover-group-arc create --shared-name jumpstartDAG --name secondarycr --mi $secondarySqlMIInstance --role secondary --partner-mi $primarySqlMIInstance  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
 
+#>
