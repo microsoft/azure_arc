@@ -35,7 +35,7 @@ ArcBox deploys several management and operations services that work with ArcBox'
 
 ## ArcBox Azure Consumption Costs
 
-ArcBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxillary services. Note that Azure consumption costs vary depending the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Users may review cost analysis of ArcBox by using [Azure Cost Analysis](https://docs.microsoft.com/azure/cost-management-billing/costs/quick-acm-cost-analysis).
+ArcBox resources generate Azure Consumption charges from the underlying Azure resources including core compute, storage, networking and auxillary services. Note that Azure consumption costs vary depending the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Please see the [ArcBox FAQ](https://aka.ms/ArcBox-FAQ) for more information on consumption costs.
 
 ## Deployment Options and Automation Flow
 
@@ -163,17 +163,20 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
   ```
 
-## ArcBox Azure Region Compatibility
+- ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
 
-ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
-
-- East US
-- East US 2
-- West US 2
-- North Europe
-- France Central
-- UK South
-- Southeast Asia
+  - East US
+  - East US 2
+  - Central US
+  - West US 2
+  - North Europe
+  - West Europe
+  - France Central
+  - UK South
+  - Australia East
+  - Japan East
+  - Korea Central
+  - Southeast Asia
 
 ## Deployment Option 1: Azure portal
 
@@ -316,15 +319,68 @@ ArcBox must be deployed to one of the following regions. **Deploying ArcBox outs
 
 ## Start post-deployment automation
 
-- After deployment, you should see the ArcBox resources inside your resource group.
+Once your deployment is complete, you can open the Azure portal and see the ArcBox resources inside your resource group. You will be using the _ArcBox-Client_ Azure virtual machine to explore various capabilities of ArcBox such as GitOps configurations and Key Vault integration. You will need to remotely access _ArcBox-Client_.
 
-  ![Screenshot showing az deployment group create](./deployed_resources.png)
+  ![Screenshot showing all deployed resources in the resource group](./deployed_resources.png)
 
-  > **NOTE: If you followed the steps in [prerequisites](#prerequisites) to allow the SQL Server to be automatically onboarded, there will be one additional resource in your ArcBox resource group (14 total)**
+   > **NOTE: For enhanced ArcBox security posture, RDP (3389) and SSH (22) ports are not open by default in ArcBox deployments. You will need to create a network security group (NSG) rule to allow network access to port 3389, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
 
-- Open a remote desktop connection into _ArcBox-Client_. Upon logging in, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
+### Connecting to the ArcBox Client virtual machine
 
-  ![Screenshot showing ArcBox-Client](./automation5.png)
+Various options are available to connect to _ArcBox-Client_ VM, depending on the parameters you supplied during deployment.
+
+- [RDP](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/ITPro/_index.md#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-time access (JIT)](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/ITPro/_index.md#connect-using-just-in-time-accessjit).
+- [Azure Bastion](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/ITPro/_index.md#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+
+#### Connecting directly with RDP
+
+By design, ArcBox does not open port 3389 on the network security group. Therefore, you must create an NSG rule to allow inbound 3389.
+
+- Open the _ArcBox-NSG_ resource in Azure portal and click "Add" to add a new rule.
+
+  ![Screenshot showing ArcBox-Client NSG with blocked RDP](./rdp_nsg_blocked.png)
+
+  ![Screenshot showing adding a new inbound security rule](./nsg_add_rule.png)
+
+- Specify the IP address that you will be connecting from and select RDP as the service with "Allow" set as the action. You can retrieve your public IP address by accessing [https://icanhazip.com](https://icanhazip.com) or [https://whatismyip.com](https://whatismyip.com).
+
+  <img src="./nsg_add_rdp_rule.png" alt="Screenshot showing adding a new allow RDP inbound security rule" width="400">
+
+  ![Screenshot showing all inbound security rule](./rdp_nsg_all_rules.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+
+#### Connect using Azure Bastion
+
+- If you have chosen to deploy Azure Bastion in your deployment, use it to connect to the VM.
+
+  ![Screenshot showing connecting to the VM using Bastion](./bastion_connect.png)
+
+- Once you log into the Client VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish and once completed the script windows will close. At this point, the deployment is complete.
+
+  > **NOTE: When using Azure Bastion, the desktop background image is not visible. Therefore some screenshots in this guide may not exactly match your experience if you are connecting to _ArcBox-Client_ with Azure Bastion.**
+
+#### Connect using just-in-time access (JIT)
+
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+
+- In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
+
+  ![Screenshot showing the Microsoft Defender for cloud portal, allowing RDP on the client VM](./jit_allowing_rdp.png)
+
+  ![Screenshot showing connecting to the VM using RDP](./rdp_connect.png)
+
+  ![Screenshot showing connecting to the VM using JIT](./jit_connect_rdp.png)
+
+#### The Logon scripts
+
+- Once you log into the _ArcBox-Client_ VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish, and once completed, the script windows will close automaticly. At this point, the deployment is complete.
+
+  ![Screenshot showing ArcBox-Client](./automation.png)
+
+- Deployment is complete! Let's begin exploring the features of Azure Arc-enabled servres with ArcBox for IT Pros!
+
+  ![Screenshot showing complete deployment](./arcbox_complete.png)
 
   ![Screenshot showing ArcBox resources in Azure portal](./rg_arc.png)
 

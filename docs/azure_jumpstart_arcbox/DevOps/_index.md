@@ -82,7 +82,7 @@ ArcBox deploys several management and operations services that work with ArcBox'
 
 ## ArcBox Azure Consumption Costs
 
-ArcBox resources generate Azure consumption charges from the underlying Azure resources including core compute, storage, networking, and auxiliary services. Note that Azure consumption costs vary depending on the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Users may review the cost analysis of ArcBox by using [Azure Cost Analysis](https://docs.microsoft.com/azure/cost-management-billing/costs/quick-acm-cost-analysis).
+ArcBox resources generate Azure consumption charges from the underlying Azure resources including core compute, storage, networking, and auxiliary services. Note that Azure consumption costs vary depending on the region where ArcBox is deployed. Be mindful of your ArcBox deployments and ensure that you disable or delete ArcBox resources when not in use to avoid unwanted charges. Please see the [ArcBox FAQ](https://aka.ms/ArcBox-FAQ) for more information on consumption costs.
 
 ## Deployment Options and Automation Flow
 
