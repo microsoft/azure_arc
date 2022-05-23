@@ -273,7 +273,7 @@ jobs:
         run: |
           plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'powershell -InputFormat None -F C:\ArcBox\DataServicesLogonScript.ps1'
       - name: Open SSH, execute DevOpsLogonScript
-        if: github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps'
+        if: github.event.inputs.flavor == 'DevOps'
         run: |
           plink -ssh -P 2204 ${{ github.event.inputs.windowsAdminUsername }}@$(az vm show -d -g ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --query publicIps -o tsv)  -pw  '${{secrets.WINDOWS_ADMIN_PASSWORD}}' -batch 'powershell -InputFormat None -F C:\ArcBox\DevOpsLogonScript.ps1'
       - name: Open SSH, execute MonitorWorkbookLogonScript
@@ -310,7 +310,7 @@ jobs:
           path: DataServicesLogonScript.log
       - name: Upload DevOpsLogonScript.log File
         uses: actions/upload-artifact@v3
-        if: (github.event.inputs.flavor == 'Full' || github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
+        if: (github.event.inputs.flavor == 'DevOps') &&  (success() || failure())
         with:
           name: DevOpsLogonScript.log
           path: DevOpsLogonScript.log
