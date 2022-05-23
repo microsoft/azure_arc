@@ -95,7 +95,6 @@ Write-Host "Primary Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on primary cluster
-<#
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
 kubectl patch svc js-sql-pr-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 5 # To allow the CRD to update
@@ -109,7 +108,6 @@ if ( $env:SQLMIHA -eq $true )
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
 
-#>
 
 # Downloading demo database and restoring onto SQL MI
 $podname = "js-sql-pr-0"
@@ -158,7 +156,6 @@ Write-Host "Secondary Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on secondary cluster
-<#
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
 kubectl patch svc js-sql-dr-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 5 # To allow the CRD to update
@@ -170,7 +167,6 @@ if ( $env:SQLMIHA -eq $true )
     kubectl patch svc js-sql-dr-external-svc -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
-#>
 
 # Retrieving SQL MI connection endpoint
 $sqlstringSecondary = kubectl get sqlmanagedinstances $secondarySqlMIInstance -n arc -o=jsonpath='{.status.endpoints.primary}'
@@ -182,16 +178,15 @@ $sqlstringSecondary = kubectl get sqlmanagedinstances $secondarySqlMIInstance -n
 & "$Env:TempDir\SQLMIEndpoints.ps1"
 
 # If PostgreSQL isn't being deployed, clean up settings file
-<#if ( $env:deployPostgreSQL -eq $false )
+if ( $env:deployPostgreSQL -eq $false )
 {
     $string = Get-Content $settingsTemplate
     $string[25] = $string[25] -replace ",",""
     $string | Set-Content $settingsTemplate
     $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
     $string | Set-Content -Path $settingsTemplate
-}#>
+}
 
-<#
 # Editing registry to allow Unicode
 Write-Host "`n"
 Write-Host "Editing registry to allow Unicode"
@@ -199,7 +194,6 @@ Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Na
 Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'OEMCP' -value '65001'
 Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'MACCP' -value '65001'
 Write-Host "`n"
-#>
 
 # Creating distributed DAG
 Write-Host "Configuring the primary cluster DAG"
