@@ -163,17 +163,20 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
   ```
 
-## ArcBox Azure Region Compatibility
+- ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
 
-ArcBox must be deployed to one of the following regions. **Deploying ArcBox outside of these regions may result in unexpected results or deployment errors.**
-
-- East US
-- East US 2
-- West US 2
-- North Europe
-- France Central
-- UK South
-- Southeast Asia
+  - East US
+  - East US 2
+  - Central US
+  - West US 2
+  - North Europe
+  - West Europe
+  - France Central
+  - UK South
+  - Australia East
+  - Japan East
+  - Korea Central
+  - Southeast Asia
 
 ## Deployment Option 1: Azure portal
 
