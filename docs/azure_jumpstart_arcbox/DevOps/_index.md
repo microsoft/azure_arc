@@ -244,7 +244,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`flavor`_ - Use the value "DevOps" to specify that you want to deploy the DevOps flavor of ArcBox
   - _`githubUser`_ - Specify the name of your GitHub account where you cloned the Sample Apps repo
 
-  ![Screenshot showing example parameters](./parameters_bugbash.png)
+  ![Screenshot showing example parameters](./parameters.png)
 
 - Now you will deploy the ARM template. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/arcbox_devops/azure_jumpstart_arcbox) and run the below command:
 
@@ -401,7 +401,7 @@ By design, ArcBox does not open port 3389 on the network security group. Therefo
 
 #### Connect using just-in-time access (JIT)
 
-If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 
@@ -644,7 +644,7 @@ After you have finished the deployment of ArcBox, you can verify that Microsoft 
   kubectl get pods --namespace=asc-alerttest-662jfi039n
   ```
 
-After a period of time (typically less than an hour), Microsoft Defender for Cloud will detect this event and trigger a security alert that you will see in the Azure Portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled Kubernetes cluster.
+After a period of time (typically less than an hour), Microsoft Defender for Cloud will detect this event and trigger a security alert that you will see in the Azure portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled Kubernetes cluster.
 
 ![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert01.png)
 
@@ -652,13 +652,13 @@ After a period of time (typically less than an hour), Microsoft Defender for Clo
 
 ![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert03.png)
 
-> **NOTE: This feature requires Microsoft Defender for Cloud to be [enabled on your Azure subscription](https://docs.microsoft.com/en-us/azure/defender-for-cloud/enable-enhanced-security).**
+> **NOTE: This feature requires Microsoft Defender for Cloud to be [enabled on your Azure subscription](https://docs.microsoft.com/azure/defender-for-cloud/enable-enhanced-security).**
 
 ### Additional optional scenarios on the _ArcBox-K3s_ cluster
 
 Optionally, you can explore additional GitOps and RBAC scenarios in a manual fashion using the _ArcBox-K3s_ cluster. When remoted into the _ArcBox-Client_ virtual machine, here are some things to try:
 
-- Browse to the Azure Portal and notice how currently there is no GitOps configuration and Flux extension installed on the _ArcBox-K3s_ cluster.
+- Browse to the Azure portal and notice how currently there is no GitOps configuration and Flux extension installed on the _ArcBox-K3s_ cluster.
   
   ![Screenshot showing K3s cluster extensions](./k3s_gitops01.png)
 

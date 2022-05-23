@@ -26,14 +26,14 @@ Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Making extension install dynamic
-Write-Header "Installing Az CLI Extensions"
+Write-Header "Installing Azure CLI extensions"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
 az extension add --name arcdata --system
 az -v
 
 # Installing Azure Data Studio extensions
-Write-Header "Installing Azure Data Studio Extensions"
+Write-Header "Installing Azure Data Studio extensions"
 $Env:argument1="--install-extension"
 $Env:argument2="microsoft.azcli"
 $Env:argument3="microsoft.azuredatastudio-postgresql"
@@ -90,7 +90,7 @@ Write-Host "`n"
 azdata --version
 
 # Installing the Azure Arc-enabled data services cluster extension
-Write-Host "Installing Azure Arc-enabled Data Services Extension"
+Write-Host "Installing the Azure Arc-enabled data services cluster extension"
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `

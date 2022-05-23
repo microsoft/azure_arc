@@ -360,7 +360,7 @@ By design, ArcBox does not open port 3389 on the network security group. Therefo
 
 #### Connect using just-in-time access (JIT)
 
-If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
+If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) enabled on your subscription and would like to use JIT to access the Client VM, use the following steps:
 
 - In the Client VM configuration pane, enable just-in-time. This will enable the default settings.
 

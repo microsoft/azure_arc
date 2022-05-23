@@ -2,7 +2,7 @@
 type: docs
 title: "Contributing"
 linkTitle: "Contributing"
-weight: 7
+weight: 8
 ---
 
 # Contributing

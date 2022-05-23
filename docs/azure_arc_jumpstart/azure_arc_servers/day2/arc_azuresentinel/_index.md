@@ -1,20 +1,20 @@
 ---
 type: docs
-title: "Azure Sentinel"
-linkTitle: "Azure Sentinel"
+title: "Microsoft Sentinel"
+linkTitle: "Microsoft Sentinel"
 weight: 8
 description: >
 ---
 
-## Connect Azure Arc-enabled servers to Azure Sentinel
+## Connect Azure Arc-enabled servers to Microsoft Sentinel
 
-The following Jumpstart scenario will guide you on how to onboard Azure Arc-enabled servers on to [Azure Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources.
+The following Jumpstart scenario will guide you on how to onboard Azure Arc-enabled servers on to [Microsoft Sentinel](https://docs.microsoft.com/es-es/azure/sentinel/), so you can start collecting security-related events and start correlating them with other data sources.
 
-In this guide, you will enable and configure Azure Sentinel on your Azure subscription. To complete this process you will:
+In this guide, you will enable and configure Microsoft Sentinel on your Azure subscription. To complete this process you will:
 
 * Setup a Log Analytics Workspace where logs and events will be aggregated for analysis and correlation.
 
-* Enable Azure Sentinel on the workspace.
+* Enable Microsoft Sentinel on the workspace.
 
 * Onboard Azure Arc-enabled servers on Sentinel by using the extension management feature and Azure Policies.
 
@@ -80,11 +80,11 @@ In this guide, you will enable and configure Azure Sentinel on your Azure subscr
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-## Onboarding Azure Sentinel
+## Onboarding Microsoft Sentinel
 
-Azure Sentinel uses the Log Analytics agent to collect Windows and Linux server's log files and forwards them to Azure Sentinel, the data collected is stored in a Log Analytics workspace. Since you cannot use the default workspace created by Microsoft Defender for Cloud, a custom one is required and you could have raw events and alerts for Defender within the same custom workspace as Sentinel.
+Microsoft Sentinel uses the Log Analytics agent to collect Windows and Linux server's log files and forwards them to Microsoft Sentinel, the data collected is stored in a Log Analytics workspace. Since you cannot use the default workspace created by Microsoft Defender for Cloud, a custom one is required and you could have raw events and alerts for Defender within the same custom workspace as Sentinel.
 
-* You will need to create a dedicated Log Analytics workspace and enable the Azure Sentinel solution on the top of it. For that you can use this [ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azuresentinel/arm/sentinel-template.json) that will create a new Log Analytics Workspace and define the Azure Sentinel solution and enable it for the workspace. To automate the deployment edit the ARM template [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azuresentinel/arm/sentinel-template.parameters.json), provide a name and location for your workspace:
+* You will need to create a dedicated Log Analytics workspace and enable the Microsoft Sentinel solution on the top of it. For that you can use this [ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azuresentinel/arm/sentinel-template.json) that will create a new Log Analytics Workspace and define the Microsoft Sentinel solution and enable it for the workspace. To automate the deployment edit the ARM template [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/azuresentinel/arm/sentinel-template.parameters.json), provide a name and location for your workspace:
 
     ![Screenshot showing Azure ARM template](./03.png)
 
@@ -100,13 +100,13 @@ For example:
 
    ![Screenshot showing az deployment group create command](./04.png)
 
-## Azure Arc-enabled VMs onboarding on Azure Sentinel
+## Azure Arc-enabled VMs onboarding on Microsoft Sentinel
 
-Once you have deployed Azure Sentinel on your Log Analytics workspace, you will need to connect data sources to it.
+Once you have deployed Microsoft Sentinel on your Log Analytics workspace, you will need to connect data sources to it.
 
-There are connectors for Microsoft services, third party solutions from the Security products ecosystem. You can also use Common Event Format (CEF), Syslog, or REST-API to connect your data sources with Azure Sentinel.
+There are connectors for Microsoft services, third party solutions from the Security products ecosystem. You can also use Common Event Format (CEF), Syslog, or REST-API to connect your data sources with Microsoft Sentinel.
 
-For servers and VMs, you can install the Microsoft Monitoring Agent (MMA) agent or the Sentinel agent which collects the logs and forwards them to Azure Sentinel. You can deploy the agent in multiple ways by leveraging Azure Arc:
+For servers and VMs, you can install the Microsoft Monitoring Agent (MMA) agent or the Sentinel agent which collects the logs and forwards them to Microsoft Sentinel. You can deploy the agent in multiple ways by leveraging Azure Arc:
 
 * Using **[Extension Management](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_vm_extension_mma_arm/)**
 

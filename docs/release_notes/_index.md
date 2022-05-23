@@ -14,12 +14,19 @@ weight: 3
 ### Release highlights
 
 - [Announcing ArcBox for DevOps](https://aka.ms/ArcBoxDevOpsBlog)
-- New and updated Azure Arc-enabled Kubernetes scenarios
-- Azure Bastion support for Azure Arc-enabled data services and app services scenarios
-- New SSH access scenario for Azure Arc-enabled servers
-- Improvements to Open Service Mesh scenarios
-- Updated VHDX files with latest OS updates and packages
-- Multiple optimizations, enhancements and bug fixes
+  - Added Azure Bastion support
+  - Added Azure Just-in-Time (JIT) support
+  - New sample applications for GitOps, Open Service Mesh (OSM), and Azure Key Vault integration
+  - New automated GitOps configuration
+  - New Azure Monitor workbook
+  - Updated Microsoft Defender for Cloud experience
+  - Bump Kubernetes version to v1.22.8
+  - Bump Cluster API Azure provider version to v1.2.1
+  - Bump Clusterctl version to v1.2.1
+  - API bumps across all ARM and Bicep templates
+  - Optimized Azure VM SKUs
+  - Added [FAQ](https://aka.ms/ArcBox-FAQ) and a sample ArcBox cost estimator with Azure Pricing Calculator
+  - Additional misc optimizations, enhancements and bug fixes
 
 ## April 2022
 

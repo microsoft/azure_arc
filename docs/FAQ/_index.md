@@ -1,20 +1,29 @@
 ---
 type: docs
-weight: 98
-toc_hide: true
+title: "Jumpstart FAQ"
+linkTitle: "Jumpstart FAQ"
+weight: 6
 ---
 
-## Jumpstart ArcBox Frequently Asked Questions (FAQ)
+## Jumpstart Frequently Asked Questions (FAQ)
 
-### What are the use cases for ArcBox?
+### General
+
+#### Can I contribute to the Jumpstart?
+
+Absolutely! The Jumpstart is a community-driven open-source project and all contributions are welcomed. To get started, review the [Jumpstart Scenario Write-up Guidelines](https://azurearcjumpstart.io/scenario_guidelines/) and our [Code of Conduct](https://azurearcjumpstart.io/code_of_conduct/).
+
+### ArcBox
+
+#### What are the use cases for ArcBox?
 
 ArcBox is a virtual hybrid sandbox that can be used to explore Azure Arc capabilities, build quick demo environments, support proof-of-concept projects, and even provide a testing platform for specific hybrid scenarios. Many partners and customers use ArcBox to quickly get hands-on with Azure Arc technology because its quick to deploy with minimal requirements.
 
-### What is required to deploy ArcBox?
+#### What is required to deploy ArcBox?
 
-ArcBox requires an Azure subscription where you have a Contributor RBAC role.
+ArcBox requires an Azure subscription where you have a Contributor role-based access control (RBAC) role.
 
-### What Azure regions can ArcBox be deployed to?
+#### What Azure regions can ArcBox be deployed to?
 
 ArcBox can be deployed to the following regions:
 
@@ -31,15 +40,15 @@ ArcBox can be deployed to the following regions:
 - Korea Central
 - Southeast Asia
 
-### What are the different "flavors" of ArcBox?
+#### What are the different "flavors" of ArcBox?
 
 ArcBox offers three different configurations, or "flavors", that allow the user to choose their own experience.
 
-- [ArcBox "Full"](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full#Troubleshooting) - The original ArcBox experience with Azure Arc-enabled servers, Kubernetes, and data services capabilties.
-- [ArcBox for DevOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps) - This flavor focuses on Azure Arc-enabled Kubernetes capabilities such as Open Service Mesh, GitOps and more.
-- [ArcBox for IT Pros](https://azurearcjumpstart.io/azure_jumpstart_arcbox/ITPro) - This flavor is for users who want to explore only Azure Arc-enabled servers capabilities.
+- [ArcBox "Full"](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full) - The core ArcBox experience with Azure Arc-enabled servers, Kubernetes, and data services capabilities.
+- [ArcBox for DevOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps) - This essential Azure Arc-enabled Kubernetes sandbox with the included capabilities such as GitOps, Open Service Mesh (OSM), secretes management, monitoring, and more.
+- [ArcBox for IT Pros](https://azurearcjumpstart.io/azure_jumpstart_arcbox/ITPro) - This essential Azure Arc-enabled servers sandbox includes a mix of Microsoft Windows and Linux servers managed using the included capabilities such Azure Monitor, Microsoft Defender for Cloud, Azure Policy, Update Management and more.
 
-### What are the costs for using ArcBox?
+#### What are the costs for using ArcBox?
 
 ArcBox incurs normal Azure consumption charges for various Azure resources such as virtual machines and storage. Each flavor of ArcBox uses a different combination of Azure resources and therefore costs vary depending on the flavor used. You can view example estimates of ArcBox costs per flavor by clicking the links below.
 
@@ -47,7 +56,7 @@ ArcBox incurs normal Azure consumption charges for various Azure resources such 
 - [ArcBox for DevOps cost estimate](https://aka.ms/ArcBoxDevOpsCost)
 - [ArcBox for ITPro cost estimate](https://aka.ms/ArcBoxITProCost)
 
-### Where can I go if I have trouble deploying or using ArcBox?
+#### Where can I go if I have trouble deploying or using ArcBox?
 
 Each ArcBox flavor has a troubleshooting section of its documentation that you can review for common issues:
 
