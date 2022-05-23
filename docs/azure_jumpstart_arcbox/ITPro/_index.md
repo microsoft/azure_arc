@@ -326,8 +326,8 @@ Once your deployment is complete, you can open the Azure portal and see the ArcB
 
 Various options are available to connect to _ArcBox-Client_ VM, depending on the parameters you supplied during deployment.
 
-- [RDP](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-time access (JIT)](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#connect-using-just-in-time-accessjit).
-- [Azure Bastion](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+- [RDP](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/ITPro/_index.md#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-time access (JIT)](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/ITPro/_index.md#connect-using-just-in-time-accessjit).
+- [Azure Bastion](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/ITPro/_index.md#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
 #### Connecting directly with RDP
 
@@ -375,7 +375,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/en
 
   ![Screenshot showing ArcBox-Client](./automation.png)
 
-- Deployment is complete! Let's begin exploring the features of Azure Arc-enabled Kubernetes with ArcBox for DevOps!
+- Deployment is complete! Let's begin exploring the features of Azure Arc-enabled servres with ArcBox for IT Pros!
 
   ![Screenshot showing complete deployment](./arcbox_complete.png)
 
