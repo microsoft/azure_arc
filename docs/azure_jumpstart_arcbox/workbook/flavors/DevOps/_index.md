@@ -18,13 +18,13 @@ The Jumpstart ArcBox workbook is automatically deployed for you as part of ArcBo
 
 - From the ArcBox resource group, select the Azure Workbook, then click "Open Workbook"
 
-![Workbook Gallery](./azure_workbook.png)
+   ![Workbook Gallery](./azure_workbook.png)
 
-![Workbook Gallery](./open_workbook.png)
+   ![Workbook Gallery](./open_workbook.png)
 
 - The Jumpstart ArcBox Workbook will be displayed.
 
-![Arcbox workbook overview](./workbook_overview.png)
+   ![Arcbox workbook overview](./workbook_overview.png)
 
 ## ArcBox Workbook for DevOps capabilities
 
