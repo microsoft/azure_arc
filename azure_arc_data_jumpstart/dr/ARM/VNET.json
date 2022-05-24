@@ -99,7 +99,7 @@
           {
             "name": "[parameters('clientSubnetName')]",
             "properties": {
-              "primaryAddressPrefix": "[parameters('ClientSubnetAddressPrefix')]",
+              "addressPrefix": "[parameters('ClientSubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
@@ -107,7 +107,7 @@
           {
             "name": "[parameters('primarySubnetName')]",
             "properties": {
-              "primaryAddressPrefix": "[parameters('primarySubnetAddressPrefix')]",
+              "addressPrefix": "[parameters('primarySubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
@@ -115,7 +115,7 @@
           {
             "name": "AzureBastionSubnet",
             "properties": {
-              "primaryAddressPrefix": "[parameters('bastionSubnetPrefix')]"
+              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
             }
           }
         ]
@@ -135,7 +135,7 @@
           {
             "name": "[parameters('secondarySubnetName')]",
             "properties": {
-              "primaryAddressPrefix": "[parameters('secondarySubnetAddressPrefix')]",
+              "addressPrefix": "[parameters('secondarySubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
@@ -157,7 +157,7 @@
           {
             "name": "[parameters('clientSubnetName')]",
             "properties": {
-              "primaryAddressPrefix": "[parameters('clientSubnetAddressPrefix')]",
+              "addressPrefix": "[parameters('clientSubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
