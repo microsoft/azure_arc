@@ -97,7 +97,7 @@
         },
         "subnets": [
           {
-            "name": "ClientVM-Subnet",
+            "name": "[parameters('clientSubnetName')]",
             "properties": {
               "primaryAddressPrefix": "[parameters('ClientSubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
