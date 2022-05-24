@@ -52,14 +52,14 @@
         "description": "The size of the VM"
       }
     },
-    "primaryVnetName": {
+    "clientVnetName": {
       "type": "string",
       "defaultValue": "Arc-Data-VNet",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
-    "primarySubnetName": {
+    "clientSubnetName": {
       "type": "string",
       "defaultValue": "Arc-Data-Subnet",
       "metadata": {
@@ -181,7 +181,7 @@
     "vmName": "[concat(parameters('vmName'))]",
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('primaryVnetName'), parameters('primarySubnetName'))]",
+    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('clientVnetName'), parameters('clientSubnetName'))]",
     "clientVMSubnetRef" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'clientVM-Vnet', 'default')]",
     "osDiskType": "Premium_LRS",
     "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",

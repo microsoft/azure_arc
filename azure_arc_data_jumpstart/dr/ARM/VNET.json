@@ -207,7 +207,7 @@
       "name": "[format('{0}/peering-to-client-vnet', parameters('primaryVnetName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('primaryVnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('clientVnetName'))]"
       ],
       "properties": {
         "allowVirtualNetworkAccess": true,
@@ -215,17 +215,17 @@
         "allowGatewayTransit": false,
         "useRemoteGateways": false,
         "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', 'clientVM-Vnet')]"
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('clientVnetName'))]"
         }
       }
     },
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-primary-vnet', 'clientVM-Vnet')]",
+      "name": "[format('{0}/peering-to-primary-vnet', parameters('clientVnetName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('primaryVnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('clientVnetName'))]"
       ],
       "properties": {
         "allowVirtualNetworkAccess": true,
@@ -243,7 +243,7 @@
       "name": "[format('{0}/peering-to-client-vnet', parameters('secondaryVnetName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryVnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('clientVnetName'))]"
       ],
       "properties": {
         "allowVirtualNetworkAccess": true,
@@ -251,17 +251,17 @@
         "allowGatewayTransit": false,
         "useRemoteGateways": false,
         "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', 'clientVM-Vnet')]"
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('clientVnetName'))]"
         }
       }
     },
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-secondary-vnet', 'clientVM-Vnet')]",
+      "name": "[format('{0}/peering-to-secondary-vnet', parameters('clientVnetName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryVnetName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('clientVnetName'))]"
       ],
       "properties": {
         "allowVirtualNetworkAccess": true,
