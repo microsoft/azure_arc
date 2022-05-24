@@ -21,7 +21,7 @@ ArcBox is a virtual hybrid sandbox that can be used to explore Azure Arc capabil
 
 ### What is required to deploy ArcBox?
 
-ArcBox requires an Azure subscription where you have a Contributor role-based access control (RBAC) role.
+ArcBox deployment requires an Azure service principal with Contributor or Owner role-based access control (RBAC) on an Azure subscription and resource group. You can deploy ArcBox using the Azure portal, Az CLI, Bicep, or Terraform. The service principal is required to run the automation scripts that deploy and configure ArcBox features. You can view how the service principal is used by exploring the ArcBox code on our [public GitHub repository](https://github.com/microsoft/azure_arc).
 
 ### What Azure regions can ArcBox be deployed to?
 
@@ -53,15 +53,15 @@ ArcBox offers three different configurations, or "flavors", that allow the user 
 ArcBox incurs normal Azure consumption charges for various Azure resources such as virtual machines and storage. Each flavor of ArcBox uses a different combination of Azure resources and therefore costs vary depending on the flavor used. You can view example estimates of ArcBox costs per flavor by clicking the links below.
 
 - [ArcBox Full cost estimate](https://aka.ms/ArcBoxFullCost)
-- [ArcBox for DevOps cost estimate](https://aka.ms/ArcBoxDevOpsCost)
 - [ArcBox for ITPro cost estimate](https://aka.ms/ArcBoxITProCost)
+- [ArcBox for DevOps cost estimate](https://aka.ms/ArcBoxDevOpsCost)
 
 ### Where can I go if I have trouble deploying or using ArcBox?
 
 Each ArcBox flavor has a troubleshooting section of its documentation that you can review for common issues:
 
 - [Troubleshooting ArcBox Full](https://azurearcjumpstart.io/azure_jumpstart_arcbox/full/#basic-troubleshooting)
-- [Troubleshooting ArcBox for DevOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#basic-troubleshooting)
 - [Troubleshooting ArcBox for IT Pros](https://azurearcjumpstart.io/azure_jumpstart_arcbox/ITPro/#basic-troubleshooting)
+- [Troubleshooting ArcBox for DevOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#basic-troubleshooting)
 
 If you're still stuck, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on our GitHub repository and the Jumpstart team will try to assist you.
