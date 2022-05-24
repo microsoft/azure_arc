@@ -44,7 +44,7 @@ The Azure Policy will be set to “Audit” mode to check the configuration of e
   az --version
   ```
 
-- As mentioned, this guide starts at the point where you already have a connected EKS/GKE cluster to Azure Arc.
+- As mentioned, this scenario starts at the point where you already have a connected EKS/GKE cluster to Azure Arc.
 
     ![Existing EKS Azure Arc connected cluster](./01.png)
 

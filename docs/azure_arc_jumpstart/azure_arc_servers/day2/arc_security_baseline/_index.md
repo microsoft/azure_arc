@@ -27,7 +27,7 @@ You can use the Azure portal, an ARM template, or PowerShell script to assign po
 
 ## Prerequisites
 
-- As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see two Windows servers and one Linux server have been connected with Azure Arc and are visible as resources in Azure.
+- As mentioned, this scenario starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see two Windows servers and one Linux server have been connected with Azure Arc and are visible as resources in Azure.
 
     ![Screenshot of Azure Arc-enabled servers in a resource group](./01.png)
 

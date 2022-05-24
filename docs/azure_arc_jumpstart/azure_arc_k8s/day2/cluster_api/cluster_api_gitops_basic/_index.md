@@ -36,7 +36,7 @@ GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a p
 
   - [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tab-auto-refresh/)
 
-- As mentioned, this guide starts at the point where you already have a Cluster API projected as an Azure Arc connected cluster.
+- As mentioned, this scenario starts at the point where you already have a Cluster API projected as an Azure Arc connected cluster.
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 

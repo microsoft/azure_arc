@@ -28,7 +28,7 @@ in this scenario, we will focus on securing an Ubuntu web server. The only prere
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using an Amazon Web Services (AWS) EC2 instance that has been already connected to Azure Arc and is visible as a resource in Azure.
+* As mentioned, this scenario starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using an Amazon Web Services (AWS) EC2 instance that has been already connected to Azure Arc and is visible as a resource in Azure.
 
     ![Screenshot showing EC2 instance in AWS console](./01.png)
 

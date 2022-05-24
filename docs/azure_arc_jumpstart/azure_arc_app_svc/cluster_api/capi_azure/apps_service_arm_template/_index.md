@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled app services](https://docs.microsoft.com/azure/app-service/overview-arc-integration) deployed on [Cluster API (CAPI)](https://cluster-api.sigs.k8s.io/introduction.html) Kubernetes cluster and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/) cluster using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will have a CAPI Kubernetes cluster deployed with an App Service plan, a sample Web Application (Web App) and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled app services.
+By the end of this scenario, you will have a CAPI Kubernetes cluster deployed with an App Service plan, a sample Web Application (Web App) and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled app services.
 
 > **NOTE: Currently, Azure Arc-enabled app services is in preview.**
 

@@ -26,7 +26,7 @@ The following Jumpstart scenario will guide you on how to enable [Azure Policy f
   az --version
   ```
 
-* As mentioned, this guide starts at the point where you already have a connected GKE cluster to Azure Arc.
+* As mentioned, this scenario starts at the point where you already have a connected GKE cluster to Azure Arc.
 
     ![Existing GKE Azure Arc-enabled Kubernetes cluster](./01.png)
 

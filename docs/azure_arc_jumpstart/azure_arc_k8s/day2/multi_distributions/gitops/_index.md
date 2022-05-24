@@ -44,7 +44,7 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
   az --version
   ```
 
-- As mentioned, this guide starts at the point where you already have an Azure Arc connected EKS/GKE cluster.
+- As mentioned, this scenario starts at the point where you already have an Azure Arc connected EKS/GKE cluster.
 
     ![Existing EKS Azure Arc connected cluster](./01.png)
 

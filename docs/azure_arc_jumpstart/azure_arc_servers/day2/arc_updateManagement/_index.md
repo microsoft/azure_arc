@@ -37,7 +37,7 @@ in this scenario, you will create and configure an Azure Automation account and 
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using an Amazon Web Services (AWS) EC2 instance that has been already connected to Azure Arc and is visible as a resource in Azure.
+* As mentioned, this scenario starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using an Amazon Web Services (AWS) EC2 instance that has been already connected to Azure Arc and is visible as a resource in Azure.
 
     ![Screenshot showing AWS cloud console with EC2 instance](./01.png)
 

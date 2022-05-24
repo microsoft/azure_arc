@@ -28,7 +28,7 @@ The following Jumpstart scenario will guide you on how to enable [Azure Policy f
   az --version
   ```
 
-* As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
+* As mentioned, this scenario starts at the point where you already have a connected AKS cluster to Azure Arc.
 
     ![Existing AKS Azure Arc connected cluster](./01.png)
 

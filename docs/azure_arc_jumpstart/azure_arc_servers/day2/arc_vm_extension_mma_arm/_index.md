@@ -37,7 +37,7 @@ Please review the [Azure Monitor supported OS documentation](https://docs.micros
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
+* As mentioned, this scenario starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below you can see a GCP server has been connected with Azure Arc and is visible as a resource in Azure.
 
     ![Screenshot Azure Arc-enabled server on resource group](./01.png)
 
