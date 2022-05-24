@@ -95,7 +95,7 @@ Write-Host "Primary Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on primary cluster
-$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"nodePort\":18103,\"targetPort\":5022}]}}'
+$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
 kubectl patch svc js-sql-pr-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 5 # To allow the CRD to update
 
@@ -103,7 +103,7 @@ Start-Sleep -Seconds 5 # To allow the CRD to update
 if ( $env:SQLMIHA -eq $true )
 {
     # Update Service Port from 1433 to Non-Standard
-    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"nodePort\":18103,\"targetPort\":5022}]}}'
+    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
     kubectl patch svc js-sql-pr-secondary-external-svc -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
@@ -156,14 +156,14 @@ Write-Host "Secondary Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on secondary cluster
-$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"nodePort\":18103,\"targetPort\":5022}]}}'
+$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
 kubectl patch svc js-sql-dr-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 5 # To allow the CRD to update
 
 if ( $env:SQLMIHA -eq $true )
 {
     # Update Service Port from 1433 to Non-Standard
-    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"nodePort\":18103,\"targetPort\":5022}]}}'
+    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
     kubectl patch svc js-sql-dr-external-svc -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
