@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to enable [Azure Key Vault](https://docs.microsoft.com/azure/key-vault/general/overview) for a Cluster API that is projected as an Azure Arc connected cluster.
 
-In this guide, you will hook the Cluster API to Azure Key Vault by deploying the Azure Key Vault extension and a sample app on your Kubernetes cluster in order to integrate Azure Key Vault as a secrets store with a Kubernetes cluster via a [Container Storage Interface (CSI)](https://kubernetes-csi.github.io/docs/) volume. This will also include deploying a Key Vault and sample secret on your Azure subscription.
+in this scenario, you will hook the Cluster API to Azure Key Vault by deploying the Azure Key Vault extension and a sample app on your Kubernetes cluster in order to integrate Azure Key Vault as a secrets store with a Kubernetes cluster via a [Container Storage Interface (CSI)](https://kubernetes-csi.github.io/docs/) volume. This will also include deploying a Key Vault and sample secret on your Azure subscription.
 
 > **NOTE: This guide assumes you already deployed a Cluster API and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using a [Shell script](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/cluster_api/capi_azure/).**
 

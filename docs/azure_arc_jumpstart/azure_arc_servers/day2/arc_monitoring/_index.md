@@ -10,7 +10,7 @@ description: >
 
 The scenario will show you how to onboard Azure Arc-enabled servers to [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/overview), so you can monitor your Linux and Windows servers running on-premises or at other cloud providers.
 
-In this guide, you will create the following Azure resources that support this Azure Monitor scenario:
+in this scenario, you will create the following Azure resources that support this Azure Monitor scenario:
 
 - Log Analytics workspace.
 

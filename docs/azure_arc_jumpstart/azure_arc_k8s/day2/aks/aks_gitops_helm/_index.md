@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on an Azure Kubernetes Service (AKS) cluster which is projected as an Azure Arc connected cluster resource.
 
-In this guide, you will deploy & attach two GitOps configurations to your cluster, a cluster-level config to deploy [nginx-ingress controller](https://kubernetes.github.io/ingress-nginx/) and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
+In this scenario, you will deploy & attach two GitOps configurations to your cluster, a cluster-level config to deploy [nginx-ingress controller](https://kubernetes.github.io/ingress-nginx/) and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
 GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a popular open-source toolset. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. The Flux toolkit component Helm Controller is a Kubernetes operator, allowing one to declaratively manage Helm chart releases with Kubernetes manifests. The Operator is aware of the “HelmRelease” Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart.
 
@@ -212,7 +212,7 @@ For our scenario, notice we have two Helm charts in the "Azure Arc Jumpstart App
 
     3. A new Kubernetes pod with the new version of the application will be deployed on the cluster. Once the new pods are successfully deployed, the old one will be terminated (rolling upgrade).
 
-- To show the above flow, open 2 (ideally 3) side-by-side browser windows:
+- To show the above flow, open 2 (ideally 3) side-by-side windows:
 
   - Azure Cloud Shell running the command
   
@@ -222,7 +222,7 @@ For our scenario, notice we have two Helm charts in the "Azure Arc Jumpstart App
   
     ![kubectl get pods -n hello-arc -w](./20.png)
 
-  - In **your fork** of the "Azure Arc Jumpstart App" repository, open the *hello_arc.yaml* file (/hello-arc/releases/app/hello_arc.yaml).
+  - In **your fork** of the "Azure Arc Jumpstart App" repository, open the *hello-arc.yaml* file (/hello-arc/releases/app/hello-arc.yaml).
 
   - The external IP address of the Kubernetes Service is seen using the _`kubectl get svc -n ingress-nginx`_ command.
 
@@ -236,7 +236,7 @@ For our scenario, notice we have two Helm charts in the "Azure Arc Jumpstart App
 
     ![Tab Auto Refresh](./23.png)
 
-- In the repository window showing the _hello_arc.yaml_ file, change the text under the "MESSAGE" section commit the change. Alternatively, you can open your cloned repository in your IDE, make the change, commit and push it.
+- In the repository window showing the _hello-arc.yaml_ file, change the text under the "MESSAGE" section commit the change. Alternatively, you can open your cloned repository in your IDE, make the change, commit and push it.
 
     ![Making a change to the replica count and the "MESSAGE" section](./24.png)
 

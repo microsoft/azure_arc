@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to work with the Hybrid Instance Metadata Service on an Azure Arc-enabled server, and authenticate the system assigned Managed Identity against Azure APIs.
 
-In this guide you will use Bash commands and REST API calls to:
+in this scenario you will use Bash commands and REST API calls to:
 
 - Query the Hybrid Instance Metadata Service (HIMDS)
 - Get challenge tokens and resource tokens

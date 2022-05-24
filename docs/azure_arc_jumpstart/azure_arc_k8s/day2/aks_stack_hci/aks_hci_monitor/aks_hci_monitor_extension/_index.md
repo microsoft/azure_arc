@@ -10,13 +10,13 @@ description: >
 
 The following Jumpstart scenario will guide you on how to enable [Azure Monitor for Containers](https://docs.microsoft.com/azure/azure-monitor/insights/container-insights-overview) for an AKS cluster running on Azure Stack HCI that is projected as an Azure Arc connected cluster.
 
-In this guide, you will hook the AKS cluster on HCI to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) in order to start collecting telemetry.  
+in this scenario, you will hook the AKS cluster on HCI to Azure Monitor by deploying the [OMS agent](https://docs.microsoft.com/azure/azure-monitor/platform/log-analytics-agent) in order to start collecting telemetry.  
 
 > **NOTE: This guide assumes you already deployed an AKS on HCI cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_stack_hci/aks_hci_powershell/).**
 
 Kubernetes extensions are add-ons for Kubernetes clusters. The extensions feature on Azure Arc-enabled Kubernetes clusters enables usage of Azure Resource Manager based APIs, CLI and portal UX for deployment of extension components (Helm charts in initial release) and will also provide lifecycle management capabilities such as auto/manual extension version upgrades for the extensions.
 
-The commands below and the script described in this guide should be run on the management computer.
+The commands below and the script described in this scenario should be run on the management computer.
 
 ## Prerequisites
 

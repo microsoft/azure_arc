@@ -88,12 +88,12 @@ Every Jumpstart scenario must have a "Prerequisites" section as the first sectio
 
 ## Markdown linting and style
 
-- All the scenarios and README files follow standard markdown and linting rules. We recommend using [Visual Studio Code (VSCode)](https://code.visualstudio.com/) as it provides a rich IDE experience with support for extensions.
-- Before submitting a PR for a new/updated scenario, make sure to perform markdown linting to avoid errors and typos. If you are using VSCode, we recommend installing the [_markdownlint_ extension] as it provides an easy way of performing an efficient MD lint.
+- All the scenarios and README files follow standard markdown and linting rules. We recommend using [Visual Studio Code (VS Code)](https://code.visualstudio.com/) as it provides a rich IDE experience with support for extensions.
+- Before submitting a PR for a new/updated scenario, make sure to perform markdown linting to avoid errors and typos. If you are using VS Code, we recommend installing the [_markdownlint_ extension] as it provides an easy way of performing an efficient MD lint.
 
 ![Screenshot of the markdownlint extension](./markdownlint_extension.png)
 
-- Below you can find an example of common markdown lint issues that will be presented to you as you are writing your scenario and must be fixed. [Here](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint), you can find detailed explanations of the markdown rules highlighted by the extension and how to fix a violation of these rules.
+- Below you can find an example of common markdown lint issues that will be presented to you as you are writing your scenario and must be fixed. [Here](https://marketplace.visualstudio.com/items?itemName=DavidAnson.VS Code-markdownlint), you can find detailed explanations of the markdown rules highlighted by the extension and how to fix a violation of these rules.
 
 ![Screenshot of the markdown lint errors](./lint_errors.png)
 
@@ -246,9 +246,9 @@ Every scenario includes URLs, either to an external or internal source.
 
     ![Screenshot of localization reference](./localization_reference.png)
 
-- To avoid broken links, we recommend using [HTTP/s and relative link checker](https://marketplace.visualstudio.com/items?itemName=blackmist.LinkCheckMD#:~:text=To%20check%20for%20broken%20links,links%20as%20they%20are%20checked.) VSCode extension. Make sure to fix all issues before submitting your PR.
+- To avoid broken links, we recommend using [HTTP/s and relative link checker](https://marketplace.visualstudio.com/items?itemName=blackmist.LinkCheckMD#:~:text=To%20check%20for%20broken%20links,links%20as%20they%20are%20checked.) VS Code extension. Make sure to fix all issues before submitting your PR.
 
-    ![Screenshot of link checker VSCode extension](./link_checker.png)
+    ![Screenshot of link checker VS Code extension](./link_checker.png)
 
 ## Automation flows explanation
 

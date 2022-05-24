@@ -78,7 +78,7 @@ By the end of the guide, you will have an AWS EC2 instance installed with Window
 
 ## Create a new AWS IAM Role & Key
 
-Create AWS User IAM Key. An access key grants programmatic access to your resources which we will be using later on in this guide.
+Create AWS User IAM Key. An access key grants programmatic access to your resources which we will be using later in this scenario.
 
 * Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home).
 

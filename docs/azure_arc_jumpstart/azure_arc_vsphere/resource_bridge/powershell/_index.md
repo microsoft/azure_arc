@@ -57,7 +57,7 @@ The following README will guide you on how to use the provided PowerShell script
     $UnsecureSecret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     ```
 
-    Copy and save the Service Principal ApplicationId and Secret as you will need it for later on in the automation.
+    Copy and save the Service Principal ApplicationId and Secret as you will need it for later in the automation.
 
     > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 

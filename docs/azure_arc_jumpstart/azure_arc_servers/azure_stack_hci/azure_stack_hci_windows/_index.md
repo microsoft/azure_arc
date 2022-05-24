@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to use the provided Power
 
 This guide will **not** provide instructions on how to deploy and set up Azure Stack HCI and it assumes you already have it provisioned. If you don't have any Azure Stack HCI cluster created, please have a look at the following [Azure Stack HCI 20H2 Evaluation Guide](https://github.com/Azure/AzureStackHCI-EvalGuide).
 
-The commands below and the Powershell script described in this guide should be run on the **management computer**.
+The commands below and the Powershell script described in this scenario should be run on the **management computer**.
 
 ## Prerequisites
 
@@ -66,7 +66,7 @@ The commands below and the Powershell script described in this guide should be r
     $UnsecureSecret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     ```
 
-    Copy and save the Service Principal ApplicationId and Secret as you will need it for later on in the automation.
+    Copy and save the Service Principal ApplicationId and Secret as you will need it for later in the automation.
 
     > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 

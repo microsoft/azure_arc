@@ -10,7 +10,7 @@ description: >
 
 The scenario will show you how to onboard Azure Arc-enabled servers to [Update Management](https://docs.microsoft.com/azure/automation/update-management/overview), so that you can manage operating system updates for your Azure Arc-enabled servers running Windows or Linux.
 
-In this guide, you will create and configure an Azure Automation account and Log Analytics workspace to support Update Management for Azure Arc-enabled servers by doing the following:
+in this scenario, you will create and configure an Azure Automation account and Log Analytics workspace to support Update Management for Azure Arc-enabled servers by doing the following:
 
 * Setup a new Log Analytics Workspace and Azure Automation account.
 

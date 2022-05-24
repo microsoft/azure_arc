@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to use Azure Arc-enabled 
 
 Azure Arc-enabled servers allows you to manage your Windows and Linux machines hosted outside of Azure on your corporate network or other cloud provider, similarly to how you manage native Azure virtual machines. When a hybrid machine is connected to Azure, it becomes a connected machine and is treated as a resource in Azure. Each connected machine has a Resource ID, is managed as part of a resource group inside a subscription, and benefits from standard Azure constructs such as Azure Policy and applying tags. The ability to easily organize and manage server inventory using Azure as a management engine greatly reduces administrative complexity and provides a consistent strategy for hybrid and multi-cloud environments.
 
-In this guide, we will use [Resource Graph Explorer](https://docs.microsoft.com/azure/governance/resource-graph/first-query-portal) and [AZ CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) to demonstrate tagging and querying server inventory across multiple clouds from a single pane of glass in Azure.
+in this scenario, we will use [Resource Graph Explorer](https://docs.microsoft.com/azure/governance/resource-graph/first-query-portal) and [AZ CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) to demonstrate tagging and querying server inventory across multiple clouds from a single pane of glass in Azure.
 
 > **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
@@ -80,7 +80,7 @@ We will be using Resource Graph Explorer during this exercise to query and view 
 
 ## Tag Arc resources
 
-Now that we have created a basic taxonomy structure, we will apply tags to our Azure Arc-enabled server resources. In this guide, we will demonstrate tagging resources in both AWS and GCP. If you only have resources in one of these providers, you can skip to the appropriate section for AWS or GCP.
+Now that we have created a basic taxonomy structure, we will apply tags to our Azure Arc-enabled server resources. In this scenario, we will demonstrate tagging resources in both AWS and GCP. If you only have resources in one of these providers, you can skip to the appropriate section for AWS or GCP.
 
 ### Tag Arc-connected AWS Ubuntu EC2 instance
 

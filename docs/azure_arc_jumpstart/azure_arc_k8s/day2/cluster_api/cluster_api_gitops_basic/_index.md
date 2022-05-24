@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to create GitOps configuration on a Cluster API which is projected as an Azure Arc-connected cluster resource.
 
-In this guide, you will deploy & attach GitOps configuration to your cluster which will also include deploying an "Hello World" Azure Arc web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
+in this scenario, you will deploy & attach GitOps configuration to your cluster which will also include deploying an "Hello World" Azure Arc web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
 GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a popular open-source toolset. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy.
 
@@ -18,7 +18,7 @@ GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a p
 
 ## Prerequisites
 
-- Fork the ["Azure Arc Jumpstart"](https://github.com/microsoft/azure_arc) repository. In this guide, you will be making changes on your own forked repository to initiate the GitOps flow.
+- Fork the ["Azure Arc Jumpstart"](https://github.com/microsoft/azure_arc) repository. In this scenario, you will be making changes on your own forked repository to initiate the GitOps flow.
 
 - Clone the forked Azure Arc Jumpstart repository.
 
@@ -191,7 +191,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
     3. A new Kubernetes pod with the new version of the application will be deployed on the cluster. Once the new pods are successfully deployed, the old one will be terminated (rolling upgrade).
 
-- To show the above flow, open 2 (ideally 3) side-by-side browser windows:
+- To show the above flow, open 2 (ideally 3) side-by-side windows:
 
   - Shell running the command
   

@@ -104,7 +104,7 @@ By the end of this guide, you will have an EKS cluster deployed with an Azure Ar
 
 ## Create a new AWS IAM Role & Key
 
-Create AWS User IAM Key. An access key grants programmatic access to your resources which we will be using later on in this guide.
+Create AWS User IAM Key. An access key grants programmatic access to your resources which we will be using later in this scenario.
 
 * Navigate to the [IAM Access page](https://console.aws.amazon.com/iam/home#/home).
 
@@ -168,7 +168,7 @@ Read the below explanation to get familiar with the automation and deployment fl
 
   2. *Bootstrap.ps1* script will run at the Terraform plan runtime Runtime and will:
       * Create the *Bootstrap.log* file  
-      * Install the required tools – az cli, az cli Powershell module, kubernetes-cli, Visual C++ Redistributable, helm, vscode, etc. (Chocolaty packages)
+      * Install the required tools – az cli, PowerShell module, kubernetes-cli, Visual C++ Redistributable, HELM, VS Code, etc. (Chocolaty packages)
       * Download Azure Data Studio & Azure Data CLI
       * Disable Windows Server Manager, remove Internet Explorer, disable Windows Firewall
       * Download the DataServicesLogonScript.ps1 PowerShell script

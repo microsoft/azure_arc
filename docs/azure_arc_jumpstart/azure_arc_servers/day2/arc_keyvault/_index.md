@@ -10,7 +10,7 @@ description: >
 
 The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/azure/virtual-machines/extensions/key-vault-linux) extension on an Azure Arc-enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server.
 
-In this guide, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc-enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
+in this scenario, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc-enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
 
 > **NOTE: This guide assumes you already deployed an Ubuntu server that is running on-premises or in other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
