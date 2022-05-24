@@ -131,7 +131,7 @@
     "secondarySubnetName": "Arc-Data-Secondary",
     "secondarySubnetAddressPrefix": "172.240.0.0/16",
     "clientVnetName": "Arc-Vnet-Client",
-    "clientSubnetName": "Arc-Data-Subnet",
+    "clientSubnetName": "Arc-Data-Client",
     "clientAddressPrefix" : "192.168.0.0/16",
     "clientSubnetAddressPrefix": "192.168.10.0/24",
     "bastionSubnetPrefix": "192.168.2.64/26",
