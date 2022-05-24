@@ -2,25 +2,25 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "virtualNetworkName": {
+    "primaryVnetName": {
       "type": "string",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
-    "subnetName": {
+    "primarySubnetName": {
       "type": "string",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
-    "addressPrefix": {
+    "primaryAddressPrefix": {
       "type": "string",
       "metadata": {
         "description": "VNET CIDR"
       }
     },
-    "subnetAddressPrefix": {
+    "primarySubnetAddressPrefix": {
       "type": "string",
       "metadata": {
         "description": "Subnet CIDR"
@@ -32,13 +32,7 @@
         "description": "Bastion subnet prefix"
       }
     },
-    "ClientSubnetAddressPrefix": {
-      "type": "string",
-      "metadata": {
-        "description": "Client VM subnet"
-      }
-    },
-    "secondaryClusterVnetName": {
+    "secondaryVnetName": {
       "type": "string",
       "metadata": {
         "description": "Secondary cluster Vnet name"
@@ -50,10 +44,40 @@
         "description": "Secondary cluster Vnet address range"
       }
     },
+    "secondarySubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Secondary subnet name"
+      }
+    },
     "secondarySubnetAddressPrefix": {
       "type": "string",
       "metadata": {
         "description": "Secondary cluster subnet prefix"
+      }
+    },
+    "clientVnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Client Vnet name"
+      }
+    },
+    "clientAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Client Vnet address range"
+      }
+    },
+    "clientSubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Client subnet name"
+      }
+    },
+    "clientSubnetAddressPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "client cluster subnet prefix"
       }
     }
   },
@@ -63,27 +87,27 @@
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "comments": "Deploys a VNET and Subnet for Client VM",
+      "comments": "Deploys a VNET and Subnet for the primary cluster",
       "apiVersion": "2021-05-01",
-      "name": "[parameters('virtualNetworkName')]",
+      "name": "[parameters('primaryVnetName')]",
       "location": "[resourceGroup().location]",
       "properties": {
         "addressSpace": {
-          "addressPrefixes": [ "[parameters('addressPrefix')]" ]
+          "addressPrefixes": [ "[parameters('primaryAddressPrefix')]" ]
         },
         "subnets": [
           {
             "name": "ClientVM-Subnet",
             "properties": {
-              "addressPrefix": "[parameters('ClientSubnetAddressPrefix')]",
+              "primaryAddressPrefix": "[parameters('ClientSubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
           },
           {
-            "name": "[parameters('subnetName')]",
+            "name": "[parameters('primarySubnetName')]",
             "properties": {
-              "addressPrefix": "[parameters('subnetAddressPrefix')]",
+              "primaryAddressPrefix": "[parameters('primarySubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
@@ -91,7 +115,7 @@
           {
             "name": "AzureBastionSubnet",
             "properties": {
-              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+              "primaryAddressPrefix": "[parameters('bastionSubnetPrefix')]"
             }
           }
         ]
@@ -101,7 +125,7 @@
       "type": "Microsoft.Network/virtualNetworks",
       "comments": "Deploys a VNET and Subnet for the secondary cluster",
       "apiVersion": "2021-05-01",
-      "name": "[parameters('secondaryClusterVnetName')]",
+      "name": "[parameters('secondaryVnetName')]",
       "location": "[resourceGroup().location]",
       "properties": {
         "addressSpace": {
@@ -109,9 +133,9 @@
         },
         "subnets": [
           {
-            "name": "cluster-subnet",
+            "name": "[parameters('secondarySubnetName')]",
             "properties": {
-              "addressPrefix": "[parameters('secondarySubnetAddressPrefix')]",
+              "primaryAddressPrefix": "[parameters('secondarySubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
@@ -121,19 +145,19 @@
     },
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "comments": "Deploys a VNET and Subnet for the clientVM",
+      "comments": "Deploys a VNET and Subnet for the Client VM",
       "apiVersion": "2021-05-01",
-      "name": "clientVM-Vnet",
+      "name": "[parameters('clientVnetName')]",
       "location": "[resourceGroup().location]",
       "properties": {
         "addressSpace": {
-          "addressPrefixes": [ "192.168.0.0/16" ]
+          "addressPrefixes": [ "[parameters('clientAddressPrefix')]" ]
         },
         "subnets": [
           {
-            "name": "default",
+            "name": "[parameters('clientSubnetName')]",
             "properties": {
-              "addressPrefix": "192.168.10.0/24",
+              "primaryAddressPrefix": "[parameters('clientSubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
             }
@@ -144,10 +168,10 @@
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-secondary-vnet', parameters('virtualNetworkName'))]",
+      "name": "[format('{0}/peering-to-secondary-vnet', parameters('primaryVnetName'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryClusterVnetName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('primaryVnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryVnetName'))]"
       ],
       "properties": {
         "allowVirtualNetworkAccess": true,
@@ -155,17 +179,17 @@
         "allowGatewayTransit": false,
         "useRemoteGateways": false,
         "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('secondaryClusterVnetName'))]"
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('secondaryVnetName'))]"
         }
       }
     },
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-primary-vnet', parameters('secondaryClusterVnetName'))]",
+      "name": "[format('{0}/peering-to-primary-vnet', parameters('secondaryVnetName'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryClusterVnetName'))]"
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('primaryVnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryVnetName'))]"
       ],
       "properties": {
         "allowVirtualNetworkAccess": true,
@@ -173,16 +197,16 @@
         "allowGatewayTransit": false,
         "useRemoteGateways": false,
         "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('primaryVnetName'))]"
         }
       }
     },
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-client-vnet', parameters('virtualNetworkName'))]",
+      "name": "[format('{0}/peering-to-client-vnet', parameters('primaryVnetName'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('primaryVnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
       ],
       "properties": {
@@ -200,7 +224,7 @@
       "apiVersion": "2021-08-01",
       "name": "[format('{0}/peering-to-primary-vnet', 'clientVM-Vnet')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('primaryVnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
       ],
       "properties": {
@@ -209,16 +233,16 @@
         "allowGatewayTransit": false,
         "useRemoteGateways": false,
         "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('primaryVnetName'))]"
         }
       }
     },
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
       "apiVersion": "2021-08-01",
-      "name": "[format('{0}/peering-to-client-vnet', parameters('secondaryClusterVnetName'))]",
+      "name": "[format('{0}/peering-to-client-vnet', parameters('secondaryVnetName'))]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryClusterVnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryVnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
       ],
       "properties": {
@@ -236,7 +260,7 @@
       "apiVersion": "2021-08-01",
       "name": "[format('{0}/peering-to-secondary-vnet', 'clientVM-Vnet')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryClusterVnetName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('secondaryVnetName'))]",
         "[resourceId('Microsoft.Network/virtualNetworks/', 'clientVM-Vnet')]"
       ],
       "properties": {
@@ -245,7 +269,7 @@
         "allowGatewayTransit": false,
         "useRemoteGateways": false,
         "remoteVirtualNetwork": {
-          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('secondaryClusterVnetName'))]"
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('secondaryVnetName'))]"
         }
       }
     }
