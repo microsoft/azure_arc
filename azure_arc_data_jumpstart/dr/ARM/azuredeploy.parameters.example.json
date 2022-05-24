@@ -38,8 +38,11 @@
     "deployBastion": {
       "value": false
     },
-    "dnsPrefix": {
-      "value": "arcAksdemoXXX"
+    "dnsPrefixPrimary": {
+      "value": "arcAksdemoprXXX"
+    },
+    "dnsPrefixSecondary": {
+      "value": "arcAksdemodrXXX"
     }
   }
 }

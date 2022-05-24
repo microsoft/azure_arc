@@ -16,7 +16,14 @@
         "description": "The location of the Managed Cluster resource"
       }
     },
-    "dnsPrefix": {
+    "dnsPrefixPrimary": {
+      "type": "string",
+      "defaultValue": "arcdata",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+      }
+    },
+    "dnsPrefixSecondary": {
       "type": "string",
       "defaultValue": "arcdata",
       "metadata": {
@@ -117,6 +124,12 @@
       "metadata": {
         "description": "Primary cluster subnet"
       }
+    },
+    "secondarySubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Secondary cluster subnet"
+      }
     }
   },
   "variables": {
@@ -137,7 +150,7 @@
       "properties": {
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
         "enableRBAC": "[parameters('enableRBAC')]",
-        "dnsPrefix": "[concat(parameters('dnsPrefix'),'pr')]",
+        "dnsPrefix": "[parameters('dnsPrefixPrimary')]",
         "aadProfile": {
           "managed": true
         },
@@ -188,7 +201,7 @@
       "properties": {
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
         "enableRBAC": "[parameters('enableRBAC')]",
-        "dnsPrefix": "[concat(parameters('dnsPrefix'),'sd')]",
+        "dnsPrefix": "[parameters('dnsPrefixSecondary')]",
         "aadProfile": {
           "managed": true
         },
@@ -202,7 +215,7 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('secondaryVnetName'),'cluster-subnet')]"
+            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('secondaryVnetName'),parameters('secondarySubnetName'))]"
           }
         ],
         "networkProfile": {

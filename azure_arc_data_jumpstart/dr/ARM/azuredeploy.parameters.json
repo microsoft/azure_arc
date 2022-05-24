@@ -38,8 +38,11 @@
     "deployBastion": {
       "value": "(true/false)"
     },
-    "dnsPrefix": {
-        "value": "<A DNS prefix for the Public IP>"
-    }
+    "dnsPrefixPrimary": {
+        "value": "<A DNS prefix for the Public IP of primary cluster>"
+    },
+    "dnsPrefixSecondary": {
+      "value": "<A DNS prefix for the Public IP of secondary cluster>"
+  }
   }
 }
