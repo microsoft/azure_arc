@@ -504,7 +504,7 @@ ArcBox deploys multiple GitOps configurations on the _ArcBox-CAPI-Data_ workload
 
     ![Screenshot showing Hello-Arc app and shell](./capi_gitops04.png)
 
-- In [your fork](#sample-applications) of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`hello_arc.yaml`_ file (_`/hello-arc/yaml/hello_arc.yaml`_), change the text under the “MESSAGE” section and commit the change.
+- In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`hello_arc.yaml`_ file (_`/hello-arc/yaml/hello_arc.yaml`_), change the text under the “MESSAGE” section and commit the change.
   
     ![Screenshot showing hello-arc repo](./capi_gitops05.png)
   
