@@ -20,7 +20,7 @@ Azure Automanage removes the need to discover virtual machines manually and auto
 - [Azure Automation Account](https://docs.microsoft.com/azure/automation/automation-create-standalone-account)
 - [Log Analytics workspace](https://docs.microsoft.com/azure/azure-monitor/logs/log-analytics-overview)
 
-By the end of this guide, you will have an Azure Arc-enabled server with Azure Automanage enabled and configured following Microsoft Cloud Adoption Framework best practices for Dev/Test or Production environments.
+By the end of this scenario, you will have an Azure Arc-enabled server with Azure Automanage enabled and configured following Microsoft Cloud Adoption Framework best practices for Dev/Test or Production environments.
 
 > **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
