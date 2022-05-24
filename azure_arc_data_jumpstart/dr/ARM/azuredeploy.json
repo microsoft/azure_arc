@@ -166,8 +166,17 @@
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"
           },
-          "ClientSubnetAddressPrefix": {
-            "value": "[variables('ClientSubnetAddressPrefix')]"
+          "clientVnetName": {
+            "value": "[variables('clientVnetName')]"
+          },
+          "clientSubnetName": {
+            "value": "[variables('clientSubnetName')]"
+          },
+          "clientAddressPrefix": {
+            "value": "[variables('clientAddressPrefix')]"
+          },
+          "clientSubnetAddressPrefix": {
+            "value": "[variables('clientSubnetAddressPrefix')]"
           },
           "secondaryVnetName": {
             "value": "[variables('secondaryVnetName')]"
