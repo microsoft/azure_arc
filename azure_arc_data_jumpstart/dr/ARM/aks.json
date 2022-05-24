@@ -100,19 +100,19 @@
         "Project": "jumpstart_azure_arc_data_services"
       }
     },
-    "virtualNetworkName": {
+    "primaryVnetName": {
       "type": "string",
       "metadata": {
         "description": "primary vnet"
       }
     },
-    "secondaryClusterVnetName": {
+    "secondaryVnetName": {
       "type": "string",
       "metadata": {
         "description": "Seconday cluster vnet"
       }
     },
-    "subnetName": {
+    "primarySubnetName": {
       "type": "string",
       "metadata": {
         "description": "Primary cluster subnet"
@@ -151,7 +151,7 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'),parameters('subnetName'))]"
+            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('primaryVnetName'),parameters('primarySubnetName'))]"
           }
         ],
         "networkProfile": {
@@ -202,7 +202,7 @@
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
             "type": "VirtualMachineScaleSets",
-            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('secondaryClusterVnetName'),'cluster-subnet')]"
+            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('secondaryVnetName'),'cluster-subnet')]"
           }
         ],
         "networkProfile": {
