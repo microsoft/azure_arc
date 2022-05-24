@@ -275,12 +275,6 @@
           "clientSubnetName": {
             "value": "[variables('clientSubnetName')]"
           },
-          "clientAddressPrefix": {
-            "value": "[variables('clientAddressPrefix')]"
-          },
-          "clientSubnetAddressPrefix": {
-            "value": "[variables('clientSubnetAddressPrefix')]"
-          },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
           },
