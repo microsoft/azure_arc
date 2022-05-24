@@ -32,7 +32,7 @@ in this scenario, you will deploy & attach GitOps configuration to your cluster 
 
   * [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tab-auto-refresh/)
 
-* As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc that is running on Azure Stack HCI.
+* As mentioned, this scenario starts at the point where you already have a connected AKS cluster to Azure Arc that is running on Azure Stack HCI.
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 

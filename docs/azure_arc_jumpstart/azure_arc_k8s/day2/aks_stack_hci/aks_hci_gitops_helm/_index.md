@@ -34,7 +34,7 @@ By doing so, you will be able to make real-time changes to the application and s
 
   * [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tab-auto-refresh/)
 
-* As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
+* As mentioned, this scenario starts at the point where you already have a connected AKS cluster to Azure Arc.
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 

@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/azure/azure-arc/data/overview) deployed on a single-node [Microk8s](https://microk8s.io/) Kubernetes cluster.
 
-By the end of this guide, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure Client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
+By the end of this scenario, you will have a Microk8s Kubernetes cluster deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure Client VM, installed & pre-configured with all the required tools needed to work with Azure Arc-enabled data services:
 
 ![Deployed Architecture](./01.png)
 

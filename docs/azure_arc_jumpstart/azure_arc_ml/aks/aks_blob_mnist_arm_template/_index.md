@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to deploy an end-to-end Machine Learning pipeline using [Azure Arc-enabled machine learning](https://docs.microsoft.com/azure/machine-learning/how-to-attach-arc-kubernetes) deployed on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster using [Azure ARM Templates](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will have:
+By the end of this scenario, you will have:
 
 - An AKS cluster onboarded with Azure Arc
 - A Microsoft Windows Server 2022 (Datacenter) Azure client VM (with optional steps outlined to remote access via [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) for increased Security Posture)
