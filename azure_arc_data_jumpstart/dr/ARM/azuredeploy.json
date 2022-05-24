@@ -66,11 +66,18 @@
         "description": "The name of the Kubernetes cluster resource"
       }
     },
-    "dnsPrefix": {
+    "dnsPrefixPrimary": {
       "type": "string",
       "defaultValue": "arcdata",
       "metadata": {
-        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN for the primary cluster"
+      }
+    },
+    "dnsPrefixSecondary": {
+      "type": "string",
+      "defaultValue": "arcdata",
+      "metadata": {
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN for the secondary cluster"
       }
     },
     "deploySQLMI": {
@@ -217,8 +224,11 @@
           "kubernetesVersion": {
             "value": "[parameters('kubernetesVersion')]"
           },
-          "dnsPrefix": {
-            "value": "[parameters('dnsPrefix')]"
+          "dnsPrefixPrimary": {
+            "value": "[parameters('dnsPrefixPrimary')]"
+          },
+          "dnsPrefixSecondary": {
+            "value": "[parameters('dnsPrefixSecondary')]"
           },
           "primaryVnetName": {
             "value": "[variables('primaryVnetName')]"
@@ -228,6 +238,9 @@
           },
           "primarySubnetName": {
             "value": "[variables('primarySubnetName')]"
+          },
+           "secondarySubnetName": {
+            "value": "[variables('secondarySubnetName')]"
           }
         }
       }
