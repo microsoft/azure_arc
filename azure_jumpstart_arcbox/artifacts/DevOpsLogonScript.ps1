@@ -126,7 +126,7 @@ osm namespace add "$ingressNamespace" --mesh-name "$osmMeshName" --disable-sidec
 # - Apply GitOps Configs
 #############################
 
-Write-Header "Applying GotOps Configs"
+Write-Header "Applying GitOps Configs"
 
 # Create GitOps config for NGINX Ingress Controller
 Write-Host "Creating GitOps config for NGINX Ingress Controller"

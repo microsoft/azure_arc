@@ -25,8 +25,8 @@ ArcBox for DevOps is a special "flavor" of ArcBox that is intended for users who
 
 ArcBox for DevOps deploys two Kubernetes clusters to give you multiple options for exploring Azure Arc-enabled Kubernetes capabilities and potential integrations.
 
-- _**ArcBox-CAPI-Data**_ - A single-node Rancher K3s cluster which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider for Azure (CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster. The workload cluster is onboarded as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys multiple [GitOps configurations](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#gitops-configurations) on this cluster for you, so you have an easy way to get started exploring GitOps capabilities.
-- _**ArcBox-K3s**_ - One single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox provides the user with [PowerShell scripts](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#additional-optional-scenarios-on-the-arcbox-k3s-cluster) that can be manually run to apply GitOps configurations on this cluster.
+- _**ArcBox-CAPI-Data**_ - A single-node Rancher K3s cluster which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider for Azure (CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster. The workload cluster is onboarded as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys multiple [GitOps configurations](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#gitops-configurations) on this cluster for you, so you have an easy way to get started exploring GitOps capabilities.
+- _**ArcBox-K3s**_ - One single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox provides the user with [PowerShell scripts](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#additional-optional-scenarios-on-the-arcbox-k3s-cluster) that can be manually run to apply GitOps configurations on this cluster.
 
 ### Sample applications
 
@@ -370,8 +370,8 @@ Once your deployment is complete, you can open the Azure portal and see the ArcB
 
 Various options are available to connect to _ArcBox-Client_ VM, depending on the parameters you supplied during deployment.
 
-- [RDP](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-time access (JIT)](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#connect-using-just-in-time-accessjit).
-- [Azure Bastion](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+- [RDP](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-time access (JIT)](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#connect-using-just-in-time-accessjit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
 #### Connecting directly with RDP
 
@@ -881,7 +881,7 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
 
     ![Screenshot showing ArcBox-K3s virtual machine public IP](./arcbox_k3s_vm_ip.png)
 
-    > **NOTE: Port 22 is not open by default in ArcBox deployments. You will need to [create an NSG rule](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/DevOps/_index.md#connecting-directly-with-rdp) to allow network access to port 22, or use Azure Bastion or JIT to connect to the VM.**
+    > **NOTE: Port 22 is not open by default in ArcBox deployments. You will need to [create an NSG rule](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#connecting-directly-with-rdp) to allow network access to port 22, or use Azure Bastion or JIT to connect to the VM.**
 
 - As described in the message of the day (motd), depending on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
   - _ArcBox-CAPI-MGMT_ log path: *jumpstart_logs/installCAPI.log*
