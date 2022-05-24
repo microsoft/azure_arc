@@ -329,8 +329,8 @@ Once your deployment is complete, you can open the Azure portal and see the ArcB
 
 Various options are available to connect to _ArcBox-Client_ VM, depending on the parameters you supplied during deployment.
 
-- [RDP](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/Full/_index.md#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-time access (JIT)](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/Full/_index.md#connect-using-just-in-time-accessjit).
-- [Azure Bastion](https://github.com/microsoft/azure_arc/blob/arcbox_devops/docs/azure_jumpstart_arcbox/Full/_index.md#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
+- [RDP](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full/#connecting-directly-with-rdp) - available after configuring access to port 3389 on the _ArcBox-NSG_, or by enabling [Just-in-time access (JIT)](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full/#connect-using-just-in-time-accessjit).
+- [Azure Bastion](https://azurearcjumpstart.io/azure_jumpstart_arcbox/Full/#connect-using-azure-bastion) - available if ```true``` was the value of your _`deployBastion`_ parameter during deployment.
 
 #### Connecting directly with RDP
 
