@@ -67,7 +67,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Prerequisites
 
-- [Install or update Azure CLI to version 2.15.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -297,7 +297,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
 
-- Now you will deploy the Terraform file. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox/bicep) and run the commands below:
+- Now you will deploy the Terraform file. Navigate to the local cloned deployment folder and run the commands below:
 
   ```shell
   terraform init
