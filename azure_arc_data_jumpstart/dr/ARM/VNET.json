@@ -79,10 +79,42 @@
       "metadata": {
         "description": "client cluster subnet prefix"
       }
+    },
+    "deployBastion": {
+      "type": "string",
+      "metadata": {
+        "description": "Option to deploy Bastion"
+      }
     }
   },
   "variables": {
-    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]"
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+    "subnetsWithBastion": [
+      {
+        "name": "[parameters('clientSubnetName')]",
+        "properties": {
+          "addressPrefix": "[parameters('clientSubnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "name": "AzureBastionSubnet",
+        "properties": {
+          "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+        }
+      }
+    ],
+    "subnetsWithoutBastion": [
+      {
+        "name": "[parameters('clientSubnetName')]",
+        "properties": {
+          "addressPrefix": "[parameters('clientSubnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      }
+    ]
   },
   "resources": [
     {
@@ -139,16 +171,7 @@
         "addressSpace": {
           "addressPrefixes": [ "[parameters('clientAddressPrefix')]" ]
         },
-        "subnets": [
-          {
-            "name": "[parameters('clientSubnetName')]",
-            "properties": {
-              "addressPrefix": "[parameters('clientSubnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled"
-            }
-          }
-        ]
+        "subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
       }
     },
     {
