@@ -12,9 +12,9 @@ This scenario will guide you on how to use Azure Arc-enabled servers to provide 
 
 Azure Arc-enabled servers allows you to manage your Windows and Linux machines hosted outside of Azure on your corporate network or other cloud provider, similarly to how you manage native Azure virtual machines. When a hybrid machine is connected to Azure, it becomes a connected machine and is treated as a resource in Azure. Each connected machine has a Resource ID, it is managed as part of a resource group inside a subscription, and benefits from standard Azure constructs such as Azure Policy and applying tags. The ability to easily organize and manage server inventory using Azure as a management engine greatly reduces administrative complexity and provides a consistent strategy for hybrid and multi-cloud environments.
 
-In this guide, we will use [Resource Graph Explorer](https://docs.microsoft.com/en-us/azure/governance/resource-graph/overview) to demonstrate querying server inventory across multiple clouds from a single pane of glass in Azure.
+In this scenario, we will use [Resource Graph Explorer](https://docs.microsoft.com/azure/governance/resource-graph/overview) to demonstrate querying server inventory across multiple clouds from a single pane of glass in Azure.
 
-> **Note: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion:**
+> **NOTE: This scenario assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion:**
 
 - **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
 - **[GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
@@ -29,7 +29,7 @@ In this guide, we will use [Resource Graph Explorer](https://docs.microsoft.com/
 
 ## Prerequisites
 
-- As mentioned before, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc.
+- As mentioned before, this scenario starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc.
 
 ## Apply resource tags to Azure Arc-enabled servers
 
@@ -144,7 +144,7 @@ lastStatusChange = tostring(properties.['lastStatusChange'])
 
 Complete the following steps to clean up your environment.
 
-- Remove the virtual machines from each environment by following the teardown instructions from each guide.
+- Remove the virtual machines from each environment by following the teardown instructions from each scenario.
 
   - **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
   - **[GCP Windows instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)**
