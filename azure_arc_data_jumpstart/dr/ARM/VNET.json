@@ -97,25 +97,11 @@
         },
         "subnets": [
           {
-            "name": "[parameters('clientSubnetName')]",
-            "properties": {
-              "addressPrefix": "[parameters('ClientSubnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled"
-            }
-          },
-          {
             "name": "[parameters('primarySubnetName')]",
             "properties": {
               "addressPrefix": "[parameters('primarySubnetAddressPrefix')]",
               "privateEndpointNetworkPolicies": "Enabled",
               "privateLinkServiceNetworkPolicies": "Enabled"
-            }
-          },
-          {
-            "name": "AzureBastionSubnet",
-            "properties": {
-              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
             }
           }
         ]
