@@ -121,6 +121,9 @@ if ((Get-Job -Id $loginJobId -IncludeChildJob | Where-Object {$_.Error} | Select
 Stop-Process -Id $edge.Id -ErrorAction SilentlyContinue
 Write-Host "Login Success!"
 
+# Set Subscription Context
+Invoke-Command -Session $Server01 -ScriptBlock {Set-AzContext -Subscription $using:subId}
+
 # Verify user permissions
 $userName = Invoke-Command -Session $Server01 -ScriptBlock {$(Get-AzADUser -SignedIn).DisplayName}
 $userObjectId = Invoke-Command -Session $Server01 -ScriptBlock {$(Get-AzADUser -SignedIn).Id}
