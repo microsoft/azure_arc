@@ -8,14 +8,17 @@ description: >
 
 ## Enable Azure Automanage on an Azure Arc-enabled servers using an ARM Template
 
-The following Jumpstart scenario will guide you on how to onboard an Azure Arc-enabled server on to [Azure Automanage](https://docs.microsoft.com/azure/automanage/automanage-virtual-machines#prerequisites), so you can follow best practices in reliability, security and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Backup](https://docs.microsoft.com/azure/backup/backup-overview).
+The following Jumpstart scenario will guide you on how to onboard an Azure Arc-enabled server on to [Azure Automanage](https://docs.microsoft.com/azure/automanage/automanage-virtual-machines#prerequisites), so you can follow best practices in reliability, security and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/vm/vminsights-overview).
 
 Azure Automanage removes the need to discover virtual machines manually and automatically onboards and configures certain services in Azure following best practices as defined in [Microsoft Cloud Adoption Framework for Azure](https://docs.microsoft.com/azure/cloud-adoption-framework/manage/best-practices). Azure services included in Azure Automanage are:
 
-- [Azure Backup](https://docs.microsoft.com/azure/backup/backup-overview)
-- [Microsoft Defender for Cloud](https://docs.microsoft.com/azure/defender-for-cloud/defender-for-cloud-introduction)
-- [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/overview)
-- [Azure Automation](https://docs.microsoft.com/azure/automation/automation-intro)
+- [Microsoft Antimalware](https://docs.microsoft.com/en-us/azure/security/fundamentals/antimalware)
+- [Change Tracking & Inventory](https://docs.microsoft.com/en-us/azure/automation/change-tracking/overview)
+- [Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview)
+- [Machines Insights Monitoring](https://docs.microsoft.com/en-us/azure/azure-monitor/vm/vminsights-overview)
+- [Azure Guest Configuration](https://docs.microsoft.com/en-us/azure/governance/policy/concepts/guest-configuration)
+- [Azure Automation Account](https://docs.microsoft.com/en-us/azure/automation/automation-create-standalone-account)
+- [Log Analytics workspace](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/log-analytics-overview)
 
 By the end of this guide, you will have an Azure Arc-enabled server with Azure Automanage enabled and configured following Microsoft Cloud Adoption Framework best practices for Dev/Test or Production environments.
 
