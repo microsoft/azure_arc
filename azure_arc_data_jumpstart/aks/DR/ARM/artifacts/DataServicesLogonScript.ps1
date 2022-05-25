@@ -168,8 +168,8 @@ Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
 $primaryCustomLocationId = $(az customlocation show --name "jumpstart-primary-cl" --resource-group $Env:resourceGroup --query id -o tsv)
-$workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+$laWorkspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$laWorkspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
 $dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 
@@ -182,8 +182,8 @@ $dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage',$Env:spnClientId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage',$Env:spnTenantId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage',$Env:spnClientSecret | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$laWorkspaceId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$laWorkspaceKey | Set-Content -Path $dataControllerParams
 
 az deployment group create --resource-group $Env:resourceGroup `
                            --template-file "$Env:TempDir\dataController.json" `
