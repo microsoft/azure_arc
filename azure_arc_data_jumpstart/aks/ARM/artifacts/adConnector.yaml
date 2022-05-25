@@ -8,7 +8,7 @@ data:
   password: {{ARC_DSA_USER_PASSWORD}}
   username: {{ARC_DSA_USER}}
 ---
-apiVersion: {{arcdata.microsoft.com/v1beta2}}
+apiVersion: {{ARC-DATA-API-VERSION}}
 kind: ActiveDirectoryConnector
 metadata:
   name: adarc
