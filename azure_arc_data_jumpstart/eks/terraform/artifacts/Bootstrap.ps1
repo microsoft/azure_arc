@@ -83,5 +83,7 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-# Stopping log for Bootstrap.ps1
+# Clean up Bootstrap.log
 Stop-Transcript
+$logSuppress = Get-Content "C:\Temp\Bootstrap.log" -Force | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content "C:\Temp\Bootstrap.log" -Force
