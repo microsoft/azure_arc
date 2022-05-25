@@ -100,7 +100,7 @@ Moreover, you could render those results using the available **Charts**:
 
 ![Screenshot showing Resource Graph Explorer cloud providers query chart](./12.png)
 
-Let's now build a query that uses the Resource Tag we assigned before to some of our Azure Arc-enabled servers. Use the following query that includes a check for resources that have a value for the **Scenario** tag:
+Let's now build a query that uses the tag we assigned before to some of our Azure Arc-enabled servers. Use the following query that includes a check for resources that have a value for the **Scenario** tag:
 
 ```kusto
 Resources
