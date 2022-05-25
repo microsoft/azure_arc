@@ -35,7 +35,7 @@ In this scenario, we will use [Resource Graph Explorer](https://docs.microsoft.c
 
 In this first step, we will assign Azure resource tags to some of your Azure Arc-enabled servers. This gives you the ability to easily organize and manage server inventory.
 
-From the Azure Portal, go to **All Services**  and search for **Servers - Azure Arc**.
+Enter **Servers - Azure Arc** in the top search bar in the Azure portal and select it.
 
 ![Screenshot showing All Services Azure Arc-enabled servers in the portal](./1.png)
 
