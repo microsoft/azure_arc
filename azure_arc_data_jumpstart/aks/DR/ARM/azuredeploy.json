@@ -124,7 +124,7 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/dr/ARM/')]",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/DR/ARM/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
