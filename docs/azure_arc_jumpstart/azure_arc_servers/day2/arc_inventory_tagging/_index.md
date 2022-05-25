@@ -63,7 +63,7 @@ Scope Azure Resource Graph Explorer to the Directory, Management Group or Subscr
 
 ![Screenshot showing Resource Graph Explorer scope](./6.png)
 
-In the query window, run the following query, that will show you all Azure Arc-enabled servers in your subscription. Enter the query and then click **Run Query**:
+In the query window, run the following query that will show you all Azure Arc-enabled servers in your subscription. Enter the query and then click **Run Query**:
 
 ```kusto
 Resources
