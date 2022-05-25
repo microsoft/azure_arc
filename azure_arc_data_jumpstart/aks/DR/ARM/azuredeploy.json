@@ -196,6 +196,9 @@
           },
           "secondarySubnetAddressPrefix": {
             "value": "[variables('secondarySubnetAddressPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
