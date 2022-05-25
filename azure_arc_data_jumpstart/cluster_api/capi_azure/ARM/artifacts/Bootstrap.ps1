@@ -150,5 +150,5 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Clean up Bootstrap.log
 Stop-Transcript
-$logSuppress = Get-Content C:\Temp\Bootstrap.log -Force | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content C:\Temp\Bootstrap.log  | Where { $_ -notmatch "Host Application: powershell.exe" } 
 $logSuppress | Set-Content C:\Temp\Bootstrap.log -Force

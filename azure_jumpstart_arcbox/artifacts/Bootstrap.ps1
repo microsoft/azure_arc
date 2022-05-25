@@ -249,5 +249,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Host "Clean up Bootstrap.log"
 Stop-Transcript
-$logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
 $logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
