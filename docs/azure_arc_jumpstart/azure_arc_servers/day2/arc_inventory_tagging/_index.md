@@ -6,7 +6,7 @@ weight: 1
 description: >
 ---
 
-## Azure Arc-enabled servers inventory using Resource Graph Explorer
+## Azure Arc-enabled servers inventory management using Resource Graph Explorer
 
 This scenario will guide you on how to use Azure Arc-enabled servers to provide server inventory management capabilities across hybrid multi-cloud and on-premises environments.
 
