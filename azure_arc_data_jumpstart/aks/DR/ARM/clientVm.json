@@ -165,7 +165,7 @@
     },
     "bastionHostName": {
       "type": "string",
-      "defaultValue": "Arc-Win-Demo-Bastion",
+      "defaultValue": "Arc-Demo-Bastion",
       "metadata": {
         "description": "Azure Bastion host name"
       }
@@ -179,7 +179,7 @@
   },
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
-    "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
+    "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(parameters('bastionHostName'),'-PIP'))]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "clientVMSubnetRef" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('clientVnetName'), parameters('clientSubnetName'))]",
     "osDiskType": "Premium_LRS",
