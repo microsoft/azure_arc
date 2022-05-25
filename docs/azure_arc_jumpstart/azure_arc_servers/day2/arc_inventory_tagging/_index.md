@@ -47,7 +47,7 @@ Click on **Tags**. Add a new tag with **Name="Scenario"** and **Value="jumpstart
 
 ![Screenshot showing how to apply a tag to an Azure Arc-enabled server](./3.png)
 
-Repeat the same process in other Azure Arc-enabled servers. This new Tag will be used later when working with Resource Graph Explorer queries.
+Repeat the same process in other Azure Arc-enabled servers. This new tag will be used later when working with Resource Graph Explorer queries.
 
 ## Using Resource Graph Explorer to Review Server Inventory
 
