@@ -245,3 +245,9 @@ Write-Host "Installing Hyper-V and restart"
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+
+# Clean up Bootstrap.log
+Write-Host "Clean up Bootstrap.log"
+Stop-Transcript
+$logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
