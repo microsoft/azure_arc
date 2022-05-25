@@ -1,0 +1,177 @@
+Start-Transcript -Path C:\Temp\DeploySQLMI.log
+
+# Deployment environment variables
+$Env:TempDir = "C:\Temp"
+
+# Verify AD domain name parameter is specified
+if ($env:addsDomainName.Length -le 0 -or $null -eq $env:addsDomainName)
+{
+    Write-Host "Active Directory Domain Name is not configured. Existing script."
+    Exit
+}
+
+# If flag set, deploy SQL MI "General Purpose" tier
+if ( $env:SQLMIHA -eq $false )
+{
+    $replicas = 1 # Value can be only 1
+    $pricingTier = "GeneralPurpose"
+}
+
+# If flag set, deploy SQL MI "Business Critical" tier
+if ( $env:SQLMIHA -eq $true )
+{
+    $replicas = 3 # Value can be either 2 or 3
+    $pricingTier = "BusinessCritical"
+}
+
+# Deploy AD Connector
+# Prior to deploying prepare YAML file to update with Domain information
+Import-Module ActiveDirectory
+Import-Module DnsServer
+
+# Get Activectory Information
+$dcInfo = Get-ADDomainController
+$sqlmiouName = "ARCSQLMI"
+$sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
+
+# Setup reverse lookup zone. Parameterize NetworkID
+Add-DnsServerPrimaryZone -NetworkID "172.16.1.0/24" -ReplicationScope "Forest" -ComputerName $dcInfo.HostName
+
+# Create reverse DNS for domain controller host
+
+# Create ArcSQLMi OU
+try
+{
+    $ou = Get-ADOrganizationalUnit -Identity $sqlmiOUDN
+    if ($null -ne $ou -and $ou.Name.Length -gt 0)
+    {
+        Write-Host "Organization Unit $sqlmiouName already exist. Skipping this step."
+    }
+    else
+    {
+        Write-Host "Organization Unit $sqlmiouName does not exist. Creating new OU."
+        New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
+    }
+}
+catch
+{
+    Write-Host "Organization Unit $sqlmiOu does not exist. Creating new OU."
+    New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
+}
+
+# Create dedicated service account for AD connector
+#$arcdsaname = "dsa-arcsqlmi"
+$arcsaname = "sa-sqlmi-cmk"
+$arcsapass = "ArcDSA#Pwd123$"
+$arcsasecpass = $arcsapass | ConvertTo-SecureString -AsPlainText -Force
+$dsaupn = $arcsaname + "@" + $dcInfo.domain
+
+$sqlMIName = "sqlmi-adauth"
+$samaccountname = $arcsaname
+$domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
+$sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
+$domain_name = $dcInfo.domain.ToUpper()
+$sqlmi_port = "32400"
+$keytab_file = "mssql.keytab"
+
+try
+{
+    New-ADUser -Name $arcsaname `
+        -UserPrincipalName $dsaupn `
+        -Path $sqlmiOUDN `
+        -AccountPassword $arcsasecpass `
+        -Enabled $true `
+        -ChangePasswordAtLogon $false `
+        -PasswordNeverExpires $true
+}
+catch
+{
+    # User already exists
+    Write-Host "User $arcdsaname already existings in the directory."
+}
+
+# Geneate key tab
+setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
+setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
+
+ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /out $keytab_file -setpass -setupn /pass $arcsapass
+ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+
+# Convert key tab file into base64 data
+$keytabrawdata = Get-Content $keytab_file -Encoding byte
+$b64keytabtext = [System.Convert]::ToBase64String($keytabrawdata)
+
+# Grant permission to DSA account on SQLMI OU 
+
+# Convert SQL Admin credentials into base64 format
+$b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_USERNAME))
+$b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_PASSWORD))
+
+# Read YAML file and replace values
+$adConectorYAMLFile = "C:\Temp\adConnectorCMK.yaml"
+$adConnectorContent = Get-Content $adConectorYAMLFile
+#$adConnectorContent = $adConnectorContent.Replace("{{ARC_DSA_USER}}", $b64UserName)
+#$adConnectorContent = $adConnectorContent.Replace("{{ARC_DSA_USER_PASSWORD}}", $b64Password)
+$adConnectorContent = $adConnectorContent.Replace("{{ARC_DATA_API_VERSION}}", "arcdata.microsoft.com/v1beta2")
+$adConnectorContent = $adConnectorContent.Replace("{{ADDS_DOMAIN_NAME}}", $dcInfo.domain.ToUpper())
+#$adConnectorContent = $adConnectorContent.Replace("{{SQLMI_OU}}", $sqlmiOUDN)
+$adConnectorContent = $adConnectorContent.Replace("{{ADDS_DC_NAME}}", $dcInfo.HostName)
+$adConnectorContent = $adConnectorContent.Replace("{{ADDS_IP_ADDRESS}}", $dcInfo.IPv4Address)
+Set-Content -Path $adConectorYAMLFile -Value $adConnectorContent
+
+# Now deploy AD connector in AKS
+kubectl apply -f $adConectorYAMLFile
+
+# Deploy SQL MI with AD auth
+$sqlMIADAuthYAMLFile = "SQLMIADAuthCMK.yaml"
+$sqlMIADAuthContent = Get-Content $sqlMIADAuthYAMLFile
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{ARC_DATA_API_VERSION}}", "sql.arcdata.microsoft.com/v3")
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{B64_SQLMI_ADMIN_USER}}", $b64UserName)
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{B64_SQLMI_ADMIN_PWD}}", $b64Password)
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{B64_KEYTAB_DATA}}", $b64keytabtext)
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_AD_USER}}", $samaccountname)
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_FQDN}}", $sqlmi_fqdn_name)
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_PORT}}", $sqlmi_port)
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_NAME}}", $sqlMIName)
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{PRICING_TIER}}", $pricingTier)
+$sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{REPLICA_COUNT}}", $replicas)
+
+Set-Content -Path $sqlMIADAuthYAMLFile -Value $sqlMIADAuthContent
+
+# Deploy SQLMI instance
+kubectl apply -f $sqlMIADAuthYAMLFile
+
+Write-Host "`n"
+Do {
+    Write-Host "Waiting for SQL Managed Instance with AD authentication. Hold tight, this might take a few minutes...(45s sleeping loop)"
+    Start-Sleep -Seconds 45
+    $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($dcStatus -eq "Nope")
+
+Write-Host "`n"
+Write-Host "Azure Arc SQL Managed Instance with AD authentication is ready!"
+Write-Host "`n"
+
+# Create windows account in SQLMI to support AD authentication
+$podname = "${sqlMIName}-0"
+kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:AZDATA_USERNAME] FROM WINDOWS"
+
+# Downloading demo database and restoring onto SQL MI
+Write-Host "`n"
+Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+
+# Retrieving SQL MI connection endpoint
+$sqlstring = kubectl get sqlmanagedinstances $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
+
+Write-Host $sqlstring
+
+<# Replace placeholder values in settingsTemplate.json
+(Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
+#>

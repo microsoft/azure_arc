@@ -248,41 +248,8 @@ add-type $code
 Stop-Process -Id $kubectlMonShell.Id
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
-# Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
+Unregister-ScheduledTask -TaskName "DataServicesLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
-
-<# If AD Auth is required join computer to ADDS domain and restart computer
-$addsDomainName = $Env:addsDomainName
-$adminUsername = $Env:adminUsername
-
-if ($addsDomainName.Length -gt 0)
-{
-    # Install Install-WindowsFeature RSAT-AD-PowerShell windows feature to setup OU and User Accounts in ADDS
-    Install-WindowsFeature -Name RSAT-AD-PowerShell
-
-    Write-Host "Installed RSAT-AD-PowerShell windows feature"
-
-    Write-Host "Joining computer to Active Directory domain ${addsDomainName}. Computer will be rebooted after joining domain."
-    # Get NitBios name from FQDN
-    $netbiosname = $addsDomainName.Split(".")[0]
-    $computername = $env:COMPUTERNAME
-
-    $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
-        UserName = "${netbiosname}\${adminUsername}"
-        Password = (ConvertTo-SecureString -String $Env:adminPassword -AsPlainText -Force)[0]
-    })
-    
-    $localCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
-        UserName = "${computername}\${adminUsername}"
-        Password = (ConvertTo-SecureString -String $Env:adminPassword -AsPlainText -Force)[0]
-    })
- 
-    Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
-    
-    Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
-    Write-Host "Joined Client VM to $addsDomainName domain."
-    Restart-Computer
-}#>
 
 Stop-Process -Name powershell -Force
 

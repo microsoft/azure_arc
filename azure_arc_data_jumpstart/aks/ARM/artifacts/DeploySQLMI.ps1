@@ -1,85 +1,9 @@
-Start-Transcript -Path C:\Temp\DeploySQLMI.log
+Start-Transcript -Path C:\Temp\deploySQL.log
 
 # Deployment environment variables
-$Env:TempDir = "C:\Temp"
 $controllerName = "jumpstart-dc"
 
-# Deploy AD Connector
-# Prior to deploying prepare YAML file to update with Domain information
-Import-Module ActiveDirectory
-Import-Module DnsServer
-
-# Get Activectory Information
-$dcInfo = Get-ADDomainController
-$sqlmiouName = "ARCSQLMI"
-$sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
-
-# Setup reverse lookup zone
-Add-DnsServerPrimaryZone -NetworkID "172.16.1.0/24" -ReplicationScope "Forest" -ComputerName $dcInfo.HostName
-
-# Create ArcSQLMi OU
-try
-{
-    $ou = Get-ADOrganizationalUnit -Identity $sqlmiOUDN
-    if ($null -ne $ou -and $ou.Name.Length -gt 0)
-    {
-        Write-Host "Organization Unit $sqlmiouName already exist. Skipping this step."
-    }
-    else
-    {
-        Write-Host "Organization Unit $sqlmiouName does not exist. Creating new OU."
-        New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
-    }
-}
-catch
-{
-    Write-Host "Organization Unit $sqlmiOu does not exist. Creating new OU."
-    New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
-}
-
-# Create dedicated service account for AD connector
-$arcdsaname = "dsa-arcsqlmi"
-$arcdsapass = "ArcDSA#Pwd123$" | ConvertTo-SecureString -AsPlainText -Force
-$dsaupn = $arcdsaname + "@" + $dcInfo.domain
-
-try
-{
-    New-ADUser -Name $arcdsaname `
-           -UserPrincipalName $dsaupn `
-           -Path $sqlmiOUDN `
-           -AccountPassword $arcdsapass `
-           -Enabled $true `
-           -ChangePasswordAtLogon $false `
-           -PasswordNeverExpires $true
-}
-catch
-{
-    # User already exists
-}
-
-# Grant permission to DSA account on SQLMI OU 
-
-# Create service account for SQL MI
-$b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($arcdsaname))
-$b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($arcdsapass))
-
-# Read YAML file and replace values
-$adConectorYAMLFile = "C:\Temp\deployADConnector.yaml"
-$adConnectorContent = Get-Content $adConectorYAMLFile
-$adConnectorContent = $adConnectorContent.Replace("{{ARC_DSA_USER}}", $b64UserName)
-$adConnectorContent = $adConnectorContent.Replace("{{ARC_DSA_USER_PASSWORD}}", $b64Password)
-$adConnectorContent = $adConnectorContent.Replace("{{ADDS_DOMAIN_NAME}}", $dcInfo.domain.ToUpper())
-$adConnectorContent = $adConnectorContent.Replace("{{SQLMI_OU}}", $sqlmiOU.ToUpper())
-$adConnectorContent = $adConnectorContent.Replace("{{ADDS_DC_NAME}}", $dcInfo.HostName.ToUpper())
-$adConnectorContent = $adConnectorContent.Replace("{{ADDS_IP_ADDRESS}}", $dcInfo.IPv4Address)
-Set-Content -Path $adConectorYAMLFile -Value $adConnectorContent
-
-# Now deploy AD connector in AKS
-kubectl apply -f $adConectorYAMLFile
-
-
 # Deploying Azure Arc SQL Managed Instance
-Write-Host "`n"
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
@@ -90,7 +14,6 @@ $dataControllerId = $(az resource show --resource-group $env:resourceGroup --nam
 # Localize ARM template
 ################################################
 $ServiceType = "LoadBalancer"
-$readableSecondaries = $ServiceType
 
 # Resource Requests
 $vCoresRequest = "2"
@@ -103,6 +26,7 @@ $StorageClassName = "managed-premium"
 $dataStorageSize = "5"
 $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
+$backupsStorageSize = "5"
 
 # If flag set, deploy SQL MI "General Purpose" tier
 if ( $env:SQLMIHA -eq $false )
@@ -120,7 +44,7 @@ if ( $env:SQLMIHA -eq $true )
 
 ################################################
 
-$SQLParams = "$Env:TempDir\SQLMI.parameters.json"
+$SQLParams = "C:\Temp\SQLMI.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $SQLParams
@@ -129,7 +53,6 @@ $SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'azdataPassword-stage',$env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'serviceType-stage',$ServiceType | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage',$readableSecondaries | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage',$vCoresRequest | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'memoryRequest-stage',$memoryRequest | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresLimit-stage',$vCoresLimit | Set-Content -Path $SQLParams
@@ -137,24 +60,22 @@ $SQLParams = "$Env:TempDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogsStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'logsStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'backupsStorageClassName-stage',$StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataSize-stage',$dataStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'logsSize-stage',$logsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogseSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'backupsSize-stage',$backupsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'pricingTier-stage' ,$pricingTier | Set-Content -Path $SQLParams
 
-az deployment group create --resource-group $env:resourceGroup `
-                           --template-file "$Env:TempDir\SQLMI.json" `
-                           --parameters "$Env:TempDir\SQLMI.parameters.json"
-
+az deployment group create --resource-group $env:resourceGroup --template-file "C:\Temp\SQLMI.json" --parameters "C:\Temp\SQLMI.parameters.json"
 Write-Host "`n"
+
 Do {
-    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
+    Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
-
-Write-Host "`n"
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
@@ -171,21 +92,13 @@ if ( $env:SQLMIHA -eq $true )
     Start-Sleep -Seconds 5 # To allow the CRD to update
 }
 
-# Downloading demo database and restoring onto SQL MI
-$podname = "jumpstart-sql-0"
-Write-Host "`n"
-Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
-kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
-Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
-
 # Creating Azure Data Studio settings for SQL Managed Instance connection
-Write-Host "`n"
+Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
-$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
+$settingsTemplate = "C:\Temp\settingsTemplate.json"
 
 # Retrieving SQL MI connection endpoint
-$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
+$sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
 # Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
@@ -194,13 +107,13 @@ $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
 
 # Unzip SqlQueryStress
-Expand-Archive -Path $Env:TempDir\SqlQueryStress.zip -DestinationPath $Env:TempDir\SqlQueryStress
+Expand-Archive -Path C:\Temp\SqlQueryStress.zip -DestinationPath C:\Temp\SqlQueryStress
 
 # Create SQLQueryStress desktop shortcut
 Write-Host "`n"
 Write-Host "Creating SQLQueryStress Desktop shortcut"
 Write-Host "`n"
-$TargetFile = "$Env:TempDir\SqlQueryStress\SqlQueryStress.exe"
+$TargetFile = "C:\Temp\SqlQueryStress\SqlQueryStress.exe"
 $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SqlQueryStress.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
@@ -208,7 +121,7 @@ $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
 # Creating SQLMI Endpoints data
-& "$Env:TempDir\SQLMIEndpoints.ps1"
+& "C:\Temp\SQLMIEndpoints.ps1"
 
 # If PostgreSQL isn't being deployed, clean up settings file
 if ( $env:deployPostgreSQL -eq $false )
@@ -218,27 +131,4 @@ if ( $env:deployPostgreSQL -eq $false )
     $string | Set-Content $settingsTemplate
     $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
     $string | Set-Content -Path $settingsTemplate
-}
-
-###########################
-# Enableld AD authentication in SQL MI
-###########################
-# Create dedicated service account for AD authentication
-$arcsaname = "sa-sqlmi-jumpstart"
-$arcsapass = "ArcDSA#Pwd123$" | ConvertTo-SecureString -AsPlainText -Force
-$saupn = $arcsaname + "@" + $dcInfo.domain
-
-try
-{
-    New-ADUser -Name $arcdsaname `
-           -UserPrincipalName $saupn `
-           -Path $sqlmiOUDN `
-           -AccountPassword $arcsapass `
-           -Enabled $true `
-           -ChangePasswordAtLogon $false `
-           -PasswordNeverExpires $true
-}
-catch
-{
-    # User already exists
 }
