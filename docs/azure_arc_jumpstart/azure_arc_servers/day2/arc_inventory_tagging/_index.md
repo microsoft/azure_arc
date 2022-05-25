@@ -80,7 +80,7 @@ Still on the results pane, go to the right and click on the **See details** link
 
 ![Screenshot showing Resource Graph Explorer query results See details link](./9.png)
 
-Here, you can see all the Azure Arc-enabled server metadata that you can query using Resource Graph explorer:
+Here you can see all the Azure Arc-enabled server metadata that you can query using Resource Graph explorer:
 
 ![Screenshot showing Resource Graph Explorer Azure Arc-enabled servers metadata](./10.png)
 
