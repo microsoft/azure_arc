@@ -81,7 +81,7 @@
       }
     },
     "deployBastion": {
-      "type": "string",
+      "type": "bool",
       "metadata": {
         "description": "Option to deploy Bastion"
       }
