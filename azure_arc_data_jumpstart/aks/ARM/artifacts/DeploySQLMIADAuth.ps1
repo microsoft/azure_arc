@@ -1,4 +1,4 @@
-Start-Transcript -Path C:\Temp\DeploySQLMI.log
+Start-Transcript -Path C:\Temp\DeploySQLMIADAuth.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
@@ -111,11 +111,8 @@ $b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(
 # Read YAML file and replace values
 $adConectorYAMLFile = "C:\Temp\adConnectorCMK.yaml"
 $adConnectorContent = Get-Content $adConectorYAMLFile
-#$adConnectorContent = $adConnectorContent.Replace("{{ARC_DSA_USER}}", $b64UserName)
-#$adConnectorContent = $adConnectorContent.Replace("{{ARC_DSA_USER_PASSWORD}}", $b64Password)
 $adConnectorContent = $adConnectorContent.Replace("{{ARC_DATA_API_VERSION}}", "arcdata.microsoft.com/v1beta2")
 $adConnectorContent = $adConnectorContent.Replace("{{ADDS_DOMAIN_NAME}}", $dcInfo.domain.ToUpper())
-#$adConnectorContent = $adConnectorContent.Replace("{{SQLMI_OU}}", $sqlmiOUDN)
 $adConnectorContent = $adConnectorContent.Replace("{{ADDS_DC_NAME}}", $dcInfo.HostName)
 $adConnectorContent = $adConnectorContent.Replace("{{ADDS_IP_ADDRESS}}", $dcInfo.IPv4Address)
 Set-Content -Path $adConectorYAMLFile -Value $adConnectorContent

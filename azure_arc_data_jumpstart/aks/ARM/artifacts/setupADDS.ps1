@@ -6,8 +6,14 @@
 param (
     [string]$domainName,
     [string]$domainAdminUsername,
-    [string]$domainAdminPassword
+    [string]$domainAdminPassword,
+    [string]$templateBaseUrl
 )
+
+Start-Transcript -Path "C:\Temp\SetupADDS.log"
+
+# Download post reboot scrpt file
+Invoke-WebRequest ($templateBaseUrl + "artifacts/RunAfterADDSRestart.ps1") -OutFile "C:\Temp\RunAfterADDSRestart.ps1"
 
 # Convert plain text password to secure string
 $secureDomainAdminPassword = $domainAdminPassword | ConvertTo-SecureString -AsPlainText -Force
@@ -17,13 +23,15 @@ Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
 
 Write-Host "Finished enabling ADDS windows feature."
 
+$netbiosname = $domainName.Split('.')[0].ToUpper()
+
 # Create Active Directory Forest
 Install-ADDSForest `
     -DomainName "$domainName" `
     -CreateDnsDelegation:$false `
     -DatabasePath "C:\Windows\NTDS" `
     -DomainMode "7" `
-    -DomainNetbiosName $domainName.Split('.')[0].ToUpper() `
+    -DomainNetbiosName $netbiosname `
     -ForestMode "7" `
     -InstallDns:$true `
     -LogPath "C:\Windows\NTDS" `
@@ -34,9 +42,13 @@ Install-ADDSForest `
 
 Write-Host "ADDS Deployment successful. Now rebooting computer to finsih setup."
 
+# schedule task to run after reboot to create reverse DNS lookup
+$Trigger = New-ScheduledTaskTrigger -AtStartup
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\RunAfterADDSRestart.ps1'
+Register-ScheduledTask -TaskName "RunAfterADDSRestart" -Trigger $Trigger -User "${netbiosname}\${domainAdminUsername}" -Password "$domainAdminPassword" -Action $Action -RunLevel "Highest" -Force
+
 # Reboot computer
 Restart-Computer
 Write-Host "System reboot requested."
 
-# Setup reverse lookup zone
-#Add-DnsServerPrimaryZone -NetworkId "172.16.1.0/24" -ReplicationScope Domain -DomainNetbiosName "contoso" -
+Stop-Transcript

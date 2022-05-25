@@ -233,7 +233,7 @@
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/setupADDS.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File setupADDS.ps1', ' -domainName ', parameters('addsDomainName'), ' -domainAdminUsername ', parameters('windowsAdminUsername'), ' -domainAdminPassword ', parameters('windowsAdminPassword'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File setupADDS.ps1', ' -domainName ', parameters('addsDomainName'), ' -domainAdminUsername ', parameters('windowsAdminUsername'), ' -domainAdminPassword ', parameters('windowsAdminPassword'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
       }
     },
@@ -264,7 +264,7 @@
   "outputs": {
     "scriptfile": {
       "type": "string",
-      "value": "[uri(parameters('templateBaseUrl'), 'artifacts/setupADDS.ps1')]"
+      "value": "[uri(parameters('templateBaseUrl'), 'artifacts/SetupADDS.ps1')]"
     }
   }
 }

@@ -47,7 +47,7 @@ Write-Output "Create deployment path"
 $tempDir = "C:\Temp"
 New-Item -Path $tempDir -ItemType directory -Force
 
-Start-Transcript "C:\Temp\Bootstrap.log"
+Start-Transcript "${tempDir}\Bootstrap.log"
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -71,20 +71,22 @@ Write-Host "Extending C:\ partition to the maximum size"
 Resize-Partition -DriveLetter C -Size $(Get-PartitionSupportedSize -DriveLetter C).SizeMax
 
 # Downloading GitHub artifacts for DataServicesLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "C:\Temp\settingsTemplate.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "C:\Temp\DataServicesLogonScript.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "C:\Temp\DeploySQLMI.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "C:\Temp\DeployPostgreSQL.ps1"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "C:\Temp\dataController.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "C:\Temp\dataController.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.json") -OutFile "C:\Temp\SQLMI.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.parameters.json") -OutFile "C:\Temp\SQLMI.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "C:\Temp\postgreSQL.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "C:\Temp\postgreSQL.parameters.json"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "C:\Temp\SQLMIEndpoints.ps1"
-Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "C:\Temp\SqlQueryStress.zip"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
-Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile "C:\Temp\adConnector.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/settingsTemplate.json") -OutFile "${tempDir}\settingsTemplate.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DataServicesLogonScript.ps1") -OutFile "${tempDir}\DataServicesLogonScript.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMI.ps1") -OutFile "${tempDir}\DeploySQLMI.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeployPostgreSQL.ps1") -OutFile "${tempDir}\DeployPostgreSQL.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile "${tempDir}\dataController.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile "${tempDir}\dataController.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.json") -OutFile "${tempDir}\SQLMI.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMI.parameters.json") -OutFile "${tempDir}\SQLMI.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.json") -OutFile "${tempDir}\postgreSQL.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/postgreSQL.parameters.json") -OutFile "${tempDir}\postgreSQL.parameters.json"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile "${tempDir}\SQLMIEndpoints.ps1"
+Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile "${tempDir}\SqlQueryStress.zip"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "${tempDir}\wallpaper.png"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile "${tempDir}\adConnector.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnectorCMK.yaml") -OutFile "${tempDir}\adConnectorCMK.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIADAuthCMK.yaml") -OutFile "${tempDir}\SQLMIADAuthCMK.yaml"
 
 # Installing tools
 workflow ClientTools_01
@@ -118,8 +120,8 @@ workflow ClientTools_01
                             }
                         }
                     }
-                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
-                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
+                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "${tempDir}\azuredatastudio.zip"
+                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "${tempDir}\AZDataCLI.msi"
                 }
         }
 
@@ -131,8 +133,8 @@ workflow ClientTools_02
             Parallel
             {
                 InlineScript {
-                    Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
+                    Expand-Archive '${tempDir}\azuredatastudio.zip' -DestinationPath 'C:\Program Files\Azure Data Studio'
+                    Start-Process msiexec.exe -Wait -ArgumentList '/I ${tempDir}\AZDataCLI.msi /quiet'
                 }
             }
         }
@@ -148,7 +150,7 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 <# Action when all if and elseif conditions are false #>
 # Creating scheduled task for DataServicesLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\DataServicesLogonScript.ps1'
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '${tempDir}\DataServicesLogonScript.ps1'
 
 ##############################################################################
 # Following code is support AD authentication in SQL MI. This code is executed
@@ -182,12 +184,13 @@ if ($addsDomainName.Length -gt 0)
     # Register schedule task to run under domain account to launch script setup all dependent
     # services
     # Use $env:username to run task under domain user
-    Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User "${netbiosname}\${adminUsername}" -Action $Action -RunLevel "Highest" -Force
-
     Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
     
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
+
+    Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User "${netbiosname}\${adminUsername}" -Password "$adminPassword" -Action $Action -RunLevel "Highest" -Force
+
     Restart-Computer
 }
 else {
