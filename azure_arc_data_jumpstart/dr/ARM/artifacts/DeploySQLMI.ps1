@@ -177,24 +177,6 @@ $sqlstringSecondary = kubectl get sqlmanagedinstances $secondarySqlMIInstance -n
 # Creating SQLMI Endpoints data
 & "$Env:TempDir\SQLMIEndpoints.ps1"
 
-# If PostgreSQL isn't being deployed, clean up settings file
-if ( $env:deployPostgreSQL -eq $false )
-{
-    $string = Get-Content $settingsTemplate
-    $string[25] = $string[25] -replace ",",""
-    $string | Set-Content $settingsTemplate
-    $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
-    $string | Set-Content -Path $settingsTemplate
-}
-
-# Editing registry to allow Unicode
-Write-Host "`n"
-Write-Host "Editing registry to allow Unicode"
-Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'ACP' -value '65001'
-Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'OEMCP' -value '65001'
-Set-Itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage' -Name 'MACCP' -value '65001'
-Write-Host "`n"
-
 # Creating distributed DAG
 Write-Host "Configuring the primary cluster DAG"
 New-Item -Path "$Env:TempDir/sqlcerts" -ItemType Directory
@@ -213,7 +195,7 @@ Write-Host "`n"
 
 Write-Host "`n"
 kubectx primary
-az sql instance-failover-group-arc create --shared-name jsdag --name primarycr --mi $primarySqlMIInstance --role primary --partner-mi $secondarySqlMIInstance  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name jumpstartDag --name primarycr --mi $primarySqlMIInstance --role primary --partner-mi $secondarySqlMIInstance  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
 kubectx secondary
-az sql instance-failover-group-arc create --shared-name jsdag --name secondarycr --mi $secondarySqlMIInstance --role secondary --partner-mi $primarySqlMIInstance  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name jumpstartDag --name secondarycr --mi $secondarySqlMIInstance --role secondary --partner-mi $primarySqlMIInstance  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:TempDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
