@@ -56,7 +56,6 @@ sudo mv ./squid-ca-cert-key.pem /usr/local/share/ca-certificates/squid-ca-cert-k
 sudo update-ca-certificates
 
 
-
 ## Configure Ubuntu to allow Azure Arc Connected Machine Agent Installation 
 
 echo "Configuring walinux agent"
