@@ -57,7 +57,6 @@ sudo update-ca-certificates
 
 
 ## Configure Ubuntu to allow Azure Arc Connected Machine Agent Installation 
-
 echo "Configuring walinux agent"
 sudo service walinuxagent stop
 sudo waagent -deprovision -force
