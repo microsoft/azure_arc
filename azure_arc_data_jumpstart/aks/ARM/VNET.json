@@ -52,8 +52,8 @@
       }
     },
     "dnsServers": {
-      "type": "string",
-      "defaultValue": "168.63.129.16",
+      "type": "array",
+      "defaultValue": ["168.63.129.16"],
       "metadata": {
         "description": "DNS Server configuration"
       }

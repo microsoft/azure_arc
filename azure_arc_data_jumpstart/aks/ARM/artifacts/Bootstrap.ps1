@@ -147,10 +147,12 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-<# Action when all if and elseif conditions are false #>
 # Creating scheduled task for DataServicesLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '${tempDir}\DataServicesLogonScript.ps1'
+
+# Register schedule task under local account
+Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 ##############################################################################
 # Following code is support AD authentication in SQL MI. This code is executed
@@ -189,11 +191,5 @@ if ($addsDomainName.Length -gt 0)
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
-    Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User "${netbiosname}\${adminUsername}" -Password "$adminPassword" -Action $Action -RunLevel "Highest" -Force
-
     Restart-Computer
-}
-else {
-    # Register schedule task under local account
-    Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
