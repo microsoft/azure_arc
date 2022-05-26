@@ -69,8 +69,8 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - The deployment will use an ARM template parameters file to customize your environment. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/proxy/azuredeploy.parameters.json) file located in your local cloned repository folder. Example parameters files are located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/proxy/azuredeploy.example.parameters.json). Fill out the parameters according to your environment:
 
-  - _`vmSize`_: client and proxy server Azure VM size.
-  - _`vmName`_: client Azure VM name.
+  - _`vmSize`_: Client and proxy server Azure VM size.
+  - _`vmName`_: Client Azure VM name.
   - _`ProxyvmName`_: Proxy server Azure VM name.
   - _`adminUsername`_: Azure VMs admin username.
   - _`adminPassword`_: A password for Client and Server.
