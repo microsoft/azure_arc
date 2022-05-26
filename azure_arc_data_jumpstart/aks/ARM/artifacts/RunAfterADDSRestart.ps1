@@ -39,7 +39,7 @@ catch {
 
 # Create reverse DNS for domain controller
 try {
-    Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.Domain -CimSession $cimsession
+    Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -CimSession $cimsession
     Write-Host "Created PTR record for domain controller."
 }
 catch {
