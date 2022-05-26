@@ -216,7 +216,7 @@
             "value": "[variables('bastionSubnetPrefix')]"
           },
           "dnsServers": {
-            "value": "[variables('addsPrivateIPAddres')]"
+            "value": ["[variables('addsPrivateIPAddres')]", "168.63.129.16"]
           }
         }
       }
