@@ -10,6 +10,10 @@ param (
     [string]$templateBaseUrl
 )
 
+[System.Environment]::SetEnvironmentVariable('domainName', $domainName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('domainAdminUsername', $domainAdminUsername,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('domainAdminPassword', $domainAdminPassword,[System.EnvironmentVariableTarget]::Machine)
+
 Start-Transcript -Path "C:\Temp\SetupADDS.log"
 
 # Download post reboot scrpt file
@@ -45,7 +49,7 @@ Write-Host "ADDS Deployment successful. Now rebooting computer to finsih setup."
 # schedule task to run after reboot to create reverse DNS lookup
 $Trigger = New-ScheduledTaskTrigger -AtStartup
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\RunAfterADDSRestart.ps1'
-Register-ScheduledTask -TaskName "RunAfterADDSRestart" -Trigger $Trigger -User "${netbiosname}\${domainAdminUsername}" -Password "$domainAdminPassword" -Action $Action -RunLevel "Highest" -Force
+Register-ScheduledTask -TaskName "RunAfterADDSRestart" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
 
 # Reboot computer
 Restart-Computer
