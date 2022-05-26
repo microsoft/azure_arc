@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Inventory Tagging"
-linkTitle: "Inventory Tagging"
+title: "Inventory Management"
+linkTitle: "Inventory Management"
 weight: 1
 description: >
 ---
