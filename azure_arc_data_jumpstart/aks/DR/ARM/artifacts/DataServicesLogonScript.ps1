@@ -325,6 +325,11 @@ if ( $Env:deploySQLMI -eq $true){
     $Favorite.Save()
 }
 
+Write-Host "`n"
+Write-Host "Switching to primary"
+kubectx primary
+Write-Host "`n"
+
 # Changing to Client VM wallpaper
 $imgPath="$Env:TempDir\wallpaper.png"
 $code = @' 
