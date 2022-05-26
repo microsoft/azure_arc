@@ -9,14 +9,24 @@ Import-Module DnsServer
 Start-Transcript -Path "C:\Temp\SetupReverseDNS.log"
 
 # Get Activectory Information
-$dcInfo = Get-ADDomainController
+$netbiosname = $Env:domainName.Split('.')[0].ToUpper()
+
+$adminuser = "$netbiosname\$Env:domainAdminUsername"
+$secpass = $Env:domainAdminPassword | ConvertTo-SecureString -AsPlainText -Force
+$adminCredential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $adminuser, $secpass
+$dcName = [System.Net.Dns]::GetHostByName($env:COMPUTERNAME).HostName
+
+$dcInfo = Get-ADDomainController -Server $dcName -Credential $adminCredential
+
 $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
 $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
-#$netbiosname = $domainName.Split('.')[0].ToUpper()
+
+# Create login session with domain credentials
+$cimsession = New-CimSession -Credential $adminCredential
 
 # Setup reverse lookup zone
 try {
-    Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope "Forest" -ComputerName $dcInfo.HostName
+    Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope "Forest" -ComputerName $dcInfo.Domain -CimSession $cimsession
     Write-Host "Successfully created reverse DNS Zone."
 
     $ReverseDnsZone = Get-DnsServerZone | Where-Object {$_.IsAutoCreated -eq $false -and $_.IsReverseLookupZone -eq $true}
@@ -29,7 +39,7 @@ catch {
 
 # Create reverse DNS for domain controller
 try {
-    Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone -Name 4 -PTRDomainName $dcInfo.HostName
+    Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.Name -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -CimSession $cimsession
     Write-Host "Created PTR record for domain controller."
 }
 catch {
