@@ -29,7 +29,7 @@ sudo openssl x509 -in /tmp/squid-ca-cert-key.pem -outform DER -out /tmp/squidTru
 
 # create a directory
 sudo mkdir -p /etc/squid/certs
-#move certificate to the directory
+# Move certificate to the directory
 sudo cp /tmp/squid-ca-cert-key.pem /etc/squid/certs/
 # change ownership so that squid can access the certificate
 sudo chown proxy:proxy -R /etc/squid/certs
