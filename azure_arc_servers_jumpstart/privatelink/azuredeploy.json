@@ -523,7 +523,7 @@
                                 "type": "CustomScriptExtension",
                                 "typeHandlerVersion": "1.10",
                                 "autoUpgradeMinorVersion": true,
-                                "settings": {
+                                "protectedSettings": {
                                     "fileUris": [
                                         "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/privatelink/artifacts/Bootstrap.ps1"
                                     ],
