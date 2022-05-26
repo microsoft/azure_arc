@@ -102,6 +102,7 @@
     },
     "bastionSubnetPrefix": {
       "type": "string",
+      "defaultValue": "172.16.2.64/26",
       "metadata": {
         "description": "Azure Bastion subnet IP prefix"
       }
@@ -233,7 +234,7 @@
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/setupADDS.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File setupADDS.ps1', ' -domainName ', parameters('addsDomainName'), ' -domainAdminUsername ', parameters('windowsAdminUsername'), ' -domainAdminPassword ', parameters('windowsAdminPassword'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1', ' -domainName ', parameters('addsDomainName'), ' -domainAdminUsername ', parameters('windowsAdminUsername'), ' -domainAdminPassword ', parameters('windowsAdminPassword'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
       }
     },
