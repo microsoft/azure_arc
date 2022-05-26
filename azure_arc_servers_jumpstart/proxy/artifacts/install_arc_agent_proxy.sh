@@ -30,18 +30,18 @@ export PORT=$PORT
 export PASSWORD=$PASSWORD
 
 export HTTP_PROXY="http://$URL:$PORT"
-export https_proxy="http://$URL:$PORT"
-export ftp_proxy="http://$URL:$PORT"
-export dns_proxy="http://$URL:$PORT"
-export rsync_proxy="http://$URL:$PORT"
+export HTTPS_PROXY="http://$URL:$PORT"
+export FTP_PROXY="http://$URL:$PORT"
+export DNS_PROXY="http://$URL:$PORT"
+export RSYNC_PROXY="http://$URL:$PORT"
 
 # Set up proxy 
 
 echo "export HTTP_PROXY="http://$URL:$PORT"" | sudo tee -a  /etc/profile.d/proxy.sh
-echo "export https_proxy=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
-echo "export ftp_proxy=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
-echo "export dns_proxy=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
-echo "export rsync_proxy=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
+echo "export HTTPS_PROXY=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
+echo "export FTP_PROXY=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
+echo "export DNS_PROXY=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
+echo "export RSYNC_PROXY=$HTTP_PROXY" | sudo tee -a  /etc/profile.d/proxy.sh
 
 
 # Set up certificate
