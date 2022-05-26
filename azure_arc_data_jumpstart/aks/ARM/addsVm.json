@@ -10,7 +10,7 @@
     },    
     "addsDomainName": {
       "type": "string",
-      "defaultValue": "contoso.local",
+      "defaultValue": "jumpstart.local",
       "metadata": {
         "description": "The name of your Virtual Machine"
       }
