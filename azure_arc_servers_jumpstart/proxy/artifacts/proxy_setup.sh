@@ -45,7 +45,6 @@ mkdir -p /var/lib/squid
 chown -R proxy:proxy /var/lib/squid
 
 # Create configuration file
-
 sudo cat << EOF > /etc/squid/whitelist.txt
 .aka.ms
 .download.microsoft.com
