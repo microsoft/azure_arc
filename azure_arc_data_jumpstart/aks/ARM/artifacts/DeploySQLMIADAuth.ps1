@@ -34,11 +34,6 @@ $dcInfo = Get-ADDomainController
 $sqlmiouName = "ARCSQLMI"
 $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
 
-# Setup reverse lookup zone. Parameterize NetworkID
-Add-DnsServerPrimaryZone -NetworkID "172.16.1.0/24" -ReplicationScope "Forest" -ComputerName $dcInfo.HostName
-
-# Create reverse DNS for domain controller host
-
 # Create ArcSQLMi OU
 try
 {
@@ -87,7 +82,7 @@ try
 catch
 {
     # User already exists
-    Write-Host "User $arcdsaname already existings in the directory."
+    Write-Host "User $arcsaname already existings in the directory."
 }
 
 # Geneate key tab
@@ -108,7 +103,7 @@ $b64keytabtext = [System.Convert]::ToBase64String($keytabrawdata)
 $b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_USERNAME))
 $b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_PASSWORD))
 
-# Read YAML file and replace values
+# Read YAML file and replace parameter values
 $adConectorYAMLFile = "C:\Temp\adConnectorCMK.yaml"
 $adConnectorContent = Get-Content $adConectorYAMLFile
 $adConnectorContent = $adConnectorContent.Replace("{{ARC_DATA_API_VERSION}}", "arcdata.microsoft.com/v1beta2")
@@ -117,8 +112,20 @@ $adConnectorContent = $adConnectorContent.Replace("{{ADDS_DC_NAME}}", $dcInfo.Ho
 $adConnectorContent = $adConnectorContent.Replace("{{ADDS_IP_ADDRESS}}", $dcInfo.IPv4Address)
 Set-Content -Path $adConectorYAMLFile -Value $adConnectorContent
 
-# Now deploy AD connector in AKS
+# Now deploy AD connector in AKS with customer managed keytab generated above
 kubectl apply -f $adConectorYAMLFile
+
+#Wait for the AD connector deploy pods
+Write-Host "`n"
+Do {
+    Write-Host "Waiting for AD connector deployment. Hold tight, this might take a few minutes...(30s sleeping loop)"
+    Start-Sleep -Seconds 30
+    $adcStatus = $(if(kubectl get adc adarc -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($adcStatus -eq "Nope")
+
+Write-Host "`n"
+Write-Host "Azure Arc SQL Managed Instance with AD authentication is ready!"
+Write-Host "`n"
 
 # Deploy SQL MI with AD auth
 $sqlMIADAuthYAMLFile = "SQLMIADAuthCMK.yaml"
@@ -143,8 +150,8 @@ Write-Host "`n"
 Do {
     Write-Host "Waiting for SQL Managed Instance with AD authentication. Hold tight, this might take a few minutes...(45s sleeping loop)"
     Start-Sleep -Seconds 45
-    $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($dcStatus -eq "Nope")
+    $sqlmiStatus = $(if(kubectl get SqlManagedInstance $sqlMIName -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($sqlmiStatus -eq "Nope")
 
 Write-Host "`n"
 Write-Host "Azure Arc SQL Managed Instance with AD authentication is ready!"
@@ -162,13 +169,9 @@ Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
 kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
 
 # Retrieving SQL MI connection endpoint
-$sqlstring = kubectl get sqlmanagedinstances $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
+$sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
 
-Write-Host $sqlstring
+Write-Host "SQL Managed Instance with AD authentication endpoint: $sqlmiEndPoint"
 
-<# Replace placeholder values in settingsTemplate.json
-(Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
-#>
+# Strop transcrip
+Stop-Transcript
