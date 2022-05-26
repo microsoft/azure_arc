@@ -1,16 +1,15 @@
 #!/bin/bash
 
-# Update
-
+# Update the operating system
 sudo apt-get clean
 sudo apt-get update
 
 wget -qO - https://packages.diladele.com/diladele_pub.asc | sudo apt-key add -
 
-# add new repo
+# Add Squid 5 repo
 echo "deb https://squid55.diladele.com/ubuntu/ focal main" | sudo tee -a /etc/apt/sources.list.d/squid55.diladele.com.list
 
-# and install
+# Install Squid proxy and its dependencies
 sudo apt-get update && sudo apt-get install -y \
     squid-common \
     squid-openssl \
@@ -27,19 +26,19 @@ sudo openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 -extension
 sudo cat  /tmp/squid-ca-cert.pem /tmp/squid-ca-key.pem >> /tmp/squid-ca-cert-key.pem
 sudo openssl x509 -in /tmp/squid-ca-cert-key.pem -outform DER -out /tmp/squidTrusted.der
 
-# create a directory
+# Create a directory
 sudo mkdir -p /etc/squid/certs
 # Move certificate to the directory
 sudo cp /tmp/squid-ca-cert-key.pem /etc/squid/certs/
-# change ownership so that squid can access the certificate
+# Change ownership so that squid can access the certificate
 sudo chown proxy:proxy -R /etc/squid/certs
-# modify certificate permissions (for self-signed certificate)
+# Modify certificate permissions (for self-signed certificate)
 sudo chmod 700 /etc/squid/certs/squid-ca-cert-key.pem
 
 
-#create the directory
+# Create the directory
 mkdir -p /var/lib/squid
-#create the SSL database to be used by squid
+# Create the SSL database to be used by squid
 /usr/lib/squid/security_file_certgen -c -s /var/lib/squid/ssl_db -M 20MB
 # Changing database permissions
 chown -R proxy:proxy /var/lib/squid
@@ -91,7 +90,5 @@ sslproxy_cert_error allow BrokenButTrustedServers
 sslproxy_cert_error deny all
 EOF
 
-
 # Restart Squid
-
 sudo systemctl restart squid
