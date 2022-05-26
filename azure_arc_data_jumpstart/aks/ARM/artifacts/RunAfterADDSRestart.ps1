@@ -12,6 +12,7 @@ Start-Transcript -Path "C:\Temp\SetupReverseDNS.log"
 $dcInfo = Get-ADDomainController
 $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
 $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
+#$netbiosname = $domainName.Split('.')[0].ToUpper()
 
 # Setup reverse lookup zone
 try {
@@ -37,5 +38,10 @@ catch {
 
 # Delete schedule task
 schtasks.exe /delete /f /tn RunAfterADDSRestart
+
+# schedule task to run after reboot to create reverse DNS lookup
+#$Trigger = New-ScheduledTaskTrigger -AtStartup
+#$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\RunAfterADDSRestart.ps1'
+#Register-ScheduledTask -TaskName "RunAfterADDSRestart" -Trigger $Trigger -User "$netbiosname\$Env:domainAdminUsername" -Password "$Env:domainAdminPassword" -Action $Action -RunLevel "Highest" -Force
 
 Stop-Transcript
