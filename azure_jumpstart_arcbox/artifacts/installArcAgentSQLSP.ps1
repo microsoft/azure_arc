@@ -34,6 +34,7 @@ $unattended = $servicePrincipalAppId -And $servicePrincipalTenantId -And $servic
 $azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
 Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
+Set-AzContext -Subscription $subId
 
 function Get-AzSPNRoleAssignment {
     param(
