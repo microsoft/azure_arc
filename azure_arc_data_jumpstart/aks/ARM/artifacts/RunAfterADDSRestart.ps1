@@ -26,7 +26,7 @@ $cimsession = New-CimSession -Credential $adminCredential
 
 # Setup reverse lookup zone
 try {
-    Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope "Forest" -ComputerName $dcInfo.Domain -CimSession $cimsession
+    Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope "Forest" -ComputerName $dcInfo.HostName -CimSession $cimsession
     Write-Host "Successfully created reverse DNS Zone."
 
     $ReverseDnsZone = Get-DnsServerZone | Where-Object {$_.IsAutoCreated -eq $false -and $_.IsReverseLookupZone -eq $true}
@@ -39,7 +39,7 @@ catch {
 
 # Create reverse DNS for domain controller
 try {
-    Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.Name -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -CimSession $cimsession
+    Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.Domain -CimSession $cimsession
     Write-Host "Created PTR record for domain controller."
 }
 catch {
