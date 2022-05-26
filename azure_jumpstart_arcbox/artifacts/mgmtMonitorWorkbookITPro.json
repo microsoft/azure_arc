@@ -376,9 +376,79 @@
                 "content": {
                   "version": "KqlParameterItem/1.0",
                   "crossComponentResources": [
-                    "/subscriptions/{Subscription}"
+                    "value::all"
                   ],
                   "parameters": [
+                    {
+                      "id": "7b9de45f-92d6-4aaf-82a6-9224aa2dc02f",
+                      "version": "KqlParameterItem/1.0",
+                      "name": "Subscription",
+                      "type": 6,
+                      "value": "/subscriptions/{Subscription}",
+                      "typeSettings": {
+                        "additionalResourceOptions": [],
+                        "includeAll": false
+                      }
+                    },
+                    {
+                      "id": "7e70122d-415c-49f2-bba5-f3a18eb5c58e",
+                      "version": "KqlParameterItem/1.0",
+                      "name": "ResourceGroup",
+                      "type": 2,
+                      "query": "Resources\r\n\r\n| summarize Count = count() by subscriptionId, resourceGroup\r\n| order by Count desc\r\n| extend Rank = row_number()\r\n| project label = resourceGroup",
+                      "crossComponentResources": [
+                        "{Subscription}"
+                      ],
+                      "value": "{resourceGroup}",
+                      "typeSettings": {
+                        "additionalResourceOptions": [],
+                        "showDefault": false
+                      },
+                      "timeContext": {
+                        "durationMs": 86400000
+                      },
+                      "queryType": 1,
+                      "resourceType": "microsoft.resourcegraph/resources"
+                    },
+                    {
+                      "id": "ae721cb1-e030-4e02-8839-9c6a00f66c8a",
+                      "version": "KqlParameterItem/1.0",
+                      "name": "Workspace",
+                      "type": 5,
+                      "description": "Select at least one workspace that contains continuous export data based on the selected subscriptions",
+                      "isRequired": true,
+                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces'\r\n| project id",
+                      "crossComponentResources": [
+                        "value::all"
+                      ],
+                      "value": "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/<workspace>",
+                      "typeSettings": {
+                        "resourceTypeFilter": {
+                          "microsoft.operationalinsights/workspaces": true
+                        },
+                        "additionalResourceOptions": [],
+                        "showDefault": false
+                      },
+                      "queryType": 1,
+                      "resourceType": "microsoft.resourcegraph/resources"
+                    },
+                    {
+                      "id": "71c18150-396c-4f92-a41f-18125550ec3d",
+                      "version": "KqlParameterItem/1.0",
+                      "name": "ArcServer",
+                      "label": "Azure Arc Enabled Server",
+                      "type": 5,
+                      "isRequired": true,
+                      "value": "ArcBox-CentOS",
+                      "typeSettings": {
+                        "additionalResourceOptions": [],
+                        "showDefault": false
+                      },
+                      "jsonData": "[[\r\n    { \"value\":\"ArcBox-SQL\", \"label\":\"ArcBox-SQL\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu\", \"label\":\"ArcBox-Ubuntu\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K19\", \"label\":\"ArcBox-Win2K19\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K22\", \"label\":\"ArcBox-Win2K22\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-CentOS\", \"label\":\"ArcBox-CentOS\", \"group\":\"Select\" }\r\n]",
+                      "timeContext": {
+                        "durationMs": 86400000
+                      }
+                    },
                     {
                       "id": "f21caac6-fae7-44b5-ba4f-a2d3593953b0",
                       "version": "KqlParameterItem/1.0",
@@ -440,42 +510,6 @@
                       "timeContext": {
                         "durationMs": 86400000
                       }
-                    },
-                    {
-                      "id": "7e70122d-415c-49f2-bba5-f3a18eb5c58e",
-                      "version": "KqlParameterItem/1.0",
-                      "name": "ResourceGroup",
-                      "type": 2,
-                      "query": "Resources\r\n| summarize Count = count() by subscriptionId, resourceGroup\r\n| order by Count desc\r\n| extend Rank = row_number()\r\n| project label = resourceGroup",
-                      "crossComponentResources": [
-                        "value::all"
-                      ],
-                      "value": "<resourceGroup>",
-                      "typeSettings": {
-                        "additionalResourceOptions": []
-                      },
-                      "timeContext": {
-                        "durationMs": 86400000
-                      },
-                      "queryType": 1,
-                      "resourceType": "microsoft.resourcegraph/resources"
-                    },
-                    {
-                      "id": "71c18150-396c-4f92-a41f-18125550ec3d",
-                      "version": "KqlParameterItem/1.0",
-                      "name": "ArcServer",
-                      "label": "Azure Arc Enabled Server",
-                      "type": 5,
-                      "isRequired": true,
-                      "value": null,
-                      "typeSettings": {
-                        "additionalResourceOptions": [],
-                        "showDefault": false
-                      },
-                      "jsonData": "[[\r\n    { \"value\":\"ArcBox-SQL\", \"label\":\"ArcBox-SQL\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu\", \"label\":\"ArcBox-Ubuntu\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K19\", \"label\":\"ArcBox-Win2K19\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K22\", \"label\":\"ArcBox-Win2K22\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-CentOS\", \"label\":\"ArcBox-CentOS\", \"group\":\"Select\" }\r\n]",
-                      "timeContext": {
-                        "durationMs": 86400000
-                      }
                     }
                   ],
                   "style": "pills",
@@ -495,7 +529,10 @@
                     "durationMs": 86400000
                   },
                   "queryType": 0,
-                  "resourceType": "microsoft.hybridcompute/machines",
+                  "resourceType": "microsoft.operationalinsights/workspaces",
+                  "crossComponentResources": [
+                    "{Workspace}"
+                  ],
                   "visualization": "timechart"
                 },
                 "customWidth": "50",
@@ -508,21 +545,49 @@
                 "type": 3,
                 "content": {
                   "version": "KqlItem/1.0",
-                  "query": "InsightsMetrics\r\n| where TimeGenerated {TimeRange}\r\n| where Computer =~ \"{ArcServer}\"\r\n| summarize Average = round(avg(Val), 2),P5th = round(percentile(Val, 5), 2),P10th = round(percentile(Val, 10), 2) by bin(TimeGenerated, totimespan('00:14:24'))",
+                  "query": "InsightsMetrics\r\n    | where Namespace == 'Memory' and Name == 'AvailableMB'\r\n    | where TimeGenerated {TimeRange}\r\n| where Computer =~ \"{ArcServer}\"\r\n| summarize Average = round(avg(Val), 2),P5th = round(percentile(Val, 5), 2),P10th = round(percentile(Val, 10), 2) by bin(TimeGenerated, totimespan('00:14:24'))\r\n    | top 10 by P5th asc",
                   "size": 0,
-                  "title": "Azure Arc enabled servers - Available Memory MB",
-                  "timeContext": {
-                    "durationMs": 86400000
-                  },
+                  "aggregation": 3,
+                  "showAnnotations": true,
+                  "title": "Azure Arc enabled servers - Available Memory",
+                  "noDataMessage": "There is no data for this counter, either enable the counter or onboard machines to this workspace",
                   "queryType": 0,
                   "resourceType": "microsoft.operationalinsights/workspaces",
-                  "visualization": "timechart"
+                  "crossComponentResources": [
+                    "{Workspace}"
+                  ],
+                  "visualization": "linechart",
+                  "tileSettings": {
+                    "showBorder": false,
+                    "titleContent": {
+                      "columnMatch": "Computer",
+                      "formatter": 1
+                    },
+                    "leftContent": {
+                      "columnMatch": "value",
+                      "formatter": 12,
+                      "formatOptions": {
+                        "palette": "auto"
+                      },
+                      "numberFormat": {
+                        "unit": 17,
+                        "options": {
+                          "maximumSignificantDigits": 3,
+                          "maximumFractionDigits": 2
+                        }
+                      }
+                    }
+                  },
+                  "chartSettings": {
+                    "ySettings": {
+                      "unit": 4,
+                      "min": 0,
+                      "max": null
+                    }
+                  }
                 },
                 "customWidth": "50",
-                "name": "query - 8",
-                "styleSettings": {
-                  "maxWidth": "90"
-                }
+                "name": "Azure Arc enabled servers - Available Memory"
               }
             ]
           },
@@ -560,7 +625,7 @@
                       "name": "Subscription",
                       "type": 6,
                       "isRequired": true,
-                      "value": "/subscriptions/<subscriptionId>",
+                      "value": "/subscriptions/{Subscription}",
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "includeAll": true,
@@ -581,7 +646,7 @@
                       "crossComponentResources": [
                         "{Subscription}"
                       ],
-                      "value": "<resourceGroup>",
+                      "value": null,
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "showDefault": false
@@ -773,7 +838,7 @@
                       "queryType": 1,
                       "resourceType": "microsoft.resourcegraph/resources",
                       "value": [
-                        "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/<workspaceName>"
+                        "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/<workspace>"
                       ]
                     }
                   ],
@@ -1945,9 +2010,6 @@
                         "aggregation": 5,
                         "showAnnotations": true,
                         "noDataMessage": "No data available. Check your continuous export configuration for the selected workspaces.",
-                        "timeContext": {
-                          "durationMs": 2592000000
-                        },
                         "timeContextFromParameter": "TimeRange",
                         "timeBrushParameterName": "TimeRange",
                         "timeBrushExportOnlyWhenBrushed": true,
@@ -2020,9 +2082,6 @@
                         "query": "//Top recommendations with recent increase in unhealthy resources\r\nSecurityRecommendation\r\n| extend SubscriptionId = iff(AssessedResourceId==\"N/A\", split(url_decode(RecommendationLink),'/')[9], split(AssessedResourceId, '/')[2])\r\n| where '{selectedSubscription}' == 'All' or SubscriptionId == '{selectedSubscription}'\r\n| where RecommendationState  =~ \"Unhealthy\"\r\n| summarize UnhealthyAssessedResources = dcount(AssessedResourceId),RecommendationName = any(RecommendationName) by RecommendationId\r\n| project  RecommendationName, UnhealthyAssessedResources\r\n| sort by UnhealthyAssessedResources desc\r\n| take 10",
                         "size": 0,
                         "noDataMessage": "No data available. Check your continuous export configuration for the selected workspaces.",
-                        "timeContext": {
-                          "durationMs": 2592000000
-                        },
                         "timeContextFromParameter": "TimeRange",
                         "queryType": 0,
                         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -2130,9 +2189,6 @@
                         "aggregation": 5,
                         "showAnnotations": true,
                         "noDataMessage": "No data available. Check your continuous export configuration for the selected workspaces.",
-                        "timeContext": {
-                          "durationMs": 2592000000
-                        },
                         "timeContextFromParameter": "TimeRange",
                         "queryType": 0,
                         "resourceType": "microsoft.operationalinsights/workspaces",
@@ -2213,9 +2269,6 @@
                         "query": "//Recommendations changes over time (count how many resources have been changed to unhealthy, heathy, and not applicable, per recommendation) \r\nlet unhealthy = SecurityRecommendation\r\n| extend SubscriptionId = iff(AssessedResourceId==\"N/A\", split(url_decode(RecommendationLink),'/')[9], split(AssessedResourceId, '/')[2])\r\n| where '{selectedSubscription}' == 'All' or SubscriptionId == '{selectedSubscription}'\r\n| where RecommendationState == 'Unhealthy'\r\n| where isnotempty(RecommendationId) and isnotempty(RecommendationName) \r\n| summarize arg_max(TimeGenerated, *) by RecommendationId, AssessedResourceId;\r\nlet healthy = SecurityRecommendation\r\n| extend SubscriptionId = iff(AssessedResourceId==\"N/A\", split(url_decode(RecommendationLink),'/')[9], split(AssessedResourceId, '/')[2])\r\n| where '{selectedSubscription}' == 'All' or SubscriptionId == '{selectedSubscription}'\r\n| where RecommendationState == 'Healthy' \r\n| where isnotempty(RecommendationId) and isnotempty(RecommendationName) \r\n| summarize arg_max(TimeGenerated, *) by RecommendationId, AssessedResourceId;\r\nlet notApplicable = SecurityRecommendation\r\n| extend SubscriptionId = iff(AssessedResourceId==\"N/A\", split(url_decode(RecommendationLink),'/')[9], split(AssessedResourceId, '/')[2])\r\n| where '{selectedSubscription}' == 'All' or SubscriptionId == '{selectedSubscription}'\r\n| where RecommendationState == 'NotApplicable' \r\n| where isnotempty(RecommendationId) and isnotempty(RecommendationName) \r\n| summarize arg_max(TimeGenerated, *) by RecommendationId, AssessedResourceId; \r\nlet notUnhealthy = SecurityRecommendation\r\n| extend SubscriptionId = iff(AssessedResourceId==\"N/A\", split(url_decode(RecommendationLink),'/')[9], split(AssessedResourceId, '/')[2])\r\n| where '{selectedSubscription}' == 'All' or SubscriptionId == '{selectedSubscription}'\r\n| where RecommendationState !~ 'Unhealthy' \r\n| where isnotempty(RecommendationId) and isnotempty(RecommendationName) \r\n| summarize arg_max(TimeGenerated, *) by RecommendationId, AssessedResourceId; \r\nlet notHealthy = SecurityRecommendation\r\n| extend SubscriptionId = iff(AssessedResourceId==\"N/A\", split(url_decode(RecommendationLink),'/')[9], split(AssessedResourceId, '/')[2])\r\n| where '{selectedSubscription}' == 'All' or SubscriptionId == '{selectedSubscription}'\r\n| where RecommendationState !~ 'Healthy'\r\n| where isnotempty(RecommendationId) and isnotempty(RecommendationName) \r\n| summarize arg_max(TimeGenerated, *) by RecommendationId, AssessedResourceId; \r\nlet notNotApplicable = SecurityRecommendation\r\n| extend SubscriptionId = iff(AssessedResourceId==\"N/A\", split(url_decode(RecommendationLink),'/')[9], split(AssessedResourceId, '/')[2])\r\n| where '{selectedSubscription}' == 'All' or SubscriptionId == '{selectedSubscription}'\r\n| where RecommendationState !~ 'NotApplicable' \r\n| where isnotempty(RecommendationId) and isnotempty(RecommendationName) \r\n| summarize arg_max(TimeGenerated, *) by RecommendationId, AssessedResourceId; \r\nlet notHealthyToHealthy =  \r\n    notHealthy \r\n    | join (\r\n        healthy\r\n      ) on RecommendationId, AssessedResourceId \r\n    | where TimeGenerated < TimeGenerated1 \r\n    | summarize ToHealthyCount = count(), RecommendationName=any(RecommendationName) by RecommendationId;\r\nlet notUnhealthyToUnhealthy =  \r\n    notUnhealthy \r\n    | join ( \r\n        unhealthy\r\n     ) on RecommendationId, AssessedResourceId \r\n    | where TimeGenerated < TimeGenerated1 \r\n    | summarize ToUnhealthyCount = count(), RecommendationName=any(RecommendationName) by RecommendationId;\r\nlet notNotApplicableToNotApplicable =  \r\n    notNotApplicable \r\n    | join (\r\n        notApplicable\r\n     ) on RecommendationId, AssessedResourceId \r\n    | where TimeGenerated < TimeGenerated1 \r\n    | summarize ToNotApplicableCount = count(), RecommendationName=any(RecommendationName) by RecommendationId;\r\n// Union \r\nunion notHealthyToHealthy, notUnhealthyToUnhealthy, notNotApplicableToNotApplicable\r\n| summarize RecommendationName=any(RecommendationName), ToUnhealthyCount = sum(ToUnhealthyCount), ToHealthyCount = sum(ToHealthyCount), ToNotApplicableCount = sum(ToNotApplicableCount) by RecommendationId\r\n| order by ToUnhealthyCount desc",
                         "size": 0,
                         "noDataMessage": "No data available. Check your continuous export configuration for the selected workspaces.",
-                        "timeContext": {
-                          "durationMs": 2592000000
-                        },
                         "timeContextFromParameter": "TimeRange",
                         "exportedParameters": [
                           {
@@ -2331,9 +2384,6 @@
                         "size": 0,
                         "title": "Changes for \"{RecommendationName}\"",
                         "noDataMessage": "No data available. Check your continuous export configuration for the selected workspaces.",
-                        "timeContext": {
-                          "durationMs": 2592000000
-                        },
                         "timeContextFromParameter": "TimeRange",
                         "showExportToExcel": true,
                         "exportToExcelOptions": "all",

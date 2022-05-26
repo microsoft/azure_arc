@@ -1,6 +1,7 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
+$Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $agentScript = "$Env:ArcBoxDir\agentScript"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\ArcServersLogonScript.log
@@ -15,15 +16,17 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 # Required for CLI commands
+Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Register Azure providers
+Write-Header "Registering Providers"
 az provider register --namespace Microsoft.HybridCompute --wait
 az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 
 # Install and configure DHCP service (used by Hyper-V nested VMs)
-Write-Output "Configure DHCP service"
+Write-Header "Configuring DHCP Service"
 $dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
 Add-DhcpServerv4Scope -Name "ArcBox" `
                       -StartRange 10.10.1.100 `
@@ -38,24 +41,25 @@ Set-DhcpServerv4OptionValue -ComputerName localhost `
 Restart-Service dhcpserver
 
 # Create the NAT network
-Write-Output "Create internal NAT"
+Write-Header "Creating Internal NAT"
 $natName = "InternalNat"
 New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
 
 # Create an internal switch with NAT
-Write-Output "Create internal switch"
+Write-Header "Creating Internal vSwitch"
 $switchName = 'InternalNATSwitch'
 New-VMSwitch -Name $switchName -SwitchType Internal
 $adapter = Get-NetAdapter | Where-Object { $_.Name -like "*"+$switchName+"*" }
 
 # Create an internal network (gateway first)
-Write-Output "Create gateway"
+Write-Header "Creating Gateway"
 New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
 
 # Enable Enhanced Session Mode on Host
-Write-Output "Enable Enhanced Session Mode"
+Write-Header "Enabling Enhanced Session Mode"
 Set-VMHost -EnableEnhancedSessionMode $true
 
+Write-Header "Fetching Nested VMs"
 $sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
 $sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
 $Env:AZCOPY_BUFFER_GB=4
@@ -70,7 +74,7 @@ if ($Env:flavor -eq "Full") {
 }
 
 # Create the nested VMs
-Write-Output "Create Hyper-V VMs"
+Write-Header "Create Hyper-V VMs"
 New-VM -Name ArcBox-Win2K19 -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-Win2K19.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
 Set-VMProcessor -VMName ArcBox-Win2K19 -Count 2
 
@@ -89,43 +93,25 @@ Set-VMFirmware -VMName ArcBox-CentOS -EnableSecureBoot On -SecureBootTemplate 'M
 Set-VMProcessor -VMName ArcBox-CentOS -Count 1
 
 # We always want the VMs to start with the host and shut down cleanly with the host
-Write-Output "Set VM auto start/stop"
+Write-Header "Set VM Auto Start/Stop"
 Set-VM -Name ArcBox-Win2K19 -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name ArcBox-Win2K22 -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name ArcBox-SQL -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name ArcBox-Ubuntu -AutomaticStartAction Start -AutomaticStopAction ShutDown
 Set-VM -Name ArcBox-CentOS -AutomaticStartAction Start -AutomaticStopAction ShutDown
 
-Write-Output "Enabling Guest Integration Service"
+Write-Header "Enabling Guest Integration Service"
 Get-VM | Get-VMIntegrationService | Where-Object {-not($_.Enabled)} | Enable-VMIntegrationService -Verbose
 
 # Start all the VMs
-Write-Output "Start VMs"
+Write-Header "Starting VMs"
 Start-VM -Name ArcBox-Win2K19
 Start-VM -Name ArcBox-Win2K22
 Start-VM -Name ArcBox-SQL
 Start-VM -Name ArcBox-Ubuntu
 Start-VM -Name ArcBox-CentOS
 
-# Expand Windows partition sizes
-Start-Sleep -Seconds 20
-$username = "Administrator"
-$password = "ArcDemo123!!"
-$secstr = New-Object -TypeName System.Security.SecureString
-$password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
-$cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $secstr
-Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
-Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $cred
-
-Start-Sleep -Seconds 5
-
-# Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
-Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
-Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
-Stop-Service WindowsAzureGuestAgent -Force -Verbose
-New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
-
+Write-Header "Creating VM Credentials"
 # Hard-coded username and password for the nested VMs
 $nestedWindowsUsername = "Administrator"
 $nestedWindowsPassword = "ArcDemo123!!"
@@ -139,6 +125,21 @@ $winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindows
 # Create Linux credential object
 $secLinuxPassword = ConvertTo-SecureString $nestedLinuxPassword -AsPlainText -Force
 $linCreds = New-Object System.Management.Automation.PSCredential ($nestedLinuxUsername, $secLinuxPassword)
+
+# Restarting Windows VM Network Adapters
+Write-Header "Restarting Network Adapters"
+Start-Sleep -Seconds 20
+Invoke-Command -VMName ArcBox-Win2K19 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+Invoke-Command -VMName ArcBox-Win2K22 -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+Start-Sleep -Seconds 5
+
+# Configure the ArcBox Hyper-V host to allow the nested VMs onboard as Azure Arc-enabled servers
+Write-Header "Blocking IMDS"
+Write-Output "Configure the ArcBox VM to allow the nested VMs onboard as Azure Arc-enabled servers"
+Set-Service WindowsAzureGuestAgent -StartupType Disabled -Verbose
+Stop-Service WindowsAzureGuestAgent -Force -Verbose
+New-NetFirewallRule -Name BlockAzureIMDS -DisplayName "Block access to Azure IMDS" -Enabled True -Profile Any -Direction Outbound -Action Block -RemoteAddress 169.254.169.254
 
 # Getting the Ubuntu nested VM IP address
 $UbuntuVmIp = Get-VM -Name ArcBox-Ubuntu | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
@@ -156,6 +157,7 @@ $authorizedRoles = $roleDefinitions | ForEach-Object { $_ | Where-Object { (Comp
 $hasPermission = $rolePermissions | Where-Object {($_.principalId -eq $spnObjectId) -and ($_.roleDefinitionName -in $authorizedRoles)}
 
 # Copying the Azure Arc Connected Agent to nested VMs
+Write-Header "Customize Onboarding Scripts"
 Write-Output "Replacing values within Azure Arc connected machine agent install scripts..."
 (Get-Content -path "$agentScript\installArcAgent.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModified.ps1"
 (Get-Content -path "$agentScript\installArcAgentUbuntu.sh" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$resourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" | Set-Content -Path "$agentScript\installArcAgentModifiedUbuntu.sh"
@@ -168,6 +170,8 @@ if(-not $hasPermission) {
     (Get-Content -path "$agentScript\installArcAgentSQLSP.ps1" -Raw) -replace '\$spnClientId',"'$Env:spnClientId'" -replace '\$spnClientSecret',"'$Env:spnClientSecret'" -replace '\$myResourceGroup',"'$Env:resourceGroup'" -replace '\$spnTenantId',"'$Env:spnTenantId'" -replace '\$azureLocation',"'$Env:azureLocation'" -replace '\$subscriptionId',"'$Env:subscriptionId'" -replace '\$logAnalyticsWorkspaceName',"'$Env:workspaceName'" | Set-Content -Path "$agentScript\installArcAgentSQLModified.ps1"
 }
 
+Write-Header "Copying Onboarding Scripts"
+
 # Copy installtion script to nested Windows VMs
 Write-Output "Transferring installation script to nested Windows VMs..."
 Copy-VMFile ArcBox-Win2K19 -SourcePath "$agentScript\installArcAgentModified.ps1" -DestinationPath C:\ArcBox\installArcAgent.ps1 -CreateFullPath -FileSource Host
@@ -178,6 +182,8 @@ Copy-VMFile ArcBox-SQL -SourcePath "$agentScript\installArcAgentSQLModified.ps1"
 Write-Output "Transferring installation script to nested Linux VMs..."
 Set-SCPItem -ComputerName $UbuntuVmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedUbuntu.sh" -Force
 Set-SCPItem -ComputerName $CentOSVmIp -Credential $linCreds -Destination "/home/$nestedLinuxUsername" -Path "$agentScript\installArcAgentModifiedCentOS.sh" -Force
+
+Write-Header "Onboarding Arc-enabled Servers"
 
 # Onboarding the nested VMs as Azure Arc-enabled servers
 Write-Output "Onboarding the nested Windows VMs as Azure Arc-enabled servers"
@@ -190,19 +196,22 @@ Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 
 $ubuntuSession = New-SSHSession -ComputerName $UbuntuVmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
-$(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 360 -WarningAction SilentlyContinue).Output
+$(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
 # Onboarding nested CentOS server VM
 Start-Sleep -Seconds 20
 $centosSession = New-SSHSession -ComputerName $CentOSVmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
 $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedCentOS.sh"
-$(Invoke-SSHCommand -SSHSession $centosSession -Command $Command -TimeOut 360 -WarningAction SilentlyContinue).Output
+$(Invoke-SSHCommand -SSHSession $centosSession -Command $Command -TimeOut 600 -WarningAction SilentlyContinue).Output
 
 # Creating Hyper-V Manager desktop shortcut
+Write-Header "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
 # Prepare ArcBox-SQL onboarding script and create shortcut on desktop if the current Service Principal doesn't have appropriate permission to onboard the VM to Azure Arc
 if(-not $hasPermission) {
+    Write-Header "Creating Arc-enabled SQL Shortcut"
+
     # Replace variables in Arc-enabled SQL onboarding scripts
     $sqlServerName = "ArcBox-SQL"
 
@@ -237,7 +246,7 @@ if(-not $hasPermission) {
     $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
     $shortcut.TargetPath = "powershell.exe"
     $shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
-    $shortcut.IconLocation="${Env:ArcBoxDir}\ArcSQLIcon.ico, 0"
+    $shortcut.IconLocation="${Env:ArcBoxIconDir}\arcsql.ico, 0"
     $shortcut.WindowStyle = 3
     $shortcut.Save()
 }
@@ -261,15 +270,18 @@ namespace Win32{
 $DataServicesLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "DataServicesLogonScript.ps1" }
 
 if(-not $DataServicesLogonScript) {
+    Write-Header "Changing Wallpaper"
     $imgPath="$Env:ArcBoxDir\wallpaper.png"
     Add-Type $code 
     [Win32.Wallpaper]::SetWallpaper($imgPath)
 }
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
+Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 
 # Executing the deployment logs bundle PowerShell script in a new window
+Write-Header "Uploading Log Bundle"
 Invoke-Expression 'cmd /c start Powershell -Command { 
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
