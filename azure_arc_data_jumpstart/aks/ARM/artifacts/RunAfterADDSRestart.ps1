@@ -49,9 +49,4 @@ catch {
 # Delete schedule task
 schtasks.exe /delete /f /tn RunAfterADDSRestart
 
-# schedule task to run after reboot to create reverse DNS lookup
-#$Trigger = New-ScheduledTaskTrigger -AtStartup
-#$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\RunAfterADDSRestart.ps1'
-#Register-ScheduledTask -TaskName "RunAfterADDSRestart" -Trigger $Trigger -User "$netbiosname\$Env:domainAdminUsername" -Password "$Env:domainAdminPassword" -Action $Action -RunLevel "Highest" -Force
-
 Stop-Transcript
