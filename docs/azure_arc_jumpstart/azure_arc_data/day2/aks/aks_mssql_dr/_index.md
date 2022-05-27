@@ -317,7 +317,7 @@ Azure Arc-enabled SQL Managed Instance is deployed on Kubernetes as a containeri
 
     ![Screenshot showing stopping the primary AKS cluster](./50.png)
 
-- Try to refresh the connection to the primary instance and you can see that its no longer available.
+- Wait for two minutes for the cluster to shutdown and try to refresh the connection to the primary instance and you can see that its no longer available.
 
     ![Screenshot showing unavailable primary instance](./51.png)
 
