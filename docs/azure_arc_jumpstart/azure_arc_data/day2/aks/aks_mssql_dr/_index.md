@@ -266,7 +266,7 @@ Azure Arc-enabled SQL Managed Instance is deployed on Kubernetes as a containeri
 
 - As part of the automation, the script will also create a new text file and a desktop shortcut named Endpoints that includes both the primary and the secondary SQL endpoints for both SQL instances.
   
-  ![Screenshot showing disaster recovery configuration](./39.png)
+  ![Screenshot showing the Azure Arc-enabled SQL Managed Instances endpoint URLs text file](./39.png)
 
 - Open Microsoft SQL Server Management Studio (SSMS) which is installed automatically for you as part of the bootstrap Jumpstart scenario and use the primary endpoint IP address for the primary cluster and login to the primary DB instance using the username and password provided in the text file mentioned above.
 
@@ -282,11 +282,11 @@ Azure Arc-enabled SQL Managed Instance is deployed on Kubernetes as a containeri
 
   ![Screenshot showing the SQL Server Management Studio after login](./43.png)
 
-  ![Screenshot showing SqlQueryStress connected](./44.png)
+  ![Screenshot showing the two Azure Arc-enabled SQL Managed Instances connected in the SQL Management Studio](./44.png)
 
 - Expand the _Always On High Availability_ node on both instances to verify that the distributed availability group is created.
 
-  ![Screenshot showing SqlQueryStress connected](./45.png)
+  ![Screenshot showing the local and distributed Availabilty groups on both instances ](./45.png)
 
 - You will find the _AdventureWorks2019_ database already deployed into the primary instance (_js-sql-pr_) and automatically replicated to the secondary instance (_js-sql-dr_) as part of the distributed availability group.
 
@@ -300,7 +300,7 @@ Azure Arc-enabled SQL Managed Instance is deployed on Kubernetes as a containeri
 
 - First, to test that the DB replication is working, a simple table modification is needed. For this example, on the primary replica, run the following query to update the title of one of the rows to be _Jumpstart Administrator_
 
-   ```shell
+   ```Sql
     USE [AdventureWorks2019]
     GO
     UPDATE [HumanResources].[Employee]
