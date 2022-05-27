@@ -144,10 +144,10 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 To make sure that your Azure Arc-enabled server is using Private Link for its connection. Use your Azure Bastion session to run the command below:
 
   ```powershell
-    azcmagent.exe show
+    azcmagent check --location <your Azure Region> --use-private-link --verbose
   ```
 
-It should list your Private Link Scope ID.
+It should show private reachable connections for the agent's endpoints.
 
   ![Connected Machine agent using PL](./09.png)
 
