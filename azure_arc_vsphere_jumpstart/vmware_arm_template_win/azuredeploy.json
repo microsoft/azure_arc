@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachineName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "extendedLocationName": {
+      "type": "string"
+    },
+    "vCenterName": {
+      "type": "string"
+    },
+    "networkName": {
+      "type": "string"
+    },
+    "nicType": {
+      "type": "string",
+      "defaultValue": "e1000e"
+    },
+    "templateName": {
+      "type": "string"
+    },
+    "clusterName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "extendedLocation": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/microsoft.extendedlocation/', parameters('extendedLocationName') )]",
+    "vCenterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VCenters/', parameters('vCenterName') )]",
+    "networkId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VirtualNetworks/', parameters('networkName') )]",
+    "templateId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/Microsoft.ConnectedVMwarevSphere/VirtualMachineTemplates/', parameters('templateName') )]",
+    "clusterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/Microsoft.ConnectedVMwarevSphere/Clusters/', parameters('clusterName') )]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ConnectedVMwarevSphere/virtualMachines",
+      "apiVersion": "2020-10-01-preview",
+      "name": "[parameters('virtualMachineName')]",
+      "location": "[parameters('location')]",
+      "kind": "VMware",
+      "extendedLocation": {
+        "name": "[variables('extendedLocation')]",
+        "type": "CustomLocation"
+      },
+      "properties": {
+        "vCenterId": "[variables('vCenterId')]",
+        "templateId": "[variables('templateId')]",
+        "placementProfile": {
+          "clusterId": "[variables('clusterId')]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "name": "NIC01",
+              "networkId": "[variables('networkId')]",
+              "nicType": "[parameters('nicType')]",
+              "powerOnBoot": "enabled",
+              "ipSettings": {
+                "allocationMethod": "dynamic"
+              }
+            }
+          ]
+        },
+        "hardwareProfile": {
+          "memorySizeMB": 4096,
+          "numCPUs": 2,
+          "numCoresPerSocket": 1
+        },
+        "osProfile": {
+          "osType": "Windows",
+          "computerName": "[parameters('virtualMachineName')]"
+        }
+      }
+    }
+  ]
+}
