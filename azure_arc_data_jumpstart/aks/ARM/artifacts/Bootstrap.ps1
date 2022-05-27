@@ -87,6 +87,8 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile "${tempDir}\adConnector.yaml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnectorCMK.yaml") -OutFile "${tempDir}\adConnectorCMK.yaml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIADAuthCMK.yaml") -OutFile "${tempDir}\SQLMIADAuthCMK.yaml"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMIADAuth.ps1") -OutFile "${tempDir}\DeploySQLMIADAuth.ps1"
+
 
 # Installing tools
 workflow ClientTools_01
@@ -149,7 +151,7 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Creating scheduled task for DataServicesLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument '${tempDir}\DataServicesLogonScript.ps1'
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$tempDir\DataServicesLogonScript.ps1"
 
 # Register schedule task under local account
 Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force

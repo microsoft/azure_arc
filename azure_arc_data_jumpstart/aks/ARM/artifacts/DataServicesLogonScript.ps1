@@ -186,6 +186,12 @@ if ( $Env:deploySQLMI -eq $true )
 & "$Env:TempDir\DeploySQLMI.ps1"
 }
 
+# if ADDS domainname is passed as parameter, deploy SQLMI with AD auth support
+if ($env:addsDomainName.Length -gt 0 -and $null -ne $env:addsDomainName)
+{
+& "$Env:TempDir\DeploySQLMIADAuth.ps1"
+}
+
 # If flag set, deploy PostgreSQL
 if ( $Env:deployPostgreSQL -eq $true )
 {
