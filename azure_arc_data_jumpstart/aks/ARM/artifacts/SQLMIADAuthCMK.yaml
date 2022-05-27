@@ -5,6 +5,7 @@ data:
 kind: Secret
 metadata:
   name: admin-login-secret
+  namespace: arc
 type: Opaque
 ---
 
