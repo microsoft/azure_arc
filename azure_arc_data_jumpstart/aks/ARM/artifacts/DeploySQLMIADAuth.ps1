@@ -67,7 +67,6 @@ $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
 $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
 $domain_name = $dcInfo.domain.ToUpper()
 $sqlmi_port = "32400"
-$keytab_file = "mssql.keytab"
 
 try
 {
@@ -89,9 +88,13 @@ catch
 setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
 setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
 
+$keytab_file = "mssql.keytab"
 ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /out $keytab_file -setpass -setupn /pass $arcsapass
+ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
 ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
 ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
 
 # Convert key tab file into base64 data
 $keytabrawdata = Get-Content $keytab_file -Encoding byte
@@ -157,9 +160,10 @@ Write-Host "`n"
 Write-Host "Azure Arc SQL Managed Instance with AD authentication is ready!"
 Write-Host "`n"
 
-# Create windows account in SQLMI to support AD authentication
+# Create windows account in SQLMI to support AD authentication and grant sysadmin role
 $podname = "${sqlMIName}-0"
 kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:AZDATA_USERNAME] FROM WINDOWS"
+kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:AZDATA_USERNAME', @rolename = N'sysadmin'"
 
 # Downloading demo database and restoring onto SQL MI
 Write-Host "`n"
