@@ -20,13 +20,14 @@ $dcInfo = Get-ADDomainController -Server $dcName -Credential $adminCredential
 
 $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
 $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
+Write-Host "Reverse lookup zone CIDR $reverseLookupCidr"
 
 # Create login session with domain credentials
-$cimsession = New-CimSession -Credential $adminCredential
+$cimsession = New-CimSession -Credential $adminCredential -ComputerName $dcInfo.HostName
 
 # Setup reverse lookup zone
 try {
-    Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope "Forest" -ComputerName $dcInfo.HostName -CimSession $cimsession
+    Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope Domain -ComputerName $dcInfo.HostName -CimSession $cimsession
     Write-Host "Successfully created reverse DNS Zone."
 
     $ReverseDnsZone = Get-DnsServerZone | Where-Object {$_.IsAutoCreated -eq $false -and $_.IsReverseLookupZone -eq $true}
