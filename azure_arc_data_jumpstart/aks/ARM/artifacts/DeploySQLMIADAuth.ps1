@@ -59,7 +59,7 @@ catch
 $arcsaname = "sa-sqlmi-cmk"
 $arcsapass = "ArcDSA#Pwd123$"
 $arcsasecpass = $arcsapass | ConvertTo-SecureString -AsPlainText -Force
-$dsaupn = $arcsaname + "@" + $dcInfo.domain
+$sqlmisaupn = $arcsaname + "@" + $dcInfo.domain
 
 $sqlMIName = "sqlmi-adauth"
 $samaccountname = $arcsaname
@@ -71,7 +71,7 @@ $sqlmi_port = "32400"
 try
 {
     New-ADUser -Name $arcsaname `
-        -UserPrincipalName $dsaupn `
+        -UserPrincipalName $sqlmisaupn `
         -Path $sqlmiOUDN `
         -AccountPassword $arcsasecpass `
         -Enabled $true `
@@ -176,6 +176,26 @@ kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S loca
 $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
 
 Write-Host "SQL Managed Instance with AD authentication endpoint: $sqlmiEndPoint"
+
+# Get public ip of the SQLMI endpoint
+$nodeRG = (az aks show --name $Env:clusterName -g $Env:resourceGroup --query "nodeResourceGroup")
+$lbName = "kubernetes"
+$lbrule = (az network lb rule list -g $nodeRG --lb-name  $lbName --query "[?contains(id, '$sqlmi_port')]") | ConvertFrom-Json
+if ($null -ne $lbrule)
+{
+    $frontendIpConfId = $lbrule.frontendIpConfiguration.id
+    $pubipid = (az network lb frontend-ip list --lb-name $lbName -g $nodeRG --query "[?id=='$frontendIpConfId'].{id:publicIpAddress.id}") | ConvertFrom-Json
+    $publicIp =  (az network public-ip show --ids $pubipid.id --query "ipAddress").trim('"')
+    Write-Host "SQLMI public ip address $publicIp"
+
+    # Create DNS record
+    Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $publicIp -TimeToLive 01:00:00 -AgeRecord
+    Write-Host "Creted SQLMI DNS A record with public ip address $publicIp"
+}
+else
+{
+    Write-Host "Could not find LoadBalancer for SQLMI."
+}
 
 # Strop transcrip
 Stop-Transcript
