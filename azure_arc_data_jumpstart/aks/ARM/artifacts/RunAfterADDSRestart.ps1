@@ -18,6 +18,9 @@ $dcName = [System.Net.Dns]::GetHostByName($env:COMPUTERNAME).HostName
 
 $dcInfo = Get-ADDomainController -Server $dcName -Credential $adminCredential
 
+# Print domain information
+$dcInfo
+
 $dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
 $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
 Write-Host "Reverse lookup zone CIDR $reverseLookupCidr"
