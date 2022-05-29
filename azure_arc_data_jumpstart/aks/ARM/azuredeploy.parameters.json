@@ -45,7 +45,7 @@
         "value": "<A DNS prefix for the Public IP>"
     },
     "addsDomainName": {
-      "value": "contoso.local"
+      "value": "jumpstart.local"
     },
     "enableADAuth": {
       "value": "(true/false)"
