@@ -181,7 +181,7 @@ Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # If flag set, deploy SQL MI
-if ( $Env:deploySQLMI -eq $true )
+if ( $Env:deploySQLMI -eq $true -and ($null -eq $env:addsDomainName -or $env:addsDomainName.Length -le 0) )
 {
 & "$Env:TempDir\DeploySQLMI.ps1"
 }
