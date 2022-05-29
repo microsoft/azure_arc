@@ -88,6 +88,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile "${
 Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnectorCMK.yaml") -OutFile "${tempDir}\adConnectorCMK.yaml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIADAuthCMK.yaml") -OutFile "${tempDir}\SQLMIADAuthCMK.yaml"
 Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploySQLMIADAuth.ps1") -OutFile "${tempDir}\DeploySQLMIADAuth.ps1"
+Invoke-WebRequest ($templateBaseUrl + "artifacts/RunAfterClientVMADJoin.ps1") -OutFile "${tempDir}\RunAfterClientVMADJoin.ps1"
 
 
 # Installing tools
@@ -149,13 +150,6 @@ New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-# Creating scheduled task for DataServicesLogonScript.ps1
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$tempDir\DataServicesLogonScript.ps1"
-
-# Register schedule task under local account
-Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Action $Action -RunLevel "Highest" -Force
-
 ##############################################################################
 # Following code is support AD authentication in SQL MI. This code is executed
 # when user sets enableADAuth=true. When this flag is set true 'addsDomainName' parameter
@@ -185,7 +179,13 @@ if ($addsDomainName.Length -gt 0)
         Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
     })
  
-    # Register schedule task to run under domain account to launch script setup all dependent
+    # Register schedule task to run after system reboot
+    # schedule task to run after reboot to create reverse DNS lookup
+    $Trigger = New-ScheduledTaskTrigger -AtStartup
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$tempDir\RunAfterClientVMADJoin.ps1"
+    Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
+    Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
+
     # services
     # Use $env:username to run task under domain user
     Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
@@ -194,4 +194,14 @@ if ($addsDomainName.Length -gt 0)
     Write-Host "Joined Client VM to $addsDomainName domain."
 
     Restart-Computer
+}
+else
+{
+    # Creating scheduled task for DataServicesLogonScript.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$tempDir\DataServicesLogonScript.ps1"
+
+    # Register schedule task under local account
+    Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Action $Action -RunLevel "Highest" -Force
+    Write-Host "Registered scheduled task 'DataServicesLogonScript' to run at user logon."
 }
