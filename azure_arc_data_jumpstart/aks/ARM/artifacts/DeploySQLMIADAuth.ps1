@@ -1,7 +1,8 @@
-Start-Transcript -Path C:\Temp\DeploySQLMIADAuth.log
-
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
+
+Start-Transcript -Path "$Env:TempDir\DeploySQLMIADAuth.log"
+
 
 # Verify AD domain name parameter is specified
 if ($env:addsDomainName.Length -le 0 -or $null -eq $env:addsDomainName)
@@ -88,11 +89,11 @@ catch
 setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
 setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
 
-$keytab_file = "mssql.keytab"
+$keytab_file = "$Env:TempDir\mssql.keytab"
 ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /out $keytab_file -setpass -setupn /pass $arcsapass
-ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
 ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
-ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
 ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
 ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
 
@@ -107,7 +108,7 @@ $b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(
 $b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_PASSWORD))
 
 # Read YAML file and replace parameter values
-$adConectorYAMLFile = "C:\Temp\adConnectorCMK.yaml"
+$adConectorYAMLFile = "$Env:TempDir\adConnectorCMK.yaml"
 $adConnectorContent = Get-Content $adConectorYAMLFile
 $adConnectorContent = $adConnectorContent.Replace("{{ARC_DATA_API_VERSION}}", "arcdata.microsoft.com/v1beta1")
 $adConnectorContent = $adConnectorContent.Replace("{{ADDS_DOMAIN_NAME}}", $dcInfo.domain.ToUpper())
@@ -131,7 +132,7 @@ Write-Host "Azure Arc AD connector ready!"
 Write-Host "`n"
 
 # Deploy SQL MI with AD auth
-$sqlMIADAuthYAMLFile = "SQLMIADAuthCMK.yaml"
+$sqlMIADAuthYAMLFile = "$Env:TempDir\SQLMIADAuthCMK.yaml"
 $sqlMIADAuthContent = Get-Content $sqlMIADAuthYAMLFile
 $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{ARC_DATA_API_VERSION}}", "sql.arcdata.microsoft.com/v3")
 $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{B64_SQLMI_ADMIN_USER}}", $b64UserName)
@@ -163,7 +164,10 @@ Write-Host "`n"
 # Create windows account in SQLMI to support AD authentication and grant sysadmin role
 $podname = "${sqlMIName}-0"
 kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "CREATE LOGIN [${domain_netbios_name}\$env:AZDATA_USERNAME] FROM WINDOWS"
+Write-Host "Created Windows user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
+
 kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P $env:AZDATA_PASSWORD -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:AZDATA_USERNAME', @rolename = N'sysadmin'"
+Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
 # Downloading demo database and restoring onto SQL MI
 Write-Host "`n"
@@ -171,6 +175,7 @@ Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
 kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
 Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
 kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+Write-Host "Restoring AdventureWorks database completed."
 
 # Retrieving SQL MI connection endpoint
 $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'

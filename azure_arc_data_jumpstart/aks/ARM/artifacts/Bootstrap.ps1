@@ -154,7 +154,7 @@ $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$tempDir\DataServicesLogonScript.ps1"
 
 # Register schedule task under local account
-Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Action $Action -RunLevel "Highest" -Force
 
 ##############################################################################
 # Following code is support AD authentication in SQL MI. This code is executed
