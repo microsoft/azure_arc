@@ -44,9 +44,6 @@
     "dnsPrefix": {
         "value": "<A DNS prefix for the Public IP>"
     },
-    "addsDomainName": {
-      "value": "jumpstart.local"
-    },
     "enableADAuth": {
       "value": "(true/false)"
     }
