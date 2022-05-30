@@ -6,6 +6,9 @@
 Import-Module ActiveDirectory
 Import-Module DnsServer
 
+# Wait for the system to fully reboot before creating reverse lookup zone
+Start-Sleep -Seconds 30
+
 Start-Transcript -Path "C:\Temp\SetupReverseDNS.log"
 
 # Get Activectory Information
