@@ -204,7 +204,7 @@ Write-Host "Creted SQLMI DNS A record with public ip address $publicIp"
 
 # Write endpoint information in the file
 $filename = "SQLMI-ADAuth-Endpoints.txt"
-$file = New-Item -Path "C:\Temp\" -Name $filename -ItemType "file"
+$file = New-Item -Path $Env:TempDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
 
 Add-Content $Endpoints "Primary SQL Managed Instance external endpoint:"
