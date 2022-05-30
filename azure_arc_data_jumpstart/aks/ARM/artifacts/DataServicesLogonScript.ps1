@@ -187,7 +187,7 @@ if ( $Env:deploySQLMI -eq $true -and ($null -eq $env:addsDomainName -or $env:add
 }
 
 # if ADDS domainname is passed as parameter, deploy SQLMI with AD auth support
-if ($env:addsDomainName.Length -gt 0 -and $null -ne $env:addsDomainName)
+if ($Env:deploySQLMI -eq $true -and $env:addsDomainName.Length -gt 0)
 {
 & "$Env:TempDir\DeploySQLMIADAuth.ps1"
 }
