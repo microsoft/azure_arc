@@ -186,7 +186,7 @@ Write-Host "SQL Managed Instance with AD authentication endpoint: $sqlmiEndPoint
 $nodeRG = (az aks show --name $Env:clusterName -g $Env:resourceGroup --query "nodeResourceGroup")
 $lbName = "kubernetes"
 $lbrule = (az network lb rule list -g $nodeRG --lb-name  $lbName --query "[?contains(id, '$sqlmi_port')]") | ConvertFrom-Json
-if ($null -eq $lbrule || $lbrule.Count -le 0)
+if ($null -eq $lbrule -or $lbrule.Count -le 0)
 {
     Write-Host "Could not find LoadBalancer for SQLMI."
     Stop-Transcript
