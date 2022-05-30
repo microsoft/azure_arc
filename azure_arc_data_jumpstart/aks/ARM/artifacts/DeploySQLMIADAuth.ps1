@@ -163,10 +163,10 @@ Write-Host "`n"
 
 # Create windows account in SQLMI to support AD authentication and grant sysadmin role
 $podname = "${sqlMIName}-0"
-kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "CREATE LOGIN [${domain_netbios_name}\$env:AZDATA_USERNAME] FROM WINDOWS"
+kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
 Write-Host "Created Windows user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
-kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:AZDATA_USERNAME', @rolename = N'sysadmin'"
+kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "EXEC master..sp_addsrvrolemember @loginame = N'${domain_netbios_name}\$env:adminUsername', @rolename = N'sysadmin'"
 Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
 # Downloading demo database and restoring onto SQL MI
@@ -186,21 +186,47 @@ Write-Host "SQL Managed Instance with AD authentication endpoint: $sqlmiEndPoint
 $nodeRG = (az aks show --name $Env:clusterName -g $Env:resourceGroup --query "nodeResourceGroup")
 $lbName = "kubernetes"
 $lbrule = (az network lb rule list -g $nodeRG --lb-name  $lbName --query "[?contains(id, '$sqlmi_port')]") | ConvertFrom-Json
-if ($null -ne $lbrule)
-{
-    $frontendIpConfId = $lbrule.frontendIpConfiguration.id
-    $pubipid = (az network lb frontend-ip list --lb-name $lbName -g $nodeRG --query "[?id=='$frontendIpConfId'].{id:publicIpAddress.id}") | ConvertFrom-Json
-    $publicIp =  (az network public-ip show --ids $pubipid.id --query "ipAddress").trim('"')
-    Write-Host "SQLMI public ip address $publicIp"
-
-    # Create DNS record
-    Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $publicIp -TimeToLive 01:00:00 -AgeRecord
-    Write-Host "Creted SQLMI DNS A record with public ip address $publicIp"
-}
-else
+if ($null -eq $lbrule || $lbrule.Count -le 0)
 {
     Write-Host "Could not find LoadBalancer for SQLMI."
+    Stop-Transcript
+    Exit
 }
+
+$frontendIpConfId = $lbrule.frontendIpConfiguration.id
+$pubipid = (az network lb frontend-ip list --lb-name $lbName -g $nodeRG --query "[?id=='$frontendIpConfId'].{id:publicIpAddress.id}") | ConvertFrom-Json
+$publicIp =  (az network public-ip show --ids $pubipid.id --query "ipAddress").trim('"')
+Write-Host "SQLMI public ip address $publicIp"
+
+# Create DNS record
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $publicIp -TimeToLive 01:00:00 -AgeRecord
+Write-Host "Creted SQLMI DNS A record with public ip address $publicIp"
+
+# Write endpoint information in the file
+$filename = "SQLMI-ADAuth-Endpoints.txt"
+$file = New-Item -Path "C:\Temp\" -Name $filename -ItemType "file"
+$Endpoints = $file.FullName
+
+Add-Content $Endpoints "Primary SQL Managed Instance external endpoint:"
+$sqlmiEndPoint | Add-Content $Endpoints
+
+Add-Content $Endpoints ""
+Add-Content $Endpoints "SQL Managed Instance username:"
+$env:AZDATA_USERNAME | Add-Content $Endpoints
+
+Add-Content $Endpoints ""
+Add-Content $Endpoints "SQL Managed Instance password:"
+$env:AZDATA_PASSWORD | Add-Content $Endpoints
+
+Write-Host "`n"
+Write-Host "Creating SQLMI Endpoints file Desktop shortcut"
+Write-Host "`n"
+$TargetFile = $Endpoints
+$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQLMI-ADAuth-Endpoints.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
 
 # Strop transcrip
 Stop-Transcript

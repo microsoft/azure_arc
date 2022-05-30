@@ -16,13 +16,13 @@
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
       }
     },
-    "addsDomainName": {
+    /*"addsDomainName": {
       "type": "string",
       "defaultValue": "jumpstart.local",
       "metadata": {
         "description": "Active Direcotory domain name ot support AD Auth. Empty value indicates AD auth not required in SQLMI."
       }
-    },    
+    },*/    
     "myIpAddress": {
       "type": "string",
       "metadata": {
@@ -154,7 +154,8 @@
     "bastionSubnetPrefix": "172.16.2.64/26",
     "addsPrivateIPAddres": "172.16.1.100",
     "bastionSubnetName": "AzureBastionSubnet",
-    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]",
+    "addsDomainName": "jumpstart.local"
   },
   "resources": [
     {
@@ -279,7 +280,7 @@
             "value": "[parameters('windowsAdminPassword')]"
           },
           "addsDomainName": {
-            "value": "[parameters('addsDomainName')]"
+            "value": "[variables('addsDomainName')]"
           },
           "virtualNetworkName": {
             "value": "[variables('virtualNetworkName')]"
@@ -374,7 +375,7 @@
             "value": "[variables('bastionSubnetRef')]"
           },
           "addsDomainName": {
-            "value": "[parameters('addsDomainName')]"
+            "value": "[variables('addsDomainName')]"
           }
         }
       }
