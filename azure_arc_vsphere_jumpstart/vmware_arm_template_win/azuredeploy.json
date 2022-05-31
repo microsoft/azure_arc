@@ -30,7 +30,7 @@
     }
   },
   "variables": {
-    "extendedLocation": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/microsoft.extendedlocation/', parameters('extendedLocationName') )]",
+    "extendedLocation": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/microsoft.extendedlocation/customlocations/', parameters('extendedLocationName') )]",
     "vCenterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VCenters/', parameters('vCenterName') )]",
     "networkId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VirtualNetworks/', parameters('networkName') )]",
     "templateId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/Microsoft.ConnectedVMwarevSphere/VirtualMachineTemplates/', parameters('templateName') )]",
