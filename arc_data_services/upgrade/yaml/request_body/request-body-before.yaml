@@ -25,7 +25,7 @@
         },
         "docker": {
           "imagePullPolicy": "Always",
-          "imageTag": "v1.0.0_2021-07-30",
+          "imageTag": "v1.5.0_2022-04-05",
           "registry": "<registry>",
           "repository": "<repository>"
         },
@@ -60,7 +60,7 @@
         "storage": {
           "data": {
             "accessMode": "ReadWriteOnce",
-            "className": "local-storage", // textbox 
+            "className": "local-storage", // textbox
             "size": "15Gi"
           },
           "logs": {

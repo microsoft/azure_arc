@@ -10,14 +10,14 @@ variable "vm_name" {
 
 variable "capi_arc_data_cluster_name" {
   type        = string
-  description = "The name of the capi virtual machine"
+  description = "The name of the CAPI cluster"
   default     = "ArcBox-CAPI-Data"
 }
 
-variable "vm_size" {
+variable "k3s_arc_cluster_name" {
   type        = string
-  description = "The size of the client virtual machine."
-  default     = "Standard_D16s_v4"
+  description = "The name of the K3s cluster"
+  default     = "ArcBox-K3s"
 }
 
 variable "os_sku" {
@@ -45,11 +45,6 @@ variable "virtual_network_name" {
 variable "subnet_name" {
   type        = string
   description = "ArcBox subnet name."
-}
-
-variable "user_ip_address" {
-  type        = string
-  description = "Users public IP address, used to RDP to the client VM."
 }
 
 variable "template_base_url" {
@@ -104,7 +99,13 @@ variable "spn_tenant_id" {
 
 variable "deployment_flavor" {
   type        = string
-  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', and 'Developer'."
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', and 'DevOps'."
+}
+
+variable "github_username" {
+  type        = string
+  description = "Specify a GitHub username for ArcBox DevOps"
+  default     = "microsoft"
 }
 
 variable "github_repo" {
@@ -121,6 +122,12 @@ variable "trigger_at_logon" {
   type        = bool
   description = "Whether or not the automation scripts will trigger at log on, or at startup. True for AtLogon, False for AtStartup."
   default     = true
+}
+
+variable "deploy_bastion" {
+  type       = bool
+  description = "Choice to deploy Bastion to connect to the client VM"
+  default = false
 }
 
 ### THESE ARE LEGACY VARIABLES FOR BACKWARDS COMPATIBILITY WITH LEGACY SCRIPT FUNCTIONS ###
@@ -140,7 +147,7 @@ variable "registry_username" {
 variable "registry_password" {
   type        = string
   description = "Registry password"
-  default     = "registrySecret"  
+  default     = "registrySecret"
 }
 
 variable "data_controller_name" {
@@ -163,7 +170,7 @@ variable "postgres_name" {
 
 variable "postgres_worker_node_count" {
   type        = number
-  description = "Number of PostgreSQL Hyperscale worker nodes."
+  description = "Number of PostgreSQL worker nodes."
   default     = 3
 }
 
@@ -181,9 +188,10 @@ variable "postgres_service_type" {
 ###########################################################################################
 
 locals {
-    public_ip_name         = "${var.vm_name}-PIP"
-    nsg_name               = "${var.vm_name}-NSG"
+    bastion_name           = "ArcBox-Bastion"
+    public_ip_name         = var.deploy_bastion == false ? "${var.vm_name}-PIP" : "${local.bastion_name}-PIP"
     network_interface_name = "${var.vm_name}-NIC"
+    bastionSubnetIpPrefix  = "172.16.3.64/26"
 }
 
 data "azurerm_subscription" "primary" {
@@ -200,28 +208,11 @@ data "azurerm_subnet" "subnet" {
 }
 
 resource "azurerm_public_ip" "pip" {
+  count               = var.deploy_bastion == false ? 1: 0
   name                = local.public_ip_name
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   allocation_method   = "Static"
-}
-
-resource "azurerm_network_security_group" "nsg" {
-  name                = local.nsg_name
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-
-  security_rule {
-    name                       = "allow_RDP_3389"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "3389"
-    source_address_prefix      = var.user_ip_address
-    destination_address_prefix = "*"
-  }
 }
 
 resource "azurerm_network_interface" "nic" {
@@ -233,21 +224,15 @@ resource "azurerm_network_interface" "nic" {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pip.id
+    public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }
-
-resource "azurerm_network_interface_security_group_association" "nic_nsg" {
-  network_interface_id      = azurerm_network_interface.nic.id
-  network_security_group_id = azurerm_network_security_group.nsg.id
-}
-
 resource "azurerm_virtual_machine" "client" {
   name                  = var.vm_name
   location              = data.azurerm_resource_group.rg.location
   resource_group_name   = data.azurerm_resource_group.rg.name
   network_interface_ids = [ azurerm_network_interface.nic.id ]
-  vm_size               = var.vm_size
+  vm_size               = var.deployment_flavor == "DevOps" ? "Standard_D4s_v4" : "Standard_D16s_v4"
 
   storage_image_reference {
     publisher = "MicrosoftWindowsServer"
@@ -286,7 +271,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${var.template_base_url}artifacts/Bootstrap.ps1"
       ],
-      "commandToExecute": "powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${var.admin_username} -spnClientId ${var.spn_client_id} -spnClientSecret ${var.spn_client_secret} -spnTenantId ${var.spn_tenant_id} -spnAuthority ${var.spn_authority} -subscriptionId ${data.azurerm_subscription.primary.subscription_id} -resourceGroup ${data.azurerm_resource_group.rg.name} -azdataUsername ${var.data_controller_username} -azdataPassword ${var.data_controller_password} -acceptEula ${var.accept_eula} -registryUsername ${var.registry_username} -registryPassword ${var.registry_password} -arcDcName ${var.data_controller_name} -azureLocation ${data.azurerm_resource_group.rg.location} -mssqlmiName ${var.sql_mi_name} -POSTGRES_NAME ${var.postgres_name} -POSTGRES_WORKER_NODE_COUNT ${var.postgres_worker_node_count} -POSTGRES_DATASIZE ${var.postgres_data_size} -POSTGRES_SERVICE_TYPE ${var.postgres_service_type} -stagingStorageAccountName ${var.storage_account_name} -workspaceName ${var.workspace_name} -templateBaseUrl ${var.template_base_url} -flavor ${var.deployment_flavor} -automationTriggerAtLogon ${var.trigger_at_logon} -capiArcDataClusterName ${var.capi_arc_data_cluster_name}"
+      "commandToExecute": "powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${var.admin_username} -spnClientId ${var.spn_client_id} -spnClientSecret ${var.spn_client_secret} -spnTenantId ${var.spn_tenant_id} -spnAuthority ${var.spn_authority} -subscriptionId ${data.azurerm_subscription.primary.subscription_id} -resourceGroup ${data.azurerm_resource_group.rg.name} -azdataUsername ${var.data_controller_username} -azdataPassword ${var.data_controller_password} -acceptEula ${var.accept_eula} -registryUsername ${var.registry_username} -registryPassword ${var.registry_password} -arcDcName ${var.data_controller_name} -azureLocation ${data.azurerm_resource_group.rg.location} -mssqlmiName ${var.sql_mi_name} -POSTGRES_NAME ${var.postgres_name} -POSTGRES_WORKER_NODE_COUNT ${var.postgres_worker_node_count} -POSTGRES_DATASIZE ${var.postgres_data_size} -POSTGRES_SERVICE_TYPE ${var.postgres_service_type} -stagingStorageAccountName ${var.storage_account_name} -workspaceName ${var.workspace_name} -templateBaseUrl ${var.template_base_url} -flavor ${var.deployment_flavor} -automationTriggerAtLogon ${var.trigger_at_logon} -capiArcDataClusterName ${var.capi_arc_data_cluster_name} -k3sArcClusterName ${var.k3s_arc_cluster_name} -githubUser ${var.github_username}"
     }
 SETTINGS
 }

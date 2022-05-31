@@ -1,6 +1,3 @@
-@description('IP address allowed SSH and RDP access to ArcBox resources. Usually this is your home or office public IP address')
-param myIpAddress string
-
 @description('RSA public key used for securing SSH access to ArcBox resources')
 @secure()
 param sshRSAPublicKey string
@@ -27,10 +24,11 @@ param windowsAdminPassword string
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
-@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
+@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
 @allowed([
   'Full'
   'ITPro'
+  'DevOps'
 ])
 param flavor string = 'Full'
 
@@ -40,13 +38,20 @@ param githubAccount string = 'microsoft'
 @description('Target GitHub branch')
 param githubBranch string = 'main'
 
+@description('Choice to deploy Bastion to connect to the client VM')
+param deployBastion bool = false
+
+@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
+param githubUser string = 'microsoft'
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
-module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full') {
+var location = resourceGroup().location
+
+module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
   name: 'ubuntuCAPIDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    myIpAddress: myIpAddress
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
@@ -54,14 +59,16 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
+    deployBastion: deployBastion
+    azureLocation: location
+    flavor: flavor
   }
 }
 
-module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full') {
+module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
   name: 'ubuntuRancherDeployment'
   params: {
     sshRSAPublicKey: sshRSAPublicKey
-    myIpAddress: myIpAddress
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
@@ -69,6 +76,8 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
     logAnalyticsWorkspace: logAnalyticsWorkspaceName
     templateBaseUrl: templateBaseUrl
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
+    deployBastion: deployBastion
+    azureLocation: location
   }
 }
 
@@ -80,18 +89,22 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
-    myIpAddress: myIpAddress
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
     flavor: flavor
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
+    deployBastion: deployBastion
+    githubUser: githubUser
+    location: location
   }
 }
 
 module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
   name: 'stagingStorageAccountDeployment'
-  params: {}
+  params: {
+    location: location
+  }
 }
 
 module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
@@ -99,5 +112,7 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
   params: {
     workspaceName: logAnalyticsWorkspaceName
     flavor: flavor
+    deployBastion: deployBastion
+    location: location
   }
 }

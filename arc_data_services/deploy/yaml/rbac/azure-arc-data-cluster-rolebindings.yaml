@@ -44,7 +44,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 # This rolebinding grants permission to the user based on the aggregated azure-arc-data:database-instance:reader cluster role.
-# The aggregated role grants read permissions on both SQL Managed Instance(s) & PostgreSQL Hyperscale Instance(s).
+# The aggregated role grants read permissions on both SQL Managed Instance(s) & PostgreSQL Instance(s).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -86,11 +86,11 @@ roleRef:
   name: azure-arc-data:sql-managed-instance:reader
   apiGroup: rbac.authorization.k8s.io
 ---
-# This rolebinding grants permission to the user based on the azure-arc-data:postgresql-hyperscale:reader cluster role
+# This rolebinding grants permission to the user based on the azure-arc-data:postgresql:reader cluster role
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: azure-arc-data:postgresql-hyperscale:readers
+  name: azure-arc-data:postgresql:readers
   #
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the namespace below.
@@ -104,7 +104,7 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
-  name: azure-arc-data:postgresql-hyperscale:reader
+  name: azure-arc-data:postgresql:reader
   apiGroup: rbac.authorization.k8s.io
 ---
 #
@@ -153,7 +153,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 # This rolebinding grants permission to the user based on the aggregated azure-arc-data:database-instance:writer cluster role.
-# The aggregated role grants write permissions on both SQL Managed Instance(s) & PostgreSQL Hyperscale Instance(s).
+# The aggregated role grants write permissions on both SQL Managed Instance(s) & PostgreSQL Instance(s).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -195,11 +195,11 @@ roleRef:
   name: azure-arc-data:sql-managed-instance:writer
   apiGroup: rbac.authorization.k8s.io
 ---
-# This rolebinding grants permission to the user based on the azure-arc-data:postgresql-hyperscale:writer cluster role
+# This rolebinding grants permission to the user based on the azure-arc-data:postgresql:writer cluster role
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: azure-arc-data:postgresql-hyperscale:writers
+  name: azure-arc-data:postgresql:writers
   #
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the namespace below.
@@ -213,6 +213,6 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: ClusterRole
-  name: azure-arc-data:postgresql-hyperscale:writer
+  name: azure-arc-data:postgresql:writer
   apiGroup: rbac.authorization.k8s.io
 ---
