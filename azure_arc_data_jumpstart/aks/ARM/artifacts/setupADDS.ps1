@@ -47,9 +47,9 @@ Install-ADDSForest `
 Write-Host "ADDS Deployment successful. Now rebooting computer to finsih setup."
 
 # schedule task to run after reboot to create reverse DNS lookup
-$Trigger = New-ScheduledTaskTrigger -AtStartup
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\RunAfterADDSRestart.ps1'
-Register-ScheduledTask -TaskName "RunAfterADDSRestart" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
+# $Trigger = New-ScheduledTaskTrigger -AtStartup
+# $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\RunAfterADDSRestart.ps1'
+# Register-ScheduledTask -TaskName "RunAfterADDSRestart" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
 
 # Reboot computer
 Restart-Computer
