@@ -8,13 +8,13 @@ description: >
 
 ## Deploy GitOps configurations and perform Helm-based GitOps flow on AKS on Azure Stack HCI as an Azure Arc Connected Cluster
 
-The following README will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on an Azure Kubernetes Service (AKS) cluster running on Azure Stack HCI, which is projected as an Azure Arc connected cluster resource.
+The following Jumpstart scenario will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on an Azure Kubernetes Service (AKS) cluster running on Azure Stack HCI, which is projected as an Azure Arc connected cluster resource.
 
-In this guide, you will deploy & attach 2 GitOps configuration to your cluster, a cluster-level config to deploy nginx-ingress controller and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster.
+in this scenario, you will deploy & attach 2 GitOps configuration to your cluster, a cluster-level config to deploy nginx-ingress controller and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster.
 
 By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-> **Note: This guide assumes you already deployed an AKS cluster on Azure Stack HCI and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_stack_hci/aks_hci_powershell/).**
+> **NOTE: This guide assumes you already deployed an AKS cluster on Azure Stack HCI and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using [PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_stack_hci/aks_hci_powershell/).**
 
 ## Prerequisites
 
@@ -32,23 +32,23 @@ By doing so, you will be able to make real-time changes to the application and s
 
   * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-  * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
+  * [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tab-auto-refresh/)
 
-* As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
+* As mentioned, this scenario starts at the point where you already have a connected AKS cluster to Azure Arc.
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
-* [Install or update Azure PowerShell modules](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-5.6.0). Use the below command to check your current installed version.
+* [Install or update Azure PowerShell modules](https://docs.microsoft.com/powershell/azure/install-az-ps?view=azps-5.6.0). Use the below command to check your current installed version.
 
   ```PowerShell
   Get-InstalledModule -Name Az -AllVersions | select Name,Version
   ```
 
-  > **Note: This guide combines automations that uses both Azure PowerShell Az modules as well as Azure CLI, however both of them can and will be run from a PowerShell window.**
+  > **NOTE: This guide combines automations that uses both Azure PowerShell Az modules as well as Azure CLI, however both of them can and will be run from a PowerShell window.**
 
-  * [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+  * [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -104,7 +104,7 @@ By doing so, you will be able to make real-time changes to the application and s
     $UnsecureSecret = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
+    > **NOTE: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/powershell/module/az.resources/new-azadserviceprincipal?view=azps-5.4.0)**
 
 * If you do not have the AksHci PowerShell module already, you will have to perform a clean installation. To install the AksHci PowerShell module remove any previous versions by running the below commands:
 
@@ -149,7 +149,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 In the process of creating Azure Arc GitOps configuration, [Weaveworks Flux Kubernetes Operator](https://github.com/fluxcd/flux) is deployed on the cluster.
 
-The Operator is aware of the "HelmRelease" Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart. Due to this configuration, a user can choose to leave the chart values intact or to have different values for different releases.
+The Operator is aware of the "HelmRelease" Custom Resource Definition (CRD). This HelmRelease points to a HELM chart in a git repo and can optionally contain specific values to input into the helm chart. Due to this configuration, a user can choose to leave the chart values intact or to have different values for different releases.
 
 For example, an application (captured in an Helm chart) dev release can have no pod replication (single pod) while a production release, using the same chart can have 3 pod replicas.
 
@@ -165,7 +165,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   * Login to your Azure subscription using the SPN credentials.
   * Retrieve the cluster credentials (KUBECONFIG).
   * Create the GitOps configurations and deploy the Flux operator and Memcached on the Azure Arc connected cluster.
-  * Deploy an Nginx ingress controller and the ["Hello Arc"](https://github.com/likamrat/hello_arc) application through a Helm-based GitOps flow. There are two Helm charts in the "Hello Arc" repository; one for nginx and one for the actual application as well as an Helm Release for each.
+  * Deploy an Nginx ingress controller and the ["Hello Arc"](https://github.com/likamrat/hello_arc) application through a HELM-based GitOps flow. There are two Helm charts in the "Hello Arc" repository; one for nginx and one for the actual application as well as an Helm Release for each.
 
 !["Hello Arc" GitHub repository](./04.png)
 
@@ -195,7 +195,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     > **Disclaimer: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval to rapidly track changes on the repository but it is recommended to have longer interval in your production environment (default value is 5min)**
 
-* Once the script will complete its run, you will have 2 GitOps configuration created and all the resources deployed in your Kubernetes cluster. **Note:** that it takes few min for the configuration change it's Operator state status from "Pending" to Install.
+* Once the script will complete its run, you will have 2 GitOps configuration created and all the resources deployed in your Kubernetes cluster. **NOTE:** that it takes few min for the configuration change it's Operator state status from "Pending" to Install.
 
     ![New GitOps configurations](./08.png)
 

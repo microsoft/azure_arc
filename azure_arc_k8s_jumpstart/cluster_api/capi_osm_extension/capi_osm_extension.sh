@@ -8,12 +8,10 @@ export password='<Your Azure service principal password>'
 export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export arcClusterName='<Azure Arc Cluster Name>'
-export k8sOSMExtensionName='<OSM extension name>'
-export k8sMonitorExtensionName='<azuremonitor extenion name>'
+export k8sOSMExtensionName='osm'
+export k8sMonitorExtensionName='azuremonitor'
 
-export osmCliDownloadUrl="https://github.com/openservicemesh/osm/releases/download/v0.8.4/osm-v0.8.4-linux-amd64.tar.gz"
-export osmCliPkg="osm-v0.8.4-linux-amd64.tar.gz"
-export osmVersion=0.8.3
+export osmRelease="v1.1.0"
 
 export bookStoreNameSpace="bookstore"
 export bookbuyerNameSpace="bookbuyer"
@@ -63,7 +61,7 @@ echo "Login to Az CLI using the service principal"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
 echo "Create OSM Kubernetes extension instance"
-az k8s-extension create --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --release-train pilot --name $k8sOSMExtensionName --release-namespace arc-osm-system --version $osmVersion
+az k8s-extension create --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name $k8sOSMExtensionName
 
 echo "Create Azure Monitor k8s extension instance"
 az k8s-extension create --name $k8sMonitorExtensionName --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
@@ -74,9 +72,7 @@ echo "Remove older copies of OSM binaries"
 sudo rm -rf /usr/local/bin/osm
 
 echo "Download OSM binaries"
-wget --quiet $osmCliDownloadUrl
-
-tar -xvf $osmCliPkg
+curl -L https://github.com/openservicemesh/osm/releases/download/${osmRelease}/osm-${osmRelease}-linux-amd64.tar.gz | tar -vxzf -
 
 echo "Copy the OSM binary to local bin folder"
 sudo cp ./linux-amd64/osm /usr/local/bin/osm
@@ -121,10 +117,10 @@ metadata:
 EOF
 
 echo "Create the Kubernetes resources for the bookstore demo applications"
-kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookbuyer.yaml
-kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookthief.yaml
-kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookstore.yaml
-kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm/main/docs/example/manifests/apps/bookwarehouse.yaml
+kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm-docs/release-v1.0/manifests/apps/bookbuyer.yaml
+kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm-docs/release-v1.0/manifests/apps/bookthief.yaml
+kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm-docs/release-v1.0/manifests/apps/bookstore.yaml
+kubectl apply -f https://raw.githubusercontent.com/openservicemesh/osm-docs/release-v1.0/manifests/apps/bookwarehouse.yaml
 
 echo "Checkpoint: What Got Installed?"
 

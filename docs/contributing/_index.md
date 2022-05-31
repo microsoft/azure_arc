@@ -2,7 +2,7 @@
 type: docs
 title: "Contributing"
 linkTitle: "Contributing"
-weight: 7
+weight: 8
 ---
 
 # Contributing
@@ -11,6 +11,10 @@ When contributing to this repository, please first discuss the change you wish t
 email, or any other method with the owners of this repository before making a change.
 
 Please note we have a code of conduct, please follow it in all your interactions with the project.
+
+## Want to be an Azure Arc "Jumpstarter"?
+
+We would love to have you! We are always looking for community support so if you want to create your own Azure Arc Jumpstart scenario, hop over to the [Jumpstart Scenario Writeup Guidelines](https://azurearcjumpstart.io/scenario_guidelines/) page to learn how to create one.
 
 ## Pull Request Process
 

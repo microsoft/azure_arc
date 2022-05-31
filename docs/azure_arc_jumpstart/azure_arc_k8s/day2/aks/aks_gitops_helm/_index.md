@@ -8,57 +8,54 @@ description: >
 
 ## Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster
 
-The following README will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on an Azure Kubernetes Service (AKS) cluster which is projected as an Azure Arc connected cluster resource.
+The following Jumpstart scenario will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on an Azure Kubernetes Service (AKS) cluster which is projected as an Azure Arc connected cluster resource.
 
-In this guide, you will deploy & attach 2 GitOps configuration to your cluster, a cluster-level config to deploy nginx-ingress controller and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster.
+In this scenario, you will deploy & attach two GitOps configurations to your cluster, a cluster-level config to deploy [nginx-ingress controller](https://kubernetes.github.io/ingress-nginx/) and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
+GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a popular open-source toolset. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. The Flux toolkit component Helm Controller is a Kubernetes operator, allowing one to declaratively manage Helm chart releases with Kubernetes manifests. The Operator is aware of the “HelmRelease” Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart.
 
-> **Note: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/) or [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/).**
+> **NOTE: This guide assumes you already deployed an AKS cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using either [ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_arm_template/) or [Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/).**
 
 ## Prerequisites
 
-* Clone the Azure Arc Jumpstart repository
+- Fork the ["Azure Arc Jumpstart Apps"](https://github.com/microsoft/azure-arc-jumpstart-apps) repository. In this scenario, you will be making changes on your own forked repository to initiate the GitOps flow.
 
-    ```shell
-    git clone https://github.com/microsoft/azure_arc.git
-    ```
+- (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
-* Fork the ["Hello Arc"](https://github.com/likamrat/hello_arc) demo application repository.
+  - [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
 
-* (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
+  - [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
 
-  * [Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/odiofbnciojkpogljollobmhplkhmofe)
+  - [Mozilla Firefox](https://addons.mozilla.org/firefox/addon/tab-auto-refresh/)
 
-  * [Google Chrome](https://chrome.google.com/webstore/detail/tab-auto-refresh/jaioibhbkffompljnnipmpkeafhpicpd?hl=en)
-
-  * [Mozilla Firefox](https://addons.mozilla.org/en-US/firefox/addon/tab-auto-refresh/)
-
-* As mentioned, this guide starts at the point where you already have a connected AKS cluster to Azure Arc.
+- As mentioned, this scenario starts at the point where you already have a connected AKS cluster to Azure Arc.
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./01.png)
 
     ![Existing Azure Arc-enabled Kubernetes cluster](./02.png)
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
   ```
 
-* Create Azure service principal (SP)
+- Create Azure service principal (SP)
 
     To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Contributor" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look like this:
@@ -66,14 +63,31 @@ By doing so, you will be able to make real-time changes to the application and s
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcK8s",
-    "name": "http://AzureArcK8s",
+    "displayName": "JumpstartArcK8s",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
 
-    > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
+
+## Automation Flow
+
+For you to get familiar with the automation and deployment flow, below is an explanation.
+
+- User has deployed the AKS cluster and has it connected as an Azure Arc-enabled Kubernetes cluster.
+
+- User is editing the environment variables in the Shell script file (1-time edit) which then be used throughout the GitOps configuration.
+
+- User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Flux extension and create GitOps configurations on the Azure Arc-connected Kubernetes cluster.
+
+- The GitOps configurations will create the namespace, deploy NGINX Ingress controller and Hello-Arc application.
+
+- User is verifying the cluster and making sure the extension and GitOps configuration is deployed.
+
+- User is making an edit on the GitHub repo that will cause Flux GitOps to detect this change and trigger an update to the pod deployment.
 
 ## Cluster-level Config vs. Namespace-level Config
 
@@ -87,125 +101,151 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
 
 ## Azure Arc Kubernetes GitOps Configuration with Helm
 
-### The Mechanism (In a nutshell)
+To create the GitOps Configuration, we will use the _`k8s-configuration flux create`_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to configure the GitOps on your Azure Arc-enabled Kubernetes cluster.
 
-In the process of creating Azure Arc GitOps configuration, [Weaveworks Flux Kubernetes Operator](https://github.com/fluxcd/flux) is deployed on the cluster.
+- In the screenshot below, notice how currently there is no GitOps configuration in your Arc-enabled Kubernetes cluster.
 
-The Operator is aware of the "HelmRelease" Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart. Due to this configuration, a user can choose to leave the chart values intact or to have different values for different releases.
-
-For example, an application (captured in an Helm chart) dev release can have no pod replication (single pod) while a production release, using the same chart can have 3 pod replicas.
-
-In the next section will use the "Hello Arc" Helm chart to deploy a production release which we will then change and see the results in real-time.
+    ![Screenshot showing Azure portal with no Azure Arc-enabled Kubernetes GitOps configurations](./03.png)
 
 ### Deployment Flow
 
-For our scenario, notice we have in two Helm charts in the "Hello Arc" repository; one for nginx and one for the actual application as well as an Helm Release for each.
+For our scenario, notice we have two Helm charts in the "Azure Arc Jumpstart Apps" repository; one for nginx and one for the Hello-Arc application as well as an Helm Release for each.
 
-!["Hello Arc" GitHub repository](./03.png)
+!["Azure Arc Jumpstart Apps" GitHub repository](./04.png)
 
-!["Hello Arc" GitHub repository](./04.png)
+!["Azure Arc Jumpstart Apps" GitHub repository](./05.png)
 
-* The nginx-ingress controller (a Cluster-level component) will be deployed with 3 replicas to the *cluster-mgmt* namespace.
+!["Azure Arc Jumpstart Apps" GitHub repository](./06.png)
 
-* The "Hello Arc" application (a Namespace-level component) will be deployed with 1 replica to the *prod* namespace.
+!["Azure Arc Jumpstart Apps" GitHub repository](./07.png)
 
-## Deployment
+- The nginx-ingress controller (a Cluster-level component) will be deployed with 2 replicas to the *ingress-nginx* namespace.
 
-* In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview) (located in the top-right corner in the Azure portal) to run the *az_k8sconfig_helm_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
+- The "Hello Arc" application (a Namespace-level component) will be deployed with 3 replica to the *hello-arc* namespace.
 
-* Edit the environment variables in the [*az_k8sconfig_helm_aks*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/helm/az_k8sconfig_helm_aks.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./az_k8sconfig_helm_aks``` command.
+### Deployment
 
-    > **Note: The extra dot is due to the script has an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
+- In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the *az_k8sconfig_helm_aks* shell script against the AKS connected cluster. **Make sure Cloud Shell is configured to use Bash.**
 
-    ![Open Azure Cloud Shell](./03.png)
+- Download [the script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/helm/az_k8sconfig_helm_aks.sh) using below command.
 
-    ![Upload a file to Azure Cloud Shell](./04.png)
+    ```shell
+    curl -L https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks/gitops/helm/az_k8sconfig_helm_aks.sh -o ~/az_k8sconfig_helm_aks.sh
+    ```
 
-    ![Upload a file to Azure Cloud Shell](./05.png)
+    ![Open Azure Cloud Shell](./08.png)
 
-    ![Upload a file to Azure Cloud Shell](./06.png)
+    ![Download file to Azure Cloud Shell](./09.png)
+
+- Edit the environment variables in the [*az_k8sconfig_helm_aks*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/helm/az_k8sconfig_helm_aks.sh) shell script to match your parameters and run it using the _`. ./az_k8sconfig_helm_aks.sh`_ command.
+
+    ![Screenshot parameter](./10.png)
+
+    For example:
+
+    ![Screenshot parameter examples](./11.png)
+
+    > **NOTE: The extra dot is due to the script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
 
     The script will:
 
-  * Login to your Azure subscription using the SPN credentials
-  * Retrieve the cluster credentials (KUBECONFIG)
-  * Create two GitOps configurations for the Azure Arc Connected Cluster. Both configurations will be using the Helm charts located in the "Hello Arc" repository.
-  * Cluster-level config to deploy nginx-ingress controller Helm chart
-  * Namespace-level config to deploy the "Hello Arc" application Helm chart
+  - Login to your Azure subscription using the SPN credentials
+  - Retrieve the cluster credentials (KUBECONFIG)
+  - Create the GitOps configuration to deploy the Flux controllers and NGINX ingress controller on the Azure Arc-connected cluster
+  - Create the GitOps configuration to deploy the ["Hello Arc"](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/hello-arc) application alongside an Ingress rule to make it available from outside the cluster
 
-    > **Disclaimer: For the purpose of this guide, notice how the "*git-poll-interval 3s*" is set. The 3 seconds interval is useful for demo purposes since it will make the git-poll interval to rapidly track changes on the repository but it is recommended to have longer interval in your production environment (default value is 5min)**
+    > **Disclaimer: For the purpose of this guide, notice how the "_sync-interval 3s_" is set. The 3 seconds interval is useful for demo purposes since it will make the sync interval rapidly track changes on the repository but it is recommended to have a longer interval in your production environment (the default value is 5min)**
 
-* Once the script will complete it's run, you will have 2 GitOps configuration created and all the resources deployed in your Kubernetes cluster. **Note:** that it takes few min for the configuration change it's Operator state status from "Pending" to Install.
+- Once the script will complete it's run, you will have the GitOps configuration create all the resources deployed in your Kubernetes cluster. **NOTE:** that it takes a few min for the configuration to change status from "Pending" to Install.
 
-    ![New GitOps configurations](./09.png)
+    ![Flux extension](./12.png)
 
-    ![New GitOps configurations](./10.png)
+    ![New GitOps configurations](./13.png)
 
-    ![New GitOps configurations](./11.png)
+    ![NGINX GitOps configuration](./14.png)
 
-    ![New GitOps configurations](./12.png)
+    ![App GitOps configuration](./15.png)
 
-* The Cluster-level config initiated the nginx-ingress Pods and Service resource deployment (along with the Flux operator and Memcached). To see it's resource, use the below *kubectl* commands.
+## The "Hello Arc" Application & Components
 
-    ```shell
-    kubectl get pods -n cluster-mgmt
-    kubectl get svc -n cluster-mgmt
-    ```
+- Before kicking off the GitOps flow, let's verify and "zoom in" to the Kubernetes resources deployed by running a few _kubectl_ commands.
 
-    ![nginx-ingress Pods and Service resource](./13.png)
-
-* The Namespace-level config initiated the "Hello Arc" Pod (1 replica), Service and Ingress Route resource deployment.
+- Show the Flux operator pods.
 
     ```shell
-    kubectl get pods -n prod
-    kubectl get svc -n prod
-    kubectl get ing -n prod
+    kubectl get pods -n flux-system 
     ```
 
-    ![Hello Arc" Pod, Service and Ingress Route resource](./14.png)
+    ![kubectl get pods -n flux-system ](./16.png)
+
+- Show 3 replicas and service of the "Hello Arc" application.
+
+    ```shell
+    kubectl get pods,svc -n hello-arc
+    ```
+
+    ![kubectl get pods,svc -n hello-arc](./17.png)
+
+- Show NGINX controller replicas and Kubernetes Service (Type _LoadBalancer_).
+
+    ```shell
+    kubectl get pods,svc -n ingress-nginx
+    ```
+
+    ![kubectl get pods,svc -n ingress-nginx](./18.png)
+
+- Show NGINX rule which will route the traffic to the "Hello Arc" application from outside the cluster.
+
+    ```shell
+    kubectl get ing -n hello-arc
+    ```
+
+    ![kubectl get ing -n hello-arc](./19.png)
 
 ## Initiating "Hello Arc" Application GitOps
 
-* The GitOps flow works as follow:
+- The GitOps flow works as follow:
 
-    1. The Flux operator holds the "desired state" for both the nginx-ingress and the "Hello Arc" Helm releases, this are the configuration we deployed against the Azure Arc connected cluster. The operator will pull every 3 seconds the state of the releases in the repository.
+    1. The Flux operator holds the "desired state" for both the NGINX Ingress Controller and the "Hello Arc" Helm releases, this is the configuration we deployed against the Azure Arc connected cluster. The operator "polls" the state of the ["Hello Arc"](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/hello-arc) application repository.
 
-    2. Changing the application release will trigger the Flux operator to kick-in the GitOps flow.
+    2. Changing the application, which is considered to be a new version of it, will trigger the Flux operator to kick in the GitOps flow.
 
-    3. A new version of the application will be deployed on the cluster with more replicas as configured. Once the new pods is successfully deployed, the old ones will be terminated (rolling upgrade).
+    3. A new Kubernetes pod with the new version of the application will be deployed on the cluster. Once the new pods are successfully deployed, the old one will be terminated (rolling upgrade).
 
-* To show the above flow, open 2 (ideally 3) side-by-side browser windows:
+- To show the above flow, open 2 (ideally 3) side-by-side windows:
 
-  * Azure Cloud Shell open running the ```kubectl get pods -n prod -w```
+  - Azure Cloud Shell running the command
+  
+      ```shell
+      kubectl get pods -n hello-arc -w
+      ```
+  
+    ![kubectl get pods -n hello-arc -w](./20.png)
 
-    ![kubectl get pods -n prod -w](./15.png)
+  - In **your fork** of the "Azure Arc Jumpstart App" repository, open the *hello-arc.yaml* file (/hello-arc/releases/app/hello-arc.yaml).
 
-  * In your own repository fork, open the "Hello Arc" [*hello-arc.yaml*](https://github.com/likamrat/hello_arc/blob/master/releases/prod/hello-arc.yaml) Helm release file.
+  - The external IP address of the Kubernetes Service is seen using the _`kubectl get svc -n ingress-nginx`_ command.
 
-  * The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n hello-arc``` command.
+    ![kubectl get svc -n ingress-nginx](./21.png)
 
-    ![kubectl get svc -n hello-arc](./16.png)
+  - End result should look like that:
 
-  * End result should look like that:
+    ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./22.png)
 
-    ![Side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./17.png)
+- As mentioned in the prerequisites section, it is optional but highly recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
 
-* As mentioned in the prerequisites section, it is optional but very recommended to configure the "Tab Auto Refresh" extension for your browser. If you did, in the "Hello Arc" application window, configure it to refresh every 2 seconds.
+    ![Tab Auto Refresh](./23.png)
 
-    ![Tab Auto Refresh](./18.png)
+- In the repository window showing the _hello-arc.yaml_ file, change the text under the "MESSAGE" section commit the change. Alternatively, you can open your cloned repository in your IDE, make the change, commit and push it.
 
-* In the repository window showing the *hello-arc.yaml* file, change the number of *replicaCount* to 3 as well as the the message text and commit your changes. Alternatively, you can open the forked repository in your IDE, make the change, commit and push it.
+    ![Making a change to the replica count and the "MESSAGE" section](./24.png)
 
-    ![Making a change to the replica count and the "MESSAGE" section](./19.png)
+    ![Making a change to the replica count and the "MESSAGE" section](./25.png)
 
-* Upon committing the changes, notice how the rolling upgrade starts. Once the Pods are up & running, the new "Hello Arc" application version window will show the new messages as well as the additional pods replicas, showing the rolling upgrade is completed and the GitOps flow is successful.
+- Upon committing the changes, notice how the Kubernetes Pod rolling upgrade will start. Once the Pod is up & running, the new "Hello Arc" application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
 
-    !["Hello Arc" rolling upgrade](./20.png)
-
-    !["Hello Arc" rolling upgrade](./21.png)
-
-    ![New side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./22.png)
+    ![New side-by-side view of terminal, "Hello Arc" GitHub repo and the application open in a web browser](./26.png)
 
 ## Cleanup
 
-To delete the GitOps configuration and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/helm/az_k8sconfig_helm_cleanup.sh) script, upload it to Cloud Shell and run it using the ```. ./az_k8sconfig_helm_cleanup.sh``` command.
+To delete the GitOps configuration and it's respective Kubernetes resources, edit the environment variables to match the Azure Arc Kubernetes cluster and Resources in the [az_k8sconfig_helm_cleanup](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/gitops/helm/az_k8sconfig_helm_cleanup.sh) script, upload it to Cloud Shell and run it using the _`. ./az_k8sconfig_helm_cleanup.sh`_ command.

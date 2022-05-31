@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmSize": {
+        "value": "Standard_D4s_v3"
+      },
+      "vmName": {
+        "value": "Arc-Proxy-Client"
+      },
+      "ProxyvmName": {
+        "value": "Arc-Proxy-Server"
+      },
+      "adminUsername": {
+        "value": "arcdemo"
+      },
+      "adminPassword": {
+        "value": "ArcPassword123!!"
+      },
+      "dnsLabelPrefix": {
+        "value": "arcproxyclient123"
+      },
+      "proxydnsLabelPrefix": {
+        "value": "arcproxyserver123"
+      },
+      "ProxysubnetName": {
+        "value": "proxy-subnet"
+      },
+      "subnetName": {
+        "value": "client-subnet"
+      },
+      "proxyNSG": {
+        "value": "Arc-Proxy-NSG"
+      },
+      "vmNSG": {
+        "value": "Arc-Client-NSG"
+      },
+      "subscriptionID": {
+        "value": "xxxxx-xxxxxx-xxxxx-xxxx"
+      },
+      "servicePrincipalClient": {
+        "value": "xxxxx-xxxxxx-xxxxx-xxxx"
+      },
+      "servicePrincipalClientSecret": {
+        "value": "xxxxx-xxxxxx-xxxxx-xxxx"
+      },
+      "tenantID": {
+        "value": "xxxxx-xxxxxx-xxxxx-xxxx"
+      },
+      "resourceGroup": {
+        "value": "Arc-Proxy-Demo"
+      },
+      "deployBastion": {
+        "value": false
+      },
+      "bastionHostName": {
+        "value": "Arc-Proxy-Demo-Bastion"
+      }
+    }
+  }
+  

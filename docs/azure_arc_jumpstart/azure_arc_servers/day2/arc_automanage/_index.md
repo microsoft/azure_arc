@@ -2,22 +2,25 @@
 type: docs
 title: "Azure Automanage"
 linkTitle: "Azure Automanage"
-weight: 9
+weight: 10
 description: >
 ---
 
 ## Enable Azure Automanage on an Azure Arc-enabled servers using an ARM Template
 
-The following README will guide you on how to onboard an Azure Arc-enabled server on to [Azure Automanage](https://docs.microsoft.com/en-us/azure/automanage/automanage-virtual-machines#prerequisites), so you can follow best practices in reliability, security and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/en-us/azure/automation/update-management/overview) and [Azure Backup](https://docs.microsoft.com/en-us/azure/backup/backup-overview).
+The following Jumpstart scenario will guide you on how to onboard an Azure Arc-enabled server onto [Azure Automanage](https://docs.microsoft.com/azure/automanage/automanage-virtual-machines#prerequisites), so you can follow best practices in reliability, security, and management for Azure Arc-enabled servers using Azure services such as [Azure Update Management](https://docs.microsoft.com/azure/automation/update-management/overview) and [Azure Monitor](https://docs.microsoft.com/azure/azure-monitor/vm/vminsights-overview).
 
-Azure Automanage removes the need to discover virtual machines manually and automatically onboards and configures certain services in Azure following best practices as defined in [Microsoft Cloud Adoption Framework for Azure](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/manage/best-practices). Azure services included in Azure Automanage are:
+Azure Automanage removes the need to discover virtual machines manually and automatically onboards and configures certain services in Azure following best practices as defined in [Microsoft Cloud Adoption Framework for Azure](https://docs.microsoft.com/azure/cloud-adoption-framework/manage/best-practices). Azure services included in Azure Automanage are:
 
-- [Azure Backup](https://docs.microsoft.com/en-us/azure/backup/backup-overview)
-- [Microsoft Defender for Cloud](https://docs.microsoft.com/en-us/azure/defender-for-cloud/defender-for-cloud-introduction)
-- [Azure Monitor](https://docs.microsoft.com/en-us/azure/azure-monitor/overview)
-- [Azure Automation](https://docs.microsoft.com/en-us/azure/automation/automation-intro)
+- [Microsoft Antimalware](https://docs.microsoft.com/azure/security/fundamentals/antimalware)
+- [Change Tracking & Inventory](https://docs.microsoft.com/azure/automation/change-tracking/overview)
+- [Update Management](https://docs.microsoft.com/azure/automation/update-management/overview)
+- [Machines Insights Monitoring](https://docs.microsoft.com/azure/azure-monitor/vm/vminsights-overview)
+- [Azure Guest Configuration](https://docs.microsoft.com/azure/governance/policy/concepts/guest-configuration)
+- [Azure Automation Account](https://docs.microsoft.com/azure/automation/automation-create-standalone-account)
+- [Log Analytics workspace](https://docs.microsoft.com/azure/azure-monitor/logs/log-analytics-overview)
 
-By the end of this guide, you will have an Azure Arc-enabled server with Azure Automanage enabled and configured following Microsoft Cloud Adoption Framework best practices for Dev/Test or Production environments.
+By the end of this scenario, you will have an Azure Arc-enabled server with Azure Automanage enabled and configured following Microsoft Cloud Adoption Framework best practices for Dev/Test or Production environments.
 
 > **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
@@ -41,13 +44,13 @@ By the end of this guide, you will have an Azure Arc-enabled server with Azure A
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- As mentioned, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario we will be using a Google Cloud Platform (GCP) instance that has been already connected to Azure Arc and is visible as a resource in Azure.
+- As mentioned, this scenario starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario we will be using a Google Cloud Platform (GCP) instance that has been already connected to Azure Arc and is visible as a resource in Azure.
 
     ![Screenshot of Azure Portal showing Azure Arc-enabled server](./01.png)
 
     ![Screenshot of Azure Portal showing Azure Arc-enabled server detail](./02.png)
 
-- [Install or update Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7*- or later. Use ```az --version``` to check your current installed version.
+- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.7*- or later. Use ```az --version``` to check your current installed version.
 
 - Create Azure service principal (SP)
 
@@ -55,13 +58,16 @@ By the end of this guide, you will have an Azure Arc-enabled server with Azure A
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "http://AzureArcServers" --role contributor
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArc" --role "Contributor" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look like this:
@@ -69,14 +75,15 @@ By the end of this guide, you will have an Azure Arc-enabled server with Azure A
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcServers",
-    "name": "http://AzureArcServers",
+    "displayName": "JumpstartArc",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
 
-  > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest). To create an Automanage Account used by the Automanage services, you need the Owner or Contributor permissions on your subscription along with User Access Administrator roles.**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 ## Automation Flow
 
@@ -111,7 +118,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
   ![Azure Automanage search](./06.png)
   ![Azure Arc-enabled server in Azure Automanage](./07.png)
 
-  > **Note: it may take upto 30 minutes for the script to finish its run**
+  > **NOTE: it may take upto 30 minutes for the script to finish its run**
 
 ## Clean up environment
 

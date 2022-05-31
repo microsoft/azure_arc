@@ -2,15 +2,15 @@
 type: docs
 title: "Azure Security Baseline"
 linkTitle: "Azure Security Baseline"
-weight: 11
+weight: 14
 description: >
 ---
 
 ## Use Azure Policy to audit if Azure Arc-enabled servers meet security baseline requirements
 
-The following README will guide you on how to use Azure Policy to push Azure Security Baseline to Azure Arc-enabled Windows and Linux servers. With this feature, you can now use the Azure portal to view the compliance status of Azure Arc-enabled servers and whether they meet security baseline requirements, and if not, why.
+The following Jumpstart scenario will guide you on how to use Azure Policy to push Azure Security Baseline to Azure Arc-enabled Windows and Linux servers. With this feature, you can now use the Azure portal to view the compliance status of Azure Arc-enabled servers and whether they meet security baseline requirements, and if not, why.
 
-You can use the Azure portal, an ARM template, or PowerShell script to assign policies to Azure subscriptions or resource groups. In this guide, you will use the PowerShell script to assign Azure security baseline policies.
+You can use the Azure portal, an ARM template, or PowerShell script to assign policies to Azure subscriptions or resource groups. In this scenario, you will use the PowerShell script to assign Azure security baseline policies.
 
 > **NOTE: This guide assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
@@ -27,7 +27,7 @@ You can use the Azure portal, an ARM template, or PowerShell script to assign po
 
 ## Prerequisites
 
-- As mentioned, this guide starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see two Windows servers and one Linux server have been connected with Azure Arc and are visible as resources in Azure.
+- As mentioned, this scenario starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below we can see two Windows servers and one Linux server have been connected with Azure Arc and are visible as resources in Azure.
 
     ![Screenshot of Azure Arc-enabled servers in a resource group](./01.png)
 

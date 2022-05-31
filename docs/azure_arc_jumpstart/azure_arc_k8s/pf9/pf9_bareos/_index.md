@@ -12,7 +12,7 @@ description: >
 
 <p align="center"><img src="/img/jumpstart_friends_logo.png" alt="jumpstart-friends-logo" width="250"></p>
 
-The following README will guide on how to deploy a Kubernetes cluster with [Platform9 Managed Kubernetes (PMK)](https://platform9.com/managed-kubernetes/) and have it as a connected Azure Arc Kubernetes resource. With PMK, you can have your clusters deployed on-premises, in public clouds, or at the edge. In this document, we'll explain the steps on how to create an **on-premise [BareOS](https://platform9.com/docs/kubernetes/bareos-what-is-bareos) cluster** using **PMK** and connect it to **Microsoft Azure Arc**.
+The following Jumpstart scenario will guide on how to deploy a Kubernetes cluster with [Platform9 Managed Kubernetes (PMK)](https://platform9.com/managed-kubernetes/) and have it as a connected Azure Arc Kubernetes resource. With PMK, you can have your clusters deployed on-premises, in public clouds, or at the edge. In this document, we'll explain the steps on how to create an **on-premise [BareOS](https://platform9.com/docs/kubernetes/bareos-what-is-bareos) cluster** using **PMK** and connect it to **Microsoft Azure Arc**.
 
 ## Prerequisites
 
@@ -29,9 +29,9 @@ The following README will guide on how to deploy a Kubernetes cluster with [Plat
   sudo apt-get install -y kubectl
   ```
 
-  > **Note: The *kubectl* package is installed from the Kubernetes repository, hence the Google Cloud public signing key need to be downloaded to enable the repository. Note: All PMK cluster nodes would have kubectl installed once the cluster is deployed.**
+  > **NOTE: The *kubectl* package is installed from the Kubernetes repository, hence the Google Cloud public signing key need to be downloaded to enable the repository. Note: All PMK cluster nodes would have kubectl installed once the cluster is deployed.**
 
-- [Install or update Azure CLI (az) to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
+- [Install or update Azure CLI (az) to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest).
 
   Use the below command to check your current installed version.
 
@@ -49,30 +49,34 @@ The following README will guide on how to deploy a Kubernetes cluster with [Plat
 
   To be able to complete the scenario and its related automation, Azure service principal assigned with the “Contributor” role is required. To create it, login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/)).
 
-  ```shell
-  az login
-  az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
-  ```
+    ```shell
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    ```
 
-  For example:
+    For example:
 
-  ```shell
-  az ad sp create-for-rbac -n "http://AzureArcK8s" --role contributor
-  ```
+    ```shell
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArcK8s" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    ```
 
-  Output should look like this:
+    Output should look like this:
 
-  ```json
-  {
-  "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "displayName": "AzureArcK8s",
-  "name": "http://AzureArcK8s",
-  "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-  }
-  ```
+    ```json
+    {
+    "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "displayName": "JumpstartArcK8s",
+    "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+    ```
 
-  > **Note: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/en-us/azure/role-based-access-control/best-practices)**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 ## Deployment
 
@@ -88,7 +92,7 @@ This deployment consists of 3 sections.
 
   ![Screenshot of PMK Management Plane Login Page](./01.png)
 
-  > **Note: If you do not have a registered Management Plane with Platform9, you can create one easily using [PMK Free Tier deployment](https://platform9.com/managed-kubernetes/)**
+  > **NOTE: If you do not have a registered Management Plane with Platform9, you can create one easily using [PMK Free Tier deployment](https://platform9.com/managed-kubernetes/)**
 
 - Onboard the Ubuntu host to your Management Plane.
 
@@ -101,7 +105,7 @@ This deployment consists of 3 sections.
 
   ![Screenshot of PF9 CLI](./03.png)
 
-  > **Note: Preparing the node and connecting it to Management Plane might take approximately 4-5 minutes to complete.**
+  > **NOTE: Preparing the node and connecting it to Management Plane might take approximately 4-5 minutes to complete.**
 
 ### Creating a PMK Cluster
 
@@ -136,7 +140,7 @@ This deployment consists of 3 sections.
 
   ![Screenshot of Exporting values](./08.png)
 
-  > **Note: The values can be referenced from the service principal output.**
+  > **NOTE: The values can be referenced from the service principal output.**
 
 - Set the KUBECONFIG variable for connecting to the K8s cluster. The kubeconfig file for the cluster is available for download from the Management Plane.
 

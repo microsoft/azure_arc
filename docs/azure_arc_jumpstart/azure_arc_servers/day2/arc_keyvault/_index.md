@@ -2,17 +2,17 @@
 type: docs
 title: "Key Vault Integration"
 linkTitle: "Key Vault Integration"
-weight: 4
+weight: 6
 description: >
 ---
 
 ## Deploy Azure Key Vault Extension to Azure Arc-enabled Ubuntu server and use a Key Vault managed certificate with Nginx
 
-The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/key-vault-linux) extension on an Azure Arc-enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server.
+The scenario will show you how to onboard the [Azure Key Vault](https://docs.microsoft.com/azure/virtual-machines/extensions/key-vault-linux) extension on an Azure Arc-enabled server, and then use a certificate managed by Azure Key Vault to secure web traffic with TLS on a web server.
 
-In this guide, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc-enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
+in this scenario, we will focus on securing an Ubuntu web server. The only prerequisite you need to complete for this scenario is an existing Azure Arc-enabled server running Ubuntu 18.04 (other Ubuntu releases may also work but have not been tested).
 
-> **Note: This guide assumes you already deployed an Ubuntu server that is running on-premises or in other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
+> **NOTE: This guide assumes you already deployed an Ubuntu server that is running on-premises or in other clouds and you have connected them to Azure Arc but If you haven't, this repository offers you a way to do so in an automated fashion:**
 
 * **[GCP Ubuntu instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)**
 * **[AWS Ubuntu EC2 instance](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/aws/aws_terraform_ubuntu/)**
@@ -28,13 +28,13 @@ In this guide, we will focus on securing an Ubuntu web server. The only prerequi
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* As mentioned, this guide starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using an Amazon Web Services (AWS) EC2 instance that has been already connected to Azure Arc and is visible as a resource in Azure.
+* As mentioned, this scenario starts at the point where you already deployed and connected VMs or bare-metal servers to Azure Arc. For this scenario, as can be seen in the screenshots below, we will be using an Amazon Web Services (AWS) EC2 instance that has been already connected to Azure Arc and is visible as a resource in Azure.
 
     ![Screenshot showing EC2 instance in AWS console](./01.png)
 
     ![Screenshot showing Azure Arc-enabled server](./02.png)
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version

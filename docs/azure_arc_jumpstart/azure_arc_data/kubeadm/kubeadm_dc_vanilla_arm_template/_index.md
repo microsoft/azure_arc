@@ -8,11 +8,11 @@ description: >
 
 ## Deploy an Azure Arc Data Controller (Vanilla) on Kubeadm cluster in an Azure VM using ARM Template
 
-The following README will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on single-node Kubernetes cluster deployed with [Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) in az Azure Ubuntu VM, using [Azure ARM Template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/overview).
+The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on single-node Kubernetes cluster deployed with [Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) in az Azure Ubuntu VM, using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
-By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this scenario, you will an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
-> **Note: Currently, Azure Arc-enabled data services with PostgreSQL Hyperscale is in [public preview](https://docs.microsoft.com/en-us/azure/azure-arc/data/release-notes)**.
+> **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -34,13 +34,22 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
 
     ```shell
     az login
-    az ad sp create-for-rbac -n "<Unique SP Name>" --role contributor
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "<Unique SP Name>" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
     ```
 
     For example:
 
     ```shell
-    az ad sp create-for-rbac -n "http://AzureArcData" --role contributor
+    az login
+    subscriptionId=$(az account show --query id --output tsv)
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Contributor" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security admin" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcDataSvc" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look like this:
@@ -48,14 +57,15 @@ By the end of this guide, you will an Ubuntu VM deployed with an Azure Arc Data 
     ```json
     {
     "appId": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "displayName": "AzureArcData",
-    "name": "http://AzureArcData",
+    "displayName": "JumpstartArcDataSvc",
     "password": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "tenant": "XXXXXXXXXXXXXXXXXXXXXXXXXXXX"
     }
     ```
 
-    > **Note: It is optional but highly recommended to scope the SP to a specific [Azure subscription and resource group](https://docs.microsoft.com/en-us/cli/azure/ad/sp?view=azure-cli-latest).**
+    > **NOTE: If you create multiple subsequent role assignments on the same service principal, your client secret (password) will be destroyed and recreated each time. Therefore, make sure you grab the correct password**.
+
+    > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
 ## Automation Flow
 
@@ -63,7 +73,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 * User is editing the ARM template parameters file (1-time edit). These parameters values are being used throughout the deployment.
 
-* Main ARM template will deploy an Ubuntu VM. The ARM template will call the the Azure [Linux Custom Script Extension](https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/custom-script-linux) to:
+* Main ARM template will deploy an Ubuntu VM. The ARM template will call the the Azure [Linux Custom Script Extension](https://docs.microsoft.com/azure/virtual-machines/extensions/custom-script-linux) to:
 
 * Deploy a single-node Kubernetes cluster using Kubeadm.
 * Deploy the Azure Arc Data Controller on that cluster.
@@ -74,7 +84,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 * Runtime script will:
 
   * Inject user parameters values (from bullet point #1) to be used in both runtime and logon script
-  * Install the required tools – az cli, az cli PowerShell module, kubernetes-cli and putty (Chocolaty packages)
+  * Install the required tools – az cli, PowerShell module, kubernetes-cli and putty (Chocolaty packages)
   * Download & install the Azure Data Studio & azdata cli
   * Download the Azure Data Studio Azure Data CLI, Azure Arc & PostgreSQL extensions
   * Create the logon script
@@ -105,14 +115,16 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
   * *SPN_CLIENT_ID* - Your Azure service principal name
   * *SPN_CLIENT_SECRET* - Your Azure service principal password
   * *SPN_TENANT_ID* - Your Azure tenant ID
-  * *SPN_AUTHORITY* - *https://login.microsoftonline.com* **Do not change**
+  * *SPN_AUTHORITY* - _https://login.microsoftonline.com_ **Do not change**
   * *AZDATA_USERNAME* - Azure Arc Data Controller
   * *AZDATA_PASSWORD* - Azure Arc Data Controller admin password (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols.)
   * *ACCEPT_EULA* - "yes" **Do not change**
-  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for *s namespace as well).
+  * *ARC_DC_NAME* - Azure Arc Data Controller name. The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character (This name will be used for namespace name as well).
   * *ARC_DC_SUBSCRIPTION* - Azure Arc Data Controller Azure subscription ID
   * *ARC_DC_RG* - Azure resource group where all the resources get deploy
   * *ARC_DC_REGION* - Azure location where the Azure Arc Data Controller resource will be created in Azure (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+  * *deployBastion* - choice (true | false) to deploy Azure Bastion
+  * *bastionHostName* - Azure Bastion host name
 
 * To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template) and run the below command:
 
@@ -125,7 +137,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
-    > **Note: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
+    > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the *azuredeploy.parameters.json* file**
 
     For example:
 
@@ -138,9 +150,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     --parameters azuredeploy.parameters.json
     ```
 
-    > **Note: Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20 minutes.**
+    > **NOTE: Deployment time of the Azure Resource (Ubuntu VM + Windows VM) can take ~15-20 minutes.**
 
-* Once Azure resources have been provisioned, you will be able to see it in Azure portal with the Azure Arc Data Controller included. 
+* Once Azure resources have been provisioned, you will be able to see it in Azure portal with the Azure Arc Data Controller included.
 
     ![A successful ARM deployment](./01.png)
 
@@ -148,11 +160,13 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Windows Login & Post Deployment
 
-Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are created, it is time to login the Client VM.
-
-* Using it's public IP, RDP to the **Client VM**
+* Now that the first phase of the automation is completed, it is time to RDP to the client VM. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
 
     ![Client VM](./03.png)
+
+* If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Screenshot showing connecting using Azure Bastion](./04.png)
 
 * At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
@@ -160,11 +174,11 @@ Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are crea
 
     Once the script will finish it's run, the logon script PowerShell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
 
-    ![PowerShell logon script run](./04.png)
-
     ![PowerShell logon script run](./05.png)
 
     ![PowerShell logon script run](./06.png)
+
+    ![PowerShell logon script run](./07.png)
 
 * To start interacting with the Azure Arc Data Controller, Open PowerShell and use the log in command bellow.
 
@@ -175,9 +189,9 @@ Now that both the Ubuntu Kubernetes VM and the Windows Server client VM are crea
 
 * Another tool automatically deployed is Azure Data Studio along with the *Azure Data CLI*, the *Azure Arc* and the *PostgreSQL* extensions. Using the Desktop shortcut created for you, open Azure Data Studio and click the Extensions settings to see both extensions.
 
-    ![Azure Data Studio shortcut](./07.png)
+    ![Azure Data Studio shortcut](./08.png)
 
-    ![Azure Data Studio extensions](./08.png)
+    ![Azure Data Studio extensions](./09.png)
 
 ## Using the Ubuntu Kubernetes VM
 
@@ -185,7 +199,7 @@ Even though everything you need is installed in the Windows client VM, it is pos
 
 * SSH to the Ubuntu VM using it public IP.
 
-    ![Ubuntu Data client VM](./09.png)
+    ![Ubuntu Data client VM](./10.png)
 
 * To start interacting with the Azure Arc Data Controller, use the log in command bellow.
 
@@ -194,10 +208,10 @@ Even though everything you need is installed in the Windows client VM, it is pos
     azdata arc dc status show
     ```
 
-    ![azdata login](./10.png)
+    ![azdata login](./11.png)
 
 ## Cleanup
 
 * To delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Delete Azure resource group](./11.png)
+    ![Delete Azure resource group](./12.png)

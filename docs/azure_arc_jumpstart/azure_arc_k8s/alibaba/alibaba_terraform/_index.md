@@ -8,7 +8,7 @@ description: >
 
 ## Deploy Alibaba Cloud Container Service for Kubernetes cluster and connect it to Azure Arc using Terraform
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Alibaba Cloud [Container Service for Kubernetes (ACK)](https://www.alibabacloud.com/product/kubernetes) and connect it as an Azure Arc cluster resource.
+The following Jumpstart scenario will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Alibaba Cloud [Container Service for Kubernetes (ACK)](https://www.alibabacloud.com/product/kubernetes) and connect it as an Azure Arc cluster resource.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ The following README will guide you on how to use the provided [Terraform](https
   git clone https://github.com/microsoft/azure_arc.git
   ```
 
-* [Install or update Azure CLI to version 2.21.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+* [Install or update Azure CLI to version 2.21.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
   az --version
@@ -32,7 +32,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * (Optional) [Install or update Aliyun CLI to latest version 3.0.73 and above](https://github.com/aliyun/aliyun-cli). Use the below command to check your current installed version.
 
-  > **Note: Ālǐyún or Aliyun is actually the chinese name for Alibaba Cloud**
+  > **NOTE: Ālǐyún or Aliyun is actually the chinese name for Alibaba Cloud**
 
   ```shell
   aliyun --version
@@ -44,7 +44,7 @@ The following README will guide you on how to use the provided [Terraform](https
   terraform -v
   ```
 
-* [Enable Azure subscription with](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes. Login with an identity with sufficient authorizations.
+* [Enable Azure subscription with](https://docs.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types#register-resource-provider) the two resource providers for Azure Arc-enabled Kubernetes. Registration is an asynchronous process, and registration may take approximately 10 minutes. Login with an identity with sufficient authorizations.
 
   ```shell
   az login
@@ -66,7 +66,7 @@ The following README will guide you on how to use the provided [Terraform](https
   az extension add --name k8s-configuration
   ```
 
-  > **Note: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
+  > **NOTE: If you already used this guide before and/or have the extensions installed, use the bellow commands:**
 
   ```shell
   az extension update --name connectedk8s
@@ -77,7 +77,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * [Sign up to or have an Alibaba Cloud account](https://www.alibabacloud.com/) - domestic or international
 
-  > **Note: The screenshots and sample outputs shown here are based on a domestic account.**
+  > **NOTE: The screenshots and sample outputs shown here are based on a domestic account.**
 
 * Browse to <https://console.aliyun.com/> and login with your Alibaba Cloud account. Once logged in, create a new access key from your profile. After creating it, be sure to copy down the access and secret key.
 
@@ -121,7 +121,7 @@ The only thing you need to do before executing the Terraform plan is to export t
   export AZURE_CLUSTER_NAME="azure-arc-aliyun"
   ```
 
-  > **Note: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _$env:variable-name=variable-value_ (see example below)**
+  > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _$env:variable-name=variable-value_ (see example below)**
 
   ```powershell
   $env:ALICLOUD_ACCESS_KEY="aBcDeFgHiJkLmNo"
@@ -213,7 +213,7 @@ terraform refresh
 terraform destroy --auto-approve
 ```
 
-> **Note: `terraform refresh` will update the local state to that `terraform destroy` also handles automatically generated resources like _Elastic IP Address_ and/or _NAT Gateway_.**
+> **NOTE: `terraform refresh` will update the local state to that `terraform destroy` also handles automatically generated resources like _Elastic IP Address_ and/or _NAT Gateway_.**
 
 output:
 
