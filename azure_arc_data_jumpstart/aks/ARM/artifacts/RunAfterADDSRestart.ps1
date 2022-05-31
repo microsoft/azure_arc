@@ -29,11 +29,11 @@ $reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $
 Write-Host "Reverse lookup zone CIDR $reverseLookupCidr"
 
 # Create login session with domain credentials
-$cimsession = New-CimSession -Credential $adminCredential -ComputerName $dcInfo.HostName
+$cimsession = New-CimSession -Credential $adminCredential
 
 # Setup reverse lookup zone
 try {
-    Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope Domain -ComputerName $dcInfo.HostName -CimSession $cimsession
+    Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope Domain -CimSession $cimsession
     Write-Host "Successfully created reverse DNS Zone."
 
     $ReverseDnsZone = Get-DnsServerZone | Where-Object {$_.IsAutoCreated -eq $false -and $_.IsReverseLookupZone -eq $true}
@@ -45,12 +45,13 @@ catch {
 }
 
 # Create reverse DNS for domain controller
-try {
+if ($null -ne $ReverseDnsZone)
+{
     Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -CimSession $cimsession
     Write-Host "Created PTR record for domain controller."
 }
-catch {
-    Write-Host "PTR record already exists for domain controller."
+else {
+    Write-Host "Failed to create reverse DNS lookup zone or zone does not exist."
 }
 
 # Delete schedule task
