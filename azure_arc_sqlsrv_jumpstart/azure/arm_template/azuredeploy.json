@@ -268,7 +268,7 @@
                 "type": "CustomScriptExtension",
                 "typeHandlerVersion": "1.10",
                 "autoUpgradeMinorVersion": true,
-                "settings": {
+                "protectedSettings": {
                     "fileUris": [
                         "[uri(variables('templateBaseUrl'), 'arm_template/scripts/Bootstrap.ps1')]"
                     ],
