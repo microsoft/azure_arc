@@ -27,6 +27,46 @@ weight: 3
   - Optimized Azure VM SKUs
   - Added [FAQ](https://aka.ms/ArcBox-FAQ) and a sample ArcBox cost estimator with Azure Pricing Calculator
   - Additional misc optimizations, enhancements and bug fixes
+- New Azure Arc-enabled servers scenarios
+- New Azure Arc-enabled VMware vSphere scenarios
+- Updated Azure Arc-enabled Kubernetes scenarios
+- New and updated Azure Arc-enabled data services scenarios
+- [Bump AzCli 2.36.0 prerequisite across all READMEs](https://github.com/microsoft/azure_arc/pull/1188)
+- [Bump Azure Arc Data Controller images to May 2022 release](https://github.com/microsoft/azure_arc/pull/1205)
+
+### Azure Arc-enabled servers scenarios
+
+- [New Scenario: Enable SSH access to Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_ssh/#enable-ssh-access-to-azure-arc-enabled-servers)
+- [New Scenario: Azure Arc-enabled servers connectivity behind a proxy server](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_proxy/#azure-arc-enabled-servers-connectivity-behind-a-proxy-server)
+- [Updated Scenario: Azure Arc-enabled servers inventory management using Resource Graph Explorer](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_inventory_management/)
+- [Bug fix: Azure Automanage - incorrect description #1193](https://github.com/microsoft/azure_arc/issues/1193)
+- [Bug fix: Updated private link scenario to show private connection #1219](https://github.com/microsoft/azure_arc/pull/1219)
+
+### Azure Arc-enabled VMware vSphere scenarios
+
+- [New Scenario: Connect VMware vCenter Server to Azure Arc using PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_vsphere/resource_bridge/powershell/)
+
+### Azure Arc-enabled Kubernetes scenarios
+
+- [Updated Scenario: Refresh AKS Onboarding ARM Template Scenario #1152](https://github.com/microsoft/azure_arc/issues/1152)
+- [Updated Scenario: Refresh AKS Onboarding Scenario - Terraform #1160](https://github.com/microsoft/azure_arc/issues/1160)
+- [Updated Scenario: Refresh AKS Basic GitOps Scenario #1169](https://github.com/microsoft/azure_arc/issues/1169)
+- [Updated Scenario: Refresh AKS GitOps Helm Scenario #1177](https://github.com/microsoft/azure_arc/issues/1177)
+- [Updated Scenario: Refresh CAPI GitOps Helm Scenario #1186](https://github.com/microsoft/azure_arc/issues/1186)
+
+### Azure Arc-enabled data services
+
+- [New Scenario: Configure disaster recovery in Azure Arc-enabled SQL Managed Instance on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_dr/#configure-disaster-recovery-in-azure-arc-enabled-sql-managed-instance-on-aks-using-an-arm-template)
+- [Feature: May 2022 image update](https://github.com/microsoft/azure_arc/pull/1205)
+- [Bug fix: Azure ArcBox CSI Driver not installed #1150](https://github.com/microsoft/azure_arc/issues/1150)
+
+### Jumpstart ArcBox
+
+- [New flavor: ArcBox for DevOps](https://aka.ms/ArcBoxDevOpsBlog)
+- [Feature: ArcBox-Client VM custom script extension should use protectedSettings instead of settings #1209](https://github.com/microsoft/azure_arc/issues/1209)
+- [Bug fix: Owner Role But No Write permission #1165](https://github.com/microsoft/azure_arc/issues/1165)
+- [Bug fix: Please change the way ServicePrincipal name is given in example #1176](https://github.com/microsoft/azure_arc/issues/1176)
+- [Bug fix: Log Analytics Workspace needs to be in different region to Automation Account #1187](https://github.com/microsoft/azure_arc/issues/1187)
 
 ## April 2022
 
