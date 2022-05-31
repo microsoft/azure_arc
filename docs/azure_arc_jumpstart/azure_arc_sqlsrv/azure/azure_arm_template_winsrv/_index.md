@@ -210,7 +210,7 @@ Now that you have both the server and SQL projected as Azure Arc resources the l
 
     ![Screenshot showing Environment Health blade of Azure Arc-enabled SQL server](./view_assessment_disabled.png)
 
-    It might take a bit of time, but after approximately 45-60min you will notice how the "View SQL Assessment Results" becomes available for you to click on. At this point the SQL assessment data and logs are getting injected to Azure Log Analytics.
+    It might take a bit of time, but after approximately 45-60 minutes you will notice how the "View SQL Assessment Results" becomes available for you to click on. At this point the SQL assessment data and logs are getting injected to Azure Log Analytics.
 
     Initially the amount of data will be limited as it take a while for the assessment to complete a full cycle but after few hours you should be able to see much more data coming in.  
 
