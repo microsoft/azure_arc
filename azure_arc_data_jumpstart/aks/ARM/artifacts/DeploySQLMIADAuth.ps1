@@ -32,10 +32,58 @@ Import-Module DnsServer
 
 # Get Activectory Information
 $dcInfo = Get-ADDomainController
+
+# Setup reverse DNS for AD authentication
+$dcIPv4 = ([System.Net.IPAddress]$dcInfo.IPv4Address).GetAddressBytes()
+$reverseLookupCidr = [System.String]::Concat($dcIPv4[0], '.', $dcIPv4[1], '.', $dcIPv4[2], '.0/24')
+Write-Host "Reverse lookup zone CIDR $reverseLookupCidr"
+
+# Setup reverse lookup zone
+# check if reverse DNS already setup
+$ReverseDnsZone = Get-DnsServerZone -ComputerName $dcInfo.HostName | Where-Object {$_.IsAutoCreated -eq $false -and $_.IsReverseLookupZone -eq $true}
+if ($null -eq $ReverseDnsZone)
+{
+    try {
+        Add-DnsServerPrimaryZone -NetworkId $reverseLookupCidr -ReplicationScope Domain -ComputerName $dcInfo.HostName
+        Write-Host "Successfully created reverse DNS Zone."
+
+        $ReverseDnsZone = Get-DnsServerZone -ComputerName $dcInfo.HostName | Where-Object {$_.IsAutoCreated -eq $false -and $_.IsReverseLookupZone -eq $true}
+    }
+    catch {
+        # Reverse DNS already setup
+        Write-Host "Failed to create Reverse DNS Zone."
+        Exit
+    }
+}
+else
+{
+    Write-Host "Reverse DNS Zone ${ReverseDnsZone.Name} already exists for this domain controller."
+}
+
+# Create reverse DNS for domain controller
+if ($null -ne $ReverseDnsZone)
+{
+    # Get existing PTR record
+    $ptrrecord = Get-DnsServerResourceRecord -RRType Ptr -ComputerName $dcInfo.HostName -Name $dcIPv4[3] -ZoneName $ReverseDnsZone.ZoneName
+    if ($null -eq $ptrrecord)
+    {
+        Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -ComputerName  $dcInfo.HostName
+        Write-Host "Created PTR record for domain controller."
+    }
+    else
+    {
+        Write-Host "Domain controller PTR record already exists."
+    }
+}
+else {
+    Write-Host "Failed to create reverse DNS lookup zone or zone does not exist."
+    Exit
+}
+
 $sqlmiouName = "ARCSQLMI"
 $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
 
-# Create ArcSQLMi OU
+# Create ArcSQLMI OU
 try
 {
     $ou = Get-ADOrganizationalUnit -Identity $sqlmiOUDN
