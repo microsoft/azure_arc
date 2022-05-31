@@ -33,8 +33,8 @@
     "extendedLocation": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/microsoft.extendedlocation/customlocations/', parameters('extendedLocationName') )]",
     "vCenterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VCenters/', parameters('vCenterName') )]",
     "networkId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VirtualNetworks/', parameters('networkName') )]",
-    "templateId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/Microsoft.ConnectedVMwarevSphere/VirtualMachineTemplates/', parameters('templateName') )]",
-    "clusterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/Microsoft.ConnectedVMwarevSphere/Clusters/', parameters('clusterName') )]"
+    "templateId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VirtualMachineTemplates/', parameters('templateName') )]",
+    "clusterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/Clusters/', parameters('clusterName') )]"
   },
   "resources": [
     {
