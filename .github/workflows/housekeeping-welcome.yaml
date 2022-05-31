@@ -1,0 +1,25 @@
+name: Housekeeping - Issues and PRs auto message
+
+on:
+  fork:
+  push:
+    branches: [main]
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: EddieHubCommunity/gh-action-community/src/welcome@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: 'Hey friend! Thanks for opening this issue. We appreciate your contribution and welcome you to our community! We are glad to have you here and to have your input on the Azure Arc Jumpstart.'
+          pr-message: 'Hi friend! Thanks you for opening this Pull Request. Someone will review it soon. Thank you for committing to making the Azure Arc Jumpstart better.'

@@ -2,7 +2,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = "Arc-Data-AKS"
+$connectedClusterName = "Arc-DataSvc-AKS"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -31,9 +31,9 @@ Write-Host "`n"
 Write-Host "Installing Azure Data Studio Extensions"
 Write-Host "`n"
 $Env:argument1="--install-extension"
-$Env:argument2="Microsoft.arc"
+$Env:argument2="microsoft.azcli"
 $Env:argument3="microsoft.azuredatastudio-postgresql"
-$Env:argument4="microsoft.azdata"
+$Env:argument4="Microsoft.arc"
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
 & "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
@@ -66,11 +66,6 @@ Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
 
-# Making extension install dynamic
-az config set extension.use_dynamic_install=yes_without_prompt
-Write-Host "`n"
-az -v
-
 # Getting AKS cluster credentials kubeconfig file
 Write-Host "Getting AKS cluster credentials"
 Write-Host "`n"
@@ -101,9 +96,9 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+# Enabling Container Insights cluster extension
 Write-Host "`n"
-Write-Host "Enabling Container Insights cluster extensions"
+Write-Host "Enabling Container Insights cluster extension"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
 Write-Host "`n"
 

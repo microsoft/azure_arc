@@ -18,6 +18,7 @@
         },
         "dnsPrefix": {
             "type": "string",
+            "defaultValue":"arck8s",
             "metadata": {
                 "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN."
             }
@@ -42,7 +43,7 @@
         },
         "agentVMSize": {
             "type": "string",
-            "defaultValue": "Standard_DS2_v2",
+            "defaultValue": "Standard_D4s_v4",
             "metadata": {
                 "description": "The size of the Virtual Machine."
             }
@@ -89,7 +90,7 @@
             }
         },
         "kubernetesVersion": {
-            "defaultValue": "1.18.2",
+            "defaultValue": "1.23.5",
             "type": "string",
             "metadata": {
                 "description": "The version of Kubernetes."
@@ -104,7 +105,7 @@
     },
     "resources": [
         {
-            "apiVersion": "2020-03-01",
+            "apiVersion": "2022-02-01",
             "type": "Microsoft.ContainerService/managedClusters",
             "location": "[parameters('location')]",
             "name": "[parameters('clusterName')]",
@@ -120,7 +121,8 @@
                         "count": "[parameters('agentCount')]",
                         "vmSize": "[parameters('agentVMSize')]",
                         "osType": "[parameters('osType')]",
-                        "storageProfile": "ManagedDisks"
+                        "storageProfile": "ManagedDisks",
+                        "mode": "System"
                     }
                 ],
                 "linuxProfile": {
