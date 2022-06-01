@@ -53,7 +53,7 @@
     },
     "dnsServers": {
       "type": "array",
-      "defaultValue": ["168.63.129.16"],
+      "defaultValue": [],
       "metadata": {
         "description": "DNS Server configuration"
       }
@@ -71,6 +71,7 @@
           "addressPrefixes": [ "[parameters('addressPrefix')]" ]
         },
         "dhcpOptions": {
+          "condition": "[greater(length(parameters('dnsServers')), 0)]",
           "dnsServers": "[parameters('dnsServers')]"
         },
         "subnets": [
