@@ -22,7 +22,7 @@ weight: 3
   - Updated Microsoft Defender for Cloud experience
   - Bump Kubernetes version to v1.22.8
   - Bump Cluster API Azure provider version to v1.2.1
-  - Bump Clusterctl version to v1.2.1
+  - Bump Clusterctl version to v1.1.3
   - API bumps across all ARM and Bicep templates
   - Optimized Azure VM SKUs
   - Added [FAQ](https://aka.ms/ArcBox-FAQ) and a sample ArcBox cost estimator with Azure Pricing Calculator
