@@ -71,7 +71,6 @@
           "addressPrefixes": [ "[parameters('addressPrefix')]" ]
         },
         "dhcpOptions": {
-          "condition": "[greater(length(parameters('dnsServers')), 0)]",
           "dnsServers": "[parameters('dnsServers')]"
         },
         "subnets": [
