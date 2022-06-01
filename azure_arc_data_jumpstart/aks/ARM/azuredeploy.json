@@ -193,6 +193,9 @@
           "kubernetesVersion": {
             "value": "[parameters('kubernetesVersion')]"
           },
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
+          },
           "dnsPrefix": {
             "value": "[parameters('dnsPrefix')]"
           }
