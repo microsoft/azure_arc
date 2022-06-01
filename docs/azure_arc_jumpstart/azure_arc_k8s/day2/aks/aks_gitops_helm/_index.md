@@ -1,12 +1,12 @@
 ---
 type: docs
-title: "Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster"
-linkTitle: "Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster"
+title: "Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster (Flux v2)"
+linkTitle: "Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster (Flux v2)"
 weight: 2
 description: >
 ---
 
-## Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster
+## Deploy GitOps configurations and perform Helm-based GitOps flow on AKS as an Azure Arc Connected Cluster (Flux v2)
 
 The following Jumpstart scenario will guide you on how to create [Helm](https://helm.sh/)-based GitOps configuration on an Azure Kubernetes Service (AKS) cluster which is projected as an Azure Arc connected cluster resource.
 
