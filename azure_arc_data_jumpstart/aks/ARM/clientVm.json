@@ -107,7 +107,7 @@
     },
     "azdataPassword": {
       "type": "securestring",
-      "defaultValue": "ArcPassword@123"
+      "defaultValue": "ArcPassword123!!"
     },
     "acceptEula": {
       "type": "string",
