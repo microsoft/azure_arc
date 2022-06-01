@@ -29,6 +29,7 @@ weight: 3
   - Additional misc optimizations, enhancements and bug fixes
 - New Azure Arc-enabled servers scenarios
 - New Azure Arc-enabled VMware vSphere scenarios
+- Updated Azure Arc-enabled SQL Server scenario
 - Updated Azure Arc-enabled Kubernetes scenarios
 - New and updated Azure Arc-enabled data services scenarios
 - [Bump AzCli 2.36.0 prerequisite across all READMEs](https://github.com/microsoft/azure_arc/pull/1188)
@@ -45,6 +46,10 @@ weight: 3
 ### Azure Arc-enabled VMware vSphere scenarios
 
 - [New Scenario: Connect VMware vCenter Server to Azure Arc using PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_vsphere/resource_bridge/powershell/)
+
+### Azure Arc-enabled SQL Server scenarios
+
+- [Updated Scenario: Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform #1212](https://github.com/microsoft/azure_arc/pull/1212)
 
 ### Azure Arc-enabled Kubernetes scenarios
 
