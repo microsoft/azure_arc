@@ -17,6 +17,9 @@
     "myIpAddress": {
       "value": "<your IP address>"
     },
+    "logAnalayticsWorkspaceName": {
+      "value": "<your unique Log Analytics workspace name>"
+    },
     "servicePrincipalAppId": {
       "value": "<Azure service principal name>"
     },
