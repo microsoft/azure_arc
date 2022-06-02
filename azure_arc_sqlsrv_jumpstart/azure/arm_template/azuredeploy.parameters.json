@@ -25,6 +25,9 @@
     },
     "servicePrincipalTenantId": {
       "value": "<Azure tenant ID>"
+    },
+    "deployBastion": {
+      "value": "(true/false)"
     }
   }
 }
