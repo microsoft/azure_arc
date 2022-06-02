@@ -166,9 +166,13 @@ As mentioned, this deployment will use an ARM Template. You will deploy a single
 
 ## Windows Login & Post Deployment
 
-- Once the Windows Server VM has been deployed, it is time to login to it. Use RDP to access the VM using the VM's public IP
+- Once the Windows Server VM has been deployed, it is time to log in to it. If you have not chosen to deploy Azure Bastion in the ARM template, RDP to the VM using its public IP.
 
     ![Screenshot showing Overview tab of Azure VM](./sql_vm_portal.png)
+
+- If you have chosen to deploy Azure Bastion in the ARM template, use it to connect to the VM.
+
+    ![Screenshot showing Overview tab of Azure VM connecting using Bastion](./sql_vm_bastion.png)
 
 - At first login a logon script will get executed. This script was created as part of the automated deployment process.
 
