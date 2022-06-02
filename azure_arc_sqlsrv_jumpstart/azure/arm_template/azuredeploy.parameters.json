@@ -1,27 +1,30 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "vmSize": {
-            "value": "<VM size>"
-        },
-        "vmName": {
-            "value": "<VM Name>"
-        },
-        "adminUsername": {
-            "value": "<Windows VM admin username>"
-        },
-        "adminPassword": {
-            "value": "<Windows VM admin password>"
-        },
-        "servicePrincipalAppId": {
-            "value": "<Azure service principal name>"
-        },
-        "servicePrincipalSecret": {
-            "value": "<Azure service principal password>"
-        },
-        "servicePrincipalTenantId": {
-            "value": "<Azure tenant ID>"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSize": {
+      "value": "<VM size>"
+    },
+    "vmName": {
+      "value": "<VM Name>"
+    },
+    "adminUsername": {
+      "value": "<Windows VM admin username>"
+    },
+    "adminPassword": {
+      "value": "<Windows VM admin password>"
+    },
+    "myIpAddress": {
+      "value": "<your IP address>"
+    },
+    "servicePrincipalAppId": {
+      "value": "<Azure service principal name>"
+    },
+    "servicePrincipalSecret": {
+      "value": "<Azure service principal password>"
+    },
+    "servicePrincipalTenantId": {
+      "value": "<Azure tenant ID>"
     }
+  }
 }
