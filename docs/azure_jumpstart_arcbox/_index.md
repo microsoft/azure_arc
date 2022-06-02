@@ -35,4 +35,4 @@ ArcBox comes in multiple "flavors", or configurations, which can be selected to 
 
     ![ArcBox for DevOps architecture diagram](./arch_devops.png)
 
-To get started with one of the flavors of ArcBox, click the relevant links above to view the detailed README for each flavor. For additional questions, please review the [ArcBox FAQ](https://azurearcjumpstart.io/azure_jumpstart_arcbox/FAQ/_index.md).
+To get started with one of the flavors of ArcBox, click the relevant links above to view the detailed README for each flavor. For additional questions, please review the [ArcBox FAQ](https://azurearcjumpstart.io/FAQ).
