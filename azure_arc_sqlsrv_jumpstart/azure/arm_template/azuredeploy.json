@@ -241,10 +241,7 @@
                 "publicIPAddressVersion": "IPv4",
                 "idleTimeoutInMinutes": 4
             },
-            "sku": {
-                "name": "Basic",
-                "tier": "Regional"
-            }
+            "sku": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
