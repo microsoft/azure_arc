@@ -99,14 +99,14 @@
             "metadata": {
                 "description": "Target GitHub account"
             },
-            "defaultValue": "sebassem"
+            "defaultValue": "microsoft"
         },
         "githubBranch": {
             "type": "string",
             "metadata": {
                 "description": "Target GitHub branch"
             },
-            "defaultValue": "jumpstart-sql-bastion"
+            "defaultValue": "main"
         },
         "deployBastion": {
             "type": "bool",
@@ -241,7 +241,10 @@
                 "publicIPAddressVersion": "IPv4",
                 "idleTimeoutInMinutes": 4
             },
-            "sku": "[if(not(parameters('deployBastion')),'Basic','Standard')]"
+            "sku": {
+                "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
+                "tier": "Regional"
+            }
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
