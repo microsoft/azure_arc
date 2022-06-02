@@ -22,6 +22,9 @@
         },
         "servicePrincipalTenantId": {
             "value": "33333333-XXXX-41af-1111-7777777777"
+        },
+        "deployBastion": {
+            "value": false
         }
     }
 }
