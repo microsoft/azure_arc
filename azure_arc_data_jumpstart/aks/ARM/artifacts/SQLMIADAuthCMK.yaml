@@ -27,11 +27,11 @@ metadata:
 spec:
   backup:
     retentionPeriodInDays: 7
-  dev: false
-  tier: GeneralPurpose
+  dev: true
+  tier: {{PRICING_TIER}}
   forceHA: "true"
   licenseType: LicenseIncluded
-  replicas: 1
+  replicas: {{REPLICA_COUNT}}
   security:
     adminLoginSecret: admin-login-secret
     activeDirectory:
