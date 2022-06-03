@@ -14,6 +14,9 @@
         "adminPassword": {
             "value": "ArcPassword123!!"
         },
+        "myIpAddress": {
+            "value": "192.168.10.10"
+        },
         "servicePrincipalAppId": {
             "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
         },
@@ -22,6 +25,12 @@
         },
         "servicePrincipalTenantId": {
             "value": "33333333-XXXX-41af-1111-7777777777"
+        },
+        "logAnalyticsWorkspaceName": {
+            "value": "rg-la-arc"
+        },
+        "deployBastion": {
+            "value": false
         }
     }
 }
