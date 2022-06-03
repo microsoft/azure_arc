@@ -2,7 +2,6 @@
 
 # <--- Change the following environment variables according to your Azure service principal name --->
 
-export subscriptionId='<Your Azure subscription ID>'
 export servicePrincipalAppId='<Your Azure service principal name>'
 export servicePrincipalSecret='<Your Azure service principal password>'
 export servicePrincipalTenantId='<Your Azure tenant ID>'
