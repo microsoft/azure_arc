@@ -22,6 +22,7 @@ az login --service-principal --username $Env:spnClientID --password $Env:spnClie
 # Register Azure providers
 Write-Header "Registering Providers"
 az provider register --namespace Microsoft.HybridCompute --wait
+az provider register --namespace Microsoft.HybridConnectivity --wait
 az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 
