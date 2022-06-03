@@ -19,7 +19,7 @@ chmod 700 get_helm.sh
 echo "Installing Azure CLI & Azure Arc Extensions"
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-echo "Clear cached helm Azure Arc Helm Charts"
+echo "Clear cached Azure Arc Helm Charts"
 rm -rf ~/.azure/AzureArcCharts
 
 # Installing Azure Arc k8s CLI extensions
