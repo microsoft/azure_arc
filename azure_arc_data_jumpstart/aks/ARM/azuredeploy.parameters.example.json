@@ -30,7 +30,7 @@
       "value": true
     },
     "enableADAuth": {
-      "value": "true"
+      "value": true
     },
     "SQLMIHA": {
       "value": true
