@@ -29,6 +29,9 @@
     "deploySQLMI": {
       "value": true
     },
+    "enableADAuth": {
+      "value": "true"
+    },
     "SQLMIHA": {
       "value": true
     },
