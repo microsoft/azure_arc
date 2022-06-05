@@ -16,9 +16,6 @@ param (
 
 Start-Transcript -Path "C:\Temp\SetupADDS.log"
 
-# Download post reboot scrpt file
-Invoke-WebRequest ($templateBaseUrl + "artifacts/RunAfterADDSRestart.ps1") -OutFile "C:\Temp\RunAfterADDSRestart.ps1"
-
 # Convert plain text password to secure string
 $secureDomainAdminPassword = $domainAdminPassword | ConvertTo-SecureString -AsPlainText -Force
 
