@@ -165,8 +165,8 @@ $dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey  | Set-Content -Path $dataControllerParams
 
 az deployment group create --resource-group $Env:resourceGroup `
-                           --template-file "$Env:TempDir \dataController.json" `
-                           --parameters "$Env:TempDir \dataController.parameters.json"
+                           --template-file "$Env:TempDir\dataController.json" `
+                           --parameters "$Env:TempDir\dataController.parameters.json"
 
 Write-Host "`n"
 Do {
@@ -182,7 +182,7 @@ Write-Host "`n"
 # If flag set, deploy SQL MI
 if ( $Env:deploySQLMI -eq $true )
 {
-& "$Env:TempDir \DeploySQLMI.ps1"
+& "$Env:TempDir\DeploySQLMI.ps1"
 }
 
 # Enabling data controller auto metrics & logs upload to log analytics
@@ -199,7 +199,7 @@ if ( $Env:deploySQLMI -eq $true){
     Write-Host "`n"
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-    Copy-Item -Path "$Env:TempDir \settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+    Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
     # Creating desktop url shortcuts for built-in Grafana and Kibana services 
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -218,7 +218,7 @@ if ( $Env:deploySQLMI -eq $true){
 }
 
 # Changing to Client VM wallpaper
-$imgPath="$Env:TempDir \wallpaper.png"
+$imgPath="$Env:TempDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
