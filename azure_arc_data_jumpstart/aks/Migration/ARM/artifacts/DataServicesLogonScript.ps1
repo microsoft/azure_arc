@@ -153,7 +153,6 @@ $workspaceKey  = $(az monitor log-analytics workspace get-shared-keys --resource
 $dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$Env:resourceGroup | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'jumpstartdc-stage',$primaryDcName | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage',$Env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage',$customLocationId  | Set-Content -Path $dataControllerParams
