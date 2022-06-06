@@ -27,6 +27,12 @@
     },
     "clusterName": {
       "type": "string"
+    },
+    "adminUserName" : {
+      "type": "string"
+    },
+    "adminPassword" : {
+      "type": "string"
     }
   },
   "variables": {
@@ -73,9 +79,25 @@
         },
         "osProfile": {
           "osType": "Windows",
-          "computerName": "[parameters('virtualMachineName')]"
+          "computerName": "[parameters('virtualMachineName')]",
+          "adminPassword" : "[parameters('adminPassword')]"
         }
       }
+    },
+    {
+            "type": "Microsoft.ConnectedVMwarevSphere/VirtualMachines/guestAgents",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[concat(parameters('virtualMachineName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ConnectedVMwarevSphere/VirtualMachines', parameters('virtualMachineName'))]"
+            ],
+            "properties": {
+                "credentials": {
+                    "username": "[parameters('adminUserName')]",
+                    "password" : "[parameters('adminPassword')]"
+                },
+                "provisioningAction": "install"
+            }
     }
   ]
 }
