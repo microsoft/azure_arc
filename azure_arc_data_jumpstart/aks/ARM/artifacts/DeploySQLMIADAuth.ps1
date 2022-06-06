@@ -63,16 +63,12 @@ else
 # Create reverse DNS for domain controller
 if ($null -ne $ReverseDnsZone)
 {
-    # Get existing PTR record
-    $ptrrecord = Get-DnsServerResourceRecord -RRType Ptr -ComputerName $dcInfo.HostName -Name $dcIPv4[3] -ZoneName $ReverseDnsZone.ZoneName
-    if ($null -eq $ptrrecord)
-    {
+    try{
         Add-DNSServerResourceRecordPTR -ZoneName $ReverseDnsZone.ZoneName -Name $dcIPv4[3] -PTRDomainName $dcInfo.HostName -ComputerName  $dcInfo.HostName
         Write-Host "Created PTR record for domain controller."
     }
-    else
-    {
-        Write-Host "Domain controller PTR record already exists."
+    catch{
+        Write-Host "Failed to create domain controller PTR record or PTR record already exists."
     }
 }
 else {
