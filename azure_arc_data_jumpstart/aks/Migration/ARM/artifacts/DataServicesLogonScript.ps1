@@ -94,7 +94,7 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Enabling Container Insights cluster extension on primary cluster
+# Enabling Container Insights cluster extension
 Write-Host "`n"
 Write-Host "Enabling Container Insights cluster extension"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
