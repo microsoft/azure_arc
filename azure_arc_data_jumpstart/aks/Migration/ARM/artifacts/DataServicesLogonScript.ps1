@@ -84,6 +84,84 @@ $Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
 Start-Sleep -Seconds 10
 
+# Install and configure DHCP service (used by Hyper-V nested VMs)
+Write-Header "Configuring DHCP Service"
+$dnsClient = Get-DnsClient | Where-Object {$_.InterfaceAlias -eq "Ethernet" }
+Add-DhcpServerv4Scope -Name "ArcBox" `
+                      -StartRange 10.10.1.100 `
+                      -EndRange 10.10.1.200 `
+                      -SubnetMask 255.255.255.0 `
+                      -LeaseDuration 1.00:00:00 `
+                      -State Active
+Set-DhcpServerv4OptionValue -ComputerName localhost `
+                            -DnsDomain $dnsClient.ConnectionSpecificSuffix `
+                            -DnsServer 168.63.129.16 `
+                            -Router 10.10.1.1
+Restart-Service dhcpserver
+
+# Create the NAT network
+Write-Header "Creating Internal NAT"
+$natName = "InternalNat"
+New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
+
+# Create an internal switch with NAT
+Write-Header "Creating Internal vSwitch"
+$switchName = 'InternalNATSwitch'
+New-VMSwitch -Name $switchName -SwitchType Internal
+$adapter = Get-NetAdapter | Where-Object { $_.Name -like "*"+$switchName+"*" }
+
+# Create an internal network (gateway first)
+Write-Header "Creating Gateway"
+New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
+
+# Enable Enhanced Session Mode on Host
+Write-Header "Enabling Enhanced Session Mode"
+Set-VMHost -EnableEnhancedSessionMode $true
+
+Write-Header "Fetching Nested VMs"
+$sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
+$sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
+$Env:AZCOPY_BUFFER_GB=4
+Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
+azcopy cp $sourceFolder/ArcBox-SQL.vhdx$sas $Env:ArcBoxVMDir --recursive=true --check-length=false --log-level=ERROR
+
+
+# Create the nested SQL VM
+Write-Header "Create Hyper-V VMs"
+New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
+Set-VMProcessor -VMName ArcBox-SQL -Count 2
+
+# We always want the VMs to start with the host and shut down cleanly with the host
+Write-Header "Set VM Auto Start/Stop"
+Set-VM -Name ArcBox-SQL -AutomaticStartAction Start -AutomaticStopAction ShutDown
+
+Write-Header "Enabling Guest Integration Service"
+Get-VM | Get-VMIntegrationService | Where-Object {-not($_.Enabled)} | Enable-VMIntegrationService -Verbose
+
+# Start all the VMs
+Write-Header "Starting SQL VM"
+Start-VM -Name ArcBox-SQL
+
+
+Write-Header "Creating VM Credentials"
+# Hard-coded username and password for the nested VMs
+$nestedWindowsUsername = "Administrator"
+$nestedWindowsPassword = "ArcDemo123!!"
+
+# Create Windows credential object
+$secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
+$winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
+
+# Restarting Windows VM Network Adapters
+Write-Header "Restarting Network Adapters"
+Start-Sleep -Seconds 20
+Invoke-Command -VMName ArcBox-SQL -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
+Start-Sleep -Seconds 5
+
+# Creating Hyper-V Manager desktop shortcut
+Write-Header "Creating Hyper-V Shortcut"
+Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
 # Create Kubernetes - Azure Arc Cluster
 az connectedk8s connect --name $connectedClusterName `
                         --resource-group $Env:resourceGroup `

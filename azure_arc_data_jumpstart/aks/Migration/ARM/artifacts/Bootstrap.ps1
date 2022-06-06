@@ -38,8 +38,9 @@ param (
 
 # Create path
 Write-Output "Create deployment path"
-$tempDir = "C:\Temp"
+$tempDir = "C:\Temp\Virtual Machines"
 New-Item -Path $tempDir -ItemType directory -Force
+
 
 Start-Transcript "C:\Temp\Bootstrap.log"
 
