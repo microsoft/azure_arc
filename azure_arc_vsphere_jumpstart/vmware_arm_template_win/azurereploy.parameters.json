@@ -22,6 +22,12 @@
       },
       "clusterName": {
         "value": "<Your VMware cluster to host the VM>"
-      }
+      },
+      "adminUserName": {
+        "value": "<Windows VM admin username>"
+      },
+      "adminPassword": {
+        "value": "<Windows VM admin password>"
+      } 
     }
   }
