@@ -31,7 +31,7 @@
     "adminUserName" : {
       "type": "string"
     },
-    "adminPassword" : {
+    "adminUserPassword" : {
       "type": "string"
     }
   },
@@ -83,7 +83,7 @@
         "osProfile": {
           "osType": "Windows",
           "computerName": "[parameters('virtualMachineName')]",
-          "adminPassword" : "[parameters('adminPassword')]"
+          "adminPassword" : "[parameters('adminUserPassword')]"
         }
       }
     },
@@ -97,7 +97,7 @@
             "properties": {
                 "credentials": {
                     "username": "[parameters('adminUserName')]",
-                    "password" : "[parameters('adminPassword')]"
+                    "password" : "[parameters('adminUserPassword')]"
                 },
                 "provisioningAction": "install"
             }
