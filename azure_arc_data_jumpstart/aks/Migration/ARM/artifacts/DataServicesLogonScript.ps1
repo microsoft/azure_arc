@@ -1,8 +1,8 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
-$Env:ArcBoxDir = "C:\ArcBox"
-$Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
+$Env:TempDir = "C:\Temp"
+$Env:ArcBoxVMDir = "Env:TempDir\Virtual Machines"
 $connectedClusterName = "Arc-DataSvc-AKS"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
@@ -150,7 +150,7 @@ $customLocationId  = $(az customlocation show --name "jumpstart-cl" --resource-g
 $workspaceId  = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey  = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "$Env:ArcBoxDir\dataController.parameters.json"
+$dataControllerParams = "$Env:Env:TempDir \dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$Env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'jumpstartdc-stage',$primaryDcName | Set-Content -Path $dataControllerParams
@@ -165,8 +165,8 @@ $dataControllerParams = "$Env:ArcBoxDir\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey  | Set-Content -Path $dataControllerParams
 
 az deployment group create --resource-group $Env:resourceGroup `
-                           --template-file "$Env:ArcBoxDir\dataController.json" `
-                           --parameters "$Env:ArcBoxDir\dataController.parameters.json"
+                           --template-file "$Env:Env:TempDir \dataController.json" `
+                           --parameters "$Env:Env:TempDir \dataController.parameters.json"
 
 Write-Host "`n"
 Do {
@@ -182,7 +182,7 @@ Write-Host "`n"
 # If flag set, deploy SQL MI
 if ( $Env:deploySQLMI -eq $true )
 {
-& "$Env:ArcBoxDir\DeploySQLMI.ps1"
+& "$Env:Env:TempDir \DeploySQLMI.ps1"
 }
 
 # Enabling data controller auto metrics & logs upload to log analytics
@@ -199,7 +199,7 @@ if ( $Env:deploySQLMI -eq $true){
     Write-Host "`n"
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-    Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+    Copy-Item -Path "$Env:Env:TempDir \settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
     # Creating desktop url shortcuts for built-in Grafana and Kibana services 
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -218,7 +218,7 @@ if ( $Env:deploySQLMI -eq $true){
 }
 
 # Changing to Client VM wallpaper
-$imgPath="$Env:ArcBoxDir\wallpaper.png"
+$imgPath="$Env:Env:TempDir \wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
