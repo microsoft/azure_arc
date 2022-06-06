@@ -150,7 +150,7 @@ $customLocationId  = $(az customlocation show --name "jumpstart-cl" --resource-g
 $workspaceId  = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey  = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "$Env:TempDir \dataController.parameters.json"
+$dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$Env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'jumpstartdc-stage',$primaryDcName | Set-Content -Path $dataControllerParams
