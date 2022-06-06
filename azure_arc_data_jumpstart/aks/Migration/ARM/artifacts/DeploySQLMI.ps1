@@ -98,7 +98,7 @@ if ( $env:SQLMIHA -eq $true )
 
 
 # Downloading demo database and restoring onto SQL MI
-$podname = "js-sql-pr-0"
+$podname = "jumpstart-sql-0"
 Write-Host "`n"
 Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
 kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
