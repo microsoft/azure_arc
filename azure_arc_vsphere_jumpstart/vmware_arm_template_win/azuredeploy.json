@@ -53,6 +53,9 @@
         "name": "[variables('extendedLocation')]",
         "type": "CustomLocation"
       },
+      "identity" : {
+        "type" : "SystemAssigned"
+      },
       "properties": {
         "vCenterId": "[variables('vCenterId')]",
         "templateId": "[variables('templateId')]",
