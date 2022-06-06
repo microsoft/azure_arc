@@ -1,14 +1,9 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
-$Env:TempDir = "C:\Temp"
-$primaryConnectedClusterName = "Arc-DataSvc-AKS-Primary"
-$secondaryConnectedClusterName = "Arc-DataSvc-AKS-Secondary"
-$clusterName = $Env:clusterName
-$primaryClusterName = $clusterName+"-Primary"
-$secondaryClusterName = $clusterName+"-Secondary"
-$primaryDcName = "jumpstart-primary-dc"
-$secondaryDcName= "jumpstart-secondary-dc"
+$Env:ArcBoxDir = "C:\ArcBox"
+$Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
+$connectedClusterName = "Arc-DataSvc-AKS"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -74,51 +69,35 @@ az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
 
 # Getting AKS cluster credentials kubeconfig file
-Write-Host "Getting AKS cluster credentials for the primary cluster"
+Write-Host "Getting AKS cluster credentials"
 Write-Host "`n"
 az aks get-credentials --resource-group $Env:resourceGroup `
-                       --name $primaryClusterName --admin
+                       --name $Env:clusterName --admin
 Write-Host "`n"
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
-Write-Host "`n"
-
-                       Write-Host "Getting AKS cluster credentials for the secondary cluster"
-Write-Host "`n"
-az aks get-credentials --resource-group $Env:resourceGroup `
-                       --name $secondaryClusterName --admin
-Write-Host "`n"
-Write-Host "Checking kubernetes nodes"
-Write-Host "`n"
-kubectl get nodes
-Write-Host "`n"
-
-# Creating Kubect aliases
-kubectx primary="$primaryConnectedClusterName-admin"
-kubectx secondary="$secondaryConnectedClusterName-admin"
 Write-Host "`n"
 
 # Localize kubeconfig
+$Env:KUBECONTEXT = kubectl config current-context
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
-Write-Host "`n"
+Start-Sleep -Seconds 10
 
-# Create Kubernetes - Azure Arc Cluster for the primary cluster
-Write-Host "Onboarding the primary cluster as an Azure Arc-enabled Kubernetes cluster"
-Write-Host "`n"
-kubectx primary
-Write-Host "`n"
-az connectedk8s connect --name $primaryConnectedClusterName `
+# Create Kubernetes - Azure Arc Cluster
+az connectedk8s connect --name $connectedClusterName `
                         --resource-group $Env:resourceGroup `
                         --location $Env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_data_services'
+                        --tags 'Project=jumpstart_azure_arc_data_services' `
+                        --kube-config $Env:KUBECONFIG `
+                        --kube-context $Env:KUBECONTEXT
 
 Start-Sleep -Seconds 10
 
 # Enabling Container Insights cluster extension on primary cluster
 Write-Host "`n"
 Write-Host "Enabling Container Insights cluster extension"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $primaryConnectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
 Write-Host "`n"
 
 # Monitor pods across arc namespace
@@ -130,7 +109,7 @@ Write-Host "Installing Azure Arc-enabled data services extension"
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
-                        --cluster-name $primaryConnectedClusterName `
+                        --cluster-name $connectedClusterName `
                         --resource-group $Env:resourceGroup `
                         --auto-upgrade false `
                         --scope cluster `
@@ -144,22 +123,22 @@ Do {
     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
     } while ($podStatus -eq "Nope")
 
-$primaryConnectedClusterId = az connectedk8s show --name $primaryConnectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
+$connectedClusterId  = az connectedk8s show --name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 
-$primaryExtensionId = az k8s-extension show --name arc-data-services `
+$extensionId  = az k8s-extension show --name arc-data-services `
                                      --cluster-type connectedClusters `
-                                     --cluster-name $primaryConnectedClusterName `
+                                     --cluster-name $connectedClusterName `
                                      --resource-group $Env:resourceGroup `
                                      --query id -o tsv
 
 Start-Sleep -Seconds 20
 
 # Create Custom Location
-az customlocation create --name 'jumpstart-primary-cl' `
+az customlocation create --name 'jumpstart-cl' `
                          --resource-group $Env:resourceGroup `
                          --namespace arc `
-                         --host-resource-id $primaryConnectedClusterId `
-                         --cluster-extension-ids $primaryExtensionId `
+                         --host-resource-id $connectedClusterId  `
+                         --cluster-extension-ids $extensionId  `
                          --kubeconfig $Env:KUBECONFIG
 
 # Deploying Azure Arc Data Controller
@@ -167,27 +146,27 @@ Write-Host "`n"
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
-$primaryCustomLocationId = $(az customlocation show --name "jumpstart-primary-cl" --resource-group $Env:resourceGroup --query id -o tsv)
-$laWorkspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$laWorkspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+$customLocationId  = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+$workspaceId  = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey  = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "$Env:TempDir\dataController.parameters.json"
+$dataControllerParams = "$Env:ArcBoxDir\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$Env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'jumpstartdc-stage',$primaryDcName | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage',$Env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'customLocation-stage',$primaryCustomLocationId | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'customLocation-stage',$customLocationId  | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage',$Env:subscriptionId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage',$Env:spnClientId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage',$Env:spnTenantId | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage',$Env:spnClientSecret | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$laWorkspaceId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$laWorkspaceKey | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage',$workspaceId  | Set-Content -Path $dataControllerParams
+(Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey  | Set-Content -Path $dataControllerParams
 
 az deployment group create --resource-group $Env:resourceGroup `
-                           --template-file "$Env:TempDir\dataController.json" `
-                           --parameters "$Env:TempDir\dataController.parameters.json"
+                           --template-file "$Env:ArcBoxDir\dataController.json" `
+                           --parameters "$Env:ArcBoxDir\dataController.parameters.json"
 
 Write-Host "`n"
 Do {
@@ -199,115 +178,28 @@ Do {
 Write-Host "`n"
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
-
-# Create Kubernetes - Azure Arc Cluster for the secondary cluster
-Write-Host "`n"
-kubectx secondary
-Write-Host "`n"
-az connectedk8s connect --name $secondaryConnectedClusterName `
-                        --resource-group $Env:resourceGroup `
-                        --location $Env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_data_services'
-
-Start-Sleep -Seconds 10
-
-# Enabling Container Insights cluster extension on secondary cluster
-Write-Host "`n"
-Write-Host "Enabling Container Insights cluster extension"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $secondaryConnectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-Write-Host "`n"
-
-# Installing Azure Arc-enabled data services extension
-Write-Host "`n"
-Write-Host "Installing Azure Arc-enabled data services extension"
-az k8s-extension create --name arc-data-services `
-                        --extension-type microsoft.arcdataservices `
-                        --cluster-type connectedClusters `
-                        --cluster-name $secondaryConnectedClusterName `
-                        --resource-group $Env:resourceGroup `
-                        --auto-upgrade false `
-                        --scope cluster `
-                        --release-namespace arc `
-                        --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
-
-$secondaryConnectedClusterId = az connectedk8s show --name $secondaryConnectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
-
-$secondaryExtensionId = az k8s-extension show --name arc-data-services `
-                                     --cluster-type connectedClusters `
-                                     --cluster-name $secondaryConnectedClusterName `
-                                     --resource-group $Env:resourceGroup `
-                                     --query id -o tsv
-
-Start-Sleep -Seconds 20
-
-# Create Custom Location
-az customlocation create --name 'jumpstart-secondary-cl' `
-                         --resource-group $Env:resourceGroup `
-                         --namespace arc `
-                         --host-resource-id $secondaryConnectedClusterId `
-                         --cluster-extension-ids $secondaryExtensionId `
-                         --kubeconfig $Env:KUBECONFIG
-
-# Deploying Azure Arc Data Controller
-Write-Host "`n"
-Write-Host "Deploying Azure Arc Data Controller"
-Write-Host "`n"
-
-$secondaryCustomLocationId = $(az customlocation show --name "jumpstart-secondary-cl" --resource-group $Env:resourceGroup --query id -o tsv)
-
-$dataControllerParams = "$Env:TempDir\dataController.parameters.json"
-
-(Get-Content -Path $dataControllerParams) -replace $primaryCustomLocationId,$secondaryCustomLocationId | Set-Content -Path $dataControllerParams
-(Get-Content -Path $dataControllerParams) -replace $primaryDcName,$secondaryDcName | Set-Content -Path $dataControllerParams
-
-az deployment group create --resource-group $Env:resourceGroup `
-                           --template-file "$Env:TempDir\dataController.json" `
-                           --parameters "$Env:TempDir\dataController.parameters.json"
-
-Write-Host "`n"
-Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes...(45s sleeping loop)"
-    Start-Sleep -Seconds 45
-    $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
-    } while ($dcStatus -eq "Nope")
-
-Write-Host "`n"
-Write-Host "Azure Arc data controller is ready!"
-Write-Host "`n"
-
 
 # If flag set, deploy SQL MI
 if ( $Env:deploySQLMI -eq $true )
 {
-& "$Env:TempDir\DeploySQLMI.ps1"
+& "$Env:ArcBoxDir\DeploySQLMI.ps1"
 }
 
-# Enabling data controller auto metrics & logs upload to log analytics on the primary cluster
-kubectx primary
+# Enabling data controller auto metrics & logs upload to log analytics
 Write-Host "`n"
-Write-Host "Enabling data controller auto metrics & logs upload to log analytics on the primary cluster"
-Write-Host "`n"
-$Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
-
-# Enabling data controller auto metrics & logs upload to log analytics on the secondary cluster
-kubectx secondary
-Write-Host "`n"
-Write-Host "Enabling data controller auto metrics & logs upload to log analytics on the secondary cluster"
+Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
 Write-Host "`n"
 $Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-az arcdata dc update --name $secondaryDcName --resource-group $Env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name $secondaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
+az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --auto-upload-logs true
+az arcdata dc update --name jumpstart-dc --resource-group $Env:resourceGroup --auto-upload-metrics true
 
 # Applying Azure Data Studio settings template file and operations url shortcut
 if ( $Env:deploySQLMI -eq $true){
     Write-Host "`n"
     Write-Host "Copying Azure Data Studio settings template file"
     New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-    Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+    Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
     # Creating desktop url shortcuts for built-in Grafana and Kibana services 
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -325,13 +217,8 @@ if ( $Env:deploySQLMI -eq $true){
     $Favorite.Save()
 }
 
-Write-Host "`n"
-Write-Host "Switching to primary"
-kubectx primary
-Write-Host "`n"
-
 # Changing to Client VM wallpaper
-$imgPath="$Env:TempDir\wallpaper.png"
+$imgPath="$Env:ArcBoxDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 

@@ -18,30 +18,30 @@ param (
     [string]$templateBaseUrl
 )
 
-[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $azdataUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $azdataPassword,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $acceptEula,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('arcDcName', $arcDcName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('deploySQLMI', $deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SQLMIHA', $SQLMIHA,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $azdataUsername, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $azdataPassword, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $acceptEula, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('arcDcName', $arcDcName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('deploySQLMI', $deploySQLMI, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SQLMIHA', $SQLMIHA, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('clusterName', $clusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
 
 # Create path
 Write-Output "Create deployment path"
-$tempDir = "C:\Temp"
+$tempDir = "C:\ArcBox"
 New-Item -Path $tempDir -ItemType directory -Force
 
-Start-Transcript "C:\Temp\Bootstrap.log"
+Start-Transcript "C:\ArcBox\Bootstrap.log"
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -79,55 +79,63 @@ Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/10
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/jumpstart_wallpaper.png" -OutFile "C:\Temp\wallpaper.png"
 
 # Installing tools
-workflow ClientTools_01
-        {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,kubectx,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,ssms,dotnetcore-3.1-sdk'
-            #Run commands in parallel.
-            Parallel 
-                {
-                    InlineScript {
-                        param (
-                            [string]$chocolateyAppList
-                        )
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false)
-                        {
-                            try{
-                                choco config get cacheLocation
-                            }catch{
-                                Write-Output "Chocolatey not detected, trying to install now"
-                                Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-                            }
-                        }
-                        if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false){   
-                            Write-Host "Chocolatey Apps Specified"  
-                            
-                            $appsToInstall = $using:chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
-                        
-                            foreach ($app in $appsToInstall)
-                            {
-                                Write-Host "Installing $app"
-                                & choco install $app /y -Force| Write-Output
-                            }
-                        }
-                    }
-                    Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
-                    Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
+workflow ClientTools_01 {
+    $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,kubectx,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,ssms,dotnetcore-3.1-sdk'
+    #Run commands in parallel.
+    Parallel {
+        InlineScript {
+            param (
+                [string]$chocolateyAppList
+            )
+            if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false) {
+                try {
+                    choco config get cacheLocation
                 }
-        }
-
-ClientTools_01 | Format-Table
-
-workflow ClientTools_02
-        {
-            #Run commands in parallel.
-            Parallel
-            {
-                InlineScript {
-                    Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-                    Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
+                catch {
+                    Write-Output "Chocolatey not detected, trying to install now"
+                    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+                }
+            }
+            if ([string]::IsNullOrWhiteSpace($using:chocolateyAppList) -eq $false) {   
+                Write-Host "Chocolatey Apps Specified"  
+                            
+                $appsToInstall = $using:chocolateyAppList -split "," | ForEach-Object { "$($_.Trim())" }
+                        
+                foreach ($app in $appsToInstall) {
+                    Write-Host "Installing $app"
+                    & choco install $app /y -Force | Write-Output
                 }
             }
         }
+        Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
+        Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
+        InlineScript {
+            # Installing DHCP service 
+            Write-Output "Installing DHCP service"
+            Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
+            Write-Header "Installing Hyper-V"
+
+            # Install Hyper-V and reboot
+            Write-Host "Installing Hyper-V and restart"
+            Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+            Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+            Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+        }
+                    
+    }
+}
+
+ClientTools_01 | Format-Table
+
+workflow ClientTools_02 {
+    #Run commands in parallel.
+    Parallel {
+        InlineScript {
+            Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
+            Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
+        }
+    }
+}
         
 ClientTools_02 | Format-Table 
 

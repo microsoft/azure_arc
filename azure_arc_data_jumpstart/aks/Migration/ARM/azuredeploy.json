@@ -66,18 +66,11 @@
         "description": "The name of the Kubernetes cluster resource"
       }
     },
-    "dnsPrefixPrimary": {
+    "dnsPrefix": {
       "type": "string",
       "defaultValue": "arcdata",
       "metadata": {
-        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN for the primary cluster"
-      }
-    },
-    "dnsPrefixSecondary": {
-      "type": "string",
-      "defaultValue": "arcdata",
-      "metadata": {
-        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN for the secondary cluster"
+        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
       }
     },
     "deploySQLMI": {
@@ -93,20 +86,27 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
+    },    
+    "deployPostgreSQL": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "PostgreSQL deployment"
+      }
     },
     "githubAccount": {
       "type": "string",
       "metadata": {
         "description": "Target GitHub account"
       },
-      "defaultValue": "sebassem"
+      "defaultValue": "microsoft"
     },
     "githubBranch": {
       "type": "string",
       "metadata": {
         "description": "Target GitHub branch"
       },
-      "defaultValue": "jumpstart-dataSvcs-AKS-DR-scenario"
+      "defaultValue": "main"
     },
     "deployBastion": {
       "type": "bool",
@@ -124,26 +124,19 @@
     }
   },
   "variables": {
-    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/DR/ARM/')]",
+    "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/ARM/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
     "VNETUrl": "[uri(variables('templateBaseUrl'), 'VNET.json')]",
-    "primaryVnetName": "Arc-VNet-Primary",
-    "primaryAddressPrefix": "10.0.0.0/8",
-    "primarySubnetName": "Arc-Data-Primary",
-    "primarySubnetAddressPrefix": "10.240.0.0/16",
-    "secondaryVnetName" : "Arc-VNet-Secondary",
-    "secondaryAddressPrefix": "172.0.0.0/8",
-    "secondarySubnetName": "Arc-Data-Secondary",
-    "secondarySubnetAddressPrefix": "172.240.0.0/16",
-    "clientVnetName": "Arc-VNet-Client",
-    "clientSubnetName": "Arc-Data-Client",
-    "clientAddressPrefix" : "192.168.0.0/16",
-    "clientSubnetAddressPrefix": "192.168.10.0/24",
-    "bastionSubnetPrefix": "192.168.2.64/26",
+    // Virtual Network configuration
+    "virtualNetworkName": "Arc-Data-VNet",
+    "subnetName": "Arc-Data-Subnet",
+    "addressPrefix": "172.16.0.0/16",
+    "subnetAddressPrefix": "172.16.1.0/24",
+    "bastionSubnetPrefix": "172.16.2.64/26",
     "bastionSubnetName": "AzureBastionSubnet",
-    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('clientVnetName'), variables('bastionSubnetName'))]"
+    "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]"
   },
   "resources": [
     {
@@ -158,47 +151,20 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "primaryVnetName": {
-            "value": "[variables('primaryVnetName')]"
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
           },
-          "primarySubnetName": {
-            "value": "[variables('primarySubnetName')]"
+          "subnetName": {
+            "value": "[variables('subnetName')]"
           },
-          "primaryAddressPrefix": {
-            "value": "[variables('primaryAddressPrefix')]"
+          "addressPrefix": {
+            "value": "[variables('addressPrefix')]"
           },
-          "primarySubnetAddressPrefix": {
-            "value": "[variables('primarySubnetAddressPrefix')]"
+          "subnetAddressPrefix": {
+            "value": "[variables('subnetAddressPrefix')]"
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"
-          },
-          "clientVnetName": {
-            "value": "[variables('clientVnetName')]"
-          },
-          "clientSubnetName": {
-            "value": "[variables('clientSubnetName')]"
-          },
-          "clientAddressPrefix": {
-            "value": "[variables('clientAddressPrefix')]"
-          },
-          "clientSubnetAddressPrefix": {
-            "value": "[variables('clientSubnetAddressPrefix')]"
-          },
-          "secondaryVnetName": {
-            "value": "[variables('secondaryVnetName')]"
-          },
-          "secondarySubnetName": {
-            "value": "[variables('secondarySubnetName')]"
-          },
-          "secondaryAddressPrefix": {
-            "value": "[variables('secondaryAddressPrefix')]"
-          },
-          "secondarySubnetAddressPrefix": {
-            "value": "[variables('secondarySubnetAddressPrefix')]"
-          },
-          "deployBastion": {
-            "value": "[parameters('deployBastion')]"
           }
         }
       }
@@ -227,23 +193,8 @@
           "kubernetesVersion": {
             "value": "[parameters('kubernetesVersion')]"
           },
-          "dnsPrefixPrimary": {
-            "value": "[parameters('dnsPrefixPrimary')]"
-          },
-          "dnsPrefixSecondary": {
-            "value": "[parameters('dnsPrefixSecondary')]"
-          },
-          "primaryVnetName": {
-            "value": "[variables('primaryVnetName')]"
-          },
-          "secondaryVnetName": {
-            "value": "[variables('secondaryVnetName')]"
-          },
-          "primarySubnetName": {
-            "value": "[variables('primarySubnetName')]"
-          },
-           "secondarySubnetName": {
-            "value": "[variables('secondarySubnetName')]"
+          "dnsPrefix": {
+            "value": "[parameters('dnsPrefix')]"
           }
         }
       }
@@ -285,17 +236,20 @@
           "clusterName": {
             "value": "[parameters('clusterName')]"
           },
-          "clientVnetName": {
-            "value": "[variables('clientVnetName')]"
+          "virtualNetworkName": {
+            "value": "[variables('virtualNetworkName')]"
           },
-          "clientSubnetName": {
-            "value": "[variables('clientSubnetName')]"
+          "subnetName": {
+            "value": "[variables('subnetName')]"
           },
           "deploySQLMI": {
             "value": "[parameters('deploySQLMI')]"
           },
           "SQLMIHA": {
             "value": "[parameters('SQLMIHA')]"
+          },
+          "deployPostgreSQL": {
+            "value": "[parameters('deployPostgreSQL')]"
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"

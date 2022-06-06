@@ -32,17 +32,17 @@
     "SQLMIHA": {
       "value": true
     },
+    "deployPostgreSQL": {
+      "value": false
+    },
     "bastionHostName": {
       "value": "Arc-Data-Demo-Bastion"
     },
     "deployBastion": {
       "value": false
     },
-    "dnsPrefixPrimary": {
-      "value": "arcAksdemoprXXX"
-    },
-    "dnsPrefixSecondary": {
-      "value": "arcAksdemodrXXX"
+    "dnsPrefix": {
+      "value": "arcAksdemoXXX"
     }
   }
 }
