@@ -71,10 +71,7 @@
             "value": "pricingTier-stage"
         },
         "licenseType": {
-            "value": "licenceType-stage"
-        },
-        "sqlMIName": {
-            "value": "sqlMIName-stage"
+            "value": "LicenseIncluded"
         }
     }
 }

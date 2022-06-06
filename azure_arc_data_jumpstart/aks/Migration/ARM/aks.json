@@ -16,14 +16,7 @@
         "description": "The location of the Managed Cluster resource"
       }
     },
-    "dnsPrefixPrimary": {
-      "type": "string",
-      "defaultValue": "arcdata",
-      "metadata": {
-        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
-      }
-    },
-    "dnsPrefixSecondary": {
+    "dnsPrefix": {
       "type": "string",
       "defaultValue": "arcdata",
       "metadata": {
@@ -90,7 +83,7 @@
     "osType": {
       "type": "string",
       "defaultValue": "Linux",
-      "allowedValues": [ "Linux" ],
+      "allowedValues": ["Linux"],
       "metadata": {
         "description": "The type of operating system"
       }
@@ -106,54 +99,23 @@
       "defaultValue": {
         "Project": "jumpstart_azure_arc_data_services"
       }
-    },
-    "primaryVnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "primary vnet"
-      }
-    },
-    "secondaryVnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Seconday cluster vnet"
-      }
-    },
-    "primarySubnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Primary cluster subnet"
-      }
-    },
-    "secondarySubnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Secondary cluster subnet"
-      }
     }
-  },
-  "variables": {
-    "serviceCidr-primary": "10.20.64.0/19",
-    "dnsServiceIP-primary": "10.20.64.10",
-    "dockerBridgeCidr-primary": "172.17.0.1/16",
-    "serviceCidr-secondary": "192.168.64.0/19",
-    "dnsServiceIP-secondary": "192.168.64.10",
-    "dockerBridgeCidr-secondary": "172.17.0.1/16"
   },
   "resources": [
     {
-      "apiVersion": "2022-03-02-preview",
+      "apiVersion": "2022-01-02-preview",
       "type": "Microsoft.ContainerService/managedClusters",
       "location": "[parameters('location')]",
-      "name": "[concat(parameters('clusterName'),'-Primary')]",
+      "name": "[parameters('clusterName')]",
       "tags": "[parameters('resourceTags')]",
       "properties": {
         "kubernetesVersion": "[parameters('kubernetesVersion')]",
         "enableRBAC": "[parameters('enableRBAC')]",
-        "dnsPrefix": "[parameters('dnsPrefixPrimary')]",
-        "aadProfile": {
-          "managed": true
-        },
+        "dnsPrefix": "[parameters('dnsPrefix')]",
+        "aadProfile": 
+          {
+            "managed": true
+          },
         "agentPoolProfiles": [
           {
             "name": "agentpool",
@@ -163,16 +125,13 @@
             "vmSize": "[parameters('agentVMSize')]",
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
-            "type": "VirtualMachineScaleSets",
-            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('primaryVnetName'),parameters('primarySubnetName'))]"
+            "type": "VirtualMachineScaleSets"
           }
         ],
-        "networkProfile": {
-          "networkPlugin": "azure",
-          "serviceCidr": "[variables('serviceCidr-primary')]",
-          "dnsServiceIP": "[variables('dnsServiceIP-primary')]",
-          "dockerBridgeCidr": "[variables('dockerBridgeCidr-primary')]"
-        },
+        "networkProfile": 
+          {
+            "networkPlugin": "azure"
+          },
         "linuxProfile": {
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
@@ -186,62 +145,14 @@
         "servicePrincipalProfile": {
           "clientId": "[parameters('spnClientId')]",
           "Secret": "[parameters('spnClientSecret')]"
-        },
-        "identity": {
-          "type": "SystemAssigned"
-        }
-      }
-    },
-    {
-      "apiVersion": "2022-03-02-preview",
-      "type": "Microsoft.ContainerService/managedClusters",
-      "location": "[parameters('location')]",
-      "name": "[concat(parameters('clusterName'),'-Secondary')]",
-      "tags": "[parameters('resourceTags')]",
-      "properties": {
-        "kubernetesVersion": "[parameters('kubernetesVersion')]",
-        "enableRBAC": "[parameters('enableRBAC')]",
-        "dnsPrefix": "[parameters('dnsPrefixSecondary')]",
-        "aadProfile": {
-          "managed": true
-        },
-        "agentPoolProfiles": [
-          {
-            "name": "agentpool",
-            "mode": "System",
-            "osDiskSizeGB": "[parameters('osDiskSizeGB')]",
-            "count": "[parameters('agentCount')]",
-            "vmSize": "[parameters('agentVMSize')]",
-            "osType": "[parameters('osType')]",
-            "storageProfile": "ManagedDisks",
-            "type": "VirtualMachineScaleSets",
-            "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('secondaryVnetName'),parameters('secondarySubnetName'))]"
-          }
-        ],
-        "networkProfile": {
-          "networkPlugin": "azure",
-          "serviceCidr": "[variables('serviceCidr-secondary')]",
-          "dnsServiceIP": "[variables('dnsServiceIP-secondary')]",
-          "dockerBridgeCidr": "[variables('dockerBridgeCidr-secondary')]"
-        },
-        "linuxProfile": {
-          "adminUsername": "[parameters('linuxAdminUsername')]",
-          "ssh": {
-            "publicKeys": [
-              {
-                "keyData": "[parameters('sshRSAPublicKey')]"
-              }
-            ]
-          }
-        },
-        "servicePrincipalProfile": {
-          "clientId": "[parameters('spnClientId')]",
-          "Secret": "[parameters('spnClientSecret')]"
-        },
-        "identity": {
-          "type": "SystemAssigned"
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+    "controlPlaneFQDN": {
+      "type": "string",
+      "value": "[reference(parameters('clusterName')).fqdn]"
+    }
+  }
 }

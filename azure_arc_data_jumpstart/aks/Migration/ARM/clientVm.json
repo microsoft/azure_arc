@@ -52,14 +52,14 @@
         "description": "The size of the VM"
       }
     },
-    "clientVnetName": {
+    "virtualNetworkName": {
       "type": "string",
       "defaultValue": "Arc-Data-VNet",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
-    "clientSubnetName": {
+    "subnetName": {
       "type": "string",
       "defaultValue": "Arc-Data-Subnet",
       "metadata": {
@@ -136,6 +136,13 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
+    },    
+    "deployPostgreSQL": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "PostgreSQL deployment"
+      }
     },
     "templateBaseUrl": {
       "type": "string",
@@ -165,7 +172,7 @@
     },
     "bastionHostName": {
       "type": "string",
-      "defaultValue": "Arc-Demo-Bastion",
+      "defaultValue": "Arc-Win-Demo-Bastion",
       "metadata": {
         "description": "Azure Bastion host name"
       }
@@ -179,9 +186,9 @@
   },
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
-    "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(parameters('bastionHostName'),'-PIP'))]",
+    "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-    "clientVMSubnetRef" : "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('clientVnetName'), parameters('clientSubnetName'))]",
+    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
     "osDiskType": "Premium_LRS",
     "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
     "bastionSubnetRef": "[concat(parameters('bastionSubnetRef'))]",
@@ -205,7 +212,7 @@
             "name": "ipconfig1",
             "properties": {
               "subnet": {
-                "id": "[variables('clientVMSubnetRef')]"
+                "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Dynamic",
               "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
@@ -319,11 +326,11 @@
         "type": "CustomScriptExtension",
         "typeHandlerVersion": "1.10",
         "autoUpgradeMinorVersion": true,
-        "settings": {
+        "protectedSettings": {
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'),  ' -clusterName ', parameters('clusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'),  ' -clusterName ', parameters('clusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
       }
     },
