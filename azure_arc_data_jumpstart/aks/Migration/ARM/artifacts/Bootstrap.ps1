@@ -38,10 +38,10 @@ param (
 
 # Create path
 Write-Output "Create deployment path"
-$tempDir = "C:\ArcBox"
+$tempDir = "C:\Temp"
 New-Item -Path $tempDir -ItemType directory -Force
 
-Start-Transcript "C:\ArcBox\Bootstrap.log"
+Start-Transcript "C:\Temp\Bootstrap.log"
 
 $ErrorActionPreference = 'SilentlyContinue'
 
