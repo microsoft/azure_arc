@@ -1,7 +1,7 @@
 Start-Transcript -Path C:\Temp\DeploySQLMI.log
 
 # Deployment environment variables
-$Env:TempDir = "C:\ArcBox"
+$Env:TempDir = "C:\Temp"
 $controllerName = "jumpstart-dc"
 
 # Deploying Azure Arc SQL Managed Instance
