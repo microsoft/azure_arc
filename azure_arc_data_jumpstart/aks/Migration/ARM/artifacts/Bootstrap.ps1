@@ -109,19 +109,6 @@ workflow ClientTools_01 {
         }
         Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
         Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
-        InlineScript {
-            # Installing DHCP service 
-            Write-Output "Installing DHCP service"
-            Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
-            Write-Header "Installing Hyper-V"
-
-            # Install Hyper-V and reboot
-            Write-Host "Installing Hyper-V and restart"
-            Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
-            Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
-            Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
-        }
-                    
     }
 }
 
@@ -149,3 +136,14 @@ Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -Us
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+
+ # Installing DHCP service
+ Write-Output "Installing DHCP service"
+ Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
+ Write-Header "Installing Hyper-V"
+
+ # Install Hyper-V and reboot
+ Write-Host "Installing Hyper-V and restart"
+ Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+ Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
