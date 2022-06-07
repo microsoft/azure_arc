@@ -2418,7 +2418,7 @@
                 "objectName": "LogicalDisk",
                 "instanceName": "*",
                 "intervalSeconds": "[variables('intervalSeconds')]",
-                "counterName": "% Processor Time"
+                "counterName": "% Free Space"
             }
         },
         {
@@ -2554,6 +2554,21 @@
                 "instanceName": "*",
                 "intervalSeconds": "[variables('intervalSeconds')]",
                 "counterName": "Available MBytes"
+            }
+        },
+        {
+            "apiVersion": "2020-08-01",
+            "type": "Microsoft.OperationalInsights/workspaces/datasources",
+            "name": "[concat(parameters('workspaceName'), '/', 'WindowsPerfMemoryPagesSec')]",
+            "kind": "WindowsPerformanceCounter",
+            "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
+            ],
+            "properties": {
+                "objectName": "Memory",
+                "instanceName": "*",
+                "intervalSeconds": "[variables('intervalSeconds')]",
+                "counterName": "Pages/sec"
             }
         },
         {
