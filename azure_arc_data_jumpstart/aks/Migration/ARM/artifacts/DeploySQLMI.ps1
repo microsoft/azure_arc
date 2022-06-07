@@ -113,8 +113,12 @@ $settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 # Retrieving SQL MI connection endpoint
 $sqlstring  = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
 
+# Getting the SQL nested VM IP address
+$SQLVmIp = Get-VM -Name ArcBox-SQL | Select-Object -ExpandProperty NetworkAdapters | Select-Object -ExpandProperty IPAddresses | Select-Object -Index 0
+
 # Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
+(Get-Content -Path $settingsTemplate) -replace 'sql_srv',$SQLVmIp | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
