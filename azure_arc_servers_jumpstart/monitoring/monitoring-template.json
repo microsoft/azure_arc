@@ -3512,7 +3512,7 @@
                 "criteria": {
                     "allOf": [
                         {
-                            "threshold": "32",
+                            "threshold": "2",
                             "name": "Metric1",
                             "metricNamespace": "Microsoft.OperationalInsights/workspaces",
                             "metricName": "Average_Current Disk Queue Length",
