@@ -19,7 +19,7 @@
       "type": "string",
       "defaultValue": "Arc-DataSvc-CAPI",
       "metadata": {
-      "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
+        "description": "The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster (lowercase)"
       }
     },
     "windowsAdminUsername": {
@@ -149,7 +149,7 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },    
+    },
     "deployPostgreSQL": {
       "type": "bool",
       "defaultValue": false,
@@ -161,6 +161,12 @@
       "type": "string",
       "metadata": {
         "description": "Base URL for ARM template"
+      }
+    },
+    "profileRootBaseUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Base URL for common scripts"
       }
     },
     "bastionSubnetRef": {
@@ -334,9 +340,11 @@
         "autoUpgradeMinorVersion": true,
         "protectedSettings": {
           "fileUris": [
-            "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
+            "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]",
+            "[uri(parameters('profileRootBaseUrl'), 'common/script/powershell/CommonBootstrapArcData.ps1')]",
+            "[uri(parameters('profileRootBaseUrl'), '../common/script/powershell/AddPSProfile-v1.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -ArcK8sClusterName ', parameters('ArcK8sClusterName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -stagingStorageAccountName ', parameters('stagingStorageAccountName'), ' -workspaceName ', parameters('workspaceName'), ' -ArcK8sClusterName ', parameters('ArcK8sClusterName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -profileRootBaseUrl ', parameters('profileRootBaseUrl'))]"
         }
       }
     },

@@ -162,6 +162,7 @@ resource vmInstallscriptCAPI 'Microsoft.Compute/virtualMachines/extensions@2022-
       commandToExecute: 'bash installCAPI.sh ${adminUsername} ${spnClientId} ${spnClientSecret} ${spnTenantId} ${vmName} ${azureLocation} ${stagingStorageAccountName} ${logAnalyticsWorkspace} ${capiArcDataClusterName} ${templateBaseUrl} ${flavor}'
       fileUris: [
         '${templateBaseUrl}artifacts/installCAPI.sh'
+        '${templateBaseUrl}../common/script/bash/DownloadDependencies-v1.sh'
       ]
     }
   }

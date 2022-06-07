@@ -117,9 +117,15 @@
             }
         },
         "templateBaseUrl": {
-        "type": "string",
-        "metadata": {
-            "description": "Base URL for ARM template"
+            "type": "string",
+            "metadata": {
+                "description": "Base URL for ARM template"
+            }
+        },
+        "profileRootBaseUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "Base URL for common scripts"
             }
         },
         "bastionSubnetPrefix": {
@@ -134,13 +140,6 @@
                 "description": "Choice to deploy Bastion to connect to the client VM"
             },
             "defaultValue": false
-        },
-        "bastionHostName": {
-            "type": "string",
-            "defaultValue": "Arc-Data-Demo-Bastion",
-            "metadata": {
-                "description": "Azure Bastion host name"
-            }
         }
     },
     "variables": {
@@ -235,7 +234,7 @@
                     }
                 ]
             }
-        },        
+        },
         {
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2021-05-01",
@@ -320,9 +319,10 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('ArcK8sClusterName'), ' ',parameters('templateBaseUrl'))]",
+                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('ArcK8sClusterName'), ' ',parameters('templateBaseUrl'), ' ',parameters('profileRootBaseUrl'))]",
                     "fileUris": [
-                        "[uri(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]"
+                        "[uri(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]",
+                        "[uri(parameters('profileRootBaseUrl'), '../common/script/bash/DownloadDependencies-v1.sh')]"
                     ]
                 }
             }

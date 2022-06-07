@@ -6,7 +6,7 @@
     "policiesDeploymentExpected": 6,
     "workbooksExpected": 1,
     "deployBastionDifference": 0,
-    "desktopElementsExpected": 10,
+    "desktopElementsExpected": 9,
     "connectedK8sClustersExpected": 2,
     "keyVaultsExpected": 0,
     "azuredatastudioSettingExpected": 1
@@ -18,7 +18,7 @@
     "policiesDeploymentExpected": 5,
     "workbooksExpected": 1,
     "deployBastionDifference": 2,
-    "desktopElementsExpected": 4,
+    "desktopElementsExpected": 3,
     "connectedK8sClustersExpected": 0,
     "keyVaultsExpected": 0,
     "azuredatastudioSettingExpected": 0
@@ -30,7 +30,7 @@
     "policiesDeploymentExpected": 2,
     "workbooksExpected": 1,
     "deployBastionDifference": 0,
-    "desktopElementsExpected": 4,
+    "desktopElementsExpected": 3,
     "connectedK8sClustersExpected": 2,
     "keyVaultsExpected": 1,
     "azuredatastudioSettingExpected": 0

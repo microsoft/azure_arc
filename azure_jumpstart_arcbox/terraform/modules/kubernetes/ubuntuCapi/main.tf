@@ -172,7 +172,8 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
   protected_settings = <<PROTECTED_SETTINGS
     {
       "fileUris": [
-          "${var.template_base_url}artifacts/installCAPI.sh"
+          "${var.template_base_url}artifacts/installCAPI.sh",
+          "${var.template_base_url}../common/script/bash/DownloadDependencies-v1.sh"
       ],
       "commandToExecute": "bash installCAPI.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name} ${var.capi_arc_data_cluster_name} ${var.template_base_url} ${var.deployment_flavor}"
     }

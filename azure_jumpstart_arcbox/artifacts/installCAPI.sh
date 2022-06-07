@@ -9,18 +9,18 @@ sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --d
 sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
 
 # Injecting environment variables from Azure deployment
-echo '#!/bin/bash' >> vars.sh
-echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_CLIENT_ID:$2 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_CLIENT_SECRET:$3 | awk '{print substr($1,2); }' >> vars.sh
-echo $SPN_TENANT_ID:$4 | awk '{print substr($1,2); }' >> vars.sh
-echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
-echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
-echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
-echo $capiArcDataClusterName:$9 | awk '{print substr($1,2); }' >> vars.sh
-echo $templateBaseUrl:${10} | awk '{print substr($1,2); }' >> vars.sh
-echo $flavor:${11} | awk '{print substr($1,2); }' >> vars.sh
+echo '#!/bin/bash' >>vars.sh
+echo $adminUsername:$1 | awk '{print substr($1,2); }' >>vars.sh
+echo $SPN_CLIENT_ID:$2 | awk '{print substr($1,2); }' >>vars.sh
+echo $SPN_CLIENT_SECRET:$3 | awk '{print substr($1,2); }' >>vars.sh
+echo $SPN_TENANT_ID:$4 | awk '{print substr($1,2); }' >>vars.sh
+echo $vmName:$5 | awk '{print substr($1,2); }' >>vars.sh
+echo $location:$6 | awk '{print substr($1,2); }' >>vars.sh
+echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >>vars.sh
+echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >>vars.sh
+echo $capiArcDataClusterName:$9 | awk '{print substr($1,2); }' >>vars.sh
+echo $templateBaseUrl:${10} | awk '{print substr($1,2); }' >>vars.sh
+echo $flavor:${11} | awk '{print substr($1,2); }' >>vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
 sed -i '4s/^/export SPN_CLIENT_SECRET=/' vars.sh
@@ -39,16 +39,16 @@ chmod +x vars.sh
 # Creating login message of the day (motd)
 sudo curl -o /etc/profile.d/welcomeCAPI.sh ${templateBaseUrl}artifacts/welcomeCAPI.sh
 
+# Download global dependencies, local dependencies would be the same but changing the root folder to "${templateBaseUrl}"
+source ./DownloadDependencies-v1.sh
+globalDependencyArray=("InstallAzureCLIAndArcExtensions-v1" "InstallingRancherK3sSingleNode-v1" "UploadLogToStorageAccount-v1")
+DownloadDependencies "${templateBaseUrl}../" "${globalDependencyArray[@]}"
+
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installCAPI.log /home/${adminUsername}/jumpstart_logs/installCAPI.log; done &
 
-# Installing Azure CLI & Azure Arc extensions
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
-sudo -u $adminUsername az extension add --name connectedk8s
-sudo -u $adminUsername az extension add --name k8s-configuration
-sudo -u $adminUsername az extension add --name k8s-extension
+InstallAzureCLIAndArcExtensions $adminUsername
 
 echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
@@ -80,7 +80,7 @@ export AZURE_DISK_CSI_DRIVER_VERSION="1.19.0"
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
-export AZURE_LOCATION=$location # Name of the Azure datacenter location.
+export AZURE_LOCATION=$location                           # Name of the Azure datacenter location.
 export CLUSTER_NAME=$(echo "${capiArcDataClusterName,,}") # Converting to lowercase case variable > # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 export AZURE_SUBSCRIPTION_ID=$subscriptionId
 export AZURE_TENANT_ID=$SPN_TENANT_ID
@@ -104,22 +104,7 @@ export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
-# Installing Rancher K3s single node cluster using k3sup
-echo ""
-sudo mkdir ~/.kube
-sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sLS https://get.k3sup.dev | sh
-sudo k3sup install --local --context arcboxcapimgmt --k3s-extra-args '--no-deploy traefik'
-sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo cp kubeconfig ~/.kube/config
-sudo cp kubeconfig /home/${adminUsername}/.kube/config
-sudo cp /var/lib/waagent/custom-script/download/0/kubeconfig /home/${adminUsername}/.kube/config-mgmt
-sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
-sudo chown -R $adminUsername /home/${adminUsername}/.kube/
-sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
-
-export KUBECONFIG=/var/lib/waagent/custom-script/download/0/kubeconfig
-kubectl config set-context arcboxcapimgmt
+InstallingRancherK3sSingleNode $adminUsername
 
 # Installing clusterctl
 echo ""
@@ -159,8 +144,8 @@ sudo curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/cap
 sudo curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
 sudo curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
 sed -e "s|CAPI_PROVIDER_VERSION|v$CAPI_PROVIDER_VERSION|" -i capz_kustomize/kustomization.yaml
-kubectl kustomize capz_kustomize/ > jumpstart.yaml
-clusterctl generate yaml --from jumpstart.yaml > template.yaml
+kubectl kustomize capz_kustomize/ >jumpstart.yaml
+clusterctl generate yaml --from jumpstart.yaml >template.yaml
 
 # Creating Microsoft Defender for Cloud audit secret
 echo ""
@@ -184,22 +169,22 @@ echo ""
 sudo kubectl apply -f template.yaml
 
 echo ""
-until sudo kubectl get cluster --all-namespaces | grep -q "Provisioned"; do echo "Waiting for Kubernetes control plane to be in Provisioned phase..." && sleep 20 ; done
+until sudo kubectl get cluster --all-namespaces | grep -q "Provisioned"; do echo "Waiting for Kubernetes control plane to be in Provisioned phase..." && sleep 20; done
 echo ""
 sudo kubectl get cluster --all-namespaces
 
 echo ""
-until sudo kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do echo "Waiting for control plane to initialize. This may take a few minutes..." && sleep 20 ; done
+until sudo kubectl get kubeadmcontrolplane --all-namespaces | grep -q "true"; do echo "Waiting for control plane to initialize. This may take a few minutes..." && sleep 20; done
 echo ""
 sudo kubectl get kubeadmcontrolplane --all-namespaces
-clusterctl get kubeconfig $CLUSTER_NAME > $CLUSTER_NAME.kubeconfig
+clusterctl get kubeconfig $CLUSTER_NAME >$CLUSTER_NAME.kubeconfig
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig apply -f https://raw.githubusercontent.com/kubernetes-sigs/cluster-api-provider-azure/main/templates/addons/calico.yaml
 
 echo ""
-CLUSTER_TOTAL_MACHINE_COUNT=`expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT`
+CLUSTER_TOTAL_MACHINE_COUNT=$(expr $CONTROL_PLANE_MACHINE_COUNT + $WORKER_MACHINE_COUNT)
 export CLUSTER_TOTAL_MACHINE_COUNT="$(echo $CLUSTER_TOTAL_MACHINE_COUNT)"
-until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30 ; done 2> /dev/null
+until [[ $(sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes | grep -c -w "Ready") == $CLUSTER_TOTAL_MACHINE_COUNT ]]; do echo "Waiting all nodes to be in Ready state. This may take a few minutes..." && sleep 30; done 2>/dev/null
 echo ""
 sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig label node -l '!node-role.kubernetes.io/master' node-role.kubernetes.io/worker=worker
 echo ""
@@ -208,7 +193,7 @@ sudo kubectl --kubeconfig=./$CLUSTER_NAME.kubeconfig get nodes -o wide | expand 
 # kubeconfig files housekeeping
 echo ""
 sudo -u $adminUsername rm -f /home/${adminUsername}/.kube/config.staging
-clusterctl get kubeconfig $CLUSTER_NAME > /home/${adminUsername}/.kube/config
+clusterctl get kubeconfig $CLUSTER_NAME >/home/${adminUsername}/.kube/config
 
 sudo service sshd restart
 
@@ -216,7 +201,7 @@ sudo service sshd restart
 echo ""
 sudo -u $adminUsername kubectl apply -f ${templateBaseUrl}artifacts/capiStorageClass.yaml
 
-# Renaming CAPI cluster context name 
+# Renaming CAPI cluster context name
 echo ""
 sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUSTER_NAME" "arcbox-capi"
 
@@ -235,23 +220,12 @@ sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" 
 echo ""
 sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights
 
+
 # Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
 echo ""
 curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh -o install-driver.sh
 sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply/g' install-driver.sh
 source ./install-driver.sh v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
 
-# Copying workload CAPI kubeconfig file to staging storage account
-echo ""
-sudo -u $adminUsername az extension add --upgrade -n storage-preview
-storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
-storageContainerName="staging-capi"
-export localPath="/home/${adminUsername}/.kube/config"
-storageAccountKey=$(sudo -u $adminUsername az storage account keys list --resource-group $storageAccountRG --account-name $stagingStorageAccountName --query [0].value | sed -e 's/^"//' -e 's/"$//')
-sudo -u $adminUsername az storage container create -n $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey
-sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $localPath
-
-# Uploading this script log to staging storage for ease of troubleshooting
-echo ""
-log="/home/${adminUsername}/jumpstart_logs/installCAPI.log"
-sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $log
+# Copying workload CAPI kubeconfig file to staging storage account & Uploading this script log to staging storage for ease of troubleshooting
+UploadLogToStorageAccount "$adminUsername" "$stagingStorageAccountName" "CAPI"

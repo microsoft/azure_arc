@@ -99,7 +99,7 @@
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
       },
-      "defaultValue" : false
+      "defaultValue": false
     },
     "bastionHostName": {
       "type": "string",
@@ -116,6 +116,7 @@
     }
   },
   "variables": {
+    "profileRootBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/')]",
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aro/ARM/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aroTemplateUrl": "[uri(variables('templateBaseUrl'), 'aro.json')]",
@@ -166,7 +167,7 @@
       "comments": "Deploys an ARO Cluster",
       "apiVersion": "2021-04-01",
       "name": "aroDeployment",
-      "dependsOn": ["VNETDeployment"],
+      "dependsOn": [ "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -200,7 +201,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["VNETDeployment","aroDeployment"],
+      "dependsOn": [ "VNETDeployment", "aroDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -249,6 +250,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "profileRootBaseUrl": {
+            "value": "[variables('profileRootBaseUrl')]"
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"

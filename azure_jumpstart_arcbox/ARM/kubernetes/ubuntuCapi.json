@@ -248,7 +248,10 @@
                 },
                 "protectedSettings": {
                     "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspace'), ' ', parameters('capiArcDataClusterName'), ' ', parameters('templateBaseUrl'), ' ', parameters('flavor'))]",
-                    "fileUris": [ "[concat(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]" ]
+                    "fileUris": [
+                        "[concat(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]",
+                        "[uri(parameters('templateBaseUrl'), '../common/script/bash/DownloadDependencies-v1.sh')]"
+                    ]
                 }
             }
         }
