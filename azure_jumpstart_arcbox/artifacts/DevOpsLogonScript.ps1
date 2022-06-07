@@ -25,14 +25,7 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-# Required for CLI commands
-Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
-
-# Required for azcopy
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+Enable-Arbox-Login-Azure-Tool
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Header "Downloading CAPI K8s Kubeconfig"
@@ -262,23 +255,10 @@ New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallFo
 Write-Header "Creating Desktop Icons"
 
 # Creating CAPI Hello Arc Icon on Desktop
-$shortcutLocation = "$Env:Public\Desktop\CAPI Hello-Arc.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "https://$certdns"
-$shortcut.IconLocation="$Env:ArcBoxIconDir\arc.ico, 0"
-$shortcut.WindowStyle = 3
-$shortcut.Save()
+Add-Desktop-Shortcut -shortcutName "CAPI Hello-Arc" -icon "arc" -targetPath "https://$certdns"
 
 # Creating CAPI Bookstore Icon on Desktop
-$shortcutLocation = "$Env:Public\Desktop\CAPI Bookstore.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "powershell.exe"
-$shortcut.Arguments =  "-ExecutionPolicy Bypass -File $Env:ArcBoxDir\BookStoreLaunch.ps1"
-$shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
-$shortcut.WindowStyle = 7
-$shortcut.Save()
+Add-Desktop-Shortcut -shortcutName "CAPI Bookstore" -icon "bookstore" -targetPath "powershell.exe" -arguments "-ExecutionPolicy Bypass -File $Env:ArcBoxDir\BookStoreLaunch.ps1" -windowsStyle 7
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 

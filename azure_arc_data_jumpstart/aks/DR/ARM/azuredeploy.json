@@ -113,7 +113,7 @@
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
       },
-      "defaultValue" : false
+      "defaultValue": false
     },
     "bastionHostName": {
       "type": "string",
@@ -124,6 +124,7 @@
     }
   },
   "variables": {
+    "profileRootBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/')]",
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/DR/ARM/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
@@ -133,13 +134,13 @@
     "primaryAddressPrefix": "10.0.0.0/8",
     "primarySubnetName": "Arc-Data-Primary",
     "primarySubnetAddressPrefix": "10.240.0.0/16",
-    "secondaryVnetName" : "Arc-VNet-Secondary",
+    "secondaryVnetName": "Arc-VNet-Secondary",
     "secondaryAddressPrefix": "172.0.0.0/8",
     "secondarySubnetName": "Arc-Data-Secondary",
     "secondarySubnetAddressPrefix": "172.240.0.0/16",
     "clientVnetName": "Arc-VNet-Client",
     "clientSubnetName": "Arc-Data-Client",
-    "clientAddressPrefix" : "192.168.0.0/16",
+    "clientAddressPrefix": "192.168.0.0/16",
     "clientSubnetAddressPrefix": "192.168.10.0/24",
     "bastionSubnetPrefix": "192.168.2.64/26",
     "bastionSubnetName": "AzureBastionSubnet",
@@ -242,7 +243,7 @@
           "primarySubnetName": {
             "value": "[variables('primarySubnetName')]"
           },
-           "secondarySubnetName": {
+          "secondarySubnetName": {
             "value": "[variables('secondarySubnetName')]"
           }
         }
@@ -253,7 +254,7 @@
       "comments": "Deploys the Client Windows VM",
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
-      "dependsOn": ["VNETDeployment"],
+      "dependsOn": [ "VNETDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -299,6 +300,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "profileRootBaseUrl": {
+            "value": "[variables('profileRootBaseUrl')]"
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"

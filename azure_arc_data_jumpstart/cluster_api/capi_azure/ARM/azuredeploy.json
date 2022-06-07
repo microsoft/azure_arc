@@ -103,6 +103,7 @@
     }
   },
   "variables": {
+    "profileRootBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/')]",
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/')]",
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
@@ -186,11 +187,11 @@
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
           },
+          "profileRootBaseUrl": {
+            "value": "[variables('profileRootBaseUrl')]"
+          },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"
-          },
-          "bastionHostName": {
-            "value": "[parameters('bastionHostName')]"
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
@@ -252,6 +253,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "profileRootBaseUrl": {
+            "value": "[variables('profileRootBaseUrl')]"
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"

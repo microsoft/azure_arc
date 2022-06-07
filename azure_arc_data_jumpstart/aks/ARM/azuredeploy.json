@@ -93,7 +93,7 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },    
+    },
     "deployPostgreSQL": {
       "type": "bool",
       "defaultValue": false,
@@ -120,7 +120,7 @@
       "metadata": {
         "description": "Choice to deploy Bastion to connect to the client VM"
       },
-      "defaultValue" : false
+      "defaultValue": false
     },
     "bastionHostName": {
       "type": "string",
@@ -132,6 +132,7 @@
   },
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/ARM/')]",
+    "profileRootBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
@@ -354,6 +355,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "profileRootBaseUrl": {
+            "value": "[variables('profileRootBaseUrl')]"
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"

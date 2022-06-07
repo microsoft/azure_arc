@@ -15,9 +15,7 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-# Required for CLI commands
-Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+Enable-Arbox-Login-Azure-Tool
 
 # Register Azure providers
 Write-Header "Registering Providers"
@@ -240,16 +238,8 @@ if(-not $hasPermission) {
     New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
     Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
-    # Creating Arc-enabled SQL Server onboarding desktop shortcut
-    $sourceFileLocation = "${Env:ArcBoxDir}\ArcSQLManualOnboarding.ps1"
-    $shortcutLocation = "$Env:Public\Desktop\Onboard SQL Server.lnk"
-    $wScriptShell = New-Object -ComObject WScript.Shell
-    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-    $shortcut.TargetPath = "powershell.exe"
-    $shortcut.Arguments = "-ExecutionPolicy Bypass -File $sourceFileLocation"
-    $shortcut.IconLocation="${Env:ArcBoxIconDir}\arcsql.ico, 0"
-    $shortcut.WindowStyle = 3
-    $shortcut.Save()
+    Write-Header "Creating Arc-enabled SQL Server onboarding desktop shortcut"
+    Add-Desktop-Shortcut -shortcutName "Onboard SQL Server" -icon "arcsql" -targetPath "powershell.exe" -arguments "-ExecutionPolicy Bypass -File '${Env:ArcBoxDir}\ArcSQLManualOnboarding.ps1'"
 }
 
 # Changing to Jumpstart ArcBox wallpaper
@@ -285,9 +275,9 @@ Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 Write-Header "Uploading Log Bundle"
 Invoke-Expression 'cmd /c start Powershell -Command { 
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-    Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
+    Write-Output "Sleeping for 5 seconds before creating deployment logs bundle..."
     Start-Sleep -Seconds 5
-    Write-Host "`n"
-    Write-Host "Creating deployment logs bundle"
+    Write-Output "`n"
+    Write-Output "Creating deployment logs bundle"
     7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
 }'

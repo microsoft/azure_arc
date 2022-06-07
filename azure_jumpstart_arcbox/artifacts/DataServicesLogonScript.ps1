@@ -15,15 +15,7 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
-# Required for azcopy
-Write-Header "Az PowerShell Login"
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
-
-# Required for CLI commands
-Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+Enable-Arbox-Login-Azure-Tool
 
 # Making extension install dynamic
 Write-Header "Installing Azure CLI extensions"
@@ -45,23 +37,13 @@ $Env:argument4="Microsoft.arc"
 
 # Create Azure Data Studio desktop shortcut
 Write-Header "Creating Azure Data Studio Desktop Shortcut"
-$TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
-$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Azure Data Studio.lnk"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-$Shortcut.TargetPath = $TargetFile
-$Shortcut.Save()
+Add-Desktop-Shortcut -shortcutName "Azure Data Studio" -username $Env:adminUsername -targetPath "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
 
 # Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut
-Write-Host "`n"
-Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
-Write-Host "`n"
-$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
-$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-$Shortcut.TargetPath = $TargetFile
-$Shortcut.Save()
+Write-Output "`n"
+Write-Output "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
+Write-Output "`n"
+Add-Desktop-Shortcut -shortcutName "Microsoft SQL Server Management Studio 18" -username $Env:adminUsername -targetPath "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Header "Downloading CAPI K8s Kubeconfig"
@@ -86,11 +68,11 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\
 Write-Header "Checking K8s Nodes"
 kubectl get nodes
 
-Write-Host "`n"
+Write-Output "`n"
 azdata --version
 
 # Installing the Azure Arc-enabled data services cluster extension
-Write-Host "Installing the Azure Arc-enabled data services cluster extension"
+Write-Output "Installing the Azure Arc-enabled data services cluster extension"
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
@@ -102,15 +84,15 @@ az k8s-extension create --name arc-data-services `
                         --release-namespace arc `
                         --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
-Write-Host "`n"
+Write-Output "`n"
 
 Do {
-    Write-Host "Waiting for bootstrapper pod, hold tight..."
+    Write-Output "Waiting for bootstrapper pod, hold tight..."
     Start-Sleep -Seconds 20
     $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
 } while ($podStatus -eq "Nope")
-Write-Host "Bootstrapper pod is ready!"
-Write-Host "`n"
+Write-Output "Bootstrapper pod is ready!"
+Write-Output "`n"
 
 # Configuring Azure Arc Custom Location on the cluster 
 Write-Header "Configuring Azure Arc Custom Location"
@@ -140,15 +122,15 @@ $dataControllerParams = "$Env:ArcBoxDir\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
 
 az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController.parameters.json"
-Write-Host "`n"
+Write-Output "`n"
 
 Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+    Write-Output "Waiting for data controller. Hold tight, this might take a few minutes..."
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
 } while ($dcStatus -eq "Nope")
-Write-Host "Azure Arc data controller is ready!"
-Write-Host "`n"
+Write-Output "Azure Arc data controller is ready!"
+Write-Output "`n"
 
 Write-Header "Deploying SQLMI & PostgreSQL"
 # Deploy SQL MI and PostgreSQL data services
@@ -186,7 +168,7 @@ Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config-k3s"
 Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
 $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
 kubectx
-Write-Host "`n"
+Write-Output "`n"
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services
 Write-Header "Creating Grafana & Kibana Shortcuts"

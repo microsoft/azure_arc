@@ -117,6 +117,7 @@
     }
   },
   "variables": {
+    "profileRootBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/')]",
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/Migration/ARM/')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
@@ -246,6 +247,9 @@
           },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          },
+          "profileRootBaseUrl": {
+            "value": "[variables('profileRootBaseUrl')]"
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"

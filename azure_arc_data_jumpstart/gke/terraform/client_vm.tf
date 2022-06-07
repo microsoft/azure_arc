@@ -88,6 +88,36 @@ resource "google_compute_instance" "default" {
   }
 
   provisioner "file" {
+    source      = "../../common/script/powershell/CommonBootstrapArcData.ps1"
+    destination = "C:/Temp/CommonBootstrapArcData.ps1"
+
+    connection {
+      host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
+      https    = false
+      insecure = true
+      timeout  = "20m"
+      type     = "winrm"
+      user     = var.windows_username
+      password = var.windows_password
+    }
+  }
+
+  provisioner "file" {
+    source      = "../../../common/script/powershell/AddPSProfile-v1.ps1"
+    destination = "C:/Temp/AddPSProfile-v1.ps1"
+
+    connection {
+      host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
+      https    = false
+      insecure = true
+      timeout  = "20m"
+      type     = "winrm"
+      user     = var.windows_username
+      password = var.windows_password
+    }
+  }
+
+  provisioner "file" {
     source      = "artifacts/DataServicesLogonScript.ps1"
     destination = "C:/Temp/DataServicesLogonScript.ps1"
 
@@ -182,6 +212,7 @@ resource "local_file" "azure_arc" {
     deploySQLMI            = var.deploy_SQLMI
     deployPostgreSQL       = var.deploy_PostgreSQL
     templateBaseUrl        = var.templateBaseUrl
+    profileRootBaseUrl     = var.profileRootBaseUrl
     }
   )
   filename = "artifacts/azure_arc.ps1"

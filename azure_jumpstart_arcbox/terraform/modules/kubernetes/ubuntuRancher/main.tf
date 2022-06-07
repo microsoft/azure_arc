@@ -165,9 +165,10 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
   protected_settings = <<PROTECTED_SETTINGS
     {
       "fileUris": [
-          "${var.template_base_url}artifacts/installK3s.sh"
+          "${var.template_base_url}artifacts/installK3s.sh",
+          "${var.template_base_url}../common/script/bash/DownloadDependencies-v1.sh"
       ],
-      "commandToExecute": "bash installK3s.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name} ${var.deploy_bastion}"
+      "commandToExecute": "bash installK3s.sh ${var.admin_username} ${var.spn_client_id} ${var.spn_client_secret} ${var.spn_tenant_id} ${var.vm_name} ${data.azurerm_resource_group.rg.location} ${var.storage_account_name} ${var.workspace_name} ${var.deploy_bastion} ${var.template_base_url}"
     }
 PROTECTED_SETTINGS
 }

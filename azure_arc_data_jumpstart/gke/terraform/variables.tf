@@ -129,3 +129,9 @@ variable "templateBaseUrl" {
   type        = string
   default     = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/"
 }
+
+variable "profileRootBaseUrl" {
+  description = "Git repo base URL for downloading common scripts for Client VM bootstrap script"
+  type        = string
+  default     = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/"
+}
