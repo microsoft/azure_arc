@@ -9,7 +9,7 @@
       "type": "string",
       "defaultValue": "[resourceGroup().location]"
     },
-    "extendedLocationName": {
+    "customLocationName": {
       "type": "string"
     },
     "vCenterName": {
@@ -36,7 +36,7 @@
     }
   },
   "variables": {
-    "extendedLocation": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/microsoft.extendedlocation/customlocations/', parameters('extendedLocationName') )]",
+    "extendedLocation": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/microsoft.extendedlocation/customlocations/', parameters('customLocationName') )]",
     "vCenterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VCenters/', parameters('vCenterName') )]",
     "networkId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VirtualNetworks/', parameters('networkName') )]",
     "templateId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VirtualMachineTemplates/', parameters('templateName') )]",
