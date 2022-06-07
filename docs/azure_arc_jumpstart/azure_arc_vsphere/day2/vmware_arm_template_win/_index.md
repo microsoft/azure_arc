@@ -78,7 +78,7 @@ As mentioned, this deployment will leverage an ARM template. You will deploy a s
 - The deployment will use an ARM template parameters file to customize your environment. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_vsphere_jumpstart/vmware_arm_template_win/azuredeploy.parameters.json) file located in your local cloned repository folder. Example parameters files are located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_vsphere_jumpstart/vmware_arm_template_win/azuredeploy.example.parameters.json). Fill out the parameters according to your environment:
 
   - _`virtualMachineName`_ - the name of the Windows virtual machine that will be created
-  - _`extendedLocationName`_ - the name of your Azure Arc custom location
+  - _`customLocationName`_ - the name of your Azure Arc custom location
   - _`vCenterName`_ - the name of your vCenter
   - _`networkName`_ - the vSphere network (port group) you will use to deploy your VM
   - _`nicType`_ - the network type to associate to the VM
@@ -101,28 +101,27 @@ As mentioned, this deployment will leverage an ARM template. You will deploy a s
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal and in your vCenter.
 
     ![Screenshot showing ARM template output](./01.jpg)
-    
+
     ![Screenshot showing vCenter console](./02.jpg)
-    
+
     ![Screenshot showing the VM created in the Azure portal](./03.jpg)
-    
+
     ![Screenshot showing the VM properties in the Azure portal](./04.jpg)
 
 - The VM is also onboarded to Azure Arc.
 
     ![Screenshot showing the VM guest configuration enabled](./05.jpg)
 
-## Clean up 
+## Clean up
 
 Complete the following steps to clean up your environment:
 
 - To delete the just the Windows VM. Navigate to the VM in the Azure portal and click "Delete". This will initiate the deletion in your connected vCenter.
 
     ![Screenshot showing the VM deletion in the Azure portal](./06.jpg)
-    
+
     ![Screenshot showing the VM deletion in the vCenter console](./07.jpg)
 
 - If you want to delete the entire Azure resources, simply delete the deployment resource group from the Azure portal.
 
     ![Screenshot showing the resource group deletion in the Azure portal](./08.jpg)
-
