@@ -12,7 +12,7 @@
       "value": "jumpstart-vCenter"
     },
     "networkName": {
-      "value": "Nested-Jumpstart-VM-Network-PG-VLAN-110-"
+      "value": "Nested-Jumpstart-VM-Network-PG-VLAN-110"
     },
     "nicType": {
       "value": "e1000e"
