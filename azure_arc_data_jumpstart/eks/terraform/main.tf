@@ -128,7 +128,8 @@ data "aws_availability_zones" "available" {}
 # Override with variable or hardcoded value if necessary
 locals {
   workstation_cidr = "${chomp(data.http.workstation_ip.body)}/32"
-   template_base_url = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_arc_data_jumpstart/eks/terraform/"
+  template_base_url = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_arc_data_jumpstart/eks/terraform/"
+  profile_root_base_url = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_arc_data_jumpstart/"
 }
 
 resource "aws_vpc" "arcdemo" {
@@ -216,6 +217,7 @@ module "client_VM"{
   deployPostgreSQL = var.deployPostgreSQL
   customLocationObjectId = var.customLocationObjectId
   templateBaseUrl = local.template_base_url
+  profileRootBaseUrl = local.profile_root_base_url
   awsDefaultRegion = var.AWS_DEFAULT_REGION
   awsAccessKeyId = var.AWS_ACCESS_KEY_ID
   awsSecretAccessKey = var.AWS_SECRET_ACCESS_KEY
