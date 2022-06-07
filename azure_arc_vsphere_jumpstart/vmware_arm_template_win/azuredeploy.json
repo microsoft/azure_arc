@@ -1,0 +1,106 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachineName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "customLocationName": {
+      "type": "string"
+    },
+    "vCenterName": {
+      "type": "string"
+    },
+    "networkName": {
+      "type": "string"
+    },
+    "nicType": {
+      "type": "string",
+      "defaultValue": "e1000e"
+    },
+    "templateName": {
+      "type": "string"
+    },
+    "clusterName": {
+      "type": "string"
+    },
+    "adminUserName" : {
+      "type": "string"
+    },
+    "adminUserPassword" : {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "extendedLocation": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/microsoft.extendedlocation/customlocations/', parameters('customLocationName') )]",
+    "vCenterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VCenters/', parameters('vCenterName') )]",
+    "networkId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VirtualNetworks/', parameters('networkName') )]",
+    "templateId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/VirtualMachineTemplates/', parameters('templateName') )]",
+    "clusterId": "[concat('/subscriptions/', subscription().subscriptionId,'/resourcegroups/',resourceGroup().name, '/providers/Microsoft.ConnectedVMwarevSphere/Clusters/', parameters('clusterName') )]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ConnectedVMwarevSphere/virtualMachines",
+      "apiVersion": "2020-10-01-preview",
+      "name": "[parameters('virtualMachineName')]",
+      "location": "[parameters('location')]",
+      "kind": "VMware",
+      "extendedLocation": {
+        "name": "[variables('extendedLocation')]",
+        "type": "CustomLocation"
+      },
+      "identity" : {
+        "type" : "SystemAssigned"
+      },
+      "properties": {
+        "vCenterId": "[variables('vCenterId')]",
+        "templateId": "[variables('templateId')]",
+        "placementProfile": {
+          "clusterId": "[variables('clusterId')]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "name": "NIC01",
+              "networkId": "[variables('networkId')]",
+              "nicType": "[parameters('nicType')]",
+              "powerOnBoot": "enabled",
+              "ipSettings": {
+                "allocationMethod": "dynamic"
+              }
+            }
+          ]
+        },
+        "hardwareProfile": {
+          "memorySizeMB": 4096,
+          "numCPUs": 2,
+          "numCoresPerSocket": 1
+        },
+        "osProfile": {
+          "osType": "Windows",
+          "computerName": "[parameters('virtualMachineName')]",
+          "adminPassword" : "[parameters('adminUserPassword')]"
+        }
+      }
+    },
+    {
+            "type": "Microsoft.ConnectedVMwarevSphere/VirtualMachines/guestAgents",
+            "apiVersion": "2020-10-01-preview",
+            "name": "[concat(parameters('virtualMachineName'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ConnectedVMwarevSphere/VirtualMachines', parameters('virtualMachineName'))]"
+            ],
+            "properties": {
+                "credentials": {
+                    "username": "[parameters('adminUserName')]",
+                    "password" : "[parameters('adminUserPassword')]"
+                },
+                "provisioningAction": "install"
+            }
+    }
+  ]
+}
