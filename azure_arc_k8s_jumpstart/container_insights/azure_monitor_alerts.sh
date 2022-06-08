@@ -75,4 +75,4 @@ clusterResourceId=$(az connectedk8s show --name $arcClusterName --resource-group
 echo ""
 
 echo "Create all Recommended Alerts with a severity of 3 (Informational) and the recommended threshold"
-az deployment group create --name allRecommendedAlerts --resource-group $resourceGroup --template-file all_alerts.json --parameters clusterResourceId=$clusterResourceId actionGroupId=$actionGroupId lawId=$lawId azureLocation=$azureLocation
+az deployment group create --name allRecommendedAlerts --resource-group $resourceGroup --template-file artifacts/all_alerts.json --parameters clusterResourceId=$clusterResourceId actionGroupId=$actionGroupId lawId=$lawId azureLocation=$azureLocation
