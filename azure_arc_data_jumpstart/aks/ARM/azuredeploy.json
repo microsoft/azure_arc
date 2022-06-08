@@ -144,7 +144,7 @@
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24",
     "bastionSubnetPrefix": "172.16.2.64/26",
-    "addsPrivateIPAddres": "172.16.1.100",
+    "addsPrivateIPAddress": "172.16.1.100",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('bastionSubnetName'))]",
     "addsDomainName": "jumpstart.local"
@@ -210,7 +210,7 @@
             "value": "[variables('bastionSubnetPrefix')]"
           },
           "dnsServers": {
-            "value": ["[variables('addsPrivateIPAddres')]", "168.63.129.16"]
+            "value": ["[variables('addsPrivateIPAddress')]", "168.63.129.16"]
           }
         }
       }
@@ -281,8 +281,8 @@
           "subnetName": {
             "value": "[variables('subnetName')]"
           },
-          "addsPrivateIPAddres":{
-            "value": "[variables('addsPrivateIPAddres')]"
+          "addsPrivateIPAddress":{
+            "value": "[variables('addsPrivateIPAddress')]"
           },
           "templateBaseUrl":{
             "value": "[variables('templateBaseUrl')]"
