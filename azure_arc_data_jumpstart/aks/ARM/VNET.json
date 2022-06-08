@@ -18,7 +18,7 @@
     },
     "aksSubnetName": {
       "type": "string",
-      "defaultValue": "Aks-Subnet",
+      "defaultValue": "AKS-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
