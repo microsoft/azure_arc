@@ -48,7 +48,7 @@
       "type": "string",
       "defaultValue": "172.16.8.0/22",
       "metadata": {
-        "description": "Bastion subnet prefix"
+        "description": "AKS subnet prefix"
       }
     },
     "dnsServers": {
