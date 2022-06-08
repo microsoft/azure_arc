@@ -118,10 +118,8 @@
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-    "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
     "osDiskType": "Premium_LRS",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-    "publicIpRef": "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
     "nsgRef": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]",
     "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
   },
@@ -131,9 +129,7 @@
       "apiVersion": "2021-05-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
-      "condition": "[parameters('deployBastion')]",
       "dependsOn": [
-            "[variables('publicIpRef')]",
             "[variables('nsgRef')]"
          ],
       "properties": {
@@ -154,54 +150,7 @@
         }       
       }
     },
-    {
-      "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2021-05-01",
-      "name": "[variables('networkInterfaceName')]",
-      "location": "[parameters('azureLocation')]",
-      "condition": "[not(parameters('deployBastion'))]",
-      "dependsOn": [
-            "[variables('publicIpRef')]",
-            "[variables('nsgRef')]"
-         ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "ipconfig1",
-            "properties": {
-              "subnet": {
-                "id": "[variables('subnetRef')]"
-              },
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress":"[parameters('addsPrivateIPAddress')]",
-              "publicIPAddress": {
-                "id": "[variables('publicIpRef')]"
-              }
-            }
-          }
-        ],
-        "networkSecurityGroup": {
-          "id": "[variables('nsgRef')]"
-        }       
-      }
-    },
-    {
-      "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2019-02-01",
-      "name": "[variables('publicIpAddressName')]",
-      "location": "[parameters('azureLocation')]",
-      "condition": "[not(parameters('deployBastion'))]",
-      "properties": {
-        "publicIpAllocationMethod": "Dynamic",
-        "publicIPAddressVersion": "IPv4",
-        "idleTimeoutInMinutes": 4
-      },
-      "sku": {
-        "name": "Basic",
-        "tier": "Regional"
-      }
-    },
-    {
+     {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2019-03-01",
       "name": "[variables('vmName')]",
