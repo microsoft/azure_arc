@@ -18,6 +18,7 @@ param (
     [string]$SQLMIHA,    
     [string]$deployPostgreSQL,
     [string]$templateBaseUrl,
+    [string]$enableADAuth,
     [string]$addsDomainName
 )
 
@@ -40,6 +41,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('enableADAuth', $enableADAuth,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('addsDomainName', $addsDomainName,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
@@ -156,7 +158,7 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 # is supplied to this script setup ADDS domain.
 ##############################################################################
 # If AD Auth is required join computer to ADDS domain and restart computer
-if ($addsDomainName.Length -gt 0)
+if ($enableADAuth -eq $true -and $addsDomainName.Length -gt 0)
 {
     # Install Windows Feature RSAT-AD-PowerShell windows feature to setup OU and User Accounts in ADDS
     Install-WindowsFeature -Name RSAT-AD-PowerShell

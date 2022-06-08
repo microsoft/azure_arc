@@ -247,11 +247,11 @@ Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Dom
 Write-Host "Creted SQLMI DNS A record with public ip address $publicIp"
 
 # Write endpoint information in the file
-$filename = "SQLMI-ADAuth-Endpoints.txt"
+$filename = "SQLMIEndpoints.txt"
 $file = New-Item -Path $Env:TempDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
 
-Add-Content $Endpoints "Primary SQL Managed Instance external endpoint:"
+Add-Content $Endpoints "Primary SQL Managed Instance external endpoint DNS name:"
 $sqlmiEndPoint | Add-Content $Endpoints
 
 Add-Content $Endpoints ""
@@ -266,7 +266,7 @@ Write-Host "`n"
 Write-Host "Creating SQLMI Endpoints file Desktop shortcut"
 Write-Host "`n"
 $TargetFile = $Endpoints
-$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQLMI-ADAuth-Endpoints.lnk"
+$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQLMI Endpoints.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
