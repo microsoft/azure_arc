@@ -12,7 +12,7 @@
       "type": "string",
       "defaultValue": "jumpstart.local",
       "metadata": {
-        "description": "The name of your Virtual Machine"
+        "description": "The FQDN of the domain"
       }
     },
     "vmName": {
