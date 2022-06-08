@@ -148,7 +148,7 @@
     // Virtual Network configuration
     "virtualNetworkName": "Arc-Data-VNet",
     "subnetName": "Arc-Data-Subnet",
-    "akssubnetName": "Aks-Subnet",
+    "akssubnetName": "AKS-Subnet",
     "addressPrefix": "172.16.0.0/16",
     "subnetAddressPrefix": "172.16.1.0/24",
     "bastionSubnetPrefix": "172.16.2.64/26",
