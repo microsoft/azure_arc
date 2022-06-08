@@ -18,9 +18,9 @@
     },
     "vnetSubnetID": {
       "type": "string",
-      "defaultValue": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'Arc-Data-VNet', 'AKS-Subnet')]",
+      "defaultValue": "[variables('vnetSubnetId')]",
       "metadata": {
-        "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
+        "description": "Resource ID of the AKS subnet"
       }
     },
     "dnsPrefix": {
@@ -107,6 +107,9 @@
         "Project": "jumpstart_azure_arc_data_services"
       }
     }
+  },
+  "variables": {
+    "vnetSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'Arc-Data-VNet', 'AKS-Subnet')]"
   },
   "resources": [
     {

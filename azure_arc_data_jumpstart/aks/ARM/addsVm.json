@@ -119,8 +119,11 @@
     "vmName": "[concat(parameters('vmName'))]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
+    "osDiskType": "Premium_LRS",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-    "osDiskType": "Premium_LRS"
+    "publicIpRef": "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
+    "nsgRef": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]",
+    "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
   },
   "resources": [
     {
@@ -128,9 +131,10 @@
       "apiVersion": "2021-05-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
+      "condition": "[parameters('deployBastion')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]",
-        "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+            "[variables('publicIpRef')]",
+            "[variables('nsgRef')]"
          ],
       "properties": {
         "ipConfigurations": [
@@ -141,15 +145,43 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress":"[parameters('addsPrivateIPAddres')]",
+              "privateIPAddress":"[parameters('addsPrivateIPAddress')]"
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[variables('nsgRef')]"
+        }       
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2021-05-01",
+      "name": "[variables('networkInterfaceName')]",
+      "location": "[parameters('azureLocation')]",
+      "condition": "[not(parameters('deployBastion'))]",
+      "dependsOn": [
+            "[variables('publicIpRef')]",
+            "[variables('nsgRef')]"
+         ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress":"[parameters('addsPrivateIPAddress')]",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                "id": "[variables('publicIpRef')]"
               }
             }
           }
         ],
         "networkSecurityGroup": {
-          "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+          "id": "[variables('nsgRef')]"
         }       
       }
     },
@@ -158,6 +190,7 @@
       "apiVersion": "2019-02-01",
       "name": "[variables('publicIpAddressName')]",
       "location": "[parameters('azureLocation')]",
+      "condition": "[not(parameters('deployBastion'))]",
       "properties": {
         "publicIpAllocationMethod": "Dynamic",
         "publicIPAddressVersion": "IPv4",
@@ -175,9 +208,8 @@
       "location": "[parameters('azureLocation')]",
       "tags": "[parameters('resourceTags')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
-        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
-      ],
+        "[variables('networkInterfaceRef')]"
+        ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -202,7 +234,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+              "id": "[variables('networkInterfaceRef')]"
             }
           ]
         },

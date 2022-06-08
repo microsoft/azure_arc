@@ -16,13 +16,6 @@
         "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long"
       }
     },
-    /*"addsDomainName": {
-      "type": "string",
-      "defaultValue": "jumpstart.local",
-      "metadata": {
-        "description": "Active Direcotory domain name ot support AD Auth. Empty value indicates AD auth not required in SQLMI."
-      }
-    },*/    
     "myIpAddress": {
       "type": "string",
       "metadata": {
@@ -139,7 +132,6 @@
   },
   "variables": {
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/', parameters('githubAccount'), '/azure_arc/', parameters('githubBranch'), '/azure_arc_data_jumpstart/aks/ARM/')]",
-    //"templateBaseUrl": "https://msspobackuppoc.blob.core.windows.net/arm/",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'clientVm.json')]",
     "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'aks.json')]",
     "logAnalyticsUrl": "[uri(variables('templateBaseUrl'), 'logAnalytics.json')]",
