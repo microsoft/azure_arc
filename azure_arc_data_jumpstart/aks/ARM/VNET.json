@@ -20,7 +20,7 @@
       "type": "string",
       "defaultValue": "AKS-Subnet",
       "metadata": {
-        "description": "Name of the subnet in the virtual network"
+        "description": "Name of the AKS subnet in the virtual network"
       }
     },
     "addressPrefix": {
