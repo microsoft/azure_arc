@@ -73,7 +73,7 @@
         "description": "Name of the subnet in the virtual network"
       }
     },
-    "addsPrivateIPAddres": {
+    "addsPrivateIPAddress": {
       "type": "string",
       "defaultValue": "172.16.1.100",
       "metadata": {
