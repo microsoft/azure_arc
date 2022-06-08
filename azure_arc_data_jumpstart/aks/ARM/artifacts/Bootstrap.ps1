@@ -165,7 +165,7 @@ if ($addsDomainName.Length -gt 0)
     Write-Host "Installed RSAT-AD-PowerShell windows feature"
 
     Write-Host "Joining computer to Active Directory domain ${addsDomainName}. Computer will be rebooted after joining domain."
-    # Get NitBios name from FQDN
+    # Get NetBios name from FQDN
     $netbiosname = $addsDomainName.Split(".")[0]
     $computername = $env:COMPUTERNAME
 
