@@ -18,7 +18,7 @@
     },
     "vnetSubnetID": {
       "type": "string",
-      "defaultValue": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'Arc-Data-VNet', 'Aks-Subnet')]",
+      "defaultValue": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'Arc-Data-VNet', 'AKS-Subnet')]",
       "metadata": {
         "description": "Optional DNS prefix to use with hosted Kubernetes API server FQDN"
       }
