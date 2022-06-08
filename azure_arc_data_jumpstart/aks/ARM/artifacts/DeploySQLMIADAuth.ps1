@@ -76,7 +76,7 @@ else {
     Exit
 }
 
-$sqlmiouName = "ARCSQLMI"
+$sqlmiouName = "ArcSQLMI"
 $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
 
 # Create ArcSQLMI OU
