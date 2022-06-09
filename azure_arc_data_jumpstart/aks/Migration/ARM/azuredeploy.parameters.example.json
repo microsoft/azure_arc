@@ -32,9 +32,6 @@
     "SQLMIHA": {
       "value": true
     },
-    "deployPostgreSQL": {
-      "value": false
-    },
     "bastionHostName": {
       "value": "Arc-Data-Demo-Bastion"
     },
