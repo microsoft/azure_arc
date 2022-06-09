@@ -31,10 +31,42 @@
       "metadata": {
         "description": "Bastion subnet prefix"
       }
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Option to deploy Bastion"
+      }
     }
   },
   "variables": {
-    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]"
+    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]",
+    "subnetsWithBastion": [
+      {
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[parameters('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "name": "AzureBastionSubnet",
+        "properties": {
+          "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+        }
+      }
+    ],
+    "subnetsWithoutBastion": [
+      {
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[parameters('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      }
+    ]
   },
   "resources": [
     {
@@ -47,22 +79,7 @@
         "addressSpace": {
           "addressPrefixes": [ "[parameters('addressPrefix')]" ]
         },
-        "subnets": [
-          {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "addressPrefix": "[parameters('subnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled"
-            }
-          },
-          {
-            "name": "AzureBastionSubnet",
-            "properties": {
-              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
-            }
-          }
-        ]
+        "subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
       }
     }
   ]
