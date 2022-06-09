@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "virtualMachineName": {
+        "value": "<Your VMware VM name>"
+      },
+      "extendedLocationName": {
+        "value": "<Your custom location name>"
+      },
+      "vCenterName": {
+        "value": "<Your vCenter Name>"
+      },
+      "networkName": {
+        "value": "<Your Network Name>"
+      },
+      "nicType": {
+        "value": "<Your NIC type name>"
+      },
+      "templateName": {
+        "value": "<Your VM Template name>"
+      },
+      "clusterName": {
+        "value": "<Your VMware cluster to host the VM>"
+      },
+      "adminUserName": {
+        "value": "<Windows VM admin username>"
+      },
+      "adminUserPassword": {
+        "value": "<Windows VM admin password>"
+      } 
+    }
+  }

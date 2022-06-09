@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachineName": {
+      "value": "Arc-VMware-Demo"
+    },
+    "extendedLocationName": {
+      "value": "jumpstart-cl"
+    },
+    "vCenterName": {
+      "value": "jumpstart-vCenter"
+    },
+    "networkName": {
+      "value": "Nested-Jumpstart-VM-Network-PG-VLAN-110"
+    },
+    "nicType": {
+      "value": "e1000e"
+    },
+    "templateName": {
+      "value": "Srv2K22-JS-TMP"
+    },
+    "clusterName": {
+      "value": "Jumpstart-Cluster"
+    },
+    "adminUserName": {
+        "value": "arcdemo"
+      },
+    "adminUserPassword": {
+        "value": "ArcPassword123!!"
+      } 
+  }
+}
