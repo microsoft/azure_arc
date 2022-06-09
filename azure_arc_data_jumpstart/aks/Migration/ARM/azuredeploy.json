@@ -158,6 +158,9 @@
           },
           "bastionSubnetPrefix": {
             "value": "[variables('bastionSubnetPrefix')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
           }
         }
       }
