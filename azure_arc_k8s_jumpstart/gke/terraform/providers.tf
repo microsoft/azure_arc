@@ -3,11 +3,16 @@
 #
 
 terraform {
-  required_version = "~> 1.0"
+  required_version = "~> 1.1.9"
   required_providers {
-    google  = "~> 3.71.0"
-    local   = "~> 2.1"
-    azurerm = "~> 2.62.1"
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = "3.8.0"
+    }
+    google = {
+      source = "hashicorp/google"
+      version = "4.23.0"
+    }
   }
 }
 
