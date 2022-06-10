@@ -92,7 +92,7 @@
       },
       "ProxysubnetName": {
         "type": "string",
-        "defaultValue": "proxy-ubnet",
+        "defaultValue": "proxy-subnet",
         "metadata": {
           "description": "Name of the subnet in the virtual network for the proxy server"
         }
@@ -157,6 +157,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "name": "InfraDeployment",
+            "location": "[parameters('location')]",
             "properties": {
                 "expressionEvaluationOptions": {
                     "scope": "Inner"
