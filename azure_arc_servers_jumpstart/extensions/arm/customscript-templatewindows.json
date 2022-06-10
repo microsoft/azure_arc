@@ -2,10 +2,10 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "vmName": {
+        "machineName": {
             "type": "string"
         },
-        "location": {
+        "Region": {
             "type": "string"
         },
         "fileUris": {
@@ -20,9 +20,9 @@
     },
     "resources": [
         {
-            "name": "[concat(parameters('vmName'),'/CustomScriptExtension')]",
+            "name": "[concat(parameters('machineName'),'/CustomScriptExtension')]",
             "type": "Microsoft.HybridCompute/machines/extensions",
-            "location": "[parameters('location')]",
+            "location": "[parameters('Region')]",
             "apiVersion": "2019-08-02-preview",
             "properties": {
                 "publisher": "Microsoft.Compute",
