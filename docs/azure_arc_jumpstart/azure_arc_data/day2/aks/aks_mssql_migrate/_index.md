@@ -210,7 +210,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Additionally, the SQL Managed Instances connection and the SQL instance on the nested VM will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation on the source SQL instance on the client VM.
 
-  ![Screenshot showing Azure Data Studio SQL MI connection](./26.png)
+  ![Screenshot showing Azure Data Studio SQL MI and nested SQL server connection](./26.png)
 
 ## Cluster extensions
 
@@ -230,7 +230,7 @@ In order to view these cluster extensions, click on the Azure Arc-enabled Kubern
 
 ### Creating backup of the _AdventureWorks_ database from the source SQL Instance to prepare for migration
 
-- As part of the automation, the script will also create a new text file and a desktop shortcut named Endpoints that includes the SQL endpoint for the Azure Azure Arc-enabled SQL Managed Instance.
+- As part of the automation, the script will also create a new text file and a desktop shortcut named "SQLMI Endpoints" that includes the SQL endpoint for the Azure Azure Arc-enabled SQL Managed Instance.
 
   ![Screenshot showing the Azure Arc-enabled SQL Managed Instance endpoint URLs text file](./29.png)
 
