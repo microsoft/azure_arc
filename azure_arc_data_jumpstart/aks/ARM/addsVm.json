@@ -213,7 +213,7 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "[uri(parameters('templateBaseUrl'), 'artifacts/setupADDS.ps1')]"
+            "[uri(parameters('templateBaseUrl'), 'artifacts/SetupADDS.ps1')]"
           ],
           "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1', ' -domainName ', parameters('addsDomainName'), ' -domainAdminUsername ', parameters('windowsAdminUsername'), ' -domainAdminPassword ', parameters('windowsAdminPassword'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
         }
