@@ -157,7 +157,6 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "name": "InfraDeployment",
-            "location": "[parameters('location')]",
             "properties": {
                 "expressionEvaluationOptions": {
                     "scope": "Inner"
