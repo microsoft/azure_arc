@@ -5,7 +5,7 @@
       "vmName": {
         "type": "string"
       },
-      "Region": {
+      "location": {
         "type": "string"
       },
       "fileUris": {
@@ -19,7 +19,7 @@
       {
         "name": "[concat(parameters('vmName'),'/CustomScript')]",
         "type": "Microsoft.HybridCompute/machines/extensions",
-        "location": "[parameters('Region')]",
+        "location": "[parameters('location')]",
         "apiVersion": "2019-08-02-preview",
         "properties": {
           "publisher": "Microsoft.Azure.Extensions",
