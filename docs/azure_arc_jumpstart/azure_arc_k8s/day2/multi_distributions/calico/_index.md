@@ -12,14 +12,14 @@ description: >
 
 <p align="center"><img src="/img/jumpstart_friends_logo.png" alt="jumpstart-friends-logo" width="250"></p>
 
-The following Jumpstart scenario will guide you how to use Azure Policy [Azure Policy for Kubernetes](https://docs.microsoft.com/azure/governance/policy/concepts/policy-for-kubernetes#:~:text=Azure%20Policy%20extends%20Gatekeeper%20v3,Kubernetes%20clusters%20from%20one%20place.) on an Azure Arc connected Kubernetes cluster to audit/enforce labels for pods. [Network policy](https://projectcalico.docs.tigera.io/about/about-network-policy) is applied to pods using label selectors.
+The following Jumpstart scenario will guide you how to use Azure Policy [Azure Policy for Kubernetes](https://docs.microsoft.com/azure/governance/policy/concepts/policy-for-kubernetes#:~:text=Azure%20Policy%20extends%20Gatekeeper%20v3,Kubernetes%20clusters%20from%20one%20place.) on an Azure Arc-enabled Kubernetes cluster to audit/enforce labels for pods. [Network policy](https://projectcalico.docs.tigera.io/about/about-network-policy) is applied to pods using label selectors.
 
-> **NOTE: This guide assumes you already deployed an Amazon Elastic Kubernetes Service (EKS) or Google Kubernetes Engine (GKE) cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these Jumpstart scenarios:**
+  > **NOTE: This guide assumes you already deployed an Amazon Elastic Kubernetes Service (EKS) or Google Kubernetes Engine (GKE) cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these Jumpstart scenarios:**
 
 - [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
 - [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
 
-> **NOTE: This guide assumes you already have deployed Calico network policy in your cluster. If you haven't, you can use our installation guides for Calico open source or Calico Cloud:**
+  > **NOTE: This guide assumes you already have deployed Calico network policy in your cluster. If you haven't, you can use our installation guides for Calico open source or Calico Cloud:**
 
 - [Deploy Calico open source in your managed public cluster](https://projectcalico.docs.tigera.io/getting-started/kubernetes/managed-public-cloud/)
 - [Sign up for a Calico Cloud trial](https://www.calicocloud.io/?utm_campaign=calicocloud&utm_medium=digital&utm_source=microsoft)
@@ -90,10 +90,10 @@ The Azure Policy will be set to “Audit” mode to check the configuration of e
 
   ![Showing pods deployment](./05.png)
 
-- Deploy a demo application and Calico Network policy in your Azure Arc-Connected Cluster.
+- Deploy a demo application and Calico Network policy in your Azure Arc-enabled Kubernetes cluster.
 
   ```shell
-  cd azure_arc/docs/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/calico/
+  cd azure_arc/azure_arc_k8s_jumpstart/multi_distributions/calico_policy
   ```
 
   ```shell
@@ -114,7 +114,7 @@ The Azure Policy will be set to “Audit” mode to check the configuration of e
 
 ## Deploy an Azure policy to verify if “fw-zone” label exists for pods in the `storefront` namespace
 
-- In the Azure portal Search bar, look for _Policy_ and click on _Definitions_ which will show you all of the available Azure policies.
+- In the Azure portal search bar, look for _Policy_ and click on _Definitions_ which will show you all of the available Azure policies.
 
     ![Searching for Azure Policy definitions](./06.png)
 
@@ -179,7 +179,6 @@ The Azure Policy will be set to “Audit” mode to check the configuration of e
 - Test Calico network policy enforcement with wrong labels.
 
   ![test result](./24.png)
-
 
 ## Clean up environment
 
