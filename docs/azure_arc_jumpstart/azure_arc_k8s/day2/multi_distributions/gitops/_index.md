@@ -52,12 +52,12 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
 
 ## Azure Arc Kubernetes GitOps Configuration for Calico
 
-- We will use a shell script [*calico_k8sconfig_gitops*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks/calico_gitops/calico_k8sconfig_gitops.sh) against the GKE/EKS connected cluster. You can use Cloud Shell in order to keep your local environment clean.
+- We will use a shell script [*calico_k8sconfig_gitops*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/multi_distributions/calico_gitops/calico_k8sconfig_gitops.sh) against the GKE/EKS connected cluster. You can use Cloud Shell in order to keep your local environment clean.
 
 [Google Cloud Shell](https://cloud.google.com/shell)
 [AWS Cloud Shell](https://aws.amazon.com/cloudshell/)
 
-- Edit the environment variables in the [*calico_k8sconfig_gitops*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/aks/calico_gitops/calico_k8sconfig_gitops.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./calico_k8sconfig_gitops.sh``` command to create the GitOps configuration.
+- Edit the environment variables in the [*calico_k8sconfig_gitops*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/multi_distributions/calico_gitops/calico_k8sconfig_gitops.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./calico_k8sconfig_gitops.sh``` command to create the GitOps configuration.
 
     > **NOTE: The extra dot is due to the script having an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
     > **NOTE: The default branch is `master`. Newer repositories have a root branch named main, in which case you need to set `--git-branch=main` in operator params.**
