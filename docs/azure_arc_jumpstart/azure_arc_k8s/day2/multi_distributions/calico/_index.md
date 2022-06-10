@@ -146,7 +146,7 @@ The Azure Policy will be set to “Audit” mode to check the configuration of e
 
   ![Compliance list](./14.png)
 
-> **NOTE: The process of evaluation can take up 30min, in the meantime will see 0 out of 0 in `Resource compliance`.**
+  > **NOTE: The process of evaluation can take up 30min, in the meantime will see 0 out of 0 in `Resource compliance`.**
 
 - After the evaluation, the policy will inform you of the result and provide details if there are any resources that are `non-compliant`.  
 
@@ -193,5 +193,6 @@ Complete the following steps to clean up your environment.
     ![Disable Azure Policy addon](./19.png)
 
 - You can use these Jumpstart scenarios below for deleting the clusters:
-- [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
-- [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
+
+  - [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
+  - [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)

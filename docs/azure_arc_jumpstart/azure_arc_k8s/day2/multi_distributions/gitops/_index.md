@@ -54,8 +54,8 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
 
 - We will use a shell script [*calico_k8sconfig_gitops*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/multi_distributions/calico_gitops/calico_k8sconfig_gitops.sh) against the GKE/EKS connected cluster. You can use Cloud Shell in order to keep your local environment clean.
 
-[Google Cloud Shell](https://cloud.google.com/shell)
-[AWS Cloud Shell](https://aws.amazon.com/cloudshell/)
+  [Google Cloud Shell](https://cloud.google.com/shell)
+  [AWS Cloud Shell](https://aws.amazon.com/cloudshell/)
 
 - Edit the environment variables in the [*calico_k8sconfig_gitops*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/multi_distributions/calico_gitops/calico_k8sconfig_gitops.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./calico_k8sconfig_gitops.sh``` command to create the GitOps configuration.
 
@@ -134,5 +134,6 @@ Complete the following steps to clean up your environment.
     ```
 
 - You can use follow these Jumpstart scenarios below for deleting the clusters:
-- [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
-- [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
+
+  - [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
+  - [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
