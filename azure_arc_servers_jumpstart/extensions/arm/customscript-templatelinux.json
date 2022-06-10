@@ -9,7 +9,7 @@
         "type": "string"
       },
       "fileUris": {
-        "type": "array"
+        "type": "string"
       },
       "commandToExecute": {
         "type": "securestring"
