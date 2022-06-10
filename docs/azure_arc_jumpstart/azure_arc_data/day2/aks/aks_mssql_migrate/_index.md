@@ -85,9 +85,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - [_clientVm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/migration/ARM/clientVm.json) - Deploys the client Windows VM. This is where all user interactions with the environment are made from.
   - [_logAnalytics_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/migration/ARM/logAnalytics.json) - Deploys Azure Log Analytics workspace to support Azure Arc-enabled data services logs uploads.
 
-  - User remotes into client Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/migration/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploy and configure Azure Arc-enabled data services on the AKS cluster including the data controller and SQL Managed Instance and the nested SQL VM.
+  - User remotes into client Windows VM, which automatically kicks off the [_DataServicesLogonScript_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/aks/migration/ARM/artifacts/DataServicesLogonScript.ps1) PowerShell script that deploys and configures Azure Arc-enabled data services on the AKS cluster including the data controller and SQL Managed Instance and a SQL Server instance in a nested VM that will act as the source SQL instance to migrate from.
 
-  - In addition to deploying the data controller and SQL Managed Instance, the sample [_AdventureWorks_](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will restored automatically for you as well on the nested SQL VM.
+  - In addition to deploying the data controller and SQL Managed Instance, the sample [_AdventureWorks_](https://docs.microsoft.com/sql/samples/adventureworks-install-configure?view=sql-server-ver15&tabs=ssms) database will restored automatically for you as well on the source SQL instance on the nested VM.
 
 ## Deployment
 
@@ -210,7 +210,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Additionally, the SQL Managed Instances connection and the SQL instance on the nested VM will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation on the source SQL instance on the client VM.
 
-  ![Screenshot showing Azure Data Studio SQL MI and nested SQL server connection](./26.png)
+  ![Screenshot showing Azure Data Studio SQL MI and nested SQL Server connection](./26.png)
 
 ## Cluster extensions
 
@@ -269,6 +269,11 @@ In order to view these cluster extensions, click on the Azure Arc-enabled Kubern
 
   ![Screenshot showing the success message after backing up the AdventureWorks database](./38.png)
 
+- You can perform the same steps to backup the _AdventureWorks_ database from Azure Data Studio.
+
+  ![Screenshot showing starting a new query in Azure Data Studio](./39.png)
+
+  ![Screenshot showing the success message after backing up the AdventureWorks database in Azure Data Studio](./40.png)
 ### Migrate the _AdventureWorks_ database from the source SQL instance to the Azure Arc-enabled SQL Managed Instance
 
 - To migrate the backup we created, open a new PowerShell ISE session and use the following PowerShell snippet to:
@@ -288,14 +293,18 @@ kubectl cp ./AdventureWorksLT2019.bak jumpstart-sql-0:var/opt/mssql/data/Adventu
 kubectl exec jumpstart-sql-0 -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorksLT2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorksLT2019.bak' WITH MOVE 'AdventureWorksLT2012_Data' TO '/var/opt/mssql/data/AdventureWorksLT2012.mdf', MOVE 'AdventureWorksLT2012_Log' TO '/var/opt/mssql/data/AdventureWorksLT2012_log.ldf'"
  ```
 
-  ![Screenshot showing PowerShell script to restore the backup](./39.png)
+  ![Screenshot showing PowerShell script to restore the backup](./41.png)
 
 - Navigate to the Azure Arc-enabled SQL Managed Instance in the Microsoft SQL Server Management Studio (SSMS) and you can see that the _AdventureWorks_ database has been restored successfully.
 
-  ![Screenshot showing the restored database](./40.png)
+  ![Screenshot showing the restored database](./42.png)
+
+- You can also see the migrated database on Azure Data Studio.
+
+  ![Screenshot showing the restored database in Azure Data Studio](./43.png)
 
 ## Cleanup
 
 - If you want to delete the entire environment, simply delete the deployment resource group from the Azure portal.
 
-    ![Screenshot showing Azure resource group deletion](./41.png)
+    ![Screenshot showing Azure resource group deletion](./44.png)
