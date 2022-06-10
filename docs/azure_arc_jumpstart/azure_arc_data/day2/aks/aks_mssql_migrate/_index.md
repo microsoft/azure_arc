@@ -210,7 +210,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Additionally, the SQL Managed Instances connection and the SQL instance on the nested VM will be configured automatically for you. As mentioned, the sample _AdventureWorks_ database was restored as part of the automation on the source SQL instance on the client VM.
 
-  ![Screenshot showing Azure Data Studio SQL MI connection](./26.png)
+  ![Screenshot showing Azure Data Studio SQL MI and nested SQL server connection](./26.png)
 
 ## Cluster extensions
 
