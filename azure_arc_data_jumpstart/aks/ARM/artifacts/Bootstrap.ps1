@@ -49,7 +49,8 @@ Write-Output "Create deployment path"
 $tempDir = "C:\Temp"
 New-Item -Path $tempDir -ItemType directory -Force
 
-Start-Transcript "${tempDir}\Bootstrap.log"
+$bootstrapLogFile = "$tempDir\Bootstrap.log"
+Start-Transcript $bootstrapLogFile
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -195,6 +196,12 @@ if ($enableADAuth -eq $true -and $addsDomainName.Length -gt 0)
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
+    # Clean up Bootstrap.log
+    Stop-Transcript
+    $logSuppress = Get-Content $bootstrapLogFile | Where { $_ -notmatch "Host Application: powershell.exe" } 
+    $logSuppress | Set-Content $bootstrapLogFile -Force
+
+    # Restart computer
     Restart-Computer
 }
 else
@@ -206,4 +213,9 @@ else
     # Register schedule task under local account
     Register-ScheduledTask -TaskName "DataServicesLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'DataServicesLogonScript' to run at user logon."
+
+    # Clean up Bootstrap.log
+    Stop-Transcript
+    $logSuppress = Get-Content $bootstrapLogFile | Where { $_ -notmatch "Host Application: powershell.exe" } 
+    $logSuppress | Set-Content $bootstrapLogFile -Force
 }
