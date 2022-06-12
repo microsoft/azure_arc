@@ -113,11 +113,32 @@ $settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 # Retrieving SQL MI connection endpoint
 $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.endpoints.primary}'
 
-# Replace placeholder values in settingsTemplate.json
-(Get-Content -Path $settingsTemplate) -replace 'arc_sql_mi',$sqlstring | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_username',$env:AZDATA_USERNAME | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'sa_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'false','true' | Set-Content -Path $settingsTemplate
+# Create database connection in Azure Data Studio
+$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
+
+$templateContent = @"
+{
+    "options": {
+      "connectionName": "ArcSQLMI",
+      "server": "$sqlstring",
+      "database": "",
+      "authenticationType": "SqlLogin",
+      "user": "$env:AZDATA_USERNAME",
+      "password": "$env:AZDATA_PASSWORD",
+      "applicationName": "azdata",
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "databaseDisplayName": ""
+    },
+    "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+    "providerName": "MSSQL",
+    "savePassword": true,
+    "id": "ac333479-a04b-436b-88ab-3b314a201295"
+}
+"@
+
+$settingsTemplateJson = Get-Content $settingsTemplate | ConvertFrom-Json
+$settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
+ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 
 # Unzip SqlQueryStress
 Expand-Archive -Path $Env:TempDir\SqlQueryStress.zip -DestinationPath $Env:TempDir\SqlQueryStress

@@ -262,11 +262,48 @@ Add-Content $Endpoints ""
 Add-Content $Endpoints "SQL Managed Instance password:"
 $env:AZDATA_PASSWORD | Add-Content $Endpoints
 
+
+# Create database connection in Azure Data Studio
+$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
+
+$templateContent = @"
+{
+    "options": {
+      "connectionName": "ArcSQLMIADAuthentication",
+      "server": "$sqlmiEndPoint",
+      "database": "",
+      "authenticationType": "Integrated",
+      "applicationName": "azdata",
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "databaseDisplayName": ""
+    },
+    "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+    "providerName": "MSSQL",
+    "savePassword": true,
+    "id": "ac333479-a04b-436b-88ab-3b314a201295"
+}
+"@
+
+$settingsTemplateJson = Get-Content $settingsTemplate | ConvertFrom-Json
+$settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
+ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
+
 Write-Host "`n"
 Write-Host "Creating SQLMI Endpoints file Desktop shortcut"
 Write-Host "`n"
 $TargetFile = $Endpoints
 $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQLMI Endpoints.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+# Creating SQL Server Management Studio desktop shortcut
+Write-Host "`n"
+Write-Host "Creating SQL Server Management Studio Desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Ssms.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
