@@ -320,6 +320,7 @@ else
     $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
     $Shortcut.TargetPath = $TargetFile
     $Shortcut.Save()
+    Write-Host "Created SQL Server Management Studio Desktop shortcut"
 }
 
 # Strop transcrip
