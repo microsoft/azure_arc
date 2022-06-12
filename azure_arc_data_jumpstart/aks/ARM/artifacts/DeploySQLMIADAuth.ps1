@@ -264,6 +264,9 @@ $env:AZDATA_PASSWORD | Add-Content $Endpoints
 
 
 # Create database connection in Azure Data Studio
+Write-Host "`n"
+Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection with AD Authentication."
+
 $settingsTemplateFile = "$Env:TempDir\settingsTemplate.json"
 
 $templateContent = @"
