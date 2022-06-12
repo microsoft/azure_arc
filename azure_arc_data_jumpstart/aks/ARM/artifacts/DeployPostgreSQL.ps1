@@ -125,6 +125,10 @@ $templateContent = @"
 }
 "@
 
+Write-Host "Creating Azure Data Studio connections settings template file $settingsTemplateJson"
+
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
+
+Write-Host "Created Azure Data Studio connections settings template file."

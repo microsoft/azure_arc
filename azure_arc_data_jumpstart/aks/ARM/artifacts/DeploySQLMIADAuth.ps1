@@ -284,9 +284,13 @@ $templateContent = @"
 }
 "@
 
+Write-Host "Creating Azure Data Studio connections settings template file $settingsTemplateJson"
+
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
+
+Write-Host "Created Azure Data Studio connections settings template file."
 
 Write-Host "`n"
 Write-Host "Creating SQLMI Endpoints file Desktop shortcut"
@@ -304,10 +308,19 @@ Write-Host "Creating SQL Server Management Studio Desktop shortcut"
 Write-Host "`n"
 $TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\Ssms.exe"
 $ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
-$WScriptShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-$Shortcut.TargetPath = $TargetFile
-$Shortcut.Save()
+
+# Verify if shortcut already exists
+if ([System.IO.File]::Exists($ShortcutFile))
+{
+    Write-Host "SQL Server Management Studio Desktop shortcut already exists."
+}
+else
+{
+    $WScriptShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+    $Shortcut.TargetPath = $TargetFile
+    $Shortcut.Save()
+}
 
 # Strop transcrip
 Stop-Transcript
