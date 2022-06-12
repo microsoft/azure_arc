@@ -251,7 +251,7 @@ $filename = "SQLMIEndpoints.txt"
 $file = New-Item -Path $Env:TempDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
 
-Add-Content $Endpoints "Primary SQL Managed Instance external endpoint DNS name:"
+Add-Content $Endpoints "Primary SQL Managed Instance external endpoint DNS name for AD Authentication:"
 $sqlmiEndPoint | Add-Content $Endpoints
 
 Add-Content $Endpoints ""
