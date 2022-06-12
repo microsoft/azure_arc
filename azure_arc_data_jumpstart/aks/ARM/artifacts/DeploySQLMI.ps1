@@ -160,13 +160,3 @@ $Shortcut.Save()
 
 # Creating SQLMI Endpoints data
 & "$Env:TempDir\SQLMIEndpoints.ps1"
-
-# If PostgreSQL isn't being deployed, clean up settings file
-if ( $env:deployPostgreSQL -eq $false )
-{
-    $string = Get-Content $settingsTemplate
-    $string[25] = $string[25] -replace ",",""
-    $string | Set-Content $settingsTemplate
-    $string = Get-Content $settingsTemplate | Select-Object -First 25 -Last 4
-    $string | Set-Content -Path $settingsTemplate
-}
