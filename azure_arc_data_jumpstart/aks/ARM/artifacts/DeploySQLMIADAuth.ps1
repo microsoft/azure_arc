@@ -264,7 +264,7 @@ $env:AZDATA_PASSWORD | Add-Content $Endpoints
 
 
 # Create database connection in Azure Data Studio
-$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
+$settingsTemplateFile = "$Env:TempDir\settingsTemplate.json"
 
 $templateContent = @"
 {
@@ -284,7 +284,7 @@ $templateContent = @"
 }
 "@
 
-$settingsTemplateJson = Get-Content $settingsTemplate | ConvertFrom-Json
+$settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 

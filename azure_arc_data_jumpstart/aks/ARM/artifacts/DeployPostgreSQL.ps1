@@ -92,7 +92,7 @@ kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -d adve
 # Creating Azure Data Studio settings for PostgreSQL connection
 Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
-$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
+$settingsTemplateFile = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving PostgreSQL connection endpoint
 $pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
@@ -125,6 +125,6 @@ $templateContent = @"
 }
 "@
 
-$settingsTemplateJson = Get-Content $settingsTemplate | ConvertFrom-Json
+$settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
