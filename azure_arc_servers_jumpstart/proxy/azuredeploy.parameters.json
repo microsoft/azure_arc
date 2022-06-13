@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmSize": {
+        "value": "<Client and Server Azure VM size>"
+      },
+      "vmName": {
+        "value": "<Client Azure VM Name>"
+      },
+      "ProxyvmName": {
+        "value": "<Proxy Server Azure VM Name>"
+      },
+      "adminUsername": {
+        "value": "<Azure VM admin username>"
+      },
+      "adminPassword": {
+        "value": "<A password for Client and Server>"
+      },
+      "dnsLabelPrefix": {
+        "value": "<DNS label for the Public IP address of the client>"
+      },
+      "proxydnsLabelPrefix": {
+        "value": "<DNS label for the Public IP address of the server>"
+      },
+      "ProxysubnetName": {
+        "value": "<Proxy subnet name>"
+      },
+      "subnetName": {
+        "value": "<Client subnet name>"
+      },
+      "proxyNSG": {
+        "value": "<Proxy NSG name>"
+      },
+      "vmNSG": {
+        "value": "<Client NSG name>"
+      },
+      "subscriptionID": {
+        "value": "<Your Subscription ID>"
+      },
+      "servicePrincipalClient": {
+        "value": "<Service Principal AppId>"
+      },
+      "servicePrincipalClientSecret": {
+        "value": "<Service Principal password>"
+      },
+      "tenantID": {
+        "value": "<Tenant ID>"
+      },
+      "resourceGroup": {
+        "value": "<Azure resource group where all resource to be deployed>"
+      },
+      "deployBastion": {
+        "value": "<true | false>"
+      },
+      "bastionHostName": {
+        "value": "<Azure Bastion Host name>"
+      }
+    }
+  }
+  

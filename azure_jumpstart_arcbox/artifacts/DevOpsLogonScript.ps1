@@ -26,6 +26,7 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 # Required for CLI commands
+Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Required for azcopy
@@ -34,7 +35,7 @@ $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID 
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
-Write-Host "Downloading CAPI Kubernetes cluster kubeconfig file"
+Write-Header "Downloading CAPI K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
@@ -42,7 +43,7 @@ $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
 # Downloading Rancher K3s cluster kubeconfig file
-Write-Host "Downloading Rancher K3s cluster kubeconfig file"
+Write-Header "Downloading K3s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
@@ -50,19 +51,19 @@ $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
 
 # Downloading 'installCAPI.log' log file
-Write-Host "Downloading 'installCAPI.log' log file"
+Write-Header "Downloading CAPI Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
 
 # Downloading 'installK3s.log' log file
-Write-Host "Downloading 'installK3s.log' log file"
+Write-Header "Downloading K3s Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s.log"
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installK3s.log"
 
 # Merging kubeconfig files from CAPI and Rancher K3s
-Write-Host "Merging kubeconfig files from CAPI and Rancher K3s clusters"
+Write-Header "Merging CAPI & K3s Kubeconfigs"
 Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
 $Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;C:\Users\$Env:USERNAME\.kube\config-k3s"
 kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
@@ -74,10 +75,12 @@ $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
 kubectx
 
 # "Download OSM binaries"
+Write-Header "Downloading OSM Binaries"
 Invoke-WebRequest -Uri "https://github.com/openservicemesh/osm/releases/download/$osmRelease/osm-$osmRelease-windows-amd64.zip" -Outfile "$Env:TempDir\osm-$osmRelease-windows-amd64.zip"
 Expand-Archive "$Env:TempDir\osm-$osmRelease-windows-amd64.zip" -DestinationPath $Env:TempDir
 Copy-Item "$Env:TempDir\windows-amd64\osm.exe" -Destination $Env:ToolsDir
 
+Write-Header "Adding Tools Folder to PATH"
 [System.Environment]::SetEnvironmentVariable('PATH', $Env:PATH + ";$Env:ToolsDir" ,[System.EnvironmentVariableTarget]::Machine)
 $Env:PATH += ";$Env:ToolsDir"
 
@@ -89,11 +92,11 @@ $Env:keyVaultName = "ArcBox-KV-$randStr"
 [System.Environment]::SetEnvironmentVariable('keyVaultName', $Env:keyVaultName, [System.EnvironmentVariableTarget]::Machine)
 
 # Create Azure Key Vault
-Write-Host "Creating Azure Key Vault"
+Write-Header "Creating Azure KeyVault"
 az keyvault create --name $Env:keyVaultName --resource-group $Env:resourceGroup --location $Env:azureLocation
 
 # Allow SPN to import certificates into Key Vault
-Write-Host "Setting Azure Key Vault access policies"
+Write-Header "Setting KeyVault Access Policies"
 az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --key-permissions --secret-permissions get --certificate-permissions get list import
 
 # Making extension install dynamic
@@ -102,14 +105,17 @@ Write-Host "`n"
 az -v
 
 # "Create OSM Kubernetes extension instance"
+Write-Header "Creating OSM K8s Extension Instance"
 az k8s-extension create --cluster-name $Env:capiArcDataClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.openservicemesh --scope cluster --name $osmMeshName
 
 # Create Kubernetes Namespaces
+Write-Header "Creating K8s Namespaces"
 foreach ($namespace in @('bookstore', 'bookbuyer', 'bookwarehouse', 'hello-arc', 'ingress-nginx')) {
     kubectl create namespace $namespace
 }
 
 # Add the bookstore namespaces to the OSM control plane
+Write-Header "Adding Bookstore Namespaces to OSM"
 osm namespace add bookstore bookbuyer bookwarehouse
 
 # To be able to discover the endpoints of this service, we need OSM controller to monitor the corresponding namespace. 
@@ -119,6 +125,8 @@ osm namespace add "$ingressNamespace" --mesh-name "$osmMeshName" --disable-sidec
 #############################
 # - Apply GitOps Configs
 #############################
+
+Write-Header "Applying GitOps Configs"
 
 # Create GitOps config for NGINX Ingress Controller
 Write-Host "Creating GitOps config for NGINX Ingress Controller"
@@ -187,6 +195,8 @@ az k8s-configuration flux create `
 # - Install Key Vault Extension / Create Ingress
 ################################################
 
+Write-Header "Installing KeyVault Extension"
+
 Write-Host "Generating a TLS Certificate"
 $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
 $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
@@ -208,6 +218,8 @@ Get-ChildItem -Path $Env:ArcBoxKVDir |
         (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:spnTenantId | Set-Content -Path $_.FullName
     }
 
+Write-Header "Creating Ingress Controller"
+
 # Deploy Ingress resources for Bookstore and Hello-Arc App
 foreach ($namespace in @('bookstore', 'bookbuyer', 'hello-arc')) {
     # Create the Kubernetes secret with the service principal credentials
@@ -222,6 +234,8 @@ $ip = kubectl get service/ingress-nginx-controller --namespace $ingressNamespace
 
 #Insert into HOSTS file
 Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$ip`t$certdns" -Force
+
+Write-Header "Configuring Edge Policies"
 
 # Disable Edge 'First Run' Setup
 $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
@@ -244,6 +258,8 @@ Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryNa
 # Tab Auto-Refresh Extension
 New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist -Force
 New-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Edge\ExtensionInstallForcelist -Name 1 -Value odiofbnciojkpogljollobmhplkhmofe -Force
+
+Write-Header "Creating Desktop Icons"
 
 # Creating CAPI Hello Arc Icon on Desktop
 $shortcutLocation = "$Env:Public\Desktop\CAPI Hello-Arc.lnk"
@@ -283,16 +299,19 @@ namespace Win32{
 $ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
 
 if(-not $ArcServersLogonScript) {
+    Write-Header "Changing Wallpaper"
     $imgPath="$Env:ArcBoxDir\wallpaper.png"
     Add-Type $code 
     [Win32.Wallpaper]::SetWallpaper($imgPath)
 }
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
+Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "DevOpsLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 # Executing the deployment logs bundle PowerShell script in a new window
+Write-Header "Uploading Log Bundle"
 Invoke-Expression 'cmd /c start Powershell -Command { 
     $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
     Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."

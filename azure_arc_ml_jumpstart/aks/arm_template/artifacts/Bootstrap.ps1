@@ -126,3 +126,8 @@ Register-ScheduledTask -TaskName "AzureMLLogonScript" -Trigger $Trigger -User $a
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+
+# Clean up Bootstrap.log
+Stop-Transcript
+$logSuppress = Get-Content C:\Temp\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content C:\Temp\Bootstrap.log -Force
