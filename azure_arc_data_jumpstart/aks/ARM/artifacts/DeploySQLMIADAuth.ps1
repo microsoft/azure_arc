@@ -106,7 +106,7 @@ $arcsapass = "ArcDSA#Pwd123$"
 $arcsasecpass = $arcsapass | ConvertTo-SecureString -AsPlainText -Force
 $sqlmisaupn = $arcsaname + "@" + $dcInfo.domain
 
-$sqlMIName = "sqlmi-adauth"
+$sqlMIName = "jumpstart-sql"
 $samaccountname = $arcsaname
 $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
 $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
