@@ -5,18 +5,18 @@
         "vmSize": {
             "value": "Standard_D8s_v3"
         },
-        "vmName":{
+        "vmName": {
             "value": "Arc-SQL-Demo"
         },
         "adminUsername": {
-          "value": "arcdemo"
+            "value": "arcdemo"
         },
         "adminPassword": {
             "value": "ArcPassword123!!"
         },
-        "resourceGroup": {
-          "value": "Arc-SQL-Demo"
-        },      
+        "myIpAddress": {
+            "value": "192.168.10.10"
+        },
         "servicePrincipalAppId": {
             "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
         },
@@ -26,12 +26,11 @@
         "servicePrincipalTenantId": {
             "value": "33333333-XXXX-41af-1111-7777777777"
         },
-        "subId": {
-            "value": "32323232-XXXXX-YYYYY-9e8f-88888888888"
+        "logAnalyticsWorkspaceName": {
+            "value": "rg-la-arc"
         },
-        "location": {
-            "value": "eastus"
+        "deployBastion": {
+            "value": false
         }
-      }
-  }
-  
+    }
+}
