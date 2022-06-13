@@ -272,7 +272,7 @@ $settingsTemplateFile = "$Env:TempDir\settingsTemplate.json"
 $templateContent = @"
 {
     "options": {
-      "connectionName": "ArcSQLMIADAuthentication",
+      "connectionName": "ArcSQLMI",
       "server": "$sqlmiEndPoint",
       "database": "",
       "authenticationType": "Integrated",
