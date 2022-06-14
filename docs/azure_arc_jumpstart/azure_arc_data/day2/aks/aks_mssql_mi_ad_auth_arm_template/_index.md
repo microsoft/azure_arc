@@ -2,7 +2,7 @@
 type: docs
 title: "SQL Managed Instance with AD Authentication ARM Template"
 linkTitle: "SQL Managed Instance with AD Authentication ARM Template"
-weight: 5
+weight: 2
 description: >
 ---
 

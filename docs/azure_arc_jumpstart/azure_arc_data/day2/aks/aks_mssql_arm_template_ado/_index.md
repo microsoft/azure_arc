@@ -2,7 +2,7 @@
 type: docs
 title: "SQL Managed Instance Azure DevOps Release"
 linkTitle: "SQL Managed Instance Azure DevOps Release"
-weight: 4
+weight: 5
 description: >
 ---
 
