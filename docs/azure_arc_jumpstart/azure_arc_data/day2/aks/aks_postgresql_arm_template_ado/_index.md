@@ -2,7 +2,7 @@
 type: docs
 title: "PostgreSQL Azure DevOps Release"
 linkTitle: "PostgreSQL Azure DevOps Release"
-weight: 5
+weight: 6
 description: >
 ---
 

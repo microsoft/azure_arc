@@ -12,8 +12,6 @@ The following Jumpstart scenario will guide you on how to explore and test Azure
 
 > **NOTE: This guide assumes you already deployed a Azure Arc-enabled SQL Managed Instance on Azure Kubernetes Service (AKS). If you haven't, this [following bootstrap Jumpstart scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/) offers you a way to do so in an automated fashion. All the steps and operations described in this scenario assume you used the mentioned bootstrap Jumpstart scenario and have the Client VM deployed as part of it.**
 
-> **NOTE: Azure Arc-enabled SQL Managed Instance with Availability Groups is currently in [preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
-
 ## Deployed Kubernetes Resources
 
 When deploying Azure Arc-enabled SQL Managed Instance in an availability group, multiple Kubernetes resources are created to support it. The below section describes the main ones that are important to understand for this scenario.
