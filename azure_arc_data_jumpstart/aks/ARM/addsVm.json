@@ -201,7 +201,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(variables('vmName'),'/DeployADDS')]",
-      "apiVersion": "2019-07-01",
+      "apiVersion": "2021-11-01",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
