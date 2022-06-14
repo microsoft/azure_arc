@@ -42,7 +42,10 @@
       "value": "(true/false)"
     },
     "dnsPrefix": {
-        "value": "<A DNS prefix for the Public IP>"
+        "value": "<Optional DNS prefix to use with hosted Kubernetes API server FQDN>"
+    },
+    "enableADAuth": {
+      "value": "(true/false)"
     }
   }
 }
