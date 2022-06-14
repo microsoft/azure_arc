@@ -221,7 +221,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2021-08-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('azureLocation')]",
       "properties": {
