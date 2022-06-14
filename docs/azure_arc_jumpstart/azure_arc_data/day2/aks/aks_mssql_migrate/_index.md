@@ -2,7 +2,7 @@
 type: docs
 title: "Migrate to Azure Arc-enabled SQL Managed Instance"
 linkTitle: "Migrate to Azure Arc-enabled SQL Managed Instance"
-weight: 2
+weight: 4
 description: >
 ---
 

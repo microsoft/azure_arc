@@ -1,20 +1,20 @@
 ---
 type: docs
-title: "SQL Managed Instance Azure DevOps Release"
-linkTitle: "SQL Managed Instance Azure DevOps Release"
-weight: 4
+title: "PostgreSQL Azure DevOps Release"
+linkTitle: "PostgreSQL Azure DevOps Release"
+weight: 6
 description: >
 ---
 
-## Deploy Azure SQL Managed Instance on AKS using Azure DevOps Release Pipeline
+## Deploy Azure PostgreSQL on AKS using Azure DevOps Release Pipeline
 
-The following Jumpstart scenario will guide you on how to use [Azure DevOps (ADO) Release pipelines](https://docs.microsoft.com/azure/devops/pipelines/release/?view=azure-devops) to deploy a "Ready to Go" environment so you can start using Azure Arc-enabled data services on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
+The following Jumpstart scenario will guide you on how to use [Azure DevOps (ADO) Release pipelines](https://docs.microsoft.com/azure/devops/pipelines/release/?view=azure-devops) to deploy a "Ready to Go" environment so you can start using Azure Arc-enabled data services with Azure PostgreSQL on [Azure Kubernetes Service (AKS)](https://docs.microsoft.com/azure/aks/intro-kubernetes) cluster using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
-By the end of this scenario, you will have an Azure DevOps Release pipeline to deploy AKS cluster with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity), Azure SQL MI with a sample database and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this scenario, you will have an Azure DevOps Release pipeline to deploy AKS cluster with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity), Azure PostgreSQL with a sample database and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
 > **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
-> **NOTE: The following scenario is focusing the Azure DevOps Release pipeline creation. Once the pipeline has been created and the environment deployment has finished, the automation flow and next steps are as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/)**
+> **NOTE: The following scenario is focusing the Azure DevOps Release pipeline creation. Once the pipeline has been created and the environment deployment has finished, the automation flow and next steps are as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_arm_template/)**
 
 ## Prerequisites
 
@@ -109,13 +109,13 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of resource group and location config](./10.jpg)
 
-* As mentioned, the task will use the existing ARM template for deploying Azure Arc-enabled data services with SQL Managed Instance that in the Azure Arc Jumpstart GitHub repository.
+* As mentioned, the task will deployed the existing ARM template for deploying Azure Arc-enabled data services with PostgreSQL that in the Azure Arc Jumpstart GitHub repository.
 
   * Change the Template location to "URL of the file"
 
-  * Copy the raw URLs for both the [template](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/ARM/azuredeploy.json) and the [parameters](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/ARM/azuredeploy.parameters.json) json files and paste it in it's the proper field.
+  * Copy the raw URLs for both the [template](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.json) and the [parameters](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/aks/arm_template/postgres_hs/azuredeploy.parameters.json) json files and paste it in it's the proper field.
 
-  * The deployment ARM template requires you to provide parameters values. Click on the _Edit Override template parameters_ button to add the values of your parameters.
+  * The deployment ARM template requires you provide parameters values. Click on the _Edit Override template parameters_ to add your parameters values.
 
     ![Screenshot of ARM template config](./11.jpg)
 
@@ -134,7 +134,7 @@ In this scenario, you will create a new Release pipeline to deploy the environme
   * _`bastionHostName`_ - Indicate whether to deploy bastion host to manage AKS
   * _`dnsPrefix`_ - AKS unique DNS prefix
   * _`kubernetesVersion`_ - AKS Kubernetes Version (See previous prerequisite)
-  
+
     > **NOTE: Make sure that you are using the same Azure resource group name as the one you've just used in the _`azuredeploy.parameters.json`_ file**
 
     ![Screenshot of ARM template parameters config](./12.jpg)
@@ -147,9 +147,9 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
 * Provide a deployment name.
 
-    ![Screenshot of deployment name config](./16.jpg)
+    ![Screenshot of ARM template parameters config](./16.jpg)
 
-* Provide pipeline name and click the save button.
+* Click the save button.
 
     ![Screenshot of config save](./17.jpg)
 
@@ -169,18 +169,16 @@ In this scenario, you will create a new Release pipeline to deploy the environme
 
     ![Screenshot of pipeline deployment](./23.jpg)
 
-    ![Screenshot of pipeline deployment](./24.jpg)
+    ![Screenshot of deployment progress logs](./24.jpg)
 
     ![Screenshot of deployment progress logs](./25.jpg)
-
-    ![Screenshot of deployment progress logs](./26.jpg)
 
 * Once completed, all the deployment resources will be available in the Azure portal.
 
   > **NOTE: Deployment time of the Azure resources (AKS + Windows VM) can take ~25-30 minutes.**
 
-    ![Screenshot of deployment completed](./27.jpg)
+    ![Screenshot of deployment completed](./26.jpg)
 
-    ![Screenshot of Azure resources](./28.jpg)
+    ![Screenshot of Azure resources](./27.jpg)
 
-* As mentioned, this scenario is focusing on the Azure DevOps Release pipeline creation. At this point, now that you have the Azure resources created, continue to the next steps as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_mi_arm_template/#windows-login--post-deployment).
+* As mentioned, this scenario is focusing on the Azure DevOps Release pipeline creation. At this point, now that you have the Azure resources created, continue to the next steps as [described on in the main bootstrap scenario](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_arm_template/#windows-login--post-deployment).
