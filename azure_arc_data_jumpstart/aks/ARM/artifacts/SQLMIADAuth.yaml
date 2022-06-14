@@ -1,0 +1,46 @@
+apiVersion: v1
+data:
+  password: {{B64_SQLMI_ADMIN_PWD}}
+  username: {{B64_SQLMI_ADMIN_USER}}
+kind: Secret
+metadata:
+  name: admin-login-secret
+  namespace: arc
+type: Opaque
+---
+apiVersion: sql.arcdata.microsoft.com/v3
+kind: SqlManagedInstance
+metadata:
+  name: {{SQLMI_NAME}}
+  namespace: arc
+spec:
+  backup:
+    retentionPeriodInDays: 7
+  dev: true
+  tier: {{PRICING_TIER}}
+  forceHA: "true"
+  licenseType: LicenseIncluded
+  replicas: {{REPLICA_COUNT}}
+  security:
+    adminLoginSecret: admin-login-secret
+    activeDirectory:
+      connector:
+        name: adarc
+        namespace: arc
+      accountName: {{SQLMI_AD_USER}}
+  services:
+    primary:
+      type: LoadBalancer
+      dnsName: {{SQLMI_FQDN}}
+      port: {{SQLMI_PORT}}
+  storage:
+    data:
+      volumes:
+      - accessMode: ReadWriteOnce
+        className: default
+        size: 5Gi
+    logs:
+      volumes:
+      - accessMode: ReadWriteOnce
+        className: default
+        size: 5Gi
