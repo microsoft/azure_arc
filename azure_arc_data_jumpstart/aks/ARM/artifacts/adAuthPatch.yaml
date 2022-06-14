@@ -1,0 +1,12 @@
+spec:
+  security:
+    activeDirectory:
+      connector:
+        name: {{AD_CONNECTOR_NAME}}
+        namespace: arc
+      accountName: {{AD_ACCOUNT_NAME}}
+  services:
+    primary:
+      type: LoadBalancer
+      dnsName: {{SQLMI_FQDN}}
+      port: {{SQLMI_PORT}}

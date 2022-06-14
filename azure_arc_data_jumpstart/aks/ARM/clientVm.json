@@ -47,7 +47,7 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_D8s_v4",
+      "defaultValue": "Standard_D4s_v4",
       "metadata": {
         "description": "The size of the VM"
       }
@@ -136,7 +136,14 @@
       "metadata": {
         "description": "SQL Managed Instance high-availability deployment"
       }
-    },    
+    },
+    "enableADAuth": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Indicate whethe to support AD authentication in SQLMI"
+      }
+    },
     "deployPostgreSQL": {
       "type": "bool",
       "defaultValue": false,
@@ -182,6 +189,13 @@
       "metadata": {
         "description": "Azure Bastion subnet IP prefix"
       }
+    },
+    "addsDomainName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The name of your Virtual Machine"
+      }
     }
   },
   "variables": {
@@ -194,7 +208,9 @@
     "bastionSubnetRef": "[concat(parameters('bastionSubnetRef'))]",
     "PublicIPNoBastion": {
       "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-    }
+    },
+    "commandToExecuteNoADDS": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'),  ' -clusterName ', parameters('clusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -enableADAuth ', parameters('enableADAuth'))]",
+    "commandToExecuteWithADDS": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -adminPassword ', parameters('windowsAdminPassword'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'),  ' -clusterName ', parameters('clusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'), ' -enableADAuth ', parameters('enableADAuth'), ' -addsDomainName ', parameters('addsDomainName'))]"
   },
   "resources": [
     {
@@ -283,7 +299,7 @@
             "managedDisk": {
               "storageAccountType": "[variables('osDiskType')]"
             },
-            "diskSizeGB": 1024
+            "diskSizeGB": 256
           },
           "imageReference": {
             "publisher": "MicrosoftWindowsServer",
@@ -330,7 +346,7 @@
           "fileUris": [
             "[uri(parameters('templateBaseUrl'), 'artifacts/Bootstrap.ps1')]"
           ],
-          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1', ' -adminUsername ', parameters('windowsAdminUsername'), ' -spnClientId ', parameters('spnClientId'), ' -spnClientSecret ', parameters('spnClientSecret'), ' -spnTenantId ', parameters('spnTenantId'), ' -spnAuthority ', parameters('spnAuthority'), ' -subscriptionId ', subscription().subscriptionId, ' -resourceGroup ', resourceGroup().name, ' -azdataUsername ', parameters('azdataUsername'), ' -azdataPassword ', parameters('azdataPassword'), ' -acceptEula ', parameters('acceptEula'), ' -arcDcName ', parameters('arcDcName'), ' -azureLocation ', parameters('azureLocation'), ' -workspaceName ', parameters('workspaceName'), ' -deploySQLMI ', parameters('deploySQLMI'), ' -SQLMIHA ', parameters('SQLMIHA'), ' -deployPostgreSQL ', parameters('deployPostgreSQL'),  ' -clusterName ', parameters('clusterName'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+          "commandToExecute": "[if(parameters('enableADAuth'), variables('commandToExecuteWithADDS'), variables('commandToExecuteNoADDS'))]"
         }
       }
     },

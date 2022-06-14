@@ -4,39 +4,62 @@
   "parameters": {
     "virtualNetworkName": {
       "type": "string",
+      "defaultValue": "Arc-Data-VNet",
       "metadata": {
         "description": "Name of the VNET"
       }
     },
     "subnetName": {
       "type": "string",
+      "defaultValue": "Arc-Data-Subnet",
       "metadata": {
         "description": "Name of the subnet in the virtual network"
       }
     },
+    "aksSubnetName": {
+      "type": "string",
+      "defaultValue": "AKS-Subnet",
+      "metadata": {
+        "description": "Name of the AKS subnet in the virtual network"
+      }
+    },
     "addressPrefix": {
       "type": "string",
+      "defaultValue": "172.16.0.0/16",
       "metadata": {
         "description": "VNET CIDR"
       }
     },
     "subnetAddressPrefix": {
       "type": "string",
+      "defaultValue": "172.16.1.0/24",
       "metadata": {
         "description": "Subnet CIDR"
       }
     },
     "bastionSubnetPrefix": {
       "type": "string",
+      "defaultValue": "172.16.2.64/26",
       "metadata": {
         "description": "Bastion subnet prefix"
       }
-    }
+    },
+    "aksSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "172.16.8.0/22",
+      "metadata": {
+        "description": "AKS subnet prefix"
+      }
+    },
+    "dnsServers": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "DNS Server configuration"
+      }
+    }    
   },
-  "variables": {
-    "bastionSubnetPrefix": "[concat(parameters('bastionSubnetPrefix'))]"
-  },
-  "resources": [
+ "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
       "comments": "Deploys a VNET and Subnet for Client VM",
@@ -46,6 +69,9 @@
       "properties": {
         "addressSpace": {
           "addressPrefixes": [ "[parameters('addressPrefix')]" ]
+        },
+        "dhcpOptions": {
+          "dnsServers": "[parameters('dnsServers')]"
         },
         "subnets": [
           {
@@ -60,6 +86,12 @@
             "name": "AzureBastionSubnet",
             "properties": {
               "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "[parameters('aksSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('aksSubnetPrefix')]"
             }
           }
         ]
