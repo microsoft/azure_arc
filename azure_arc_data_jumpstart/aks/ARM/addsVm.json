@@ -152,7 +152,7 @@
     },
      {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2019-03-01",
+      "apiVersion": "2021-11-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('azureLocation')]",
       "tags": "[parameters('resourceTags')]",
