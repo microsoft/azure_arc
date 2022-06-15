@@ -18,7 +18,7 @@ Write-Host "`n"
 Write-Host "Configuring and deploying sample Logic App template Azure dependencies.`n"
 Write-Host "Updating connectors-parameters.json with appropriate values.`n"
 $connectorsParametersPath = "C:\Temp\ARM\connectors-parameters.json"
-$spnObjectId = az ad sp show --id $env:spnClientID --query objectId -o tsv
+$spnObjectId = az ad sp show --id $env:spnClientID --query id -o tsv
 (Get-Content -Path $connectorsParametersPath) -replace '<azureLocation>',$env:azureLocation | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<tenantId>',$env:spnTenantId | Set-Content -Path $connectorsParametersPath
 (Get-Content -Path $connectorsParametersPath) -replace '<objectId>',$spnObjectId | Set-Content -Path $connectorsParametersPath
