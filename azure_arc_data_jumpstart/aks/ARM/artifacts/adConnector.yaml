@@ -1,0 +1,28 @@
+apiVersion: v1 
+kind: Secret 
+type: Opaque 
+metadata: 
+  name: adarc-dsa-secret
+  namespace: arc
+data: 
+  password: {{ARC_DSA_USER_PASSWORD}}
+  username: {{ARC_DSA_USER}}
+---
+apiVersion: {{ARC-DATA-API-VERSION}}
+kind: ActiveDirectoryConnector
+metadata:
+  name: adarc
+  namespace: arc
+spec:
+  activeDirectory:
+    realm: {{ADDS_DOMAIN_NAME}}
+    serviceAccountProvisioning: automatic
+    ouDistinguishedName: {{SQLMI_OU}}
+    domainServiceAccountSecret: adarc-dsa-secret
+    domainControllers:
+      primaryDomainController:
+        hostname: {{ADDS_DC_NAME}}
+  dns:
+    preferK8sDnsForPtrLookups: false
+    nameserverIPAddresses:
+      - {{ADDS_IP_ADDRESS}}

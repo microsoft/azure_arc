@@ -14,12 +14,12 @@ description: >
 
 The following Jumpstart scenario will guide you how to use GitOps [GitOps for Azure Arc](https://docs.microsoft.com/azure/azure-arc/kubernetes/tutorial-use-gitops-connected-cluster) in an Azure Arc connected Kubernetes cluster to manage Calico Network Policy [Network Policy](https://projectcalico.docs.tigera.io/about/about-network-policy).
 
-> **NOTE: This guide assumes you already deployed an Amazon Elastic Kubernetes Service (EKS) or Google Kubernetes Engine (GKE) cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these Jumpstart scenarios:**
+  > **NOTE: This guide assumes you already deployed an Amazon Elastic Kubernetes Service (EKS) or Google Kubernetes Engine (GKE) cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion using these Jumpstart scenarios:**
 
 - [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
 - [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
 
-> **NOTE: This guide assumes you already have deployed Calico network policy in your cluster. If you haven't, you can use our installation guides for Calico open source or Calico Cloud:**
+  > **NOTE: This guide assumes you already have deployed Calico network policy in your cluster. If you haven't, you can use our installation guides for Calico open source or Calico Cloud:**
 
 - [Deploy Calico open source in your managed public cluster](https://projectcalico.docs.tigera.io/getting-started/kubernetes/managed-public-cloud/)
 - [Sign up for a Calico Cloud trial](https://www.calicocloud.io/?utm_campaign=calicocloud&utm_medium=digital&utm_source=microsoft)
@@ -52,12 +52,12 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
 
 ## Azure Arc Kubernetes GitOps Configuration for Calico
 
-* We will use a shell script [*calico_k8sconfig_gitops*](https://github.com/microsoft/azure_arc/tree/main/docs/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/gitops/calico_k8sconfig_gitops.sh) against the GKE/EKS connected cluster.You can use Cloud Shell in order to keep your local environment clean.
+- We will use a shell script [*calico_k8sconfig_gitops*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/multi_distributions/calico_gitops/calico_k8sconfig_gitops.sh) against the GKE/EKS connected cluster. You can use Cloud Shell in order to keep your local environment clean.
 
-[Google Cloud Shell](https://cloud.google.com/shell)
-[AWS Cloud Shell](https://aws.amazon.com/cloudshell/)
+  [Google Cloud Shell](https://cloud.google.com/shell)
+  [AWS Cloud Shell](https://aws.amazon.com/cloudshell/)
 
-* Edit the environment variables in the [*calico_k8sconfig_gitops*](https://github.com/microsoft/azure_arc/tree/main/docs/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/gitops/calico_k8sconfig_gitops.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./calico_k8sconfig_gitops.sh``` command to create the GitOps configuration.
+- Edit the environment variables in the [*calico_k8sconfig_gitops*](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/multi_distributions/calico_gitops/calico_k8sconfig_gitops.sh) shell script to match your parameters, upload it to the Cloud Shell environment and run it using the ```. ./calico_k8sconfig_gitops.sh``` command to create the GitOps configuration.
 
     > **NOTE: The extra dot is due to the script having an *export* function and needs to have the vars exported in the same shell session as the rest of the commands.**
     > **NOTE: The default branch is `master`. Newer repositories have a root branch named main, in which case you need to set `--git-branch=main` in operator params.**
@@ -68,15 +68,15 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
 
     The script will:
 
-  * Login to your Azure subscription using the SPN credentials
-  * Retrieve the cluster credentials (KUBECONFIG)
-  * Install Helm 3 & Azure CLI & Azure Arc Extensions
-  * Create the GitOps configuration and deploy the Flux operator and Memcached on the Azure Arc connected cluster
-  * Deploy the `dev` utilities as well as `network policy` and `network set` on the Azure Arc connected cluster
+  - Login to your Azure subscription using the SPN credentials
+  - Retrieve the cluster credentials (KUBECONFIG)
+  - Install Helm 3 & Azure CLI & Azure Arc Extensions
+  - Create the GitOps configuration and deploy the Flux operator and Memcached on the Azure Arc connected cluster
+  - Deploy the `dev` utilities as well as `network policy` and `network set` on the Azure Arc connected cluster
 
     > **Disclaimer: For the purpose of this guide, notice that "*git-poll-interval 30s*" is set. The 30 seconds interval is useful for demo purposes since changes can be observed quickly but it is recommended to have a longer interval in your production environment (default value is 5min)**
 
-* Once the script completes running, a GitOps configuration will be created with all the resources deployed in your Kubernetes cluster. Note that it takes a few minutes for the configuration to change it's Operator state status from "Pending" to "Installed".
+- Once the script completes running, a GitOps configuration will be created with all the resources deployed in your Kubernetes cluster. Note that it takes a few minutes for the configuration to change it's Operator state status from "Pending" to "Installed".
 
     ![New GitOps configuration](./05.png)
 
@@ -86,7 +86,6 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
   > You should see the following pods running.
 
   ![Showing operator deployment](./07.png)
-
 
 ## Confirm Network Sets exist in the Azure Arc connected cluster
 
@@ -119,9 +118,6 @@ In this scenario, we will be using GitOps in an Azure Arc connected Kubernetes c
 
   ![Showing network set deployment](./16.png)  
 
-
-
-
 ## Clean up environment
 
 Complete the following steps to clean up your environment.
@@ -138,5 +134,6 @@ Complete the following steps to clean up your environment.
     ```
 
 - You can use follow these Jumpstart scenarios below for deleting the clusters:
-- [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
-- [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
+
+  - [Deploy EKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/eks_terraform/)
+  - [Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)

@@ -16,6 +16,13 @@
         "description": "The location of the Managed Cluster resource"
       }
     },
+    "vnetSubnetID": {
+      "type": "string",
+      "defaultValue": "[variables('vnetSubnetId')]",
+      "metadata": {
+        "description": "Resource ID of the AKS subnet"
+      }
+    },
     "dnsPrefix": {
       "type": "string",
       "defaultValue": "arcdata",
@@ -101,9 +108,12 @@
       }
     }
   },
+  "variables": {
+    "vnetSubnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'Arc-Data-VNet', 'AKS-Subnet')]"
+  },
   "resources": [
     {
-      "apiVersion": "2022-01-02-preview",
+      "apiVersion": "2022-03-02-preview",
       "type": "Microsoft.ContainerService/managedClusters",
       "location": "[parameters('location')]",
       "name": "[parameters('clusterName')]",
@@ -125,7 +135,8 @@
             "vmSize": "[parameters('agentVMSize')]",
             "osType": "[parameters('osType')]",
             "storageProfile": "ManagedDisks",
-            "type": "VirtualMachineScaleSets"
+            "type": "VirtualMachineScaleSets",
+            "vnetSubnetID": "[parameters('vnetSubnetID')]"
           }
         ],
         "networkProfile": 
@@ -133,6 +144,7 @@
             "networkPlugin": "azure"
           },
         "linuxProfile": {
+          "condition": "[greater(length(parameters('sshRSAPublicKey')), 0)]",
           "adminUsername": "[parameters('linuxAdminUsername')]",
           "ssh": {
             "publicKeys": [

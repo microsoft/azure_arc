@@ -2,7 +2,7 @@
 type: docs
 title: "SQL Managed Instance disaster recovery"
 linkTitle: "SQL Managed Instance disaster recovery"
-weight: 2
+weight: 3
 description: >
 ---
 
