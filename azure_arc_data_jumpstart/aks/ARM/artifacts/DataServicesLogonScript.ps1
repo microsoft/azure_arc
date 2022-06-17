@@ -181,9 +181,15 @@ Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # If flag set, deploy SQL MI
-if ( $Env:deploySQLMI -eq $true )
+if ( $Env:deploySQLMI -eq $true -and $Env:enableADAuth -eq $false)
 {
 & "$Env:TempDir\DeploySQLMI.ps1"
+}
+
+# if ADDS domainname is passed as parameter, deploy SQLMI with AD auth support
+if ($Env:deploySQLMI -eq $true -and $Env:enableADAuth -eq $true)
+{
+& "$Env:TempDir\DeploySQLMIADAuth.ps1"
 }
 
 # If flag set, deploy PostgreSQL
