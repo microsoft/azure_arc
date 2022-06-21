@@ -14,7 +14,10 @@ provider "aws" {
   region = var.awsLocation
 }
 
-
+variable "awsLocation" {
+  type = string
+  description = "the location of all AWS resources"
+}
 variable "resourceGroup" {
   type        = string
   description = "Azure Resource Group"

@@ -1,3 +1,7 @@
+variable "awsLocation" {
+  type = string
+  description = "the location of all AWS resources"
+}
 variable "resourceGroup" {
   type        = string
   description = "Azure Resource Group"
@@ -52,11 +56,6 @@ variable "arcDcName" {
 variable "azureLocation" {
   type        = string
   description = "Location for all resources"
-}
-
-variable "awsLocation" {
-  type        = string
-  description = "Location for AWS resources"
 }
 
 variable "workspaceName" {
@@ -190,13 +189,18 @@ resource "aws_instance" "windows" {
 
   user_data = file("artifacts/user_data.txt")
 
-  /*provisioner "local-exec" {
-    command = "terraform output -raw kubeconfig > config"
+provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --region ${var.awsLocation} --name ${var.clusterName} --kubeconfig config"
   }
+//  provisioner "local-exec" {
+//    command = "terraform output -raw kubeconfig > config"
+//  }
 
+/*
   provisioner "local-exec" {
     command = "terraform output -raw config_map_aws_auth > configmap.yml"
   }
+*/
 
   provisioner "file" {
     source      = "config"
@@ -213,7 +217,7 @@ resource "aws_instance" "windows" {
     }
   }
 
-  provisioner "file" {
+  /*provisioner "file" {
     source      = "configmap.yml"
     destination = "C:/Temp/configmap.yml"
 
