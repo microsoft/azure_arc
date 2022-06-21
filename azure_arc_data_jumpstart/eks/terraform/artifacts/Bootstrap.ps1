@@ -86,7 +86,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/AROSCC.yaml") -OutFile "C:\Temp
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,ssms,dotnetcore-3.1-sdk'
+            $chocolateyAppList = 'awscli,azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,ssms,dotnetcore-3.1-sdk'
             #Run commands in parallel.
             Parallel 
                 {

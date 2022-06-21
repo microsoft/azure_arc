@@ -11,7 +11,96 @@ terraform {
 provider "aws" {
   access_key = var.AWS_ACCESS_KEY_ID
   secret_key = var.AWS_SECRET_ACCESS_KEY
-  region = var.AWS_REGION
+  region = var.awsLocation
+}
+
+
+variable "resourceGroup" {
+  type        = string
+  description = "Azure Resource Group"
+}
+
+variable "spnClientId" {
+  type        = string
+  description = "Client id of the service principal"
+}
+
+variable "spnClientSecret" {
+  type        = string
+  description = "Client secret of the service principal"
+}
+
+variable "spnAuthority" {
+  type        = string
+  description = "Authority for Service Principal authentication"
+  default     = "https://login.microsoftonline.com"
+}
+variable "spnTenantId" {
+  type        = string
+  description = "Tenant id of the service principal"
+}
+
+variable "subscriptionId" {
+  type        = string
+  description = "Subscription ID"
+}
+
+variable "azureLocation" {
+  type        = string
+  description = "Location for all resources"
+}
+
+variable "workspaceName" {
+  type        = string
+  description = "Name for the environment Azure Log Analytics workspace"
+}
+
+variable "deploySQLMI" {
+  type        = bool
+  default = false
+  description = "SQL Managed Instance deployment"
+}
+
+variable "SQLMIHA" {
+  type        = bool
+  default = false
+  description = "SQL Managed Instance high-availability deployment"
+}
+
+variable "deployPostgreSQL" {
+  type        = bool
+  default = false
+  description = "PostgreSQL deployment"
+}
+
+variable "clusterName" {
+  type        = string
+  default = "Arc-Data-EKS"
+  description = "The name of the Kubernetes cluster resource."
+}
+
+variable "eks_instance_types" {
+  description = "EKS node instance type"
+  default     = "t3.xlarge"
+  type        = string
+}
+
+variable "windows_instance_types" {
+  description = "EC2 Client instance Windows type"
+  default     = "t2.large"
+  type        = string
+}
+
+variable "github_repo" {
+  type        = string
+  description = "Specify a GitHub repo (used for testing purposes)"
+  default     = "sebassem"
+}
+
+variable "github_branch" {
+  type        = string
+  description = "Specify a GitHub branch (used for testing purposes)"
+  default     = "jumpstart_DataSvc_EKS_Refactoring"
 }
 
 data "http" "workstation_ip" {
@@ -23,6 +112,7 @@ data "aws_availability_zones" "available" {}
 # Override with variable or hardcoded value if necessary
 locals {
   workstation_cidr = "${chomp(data.http.workstation_ip.body)}/32"
+   template_base_url = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_jumpstart_arcbox/"
 }
 
 resource "aws_vpc" "arcdemo" {
@@ -92,4 +182,26 @@ module "eks_workers" {
   cluster_subnet_ids = aws_subnet.arcdemo[*].id
 
   depends_on = [module.eks_cluster]
+}
+
+
+module "client_VM"{
+  source = "./modules/ClientVM"
+
+  resourceGroup = var.resourceGroup
+  spnClientId = var.spnClientId
+  spnClientSecret = var.spnClientSecret
+  spnTenantId = var.spnTenantId
+  subscriptionId = var.subscriptionId
+  azureLocation = var.azureLocation
+  workspaceName = var.workspaceName
+  deploySQLMI = var.deploySQLMI
+  SQLMIHA = var.SQLMIHA
+  deployPostgreSQL = var.deployPostgreSQL
+  templateBaseUrl = local.template_base_url
+  awsLocation = var.awsLocation
+
+  depends_on = [module.eks_workers]
+
+
 }

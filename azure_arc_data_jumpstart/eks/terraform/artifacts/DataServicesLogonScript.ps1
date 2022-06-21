@@ -2,7 +2,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = "Arc-Data-ARO"
+$connectedClusterName = "Arc-Data-EKS"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -21,22 +21,6 @@ az extension add --name k8s-configuration
 az extension add --name customlocation
 Write-Host "`n"
 az -v
-
-# Install ARO CLI
-Write-Host "Installing the ARO CLI..."
-Invoke-WebRequest "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-windows.zip" -OutFile "C:\Temp\openshift-client-windows.zip"
-Write-Host "`n"
-mkdir $Env:TempDir\OpenShift
-Expand-Archive -Force -Path "C:\Temp\openshift-client-windows.zip" -DestinationPath $Env:TempDir\OpenShift
-Write-Host "`n"
-Write-Host "Adding ARO Cli to envrionment variables for this session"
-$env:Path += ";$Env:TempDir\OpenShift"
-[Environment]::SetEnvironmentVariable(
-    "Path",
-    [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine) + ";$Env:TempDir\OpenShift",
-    [EnvironmentVariableTarget]::Machine)
-Write-Host "`n"
-
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
@@ -92,21 +76,18 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
-# Getting ARO cluster credentials kubeconfig file
-Write-Host "Getting ARO cluster credentials"
+# ************** add aws location as variable*************
+# Getting the EKS cluster credentials kubeconfig file
+Write-Host "Getting EKS cluster credentials"
 Write-Host "`n"
-$kubcepass=(az aro list-credentials --name $connectedClusterName --resource-group $Env:resourceGroup --query "kubeadminPassword" -o tsv)
-$apiServer=(az aro show -g $Env:resourceGroup -n $Env:clusterName --query apiserverProfile.url -o tsv)
-oc login $apiServer -u kubeadmin -p $kubcepass
-oc adm policy add-scc-to-user privileged system:serviceaccount:azure-arc:azure-arc-kube-aad-proxy-sa
-oc adm policy add-scc-to-user hostaccess system:serviceaccount:azure-arc-data:sa-arc-metricsdc-reader
+aws eks update-kubeconfig --region "us-west-1" --name $connectedClusterName
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
 kubectl get nodes
 Write-Host "`n"
 
-# Onboarding the ARO cluster as an Azure Arc-enabled Kubernetes cluster
+# Onboarding the EKS cluster as an Azure Arc-enabled Kubernetes cluster
 Write-Host "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
 Write-Host "`n"
 
