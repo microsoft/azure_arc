@@ -83,7 +83,7 @@ variable "deployPostgreSQL" {
 
 variable "clusterName" {
   type        = string
-  default = "Arc-Data-EKS"
+  default = "Arc-EKS-Demo"
   description = "The name of the Kubernetes cluster resource."
 }
 
@@ -191,7 +191,7 @@ resource "aws_instance" "windows" {
 
 provisioner "local-exec" {
     command = "aws eks update-kubeconfig --region ${var.awsLocation} --name ${var.clusterName} --kubeconfig config"
-  }
+}
 //  provisioner "local-exec" {
 //    command = "terraform output -raw kubeconfig > config"
 //  }
