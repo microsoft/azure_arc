@@ -188,9 +188,9 @@ resource "aws_instance" "windows" {
 
   user_data = file("artifacts/user_data.txt")
 
-provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --region ${var.awsLocation} --name ${var.clusterName} --kubeconfig config"
-}
+//provisioner "local-exec" {
+//    command = "aws eks update-kubeconfig --region ${var.awsLocation} --name ${var.clusterName} --kubeconfig config"
+//}
 //  provisioner "local-exec" {
 //    command = "terraform output -raw kubeconfig > config"
 //  }
@@ -201,7 +201,7 @@ provisioner "local-exec" {
   }
 */
 
-  provisioner "file" {
+/*  provisioner "file" {
     source      = "config"
     destination = "C:/Users/Administrator/.kube/config"
 
@@ -214,7 +214,7 @@ provisioner "local-exec" {
       user     = "Administrator"
       password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
-  }
+  }*/
 
   /*provisioner "file" {
     source      = "configmap.yml"
@@ -249,14 +249,14 @@ provisioner "local-exec" {
 provisioner "remote-exec" {
     inline = [
       "powershell.exe -c Invoke-WebRequest -Uri '${var.templateBaseUrl}artifacts/Bootstrap.ps1' -OutFile C:/Temp/Bootstrap.ps1",
-      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername 'Administrator' -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl}"
+      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername 'Administrator' -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl} -AWS_ACCESS_KEY_ID ${var.AWS_ACCESS_KEY_ID} -AWS_SECRET_ACCESS_KEY ${var.AWS_SECRET_ACCESS_KEY} -awsLocation ${var.awsLocation}"
     ]
 
     connection {
       host     = self.public_ip
       https    = false
       insecure = true
-      timeout  = "5m"
+      timeout  = "60m"
       type     = "winrm"
       user     = "Administrator"
       password = rsadecrypt(self.password_data, file(var.key_pair_filename))

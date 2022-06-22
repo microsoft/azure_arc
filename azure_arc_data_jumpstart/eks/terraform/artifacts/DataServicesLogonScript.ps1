@@ -76,11 +76,18 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
-# ************** add aws location as variable*************
-# Getting the EKS cluster credentials kubeconfig file
-Write-Host "Getting EKS cluster credentials"
+# Configure AWS CLI
+Write-Host "Configuring AWS CLI"
 Write-Host "`n"
-aws eks update-kubeconfig --region "us-west-1" --name $connectedClusterName
+aws configure set aws_access_key_id $env:AWS_ACCESS_KEY_ID
+aws configure set aws_secret_access_key $env:AWS_SECRET_ACCESS_KEY
+Write-Host "`n"
+
+# Get EKS cluster token
+Write-Host "Getting EKS cluster token"
+Write-Host "`n"
+aws eks update-kubeconfig --region $env:awsLocation --name connectedClusterName
+Write-Host "`n"
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
