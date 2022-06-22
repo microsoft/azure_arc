@@ -39,7 +39,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AWS_ACCESS_KEY_ID', $AWS_ACCESS_KEY_ID,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('AWS_SECRET_ACCESS_KEY', $AWS_SECRET_ACCESS_KEY,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('awsLocation', $awsLocation,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION', $AWS_DEFAULT_REGION,[System.EnvironmentVariableTarget]::Machine)
 
 
 # Create path
