@@ -83,7 +83,6 @@ variable "deployPostgreSQL" {
 
 variable "clusterName" {
   type        = string
-  default = "Arc-EKS-Demo"
   description = "The name of the Kubernetes cluster resource."
 }
 
@@ -250,7 +249,7 @@ provisioner "local-exec" {
 provisioner "remote-exec" {
     inline = [
       "powershell.exe -c Invoke-WebRequest -Uri '${var.templateBaseUrl}/artifacts/Bootstrap.ps1' -OutFile C:/Temp/Bootstrap.ps1",
-      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername 'Administrator' -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl}"
+      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername 'Administrator' -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl}"
     ]
 
     connection {
