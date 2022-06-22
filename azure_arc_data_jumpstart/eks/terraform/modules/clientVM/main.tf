@@ -99,7 +99,7 @@ variable "eks_instance_types" {
 
 variable "windows_instance_types" {
   description = "EC2 Client instance Windows type"
-  default     = "t2.large"
+  default     = "t2.medium"
   type        = string
 }
 
