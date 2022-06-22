@@ -214,6 +214,8 @@ module "client_VM"{
   deployPostgreSQL = var.deployPostgreSQL
   templateBaseUrl = local.template_base_url
   awsLocation = var.awsLocation
+  AWS_ACCESS_KEY_ID = var.AWS_ACCESS_KEY_ID
+  AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
   clusterName = var.clusterName
 
   depends_on = [module.eks_workers]
