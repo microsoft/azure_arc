@@ -10,12 +10,6 @@ export resourceGroup='<Azure resource group name>'
 export arcClusterName='<Azure Arc Cluster Name>'
 export k8sExtensionName='<Azure Policy extension name>' #default: 'azurepolicy'
 
-# Installing Helm 3
-echo "Installing Helm 3"
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-chmod 700 get_helm.sh
-./get_helm.sh
-
 # Installing Azure CLI & Azure Arc Extensions
 echo ""
 echo "Installing Azure CLI & Azure Arc extensions"
