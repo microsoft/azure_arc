@@ -11,7 +11,7 @@ terraform {
 provider "aws" {
   access_key = var.AWS_ACCESS_KEY_ID
   secret_key = var.AWS_SECRET_ACCESS_KEY
-  region = var.awsLocation
+  region = var.AWS_DEFAULT_REGION
 }
 
 
@@ -22,10 +22,9 @@ variable "AWS_ACCESS_KEY_ID" {
 
 variable "AWS_SECRET_ACCESS_KEY" {
   type = string
-  sensitive = true
   description = "AWS Access Secret"
 }
-variable "awsLocation" {
+variable "AWS_DEFAULT_REGION" {
   type = string
   description = "the location of all AWS resources"
 }
@@ -213,7 +212,7 @@ module "client_VM"{
   SQLMIHA = var.SQLMIHA
   deployPostgreSQL = var.deployPostgreSQL
   templateBaseUrl = local.template_base_url
-  awsLocation = var.awsLocation
+  AWS_DEFAULT_REGION = var.AWS_DEFAULT_REGION
   AWS_ACCESS_KEY_ID = var.AWS_ACCESS_KEY_ID
   AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
   clusterName = var.clusterName
