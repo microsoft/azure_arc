@@ -14,6 +14,17 @@ provider "aws" {
   region = var.awsLocation
 }
 
+
+variable "AWS_ACCESS_KEY_ID" {
+  type = string
+  description = "AWS Access key id"
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  type = string
+  sensitive = true
+  description = "AWS Access Secret"
+}
 variable "awsLocation" {
   type = string
   description = "the location of all AWS resources"
@@ -115,7 +126,7 @@ data "aws_availability_zones" "available" {}
 # Override with variable or hardcoded value if necessary
 locals {
   workstation_cidr = "${chomp(data.http.workstation_ip.body)}/32"
-   template_base_url = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_jumpstart_arcbox/"
+   template_base_url = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_arc_data_jumpstart/eks/terraform/')"
 }
 
 resource "aws_vpc" "arcdemo" {
@@ -170,7 +181,7 @@ resource "aws_route_table_association" "arcdemo" {
 module "eks_cluster" {
   source = "./modules/cluster"
 
-  cluster_name       = var.cluster_name
+  cluster_name       = var.clusterName
   cluster_vpc_id     = aws_vpc.arcdemo.id
   cluster_subnet_ids = aws_subnet.arcdemo[*].id
   workstation_cidr   = local.workstation_cidr
@@ -181,7 +192,7 @@ module "eks_cluster" {
 module "eks_workers" {
   source = "./modules/workers"
 
-  cluster_name       = var.cluster_name
+  cluster_name       = var.clusterName
   cluster_subnet_ids = aws_subnet.arcdemo[*].id
 
   depends_on = [module.eks_cluster]
@@ -203,6 +214,7 @@ module "client_VM"{
   deployPostgreSQL = var.deployPostgreSQL
   templateBaseUrl = local.template_base_url
   awsLocation = var.awsLocation
+  clusterName = var.clusterName
 
   depends_on = [module.eks_workers]
 
