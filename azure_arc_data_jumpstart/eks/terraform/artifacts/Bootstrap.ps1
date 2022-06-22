@@ -37,6 +37,10 @@ param (
 [System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AWS_ACCESS_KEY_ID', $AWS_ACCESS_KEY_ID,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AWS_SECRET_ACCESS_KEY', $AWS_SECRET_ACCESS_KEY,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('awsLocation', $awsLocation,[System.EnvironmentVariableTarget]::Machine)
+
 
 # Create path
 Write-Output "Create deployment path"
@@ -84,7 +88,7 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'awscli,azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,ssms,dotnetcore-3.1-sdk'
+            $chocolateyAppList = 'awscli,aws-iam-authenticator,azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,ssms,dotnetcore-3.1-sdk'
             #Run commands in parallel.
             Parallel 
                 {
