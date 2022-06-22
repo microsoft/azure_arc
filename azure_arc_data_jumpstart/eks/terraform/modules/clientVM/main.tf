@@ -1,3 +1,14 @@
+variable "AWS_ACCESS_KEY_ID" {
+  type = string
+  description = "AWS Access key id"
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  type = string
+  sensitive = true
+  description = "AWS Access Secret"
+}
+
 variable "awsLocation" {
   type = string
   description = "the location of all AWS resources"
@@ -249,7 +260,7 @@ resource "aws_instance" "windows" {
 provisioner "remote-exec" {
     inline = [
       "powershell.exe -c Invoke-WebRequest -Uri '${var.templateBaseUrl}artifacts/Bootstrap.ps1' -OutFile C:/Temp/Bootstrap.ps1",
-      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername 'Administrator' -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl} -AWS_ACCESS_KEY_ID ${var.AWS_ACCESS_KEY_ID} -AWS_SECRET_ACCESS_KEY ${var.AWS_SECRET_ACCESS_KEY} -awsLocation ${var.awsLocation}"
+      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername Administrator -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl} -AWS_ACCESS_KEY_ID ${var.AWS_ACCESS_KEY_ID} -AWS_SECRET_ACCESS_KEY ${var.AWS_SECRET_ACCESS_KEY} -awsLocation ${var.awsLocation}"
     ]
 
     connection {
