@@ -1,0 +1,7 @@
+apiVersion: arcdata.microsoft.com/v2
+kind: DataController
+metadata:
+  name: arc
+spec:
+  docker:
+    imageTag: v1.8.0_2022-06-14
