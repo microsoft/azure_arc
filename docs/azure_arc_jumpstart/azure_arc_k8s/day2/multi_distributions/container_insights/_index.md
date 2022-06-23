@@ -113,7 +113,6 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
   - _`actionGroupName`_ - Action Group for the Alerts
   - _`email`_ - Email for the Action Group
 
-  &nbsp;
   ![Screenshot parameter examples](./02.png)
 
 - After editing the variables, to run the script, navigate to the [script folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/multi_distributions/container_insights) and run the command
