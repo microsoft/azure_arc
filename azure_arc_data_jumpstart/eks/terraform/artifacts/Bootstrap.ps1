@@ -16,7 +16,11 @@ param (
     [string]$deploySQLMI,
     [string]$SQLMIHA,    
     [string]$deployPostgreSQL,
-    [string]$templateBaseUrl
+    [string]$templateBaseUrl,
+    [string]$awsDefaultRegion,
+    [string]$awsAccessKeyId,
+    [string]$awsSecretAccessKey
+
 )
 
 [System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
@@ -37,9 +41,9 @@ param (
 [System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('clusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AWS_ACCESS_KEY_ID', $AWS_ACCESS_KEY_ID,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AWS_SECRET_ACCESS_KEY', $AWS_SECRET_ACCESS_KEY,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION', $AWS_DEFAULT_REGION,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AWS_ACCESS_KEY_ID', $awsAccessKeyId,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AWS_SECRET_ACCESS_KEY', $awsSecretAccessKey,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AWS_DEFAULT_REGION', $awsDefaultRegion,[System.EnvironmentVariableTarget]::Machine)
 
 
 # Create path

@@ -1,14 +1,14 @@
-variable "AWS_ACCESS_KEY_ID" {
+variable "awsAccessKeyId" {
   type = string
   description = "AWS Access key id"
 }
 
-variable "AWS_SECRET_ACCESS_KEY" {
+variable "awsSecretAccessKey" {
   type = string
   description = "AWS Access Secret"
 }
 
-variable "AWS_DEFAULT_REGION" {
+variable "awsDefaultRegion" {
   type = string
   description = "the location of all AWS resources"
 }
@@ -259,7 +259,7 @@ resource "aws_instance" "windows" {
 provisioner "remote-exec" {
     inline = [
       "powershell.exe -c Invoke-WebRequest -Uri '${var.templateBaseUrl}artifacts/Bootstrap.ps1' -OutFile C:/Temp/Bootstrap.ps1",
-      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername Administrator -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl} -AWS_ACCESS_KEY_ID ${var.AWS_ACCESS_KEY_ID} -AWS_SECRET_ACCESS_KEY ${var.AWS_SECRET_ACCESS_KEY} -AWS_DEFAULT_REGION ${var.AWS_DEFAULT_REGION}"
+      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername Administrator -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl} -awsAccessKeyId ${var.awsAccessKeyId} -awsSecretAccessKey ${var.awsSecretAccessKey} -awsDefaultRegion ${var.awsDefaultRegion}"
     ]
 
     connection {

@@ -86,7 +86,7 @@ az -v
 # Get EKS cluster token
 Write-Host "Getting EKS cluster token"
 Write-Host "`n"
-aws eks update-kubeconfig --region $env:AWS_DEFAULT_REGION --name connectedClusterName
+aws eks update-kubeconfig --region $env:AWS_DEFAULT_REGION --name $connectedClusterName
 Write-Host "`n"
 
 Write-Host "Checking kubernetes nodes"
