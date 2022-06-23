@@ -212,9 +212,9 @@ module "client_VM"{
   SQLMIHA = var.SQLMIHA
   deployPostgreSQL = var.deployPostgreSQL
   templateBaseUrl = local.template_base_url
-  AWS_DEFAULT_REGION = var.AWS_DEFAULT_REGION
-  AWS_ACCESS_KEY_ID = var.AWS_ACCESS_KEY_ID
-  AWS_SECRET_ACCESS_KEY = var.AWS_SECRET_ACCESS_KEY
+  awsDefaultRegion = var.AWS_DEFAULT_REGION
+  awsAccessKeyId = var.AWS_ACCESS_KEY_ID
+  awsSecretAccessKey = var.AWS_SECRET_ACCESS_KEY
   clusterName = var.clusterName
 
   depends_on = [module.eks_workers]
