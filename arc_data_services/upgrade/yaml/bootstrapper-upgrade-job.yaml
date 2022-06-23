@@ -5,6 +5,8 @@ metadata:
 spec:
   template:
     spec:
+      nodeSelector:
+        kubernetes.io/os: linux
       imagePullSecrets:
       - name: your-private-registry
       containers:
