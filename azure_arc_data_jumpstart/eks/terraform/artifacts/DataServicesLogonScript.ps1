@@ -76,13 +76,6 @@ az config set extension.use_dynamic_install=yes_without_prompt
 Write-Host "`n"
 az -v
 
-# Configure AWS CLI
-#Write-Host "Configuring AWS CLI"
-#Write-Host "`n"
-#aws configure set aws_access_key_id $env:AWS_ACCESS_KEY_ID
-#aws configure set aws_secret_access_key $env:AWS_SECRET_ACCESS_KEY
-#Write-Host "`n"
-
 # Get EKS cluster token
 Write-Host "Getting EKS cluster token"
 Write-Host "`n"
@@ -122,13 +115,6 @@ Write-Host "`n"
 
 # Monitor pods across arc namespace
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
-
-# Deploying security context
-Write-Host "Adding security context for ARO"
-Write-Host "`n"
-kubectl create namespace arc
-kubectl apply -f $Env:TempDir\AROSCC.yaml --namespace arc
-Write-Host "`n"
 
 Start-Sleep -Seconds 10
 
