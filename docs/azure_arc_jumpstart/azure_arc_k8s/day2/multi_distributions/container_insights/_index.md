@@ -113,12 +113,13 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
   - _`actionGroupName`_ - Action Group for the Alerts
   - _`email`_ - Email for the Action Group
 
-    ![Screenshot parameter examples](./02.png)
+  &nbsp;
+  ![Screenshot parameter examples](./02.png)
 
 - After editing the variables, to run the script, navigate to the [script folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/multi_distributions/container_insights) and run the command
 
   ```shell  
-  . ./azure_monitor_alerts.
+  sudo chmod +x azure_monitor_alerts.sh && . ./azure_monitor_alerts.sh
   ```
 
     > **NOTE: The extra dot is due to the shell script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
@@ -137,7 +138,7 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
 - You can also verify the pods by running the command below:
 
   ```bash
-  kubectl get pod -n kube-system --kubeconfig <cluster-name>.kubeconfig | grep omsagent
+  kubectl get pod -n kube-system --kubeconfig <kubeconfig> | grep omsagent
   ```
 
   ![Screenshot extension pods on cluster](./04.png)
@@ -150,6 +151,7 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
 
 - To verify that the recommended alerts are working properly, create the below pod to simulate an OOMKilledContainers alert:
 
+  > **pod-test.yaml**
   ```yaml
   apiVersion: v1
   kind: Pod
@@ -167,7 +169,12 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
       command: ["stress"]
       args: ["--vm", "1", "--vm-bytes", "250M", "--vm-hang", "1"]
   ```
+- Create the above file and run the following command to create the pod:
 
+  ```bash
+  kubectl apply -f pod-test.yaml --kubeconfig <kubeconfig>
+  ```
+  
 - In few minutes an alert will be created, you will see it in the Azure Portal under Alerts tab of your Azure Arc-enabled cluster.
 
   ![Screenshot Monitor alert](./06.png)
