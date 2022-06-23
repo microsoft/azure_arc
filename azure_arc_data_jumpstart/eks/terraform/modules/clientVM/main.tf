@@ -204,12 +204,9 @@ resource "aws_instance" "windows" {
 //  provisioner "local-exec" {
 //    command = "terraform output -raw kubeconfig > config"
 //  }
-
-/*
   provisioner "local-exec" {
     command = "terraform output -raw config_map_aws_auth > configmap.yml"
   }
-*/
 
 /*  provisioner "file" {
     source      = "config"
@@ -226,7 +223,7 @@ resource "aws_instance" "windows" {
     }
   }*/
 
-  /*provisioner "file" {
+  provisioner "file" {
     source      = "configmap.yml"
     destination = "C:/Temp/configmap.yml"
 
@@ -241,7 +238,7 @@ resource "aws_instance" "windows" {
     }
   }
 
-  provisioner "file" {
+  /*provisioner "file" {
     source      = "artifacts/azure_arc.ps1"
     destination = "C:/Temp/azure_arc.ps1"
 
