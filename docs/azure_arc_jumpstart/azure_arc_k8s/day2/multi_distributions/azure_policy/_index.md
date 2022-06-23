@@ -110,12 +110,13 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
   - _`arcClusterName`_ - Azure Arc Cluster Name
   - _`k8sExtensionName`_ - Azure Policy extension name, should be azurepolicy
 
-    ![Screenshot parameter examples](./02.png)
+  &nbsp;
+  ![Screenshot parameter examples](./02.png)
 
 - After editing the variables, to run the script, navigate to the [script folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/multi_distributions/azure_policy) and run the command
 
   ```shell  
-  . ./azure_policy.sh
+  sudo chmod +x azure_monitor_alerts.sh && . ./azure_policy.sh
   ```
 
     > **NOTE: The extra dot is due to the shell script having an _export_ function and needs to have the vars exported in the same shell session as the rest of the commands.**
@@ -136,7 +137,7 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
   - The azure-policy pods are installed in the kube-system namespace:
 
     ```bash
-    kubectl get pods -n kube-system --kubeconfig <cluster-name>.kubeconfig | grep azure-policy
+    kubectl get pods -n kube-system --kubeconfig <kubeconfig> | grep azure-policy
     ```
 
     ![Screenshot extension pods on cluster](./04.png)
@@ -144,7 +145,7 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
   - The gatekeeper pods are installed in the gatekeeper-system namespace:
 
     ```bash
-    kubectl get pods -n gatekeeper-system --kubeconfig <cluster-name>.kubeconfig
+    kubectl get pods -n gatekeeper-system --kubeconfig <kubeconfig>
     ```
 
     ![Screenshot extension pods on cluster](./05.png)
@@ -155,8 +156,11 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
 
 ## Test Azure Policy
 
+> **IMPORTANT NOTE: Please note that it may take up to 30 minutes for the Azure Policy to take effect.**
+
 - The Azure Policy we have assigned works as a [LimitRange](https://kubernetes.io/docs/concepts/policy/limit-range/), but we do not specify any namespace, so the Azure Policy will be applied on all namespaces. The limits specified in the Azure Policy are cpuLimit=200m and memoryLimit=1Gi, so to test it we need to create a pod with higher limits:
 
+  > **pod-test.yaml**
   ```yaml
   apiVersion: v1
   kind: Pod
@@ -175,9 +179,15 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
           cpu: "16"
   ```
 
-- When we create the above pod, we get the following output:
+- Create the above file and run the following command to create the pod:
+
+  ```bash
+  kubectl apply -f pod-test.yaml --kubeconfig <kubeconfig>
+  ```
 
   ![Screenshot Azure Policy test](./07.png)
+
+  As you can see we cannot create the pod due to the Azure policy that was applied.
 
 - If there were pods that exceeded the limit before applying the Azure Policy, they will not be removed, but we can see which ones do not comply in the Azure Policy service in the Compliance tab, select the non-compliance event
 
