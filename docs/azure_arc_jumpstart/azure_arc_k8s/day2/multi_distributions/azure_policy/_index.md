@@ -86,11 +86,11 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User has deployed a Kubernetes cluster and has it connected as an Azure Arc-enabled Kubernetes cluster.
 
-- User is editing the environment variables on the Shell script file (1-time edit) which then will be used throughout the extension deployment.
+- User edits the environment variables on the Shell script file (1-time edit) which then will be used throughout the extension deployment.
 
-- User is running the shell script. The script will use the extension management feature of Azure Arc to deploy the Azure Policy extension on the Azure Arc-enabled Kubernetes cluster and assign an Azure Policy to your Azure Arc-enabled K8s cluster's resource group.
+- User runs the shell script. The script will use the extension management feature of Azure Arc to deploy the Azure Policy extension on the Azure Arc-enabled Kubernetes cluster and assign an Azure Policy to your Azure Arc-enabled K8s cluster's resource group.
 
-- User is veryfing that the Azure Policy extension is deployed as well as the Azure Policy assignment was created.
+- User verifies that the Azure Policy extension is deployed as well as the Azure Policy assignment was created.
 
 ## Create Azure Policy cluster extensions instance
 
@@ -110,7 +110,6 @@ To create a new extension instance, we will use the _k8s-extension create_ comma
   - _`arcClusterName`_ - Azure Arc Cluster Name
   - _`k8sExtensionName`_ - Azure Policy extension name, should be azurepolicy
 
-  &nbsp;
   ![Screenshot parameter examples](./02.png)
 
 - After editing the variables, to run the script, navigate to the [script folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/multi_distributions/azure_policy) and run the command
