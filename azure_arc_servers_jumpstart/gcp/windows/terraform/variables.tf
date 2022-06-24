@@ -14,13 +14,15 @@ variable "gcp_zone" {
 }
 
 variable "admin_username" {
-  default = "arcadmin"
+  default = "arcdemo"
 }
 
 variable "admin_password" {
-  default = "arcdemo123!!"
+  default = "arcPassword123!!"
 }
-
+variable "instance_type" {
+  default = "n1-standard-1"
+}
 variable "key_name" {
   default = "rsakey1"
 }

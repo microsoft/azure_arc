@@ -14,11 +14,11 @@ variable "gcp_zone" {
 }
 
 variable "admin_username" {
-  default = "arcadmin"
+  default = "arcdemo"
 }
 
 variable "admin_password" {
-  default = "arcdemo123!!"
+  default = "ArcPassword123!!"
 }
 
 variable "azure_location" {
@@ -27,6 +27,10 @@ variable "azure_location" {
 
 variable "azure_resource_group" {
   default = "Arc-GCP-Demo"
+}
+
+variable "instance_type" {
+  default = "n1-standard-1"
 }
 
 variable "subscription_id" {
