@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "azure_rg" {
 // A single Google Cloud Engine instance
 resource "google_compute_instance" "default" {
   name         = "arc-gcp-demo"
-  machine_type = "n1-standard-1"
+  machine_type = var.instance_type
   zone         = var.gcp_zone
   boot_disk {
     initialize_params {
