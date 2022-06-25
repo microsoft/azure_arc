@@ -231,7 +231,7 @@ resource "aws_instance" "windows" {
       host     = self.public_ip
       https    = false
       insecure = true
-      timeout  = "5m"
+      timeout  = "30m"
       type     = "winrm"
       user     = "Administrator"
       password = rsadecrypt(self.password_data, file(var.key_pair_filename))
