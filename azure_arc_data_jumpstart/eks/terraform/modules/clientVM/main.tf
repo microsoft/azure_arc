@@ -271,6 +271,7 @@ provisioner "remote-exec" {
   }
 }
 
+
 output "password_decrypted" {
   value = rsadecrypt(aws_instance.windows.password_data, file(var.key_pair_filename))
 }
