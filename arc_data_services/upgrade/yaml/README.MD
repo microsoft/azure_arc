@@ -6,40 +6,31 @@ This folder contains upgrade related scripts for Azure Arc-enabled data services
 
 The following yaml files can be used to upgrade an existing Azure Arc-enabled data services deployment using kubectl CLI. The yaml files can be applied in the order specified below and modifying the parameters based on your Kubernetes environment.
 
-1. [Service account](./service-account.yaml)
-This yaml file describes a service account named `sa-arc-upgrade-worker` to run the upgrade.
+1. [Service Account](../../arcdata-deployer.yaml)
+This yaml file defines a service account named `sa-arcdata-deployer` and related RBAC permission for running the upgrade. Replace the placeholder `{{NAMESPACE}}` in the file before applying.
 
    Example command:
 
    ```kubectl
-   kubectl apply -n arc --f service-account.yaml
+   kubectl apply -n arc -f ../../arcdata-deployer.yaml
    ```
 
-1. [Cluster role](./cluster-role.yaml)
-This yaml file describes a cluster role for the upgrade named `cr-upgrade-worker`.
+1. [Bootstrapper Upgrade Job](./bootstrapper-upgrade-job.yaml)
+This yaml file creates a job for upgrading the bootstrapper and related Kubernetes objects.
 
    Example command:
 
    ```kubectl
-   kubectl apply -n arc --f cluster-role.yaml
+   kubectl apply -n arc -f bootstrapper-upgrade-job.yaml
    ```
 
-1. [Cluster role binding](./cluster-role-binding.yaml)
-This yaml file creates a cluster role binding named ` arc:crb-upgrade-worker`.
+1. [Upgrade Data Controller](./data-controller-upgrade.yaml)
+This yaml file defines patch of the data controller image tag for upgrading the data controller.
 
    Example command:
 
    ```kubectl
-   kubectl apply -n arc --f cluster-role-binding.yaml
-   ```
-
-1. [Job](./job.yaml)
-This yaml file creates the data controller resources.
-
-   Example command:
-
-   ```kubectl
-   kubectl apply -n arc --f job.yaml
+   kubectl apply -n arc -f data-controller-upgrade.yaml
    ```
 
 For deployment resources, see [Deploy](../../deploy/readme.md).
