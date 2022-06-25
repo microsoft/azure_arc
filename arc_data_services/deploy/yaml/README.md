@@ -6,11 +6,11 @@ This folder contains deployment related scripts for Azure Arc enabled data servi
 
 The following yaml files can be used to create Azure Arc enabled data services using kubectl CLI. The yaml files can be applied in the order specified below and modifying the parameters based on your Kubernetes environment.
 
-1. [Create Custom Resource Definitions](./custom-resource-definitions.yaml)
-This yaml file creates custom resource definitions (CRDs) for data controller, SQL Managed Instance and PostgreSQL Hyperscale resources.
+1. [Create Deployer Service Account](../../arcdata-deployer.yaml)
+This yaml file creates a deployer service account in a specified namespace with proper RBAC. This service account will be used in the next step to run a "bootstrap" job. Replace the placeholder `{{NAMESPACE}}` in the file before applying.
 
-1. [Create Bootstrapper](./bootstrapper.yaml)
-This yaml file creates bootstrapper pad in a specified namespace along with the service account and bootstrapper role.
+1. [Create Bootstrapper](./bootstrap.yaml)
+This yaml file creates "bootstrap" job to install the bootstrapper along with related cluster-scope and namespaced objects, such as custom resource definitions (CRDs), the service account and bootstrapper role. The [unistall.yaml](./uninstall.yaml) is for uninstalling the bootstrapper and related Kubernetes objects, except the CRDs.
 
 1. [Create data controller login secret](./controller-login-secret.yaml)
 This yaml file creates a secret containing the data controller administrator username and password. These credentials will be used to perform operations via the azdata CLI. The secret values should be base64 encoded strings. See instructions under [Creating base64 encoded strings](#creating-base64-encoded-strings).
