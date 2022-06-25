@@ -231,7 +231,7 @@ resource "aws_instance" "windows" {
       host     = self.public_ip
       https    = false
       insecure = true
-      timeout  = "30m"
+      timeout  = "5m"
       type     = "winrm"
       user     = "Administrator"
       password = rsadecrypt(self.password_data, file(var.key_pair_filename))
@@ -269,6 +269,8 @@ provisioner "remote-exec" {
       password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
   }
+
+  depends_on = [aws_eks_node_group.arcdemo]
 }
 
 

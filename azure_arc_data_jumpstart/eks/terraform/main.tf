@@ -217,7 +217,7 @@ module "client_VM"{
   awsSecretAccessKey = var.AWS_SECRET_ACCESS_KEY
   clusterName = var.clusterName
 
-  depends_on = [module.eks_workers]
+  //depends_on = [module.eks_workers]
 
 
 }
