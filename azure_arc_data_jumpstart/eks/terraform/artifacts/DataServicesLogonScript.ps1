@@ -157,6 +157,13 @@ az customlocation create --name 'jumpstart-cl' `
                          --cluster-extension-ids $extensionId `
                          --kubeconfig $Env:KUBECONFIG
 
+
+# Creating Log Analytics Workspace for Metric Upload
+Write-Host "Deploying Log Analytics Workspace"
+Write-Host "`n"
+
+az monitor log-analytics workspace create --resource-group $env:resourceGroup --workspace-name $Env:workspaceName
+
 # Deploying Azure Arc Data Controller
 Write-Host "`n"
 Write-Host "Deploying Azure Arc Data Controller"
