@@ -149,9 +149,12 @@ $extensionId = az k8s-extension show --name arc-data-services `
 
 Start-Sleep -Seconds 20
 
-# Create Custom Location 
+#Enable custom location feature
 az connectedk8s enable-features -n $connectedClusterName -g $Env:resourceGroup --custom-locations-oid "649cb28f-bc13-492a-9470-c8bf01fa8eeb" --features cluster-connect custom-locations
 
+start-sleep -seconds 20
+
+# Create Custom Location 
 az customlocation create --name 'jumpstart-cl' `
                          --resource-group $Env:resourceGroup `
                          --namespace arc `
@@ -163,7 +166,6 @@ az customlocation create --name 'jumpstart-cl' `
 # Creating Log Analytics Workspace for Metric Upload
 Write-Host "Deploying Log Analytics Workspace"
 Write-Host "`n"
-
 az monitor log-analytics workspace create --resource-group $env:resourceGroup --workspace-name $Env:workspaceName
 
 # Deploying Azure Arc Data Controller
