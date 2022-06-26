@@ -149,7 +149,9 @@ $extensionId = az k8s-extension show --name arc-data-services `
 
 Start-Sleep -Seconds 20
 
-# Create Custom Location
+# Create Custom Location 
+az connectedk8s enable-features -n $connectedClusterName -g $Env:resourceGroup --custom-locations-oid "649cb28f-bc13-492a-9470-c8bf01fa8eeb" --features cluster-connect custom-locations
+
 az customlocation create --name 'jumpstart-cl' `
                          --resource-group $Env:resourceGroup `
                          --namespace arc `
