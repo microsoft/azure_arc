@@ -86,7 +86,7 @@
       "value": "2021-11-01"
     },
     "infrastructure": {
-      "value": "azure"
+      "value": "aws"
     }
   }
 }
