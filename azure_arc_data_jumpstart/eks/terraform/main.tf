@@ -220,3 +220,4 @@ module "client_VM"{
 depends_on = [module.eks_workers]
 
 }
+

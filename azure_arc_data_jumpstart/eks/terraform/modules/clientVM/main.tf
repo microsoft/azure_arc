@@ -204,9 +204,7 @@ resource "aws_instance" "windows" {
 //  provisioner "local-exec" {
 //    command = "terraform output -raw kubeconfig > config"
 //  }
-//  provisioner "local-exec" {
-//   command = "terraform output -raw config_map_aws_auth > configmap.yml"
-//  }
+
 
 /*  provisioner "file" {
     source      = "config"
@@ -223,21 +221,6 @@ resource "aws_instance" "windows" {
     }
   }*/
 
- /* provisioner "file" {
-    source      = "configmap.yml"
-    destination = "C:/Temp/configmap.yml"
-
-    connection {
-      host     = self.public_ip
-      https    = false
-      insecure = true
-      timeout  = "5m"
-      type     = "winrm"
-      user     = "Administrator"
-      password = rsadecrypt(self.password_data, file(var.key_pair_filename))
-    }
-  }
-*/
   /*provisioner "file" {
     source      = "artifacts/azure_arc.ps1"
     destination = "C:/Temp/azure_arc.ps1"
@@ -269,6 +252,25 @@ provisioner "remote-exec" {
       password = rsadecrypt(self.password_data, file(var.key_pair_filename))
     }
   }
+
+/*provisioner "local-exec" {
+  command = "terraform output -raw config_map_aws_auth > configmap.yml"
+}
+
+provisioner "file" {
+    source      = "configmap.yml"
+    destination = "C:/Temp/configmap.yml"
+
+    connection {
+      host     = self.public_ip
+      https    = false
+      insecure = true
+      timeout  = "5m"
+      type     = "winrm"
+      user     = "Administrator"
+      password = rsadecrypt(self.password_data, file(var.key_pair_filename))
+    }
+}*/
 
 }
 
