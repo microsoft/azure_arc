@@ -162,6 +162,8 @@ Write-Host "Deploying Log Analytics Workspace"
 Write-Host "`n"
 az monitor log-analytics workspace create --resource-group $env:resourceGroup --workspace-name $Env:workspaceName
 
+Start-Sleep -Seconds 10
+
 # Deploying Azure Arc Data Controller
 Write-Host "`n"
 Write-Host "Deploying Azure Arc Data Controller"
