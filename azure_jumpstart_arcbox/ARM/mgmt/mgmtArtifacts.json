@@ -471,6 +471,7 @@
       "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
       "apiVersion": "2020-08-01",
       "name": "[concat(parameters('workspaceName'), '/' , 'Automation')]",
+      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[parameters('workspaceName')]",
