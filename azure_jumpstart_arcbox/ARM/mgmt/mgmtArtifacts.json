@@ -477,7 +477,7 @@
         "[variables('automationAccountName')]"
       ],
       "properties": {
-        "resourceId": "[resourceId('Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
+        "resourceId": "[resourceId(resourceGroup(), 'Microsoft.Automation/automationAccounts', variables('automationAccountName'))]"
       }
     },
     {
