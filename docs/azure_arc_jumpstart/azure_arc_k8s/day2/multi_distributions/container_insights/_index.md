@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to enable [Azure Monitor 
 
 In this scenario, you will hook the Azure Arc-enabled Kubernetes cluster to Azure Monitor Container Insights by deploying the [Azure Monitor cluster extension](https://docs.microsoft.com/azure/azure-monitor/containers/container-insights-enable-arc-enabled-clusters?toc=%2Fazure%2Fazure-arc%2Fkubernetes%2Ftoc.json#create-extension-instance-using-azure-cli) on your Kubernetes cluster in order to start collecting Kubernetes related logs and telemetry. Then the recommended alerts will be enabled by an [ARM template](https://docs.microsoft.com/es-es/azure/azure-resource-manager/templates/overview).
 
-  > **NOTE: This guide assumes you already deployed a Kubernetes cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion**
+  > **NOTE: This scenario assumes you already deployed a Kubernetes cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion**
 
 - **[Azure Kubernetes Service](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/)**
 - **[AKS on Azure Stack HCI](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_stack_hci/)**
