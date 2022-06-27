@@ -56,7 +56,7 @@
       "value": "Always"
     },
     "dockerImageTag": {
-      "value": "v1.7.0_2022-05-24"
+      "value": "v1.8.0_2022-06-14"
     },
     "dockerRegistry": {
       "value": "mcr.microsoft.com"
@@ -65,13 +65,13 @@
       "value": "arcdata"
     },
     "dataStorageClass": {
-      "value": "managed-premium"
+      "value": "gp2"
     },
     "dataStorageSize": {
       "value": "15Gi"
     },
     "logsStorageClass": {
-      "value": "managed-premium"
+      "value": "gp2"
     },
     "logsStorageSize": {
       "value": "10Gi"
