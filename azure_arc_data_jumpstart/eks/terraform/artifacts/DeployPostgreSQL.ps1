@@ -24,7 +24,7 @@ $coordinatorCoresLimit = "4"
 $coordinatorMemoryLimit = "8Gi"
 
 # Storage
-$StorageClassName = "managed-premium"
+$StorageClassName = "gp2"
 $dataStorageSize = "5Gi"
 $logsStorageSize = "5Gi"
 $backupsStorageSize = "5Gi"
