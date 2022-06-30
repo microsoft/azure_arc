@@ -15,7 +15,7 @@ weight: 3
 
 - New and refreshed Azure Arc-enabled Kubernetes scenarios
 - New Azure Arc-enabled data services scenarios
-- Updated Azure Arc-enabled servers scenario
+- Updated and refreshed Azure Arc-enabled servers scenarios
 - Updated Azure Arc-enabled SQL server scenario
 - [Bump Azure Arc Data Controller images to May 2022 release](https://github.com/microsoft/azure_arc/pull/1247)
 - Bug fixes
@@ -24,6 +24,8 @@ weight: 3
 
 - [Updated scenario: Monitoring, Alerting, and Visualization on Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_monitoring/)
 - [Updated scenario: Added Azure Bastion support for Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_winsrv/)
+- [Refreshed scenario: Deploy a GCP Ubuntu instance and connect it to Azure Arc using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)
+- [Deploy a GCP Windows instance and connect it to Azure Arc using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)
 - Added "Deploy to Azure" button to all Azure-Arc enabled servers scenarios
 
 ### Azure Arc-enabled VMware
