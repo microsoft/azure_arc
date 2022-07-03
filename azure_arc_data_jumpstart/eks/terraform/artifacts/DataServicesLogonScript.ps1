@@ -108,7 +108,7 @@ Start-Sleep -Seconds 10
 #Enable custom location feature
 Write-Host "`n"
 Write-Host "Enabling Custom Location feature on the connected cluster"
-az connectedk8s enable-features -n $connectedClusterName -g $Env:resourceGroup --custom-locations-oid "649cb28f-bc13-492a-9470-c8bf01fa8eeb" --features cluster-connect custom-locations
+az connectedk8s enable-features -n $connectedClusterName -g $Env:resourceGroup --custom-locations-oid $Env:customLocationObjectId --features cluster-connect custom-locations
 Write-Host "`n"
 
 start-sleep -seconds 20
