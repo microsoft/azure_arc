@@ -106,8 +106,8 @@ az connectedk8s connect --name $connectedClusterName `
 Start-Sleep -Seconds 10
 
 #Enable custom location feature
-az connectedk8s enable-features -n $connectedClusterName -g $Env:resourceGroup --custom-locations-oid "649cb28f-bc13-492a-9470-c8bf01fa8eeb" --features cluster-connect custom-locations
-start-sleep -seconds 20
+#az connectedk8s enable-features -n $connectedClusterName -g $Env:resourceGroup --custom-locations-oid "649cb28f-bc13-492a-9470-c8bf01fa8eeb" --features cluster-connect custom-locations
+#start-sleep -seconds 20
 
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
 Write-Host "`n"
