@@ -234,20 +234,26 @@ if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
     Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
     # Creating desktop url shortcuts for built-in Grafana and Kibana services 
-    $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
     $GrafanaURL = "https://"+$GrafanaURL+":3000"
     $Shell = New-Object -ComObject ("WScript.Shell")
     $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Grafana.url")
     $Favorite.TargetPath = $GrafanaURL;
     $Favorite.Save()
 
-    $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
     $KibanaURL = "https://"+$KibanaURL+":5601"
     $Shell = New-Object -ComObject ("WScript.Shell")
     $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
     $Favorite.TargetPath = $KibanaURL;
     $Favorite.Save()
 }
+
+# Deleting AWS Desktop shortcuts
+Write-Host "Deleting AWS Desktop shortcuts"
+Write-Host "`n"
+Remove-Item -Path "C:\Users\$env:adminUsername\Desktop\EC2 Microsoft Windows Guide.website" -Force
+Remove-Item -Path "C:\Users\$env:adminUsername\Desktop\EC2 Feedback.website" -Force
 
 # Changing to Client VM wallpaper
 $imgPath="$Env:TempDir\wallpaper.png"
