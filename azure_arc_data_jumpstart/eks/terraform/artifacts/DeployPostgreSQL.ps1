@@ -59,8 +59,8 @@ az deployment group create --resource-group $env:resourceGroup `
 
 Write-Host "`n"
 # Ensures Postgres container is initiated and ready to accept restores
-$pgControllerPodName = "jumpstartpsc0-0"
-$pgWorkerPodName = "jumpstartpsw0-0"
+$pgControllerPodName = "js-psc0-0"
+$pgWorkerPodName = "js-psw0-0"
 
 Write-Host "`n"
     Do {
@@ -77,7 +77,7 @@ Start-Sleep -Seconds 60
 
 # Update Service Port from 5432 to Non-Standard
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-pgsql\",\"port\":15432,\"targetPort\":5432}]}}'
-kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
+kubectl patch svc js-ps-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
@@ -95,7 +95,7 @@ Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
 $settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving PostgreSQL connection endpoint
-$pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
+$pgsqlstring = kubectl get postgresql js-ps -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
 # Replace placeholder values in settingsTemplate.json
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
