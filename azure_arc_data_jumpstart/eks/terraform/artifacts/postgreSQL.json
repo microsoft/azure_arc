@@ -85,7 +85,7 @@
     {
       "type": "Microsoft.AzureArcData/postgresInstances",
       "apiVersion": "[parameters('apiVersion')]",
-      "name": "js-ps",
+      "name": "jumpstartps",
       "location": "[parameters('location')]",
       "extendedLocation": {
         "type": "CustomLocation",
