@@ -59,8 +59,8 @@ az deployment group create --resource-group $env:resourceGroup `
 
 Write-Host "`n"
 # Ensures Postgres container is initiated and ready to accept restores
-$pgControllerPodName = "js-psc0-0"
-$pgWorkerPodName = "js-psw0-0"
+$pgControllerPodName = "jumpstartpsc0-0"
+$pgWorkerPodName = "jumpstartpsw0-0"
 
 Write-Host "`n"
     Do {
@@ -77,7 +77,7 @@ Start-Sleep -Seconds 60
 
 # Update Service Port from 5432 to Non-Standard
 $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-pgsql\",\"port\":15432,\"targetPort\":5432}]}}'
-kubectl patch svc js-ps-external-svc -n arc --type merge --patch $payload
+kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
 Start-Sleep -Seconds 60
 
 # Downloading demo database and restoring onto Postgres
@@ -92,20 +92,43 @@ kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -d adve
 # Creating Azure Data Studio settings for PostgreSQL connection
 Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
-$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
+$settingsTemplateFile = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving PostgreSQL connection endpoint
-$pgsqlstring = kubectl get postgresql js-ps -n arc -o=jsonpath='{.status.primaryEndpoint}'
+$pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
 # Replace placeholder values in settingsTemplate.json
-(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_port',$pgsqlstring.split(":")[1] | Set-Content -Path $settingsTemplate
-(Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
+$postgresHost = $pgsqlstring.split(":")[0]
+$postgresPort = $pgsqlstring.split(":")[1]
 
-
-# If SQL MI isn't being deployed, clean up settings file
-if ( $env:deploySQLMI -eq $false )
+$templateContent = @"
 {
-     $string = Get-Content -Path $settingsTemplate | Select-Object -First 9 -Last 24
-     $string | Set-Content -Path $settingsTemplate
+    "options": {
+      "connectionName": "ArcPostgres",
+      "host": "jumpstartps",
+      "authenticationType": "SqlLogin",
+      "dbname": "",
+      "user": "postgres",
+      "password": "$env:AZDATA_PASSWORD",
+      "hostaddr": "$postgresHost",
+      "port": "$postgresPort",
+      "connectTimeout": "15",
+      "applicationName": "azdata",
+      "sslmode": "prefer",
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "databaseDisplayName": ""
+    },
+    "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+    "providerName": "PGSQL",
+    "savePassword": true,
+    "id": "4b0e89a5-0376-492d-aa14-791667f51253"
 }
+"@
+
+Write-Host "Creating Azure Data Studio connections settings template file $settingsTemplateJson"
+
+$settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
+$settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
+ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
+
+Write-Host "Created Azure Data Studio connections settings template file."
