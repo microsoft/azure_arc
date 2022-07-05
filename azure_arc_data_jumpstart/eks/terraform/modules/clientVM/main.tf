@@ -91,6 +91,11 @@ variable "deployPostgreSQL" {
   description = "PostgreSQL deployment"
 }
 
+variable "customLocationObjectId" {
+  type   = string
+  description = "Custom Location object Id"
+}
+
 variable "clusterName" {
   type        = string
   description = "The name of the Kubernetes cluster resource."
@@ -195,6 +200,9 @@ resource "aws_instance" "windows" {
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.subnet1.id
   get_password_data           = "true"
+  tags = {
+    "Name" = "Arc-Data-Demo"
+  }
 
   user_data = file("artifacts/user_data.txt")
 
@@ -239,7 +247,7 @@ resource "aws_instance" "windows" {
 provisioner "remote-exec" {
     inline = [
       "powershell.exe -c Invoke-WebRequest -Uri '${var.templateBaseUrl}artifacts/Bootstrap.ps1' -OutFile C:/Temp/Bootstrap.ps1",
-      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername Administrator -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl} -awsAccessKeyId ${var.awsAccessKeyId} -awsSecretAccessKey ${var.awsSecretAccessKey} -awsDefaultRegion ${var.awsDefaultRegion}"
+      "powershell.exe -ExecutionPolicy Bypass -File C:/Temp/Bootstrap.ps1 -adminUsername Administrator -spnClientId ${var.spnClientId} -spnClientSecret ${var.spnClientSecret} -spnTenantId ${var.spnTenantId} -spnAuthority ${var.spnAuthority} -subscriptionId ${var.subscriptionId} -resourceGroup ${var.resourceGroup} -azdataUsername ${var.azdataUsername} -azdataPassword ${var.azdataPassword} -acceptEula ${var.acceptEula} -arcDcName ${var.arcDcName} -azureLocation ${var.azureLocation} -deploySQLMI ${var.deploySQLMI} -SQLMIHA ${var.SQLMIHA} -deployPostgreSQL  ${var.deployPostgreSQL } -customLocationObjectId ${var.customLocationObjectId} -workspaceName ${var.workspaceName} -templateBaseUrl ${var.templateBaseUrl} -awsAccessKeyId ${var.awsAccessKeyId} -awsSecretAccessKey ${var.awsSecretAccessKey} -awsDefaultRegion ${var.awsDefaultRegion}"
     ]
 
     connection {
@@ -273,7 +281,6 @@ provisioner "file" {
 }*/
 
 }
-
 
 output "password_decrypted" {
   value = rsadecrypt(aws_instance.windows.password_data, file(var.key_pair_filename))
