@@ -85,7 +85,10 @@ variable "deployPostgreSQL" {
   default = false
   description = "PostgreSQL deployment"
 }
-
+variable "customLocationObjectId" {
+  type   = string
+  description = "Custom Location object Id"
+}
 variable "clusterName" {
   type        = string
   default = "Arc-Data-EKS"
@@ -107,13 +110,13 @@ variable "windows_instance_types" {
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
-  default     = "sebassem"
+  default     = "microsoft"
 }
 
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "jumpstart_DataSvc_EKS_Refactoring"
+  default     = "main"
 }
 
 data "http" "workstation_ip" {
@@ -211,6 +214,7 @@ module "client_VM"{
   deploySQLMI = var.deploySQLMI
   SQLMIHA = var.SQLMIHA
   deployPostgreSQL = var.deployPostgreSQL
+  customLocationObjectId = var.customLocationObjectId
   templateBaseUrl = local.template_base_url
   awsDefaultRegion = var.AWS_DEFAULT_REGION
   awsAccessKeyId = var.AWS_ACCESS_KEY_ID
@@ -221,3 +225,6 @@ depends_on = [module.eks_workers]
 
 }
 
+output "client_vm_password_decrypted" {
+  value = module.client_VM.password_decrypted
+}
