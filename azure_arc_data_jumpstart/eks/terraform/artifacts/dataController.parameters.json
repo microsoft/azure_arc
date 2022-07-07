@@ -68,13 +68,13 @@
       "value": "gp2"
     },
     "dataStorageSize": {
-      "value": "15Gi"
+      "value": "5Gi"
     },
     "logsStorageClass": {
       "value": "gp2"
     },
     "logsStorageSize": {
-      "value": "10Gi"
+      "value": "5Gi"
     },
     "serviceType": {
       "value": "LoadBalancer"
