@@ -77,7 +77,6 @@ az -v
 Write-Host "Getting EKS cluster token"
 Write-Host "`n"
 aws eks update-kubeconfig --region $env:AWS_DEFAULT_REGION --name $connectedClusterName
-#kubectl apply -f "C:\Temp\configmap.yml"
 Write-Host "`n"
 
 Write-Host "Checking kubernetes nodes"
