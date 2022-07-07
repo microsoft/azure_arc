@@ -152,7 +152,7 @@ $CentOSVmIp = Get-VM -Name ArcBox-CentOS | Select-Object -ExpandProperty Network
 $requiredActions = @('*', 'Microsoft.Authorization/roleAssignments/write', 'Microsoft.Authorization/*', 'Microsoft.Authorization/*/write')
 
 $roleDefinitions = az role definition list --out json | ConvertFrom-Json
-$spnObjectId = az ad sp show --id $Env:spnClientID --query objectId -o tsv
+$spnObjectId = az ad sp show --id $Env:spnClientID --query id -o tsv
 $rolePermissions = az role assignment list --include-inherited --include-groups --scope "/subscriptions/${env:subscriptionId}/resourceGroups/${env:resourceGroup}" | ConvertFrom-Json
 $authorizedRoles = $roleDefinitions | ForEach-Object { $_ | Where-Object { (Compare-Object -ReferenceObject $requiredActions -DifferenceObject @($_.permissions.actions | Select-Object) -ExcludeDifferent -IncludeEqual) -and -not (Compare-Object -ReferenceObject $requiredActions -DifferenceObject @($_.permissions.notactions | Select-Object) -ExcludeDifferent -IncludeEqual) } } | Select-Object -ExpandProperty roleName
 $hasPermission = $rolePermissions | Where-Object {($_.principalId -eq $spnObjectId) -and ($_.roleDefinitionName -in $authorizedRoles)}
