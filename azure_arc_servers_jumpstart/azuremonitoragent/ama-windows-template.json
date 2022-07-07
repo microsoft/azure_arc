@@ -27,20 +27,20 @@
         "vmName": {
             "type": "string",
             "metadata": {
-                "description": "Azure Arc-enabled server where the AMA extension will be installed."
+                "description": "Windows Azure Arc-enabled server where the AMA extension will be installed."
             }
         },
         "dcrName": {
             "type": "string",
             "minLength": 1,
-            "defaultValue": "dcr-jumpstart",
+            "defaultValue": "dcr-windows-jumpstart",
             "metadata": {
                 "description": "Name of the data collection rule"
             }
         },
         "associationName": {
             "type": "string",
-            "defaultValue": "my-windows-vm-my-dcr",
+            "defaultValue": "my-windows-jumpstart-dcr",
             "metadata": {
                 "description": "The name of the association."
             }
@@ -143,19 +143,19 @@
                                 "\\Network Interface(*)\\Packets Outbound Errors",
                                 "\\Network Interface(*)\\Packets Received Errors"
                             ],
-                            "name": "perfCounterDataSource10"
+                            "name": "windowsPerfLogsDataSource"
                         }
                     ],
                     "windowsEventLogs": [
                         {
-                            "name": "windowsEventLogsDataSource",
                             "streams": [
                                 "Microsoft-Event"
                             ],
                             "xPathQueries": [
                                 "Application!*",
                                 "System!*[System[EventID=7036]]"
-                            ]
+                            ],
+                            "name": "windowsEventLogsDataSource"
                         }
                     ]
                 },
