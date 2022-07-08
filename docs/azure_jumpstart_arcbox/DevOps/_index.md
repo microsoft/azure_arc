@@ -894,3 +894,7 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
   ![Screenshot showing az login error](./az_login_error.png)
 
 If you are still having issues deploying ArcBox, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on GitHub and include a detailed description of your issue, the Azure region you are deploying to, the flavor of ArcBox you are trying to deploy. Inside the _C:\ArcBox\Logs_ folder you can also find instructions for uploading your logs to an Azure storage account for review by the Jumpstart team.
+
+### Known issues
+
+- Microsoft Defender is not enabled for _ArcBox-CAPI-Data_ connected cluster.
