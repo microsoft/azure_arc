@@ -256,7 +256,7 @@ echo ""
 # sleep 5
 # sudo -u $adminUsername kubectl get pods -A
 
-curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh
+curl -o install-driver.sh https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v1.19.0/deploy/install-driver.sh 
 sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply /g' install-driver.sh
 ./install-driver.sh "$adminUsername"
 sleep 5
