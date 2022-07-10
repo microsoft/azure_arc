@@ -258,17 +258,6 @@ echo ""
 
 curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v1.19.0/deploy/install-driver.sh -o install-driver.sh
 sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply/g' install-driver.sh
-# sudo chmod +x ./install-driver.sh
-# sudo -u $adminUsername ./install-driver.sh "$adminUsername"
-source ./install-driver.sh v1.19.0 snapshot --
-sleep 5
-sudo -u $adminUsername kubectl get pods -A
-
-echo ""
-echo ""
-curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v1.19.0/deploy/install-driver.sh -o install-driver.sh
-sed -i '2 i sudo -- -sh -c <<EOF' install-driver.sh
-sed -i -e '$aEOF' install-driver.sh
 source ./install-driver.sh v1.19.0 snapshot --
 sleep 5
 sudo -u $adminUsername kubectl get pods -A
