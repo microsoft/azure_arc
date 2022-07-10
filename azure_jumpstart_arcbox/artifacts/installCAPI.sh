@@ -239,11 +239,28 @@ sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluste
 echo ""
 # sudo -u $adminUsername curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
 echo ""
-curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
-sudo -u $adminUsername kubectl get pods -A
-echo ""
-# sudo curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
+# curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
+# sudo -u $adminUsername kubectl get pods -A
 
+
+# echo ""
+# curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo -u $adminUsername bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
+# sleep 5
+# sudo -u $adminUsername kubectl get pods -A
+# echo ""
+# curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo -u $adminUsername bash v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
+# sleep 5
+# sudo -u $adminUsername kubectl get pods -A
+# echo ""
+# curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo bash v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
+# sleep 5
+# sudo -u $adminUsername kubectl get pods -A
+
+curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh
+sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply /g' install-driver.sh
+./install-driver.sh "$adminUsername"
+sleep 5
+sudo -u $adminUsername kubectl get pods -A
 
 # Copying workload CAPI kubeconfig file to staging storage account
 echo ""
