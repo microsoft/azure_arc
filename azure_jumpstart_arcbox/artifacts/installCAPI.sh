@@ -262,11 +262,11 @@ sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply /g' install-drive
 sleep 5
 sudo -u $adminUsername kubectl get pods -A
 
-curl -o install-driver.sh https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh 
-sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply /g' install-driver.sh
-source ./install-driver.sh
-sleep 5
-sudo -u $adminUsername kubectl get pods -A
+# curl -o install-driver.sh https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh 
+# sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply /g' install-driver.sh
+# source ./install-driver.sh
+# sleep 5
+# sudo -u $adminUsername kubectl get pods -A
 
 # Copying workload CAPI kubeconfig file to staging storage account
 echo ""
