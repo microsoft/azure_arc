@@ -75,8 +75,9 @@ sudo snap install kustomize
 export CLUSTERCTL_VERSION="1.1.5" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
-export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export KUBERNETES_VERSION="1.24.2" # Do not change!
+export AZURE_DISK_CSI_DRIVER_VERSION="1.19.0"
+export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
@@ -213,7 +214,7 @@ sudo service sshd restart
 
 # Creating Storage Class with azure-managed-disk for the CAPI cluster
 echo ""
-sudo -u $adminUsername kubectl apply -f https://raw.githubusercontent.com/likamrat/azure_arc/capi_updates/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml
+sudo -u $adminUsername kubectl apply -f ${templateBaseUrl}artifacts/capiStorageClass.yaml
 
 # Renaming CAPI cluster context name 
 echo ""
@@ -226,18 +227,17 @@ sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --
 
 # Enabling Azure Policy for Kubernetes on the cluster
 echo ""
-# sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights
+sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights
 
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
 echo ""
-# sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 echo ""
 sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
-
-#Testing CSI Driver
-curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v1.19.0/deploy/install-driver.sh | bash -s v1.19.0 snapshot --
-
+# Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
+echo ""
+sudo curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
 
 # Copying workload CAPI kubeconfig file to staging storage account
 echo ""
