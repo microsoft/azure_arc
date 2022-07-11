@@ -127,7 +127,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: location
   tags: resourceTags
@@ -171,7 +171,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
   }
 }
 
-resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
+resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
   parent: vm
   name: 'Bootstrap'
   location: location

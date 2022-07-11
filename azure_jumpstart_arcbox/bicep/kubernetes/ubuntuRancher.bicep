@@ -89,7 +89,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if(d
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
+resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: vmName
   location: azureLocation
   tags: resourceTags
@@ -138,7 +138,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
   }
 }
 
-resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2021-07-01' = {
+resource vmInstallscriptK3s 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
   parent: vm
   name: 'installscript_k3s'
   location: azureLocation
