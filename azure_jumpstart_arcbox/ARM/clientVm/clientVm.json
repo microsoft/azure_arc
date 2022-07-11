@@ -253,7 +253,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[if(equals(parameters('flavor'),'DevOps'),'Standard_B4ms','Standard_B16ms')]"
+                    "vmSize": "[if(equals(parameters('flavor'),'DevOps'),'Standard_B4ms','Standard_D16s_v4')]"
                 },
                 "storageProfile": {
                     "osDisk": {
