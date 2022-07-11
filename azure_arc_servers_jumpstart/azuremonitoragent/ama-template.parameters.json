@@ -6,10 +6,10 @@
             "value": "la-ama-jumpstart" // Name for your Log Analytics workspace
         },
         "vmName": {
-          "value": "Arc-Linux-Demo" // Name of your Linux Azure Arc-enabled Server
+          "value": "Arc-Linux-Demo" // Name of your Azure Arc-enabled Server
         },
         "location": {
-          "value": "westeurope" // Region of your Linux Azure Arc-enabled Server
+          "value": "westeurope" // Region of your Azure Arc-enabled Server
         }
     }
   }
