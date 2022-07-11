@@ -90,7 +90,7 @@ export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_B4ms"
 if [ $flavor = "DevOps" ]; then
   export AZURE_NODE_MACHINE_TYPE="Standard_B4ms"
 else
-  export AZURE_NODE_MACHINE_TYPE="Standard_D8s_v4"
+  export AZURE_NODE_MACHINE_TYPE="Standard_B8ms"
 fi
 
 # Base64 encode the variables - Do not change!
