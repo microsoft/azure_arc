@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "workspaceName": {
-            "value": "la-ama-jumpstart" // Name for your Log Analytics workspace
+            "value": "<name of your Log Analytics workspace>" // Name for your Log Analytics workspace
         },
         "vmName": {
-          "value": "Arc-Linux-Demo" // Name of your Azure Arc-enabled Server
+          "value": "<name of your Azure Arc-enabled Server>" // Name of your Azure Arc-enabled Server
         },
         "location": {
-          "value": "westeurope" // Region of your Azure Arc-enabled Server
+          "value": "<region of your Azure Arc-enabled Server>" // Region of your Azure Arc-enabled Server
         }
     }
   }
