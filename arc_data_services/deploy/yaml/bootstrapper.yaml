@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: arc-bootstrap-job
+  name: arc-bootstrapper-job
 spec:
   template:
     spec:
@@ -25,4 +25,5 @@ spec:
       - name: arc-private-registry
       restartPolicy: Never
       serviceAccountName: sa-arcdata-deployer
+      ttlSecondsAfterFinished: 86400 #24 hours
   backoffLimit: 0
