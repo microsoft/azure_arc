@@ -13,6 +13,19 @@ rules:
   - get
   - list
 - apiGroups:
+  - ""
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
   - arcdata.microsoft.com
   resources:
   - datacontrollers
