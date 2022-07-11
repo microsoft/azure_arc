@@ -78,7 +78,7 @@ export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
 export KUBERNETES_VERSION="1.24.2" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.19.0"
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export CONTROL_PLANE_MACHINE_COUNT="3"
+export CONTROL_PLANE_MACHINE_COUNT="1"
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
 export CLUSTER_NAME=$(echo "${capiArcDataClusterName,,}") # Converting to lowercase case variable > # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
@@ -237,32 +237,9 @@ sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluste
 
 # Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
 echo ""
-# sudo -u $adminUsername curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
-echo ""
-# curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
-# sudo -u $adminUsername kubectl get pods -A
-
-
-# echo ""
-# curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo -u $adminUsername bash -s v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
-# sleep 5
-# sudo -u $adminUsername kubectl get pods -A
-# echo ""
-# curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo -u $adminUsername bash v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
-# sleep 5
-# sudo -u $adminUsername kubectl get pods -A
-# echo ""
-# curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh | sudo bash v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
-# sleep 5
-# sudo -u $adminUsername kubectl get pods -A
-
-curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v1.19.0/deploy/install-driver.sh -o install-driver.sh
+curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh -o install-driver.sh
 sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply/g' install-driver.sh
-source ./install-driver.sh v1.19.0 snapshot --
-sleep 5
-sudo -u $adminUsername kubectl get pods -A
-
-
+source ./install-driver.sh v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
 
 # Copying workload CAPI kubeconfig file to staging storage account
 echo ""
