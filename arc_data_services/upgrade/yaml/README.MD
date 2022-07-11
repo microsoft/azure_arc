@@ -15,6 +15,9 @@ This yaml file defines a service account named `sa-arcdata-deployer` and related
    kubectl apply -n arc -f ../../arcdata-deployer.yaml
    ```
 
+1. [Optional: Configure Upgrader User Account](./arcdata-upgrader.yaml)
+This yaml file configures the permissions needed for a user account to upgrade the bootstrapper and data controller. Replace the placeholder `{{UPGRADER_USERNAME}}` in the file before applying. The following steps can also be run by a low-privilege upgrader user account.
+
 1. [Bootstrapper Upgrade Job](./bootstrapper-upgrade-job.yaml)
 This yaml file creates a job for upgrading the bootstrapper and related Kubernetes objects.
 
