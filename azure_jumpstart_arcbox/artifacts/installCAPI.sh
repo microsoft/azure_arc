@@ -78,7 +78,7 @@ export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
 export KUBERNETES_VERSION="1.24.2" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.19.0"
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export CONTROL_PLANE_MACHINE_COUNT="3"
+export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
 export CLUSTER_NAME=$(echo "${capiArcDataClusterName,,}") # Converting to lowercase case variable > # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
@@ -88,7 +88,7 @@ export AZURE_CLIENT_ID=$SPN_CLIENT_ID
 export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_B4ms"
 if [ $flavor = "DevOps" ]; then
-  export AZURE_NODE_MACHINE_TYPE="Standard_D2s_v4"
+  export AZURE_NODE_MACHINE_TYPE="Standard_B2ms"
 else
   export AZURE_NODE_MACHINE_TYPE="Standard_D8s_v4"
 fi
