@@ -14,7 +14,7 @@ resource "azurerm_subnet" "arck3sdemo" {
   name                 = var.azure_vnet_subnet
   resource_group_name  = azurerm_resource_group.arck3sdemo.name
   virtual_network_name = azurerm_virtual_network.arck3sdemo.name
-  address_prefix       = var.azure_subnet_address_prefix
+  address_prefixes       = [var.azure_subnet_address_prefix[0]]
 }
 
 resource "azurerm_public_ip" "arck3sdemo" {
