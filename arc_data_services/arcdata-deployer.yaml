@@ -1,0 +1,300 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: arcdata-deployer-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - delete
+- apiGroups:
+  - ""
+  resourceNames:
+  - sa-arc-webhook-job
+  - sa-arc-bootstrapper
+  resources:
+  - serviceaccounts
+  verbs:
+  - delete
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - delete
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  - rolebindings
+  verbs:
+  - delete
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - get
+  - list
+  - delete
+- apiGroups:
+  - arcdata.microsoft.com
+  resources:
+  - datacontrollers
+  verbs:
+  - delete
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bootstrapper-grantor-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - persistentvolumeclaims
+  - secrets
+  verbs:
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - events
+  - persistentvolumeclaims
+  - secrets
+  - serviceaccounts
+  - services
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  - rolebindings
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - sql.arcdata.microsoft.com
+  - tasks.sql.arcdata.microsoft.com
+  - tasks.arcdata.microsoft.com
+  - arcdata.microsoft.com
+  resources:
+  - "*"
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - patch
+  - update
+- apiGroups:
+  - clusterconfig.azure.com
+  resources:
+  - azureclusteridentityrequests
+  verbs:
+  - create
+  - delete
+  - get
+- apiGroups:
+  - clusterconfig.azure.com
+  resources:
+  - azureclusteridentityrequests/status
+  verbs:
+  - patch
+  - update
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{NAMESPACE}}:cr-deployer
+rules:
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - create
+  - list
+  - get
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resourceNames:
+  - activedirectoryconnectors.arcdata.microsoft.com
+  - datacontrollers.arcdata.microsoft.com
+  - exporttasks.tasks.arcdata.microsoft.com
+  - failovergroups.sql.arcdata.microsoft.com
+  - kafkas.arcdata.microsoft.com
+  - monitors.arcdata.microsoft.com
+  - postgresqls.arcdata.microsoft.com
+  - sqlmanagedinstancerestoretasks.tasks.sql.arcdata.microsoft.com
+  - sqlmanagedinstances.sql.arcdata.microsoft.com
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - update
+  - patch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - create
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - mutatingwebhookconfigurations
+  verbs:
+  - delete
+  - get
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  verbs:
+  - create
+  - patch
+  - get
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterroles
+  verbs:
+  - delete
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  verbs:
+  - create
+  - patch
+  - get
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - clusterrolebindings
+  verbs:
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - create
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/stats
+  - nodes/proxy
+  - pods
+  verbs:
+  - list
+  - get
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sa-arcdata-deployer
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{NAMESPACE}}:crb-deployer
+subjects:
+- kind: ServiceAccount
+  name: sa-arcdata-deployer
+  namespace: {{NAMESPACE}}
+roleRef:
+  kind: ClusterRole
+  name: {{NAMESPACE}}:cr-deployer
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bootstrapper-grantor-role-binding
+subjects:
+- kind: ServiceAccount
+  name: sa-arcdata-deployer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: bootstrapper-grantor-role
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: arcdata-deployer-role-binding
+subjects:
+- kind: ServiceAccount
+  name: sa-arcdata-deployer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: arcdata-deployer-role
