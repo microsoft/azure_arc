@@ -88,7 +88,7 @@ export AZURE_CLIENT_ID=$SPN_CLIENT_ID
 export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
 export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_B4ms"
 if [ $flavor = "DevOps" ]; then
-  export AZURE_NODE_MACHINE_TYPE="Standard_B4ms"
+  export AZURE_NODE_MACHINE_TYPE="Standard_B2ms"
 else
   export AZURE_NODE_MACHINE_TYPE="Standard_B8ms"
 fi
