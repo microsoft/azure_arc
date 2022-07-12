@@ -17,5 +17,4 @@ spec:
         args: ["-image", "mcr.microsoft.com/arcdata/arc-bootstrapper:v1.9.0_2022-07-12", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
       restartPolicy: Never
       serviceAccountName: sa-arcdata-deployer
-  ttlSecondsAfterFinished: 86400 #24 hours
   backoffLimit: 0
