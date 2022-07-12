@@ -1,0 +1,49 @@
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: arcdata-upgrader-role
+rules:
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - pods/log
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - arcdata.microsoft.com
+  resources:
+  - datacontrollers
+  verbs:
+  - patch
+  - get
+  - list
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: arcdata-upgrader-role-binding
+subjects:
+- kind: User
+  name: {{UPGRADER_USERNAME}}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: arcdata-upgrader-role
