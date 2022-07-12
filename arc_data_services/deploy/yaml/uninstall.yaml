@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: arc-bootstrapper-job
+  name: arc-uninstall-job
 spec:
   template:
     spec:
@@ -10,20 +10,12 @@ spec:
       containers:
       - name: bootstrapper
         image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.9.0_2022-07-12
-        imagePullPolicy: Always
-        args:
-        - -image
-        - mcr.microsoft.com/arcdata/arc-bootstrapper:v1.9.0_2022-07-12
-        - -policy
-        - Always
-        - -chart
-        - /opt/helm/arcdataservices
-        - -bootstrap
-        command:
-        - /opt/bootstrapper/bin/bootstrapper
+        imagePullPolicy: IfNotPresent
+        args: ["-uninstall"]
+        command: ["/opt/bootstrapper/bin/bootstrapper"]
       imagePullSecrets:
       - name: arc-private-registry
       restartPolicy: Never
-      serviceAccountName: sa-arcdata-deployer
+      serviceAccountName: sa-arcdata-deployer #optional
       ttlSecondsAfterFinished: 86400 #24 hours
   backoffLimit: 0
