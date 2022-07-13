@@ -340,5 +340,5 @@ spec:
       imagePullSecrets:
       - name: arc-private-registry
       restartPolicy: Never
-      ttlSecondsAfterFinished: 86400 #24 hours
+  ttlSecondsAfterFinished: 86400 #24 hours
   backoffLimit: 0
