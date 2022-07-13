@@ -17,7 +17,7 @@ variable "capi_arc_data_cluster_name" {
 variable "vm_size" {
   type        = string
   description = "The size of the capi virtual machine"
-  default     = "Standard_D4s_v4"
+  default     = "Standard_B4ms"
 }
 
 variable "os_sku" {
