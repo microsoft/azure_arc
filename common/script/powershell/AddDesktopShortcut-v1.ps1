@@ -16,7 +16,9 @@ function Add-Desktop-Shortcut {
         [string] $username
     )
     #If WindowStyle is 1, then the application window will be set to its default location and size. If this property has a value of 3, the application will be launched in a maximized window, and if it has a value of 7, it will be launched in a minimized window.
-    Write-Output "Creating $shortcutName Icon on Desktop"
+    Write-Output "`n"
+    Write-Output "Creating $shortcutName Desktop shortcut"
+    Write-Output "`n"
     if ( -not $username) {
         $shortcutLocation = "$Env:Public\Desktop\$shortcutName.lnk"
     }
