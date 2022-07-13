@@ -17,5 +17,5 @@ spec:
       - name: arc-private-registry
       restartPolicy: Never
       serviceAccountName: sa-arcdata-deployer #optional
-      ttlSecondsAfterFinished: 86400 #24 hours
+  ttlSecondsAfterFinished: 86400 #24 hours
   backoffLimit: 0
