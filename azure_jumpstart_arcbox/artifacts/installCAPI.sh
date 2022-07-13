@@ -72,12 +72,13 @@ sudo snap install kubectl --classic
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export CLUSTERCTL_VERSION="1.1.3" # Do not change!
+export CLUSTERCTL_VERSION="1.1.5" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.2.1" # Do not change!
+export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
+export KUBERNETES_VERSION="1.24.2" # Do not change!
+export AZURE_DISK_CSI_DRIVER_VERSION="1.19.0"
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-export KUBERNETES_VERSION="1.22.8" # Do not change!
-export CONTROL_PLANE_MACHINE_COUNT="1"
+export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
 export CLUSTER_NAME=$(echo "${capiArcDataClusterName,,}") # Converting to lowercase case variable > # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
@@ -85,11 +86,11 @@ export AZURE_SUBSCRIPTION_ID=$subscriptionId
 export AZURE_TENANT_ID=$SPN_TENANT_ID
 export AZURE_CLIENT_ID=$SPN_CLIENT_ID
 export AZURE_CLIENT_SECRET=$SPN_CLIENT_SECRET
-export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_D4s_v4"
+export AZURE_CONTROL_PLANE_MACHINE_TYPE="Standard_B4ms"
 if [ $flavor = "DevOps" ]; then
-  export AZURE_NODE_MACHINE_TYPE="Standard_D2s_v4"
+  export AZURE_NODE_MACHINE_TYPE="Standard_B2ms"
 else
-  export AZURE_NODE_MACHINE_TYPE="Standard_D8s_v4"
+  export AZURE_NODE_MACHINE_TYPE="Standard_B8ms"
 fi
 
 # Base64 encode the variables - Do not change!
@@ -213,7 +214,7 @@ sudo service sshd restart
 
 # Creating Storage Class with azure-managed-disk for the CAPI cluster
 echo ""
-sudo -u $adminUsername kubectl apply -f https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_jumpstart_arcbox/artifacts/capiStorageClass.yaml
+sudo -u $adminUsername kubectl apply -f ${templateBaseUrl}artifacts/capiStorageClass.yaml
 
 # Renaming CAPI cluster context name 
 echo ""
@@ -224,15 +225,21 @@ echo ""
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $AZURE_RESOURCE_GROUP --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
 sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_arcbox'
 
-# Enabling Azure Policy for Kubernetes on the cluster
+# Enabling Microsoft Defender for Containers and Container Insights cluster extensions
 echo ""
-sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights 
-
-# Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 echo ""
 sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+
+# Enabling Azure Policy for Kubernetes on the cluster
 echo ""
-#sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights
+
+# Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
+echo ""
+curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh -o install-driver.sh
+sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply/g' install-driver.sh
+source ./install-driver.sh v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
 
 # Copying workload CAPI kubeconfig file to staging storage account
 echo ""
