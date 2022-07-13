@@ -7,7 +7,7 @@ weight: 1
 
 ## Azure Arc Jumpstart
 
-The Azure Arc Jumpstart project is designed to provide a "zero to hero" experience so you can start working with Azure Arc right away!
+The Azure Arc Jumpstart is designed to provide a "zero to hero" experience so you can start working with Azure Arc right away!
 
 The Jumpstart provides step-by-step guides for independent Azure Arc scenarios that incorporate as much automation as possible, detailed screenshots and code samples, and a rich and comprehensive experience while getting started with the Azure Arc platform.
 

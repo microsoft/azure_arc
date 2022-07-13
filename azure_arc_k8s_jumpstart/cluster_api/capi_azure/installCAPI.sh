@@ -15,11 +15,12 @@ echo ""
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
-  export CLUSTERCTL_VERSION="1.1.3" # Do not change!
+  export CLUSTERCTL_VERSION="1.1.5" # Do not change!
   export CAPI_PROVIDER="azure" # Do not change!
-  export CAPI_PROVIDER_VERSION="1.2.1" # Do not change!
+  export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
+  export KUBERNETES_VERSION="1.24.2" # Do not change!
+  export AZURE_DISK_CSI_DRIVER_VERSION="1.19.0"
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-  export KUBERNETES_VERSION="1.22.8" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
   export WORKER_MACHINE_COUNT="<Workers node count>"
   export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
@@ -307,6 +308,12 @@ EOF
   echo ""
   az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --kube-config $CLUSTER_NAME.kubeconfig
   echo ""
+
+  # Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
+  echo ""
+  curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh -o install-driver.sh
+  sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply/g' install-driver.sh
+  source ./install-driver.sh v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
 
 } 2>&1 | tee -a $LOG_FILE # Send terminal output to log file
 

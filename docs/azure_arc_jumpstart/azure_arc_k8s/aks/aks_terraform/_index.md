@@ -61,9 +61,26 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
+## Automation Flow
+
+For you to get familiar with the automation and deployment flow, below is an explanation.
+
+1. User edits the tfvars to match the environment.
+2. User runs ```terraform init``` to download the required terraform providers.
+3. User is uploading the script to Azure Cloud Shell and running the shell script. The script will:
+
+    - Connect to Azure using SPN credentials.
+    - Get AKS credentials.
+    - Install Azure Arc CLI extensions.
+    - Connecting the cluster to Azure Arc.
+
+4. User verifies the Arc-enabled Kubernetes cluster.
+
 ## Deployment
 
-The only thing you need to do before executing the Terraform plan is to export the environment variables which will be used by the plan. This is based on the Azure service principal you've just created and your subscription.  
+The only thing you need to do before executing the Terraform plan is to create the tfvars file which will be used by the plan. This is based on the Azure service principal you've just created and your subscription.
+
+- Navigate to the [terraform folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/aks/terraform) and fill in the terraform.tfvars file with the values for your environment.
 
 In addition, validate that the AKS Kubernetes version is available in your region using the below Azure CLI command.
 
@@ -73,20 +90,7 @@ az aks get-versions -l "<Your Azure Region>"
 
 In case the AKS service is not available in your region, you can change the AKS Kubernetes version in the [*variables.tf*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/terraform/variables.tf) file by searching for *kubernetes_version*.
 
-- Export the environment variables needed for the Terraform plan.
-
-    ```shell
-    export TF_VAR_client_id=<Your Azure service principal App ID>
-    export TF_VAR_client_secret=<Your Azure service principal App Password>
-    ```
-
-    > **NOTE: If you are running in a PowerShell environment, to set the Terraform environment variables, use the _Set-Item -Path env:_ prefix (see example below)**
-
-    ```powershell
-    Set-Item -Path env:TF_VAR_client_id
-    ```
-
-- Navigate to the [terraform folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/aks/terraform) and run the *`terraform init`* command which will download the Terraform AzureRM provider.
+- Run the ```terraform init``` command which will download the required terraform providers.
 
     ![Screenshot showing terraform init being run](./01.png)
 
@@ -99,18 +103,6 @@ In case the AKS service is not available in your region, you can change the AKS 
     ![Screenshot showing Azure portal with AKS resource](./03.png)
 
     ![Screenshot showing Azure portal with AKS resource](./04.png)
-
-## Automation Flow
-
-For you to get familiar with the automation and deployment flow, below is an explanation.
-
-- User is editing the environment variables in the Shell script file (1-time edit) which then be used throughout the deployment.
-- User is uploading the script to Azure Cloud Shell and running the shell script. The script will:
-  - Connect to Azure using SPN credentials.
-  - Get AKS credentials.
-  - Install Azure Arc CLI extensions.
-  - Connecting the cluster to Azure Arc.
-- User is verifying the Arc-enabled Kubernetes cluster.
 
 ## Connecting to Azure Arc
 
