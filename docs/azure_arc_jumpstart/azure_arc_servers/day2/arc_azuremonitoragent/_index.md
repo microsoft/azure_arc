@@ -72,7 +72,7 @@ The steps below will help you get familiar with the automation and deployment fl
 
 - To match your configuration you will need to provide:
 
-  - The **subscription**, **resource group**, **Computer name** and **location** where you where you registered the Azure Arc-enabled server:
+  - The **subscription**, **resource group**, **Computer name** and **location** where you registered the Azure Arc-enabled server:
 
     ![Screenshot Azure Arc-enabled server location](./08.png)
 
