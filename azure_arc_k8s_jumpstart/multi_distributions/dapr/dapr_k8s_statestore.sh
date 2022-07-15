@@ -30,6 +30,7 @@ fi
 echo ""
 
 echo "Deploying Azure Cache for Redis"
+az group create --location $location --name $resourceGroup
 az redis create --location $location --name $redisName --resource-group $resourceGroup --sku $redisSKU --vm-size $redisVMSize
 
 echo "Installing Dapr extension"
