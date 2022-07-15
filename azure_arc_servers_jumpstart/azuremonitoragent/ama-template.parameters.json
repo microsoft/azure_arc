@@ -1,0 +1,15 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName": {
+            "value": "<name of your Log Analytics workspace>" // Name for your Log Analytics workspace
+        },
+        "vmName": {
+          "value": "<name of your Azure Arc-enabled Server>" // Name of your Azure Arc-enabled Server
+        },
+        "location": {
+          "value": "<region of your Azure Arc-enabled Server>" // Region of your Azure Arc-enabled Server
+        }
+    }
+  }
