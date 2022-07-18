@@ -41,7 +41,7 @@
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_D4s_v4",
+            "defaultValue": "Standard_B4ms",
             "metadata": {
                 "description": "The size of the VM"
             }
@@ -162,7 +162,7 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2021-07-01",
+            "apiVersion": "2022-03-01",
             "name": "[variables('vmName')]",
             "location": "[parameters('azureLocation')]",
             "tags": "[parameters('resourceTags')]",
@@ -216,7 +216,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/installscript_k3s')]",
-            "apiVersion": "2021-07-01",
+            "apiVersion": "2022-03-01",
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
