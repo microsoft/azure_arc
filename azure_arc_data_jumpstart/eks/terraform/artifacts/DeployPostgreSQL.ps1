@@ -1,9 +1,11 @@
-Start-Transcript -Path C:\Temp\deployPostgreSQL.log
+Start-Transcript -Path C:\Temp\DeployPostgreSQL.log
 
 # Deployment environment variables
+$Env:TempDir = "C:\Temp"
 $controllerName = "jumpstart-dc"
 
-# Deploying Azure Arc SQL Managed Instance
+# Deploying Azure Arc PostgreSQL
+Write-Host "`n"
 Write-Host "Deploying Azure Arc PostgreSQL"
 Write-Host "`n"
 
@@ -31,7 +33,7 @@ $backupsStorageSize = "5Gi"
 $numWorkers = 1
 ################################################
 
-$PSQLParams = "C:\Temp\postgreSQL.parameters.json"
+$PSQLParams = "$Env:TempDir\postgreSQL.parameters.json"
 
 (Get-Content -Path $PSQLParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $PSQLParams
 (Get-Content -Path $PSQLParams) -replace 'dataControllerId-stage',$dataControllerId | Set-Content -Path $PSQLParams
@@ -52,58 +54,55 @@ $PSQLParams = "C:\Temp\postgreSQL.parameters.json"
 (Get-Content -Path $PSQLParams) -replace 'numWorkersStage',$numWorkers | Set-Content -Path $PSQLParams
 
 az deployment group create --resource-group $env:resourceGroup `
-                           --template-file "C:\Temp\postgreSQL.json" `
-                           --parameters "C:\Temp\postgreSQL.parameters.json" `
-                           --no-wait
-Write-Host "`n"
+                           --template-file "$Env:TempDir\postgreSQL.json" `
+                           --parameters "$Env:TempDir\postgreSQL.parameters.json"
 
-# Ensures postgres container is initiated and ready to accept restores
-$pgCoordinatorPodName = "jumpstartpsc0-0"
+Write-Host "`n"
+# Ensures Postgres container is initiated and ready to accept restores
+$pgControllerPodName = "jumpstartpsc0-0"
 $pgWorkerPodName = "jumpstartpsw0-0"
 
+Write-Host "`n"
     Do {
-        Write-Host "Waiting for PostgreSQL. Hold tight, this might take a few minutes..."
+        Write-Host "Waiting for PostgreSQL. Hold tight, this might take a few minutes...(45s sleeping loop)"
         Start-Sleep -Seconds 45
-        $buildService = $(if((kubectl get pods -n arc | Select-String $pgCoordinatorPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
+        $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
+
+Write-Host "`n"
+Write-Host "Azure Arc-enabled PostgreSQL is ready!"
+Write-Host "`n"
 
 Start-Sleep -Seconds 60
 
+# Update Service Port from 5432 to Non-Standard
+$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-pgsql\",\"port\":15432,\"targetPort\":5432}]}}'
+kubectl patch svc jumpstartps-external-svc -n arc --type merge --patch $payload
+Start-Sleep -Seconds 60
+
 # Downloading demo database and restoring onto Postgres
+Write-Host "`n"
 Write-Host "Downloading AdventureWorks.sql template for Postgres... (1/3)"
-kubectl exec $pgCoordinatorPodName -n arc -c postgres -- /bin/bash -c "curl -o /tmp/AdventureWorks2019.sql 'https://jumpstart.blob.core.windows.net/jumpstartbaks/AdventureWorks2019.sql?sp=r&st=2021-09-08T21:04:16Z&se=2030-09-09T05:04:16Z&spr=https&sv=2020-08-04&sr=b&sig=MJHGMyjV5Dh5gqyvfuWRSsCb4IMNfjnkM%2B05F%2F3mBm8%3D'" 2>&1 | Out-Null
+kubectl exec $pgControllerPodName -n arc -c postgres -- /bin/bash -c "curl -o /tmp/AdventureWorks2019.sql 'https://jumpstart.blob.core.windows.net/jumpstartbaks/AdventureWorks2019.sql?sp=r&st=2021-09-08T21:04:16Z&se=2030-09-09T05:04:16Z&spr=https&sv=2020-08-04&sr=b&sig=MJHGMyjV5Dh5gqyvfuWRSsCb4IMNfjnkM%2B05F%2F3mBm8%3D'" 2>&1 | Out-Null
 Write-Host "Creating AdventureWorks database on Postgres... (2/3)"
-kubectl exec $pgCoordinatorPodName -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
+kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -c 'CREATE DATABASE "adventureworks2019";' postgres 2>&1 | Out-Null
 Write-Host "Restoring AdventureWorks database on Postgres. (3/3)"
-kubectl exec $pgCoordinatorPodName -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
+kubectl exec $pgControllerPodName -n arc -c postgres -- psql -U postgres -d adventureworks2019 -f /tmp/AdventureWorks2019.sql 2>&1 | Out-Null
 
 # Creating Azure Data Studio settings for PostgreSQL connection
-Write-Host ""
+Write-Host "`n"
 Write-Host "Creating Azure Data Studio settings for PostgreSQL connection"
-$settingsTemplate = "C:\Temp\settingsTemplate.json"
+$settingsTemplate = "$Env:TempDir\settingsTemplate.json"
 
 # Retrieving PostgreSQL connection endpoint
 $pgsqlstring = kubectl get postgresql jumpstartps -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
 # Replace placeholder values in settingsTemplate.json
-
-################################################
-# NOTE: Following is unique to EKS only
-# EKS doesn't provide Public IP's for their LB's - since they don't guarantee static
-# Therefore - for ADS to work - we need to:
-# 1. Set value in `host` with the ELB FQDN
-# 2. Set value in `hostAddr` with blank
-################################################
-
-# 1. Set value in `host` with the ELB FQDN
-(Get-Content -Path $settingsTemplate) -replace 'jumpstartps',$pgsqlstring.split(":")[0] | Set-Content -Path $settingsTemplate
-
-# 2. Set value in `hostAddr` with blank
-(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host', "" | Set-Content -Path $settingsTemplate
-
-################################################
+$hostIPaddress = (Resolve-DnsName $pgsqlstring.split(":")[0]).ipaddress[0]
+(Get-Content -Path $settingsTemplate) -replace 'arc_postgres_host',$hostIPaddress | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'arc_postgres_port',$pgsqlstring.split(":")[1] | Set-Content -Path $settingsTemplate
 (Get-Content -Path $settingsTemplate) -replace 'ps_password',$env:AZDATA_PASSWORD | Set-Content -Path $settingsTemplate
+
 
 # If SQL MI isn't being deployed, clean up settings file
 if ( $env:deploySQLMI -eq $false )
