@@ -12,9 +12,6 @@ export redisSKU='Basic'
 export redisVMSize='c0'
 export redisName=secret-store-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 
-echo "Installing Azure CLI"
-curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
 echo "Login to Az CLI using the service principal"
 az login --service-principal --username $appId --password $password --tenant $tenantId
 
