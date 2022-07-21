@@ -93,7 +93,7 @@ Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/im
 
 
 # Installing tools
-Write-Header "Installing Chocolatey Apps"
+Write-Output "Installing Chocolatey Apps"
 $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,awscli'
 
 try {
@@ -114,10 +114,16 @@ foreach ($app in $appsToInstall)
     & choco install $app /y -Force | Write-Output
 }
 
-Write-Header "Installing Azure Data Studio"
+# Downloading Azure Data Studio and azdata CLI
+Write-Output "Downloading Azure Data Studio and azdata CLI"
+Write-Output "`n"
+Invoke-WebRequest "https://azuredatastudio-update.azurewebsites.net/latest/win32-x64-archive/stable" -OutFile "C:\Temp\azuredatastudio.zip"
+Invoke-WebRequest "https://aka.ms/azdata-msi" -OutFile "C:\Temp\AZDataCLI.msi"
 
-Expand-Archive $Env:ArcBoxDir\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
-Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\AZDataCLI.msi /quiet"
+Write-Output "Unzipping and installing Data Studio"
+Write-Output "`n"
+Expand-Archive C:\Temp\azuredatastudio.zip -DestinationPath 'C:\Program Files\Azure Data Studio'
+Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Temp\AZDataCLI.msi /quiet'
 
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
