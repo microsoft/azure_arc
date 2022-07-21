@@ -33,7 +33,7 @@ az redis create --location $location --name $redisName --resource-group $resourc
 echo "Installing Dapr Azure Arc-enabled Kuberntets Cluster extension"
 az k8s-extension create --cluster-type connectedClusters --cluster-name $arcClusterName --resource-group $resourceGroup --name $daprExtensionName --extension-type Microsoft.Dapr
 
-echo "Creating the Kubernetes secret"
+echo "Creating the Kubernetes secret for Redis"
 export key=$(az redis list-keys --name $redisName --resource-group $resourceGroup --query "primaryKey" -o tsv)
 kubectl create secret generic redis --from-literal=redis-password=$key
 
