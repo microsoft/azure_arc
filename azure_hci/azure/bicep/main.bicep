@@ -65,6 +65,13 @@ module networkDeployment 'network/network.bicep' = {
   }
 }
 
+module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
+  name: 'stagingStorageAccountDeployment'
+  params: {
+    location: location
+  }
+}
+
 module hostDeployment 'host/host.bicep' = {
   name: 'hostVmDeployment'
   params: {
@@ -82,12 +89,5 @@ module hostDeployment 'host/host.bicep' = {
     githubUser: githubUser
     location: location
     addsDomainName: addsDomainName
-  }
-}
-
-module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
-  name: 'stagingStorageAccountDeployment'
-  params: {
-    location: location
   }
 }
