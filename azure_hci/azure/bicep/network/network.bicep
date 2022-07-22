@@ -33,36 +33,40 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         addressPrefix
       ]
     }
-    subnets: (deployBastion) == true ? [
-      subnet
-      subnetBastion
+    subnets: deployBastion == true ? [
+      {
+        name: subnetName
+        properties: {
+          addressPrefix: subnetAddressPrefix
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+          networkSecurityGroup: {
+            id: networkSecurityGroup.id
+          }
+        }
+      }
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: bastionSubnetIpPrefix
+          networkSecurityGroup: {
+            id: bastionNetworkSecurityGroup.id
+          }
+        }
+      }
     ] : [
-      subnet
+      {
+        name: subnetName
+        properties: {
+          addressPrefix: subnetAddressPrefix
+          privateEndpointNetworkPolicies: 'Enabled'
+          privateLinkServiceNetworkPolicies: 'Enabled'
+          networkSecurityGroup: {
+            id: networkSecurityGroup.id
+          }
+        }
+      }
     ]
-  }
-}
-
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' = {
-  name: subnetName
-  properties: {
-    addressPrefix: subnetAddressPrefix
-    privateEndpointNetworkPolicies: 'Enabled'
-    privateLinkServiceNetworkPolicies: 'Enabled'
-    networkSecurityGroup: {
-      id: networkSecurityGroup.id
-    }
-  }
-}
-
-resource subnetBastion 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' = {
-  name: bastionSubnetName
-  properties: {
-    addressPrefix: bastionSubnetIpPrefix
-    privateEndpointNetworkPolicies: 'Enabled'
-    privateLinkServiceNetworkPolicies: 'Enabled'
-    networkSecurityGroup: {
-      id: bastionNetworkSecurityGroup.id
-    }
   }
 }
 
