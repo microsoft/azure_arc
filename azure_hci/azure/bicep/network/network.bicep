@@ -18,8 +18,6 @@ param bastionNetworkSecurityGroupName string = 'HciBox-Bastion-NSG'
 
 var addressPrefix = '172.16.0.0/16'
 var subnetAddressPrefix = '172.16.1.0/24'
-var mgmtSubnetName = 'ManagementSubnet'
-var mgmtSubnetAddressPrefix = '172.16.100.0/24'
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'HciBox-Bastion'
