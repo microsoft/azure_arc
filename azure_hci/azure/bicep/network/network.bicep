@@ -18,8 +18,6 @@ param bastionNetworkSecurityGroupName string = 'HciBox-Bastion-NSG'
 
 var addressPrefix = '172.16.0.0/16'
 var subnetAddressPrefix = '172.16.1.0/24'
-var mgmtSubnetName = 'ManagementSubnet'
-var mgmtSubnetAddressPrefix = '172.16.100.0/24'
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'HciBox-Bastion'
@@ -38,10 +36,8 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
     subnets: (deployBastion) == true ? [
       subnet
       subnetBastion
-      subnetMgmt
     ] : [
       subnet
-      subnetMgmt
     ]
   }
 }
@@ -50,18 +46,6 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' = {
   name: subnetName
   properties: {
     addressPrefix: subnetAddressPrefix
-    privateEndpointNetworkPolicies: 'Enabled'
-    privateLinkServiceNetworkPolicies: 'Enabled'
-    networkSecurityGroup: {
-      id: networkSecurityGroup.id
-    }
-  }
-}
-
-resource subnetMgmt 'Microsoft.Network/virtualNetworks/subnets@2021-08-01' = {
-  name: mgmtSubnetName
-  properties: {
-    addressPrefix: mgmtSubnetAddressPrefix
     privateEndpointNetworkPolicies: 'Enabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
     networkSecurityGroup: {
