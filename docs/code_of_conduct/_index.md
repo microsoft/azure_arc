@@ -2,7 +2,7 @@
 type: docs
 title: "Microsoft Open Source Code of Conduct"
 linkTitle: "Code of Conduct"
-weight: 7
+weight: 8
 ---
 
 # Microsoft Open Source Code of Conduct
