@@ -217,6 +217,10 @@ Complete the following steps to clean up your environment.
     kubectl delete secret redis
     ```
 
-- Delete the Dapr Cluster extension from the Azure Portal.
+- Delete the Azure Cache for Redis from the Azure Portal.
 
-    ![Screenshot delete extension](./20.png)
+    ![Screenshot delete Redis](./20.png)
+
+- Uninstall the Dapr Cluster extension from the Azure Portal.
+
+    ![Screenshot delete extension](./21.png)
