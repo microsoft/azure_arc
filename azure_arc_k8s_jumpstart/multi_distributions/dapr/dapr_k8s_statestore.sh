@@ -7,10 +7,10 @@ export tenantId='<Your Azure tenant ID>'
 export resourceGroup='<Azure resource group name>'
 export arcClusterName='<The name of your k8s cluster as it will be shown in Azure Arc>'
 export location='<Azure Region>'
-export daprExtensionName='daprextension'
-export redisSKU='Basic'
-export redisVMSize='c0'
-export redisName=secret-store-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
+export daprExtensionName='daprextension' # Do not change!
+export redisSKU='Basic' # Do not change!
+export redisVMSize='c0' # Do not change!
+export redisName=secret-store-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1) # Do not change!
 
 echo "Login to Az CLI using the service principal"
 az login --service-principal --username $appId --password $password --tenant $tenantId

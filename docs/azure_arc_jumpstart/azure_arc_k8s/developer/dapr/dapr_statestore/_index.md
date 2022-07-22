@@ -203,3 +203,20 @@ The following is a basic "hello world" [Python app](https://github.com/dapr/quic
     ```
 
     ![Screenshot validate persistence](./19.png)
+
+## Delete the deployment
+
+Complete the following steps to clean up your environment.
+
+- Run below _kubectl_ commands to delete the Kubernetes resources.
+
+    ```shell
+    kubectl delete -f python.yaml
+    kubectl delete deployment,service nodeapp
+    kubectl delete component statestore
+    kubectl delete secret redis
+    ```
+
+- Delete the Dapr Cluster extension from the Azure Portal.
+
+    ![Screenshot delete extension](./20.png)
