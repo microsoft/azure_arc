@@ -63,7 +63,6 @@ module networkDeployment 'network/network.bicep' = {
     deployBastion: deployBastion
     location: location
   }
-  
 }
 
 module hostDeployment 'host/host.bicep' = {
