@@ -91,14 +91,34 @@
         "metadata": {
             "description": "The principal to assign the role to"
         }
-    }
+      },
+      "securityAdminRoleGuid": {
+        "type": "string",
+        "defaultValue": "[newGuid()]"
+      },
+      "contributorRoleGuid": {
+        "type": "string",
+        "defaultValue": "[newGuid()]"
+      },
+      "securityReaderRoleGuid": {
+        "type": "string",
+        "defaultValue": "[newGuid()]"
+      },
+      "monitoringMetricsRoleGuid": {
+        "type": "string",
+        "defaultValue": "[newGuid()]"
+      },
+      "userAccessAdministratorRoleGuid": {
+        "type": "string",
+        "defaultValue": "[newGuid()]"
+      }
     },
     "variables": {
-        "SecurityAdminRoleName": "[guid('SecurityAdminRoleName')]",
-        "ContributorRoleName": "[guid('ContributorRoleName')]",
-        "SecurityReaderRoleName": "[guid('SecurityReaderRoleName')]",
-        "MonitoringMetricsRoleName": "[guid('MonitoringMetricsRoleName')]",
-        "UserAccessAdministratorRoleName": "[guid('UserAccessAdministratorRoleName')]",
+        "SecurityAdminRoleName": "[parameters('securityAdminRoleGuid')]",
+        "ContributorRoleName": "[parameters('contributorRoleGuid')]",
+        "SecurityReaderRoleName": "[parameters('securityReaderRoleGuid')]",
+        "MonitoringMetricsRoleName": "[parameters('monitoringMetricsRoleGuid')]",
+        "UserAccessAdministratorRoleName": "[parameters('userAccessAdministratorRoleGuid')]",
         "SecurityAdmin": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'fb1c8493-542b-48eb-b624-b4c8fea62acd')]",
         "Contributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
         "SecurityReader": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '39bc4728-0917-49c7-9d2c-d95423bc2eb4')]",
