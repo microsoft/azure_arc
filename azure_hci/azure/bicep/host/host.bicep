@@ -135,7 +135,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   tags: resourceTags
   properties: {
     hardwareProfile: {
-      vmSize: flavor == 'DevOps' ? 'Standard_B4ms' : 'Standard_D16s_v4' 
+      vmSize: 'Standard_D32s_v4' 
     }
     storageProfile: {
       osDisk: {
@@ -153,6 +153,96 @@ resource vm 'Microsoft.Compute/virtualMachines@2022-03-01' = {
         sku: windowsOSVersion
         version: 'latest'
       }
+      dataDisks: [
+        {
+          name: 'ASHCIHost001_DataDisk_0'
+          diskSizeGB: 256
+          createOption: 'Empty'
+          lun: 0
+          caching: 'None'
+          writeAcceleratorEnabled: false
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          name: 'ASHCIHost001_DataDisk_1'
+          diskSizeGB: 256
+          createOption: 'Empty'
+          lun: 1
+          caching: 'None'
+          writeAcceleratorEnabled: false
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          name: 'ASHCIHost001_DataDisk_2'
+          diskSizeGB: 256
+          createOption: 'Empty'
+          lun: 2
+          caching: 'None'
+          writeAcceleratorEnabled: false
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          name: 'ASHCIHost001_DataDisk_3'
+          diskSizeGB: 256
+          createOption: 'Empty'
+          lun: 3
+          caching: 'None'
+          writeAcceleratorEnabled: false
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          name: 'ASHCIHost001_DataDisk_4'
+          diskSizeGB: 256
+          createOption: 'Empty'
+          lun: 4
+          caching: 'None'
+          writeAcceleratorEnabled: false
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          name: 'ASHCIHost001_DataDisk_5'
+          diskSizeGB: 256
+          createOption: 'Empty'
+          lun: 5
+          caching: 'None'
+          writeAcceleratorEnabled: false
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          name: 'ASHCIHost001_DataDisk_6'
+          diskSizeGB: 256
+          createOption: 'Empty'
+          lun: 6
+          caching: 'None'
+          writeAcceleratorEnabled: false
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+        {
+          name: 'ASHCIHost001_DataDisk_7'
+          diskSizeGB: 256
+          createOption: 'Empty'
+          lun: 7
+          caching: 'None'
+          writeAcceleratorEnabled: false
+          managedDisk: {
+            storageAccountType: 'Premium_LRS'
+          }
+        }
+      ]
     }
     networkProfile: {
       networkInterfaces: [
