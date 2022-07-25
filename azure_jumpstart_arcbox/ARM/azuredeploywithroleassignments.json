@@ -111,7 +111,11 @@
       "userAccessAdministratorRoleGuid": {
         "type": "string",
         "defaultValue": "[newGuid()]"
-      }
+      },
+      "epochTime": {
+        "type": "int",
+        "defaultValue": "[dateTimeToEpoch(dateTimeAdd(utcNow(), 'P0Y'))]"
+      } 
     },
     "variables": {
         "SecurityAdminRoleName": "[parameters('securityAdminRoleGuid')]",
@@ -174,7 +178,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
-            "name": "[concat('Deployment-ArcBox-', parameters('flavor'))]",
+            "name": "[concat('Deployment-ArcBox-', parameters('flavor'), '_', parameters('epochTime'))]",
             "dependsOn": [
                 "[variables('SecurityAdminRoleName')]",
                 "[variables('ContributorRoleName')]",
