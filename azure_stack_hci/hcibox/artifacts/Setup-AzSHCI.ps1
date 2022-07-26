@@ -1149,8 +1149,7 @@ function New-DCVM {
     <cpi:offlineImage cpi:source="" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
 </unattend>
 "@
-
-        New-Item -Path C:\TempMount\windows -ItemType Directory -Name Panther -Force | Out-Null
+        New-Item -Path "C:\TempMount\Windows" -ItemType Directory -Name Panther -Force | Out-Null
         Set-Content -Value $Unattend -Path "C:\TempMount\Windows\Panther\Unattend.xml" -Force
 
         Write-Verbose "Dismounting Windows Image"
