@@ -65,7 +65,7 @@ module networkDeployment 'network/network.bicep' = {
   }
 }
 
-module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
+module storageAccountDeployment 'mgmt/storageAccount.bicep' = {
   name: 'stagingStorageAccountDeployment'
   params: {
     location: location
@@ -81,7 +81,7 @@ module hostDeployment 'host/host.bicep' = {
     spnClientSecret: spnClientSecret
     spnTenantId: spnTenantId
     workspaceName: logAnalyticsWorkspaceName
-    stagingStorageAccountName: stagingStorageAccountDeployment.outputs.storageAccountName
+    stagingStorageAccountName: storageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
     flavor: flavor
     subnetId: networkDeployment.outputs.subnetId
