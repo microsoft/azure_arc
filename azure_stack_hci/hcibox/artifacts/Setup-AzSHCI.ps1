@@ -1151,21 +1151,18 @@ function New-DCVM {
 "@
 
         New-Item -Path C:\TempMount\windows -ItemType Directory -Name Panther -Force | Out-Null
-        Set-Content -Value $Unattend -Path "C:\TempMount\Windows\Panther\Unattend.xml"  -Force
+        Set-Content -Value $Unattend -Path "C:\TempMount\Windows\Panther\Unattend.xml" -Force
 
         Write-Verbose "Dismounting Windows Image"
         Dismount-WindowsImage -Path "C:\TempMount" -Save | Out-Null
         Remove-Item "C:\TempMount" | Out-Null
 
         # Start Virtual Machine
-
         Write-Verbose "Starting Virtual Machine" 
         Start-VM -Name $VMName | Out-Null
 
         # Wait until the VM is restarted
-
-        while ((Invoke-Command -VMName $VMName -Credential $using:domainCred { "Test" } `
-                    -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
+        while ((Invoke-Command -VMName $VMName -Credential $using:domainCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
 
         Write-Verbose "Configuring Domain Controller VM and Installing Active Directory."
 
@@ -1201,23 +1198,17 @@ function New-DCVM {
             Write-Verbose "Installing Active Directory..." 
 
             $params = @{
-
                 DomainName                    = $DomainFQDN
                 DomainMode                    = 'WinThreshold'
                 DatabasePath                  = "C:\Domain"
                 DomainNetBiosName             = $DomainNetBiosName
                 SafeModeAdministratorPassword = $SecureString
-
             }
-
 
             Write-Output $params
 
-            
             $VerbosePreference = "SilentlyContinue"
-
             Install-ADDSForest  @params -InstallDns -Confirm -Force -NoRebootOnCompletion | Out-Null
-
         }
 
         Write-Verbose "Stopping $VMName"
@@ -1226,7 +1217,6 @@ function New-DCVM {
         Get-VM $VMName | Start-VM 
 
         # Wait until DC is created and rebooted
-
         while ((Invoke-Command -VMName $VMName -Credential $using:domainCred `
                     -ArgumentList $SDNConfig.DCName { (Get-ADDomainController $args[0]).enabled } -ea SilentlyContinue) -ne $true) { Start-Sleep -Seconds 1 }
 
@@ -1234,29 +1224,21 @@ function New-DCVM {
         Write-Verbose "Configuring User Accounts and Groups in Active Directory"
 
         Invoke-Command -VMName $VMName -Credential $using:domainCred -ArgumentList $SDNConfig -ScriptBlock {
-
             $SDNConfig = $args[0]
             $SDNDomainFQDN = $SDNConfig.SDNDomainFQDN
-
             $VerbosePreference = "Continue"
             $ErrorActionPreference = "Stop"
-    
             $SecureString = ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force
 
-
             $params = @{
-
                 ComplexityEnabled = $false
                 Identity          = $SDNConfig.SDNDomainFQDN
                 MinPasswordLength = 0
-
             }
-
 
             Set-ADDefaultDomainPasswordPolicy @params
 
             $params = @{
-
                 Name                  = 'NC Admin'
                 GivenName             = 'NC'
                 Surname               = 'Admin'
@@ -1270,14 +1252,12 @@ function New-DCVM {
             }
 
             New-ADUser @params
-
             $params.Name = 'NC Client'
             $params.Surname = 'Client'
             $params.SamAccountName = 'NCClient'
             $params.UserPrincipalName = "NCClient@$SDNDomainFQDN" 
 
             New-ADUser @params
-
             NEW-ADGroup –name “NCAdmins” –groupscope Global
             NEW-ADGroup –name “NCClients” –groupscope Global
 
@@ -1288,11 +1268,9 @@ function New-DCVM {
             add-ADGroupMember "NCAdmins" "Administrator"
 
             # Set Administrator Account Not to Expire
-
             Get-ADUser Administrator | Set-ADUser -PasswordNeverExpires $true  -CannotChangePassword $true
 
             # Set DNS Forwarder
-
             Write-Verbose "Adding DNS Forwarders"
             $VerbosePreference = "SilentlyContinue"
 
@@ -1300,17 +1278,13 @@ function New-DCVM {
             else { Add-DnsServerForwarder 8.8.8.8 }
 
             # Create Enterprise CA 
-
             $VerbosePreference = "Continue"
             Write-Verbose "Installing and Configuring Active Directory Certificate Services and Certificate Templates"
             $VerbosePreference = "SilentlyContinue"
-
-            
-
+    
             Install-WindowsFeature -Name AD-Certificate -IncludeAllSubFeature -IncludeManagementTools | Out-Null
 
             $params = @{
-
                 CAtype              = 'EnterpriseRootCa'
                 CryptoProviderName  = 'ECDSA_P256#Microsoft Software Key Storage Provider'
                 KeyLength           = 256
@@ -1322,7 +1296,6 @@ function New-DCVM {
             Install-AdcsCertificationAuthority @params -Confirm:$false | Out-Null
 
             # Give WebServer Template Enroll rights for Domain Computers
-
             $filter = "(CN=WebServer)"
             $ConfigContext = ([ADSI]"LDAP://RootDSE").configurationNamingContext
             $ConfigContext = "CN=Certificate Templates,CN=Public Key Services,CN=Services,$ConfigContext"
@@ -1343,28 +1316,21 @@ function New-DCVM {
             Restart-Service CertSvc
             Start-Sleep -Seconds 60
  
-            #Issue Certificate Template
-
+            # Issue Certificate Template
             CMD.exe /c "certutil -SetCATemplates +WebServer"
  
         }
- 
     }
-
 }
 
 function New-RouterVM {
-
     Param (
-
         $SDNConfig,
         $localCred,
         $domainCred
-
     )
 
     Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
-
         $SDNConfig = $using:SDNConfig
         $localcred = $using:localcred
         $domainCred = $using:domainCred
@@ -1382,38 +1348,29 @@ function New-RouterVM {
         $VMName = "bgp-tor-router"
     
         # Create Host OS Disk
-
         Write-Verbose "Creating $VMName differencing disks"
 
         $params = @{
-
             ParentPath = ($ParentDiskPath + $OSVHDX)
             Path       = ($vmpath + $VMName + '\' + $VMName + '.vhdx') 
-
         }
 
         New-VHD @params -Differencing | Out-Null
     
         # Create VM
-
         $params = @{
-
             Name       = $VMName
             VHDPath    = ($vmpath + $VMName + '\' + $VMName + '.vhdx')
             Path       = ($vmpath + $VMName)
             Generation = 2
-
         }
 
         Write-Verbose "Creating the $VMName VM."
         New-VM @params | Out-Null
     
         # Set VM Configuration
-
         Write-Verbose "Setting $VMName's VM Configuration"
-
         $params = @{
-
             VMName               = $VMName
             DynamicMemoryEnabled = $true
             StartupBytes         = $SDNConfig.MEM_BGP
@@ -1427,7 +1384,6 @@ function New-RouterVM {
         set-vm -Name $VMName -AutomaticStopAction TurnOff | Out-Null
     
         # Configure VM Networking
-
         Write-Verbose "Configuring $VMName's Networking"
         Add-VMNetworkAdapter -VMName $VMName -Name Mgmt -SwitchName vSwitch-Fabric -DeviceNaming On
         Add-VMNetworkAdapter -VMName $VMName -Name Provider -SwitchName vSwitch-Fabric -DeviceNaming On
@@ -1436,12 +1392,9 @@ function New-RouterVM {
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName Provider -Access -VlanId $SDNConfig.providerVLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName VLAN200 -Access -VlanId $SDNConfig.vlan200VLAN
         Set-VMNetworkAdapterVlan -VMName $VMName -VMNetworkAdapterName SIMInternet -Access -VlanId $SDNConfig.simInternetVLAN
-           
     
         # Add NAT Adapter
-
         if ($SDNConfig.natConfigure) {
-
             Add-VMNetworkAdapter -VMName $VMName -Name NAT -SwitchName NAT -DeviceNaming On
         }    
     
@@ -1450,7 +1403,6 @@ function New-RouterVM {
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null      
     
         # Inject Answer File
-
         Write-Verbose "Mounting Disk Image and Injecting Answer File into the $VMName VM." 
         New-Item -Path "C:\TempBGPMount" -ItemType Directory | Out-Null
         Mount-WindowsImage -Path "C:\TempBGPMount" -Index 1 -ImagePath ($vmpath + $VMName + '\' + $VMName + '.vhdx') | Out-Null
@@ -3187,155 +3139,112 @@ if ($SDNConfig.MultipleHyperVHosts) {
     Copy-VHDXtoHosts @params
 }
     
-    
 # if single host installation, copy the parent VHDX file to the specified Parent VHDX Path
-
 if (!$SDNConfig.MultipleHyperVHosts) {
-
     Write-Verbose "Copying VHDX Files to Host"
 
     $params = @{
-
         azSHCIVHDXPath = $azSHCIVHDXPath
         HostVMPath     = $HostVMPath
         guiVHDXPath    = $guiVHDXPath 
     }
-
     Copy-VHDXtoHost @params
 }
     
     
 # Create Virtual Machines
-
 $vmMacs = @()
-
 foreach ($VM in $VMPlacement) {
-
     Write-Verbose "Generating the VM: $VM" 
-
     $params = @{
-
         VMHost     = $VM.VMHost
         AzSHOST    = $VM.AzSHOST
         HostVMPath = $HostVMPath
         VMSwitch   = $VMSwitch
         SDNConfig  = $SDNConfig
-
     }
 
     $vmMac = New-NestedVM @params
-
     Write-Verbose "Returned VMMac is $vmMac"
-
     $vmMacs += [pscustomobject]@{
-
         Hostname = $VM.AzSHOST
         vmMAC    = $vmMac
-
-    }
-        
+    }   
 }
     
 # Inject Answer Files and Binaries into Virtual Machines
-
 $params = @{
-
     VMPlacement    = $VMPlacement
     HostVMPath     = $HostVMPath
     SDNConfig      = $SDNConfig
     guiVHDXPath    = $guiVHDXPath
     azSHCIVHDXPath = $azSHCIVHDXPath
     vmMacs         = $vmMacs
-
 }
 
 Add-Files @params
     
 # Start Virtual Machines
-
 Start-AzSHOSTS -VMPlacement $VMPlacement
     
 # Wait for AzSHOSTs to come online
-
 Write-Verbose "Waiting for VMs to provision and then come online"
 
 $params = @{
-
     VMPlacement = $VMPlacement
     localcred   = $localCred
-
 }
-
 Test-AzSHOSTVMConnection @params
     
 # Online and Format Data Volumes on Virtual Machines
-
 $params = @{
-
     VMPlacement = $VMPlacement
     SDNConfig   = $SDNConfig
     localcred   = $localCred
-
 }
 
 New-DataDrive @params
     
 # Install SDN Host Software on NestedVMs
-
 $params = @{
-
     SDNConfig   = $SDNConfig
     VMPlacement = $VMPlacement
     localcred   = $localCred
-
 }
 
 Set-SDNserver @params
     
 # Rename NICs from Ethernet to FABRIC
-
 $params = @{
-
     scriptpath  = 'Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC'
     VMPlacement = $VMPlacement
     localcred   = $localCred
-
 }
 
 Start-PowerShellScriptsOnHosts @params
-
 $params.scriptpath = 'Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2'
-
 Start-PowerShellScriptsOnHosts @params
     
 # Restart Machines
-
 $params.scriptpath = "Restart-Computer -Force"
 Start-PowerShellScriptsOnHosts @params
 Start-Sleep -Seconds 30
     
 # Wait for AzSHOSTs to come online
-
 Write-Verbose "Waiting for VMs to restart..."
 
 $params = @{
-
     VMPlacement = $VMPlacement
     localcred   = $localCred
-
 }
-
 Test-AzSHOSTVMConnection @params
     
 # This step has to be done as during the Hyper-V install as hosts reboot twice.
-
 Write-Verbose "Ensuring that all VMs have been restarted after Hyper-V install.."
 Test-AzSHOSTVMConnection @params
     
 # Create NAT Virtual Switch on AzSMGMT
-
 if ($natConfigure) {
-
     if (!$SDNConfig.MultipleHyperVHosts) { $SwitchName = $SDNConfig.InternalSwitch }
     else { $SwitchName = $SDNConfig.MultipleHyperVHostExternalSwitchName }
     
@@ -3343,107 +3252,67 @@ if ($natConfigure) {
     $VerbosePreference = "SilentlyContinue"
 
     $params = @{
-
         SwitchName  = $SwitchName
         VMPlacement = $VMPlacement
         SDNConfig   = $SDNConfig
     }
-
     New-NATSwitch  @params
     $VerbosePreference = "Continue"
-
 }
     
 # Provision AzSMGMT VMs (DC, Router, and AdminCenter)
-
 Write-Verbose  "Configuring Management VM"
 
-
 $params = @{
-
     SDNConfig  = $SDNConfig
     localCred  = $localCred
     domainCred = $domainCred
-
 }
-
 Set-AzSMGMT @params
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
-
 $params = @{
-
     localCred  = $localCred
     domainCred = $domainCred
-
 }
 
 New-HyperConvergedEnvironment @params
 
-
 # Create S2D Cluster
-
 $params = @{
-
     SDNConfig          = $SDNConfig
     DomainCred         = $domainCred
     AzStackClusterNode = 'AzSHOST2'
-
 }
-
 
 New-SDNS2DCluster @params
 
-
-
 # Install and Configure Network Controller if specified
-
 If ($SDNConfig.ProvisionNC) {
-
     $params = @{
-
         SDNConfig  = $SDNConfig
         domainCred = $domainCred
-
     }
 
     New-SDNEnvironment @params
 
     # Add Systems to Windows Admin Center
-
     $fqdn = $SDNConfig.SDNDomainFQDN
-
     $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
-
-    # Add VMs for Domain Admin
-
     $params = @{
-
         SDNLabSystems = $SDNLabSystems 
         SDNConfig     = $SDNConfig
         domainCred    = $domainCred
-
     }
-
-    #   Add-WACtenants @params
-
-
-    # Add VMs for NC Admin
 
     $params.domainCred = $NCAdminCred
 
-    #   Add-WACtenants @params
-
     # Enable Single Sign On
-
     Write-Verbose "Enabling Single Sign On in WAC"
     enable-singleSignOn -SDNConfig $SDNConfig 
-    
 }
 
-
 # Finally - Add RDP Link to Desktop
-
 Remove-Item C:\Users\Public\Desktop\AdminCenter.lnk -Force -ErrorAction SilentlyContinue
 $wshshell = New-Object -ComObject WScript.Shell
 $lnk = $wshshell.CreateShortcut("C:\Users\Public\Desktop\AdminCenter.lnk")
@@ -3456,7 +3325,6 @@ $endtime = Get-Date
 
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 
-
 Write-Verbose "`nSuccessfully deployed the Azure Stack HCI Sandbox"
 
 Write-Host "Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes." -ForegroundColor Green
@@ -3465,4 +3333,4 @@ $ErrorActionPreference = "Continue"
 $VerbosePreference = "SilentlyContinue"
 $WarningPreference = "Continue"
     
-#endregion    
+   
