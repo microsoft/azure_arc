@@ -673,13 +673,13 @@ $azsmgmtProdKey
             New-Item -Path ($MountedDrive + ":\VMs\Base") -ItemType Directory -Force | Out-Null
 
             Write-Verbose "Injecting VMConfigs to $path"
-            Copy-Item -Path .\AzSHCISandbox-Config.psd1 -Destination ($MountedDrive + ":\") -Recurse -Force
+            Copy-Item -Path .\AzSHCI-Config.psd1 -Destination ($MountedDrive + ":\") -Recurse -Force
             New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
             Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
             Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
-            Copy-Item -Path .\Applications\SCRIPTS -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path .\Applications\SDNEXAMPLES -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path '.\Applications\Windows Admin Center' -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
+            Copy-Item -Path .\sdn -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+            #Copy-Item -Path .\Applications\SDNEXAMPLES -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+            Copy-Item -Path '.\VHD\WindowsAdminCenter.msi' -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
 
         }       
     
