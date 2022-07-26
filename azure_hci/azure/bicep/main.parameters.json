@@ -22,6 +22,9 @@
         },
         "deployBastion": {
             "value": false
+        },
+        "flavor": {
+            "value": "Full"
         }
     }
 }
