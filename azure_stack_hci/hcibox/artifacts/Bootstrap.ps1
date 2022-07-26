@@ -70,13 +70,16 @@ $Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
 $Env:HciBoxKVDir = "C:\HciBox\KeyVault"
 $Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
 $Env:HciBoxIconDir = "C:\HciBox\Icons"
-$Env:HciBoxVHDs = "C:\HciBox\VHD"
+$Env:HciBoxVHDDir = "C:\HciBox\VHD"
+$Env:HciBoxSDNDir = "C:\HciBox\sdn"
 $Env:agentScript = "C:\HciBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
 New-Item -Path $Env:HciBoxDir -ItemType directory -Force
+New-Item -Path $Env:HciBoxVHDDir -ItemType directory -Force
+New-Item -Path $Env:HciBoxSDNDir -ItemType directory -Force
 New-Item -Path $Env:HciBoxLogsDir -ItemType directory -Force
 New-Item -Path $Env:HciBoxVMDir -ItemType directory -Force
 New-Item -Path $Env:HciBoxKVDir -ItemType directory -Force
@@ -244,12 +247,20 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Downloading AzSHCI files
 Write-Header "Downloading Azure Stack HCI configuration scripts"
-# Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile $Env:HciBoxDir\AZSHCI.vhdx
-# Invoke-WebRequest https://aka.ms/AAbclsv -OutFile $Env:HciBoxDir\GUI.vhdx
-# Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxDir\WindowsAdminCenter.msi
+# Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile $Env:HciBoxVHDDir\AZSHCI.vhdx
+# Invoke-WebRequest https://aka.ms/AAbclsv -OutFile $Env:HciBoxVHDDir\GUI.vhdx
+# Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxVHDDir\WindowsAdminCenter.msi
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Setup-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Setup-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Register-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AzSHCI-Config.psd1") -OutFile $Env:HciBoxDir\AzSHCI-Config.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/CertHelpers.ps1") -OutFile $Env:HciBoxSDNDir\CertHelpers.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HciBoxSDNDir\NetworkControllerRESTWrappers.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HciBoxSDNDir\NetworkControllerWorkloadHelpers.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/SDNExplorer.ps1") -OutFile $Env:HciBoxSDNDir\SDNExplorer.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/SDNExpress.ps1") -OutFile $Env:HciBoxSDNDir\SDNExpress.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/SDNExpressModule.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressModule.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/SDNExpressUI.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressUI.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/Single-NC.psd1") -OutFile $Env:HciBoxSDNDir\Single-NC.psd1
 
 # Configure storage pools and data disks
 Write-Header "Configuring storage"
