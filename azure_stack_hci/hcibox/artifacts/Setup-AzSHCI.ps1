@@ -1167,9 +1167,7 @@ function New-DCVM {
         Write-Verbose "Configuring Domain Controller VM and Installing Active Directory."
 
         Invoke-Command -VMName $VMName -Credential $localCred -ArgumentList $SDNConfig -ScriptBlock {
-
             $SDNConfig = $args[0]
-
             $VerbosePreference = "Continue"
             $WarningPreference = "SilentlyContinue"
             $ErrorActionPreference = "Stop"
@@ -1193,7 +1191,6 @@ function New-DCVM {
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 
             Write-Verbose "Installing Active Directory Forest. This will take some time..."
-        
             $SecureString = ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force
             Write-Verbose "Installing Active Directory..." 
 
@@ -1470,18 +1467,13 @@ function New-RouterVM {
         Remove-Item "C:\TempBGPMount"
     
         # Start the VM
-
         Write-Verbose "Starting $VMName VM."
         Start-VM -Name $VMName      
     
         # Wait for VM to be started
-
         while ((Invoke-Command -VMName $VMName -Credential $localcred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }    
-    
         Write-Verbose "Configuring $VMName" 
-    
         Invoke-Command -VMName $VMName -Credential $localCred -ArgumentList $SDNConfig -ScriptBlock {
-    
             $ErrorActionPreference = "Stop"
             $VerbosePreference = "Continue"
             $WarningPreference = "SilentlyContinue"
@@ -1502,7 +1494,6 @@ function New-RouterVM {
             $simInternetPFX = $SDNConfig.BGPRouterIP_SimulatedInternet.Split("/")[1]
     
             # Renaming NetAdapters and setting up the IPs inside the VM using CDN parameters
-
             Write-Verbose "Configuring $env:COMPUTERNAME's Networking"
             $VerbosePreference = "SilentlyContinue"  
             $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" | Where-Object { $_.RegistryValue -eq "Mgmt" }
@@ -1520,9 +1511,7 @@ function New-RouterVM {
             New-NetIPAddress -InterfaceAlias "SIMInternet" –IPAddress $simInternetIP -PrefixLength $simInternetPFX | Out-Null      
     
             # if NAT is selected, configure the adapter
-       
             if ($SDNConfig.natConfigure) {
-    
                 $NIC = Get-NetAdapterAdvancedProperty -RegistryKeyWord "HyperVNetworkAdapterName" `
                 | Where-Object { $_.RegistryValue -eq "NAT" }
                 Rename-NetAdapter -name $NIC.name -newname "NAT" | Out-Null
@@ -1538,50 +1527,37 @@ function New-RouterVM {
             }
     
             # Configure Trusted Hosts
-
             Write-Verbose "Configuring Trusted Hosts"
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
             
-            
             # Installing Remote Access
-
             Write-Verbose "Installing Remote Access on $env:COMPUTERNAME" 
             $VerbosePreference = "SilentlyContinue"
             Install-RemoteAccess -VPNType RoutingOnly | Out-Null
     
             # Adding a BGP Router to the VM
-
             $VerbosePreference = "Continue"
             Write-Verbose "Installing BGP Router on $env:COMPUTERNAME"
             $VerbosePreference = "SilentlyContinue"
 
             $params = @{
-
                 BGPIdentifier  = $PNVIP
                 LocalASN       = $SDNConfig.BGPRouterASN
                 TransitRouting = 'Enabled'
                 ClusterId      = 1
                 RouteReflector = 'Enabled'
-
             }
 
             Add-BgpRouter @params
 
-            #Add-BgpRouter -BGPIdentifier $PNVIP -LocalASN $SDNConfig.BGPRouterASN `
-            # -TransitRouting Enabled -ClusterId 1 -RouteReflector Enabled
-
-            # Configure BGP Peers
-
             if ($SDNConfig.ConfigureBGPpeering -and $SDNConfig.ProvisionNC) {
 
                 Write-Verbose "Peering future MUX/GWs"
-
                 $Mux01IP = ($SDNConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "4"
                 $GW01IP = ($SDNConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "5"
                 $GW02IP = ($SDNConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "6"
 
                 $params = @{
-
                     Name           = 'MUX01'
                     LocalIPAddress = $PNVIP
                     PeerIPAddress  = $Mux01IP
@@ -1589,48 +1565,36 @@ function New-RouterVM {
                     OperationMode  = 'Mixed'
                     PeeringMode    = 'Automatic'
                 }
-
                 Add-BgpPeer @params -PassThru
 
                 $params.Name = 'GW01'
                 $params.PeerIPAddress = $GW01IP
-
                 Add-BgpPeer @params -PassThru
 
                 $params.Name = 'GW02'
                 $params.PeerIPAddress = $GW02IP
-
                 Add-BgpPeer @params -PassThru    
-
             }
     
             # Enable Large MTU
-
             Write-Verbose "Configuring MTU on all Adapters"
             Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $SDNConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
-    
         }     
     
         $ErrorActionPreference = "Continue"
         $VerbosePreference = "SilentlyContinue"
         $WarningPreference = "Continue"
-
     } -AsJob
-
 }
 
 function New-AdminCenterVM {
-
     Param (
-
         $SDNConfig,
         $localCred,
         $domainCred
-
     )
 
     Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
-
         $VMName = "admincenter"
         $ParentDiskPath = "C:\VMs\Base\"
         $VHDPath = "D:\VMs\"
@@ -1644,24 +1608,18 @@ function New-AdminCenterVM {
         $WarningPreference = "SilentlyContinue"
 
         # Set Credentials
-
         $localCred = $using:localCred
         $domainCred = $using:domainCred
 
         # Create Host OS Disk
-
         Write-Verbose "Creating $VMName differencing disks"
-
         $params = @{
-
             ParentPath = $BaseVHDPath
             Path       = (($VHDPath) + ($VMName) + (".vhdx")) 
         }
-
         New-VHD -Differencing @params | out-null
 
         # MountVHDXFile
-
         $VerbosePreference = "SilentlyContinue"
         Import-Module DISM
         $VerbosePreference = "Continue"
@@ -1671,7 +1629,6 @@ function New-AdminCenterVM {
         Mount-WindowsImage -Path "C:\TempWACMount" -Index 1 -ImagePath (($VHDPath) + ($VMName) + (".vhdx")) | Out-Null
 
         # Copy Source Files
-
         Write-Verbose "Copying Application and Script Source Files to $VMName"
         Copy-Item 'C:\VMConfigs\Windows Admin Center' -Destination C:\TempWACMount\ -Recurse -Force
         Copy-Item C:\VMConfigs\SCRIPTS -Destination C:\TempWACMount -Recurse -Force
@@ -1681,7 +1638,6 @@ function New-AdminCenterVM {
         Copy-Item C:\VMs\Base\GUI.vhdx  -Destination  C:\TempWACMount\VHDs -Force
 
         # Apply Custom Unattend.xml file
-
         New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null
         $Password = $SDNConfig.SDNAdminPassword
         $ProductKey = $SDNConfig.GUIProductKey
@@ -1793,17 +1749,14 @@ function New-AdminCenterVM {
         Enable-WindowsOptionalFeature -Path C:\TempWACMount -FeatureName RemoteAccessPowerShell -All -LimitAccess | Out-Null
 
         # Save Customizations and then dismount.
-
         Write-Verbose "Dismounting Disk"
         Dismount-WindowsImage -Path "C:\TempWACMount" -Save | Out-Null
         Remove-Item "C:\TempWACMount"
 
         # Create VM
-
         Write-Verbose "Creating the $VMName VM."
 
         $params = @{
-
             Name       = $VMName
             VHDPath    = (($VHDPath) + ($VMName) + (".vhdx")) 
             Path       = $VHDPath
@@ -1815,7 +1768,6 @@ function New-AdminCenterVM {
         $memory = $SDNConfig.MEM_WAC
 
         $params = @{
-
             VMName               = $VMName
             DynamicMemoryEnabled = $true
             StartupBytes         = $SDNConfig.MEM_WAC
@@ -1838,20 +1790,16 @@ function New-AdminCenterVM {
         Start-VM -Name $VMName
 
         # Refresh Domain Cred
-
         $domainCred = new-object -typename System.Management.Automation.PSCredential `
             -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
         (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
         # Wait until the VM is restarted
-
         while ((Invoke-Command -VMName $VMName -Credential $domainCred { "Test" } `
                     -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
 
         # Finish Configuration
-
         Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $SDNConfig, $VMName -ScriptBlock {
-
             $SDNConfig = $args[0]
             $VMName = $args[1]
             $Gateway = $SDNConfig.SDNLABRoute
@@ -1877,7 +1825,6 @@ function New-AdminCenterVM {
             $fqdn = $SDNConfig.SDNDomainFQDN
 
             # Enable CredSSP
-
             $VerbosePreference = "SilentlyContinue" 
             Enable-PSRemoting -force
             Enable-WSManCredSSP -Role Server -Force
@@ -1892,37 +1839,27 @@ function New-AdminCenterVM {
 
             $VerbosePreference = "Continue" 
 
-
             # Enable Large MTU
-
             Write-Verbose "Configuring MTU on all Adapters"
             Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $SDNConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
 
-
             # $PNVIP 
-
             $WACIP = $SDNConfig.WACIP.Split("/")[0]
     
             # Install RSAT-NetworkController
-
             $isAvailable = Get-WindowsFeature | Where-Object { $_.Name -eq 'RSAT-NetworkController' }
-
             if ($isAvailable) {
-
                 $VerbosePreference = "SilentlyContinue"
                 Import-Module ServerManager
                 $VerbosePreference = "Continue"
 
                 Write-Verbose "Installing RSAT-NetworkController"
                 Install-WindowsFeature -Name RSAT-NetworkController -IncludeAllSubFeature -IncludeManagementTools | Out-Null
-
             }
 
             # Install Hyper-V RSAT
-
             Write-Verbose "Installing Hyper-V RSAT Tools"
             Install-WindowsFeature -Name RSAT-Hyper-V-Tools -IncludeAllSubFeature -IncludeManagementTools | Out-Null
-
 
             # Install RSAT AD Tools
             Write-Verbose "Installing Active Directory RSAT Tools"
@@ -1953,13 +1890,11 @@ function New-AdminCenterVM {
 
             # Create BGP Router
             $params = @{
-
                 BGPIdentifier  = $WACIP
                 LocalASN       = $SDNConfig.WACASN
                 TransitRouting = 'Enabled'
                 ClusterId      = 1
                 RouteReflector = 'Enabled'
-
             }
 
             Add-BgpRouter @params
@@ -2005,7 +1940,6 @@ CertificateTemplate= WebServer
             $fqdn = $SDNConfig.SDNDomainFQDN
 
             $params = @{
-
                 Name                                = 'microsoft.SDNNested'
                 RunAsCredential                     = $Using:domainCred 
                 MaximumReceivedDataSizePerCommandMB = 1000
@@ -2019,7 +1953,6 @@ CertificateTemplate= WebServer
             Write-Verbose "Requesting and installing SSL Certificate" 
 
             Invoke-Command -ComputerName $WACVMName -ConfigurationName microsoft.SDNNested -ArgumentList $WACVMName, $SDNConfig, $DCFQDN -Credential $WACdomainCred -ScriptBlock {
-
                 $VMName = $args[0]
                 $SDNConfig = $args[1]
                 $DCFQDN = $args[2]
@@ -2027,7 +1960,6 @@ CertificateTemplate= WebServer
                 $ErrorActionPreference = "Stop"
 
                 # Get the CA Name
-
                 $CertDump = certutil -dump
                 $ca = ((((($CertDump.Replace('`', "")).Replace("'", "")).Replace(":", "=")).Replace('\', "")).Replace('"', "") `
                     | ConvertFrom-StringData).Name
@@ -2038,7 +1970,6 @@ CertificateTemplate= WebServer
                 Write-Verbose "Certdump is $CertDump"
 
                 # Request and Accept SSL Certificate
-
                 Set-Location C:\WACCert
                 certreq -f -new WACCert.inf WACCert.req
                 certreq -config $CertAuth -attrib "CertificateTemplate:webserver" –submit WACCert.req  WACCert.cer 
@@ -2053,9 +1984,7 @@ CertificateTemplate= WebServer
 
             $SDNConfig = Import-PowerShellDataFile -Path C:\SCRIPTS\AzSHCISandbox-Config.psd1
 
-
             # Install Windows Admin Center
-
             $pfxThumbPrint = (Get-ChildItem -Path Cert:\LocalMachine\my | Where-Object { $_.FriendlyName -match "Nested SDN Windows Admin Cert" }).Thumbprint
             Write-Verbose "Thumbprint: $pfxThumbPrint"
             Write-Verbose "WACPort: $WACPort"
@@ -2067,7 +1996,6 @@ CertificateTemplate= WebServer
             Start-Process -FilePath $PathResolve -ArgumentList $arguments -PassThru | Wait-Process
            
             # Create a shortcut for Windows PowerShell ISE
-
             Write-Verbose "Creating Shortcut for PowerShell ISE"
             $TargetFile = "c:\windows\system32\WindowsPowerShell\v1.0\powershell_ise.exe"
             $ShortcutFile = "C:\Users\Public\Desktop\PowerShell ISE.lnk"
@@ -2077,7 +2005,6 @@ CertificateTemplate= WebServer
             $Shortcut.Save()
 
             # Create a shortcut for Windows PowerShell Console
-
             Write-Verbose "Creating Shortcut for PowerShell Console"
             $TargetFile = "c:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
             $ShortcutFile = "C:\Users\Public\Desktop\PowerShell.lnk"
@@ -2087,7 +2014,6 @@ CertificateTemplate= WebServer
             $Shortcut.Save()
 
             # Create a shortcut for Windows Admin Center
-
             Write-Verbose "Creating Shortcut for Windows Admin Center"
 
             if ($SDNConfig.WACport -ne "443") { $TargetPath = "https://admincenter." + $SDNConfig.SDNDomainFQDN + ":" + $SDNConfig.WACport }
@@ -2099,43 +2025,36 @@ CertificateTemplate= WebServer
             $Shortcut.Save()
     
             # Create Shortcut for Hyper-V Manager
-
             Write-Verbose "Creating Shortcut for Hyper-V Manager"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" `
                 -Destination "C:\Users\Public\Desktop"
 
             # Create Shortcut for Failover-Cluster Manager
-
             Write-Verbose "Creating Shortcut for Failover-Cluster Manager"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Failover Cluster Manager.lnk" `
                 -Destination "C:\Users\Public\Desktop"
 
             # Create Shortcut for DNS
-
             Write-Verbose "Creating Shortcut for DNS Manager"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\DNS.lnk" `
                 -Destination "C:\Users\Public\Desktop"
 
             # Create Shortcut for Active Directory Users and Computers
-
             Write-Verbose "Creating Shortcut for AD Users and Computers"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Active Directory Users and Computers.lnk" `
                 -Destination "C:\Users\Public\Desktop"
     
             # Set the SDNExplorer Script and place on desktop
-
             Write-Verbose "Configuring SDNExplorer"
             $SENCIP = "nc01." + $SDNConfig.SDNDomainFQDN    
             $SDNEXPLORER = "Set-Location 'C:\SCRIPTS\SDNExpress-Custom';.\SDNExplorer.ps1 -NCIP $SENCIP"    
             Set-Content -Value $SDNEXPLORER -Path 'C:\users\Public\Desktop\SDN Explorer.ps1' -Force
     
             # Set Network Profiles
-
             Get-NetConnectionProfile | Where-Object { $_.NetworkCategory -eq "Public" } `
             | Set-NetConnectionProfile -NetworkCategory Private | Out-Null    
     
             # Disable Automatic Updates
-
             $WUKey = "HKLM:\software\Policies\Microsoft\Windows\WindowsUpdate"
             New-Item -Path $WUKey -Force | Out-Null
             New-ItemProperty -Path $WUKey -Name AUOptions -PropertyType Dword -Value 2 `
@@ -2148,7 +2067,6 @@ CertificateTemplate= WebServer
             Start-Sleep -Seconds 10
 
             # Install Chromium
-
             Write-Verbose 'Installing Chromium browser in admincenter vm'
             $expression = "choco install googlechrome -y"
             Invoke-Expression $expression
@@ -2160,37 +2078,27 @@ CertificateTemplate= WebServer
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
                           
-       
             # Add Chromium to list of browsers
             Write-Verbose 'Setting Default Broswer on admincenter vm'
             $expression = "SetDefaultBrowser.exe Chrome"
             Invoke-Expression $expression
 
-
             # Add Scheduled task to set default browser at login
-
             $stTrigger = New-ScheduledTaskTrigger -AtLogOn
             $stTrigger.Delay = 'PT1M'
             $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Chrome'
             $schedTask = Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Force
-
         } 
-
     } 
-
 }
 
 function New-HyperConvergedEnvironment {
-
     Param (
-
         $localCred,
         $domainCred
-
     )
 
     Invoke-Command -ComputerName Admincenter -Credential $domainCred -ScriptBlock {
-
         $SDNConfig = $Using:SDNConfig
         $AzSHOSTs = @("AzSHOST1", "AzSHOST2")
 
@@ -2202,15 +2110,10 @@ function New-HyperConvergedEnvironment {
         (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
         foreach ($AzSHOST in $AzSHOSTs) {
-
             Write-Verbose "Invoking Command on $AzSHOST"
-
             Invoke-Command -ComputerName $AzSHOST -ArgumentList $SDNConfig -Credential $using:domainCred  -ScriptBlock {
-
                 function New-sdnSETSwitch {
-
                     param (
-
                         $sdnswitchName, 
                         $sdnswitchIP, 
                         $sdnswitchIPpfx, 
@@ -2218,22 +2121,17 @@ function New-HyperConvergedEnvironment {
                         $sdnswitchGW, 
                         $sdnswitchDNS, 
                         $sdnswitchteammembers
-
                     )
 
                     $VerbosePreference = "Continue"
 
                     Write-Verbose "Creating SET Hyper-V External Switch $sdnswitchName on host $env:COMPUTERNAME"
-
-
                     $params = @{
-
                         Name                  = $sdnswitchName
                         AllowManagementOS     = $true
                         NetAdapterName        = $sdnswitchteammembers
                         EnableEmbeddedTeaming = $true
                         MinimumBandwidthMode  = "Weight"
-
                     }
 
                     New-VMSwitch @params | Out-Null
@@ -2243,47 +2141,37 @@ function New-HyperConvergedEnvironment {
                     $sdnswitchNIC = Get-Netadapter | Where-Object { $_.Name -match $sdnswitchName }
 
                     $params = @{
-
                         InterfaceIndex = $sdnswitchNIC.InterfaceIndex
                         IpAddress      = $sdnswitchIP 
                         PrefixLength   = $sdnswitchIPpfx 
                         AddressFamily  = 'IPv4'
                         DefaultGateway = $sdnswitchGW
                         ErrorAction    = 'SilentlyContinue'
-
                     }
 
                     New-NetIPAddress @params | Out-Null
 
                     # Set DNS
-
                     Set-DnsClientServerAddress -InterfaceIndex $sdnswitchNIC.InterfaceIndex -ServerAddresses ($sdnswitchDNS)
 
                     # Set VLAN 
- 
                     Write-Verbose "Setting VLAN ($sdnswitchVLAN) on host vNIC"
 
                     $params = @{
-
                         IsolationMode        = 'Vlan'
                         DefaultIsolationID   = $sdnswitchVLAN 
                         AllowUntaggedTraffic = $true
                         VMNetworkAdapterName = $sdnswitchName
-
                     }
 
                     Set-VMNetworkAdapterIsolation -ManagementOS @params
 
                     # Disable Switch Extensions
-
                     Get-VMSwitchExtension -VMSwitchName $sdnswitchName | Disable-VMSwitchExtension | Out-Null
 
-
                     # Enable Large MTU
-
                     Write-Verbose "Configuring MTU on all Adapters"
                     Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $SDNConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
-
                 }
 
                 $ErrorActionPreference = "Stop"
@@ -2298,9 +2186,7 @@ function New-HyperConvergedEnvironment {
 
                 if ($sdnswitchCheck) { Write-Warning "Switch already exists on $env:COMPUTERNAME. Skipping this host." }
                 else {
-
                     $params = @{
-
                         sdnswitchName        = 'sdnSwitch'
                         sdnswitchIP          = $sdnswitchIP
                         sdnswitchIPpfx       = $sdnswitchIPpfx
@@ -2308,70 +2194,48 @@ function New-HyperConvergedEnvironment {
                         sdnswitchGW          = $sdnswitchGW
                         sdnswitchDNS         = $SDNConfig.SDNLABDNS
                         sdnswitchteammembers = $sdnswitchteammembers
-
                     }
 
                     New-sdnSETSwitch  @params | out-null
-
-                }
-
-                
+                }  
             } 
 
             Write-Verbose "Rebooting SDN Host $AzSHOST"
             Start-Sleep -Seconds 60
             Restart-Computer $AzSHOST -Force -Confirm:$false -Credential $using:domainCred
-
         }
 
         # Wait until all the AzSHOSTs have been restarted
-
         foreach ($AzSHOST in $AzSHOSTs) {
-
             Write-Verbose "Checking to see if $AzSHOST is up and online"
-            while ((Invoke-Command -ComputerName $AzSHOST -Credential $using:domainCred { "Test" } `
-                        -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 60 }
-
+            while ((Invoke-Command -ComputerName $AzSHOST -Credential $using:domainCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 60 }
         }
-
     }
-
 }
 
 function New-SDNEnvironment {
-
     Param (
-
         $domainCred,
         $SDNConfig
-
     )
 
     Invoke-Command -ComputerName admincenter -Credential $domainCred -ScriptBlock {
-
         Register-PSSessionConfiguration -Name microsoft.SDNNestedSetup -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000 | Out-Null
-
         Invoke-Command -ComputerName localhost -Credential $Using:domainCred -ArgumentList $Using:domainCred, $Using:SDNConfig -ConfigurationName microsoft.SDNNestedSetup -ScriptBlock {
-
-            
             $NCConfig = @{ }
 
             $ErrorActionPreference = "Stop"
             $VerbosePreference = "Continue"
 
             # Set Credential Object
-
             $domainCred = $args[0]
             $SDNConfig = $args[1]
 
             # Set fqdn
-
             $fqdn = $SDNConfig.SDNDomainFQDN
 
             if ($SDNConfig.ProvisionNC) {
-
                 # Set NC Configuration Data
-
                 $NCConfig.RestName = ("NC01.") + $SDNConfig.SDNDomainFQDN
                 $NCConfig.PASubnet = $SDNConfig.ProviderSubnet
                 $NCConfig.JoinDomain = $SDNConfig.SDNDomainFQDN
@@ -2406,7 +2270,6 @@ function New-SDNEnvironment {
                 ) 
 
                 $NCConfig.Muxes = @(
-
                     @{
                         ComputerName = 'Mux01'
                         HostName     = "AzSHOST2.$($SDNConfig.SDNDomainFQDN)"
@@ -2415,11 +2278,9 @@ function New-SDNEnvironment {
                         PAIPAddress  = ($SDNConfig.BGPRouterIP_ProviderNetwork.TrimEnd("1/24")) + "4"
                         PAMACAddress = '00-1D-D8-B7-1C-02'
                     }
-
                 )
 
                 $NCConfig.Gateways = @(
-
                     @{
                         ComputerName = "GW01"
                         ManagementIP = ($SDNConfig.BGPRouterIP_MGMT.TrimEnd("1/24")) + "62"
@@ -2439,78 +2300,57 @@ function New-SDNEnvironment {
                         FrontEndMac  = "00-1D-D8-B7-1C-07"
                         BackEndMac   = "00-1D-D8-B7-1C-08"
                     }
-
                 )
 
                 $NCConfig.NCs = @{
-
                     MACAddress   = "00:1D:D8:B7:1C:00"
                     ComputerName = "NC01"
                     HostName     = "AzSHOST2.$($SDNConfig.SDNDomainFQDN)"
                     ManagementIP = ($SDNConfig.BGPRouterIP_MGMT.TrimEnd("1/24")) + "60"
-
                 }
 
                 $NCConfig.Routers = @(
-
                     @{
-
                         RouterASN       = $SDNConfig.BGPRouterASN
                         RouterIPAddress = ($SDNConfig.BGPRouterIP_ProviderNetwork).Split("/")[0]
-
                     }
-
                 )
 
                 # Start SDNExpress (Nested Version) Install
-
                 Set-Location -Path 'C:\SCRIPTS\SDNExpress-Custom'
 
                 $params = @{
-
                     ConfigurationData    = $NCConfig
                     DomainJoinCredential = $domainCred
                     LocalAdminCredential = $domainCred
                     NCCredential         = $domainCred
-
                 }
 
                 .\SDNExpress.ps1 @params
-
             }
 
         } -Authentication Credssp
-
-
     } 
-
 }
 
 function Delete-AzSHCISandbox {
-
     param (
-
         $VMPlacement,
         $SDNConfig,
         $SingleHostDelete
-
     )
 
     $VerbosePreference = "Continue"
-
     Write-Verbose "Deleting Azure Stack HCI Sandbox"
 
     foreach ($vm in $VMPlacement) {
-
         $AzSHOSTName = $vm.vmHost
         $VMName = $vm.AzSHOST
 
         Invoke-Command -ComputerName $AzSHOSTName -ArgumentList $VMName -ScriptBlock {
-
             $VerbosePreference = "SilentlyContinue"
 
             Import-Module Hyper-V
-
             $VerbosePreference = "Continue"
             $vmname = $args[0]
 
@@ -2520,80 +2360,60 @@ function Delete-AzSHCISandbox {
 
             $sdnvm = Get-VM | Where-Object { $_.Name -eq $vmname }
 
-            If (!$sdnvm) { Write-Verbose "Could not find $vmname to delete" }
+            if (!$sdnvm) { 
+                Write-Verbose "Could not find $vmname to delete" 
+            }
 
             if ($sdnvm) {
-
                 Write-Verbose "Shutting down VM: $sdnvm)"
-
                 Stop-VM -VM $sdnvm -TurnOff -Force -Confirm:$false 
                 $VHDs = $sdnvm | Select-Object VMId | Get-VHD
                 Remove-VM -VM $sdnvm -Force -Confirm:$false 
 
                 foreach ($VHD in $VHDs) {
-
                     Write-Verbose "Removing $($VHD.Path)"
                     Remove-Item -Path $VHD.Path -Force -Confirm:$false
-
                 }
-
             }
-
-
         }
-
     }
 
     If ($SingleHostDelete -eq $true) {
-        
         $RemoveSwitch = Get-VMSwitch | Where-Object { $_.Name -match $SDNConfig.InternalSwitch }
 
         If ($RemoveSwitch) {
-
             Write-Verbose "Removing Internal Switch: $($SDNConfig.InternalSwitch)"
             $RemoveSwitch | Remove-VMSwitch -Force -Confirm:$false
-
         }
-
     }
 
     Write-Verbose "Deleting RDP links"
-
     Remove-Item C:\Users\Public\Desktop\AdminCenter.lnk -Force -ErrorAction SilentlyContinue
-
 
     Write-Verbose "Deleting NetNAT"
     Get-NetNAT | Remove-NetNat -Confirm:$false
 
     Write-Verbose "Deleting Internal Switches"
     Get-VMSwitch | Where-Object { $_.SwitchType -eq "Internal" } | Remove-VMSwitch -Force -Confirm:$false
-
-
 }
 
 function Add-WACtenants {
-
     param (
-
         $SDNLabSystems,
         $SDNConfig,
         $domainCred
-
     )
 
     $VerbosePreference = "Continue"
     Write-Verbose "Invoking Command to add Windows Admin Center Tenants"
 
     Invoke-Command -ComputerName Admincenter -Credential $domainCred -ScriptBlock {   
-     
         $domainCred = $using:domainCred
         $SDNLabSystems = $using:SDNLabSystems
         $SDNConfig = $using:SDNConfig
         $VerbosePreference = "Continue" 
 
-        Invoke-Command -ComputerName admincenter -Credential $domainCred -ScriptBlock {
-                     
-        
+        Invoke-Command -ComputerName admincenter -Credential $domainCred -ScriptBlock {         
             # Set Variables
 
             $SDNConfig = Import-PowerShellDataFile -Path C:\SCRIPTS\AzSHCISandbox-Config.psd1
@@ -2603,17 +2423,12 @@ function Add-WACtenants {
             $domainCred = new-object -typename System.Management.Automation.PSCredential `
                 -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
             (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
- 
-
 
             # Set Constrained Delegation for NC/MUX/GW Virtual Machines for Windows Admin Center
-
             $SDNvms = ("NC01", "MUX01", "GW01", "GW02")
 
             $VerbosePreference = "Continue"
-
             foreach ($SDNvm in $SDNvms) {
-
                 Write-Verbose "Setting Delegation for $SDNvm"
                 $gateway = "AdminCenter"
                 Write-Verbose "gateway = $gateway"
@@ -2624,95 +2439,67 @@ function Add-WACtenants {
                 $nodeObject = Get-ADComputer -Identity $node -Credential $domainCred
                 Write-Verbose "nodeObject = $nodeObject"
                 Set-ADComputer -Identity $nodeObject -PrincipalsAllowedToDelegateToAccount $gatewayObject -Credential $domainCred
-
             }
 
-
-
             foreach ($SDNLabSystem in $SDNLabSystems) {
-
-
                 $json = [pscustomobject]@{
-
                     id   = "msft.sme.connection-type.server!$SDNLabSystem"
                     name = $SDNLabSystem
                     type = "msft.sme.connection-type.server"
 
                 } | ConvertTo-Json
 
-
                 $payload = @"
 [
 $json
 ]
 "@
-
                 if ($SDNConfig.WACport -eq "443" -or !$SDNConfig.WACport) {
 
                     $uri = "https://admincenter.$($SDNConfig.SDNDomainFQDN)/api/connections"
 
                 }
-
                 else {
 
                     $uri = "https://admincenter.$($SDNConfig.SDNDomainFQDN):$($SDNConfig.WACport)/api/connections"
 
                 }
-
                 Write-Verbose "Adding Host: $SDNLabSystem"
 
-
                 $param = @{
-
                     Uri         = $uri
                     Method      = 'Put'
                     Body        = $payload
                     ContentType = $content
                     Credential  = $domainCred
-
                 }
-
                 Invoke-RestMethod @param -UseBasicParsing -DisableKeepAlive | Out-Null
-
-   
             }
-        
         }
-
     }
-
 }
 
 function New-SDNS2DCluster {
-
     param (
-
         $SDNConfig,
         $domainCred,
         $AzStackClusterNode
-
     )
 
-    $VerbosePreference = "Continue" 
-                
+    $VerbosePreference = "Continue"       
     Invoke-Command -ComputerName $AzStackClusterNode -ArgumentList $SDNConfig, $domainCred -Credential $domainCred -ScriptBlock {
-         
         $SDNConfig = $args[0]
         $domainCred = $args[1]
         $VerbosePreference = "SilentlyContinue"
         $ErrorActionPreference = "Stop"
 
-
         Register-PSSessionConfiguration -Name microsoft.SDNNestedS2D -RunAsCredential $domainCred -MaximumReceivedDataSizePerCommandMB 1000 -MaximumReceivedObjectSizeMB 1000 | Out-Null
-
         Invoke-Command -ComputerName $Using:AzStackClusterNode -ArgumentList $SDNConfig, $domainCred -Credential $domainCred -ConfigurationName microsoft.SDNNestedS2D -ScriptBlock {
-
             $SDNConfig = $args[0]
             $domainCred = $args[1]
 
 
             # Create S2D Cluster
-
             $SDNConfig = $args[0]
             $AzSHOSTs = @("AzSHOST1", "AzSHOST2")
 
@@ -2729,7 +2516,6 @@ function New-SDNS2DCluster {
             $ClusterName = "AzStackCluster"
 
             # Create Cluster
-
             $VerbosePreference = "SilentlyContinue"
 
             New-Cluster -Name $ClusterName -Node $AzSHOSTs -StaticAddress $ClusterIP `
@@ -2738,35 +2524,27 @@ function New-SDNS2DCluster {
             $VerbosePreference = "Continue"
 
             # Invoke Command to enable S2D on AzStackCluster        
-            
-              Enable-ClusterS2D -Confirm:$false -Verbose
+            Enable-ClusterS2D -Confirm:$false -Verbose
 
             # Wait for Cluster Performance History Volume to be Created
             while (!$PerfHistory) {
-
-            Write-Verbose "Waiting for Cluster Performance History volume to come online."
-            Start-Sleep -Seconds 10            
-            $PerfHistory = Get-ClusterResource | Where-Object {$_.Name -match 'ClusterPerformanceHistory'}
-            if ($PerfHistory) {Write-Verbose "Cluster Perfomance History volume online." }            
-
+                Write-Verbose "Waiting for Cluster Performance History volume to come online."
+                Start-Sleep -Seconds 10            
+                $PerfHistory = Get-ClusterResource | Where-Object {$_.Name -match 'ClusterPerformanceHistory'}
+                if ($PerfHistory) {Write-Verbose "Cluster Perfomance History volume online." }            
             }
 
-
             Write-Verbose "Setting Physical Disk Media Type"
-
             Get-PhysicalDisk | Where-Object { $_.Size -lt 127GB } | Set-PhysicalDisk -MediaType HDD | Out-Null
-
-            $params = @{
             
+            $params = @{
                 FriendlyName            = "S2D_vDISK1" 
                 FileSystem              = 'CSVFS_ReFS'
                 StoragePoolFriendlyName = 'S2D on AzStackCluster'
                 ResiliencySettingName   = 'Mirror'
                 PhysicalDiskRedundancy  = 1
                 AllocationUnitSize = 64KB
-                
             }
-
 
             Write-Verbose "Creating Physical Disk"
 
@@ -2774,67 +2552,53 @@ function New-SDNS2DCluster {
             New-Volume @params -UseMaximumSize  | Out-Null
 
             # Set Virtual Environment Optimizations
-
             Write-Verbose "Setting Virtual Environment Optimizations"
-
-
-             
 
             $VerbosePreference = "SilentlyContinue"
             Get-storagesubsystem clus* | set-storagehealthsetting -name “System.Storage.PhysicalDisk.AutoReplace.Enabled” -value “False”
             Set-ItemProperty -Path HKLM:\SYSTEM\CurrentControlSet\Services\spaceport\Parameters -Name HwTimeout -Value 0x00007530
             $VerbosePreference = "Continue"
            
-                    # Rename Storage Network Adapters
+            # Rename Storage Network Adapters
+            Write-Verbose "Renaming Storage Network Adapters"
 
-        Write-Verbose "Renaming Storage Network Adapters"
-
-        (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.storageAsubnet.Replace('/24', '')) }).Name = 'StorageA'
-        (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.storageBsubnet.Replace('/24', '')) }).Name = 'StorageB'
-        (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.MGMTSubnet.Replace('/24', '')) }).Name = 'Public'
+            (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.storageAsubnet.Replace('/24', '')) }).Name = 'StorageA'
+            (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.storageBsubnet.Replace('/24', '')) }).Name = 'StorageB'
+            (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.MGMTSubnet.Replace('/24', '')) }).Name = 'Public'
 
 
-        # Set Allowed Networks for Live Migration
+            # Set Allowed Networks for Live Migration
 
-        Write-Verbose "Setting allowed networks for Live Migration"
+            Write-Verbose "Setting allowed networks for Live Migration"
 
-        Get-ClusterResourceType -Name "Virtual Machine" -Cluster AzStackCluster | Set-ClusterParameter -Cluster AzStackCluster -Name MigrationExcludeNetworks `
-            -Value ([String]::Join(";", (Get-ClusterNetwork -Cluster AzStackCluster | Where-Object { $_.Name -notmatch "Storage" }).ID))
+            Get-ClusterResourceType -Name "Virtual Machine" -Cluster AzStackCluster | Set-ClusterParameter -Cluster AzStackCluster -Name MigrationExcludeNetworks `
+                -Value ([String]::Join(";", (Get-ClusterNetwork -Cluster AzStackCluster | Where-Object { $_.Name -notmatch "Storage" }).ID))
 
         } | Out-Null
-
     } 
 
 
 }
 
 function test-internetConnect {
-
     $testIP = '1.1.1.1'
     $ErrorActionPreference = "Stop"  
     $intConnect = Test-Connection -ComputerName $testip -Quiet -Count 2
 
     if (!$intConnect) {
-
         Write-Error "Unable to connect to Internet. An Internet connection is required."
-
     }
-
 }
 
 function set-hostnat {
-
     param (
-
         $SDNConfig
     )
 
     $VerbosePreference = "Continue" 
-
     $switchExist = Get-NetAdapter | Where-Object { $_.Name -match $SDNConfig.natHostVMSwitchName }
 
     if (!$switchExist) {
-
         Write-Verbose "Creating Internal NAT Switch: $($SDNConfig.natHostVMSwitchName)"
         # Create Internal VM Switch for NAT
         New-VMSwitch -Name $SDNConfig.natHostVMSwitchName -SwitchType Internal | Out-Null
@@ -2847,47 +2611,32 @@ function set-hostnat {
         New-NetIPAddress -IPAddress $natIP -PrefixLength 24 -InterfaceIndex $intIdx | Out-Null
 
         # Create NetNAT
-
         Write-Verbose "Creating new NETNAT"
         New-NetNat -Name $SDNConfig.natHostVMSwitchName  -InternalIPInterfaceAddressPrefix $SDNConfig.natHostSubnet | Out-Null
-
     }
-
 }
 
 function enable-singleSignOn {
-
     param (
-
         $SDNConfig
     )
 
-    $domainCred = new-object -typename System.Management.Automation.PSCredential `
-        -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
-    (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
-
+    $domainCred = new-object -typename System.Management.Automation.PSCredential -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
     Invoke-Command -ComputerName ("$($SDNConfig.DCName).$($SDNConfig.SDNDomainFQDN)") -ScriptBlock {
-
         Get-ADComputer -Filter * | Set-ADComputer -PrincipalsAllowedToDelegateToAccount (Get-ADComputer AdminCenter)
-
-
     } -Credential $domainCred
-
 }
 
 #endregion
    
 #region Main
-    
 $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop" 
 
-#Get Start Time
+# Get Start Time
 $starttime = Get-Date
    
-    
 # Import Configuration Module
-
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 Copy-Item $ConfigurationDataFile -Destination .\Applications\SCRIPTS -Force
 
@@ -2915,40 +2664,30 @@ $NCClientCred = new-object -typename System.Management.Automation.PSCredential `
 # Define SDN host Names. Please do not change names as these names are hardcoded in the setup.
 $AzSHOSTs = @("AzSMGMT", "AzSHOST1", "AzSHOST2")
 
-
 # Delete configuration if specified
-
 if ($Delete) {
-
     if ($SDNConfig.MultipleHyperVHosts) {
-
         $params = @{
-
             MultipleHyperVHosts = $SDNConfig.MultipleHyperVHostNames
             AzSHOSTs            = $AzSHOSTs    
-
         }       
 
         $VMPlacement = Select-VMHostPlacement @params
         $SingleHostDelete = $false
     }     
     elseif (!$SDNConfig.MultipleHyperVHosts) { 
-    
         Write-Verbose "This is a single host installation"
         $VMPlacement = Select-SingleHost -AzSHOSTs $AzSHOSTs
         $SingleHostDelete = $true
-
     }
 
     Delete-AzSHCISandbox -SDNConfig $SDNConfig -VMPlacement $VMPlacement -SingleHostDelete $SingleHostDelete
 
     Write-Verbose "Successfully Removed the Azure Stack HCI Sandbox"
     exit
-
 }
     
 # Set Variables from config file
-
 $NestedVMMemoryinGB = $SDNConfig.NestedVMMemoryinGB
 $guiVHDXPath = $SDNConfig.guiVHDXPath
 $azSHCIVHDXPath = $SDNConfig.azSHCIVHDXPath
@@ -2958,15 +2697,12 @@ $natDNS = $SDNConfig.natDNS
 $natSubnet = $SDNConfig.natSubnet
 $natConfigure = $SDNConfig.natConfigure   
 
-
 $VerbosePreference = "SilentlyContinue" 
 Import-Module Hyper-V 
 $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
     
-
 # Enable PSRemoting
-
 Write-Verbose "Enabling PS Remoting on client..."
 $VerbosePreference = "SilentlyContinue"
 Enable-PSRemoting
@@ -2974,166 +2710,112 @@ Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 $VerbosePreference = "Continue"
 
 # Verify Applications
-
 Resolve-Applications -SDNConfig $SDNConfig
 
 # Verify Internet Connectivity
 test-internetConnect
     
 # if single host installation, set up installation parameters
-
 if (!$SDNConfig.MultipleHyperVHosts) {
-
     Write-Verbose "No Multiple Hyper-V Hosts defined. Using Single Hyper-V Host Installation"
     Write-Verbose "Testing VHDX Path"
 
     $params = @{
-
         guiVHDXPath    = $guiVHDXPath
         azSHCIVHDXPath = $azSHCIVHDXPath
-    
     }
 
     Test-VHDPath @params
 
     Write-Verbose "Generating Single Host Placement"
-
     $VMPlacement = Select-SingleHost -AzSHOSTs $AzSHOSTs
 
     Write-Verbose "Creating Internal Switch"
-
     $params = @{
-
         pswitchname = $InternalSwitch
         SDNConfig   = $SDNConfig
-    
     }
-
     New-InternalSwitch @params
 
     Write-Verbose "Creating NAT Switch"
-
     set-hostnat -SDNConfig $SDNConfig
-
     $VMSwitch = $InternalSwitch
 
     Write-Verbose "Getting local Parent VHDX Path"
-
     $params = @{
-
         guiVHDXPath = $guiVHDXPath
         HostVMPath  = $HostVMPath
-    
     }
 
-
     $ParentVHDXPath = Get-guiVHDXPath @params
-
     Set-LocalHyperVSettings -HostVMPath $HostVMPath
-
     $params = @{
-
         azSHCIVHDXPath = $azSHCIVHDXPath
         HostVMPath     = $HostVMPath
-    
     }
 
     $coreParentVHDXPath = Get-azSHCIVHDXPath @params
-
-
 }
     
 # if multiple host installation, set up installation parameters
-
 if ($SDNConfig.MultipleHyperVHosts) {
-
     Write-Verbose "Multiple Hyper-V Hosts defined. Using Mutiple Hyper-V Host Installation"
     Get-PhysicalNICMTU -SDNConfig $SDNConfig
 
     $params = @{
-
         MultipleHyperVHosts = $SDNConfig.MultipleHyperVHostNames
         HostVMPath          = $HostVMPath
-        
     }
-
     Get-HyperVHosts @params
 
     Write-Verbose "Testing VHDX Path"
-
     $params = @{
-
         guiVHDXPath    = $guiVHDXPath
         azSHCIVHDXPath = $azSHCIVHDXPath
-    
     }
-
-
     Test-VHDPath @params
 
     Write-Verbose "Generating Multiple Host Placement"
-
     $params = @{
-
         MultipleHyperVHosts = $SDNConfig.MultipleHyperVHostNames
         AzSHOSTs            = $AzSHOSTs
     }
-
     $VMPlacement = Select-VMHostPlacement @params
 
     Write-Verbose "Getting local Parent VHDX Path"
-
     $params = @{
-
         guiVHDXPath = $guiVHDXPath
         HostVMPath  = $HostVMPath
-    
     }
 
     $ParentVHDXPath = Get-guiVHDXPath @params
-
     $params = @{
-
         MultipleHyperVHosts = $MultipleHyperVHosts
         HostVMPath          = $HostVMPath
     
     }
-
     Set-HyperVSettings @params
-
-
     $params = @{
-
         azSHCIVHDXPath = $azSHCIVHDXPath
         HostVMPath     = $HostVMPath
-    
     }
 
-
     $coreParentVHDXPath = Get-azSHCIVHDXPath @params
-
-
     $VMSwitch = $SDNConfig.MultipleHyperVHostExternalSwitchName
 
     # Write-Verbose "Creating vNIC on $env:COMPUTERNAME"
     New-HostvNIC -SDNConfig $SDNConfig -localCred $localCred
-
 }
     
-    
 # if multiple host installation, copy the parent VHDX file to the specified Parent VHDX Path
-
 if ($SDNConfig.MultipleHyperVHosts) {
-
     Write-Verbose "Copying VHDX Files to Host"
 
     $params = @{
-
         MultipleHyperVHosts = $SDNConfig.MultipleHyperVHostNames
         azSHCIVHDXPath      = $azSHCIVHDXPath
         HostVMPath          = $HostVMPath
         guiVHDXPath         = $guiVHDXPath 
-
     }
 
     Copy-VHDXtoHosts @params
@@ -3333,4 +3015,4 @@ $ErrorActionPreference = "Continue"
 $VerbosePreference = "SilentlyContinue"
 $WarningPreference = "Continue"
     
-   
+#endregion
