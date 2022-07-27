@@ -149,17 +149,17 @@ Write-Header "Downloading Azure Stack HCI configuration scripts"
 # Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile $Env:HciBoxVHDDir\AZSHCI.vhdx
 # Invoke-WebRequest https://aka.ms/AAbclsv -OutFile $Env:HciBoxVHDDir\GUI.vhdx
 # Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxVHDDir\WindowsAdminCenter.msi
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Setup-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Setup-AzSHCI.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/New-AzSHCISandbox.ps1") -OutFile $Env:HciBoxDir\New-AzSHCISandbox.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Register-AzSHCI.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AzSHCI-Config.psd1") -OutFile $Env:HciBoxDir\AzSHCI-Config.psd1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/CertHelpers.ps1") -OutFile $Env:HciBoxSDNDir\CertHelpers.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HciBoxSDNDir\NetworkControllerRESTWrappers.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HciBoxSDNDir\NetworkControllerWorkloadHelpers.psm1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/SDNExplorer.ps1") -OutFile $Env:HciBoxSDNDir\SDNExplorer.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/SDNExpress.ps1") -OutFile $Env:HciBoxSDNDir\SDNExpress.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/SDNExpressModule.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressModule.psm1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/SDNExpressUI.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressUI.psm1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/sdn/Single-NC.psd1") -OutFile $Env:HciBoxSDNDir\Single-NC.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/AzSHCISandbox-Config.psd1") -OutFile $Env:HciBoxDir\AzSHCISandbox-Config.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HciBoxSDNDir\CertHelpers.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HciBoxSDNDir\NetworkControllerRESTWrappers.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HciBoxSDNDir\NetworkControllerWorkloadHelpers.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExplorer.ps1") -OutFile $Env:HciBoxSDNDir\SDNExplorer.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpress.ps1") -OutFile $Env:HciBoxSDNDir\SDNExpress.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressModule.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressModule.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressUI.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HciBoxSDNDir\Single-NC.psd1
 
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V"
