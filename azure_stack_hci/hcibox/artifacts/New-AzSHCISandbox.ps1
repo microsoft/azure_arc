@@ -677,9 +677,9 @@ $azsmgmtProdKey
             New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
             Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
             Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
-            Copy-Item -Path .\Applications\SCRIPTS -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path .\Applications\SDNEXAMPLES -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path '.\Applications\Windows Admin Center' -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
+            Copy-Item -Path .\SDN -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+            Copy-Item -Path .\SDN -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+            Copy-Item -Path '.\Windows Admin Center' -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
 
         }       
     
@@ -865,8 +865,8 @@ function Resolve-Applications {
     
 
     # Verify Windows Admin Center
-    $isWAC = Get-ChildItem -Path '.\Applications\Windows Admin Center' -Filter *.MSI
-    if (!$isWAC) { Write-Error "Please check and ensure that you have correctly copied the Admin Center install file to \Applications\RSAT." }
+    $isWAC = Get-ChildItem -Path '.\Windows Admin Center' -Filter *.MSI
+    if (!$isWAC) { Write-Error "Please check and ensure that you have correctly copied the Admin Center install file to C:\HciBox\Windows Admin Center." }
 
     # Are we on Server Core?
     $regKey = "hklm:/software/microsoft/windows nt/currentversion"
@@ -3285,7 +3285,7 @@ $starttime = Get-Date
 # Import Configuration Module
 
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-Copy-Item $ConfigurationDataFile -Destination .\Applications\SCRIPTS -Force
+Copy-Item $ConfigurationDataFile -Destination .\SDN -Force
 
 # Set VM Host Memory
 $totalPhysicalMemory = (Get-CimInstance -ClassName 'Cim_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1GB
