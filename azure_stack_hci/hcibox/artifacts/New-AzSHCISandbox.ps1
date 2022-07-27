@@ -15,7 +15,7 @@
      remain after deletion.)
 
 .NOTES
-    Prerequisites:
+    Prerequisites: 
 
     * All Hyper-V hosts must have Hyper-V enabled and the Virtual Switch 
     already created with the same name (if using Multiple Hosts). If you are
