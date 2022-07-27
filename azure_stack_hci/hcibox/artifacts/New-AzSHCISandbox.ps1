@@ -3277,13 +3277,17 @@ function enable-singleSignOn {
     
 $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop" 
+$ProgressPreference = 'SilentlyContinue'
 
 #Get Start Time
 $starttime = Get-Date
    
-    
-# Import Configuration Module
 
+# Download HciBox VHDs
+Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile C:\HciBox\VHD\AZSHCI.vhdx
+Invoke-WebRequest https://aka.ms/AAbclsv -OutFile C:\HciBox\VHD\GUI.vhdx
+
+# Import Configuration Module
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 Copy-Item $ConfigurationDataFile -Destination .\SDN -Force
 
