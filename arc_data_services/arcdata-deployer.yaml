@@ -197,6 +197,7 @@ rules:
   verbs:
   - delete
   - get
+  - patch
 - apiGroups:
   - rbac.authorization.k8s.io
   resources:
