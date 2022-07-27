@@ -59,7 +59,7 @@ param(
     [Bool] $Delete = $false
 )
 
-# Region functions
+#region functions
 function Get-HyperVHosts {
     param (
         [String[]]$MultipleHyperVHosts,
@@ -2414,7 +2414,6 @@ function Add-WACtenants {
 
         Invoke-Command -ComputerName admincenter -Credential $domainCred -ScriptBlock {
             # Set Variables
-
             $SDNConfig = Import-PowerShellDataFile -Path" C:\SCRIPTS\AzSHCISandbox-Config.psd1"
             $fqdn = $SDNConfig.SDNDomainFQDN
             $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
