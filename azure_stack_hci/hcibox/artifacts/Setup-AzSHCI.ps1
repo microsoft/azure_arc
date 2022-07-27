@@ -1403,7 +1403,7 @@ function New-RouterVM {
         New-Item -Path "C:\TempBGPMount" -ItemType Directory | Out-Null
         Mount-WindowsImage -Path "C:\TempBGPMount" -Index 1 -ImagePath ($vmpath + $VMName + '\' + $VMName + '.vhdx') | Out-Null
 
-        New-Item -Path C:\TempBGPMount\windows -ItemType Directory -Name Panther -Force | Out-Null
+        New-Item -Path "C:\TempBGPMount\windows" -ItemType Directory -Name Panther -Force | Out-Null
 
         $Password = $SDNConfig.SDNAdminPassword
         $ProductKey = $SDNConfig.GUIProductKey
@@ -1459,8 +1459,8 @@ function New-RouterVM {
         Set-Content -Value $Unattend -Path "C:\TempBGPMount\Windows\Panther\Unattend.xml" -Force
 
         Write-Verbose "Enabling Remote Access"
-        Enable-WindowsOptionalFeature -Path C:\TempBGPMount -FeatureName RasRoutingProtocols -All -LimitAccess | Out-Null
-        Enable-WindowsOptionalFeature -Path C:\TempBGPMount -FeatureName RemoteAccessPowerShell -All -LimitAccess | Out-Null
+        Enable-WindowsOptionalFeature -Path "C:\TempBGPMount" -FeatureName RasRoutingProtocols -All -LimitAccess | Out-Null
+        Enable-WindowsOptionalFeature -Path "C:\TempBGPMount" -FeatureName RemoteAccessPowerShell -All -LimitAccess | Out-Null
         Write-Verbose "Dismounting Disk Image for $VMName VM."
         Dismount-WindowsImage -Path "C:\TempBGPMount" -Save | Out-Null
         Remove-Item "C:\TempBGPMount"
@@ -1630,14 +1630,14 @@ function New-AdminCenterVM {
         # Copy Source Files
         Write-Verbose "Copying Application and Script Source Files to $VMName"
         Copy-Item 'C:\VMConfigs\Windows Admin Center' -Destination C:\TempWACMount\ -Recurse -Force
-        Copy-Item C:\VMConfigs\SCRIPTS -Destination C:\TempWACMount -Recurse -Force
-        Copy-Item C:\VMConfigs\SDNEXAMPLES -Destination C:\TempWACMount -Recurse -Force
-        New-Item -Path C:\TempWACMount\VHDs -ItemType Directory -Force | Out-Null
-        Copy-Item C:\VMs\Base\AzSHCI.vhdx -Destination C:\TempWACMount\VHDs -Force
-        Copy-Item C:\VMs\Base\GUI.vhdx  -Destination  C:\TempWACMount\VHDs -Force
+        Copy-Item "C:\VMConfigs\SCRIPTS" -Destination "C:\TempWACMount" -Recurse -Force
+        Copy-Item "C:\VMConfigs\SDNEXAMPLES" -Destination "C:\TempWACMount" -Recurse -Force
+        New-Item -Path "C:\TempWACMount\VHDs" -ItemType Directory -Force | Out-Null
+        Copy-Item "C:\VMs\Base\AzSHCI.vhdx" -Destination "C:\TempWACMount\VHDs" -Force
+        Copy-Item "C:\VMs\Base\GUI.vhdx"  -Destination  "C:\TempWACMount\VHDs" -Force
 
         # Apply Custom Unattend.xml file
-        New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null
+        New-Item -Path "C:\TempWACMount\windows" -ItemType Directory -Name Panther -Force | Out-Null
         $Password = $SDNConfig.SDNAdminPassword
         $ProductKey = $SDNConfig.GUIProductKey
         $Gateway = $SDNConfig.SDNLABRoute
@@ -1744,8 +1744,8 @@ function New-AdminCenterVM {
 
         # Enabling Remote Access on Admincenter VM
         Write-Verbose "Enabling Remote Access"
-        Enable-WindowsOptionalFeature -Path C:\TempWACMount -FeatureName RasRoutingProtocols -All -LimitAccess | Out-Null
-        Enable-WindowsOptionalFeature -Path C:\TempWACMount -FeatureName RemoteAccessPowerShell -All -LimitAccess | Out-Null
+        Enable-WindowsOptionalFeature -Path "C:\TempWACMount" -FeatureName RasRoutingProtocols -All -LimitAccess | Out-Null
+        Enable-WindowsOptionalFeature -Path "C:\TempWACMount" -FeatureName RemoteAccessPowerShell -All -LimitAccess | Out-Null
 
         # Save Customizations and then dismount.
         Write-Verbose "Dismounting Disk"
@@ -1928,7 +1928,7 @@ CertificateTemplate= WebServer
 "@
 
             New-Item C:\WACCert -ItemType Directory -Force | Out-Null
-            Set-Content -Value $RequestInf -Path C:\WACCert\WACCert.inf -Force | Out-Null
+            Set-Content -Value $RequestInf -Path "C:\WACCert\WACCert.inf" -Force | Out-Null
 
             $WACdomainCred = new-object -typename System.Management.Automation.PSCredential `
                 -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
@@ -1981,10 +1981,10 @@ CertificateTemplate= WebServer
             } -Authentication Credssp
 
 
-            $SDNConfig = Import-PowerShellDataFile -Path C:\SCRIPTS\AzSHCISandbox-Config.psd1
+            $SDNConfig = Import-PowerShellDataFile -Path "C:\SCRIPTS\AzSHCISandbox-Config.psd1"
 
             # Install Windows Admin Center
-            $pfxThumbPrint = (Get-ChildItem -Path Cert:\LocalMachine\my | Where-Object { $_.FriendlyName -match "Nested SDN Windows Admin Cert" }).Thumbprint
+            $pfxThumbPrint = (Get-ChildItem -Path "Cert:\LocalMachine\my" | Where-Object { $_.FriendlyName -match "Nested SDN Windows Admin Cert" }).Thumbprint
             Write-Verbose "Thumbprint: $pfxThumbPrint"
             Write-Verbose "WACPort: $WACPort"
             $WindowsAdminCenterGateway = "https://admincenter." + $fqdn
@@ -2415,7 +2415,7 @@ function Add-WACtenants {
         Invoke-Command -ComputerName admincenter -Credential $domainCred -ScriptBlock {
             # Set Variables
 
-            $SDNConfig = Import-PowerShellDataFile -Path C:\SCRIPTS\AzSHCISandbox-Config.psd1
+            $SDNConfig = Import-PowerShellDataFile -Path" C:\SCRIPTS\AzSHCISandbox-Config.psd1"
             $fqdn = $SDNConfig.SDNDomainFQDN
             $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
             $VerbosePreference = "Continue"
