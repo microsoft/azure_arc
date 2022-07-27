@@ -45,7 +45,8 @@ param (
 [System.Environment]::SetEnvironmentVariable('enableADAuth', $enableADAuth,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('addsDomainName', $addsDomainName,[System.EnvironmentVariableTarget]::Machine)
 
-$bootstrapLogFile = "C:\Temp\Bootstrap.log"
+$Env:tempDir="C:\Temp"
+$bootstrapLogFile = "$Env:tempDir\Bootstrap.log"
 Start-Transcript $bootstrapLogFile
 . ./AddPSProfile-v1.ps1
 
@@ -90,7 +91,7 @@ if ($enableADAuth -eq $true -and $addsDomainName.Length -gt 0)
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
     $Trigger = New-ScheduledTaskTrigger -AtStartup
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$tempDir\RunAfterClientVMADJoin.ps1"
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:tempDir\RunAfterClientVMADJoin.ps1"
     Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
 

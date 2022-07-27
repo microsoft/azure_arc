@@ -5,7 +5,7 @@ param (
 )
 Write-Output "Common DataServicesLogonScript"
 
-# Function repository1
+# Function repository
 function SetDefaultSubscription {
     param (
         [string]$subscriptionId
@@ -86,7 +86,110 @@ function CreateCustomLocation {
         --cluster-extension-ids $extensionId `
         --kubeconfig $KUBECONFIG
 }
+function DeployingAzureArcDataController {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingPlainTextForPassword", "")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingUsernameAndPasswordParams", "")]
+    param (
+        [string]$resourceGroup,
+        [string]$directory,
+        [string]$workspaceName,
+        [string]$AZDATA_USERNAME,
+        [string]$AZDATA_PASSWORD,
+        [string]$spnClientId,
+        [string]$spnTenantId,
+        [string]$spnClientSecret,
+        [string]$subscriptionId
+    )
+    $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $resourceGroup --query id -o tsv)
+    $workspaceId = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+    $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName --query primarySharedKey -o tsv)
 
+    $dataControllerParams = "$directory\dataController.parameters.json"
+
+    (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $resourceGroup | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage', $AZDATA_USERNAME | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage', $AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'subscriptionId-stage', $subscriptionId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'spnClientId-stage', $spnClientId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'spnTenantId-stage', $spnTenantId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'spnClientSecret-stage', $spnClientSecret | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
+    (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
+
+    az deployment group create --resource-group $resourceGroup `
+        --template-file "$directory\dataController.json" `
+        --parameters "$directory\dataController.parameters.json"
+
+    Write-Output "`n"
+    Do {
+        Write-Output "Waiting for data controller. Hold tight, this might take a few minutes...(45s sleeping loop)"
+        Start-Sleep -Seconds 45
+        $dcStatus = $(if (kubectl get datacontroller -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($dcStatus -eq "Nope")
+
+    Write-Output "`n"
+    Write-Output "Azure Arc data controller is ready!"
+    Write-Output "`n"
+}
+function EnablingDataControllerAutoMetrics {
+    param (
+        [string]$resourceGroup,
+        [string]$workspaceName
+    )
+    Write-Output "`n"
+    Write-Output "Enabling data controller auto metrics & logs upload to log analytics"
+    Write-Output "`n"
+    $Env:WORKSPACE_ID = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+    $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName  --query primarySharedKey -o tsv)
+    az arcdata dc update --name jumpstart-dc --resource-group $resourceGroup --auto-upload-logs true
+    az arcdata dc update --name jumpstart-dc --resource-group $resourceGroup --auto-upload-metrics true
+}
+function CopyingAzureDataStudioSettingsRemplateFile {
+    param (
+        [string]$adminUsername,
+        [string]$directory
+    )
+    Write-Output "`n"
+    Write-Output "Copying Azure Data Studio settings template file"
+    New-Item -Path "C:\Users\$adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+    Copy-Item -Path "$directory\settingsTemplate.json" -Destination "C:\Users\$adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+}
+function Add-URL-Shortcut-Desktop {
+    param (
+        [string]$url,
+        [string]$name,
+        [string]$USERPROFILE
+    )
+    $Shell = New-Object -ComObject ("WScript.Shell")
+    $Favorite = $Shell.CreateShortcut($USERPROFILE + "\Desktop\$name.url")
+    $Favorite.TargetPath = $url;
+    $Favorite.Save()
+}
+function ChangingToClientVMWallpaper {
+    param (
+        [string]$directory
+    )
+
+    $imgPath = "$directory\wallpaper.png"
+    $code = @'
+using System.Runtime.InteropServices;
+namespace Win32{
+
+     public class Wallpaper{
+        [DllImport("user32.dll", CharSet=CharSet.Auto)]
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ;
+
+         public static void SetWallpaper(string thePath){
+            SystemParametersInfo(20,0,thePath,3);
+         }
+    }
+ }
+'@
+
+    add-type $code
+    [Win32.Wallpaper]::SetWallpaper($imgPath)
+}
 # Main script
 Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False
 
