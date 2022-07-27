@@ -71,7 +71,8 @@ $Env:HciBoxKVDir = "C:\HciBox\KeyVault"
 $Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
 $Env:HciBoxIconDir = "C:\HciBox\Icons"
 $Env:HciBoxVHDDir = "C:\HciBox\VHD"
-$Env:HciBoxSDNDir = "C:\HciBox\sdn"
+$Env:HciBoxSDNDir = "C:\HciBox\SDN"
+$Env:HciBoxWACDir = "C:\HciBox\Windows Admin Center"
 $Env:agentScript = "C:\HciBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
@@ -85,6 +86,7 @@ New-Item -Path $Env:HciBoxVMDir -ItemType directory -Force
 New-Item -Path $Env:HciBoxKVDir -ItemType directory -Force
 New-Item -Path $Env:HciBoxGitOpsDir -ItemType directory -Force
 New-Item -Path $Env:HciBoxIconDir -ItemType directory -Force
+New-Item -Path $Env:HciBoxWACDir -ItemType directory -Force
 New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
@@ -148,7 +150,7 @@ Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 Write-Header "Downloading Azure Stack HCI configuration scripts"
 # Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile $Env:HciBoxVHDDir\AZSHCI.vhdx
 # Invoke-WebRequest https://aka.ms/AAbclsv -OutFile $Env:HciBoxVHDDir\GUI.vhdx
-# Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxVHDDir\WindowsAdminCenter.msi
+Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxWACDir\WindowsAdminCenter.msi
 Invoke-WebRequest ($templateBaseUrl + "artifacts/New-AzSHCISandbox.ps1") -OutFile $Env:HciBoxDir\New-AzSHCISandbox.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Register-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AzSHCISandbox-Config.psd1") -OutFile $Env:HciBoxDir\AzSHCISandbox-Config.psd1
