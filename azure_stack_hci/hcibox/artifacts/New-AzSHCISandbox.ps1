@@ -3284,6 +3284,7 @@ $starttime = Get-Date
    
 
 # Download HciBox VHDs
+Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
 Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile C:\HciBox\VHD\AZSHCI.vhdx
 Invoke-WebRequest https://aka.ms/AAbclsv -OutFile C:\HciBox\VHD\GUI.vhdx
 

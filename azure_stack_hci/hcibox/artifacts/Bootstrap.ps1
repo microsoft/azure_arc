@@ -63,7 +63,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('addsDomainName', $addsDomainName,[System.EnvironmentVariableTarget]::Machine)
 
 # Creating HciBox path
-Write-Output "Creating HciBox path"
+Write-Output "Creating HciBox paths"
 $Env:HciBoxDir = "C:\HciBox"
 $Env:HciBoxLogsDir = "C:\HciBox\Logs"
 $Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
@@ -151,6 +151,7 @@ Write-Header "Downloading Azure Stack HCI configuration scripts"
 #Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile $Env:HciBoxVHDDir\AZSHCI.vhdx
 #Invoke-WebRequest https://aka.ms/AAbclsv -OutFile $Env:HciBoxVHDDir\GUI.vhdx
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxWACDir\WindowsAdminCenter.msi
+Invoke-WebRequest ($templateBaseUrl + "artifacts/HciBoxLogonScript.ps1") -OutFile $Env:HciBoxDir\HciBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/New-AzSHCISandbox.ps1") -OutFile $Env:HciBoxDir\New-AzSHCISandbox.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Register-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AzSHCISandbox-Config.psd1") -OutFile $Env:HciBoxDir\AzSHCISandbox-Config.psd1
@@ -163,25 +164,37 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressModule.psm1") -Ou
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressUI.psm1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HciBoxSDNDir\Single-NC.psd1
 
+# Disable Server Manager WAC prompt
+$RegistryPath = "HKLM:\SOFTWARE\Microsoft\ServerManager"
+$Name = "DoNotPopWACConsoleAtSMLaunch"
+$Value = "1"
+if (-not (Test-Path $RegistryPath)) {
+    New-Item -Path $RegistryPath -Force | Out-Null
+}
+New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWORD -Force
+
+# Disable Network Profile prompt
+$RegistryPath = "HKLM:\System\CurrentControlSet\Control\Network\NewNetworkWindowOff"
+$Name = ""
+$Value = ""
+if (-not (Test-Path $RegistryPath)) {
+    New-Item -Path $RegistryPath -Force | Out-Null
+}
+
+# Configuring CredSSP and WinRM
+Enable-WSManCredSSP -Role Server -Force | Out-Null
+Enable-WSManCredSSP -Role Client -DelegateComputer $Env:COMPUTERNAME -Force | Out-Null
+
+# Creating scheduled task for HciBoxLogonScript.ps1
+$Trigger = New-ScheduledTaskTrigger -AtLogOn
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HciBoxDir\HciBoxLogonScript.ps1
+Register-ScheduledTask -TaskName "HciBoxLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V"
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
 Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
-
-# Configure storage pools and data disks
-Write-Header "Configuring storage"
-New-StoragePool -FriendlyName AsHciPool -StorageSubSystemFriendlyName '*storage*' -PhysicalDisks (Get-PhysicalDisk -CanPool $true)
-$disks = Get-StoragePool -FriendlyName AsHciPool -IsPrimordial $False | Get-PhysicalDisk
-$diskNum = $disks.Count
-New-VirtualDisk -StoragePoolFriendlyName AsHciPool -FriendlyName AsHciDisk -ResiliencySettingName Simple -NumberOfColumns $diskNum -UseMaximumSize
-$vDisk = Get-VirtualDisk -FriendlyName AsHciDisk
-if ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'raw') {
-    $vDisk | Get-Disk | Initialize-Disk -Passthru | New-Partition -DriveLetter V -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
-}
-elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
-    $vDisk | Get-Disk | New-Partition -DriveLetter V -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
-}
 
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log"
