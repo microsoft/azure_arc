@@ -16,4 +16,4 @@ Start-Process msiexec.exe -Wait -ArgumentList "/I $Env:ArcBoxDir\AZDataCLI.msi /
 Write-Output "Creating scheduled task for DataServicesLogonScript.ps1"
 Add-Logon-Script $adminUsername "DataServicesLogonScript" ("$Env:ArcBoxDir\DataServicesLogonScript.ps1")
 
-. $Env:ArcBoxDir\ProfileFullItPro-v1.ps1
+. $Env:ArcBoxDir\ArcboxProfileFullItPro-v1.ps1

@@ -88,11 +88,11 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 $ErrorActionPreference = 'SilentlyContinue'
 
 # Copy PowerShell Profile and Reload
-Add-PowerShell-Profile  ($templateBaseUrl + "artifacts\PSProfile.ps1") $templateBaseUrl @("DownloadFiles-v1","InstallChocoApps-v1","AddLogonScripts-v1","AddDesktopShortcut-v1") @("EnableArcboxLoginAzureTools-v1")
+Add-PowerShell-Profile  ($templateBaseUrl + "artifacts\PSProfile.ps1") $templateBaseUrl @("DownloadFiles-v1","InstallChocoApps-v1","AddLogonScripts-v1","AddDesktopShortcut-v1","EnableArcboxLoginAzureTools-v1")
 . $PsHome/DownloadFiles-v1.ps1
 . $PsHome/InstallChocoApps-v1.ps1
 . $PsHome/AddLogonScripts-v1.ps1
-Get-File ($templateBaseUrl + "common/script/powershell")  @("ProfileITPro-v1.ps1","ProfileFullItPro-v1.ps1","ProfileFull-v1.ps1","ProfileDevOps-v1.ps1") $Env:ArcBoxDir
+Get-File ($templateBaseUrl + "../common/script/powershell")  @("ArcboxProfileITPro-v1.ps1","ArcboxProfileFullItPro-v1.ps1","ArcboxProfileFull-v1.ps1","ArcboxProfileDevOps-v1.ps1") $Env:ArcBoxDir
 
 # Extending C:\ partition to the maximum size
 Write-Output "Extending C:\ partition to the maximum size"
@@ -122,7 +122,7 @@ Get-File ($templateBaseUrl + "../tests")  @("GHActionDeploy.ps1", "OpenSSHDeploy
 New-Item -path alias:kubectl -value 'C:\ProgramData\chocolatey\lib\kubernetes-cli\tools\kubernetes\client\bin\kubectl.exe'
 New-Item -path alias:azdata -value 'C:\Program Files (x86)\Microsoft SDKs\Azdata\CLI\wbin\azdata.cmd'
 
-$file="Profile"+$flavor+"-v1.ps1"
+$file="ArcboxProfile"+$flavor+"-v1.ps1"
 Write-Output $Env:ArcBoxDir\$file
 . $Env:ArcBoxDir\$file
 
