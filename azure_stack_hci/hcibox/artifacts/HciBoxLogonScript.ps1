@@ -37,6 +37,7 @@ if ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'raw') {
 elseif ($vDisk | Get-Disk | Where-Object PartitionStyle -eq 'GPT') {
     $vDisk | Get-Disk | New-Partition -DriveLetter V -UseMaximumSize | Format-Volume -NewFileSystemLabel AsHciData -AllocationUnitSize 64KB -FileSystem NTFS
 }
+New-Item -Path "V:\" -Name "VMs" -ItemType "directory"
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
@@ -48,7 +49,7 @@ az provider register --namespace Microsoft.HybridCompute --wait
 az provider register --namespace Microsoft.HybridConnectivity --wait
 az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.AzureArcData --wait
-
+az provider register --namespace Microsoft.AzureStackHCI --wait
 
 
 # Changing to Jumpstart ArcBox wallpaper
@@ -66,6 +67,11 @@ namespace Win32{
         }
     } 
 '@
+
+Write-Header "Changing Wallpaper"
+$imgPath="$Env:HciBoxDir\wallpaper.png"
+Add-Type $code 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"

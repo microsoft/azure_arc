@@ -2070,8 +2070,8 @@ function New-AdminCenterVM {
 
         Write-Verbose "Copying Application and Script Source Files to $VMName"
         Copy-Item 'C:\VMConfigs\Windows Admin Center' -Destination C:\TempWACMount\ -Recurse -Force
-        Copy-Item C:\VMConfigs\SCRIPTS -Destination C:\TempWACMount -Recurse -Force
-        Copy-Item C:\VMConfigs\SDNEXAMPLES -Destination C:\TempWACMount -Recurse -Force
+        Copy-Item C:\VMConfigs\SDN -Destination C:\TempWACMount -Recurse -Force
+        #Copy-Item C:\VMConfigs\SDNEXAMPLES -Destination C:\TempWACMount -Recurse -Force
         New-Item -Path C:\TempWACMount\VHDs -ItemType Directory -Force | Out-Null
         Copy-Item C:\VMs\Base\AzSHCI.vhdx -Destination C:\TempWACMount\VHDs -Force
         Copy-Item C:\VMs\Base\GUI.vhdx  -Destination  C:\TempWACMount\VHDs -Force

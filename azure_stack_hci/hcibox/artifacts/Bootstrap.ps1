@@ -130,7 +130,7 @@ foreach ($app in $appsToInstall)
 }
 
 # All flavors
-Write-Host "Fetching Artifacts for All Flavors"
+Write-Host "Fetching artifacts"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/HciBox_wallpaper.png" -OutFile $Env:HciBoxDir\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:HciBoxDir\DeploymentStatus.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HciBoxLogsDir\LogInstructions.txt
@@ -142,9 +142,6 @@ Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$E
 #$Trigger = New-ScheduledTaskTrigger -AtLogOn
 #$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HciBoxDir\MonitorWorkbookLogonScript.ps1
 #Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
-
-# Disabling Windows Server Manager Scheduled Task
-Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Downloading AzSHCI files
 Write-Header "Downloading Azure Stack HCI configuration scripts"
@@ -163,6 +160,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpress.ps1") -OutFile $
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressModule.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressModule.psm1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressUI.psm1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HciBoxSDNDir\Single-NC.psd1
+
+# Disabling Windows Server Manager Scheduled Task
+Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
 # Disable Server Manager WAC prompt
 $RegistryPath = "HKLM:\SOFTWARE\Microsoft\ServerManager"
@@ -247,5 +247,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log"
 Stop-Transcript
-$logSuppress = Get-Content $Env:HciBoxLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress = Get-Content $Env:HciBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
 $logSuppress | Set-Content $Env:HciBoxLogsDir\Bootstrap.log -Force
