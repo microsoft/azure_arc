@@ -2860,7 +2860,7 @@ function New-SDNEnvironment {
 
                 # Start SDNExpress (Nested Version) Install
 
-                Set-Location -Path 'C:\VMConfigs\SDN'
+                Set-Location -Path 'C:\SDN'
 
                 $params = @{
 
