@@ -40,7 +40,7 @@
     SDNLABMTU                            = 9014                                   # Controls the MTU for all Hosts. If using multiple physical hosts. Ensure that you have configured MTU on physical nics on the hosts to match this value.
 
     #SDN Provisioning
-    ProvisionNC                          = $true                                  # Provisions Network Controller Automatically.
+    ProvisionNC                          = $false                                  # Provisions Network Controller Automatically.
     ConfigureBGPpeering                  = $true                                  # Peers the GW and MUX VMs with the BGP-ToR-Router automatically if ProvisionNC = $true
 
     ################################################################################################################

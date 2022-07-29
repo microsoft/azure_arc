@@ -2447,7 +2447,7 @@ CertificateTemplate= WebServer
             } -Authentication Credssp
 
 
-            $SDNConfig = Import-PowerShellDataFile -Path C:\SCRIPTS\AzSHCISandbox-Config.psd1
+            $SDNConfig = Import-PowerShellDataFile -Path C:\SDN\AzSHCISandbox-Config.psd1
 
 
             # Install Windows Admin Center
@@ -2522,7 +2522,7 @@ CertificateTemplate= WebServer
 
             Write-Verbose "Configuring SDNExplorer"
             $SENCIP = "nc01." + $SDNConfig.SDNDomainFQDN    
-            $SDNEXPLORER = "Set-Location 'C:\SCRIPTS\SDNExpress-Custom';.\SDNExplorer.ps1 -NCIP $SENCIP"    
+            $SDNEXPLORER = "Set-Location 'C:\VMConfigs\SDN';.\SDNExplorer.ps1 -NCIP $SENCIP"    
             Set-Content -Value $SDNEXPLORER -Path 'C:\users\Public\Desktop\SDN Explorer.ps1' -Force
     
             # Set Network Profiles
@@ -2860,7 +2860,7 @@ function New-SDNEnvironment {
 
                 # Start SDNExpress (Nested Version) Install
 
-                Set-Location -Path 'C:\SCRIPTS\SDNExpress-Custom'
+                Set-Location -Path 'C:\VMConfigs\SDN'
 
                 $params = @{
 
@@ -2992,7 +2992,7 @@ function Add-WACtenants {
         
             # Set Variables
 
-            $SDNConfig = Import-PowerShellDataFile -Path C:\SCRIPTS\AzSHCISandbox-Config.psd1
+            $SDNConfig = Import-PowerShellDataFile -Path C:\SDN\AzSHCISandbox-Config.psd1
             $fqdn = $SDNConfig.SDNDomainFQDN
             $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
             $VerbosePreference = "Continue"
