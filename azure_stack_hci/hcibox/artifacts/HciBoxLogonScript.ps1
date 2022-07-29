@@ -51,6 +51,12 @@ az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 az provider register --namespace Microsoft.AzureStackHCI --wait
 
+#  build cluster .\New-Sandbox
+
+# deploy AKS
+
+# deploy Data services
+
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
@@ -83,3 +89,4 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Write-Host "Creating deployment logs bundle"
     7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:HciBoxLogsDir\*.log
 }'
+
