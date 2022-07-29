@@ -9,14 +9,57 @@ weight: 3
 
 **Release notes will be released around the first week of each month and will cover the previous month.**
 
+## July 2022
+
+### Release highlights
+
+- New ["Azure Arc Jumpstart commitment to open-source software"](https://azurearcjumpstart.io/oss/) page added
+- New Azure Arc-enabled servers scenarios
+- New and Updated Azure Arc-enabled Kubernetes scenarios
+- Updated Azure Arc-enabled data services scenarios
+- Multiple ArcBox enhancements
+- Bug fixes
+
+### Azure Arc-enabled servers
+
+- [New scenario: Deploy the Azure Monitor Agent (AMA) on Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_azuremonitoragent/)
+
+### Azure Arc-enabled Kubernetes
+
+- [New scenario: Deploy an application using the Dapr Cluster extension for Azure Arc-enabled Kubernetes cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/developer/dapr/dapr_statestore/)
+- [Updated scenario: Deploy AKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/)
+- [Updated scenario: Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_terraform/)
+- [Bug fix: AKS 1.23.3 is not supported anymore #1293](https://github.com/microsoft/azure_arc/issues/1293)
+
+### Azure Arc-enabled data services
+
+- [Updated scenario: Deploy a vanilla Azure Arc Data Controller in a directly connected mode on EKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_dc_vanilla_terraform/)
+- [Updated scenario: Deploy Azure SQL Managed Instance in directly connected mode on EKS using a Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_mssql_mi_terraform/)
+- [Updated scenario: Deploy Azure PostgreSQL in directly connected mode on AKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_postgres_terraform/)
+- [Bug fix: AKS 1.23.3 is not supported anymore #1293](https://github.com/microsoft/azure_arc/issues/1293)
+
+### Jumpstart ArcBox
+
+- [Enhancement: CAPZ/ArcBox Optimizations #1277](https://github.com/microsoft/azure_arc/pull/1277)
+  - Versions bump
+    - clusterctrl -> 1.1.5
+    - CAPZ provider -> 1.4.0
+    - CAPZ K8s -> 1.24.2
+  - Kubernetes CSI driver implementation (1.19.0) + Updated StorageClass yaml
+  - Reversing Azure Arc-enabled Kubernetes cluster extensions installation order on CAPZ cluster
+  - Switching to Azure to B-series virtual machines from previous D-series. Keeping ArcBox Full/ITPro Client VM as D16s_v4 for nested virtualization support
+  - Bump control plane nodes from 1 to 3
+  - ARM/Bicep API versions bump
+  - Docs updates to reflect capacity requirements
+
 ## June 2022
 
 ### Release highlights
 
-- New and Updated Azure Arc-enabled Kubernetes scenarios
-- New Azure Arc-enabled data services scenarios
 - Updated Azure Arc-enabled servers scenarios
 - Updated Azure Arc-enabled SQL server scenario
+- New and Updated Azure Arc-enabled Kubernetes scenarios
+- New Azure Arc-enabled data services scenarios
 - [Bump Azure Arc Data Controller images to May 2022 release](https://github.com/microsoft/azure_arc/pull/1247)
 - Bug fixes
 
@@ -25,8 +68,8 @@ weight: 3
 - [Updated scenario: Monitoring, Alerting, and Visualization on Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_monitoring/)
 - [Updated scenario: Added Azure Bastion support for Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_winsrv/)
 - [Updated scenario: Deploy a GCP Ubuntu instance and connect it to Azure Arc using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_ubuntu/)
-- [Deploy a GCP Windows instance and connect it to Azure Arc using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)
-- Added "Deploy to Azure" button to all Azure-Arc enabled servers scenarios
+- [Updated scenario: Deploy a GCP Windows instance and connect it to Azure Arc using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)
+- [Enhancement: Add Deploy to Azure button to ARM based deployments for Azure Arc-enabled servers #1249](https://github.com/microsoft/azure_arc/issues/1249)
 
 ### Azure Arc-enabled VMware
 
