@@ -35,7 +35,7 @@ weight: 3
 
 - [Updated scenario: Deploy a vanilla Azure Arc Data Controller in a directly connected mode on EKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_dc_vanilla_terraform/)
 - [Updated scenario: Deploy Azure SQL Managed Instance in directly connected mode on EKS using a Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_mssql_mi_terraform/)
-- [Updated scenario: Deploy Azure PostgreSQL in directly connected mode on AKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_postgres_terraform/)
+- [Updated scenario: Deploy Azure PostgreSQL in directly connected mode on EKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_postgres_terraform/)
 - [Bug fix: AKS 1.23.3 is not supported anymore #1293](https://github.com/microsoft/azure_arc/issues/1293)
 
 ### Jumpstart ArcBox
