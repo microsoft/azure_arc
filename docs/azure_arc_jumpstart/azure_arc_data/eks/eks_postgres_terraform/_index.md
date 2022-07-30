@@ -6,7 +6,7 @@ weight: 3
 description: >
 ---
 
-## Deploy Azure PostgreSQL in directly connected mode on AKS using Terraform
+## Deploy Azure PostgreSQL in directly connected mode on EKS using Terraform
 
 The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using [Azure Arc-enabled data services](https://docs.microsoft.com/azure/azure-arc/data/overview) and [PostgreSQL](https://docs.microsoft.com/azure/azure-arc/data/what-is-azure-arc-enabled-postgres-hyperscale) deployed on [Elastic Kubernetes Service (EKS)](https://aws.amazon.com/eks/) cluster using [Terraform](https://www.terraform.io/)
 
