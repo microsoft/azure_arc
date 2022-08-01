@@ -63,6 +63,19 @@ var policies = [
     }
   }
   {
+    name: '(ArcBox) Configure VMInsights DCRs'
+    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/7c4214e9-ea57-487a-b38e-310ec09bc21d'
+    flavors: [
+      'Full'
+      'ITPro'
+    ]
+    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+    parameters: {
+      workspaceResourceId: logAnalyticsWorkspaceId
+      enableProcessesAndDependencies: true
+    }
+  }
+  {
     name: '(ArcBox) Deploy Linux Dependency Agents'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43'
     flavors: [

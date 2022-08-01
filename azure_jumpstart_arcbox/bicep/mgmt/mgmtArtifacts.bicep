@@ -334,20 +334,6 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   }
 }
 
-resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = if (flavor == 'Full' || flavor == 'ITPro') {
-  location: location
-  name: 'VMInsights(${split(workspace.id, '/')[8]})'
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: 'VMInsights(${split(workspace.id, '/')[8]})'
-    product: 'OMSGallery/VMInsights'
-    promotionCode: ''
-    publisher: 'Microsoft'
-  }
-}
-
 resource securityGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
   name: security.name
   location: location

@@ -8,10 +8,10 @@
                 "description": "Location of your Azure resources"
             }
         },
-        "logAnalyticsWorkspace": {
+        "logAnalyticsWorkspaceId": {
             "type": "string",
             "metadata": {
-                "description": "Name of your log analytics workspace"
+                "description": "Resource id of your log analytics workspace"
             }
         },
         "flavor": {
@@ -69,7 +69,7 @@
                     }
                 }
             },
-                        {
+            {
                 "name": "(ArcBox) Configure Windows machines data collection rules",
                 "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/c24c537f-2516-4c2f-aac5-2cd26baa3d26",
                 "flavors": [
@@ -80,6 +80,23 @@
                 "parameters": {
                     "dcrResourceId": {
                         "value": "[parameters('windowsDcrId')]"
+                    }
+                }
+            },
+            {
+                "name": "(ArcBox) Configure VMInsights DCRs",
+                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/7c4214e9-ea57-487a-b38e-310ec09bc21d",
+                "flavors": [
+                    "Full",
+                    "ITPro"
+                ],
+                "roleDefinition": "/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c",
+                "parameters": {
+                    "workspaceResourceId": {
+                        "value": "[parameters('logAnalyticsWorkspaceId')]"
+                    },
+                    "enableProcessesAndDependencies": {
+                        "value": true
                     }
                 }
             },

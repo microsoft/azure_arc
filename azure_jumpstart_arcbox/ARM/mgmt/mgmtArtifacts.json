@@ -400,25 +400,6 @@
     {
       "type": "Microsoft.OperationsManagement/solutions",
       "apiVersion": "2015-11-01-preview",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-      ],
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
-      "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
-      "properties": {
-        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-      },
-      "plan": {
-        "name": "[concat('VMInsights', '(', split(resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName')),'/')[8], ')')]",
-        "product": "[concat('OMSGallery/', 'VMInsights')]",
-        "promotionCode": "",
-        "publisher": "Microsoft"
-      }
-    },
-    {
-      "type": "Microsoft.OperationsManagement/solutions",
-      "apiVersion": "2015-11-01-preview",
       "name": "[variables('ChangeTracking').name]",
       "location": "[parameters('location')]",
       "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
@@ -499,7 +480,7 @@
             "value": "[parameters('location')]"
           },
           "logAnalyticsWorkspace": {
-            "value": "[parameters('workspaceName')]"
+            "value": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
           },
           "flavor": {
             "value": "[parameters('flavor')]"
