@@ -9,8 +9,17 @@ param flavor string
 
 var policies = [
   {
-    name: '(ArcBox) Deploy Linux Log Analytics agents'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf'
+    name: '(ArcBox) Deploy Linux Azure Monitor agents'
+    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/845857af-0333-4c5d-bbbc-6076697da122'
+    flavors: [
+      'Full'
+      'ITPro'
+    ]
+    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+  }
+  {
+    name: '(ArcBox) Deploy Windows Azure Monitor agents'
+    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/94f686d6-9a24-4e19-91f1-de937dc171a4'
     flavors: [
       'Full'
       'ITPro'
@@ -21,40 +30,6 @@ var policies = [
         value: logAnalyticsWorkspaceId
       }
     }
-  }
-  {
-    name: '(ArcBox) Deploy Windows Log Analytics agents'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203'
-    flavors: [
-      'Full'
-      'ITPro'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-    parameters: {
-      logAnalytics: {
-        value: logAnalyticsWorkspaceId
-      }
-    }
-  }
-  {
-    name: '(ArcBox) Deploy Linux Dependency Agents'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43'
-    flavors: [
-      'Full'
-      'ITPro'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-    parameters: {}
-  }
-  {
-    name: '(ArcBox) Deploy Windows Dependency Agents'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4'
-    flavors: [
-      'Full'
-      'ITPro'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-    parameters: {}
   }
   {
     name: '(ArcBox) Tag resources'
