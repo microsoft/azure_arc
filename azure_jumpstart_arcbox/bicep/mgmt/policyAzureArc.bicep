@@ -22,9 +22,7 @@ var policies = [
       'ITPro'
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-    parameters: {
-
-    }
+    parameters: {}
   }
   {
     name: '(ArcBox) Deploy Windows Azure Monitor agents'
@@ -34,9 +32,7 @@ var policies = [
       'ITPro'
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
-    parameters: {
-      
-    }
+    parameters: {}
   }
   {
     name: '(ArcBox) Configure Linux machines data collection rules'
@@ -65,6 +61,26 @@ var policies = [
         value: windowsDcrId
       }
     }
+  }
+  {
+    name: '(ArcBox) Deploy Linux Dependency Agents'
+    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/deacecc0-9f84-44d2-bb82-46f32d766d43'
+    flavors: [
+      'Full'
+      'ITPro'
+    ]
+    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+    parameters: {}
+  }
+  {
+    name: '(ArcBox) Deploy Windows Dependency Agents'
+    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/91cb9edd-cd92-4d2f-b2f2-bdd8d065a3d4'
+    flavors: [
+      'Full'
+      'ITPro'
+    ]
+    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+    parameters: {}
   }
   {
     name: '(ArcBox) Tag resources'

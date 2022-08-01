@@ -19,35 +19,67 @@
             "metadata": {
                 "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
             }
+        },
+        "linuxDcrId": {
+            "type": "string",
+            "metadata": {
+                "description": "The id of the Linux data collection rules"
+            }
+        },
+        "windowsDcrId": {
+            "type": "string",
+            "metadata": {
+                "description": "The id of the Windows data collection rules"
+            }
         }
     },
     "variables": {
         "policies": [
             {
-                "name": "(ArcBox) Deploy Linux Log Analytics agents",
-                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/9d2b61b4-1d14-4a63-be30-d4498e7ad2cf",
+                "name": "(ArcBox) Deploy Linux Azure Monitor agents",
+                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/845857af-0333-4c5d-bbbc-6076697da122",
                 "flavors": [
                     "Full",
                     "ITPro"
                 ],
                 "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                "parameters": {}
+            },
+            {
+                "name": "(ArcBox) Deploy Windows Azure Monitor agents",
+                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/94f686d6-9a24-4e19-91f1-de937dc171a4",
+                "flavors": [
+                    "Full",
+                    "ITPro"
+                ],
+                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                "parameters": {}
+            },
+            {
+                "name": "(ArcBox) Configure Linux machines data collection rules",
+                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/d5c37ce1-5f52-4523-b949-f19bf945b73a",
+                "flavors": [
+                    "Full",
+                    "ITPro"
+                ],
+                "roleDefinition": "/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c",
                 "parameters": {
-                    "logAnalytics": {
-                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
+                    "dcrResourceId": {
+                        "value": "[parameters('linuxDcrId')]"
                     }
                 }
             },
-            {
-                "name": "(ArcBox) Deploy Windows Log Analytics agents",
-                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/69af7d4a-7b18-4044-93a9-2651498ef203",
+                        {
+                "name": "(ArcBox) Configure Windows machines data collection rules",
+                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/c24c537f-2516-4c2f-aac5-2cd26baa3d26",
                 "flavors": [
                     "Full",
                     "ITPro"
                 ],
-                "roleDefinition": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')]",
+                "roleDefinition": "/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c",
                 "parameters": {
-                    "logAnalytics": {
-                        "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspace'))]"
+                    "dcrResourceId": {
+                        "value": "[parameters('windowsDcrId')]"
                     }
                 }
             },
