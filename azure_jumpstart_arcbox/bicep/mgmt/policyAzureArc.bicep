@@ -22,6 +22,9 @@ var policies = [
       'ITPro'
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+    parameters: {
+
+    }
   }
   {
     name: '(ArcBox) Deploy Windows Azure Monitor agents'
@@ -31,9 +34,12 @@ var policies = [
       'ITPro'
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+    parameters: {
+      
+    }
   }
   {
-    name: '(ArcBox) Configure Linux Arc machines to be associated with a Data Collection Rule'
+    name: '(ArcBox) Configure Linux machines data collection rules'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/d5c37ce1-5f52-4523-b949-f19bf945b73a'
     flavors: [
       'Full'
@@ -47,7 +53,7 @@ var policies = [
     }
   }
   {
-    name: '(ArcBox) Configure Windows machines to be associated with a Data Collection Rule'
+    name: '(ArcBox) Configure Windows machines data collection rules'
     definitionId: '/providers/Microsoft.Authorization/policyDefinitions/c24c537f-2516-4c2f-aac5-2cd26baa3d26'
     flavors: [
       'Full'
