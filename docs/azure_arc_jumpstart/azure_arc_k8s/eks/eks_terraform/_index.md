@@ -150,7 +150,22 @@ The following README will guide you on how to use the provided [Terraform](https
 
 ## Connecting to Azure Arc
 
+* Create a new GitHub Workflow from scratch
 
+    ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_create.png)
+    
+    
+* Update your new GitHub Workflow with content file "connect-eks-and-arc.yml"
+
+    ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_udpate.png)
+    
+* Create the following GitHub Secrets in your GitHub Repo, these 8 secrests are needed to run workflow.
+    - AWS Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, EKSCLUSTER_NAME
+    - Azure Service Principal Secrets: CLIENTID, CLIENTSECRET, TENANTID
+    - Other Azure Secrets: AZURE_RG, AZURE_REGION
+
+   
+    
 
 Now that you have a running EKS cluster, lets connect the EKS cluster to Azure Arc by:
 
