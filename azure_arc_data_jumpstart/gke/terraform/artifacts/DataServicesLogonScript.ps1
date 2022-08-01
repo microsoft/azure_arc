@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 # Deployment environment variables
 $connectedClusterName="Arc-Data-GKE-K8s"
 
-. $Env:tempDir/CommonDataServicesLogonScript.ps1 -notInstallK8extensions
+. $Env:tempDir/ArcDataCommonDataServicesLogonScript.ps1 -notInstallK8extensions
 
 $azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
 $psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)

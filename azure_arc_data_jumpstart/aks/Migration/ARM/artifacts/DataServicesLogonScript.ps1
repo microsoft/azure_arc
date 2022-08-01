@@ -4,7 +4,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 $Env:ArcBoxVMDir = "$Env:TempDir\Virtual Machines"
 $connectedClusterName = "Arc-DataSvc-AKS"
 
-. $Env:tempDir/CommonDataServicesLogonScript.ps1 -extraAzExtensions @("customlocation")
+. $Env:tempDir/ArcDataCommonDataServicesLogonScript.ps1 -extraAzExtensions @("customlocation")
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 

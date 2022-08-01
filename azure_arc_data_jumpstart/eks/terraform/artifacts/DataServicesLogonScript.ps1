@@ -1,7 +1,7 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 
-. $Env:tempDir/CommonDataServicesLogonScript.ps1 -extraAzExtensions @("k8s-configuration", "customlocation")
+. $Env:tempDir/ArcDataCommonDataServicesLogonScript.ps1 -extraAzExtensions @("k8s-configuration", "customlocation")
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 

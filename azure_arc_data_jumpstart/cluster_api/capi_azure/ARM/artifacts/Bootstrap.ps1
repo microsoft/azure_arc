@@ -43,7 +43,7 @@ param (
 
 Start-Transcript "C:\Temp\Bootstrap.log"
 . ./AddPSProfile-v1.ps1
-. ./CommonBootstrapArcData.ps1 -profileRootBaseUrl $profileRootBaseUrl -templateBaseUrl $templateBaseUrl -adminUsername $adminUsername
+. ./ArcDataCommonBootstrap.ps1 -profileRootBaseUrl $profileRootBaseUrl -templateBaseUrl $templateBaseUrl -adminUsername $adminUsername
 
 # Downloading GitHub artifacts for DataServicesLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/capiStorageClass.yaml") -OutFile "$Env:tempDir\capiStorageClass.yaml"

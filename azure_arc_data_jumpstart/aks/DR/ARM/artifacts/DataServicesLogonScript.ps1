@@ -9,7 +9,7 @@ $secondaryClusterName = $clusterName + "-Secondary"
 $primaryDcName = "jumpstart-primary-dc"
 $secondaryDcName = "jumpstart-secondary-dc"
 
-. $Env:tempDir/CommonDataServicesLogonScript.ps1 -extraAzExtensions @("customlocation")
+. $Env:tempDir/ArcDataCommonDataServicesLogonScript.ps1 -extraAzExtensions @("customlocation")
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 

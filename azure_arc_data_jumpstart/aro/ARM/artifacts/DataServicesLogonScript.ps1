@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 # Deployment environment variables
 $connectedClusterName = "Arc-Data-ARO"
 
-. $Env:tempDir/CommonDataServicesLogonScript.ps1 -extraAzExtensions @("customlocation", "k8s-configuration")
+. $Env:tempDir/ArcDataCommonDataServicesLogonScript.ps1 -extraAzExtensions @("customlocation", "k8s-configuration")
 
 # Install ARO CLI
 Write-Output "Installing the ARO CLI..."

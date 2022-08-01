@@ -49,7 +49,7 @@ function AKSClusterAsAnAzureArcEnabledKubernetesCluster {
 ## Main Script
 SetEnviromentVariables
 
-. "$Env:tempDir/CommonDataServicesLogonScript.ps1"
+. "$Env:tempDir/ArcDataCommonDataServicesLogonScript.ps1"
 
 SetDefaultSubscription -subscriptionId $Env:subscriptionId
 

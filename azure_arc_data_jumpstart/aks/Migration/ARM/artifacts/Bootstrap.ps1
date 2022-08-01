@@ -39,7 +39,7 @@ param (
 
 Start-Transcript "C:\Temp\Bootstrap.log"
 . ./AddPSProfile-v1.ps1
-. ./CommonBootstrapArcData.ps1 -profileRootBaseUrl $profileRootBaseUrl -templateBaseUrl $templateBaseUrl -adminUsername $adminUsername -avoidPostgreSQL
+. ./ArcDataCommonBootstrap.ps1 -profileRootBaseUrl $profileRootBaseUrl -templateBaseUrl $templateBaseUrl -adminUsername $adminUsername -avoidPostgreSQL
 
 # Installing DHCP service
 Write-Output "Installing DHCP service"

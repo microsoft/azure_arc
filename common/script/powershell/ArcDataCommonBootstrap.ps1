@@ -8,7 +8,7 @@ param (
 )
 Write-Output "Common Arc Data Boostrap"
 
-Add-PowerShell-Profile  ($profileRootBaseUrl + "common\script\powershell\PSArcDataProfile.ps1") $profileRootBaseUrl @("DownloadFiles-v1", "InstallChocoApps-v1", "AddLogonScripts-v1", "AddDesktopShortcut-v1")
+Add-PowerShell-Profile  ($profileRootBaseUrl + "..\common\script\powershell\ArcDataPSProfile.ps1") $profileRootBaseUrl @("DownloadFiles-v1", "InstallChocoApps-v1", "AddLogonScripts-v1", "AddDesktopShortcut-v1")
 
 . $PsHome/DownloadFiles-v1.ps1
 . $PsHome/InstallChocoApps-v1.ps1
@@ -48,7 +48,7 @@ Get-File ($templateBaseUrl + "artifacts") @("settingsTemplate.json", "DataServic
 if (-not $avoidPostgreSQL) {
     Get-File ($templateBaseUrl + "artifacts") @("postgreSQL.json", "postgreSQL.parameters.json", "DeployPostgreSQL.ps1") ($Env:tempDir)
 }
-Get-File ($profileRootBaseUrl + "common/script/powershell") @("CommonDataServicesLogonScript.ps1") ($Env:tempDir)
+Get-File ($profileRootBaseUrl + "../common/script/powershell") @("ArcDataCommonDataServicesLogonScript.ps1") ($Env:tempDir)
 
 Get-File-Renaming ("https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip") "$Env:tempDir\SqlQueryStress.zip"
 Get-File-Renaming ($profileRootBaseUrl + "../img/arcbox_wallpaper.png") $Env:tempDir\wallpaper.png
