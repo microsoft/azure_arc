@@ -79,6 +79,10 @@ $imgPath="$Env:HciBoxDir\wallpaper.png"
 Add-Type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
+# Removing the LogonScript Scheduled Task so it won't run on next reboot
+Write-Header "Removing Logon Task"
+Unregister-ScheduledTask -TaskName "HciBoxLogonScript" -Confirm:$false
+
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"
 Invoke-Expression 'cmd /c start Powershell -Command { 

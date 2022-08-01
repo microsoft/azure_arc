@@ -181,7 +181,6 @@ if (-not (Test-Path $RegistryPath)) {
     New-Item -Path $RegistryPath -Force | Out-Null
 }
 
-
 # Configuring CredSSP and WinRM
 #Enable-WSManCredSSP -Role Server -Force | Out-Null
 #Enable-WSManCredSSP -Role Client -DelegateComputer $Env:COMPUTERNAME -Force | Out-Null

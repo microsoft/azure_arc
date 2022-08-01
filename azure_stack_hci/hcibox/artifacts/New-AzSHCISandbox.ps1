@@ -2450,7 +2450,7 @@ CertificateTemplate= WebServer
             # Install Chocolatey
             $ErrorActionPreference = "Continue"
             Write-Verbose "Installing Chocolatey"
-            Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+            Set-ExecutionPolicy Bypass -Scope Process -Force; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
             Start-Sleep -Seconds 10
 
             # Install Edge
@@ -2465,7 +2465,7 @@ CertificateTemplate= WebServer
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
                           
-            # Add Chromium to list of browsers
+            # Add Edge to list of browsers
             Write-Verbose 'Setting Default Broswer on admincenter vm'
             $expression = "SetDefaultBrowser.exe Edge"
             Invoke-Expression $expression
