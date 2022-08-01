@@ -8,9 +8,7 @@ param(
 ) 
 
 #region functions
-
 function Get-HyperVHosts {
-
     param (
 
         [String[]]$MultipleHyperVHosts,
@@ -40,7 +38,6 @@ function Get-HyperVHosts {
 } 
     
 function Set-HyperVSettings {
-    
     param (
 
         $MultipleHyperVHosts,
@@ -48,9 +45,7 @@ function Set-HyperVSettings {
     )
     
     foreach ($HypervHost in $MultipleHyperVHosts) {
-
         Write-Verbose "Configuring Hyper-V Settings on $HypervHost"
-
         $params = @{
         
             ComputerName              = $HypervHost
@@ -59,15 +54,11 @@ function Set-HyperVSettings {
             EnableEnhancedSessionMode = $true
 
         }
-
         Set-VMhost @params
-    
-    }
-    
+    }  
 }
     
 function Set-LocalHyperVSettings {
-
     Param (
 
         [string]$HostVMPath
@@ -87,7 +78,6 @@ function Set-LocalHyperVSettings {
 }
     
 function New-InternalSwitch {
-    
     Param (
 
         $pswitchname, 
@@ -97,7 +87,6 @@ function New-InternalSwitch {
     $querySwitch = Get-VMSwitch -Name $pswitchname -ErrorAction Ignore
     
     if (!$querySwitch) {
-    
         New-VMSwitch -SwitchType Internal -MinimumBandwidthMode None -Name $pswitchname | Out-Null
     
         #Assign IP to Internal Switch
@@ -121,12 +110,12 @@ function New-InternalSwitch {
     
     }
     
-    Else { Write-Verbose "Internal Switch $pswitchname already exists. Not creating a new internal switch." }
-    
+    Else { 
+        Write-Verbose "Internal Switch $pswitchname already exists. Not creating a new internal switch." 
+    } 
 }
     
 function New-HostvNIC {
-    
     param (
 
         $SDNConfig,
@@ -183,13 +172,10 @@ function New-HostvNIC {
         }
 
         $SBXIP--
-    
     }
-    
 }
     
 function Test-VHDPath {
-
     Param (
 
         $guiVHDXPath,
@@ -200,11 +186,9 @@ function Test-VHDPath {
     if (!$result) { Write-Host "Path $guiVHDXPath was not found!" -ForegroundColor Red ; break }
     $Result = Get-ChildItem -Path $azSHCIVHDXPath -ErrorAction Ignore  
     if (!$result) { Write-Host "Path $azSHCIVHDXPath was not found!" -ForegroundColor Red ; break }
-
 }
     
 function Select-VMHostPlacement {
-    
     Param($MultipleHyperVHosts, $AzSHOSTs)    
     
     $results = @()
@@ -230,11 +214,9 @@ function Select-VMHostPlacement {
     }
     
     return $results
-     
 }
     
 function Select-SingleHost {
-
     Param (
 
         $AzSHOSTs
@@ -248,7 +230,6 @@ function Select-SingleHost {
     }
 
     Return $results
-
 }
     
 function Copy-VHDXtoHosts {
