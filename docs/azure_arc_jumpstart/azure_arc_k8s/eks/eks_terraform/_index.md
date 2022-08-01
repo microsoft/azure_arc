@@ -70,6 +70,29 @@ The following README will guide you on how to use the provided [Terraform](https
   az extension update --name connectedk8s
   az extension update --name k8s-configuration
   ```
+  
+* Create service principal with a secret and save it to use it later.
+
+  ```shell
+  az ad sp create-for-rbac --name "AzureArc" --role contributor \
+                            --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} \
+                            --sdk-auth
+                            
+  # Replace {subscription-id}, {resource-group} with the subscription, resource group details
+
+  # The command should output a JSON object similar to this:
+
+ 
+  {
+    "clientId": "<GUID>",
+    "clientSecret": "<STRING>",
+    "subscriptionId": "<GUID>",
+    "tenantId": "<GUID>",
+    "resourceManagerEndpointUrl": "<URL>"
+    (...)
+  }
+  ```
+  
 * Create a Terraform Cloud Workspace
   
   * Login your Terraform Cloud account and create Workspace, workflow type CLI-driven
@@ -119,7 +142,7 @@ The following README will guide you on how to use the provided [Terraform](https
     ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_create.png)
 
 
-* Copy and Paste content file "[tf-deploy-eks.yml](!azure_arc_k8s_jumpstart/eks/terraform/github/workflow/tf-deploy-eks.yml)" in your GitHub Workflow.
+* Copy and Paste content file "[tf-deploy-eks.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github/workflow/tf-deploy-eks.yml)" in your GitHub Workflow.
 
     ![Screenshot showing how to update your GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_update.png)
     
@@ -127,7 +150,7 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ![Screenshot showing how to create GitHub Secret](./github_workflow_terraform_secret.png)
 
-* Update "[main.tf](!/azure_arc_k8s_jumpstart/eks/terraform/main.tf)" file with your Terraform Cloud Organization Name and Terraform Cloud Workspace Name
+* Update "[main.tf](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/main.tf)" file with your Terraform Cloud Organization Name and Terraform Cloud Workspace Name
 
     ![Screenshot showing how to create GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_update.png)
 
@@ -155,9 +178,9 @@ The following README will guide you on how to use the provided [Terraform](https
     ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_create.png)
     
     
-* Update your new GitHub Workflow with content file "connect-eks-and-arc.yml"
+* Update your new GitHub Workflow with content file "[connect-eks-and-arc.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github/workflow/connect-eks-and-arc.yml)"
 
-    ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_udpate.png)
+    ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_update.png)
     
 * Create the following GitHub Secrets in your GitHub Repo, these 8 secrests are needed to run workflow.
     - AWS Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, EKSCLUSTER_NAME
@@ -166,31 +189,13 @@ The following README will guide you on how to use the provided [Terraform](https
 
 * Run GitHub Workflow to connect EKS to Azure Arc, run GitHub Workflow manually. 
 
-    ![Screenshot showing how to run GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_run.png)
+    ![Screenshot showing how to run GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_run.png)
     
 * Wait for 7 minutes or more to finish GitHub Workflow. 
 
     ![Screenshot showing how to run and finish GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_finish.png)   
 
-Now that you have a running EKS cluster, lets connect the EKS cluster to Azure Arc by:
-
-* Create a resource group
-
-   ```shell
-   az group create --name "Arc-EKS-Demo" --location "eastus"
-   ```
-
-   > **NOTE:  Before deploying, make sure to check the Azure Arc-enabled Kubernetes region availability [page](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=azure-arc).**
-
-* Deploy Arc binaries using Azure CLI:
-
-  ```shell
-  az connectedk8s connect --name "Arc-EKS-Demo" --resource-group "Arc-EKS-Demo" --location "eastus" --tags "Project=jumpstart_azure_arc_k8s"
-  ```
-
 * Upon completion, you will have your EKS cluster connect as a new Azure Arc-enabled Kubernetes resource in a new resource group.
-
-  ![Screenshot showing Azure CLI command to onboard EKS cluster](./connectedk8s_onboard.png)
 
   ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./arc_cluster_portal.png)
 
@@ -206,6 +211,4 @@ az group delete --name "Arc-EKS-Demo"
 
 ![Screenshot showing delete resource group function in Azure Portal](./delete_resource_group.png)
 
-To delete the EKS cluster and supporting components, use the ```terraform destroy --auto-approve``` command.
-
-![Screenshot showing terraform destroy being run](./terraform_destroy.png)
+To delete the EKS cluster, you must sign in to the AWS Console and delete EKS Cluster.
