@@ -1,57 +1,4 @@
-﻿<#
-.SYNOPSIS 
-    Deploys and configures a minimal Microsoft SDN infrastructure in a Hyper-V
-    Nested Environment for training purposes. This deployment method is not
-    supported for Production purposes.
-
-.EXAMPLE
-    .\New-AzSHCISandbox.ps1
-    Reads in the configuration from AzSHCISandbox-Config.psd1 that contains a hash table 
-    of settings data that will in same root as New-SDNSandbox.ps1
-  
-.EXAMPLE
-    .\New-AzSHCISandbox.ps1 -Delete $true
-     Removes the VMs and VHDs of the Azure Stack HCI Sandbox installation. (Note: Some files will
-     remain after deletion.)
-
-.NOTES
-    Prerequisites: 
-
-    * All Hyper-V hosts must have Hyper-V enabled and the Virtual Switch 
-    already created with the same name (if using Multiple Hosts). If you are
-    using a single host, a Internal VM Switch will be created.
-
-    * 250gb minimum of hard drive space if a single host installation. 150GB 
-      minimum of drive space per Hyper-V host if using multiple hosts.
-
-    * 64gb of memory if single host. 32GB of memory per host if using 2 hosts,
-      and 16gb of memory if using 4 hosts.
-
-    * If using multiple Hyper-V hosts for the lab, then you will need to either
-    use a dumb hub to connect the hosts or a switch with all defined VLANs
-    trunked (12 and 200).
-
-    * If you wish the environment to have internet access, create a VMswitch on
-      the FIRST host that maps to a NIC on a network that has internet access. 
-      The network should use DHCP.
-
-    * 2 VHDX (GEN2) files will need to be specified. 
-
-        1. GUI.VHDX - Sysprepped Desktop Experience version of Windows Server 2019 
-           Standard/Datacenter.
-
-        2. AZHCI.VHDX - Generalized\ version of Azure Stack HCI. 
-          
-
-    * The AzSHCISandbox-Config.psd1 will need to be edited to include product keys for the
-      installation media. If using VL Media, use KMS keys for the product key. Additionally,
-      please ensure that the NAT settings are filled in to specify the switch allowing 
-      internet access.
-          
-#>
-
-
-[CmdletBinding(DefaultParameterSetName = "NoParameters")]
+﻿[CmdletBinding(DefaultParameterSetName = "NoParameters")]
 
 param(
     [Parameter(Mandatory = $true, ParameterSetName = "ConfigurationFile")]
@@ -2016,7 +1963,6 @@ function New-RouterVM {
 }
 
 function New-AdminCenterVM {
-
     Param (
 
         $SDNConfig,
@@ -2040,12 +1986,10 @@ function New-AdminCenterVM {
         $WarningPreference = "SilentlyContinue"
 
         # Set Credentials
-
         $localCred = $using:localCred
         $domainCred = $using:domainCred
 
         # Create Host OS Disk
-
         Write-Verbose "Creating $VMName differencing disks"
 
         $params = @{
@@ -2057,7 +2001,6 @@ function New-AdminCenterVM {
         New-VHD -Differencing @params | out-null
 
         # MountVHDXFile
-
         $VerbosePreference = "SilentlyContinue"
         Import-Module DISM
         $VerbosePreference = "Continue"
@@ -2067,17 +2010,14 @@ function New-AdminCenterVM {
         Mount-WindowsImage -Path "C:\TempWACMount" -Index 1 -ImagePath (($VHDPath) + ($VMName) + (".vhdx")) | Out-Null
 
         # Copy Source Files
-
         Write-Verbose "Copying Application and Script Source Files to $VMName"
         Copy-Item 'C:\VMConfigs\Windows Admin Center' -Destination C:\TempWACMount\ -Recurse -Force
         Copy-Item C:\VMConfigs\SDN -Destination C:\TempWACMount -Recurse -Force
-        #Copy-Item C:\VMConfigs\SDNEXAMPLES -Destination C:\TempWACMount -Recurse -Force
         New-Item -Path C:\TempWACMount\VHDs -ItemType Directory -Force | Out-Null
         Copy-Item C:\VMs\Base\AzSHCI.vhdx -Destination C:\TempWACMount\VHDs -Force
         Copy-Item C:\VMs\Base\GUI.vhdx  -Destination  C:\TempWACMount\VHDs -Force
 
         # Apply Custom Unattend.xml file
-
         New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null
         $Password = $SDNConfig.SDNAdminPassword
         $ProductKey = $SDNConfig.GUIProductKey
@@ -2189,13 +2129,11 @@ function New-AdminCenterVM {
         Enable-WindowsOptionalFeature -Path C:\TempWACMount -FeatureName RemoteAccessPowerShell -All -LimitAccess | Out-Null
 
         # Save Customizations and then dismount.
-
         Write-Verbose "Dismounting Disk"
         Dismount-WindowsImage -Path "C:\TempWACMount" -Save | Out-Null
         Remove-Item "C:\TempWACMount"
 
         # Create VM
-
         Write-Verbose "Creating the $VMName VM."
 
         $params = @{
@@ -2234,18 +2172,15 @@ function New-AdminCenterVM {
         Start-VM -Name $VMName
 
         # Refresh Domain Cred
-
         $domainCred = new-object -typename System.Management.Automation.PSCredential `
             -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
         (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
         # Wait until the VM is restarted
-
         while ((Invoke-Command -VMName $VMName -Credential $domainCred { "Test" } `
                     -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
 
         # Finish Configuration
-
         Invoke-Command -VMName $VMName -Credential $domainCred -ArgumentList $SDNConfig, $VMName -ScriptBlock {
 
             $SDNConfig = $args[0]
@@ -2273,7 +2208,6 @@ function New-AdminCenterVM {
             $fqdn = $SDNConfig.SDNDomainFQDN
 
             # Enable CredSSP
-
             $VerbosePreference = "SilentlyContinue" 
             Enable-PSRemoting -force
             Enable-WSManCredSSP -Role Server -Force
@@ -2288,19 +2222,13 @@ function New-AdminCenterVM {
 
             $VerbosePreference = "Continue" 
 
-
             # Enable Large MTU
-
             Write-Verbose "Configuring MTU on all Adapters"
             Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $SDNConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
-
-
-            # $PNVIP 
 
             $WACIP = $SDNConfig.WACIP.Split("/")[0]
     
             # Install RSAT-NetworkController
-
             $isAvailable = Get-WindowsFeature | Where-Object { $_.Name -eq 'RSAT-NetworkController' }
 
             if ($isAvailable) {
@@ -2315,10 +2243,8 @@ function New-AdminCenterVM {
             }
 
             # Install Hyper-V RSAT
-
             Write-Verbose "Installing Hyper-V RSAT Tools"
             Install-WindowsFeature -Name RSAT-Hyper-V-Tools -IncludeAllSubFeature -IncludeManagementTools | Out-Null
-
 
             # Install RSAT AD Tools
             Write-Verbose "Installing Active Directory RSAT Tools"
@@ -2423,7 +2349,6 @@ CertificateTemplate= WebServer
                 $ErrorActionPreference = "Stop"
 
                 # Get the CA Name
-
                 $CertDump = certutil -dump
                 $ca = ((((($CertDump.Replace('`', "")).Replace("'", "")).Replace(":", "=")).Replace('\', "")).Replace('"', "") `
                     | ConvertFrom-StringData).Name
@@ -2434,7 +2359,6 @@ CertificateTemplate= WebServer
                 Write-Verbose "Certdump is $CertDump"
 
                 # Request and Accept SSL Certificate
-
                 Set-Location C:\WACCert
                 certreq -f -new WACCert.inf WACCert.req
                 certreq -config $CertAuth -attrib "CertificateTemplate:webserver" –submit WACCert.req  WACCert.cer 
@@ -2446,12 +2370,9 @@ CertificateTemplate= WebServer
 
             } -Authentication Credssp
 
-
             $SDNConfig = Import-PowerShellDataFile -Path C:\SDN\AzSHCISandbox-Config.psd1
 
-
             # Install Windows Admin Center
-
             $pfxThumbPrint = (Get-ChildItem -Path Cert:\LocalMachine\my | Where-Object { $_.FriendlyName -match "Nested SDN Windows Admin Cert" }).Thumbprint
             Write-Verbose "Thumbprint: $pfxThumbPrint"
             Write-Verbose "WACPort: $WACPort"
@@ -2463,7 +2384,6 @@ CertificateTemplate= WebServer
             Start-Process -FilePath $PathResolve -ArgumentList $arguments -PassThru | Wait-Process
            
             # Create a shortcut for Windows PowerShell ISE
-
             Write-Verbose "Creating Shortcut for PowerShell ISE"
             $TargetFile = "c:\windows\system32\WindowsPowerShell\v1.0\powershell_ise.exe"
             $ShortcutFile = "C:\Users\Public\Desktop\PowerShell ISE.lnk"
@@ -2473,7 +2393,6 @@ CertificateTemplate= WebServer
             $Shortcut.Save()
 
             # Create a shortcut for Windows PowerShell Console
-
             Write-Verbose "Creating Shortcut for PowerShell Console"
             $TargetFile = "c:\windows\system32\WindowsPowerShell\v1.0\powershell.exe"
             $ShortcutFile = "C:\Users\Public\Desktop\PowerShell.lnk"
@@ -2483,9 +2402,7 @@ CertificateTemplate= WebServer
             $Shortcut.Save()
 
             # Create a shortcut for Windows Admin Center
-
             Write-Verbose "Creating Shortcut for Windows Admin Center"
-
             if ($SDNConfig.WACport -ne "443") { $TargetPath = "https://admincenter." + $SDNConfig.SDNDomainFQDN + ":" + $SDNConfig.WACport }
             else { $TargetPath = "https://admincenter." + $SDNConfig.SDNDomainFQDN }
             $ShortcutFile = "C:\Users\Public\Desktop\Windows Admin Center.url"
@@ -2495,43 +2412,36 @@ CertificateTemplate= WebServer
             $Shortcut.Save()
     
             # Create Shortcut for Hyper-V Manager
-
             Write-Verbose "Creating Shortcut for Hyper-V Manager"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" `
                 -Destination "C:\Users\Public\Desktop"
 
             # Create Shortcut for Failover-Cluster Manager
-
             Write-Verbose "Creating Shortcut for Failover-Cluster Manager"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Failover Cluster Manager.lnk" `
                 -Destination "C:\Users\Public\Desktop"
 
             # Create Shortcut for DNS
-
             Write-Verbose "Creating Shortcut for DNS Manager"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\DNS.lnk" `
                 -Destination "C:\Users\Public\Desktop"
 
             # Create Shortcut for Active Directory Users and Computers
-
             Write-Verbose "Creating Shortcut for AD Users and Computers"
             Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Active Directory Users and Computers.lnk" `
                 -Destination "C:\Users\Public\Desktop"
     
             # Set the SDNExplorer Script and place on desktop
-
             Write-Verbose "Configuring SDNExplorer"
             $SENCIP = "nc01." + $SDNConfig.SDNDomainFQDN    
             $SDNEXPLORER = "Set-Location 'C:\VMConfigs\SDN';.\SDNExplorer.ps1 -NCIP $SENCIP"    
             Set-Content -Value $SDNEXPLORER -Path 'C:\users\Public\Desktop\SDN Explorer.ps1' -Force
     
             # Set Network Profiles
-
             Get-NetConnectionProfile | Where-Object { $_.NetworkCategory -eq "Public" } `
             | Set-NetConnectionProfile -NetworkCategory Private | Out-Null    
     
             # Disable Automatic Updates
-
             $WUKey = "HKLM:\software\Policies\Microsoft\Windows\WindowsUpdate"
             New-Item -Path $WUKey -Force | Out-Null
             New-ItemProperty -Path $WUKey -Name AUOptions -PropertyType Dword -Value 2 `
@@ -2543,10 +2453,9 @@ CertificateTemplate= WebServer
             Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
             Start-Sleep -Seconds 10
 
-            # Install Chromium
-
-            Write-Verbose 'Installing Chromium browser in admincenter vm'
-            $expression = "choco install googlechrome -y"
+            # Install Edge
+            Write-Verbose 'Installing Microsft Edge browser in admincenter vm'
+            $expression = "choco install microsoft-edge -y"
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
             
@@ -2556,24 +2465,18 @@ CertificateTemplate= WebServer
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
                           
-       
             # Add Chromium to list of browsers
             Write-Verbose 'Setting Default Broswer on admincenter vm'
-            $expression = "SetDefaultBrowser.exe Chrome"
+            $expression = "SetDefaultBrowser.exe Edge"
             Invoke-Expression $expression
 
-
             # Add Scheduled task to set default browser at login
-
             $stTrigger = New-ScheduledTaskTrigger -AtLogOn
             $stTrigger.Delay = 'PT1M'
-            $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Chrome'
-            $schedTask = Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Force
-
+            $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Edge'
+            Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Force
         } 
-
     } 
-
 }
 
 function New-HyperConvergedEnvironment {
@@ -3275,22 +3178,35 @@ function enable-singleSignOn {
    
 #region Main
     
-$WarningPreference = "SilentlyContinue"
-$ErrorActionPreference = "Stop" 
-$ProgressPreference = 'SilentlyContinue'
-
 #Get Start Time
 $starttime = Get-Date
-   
+
+# Import Configuration Module
+$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+Copy-Item $ConfigurationDataFile -Destination .\SDN -Force
+
+# Set Variables from config file
+
+$NestedVMMemoryinGB = $SDNConfig.NestedVMMemoryinGB
+$guiVHDXPath = $SDNConfig.guiVHDXPath
+$azSHCIVHDXPath = $SDNConfig.azSHCIVHDXPath
+$HostVMPath = $SDNConfig.HostVMPath
+$InternalSwitch = $SDNConfig.InternalSwitch
+$natDNS = $SDNConfig.natDNS
+$natSubnet = $SDNConfig.natSubnet
+$natConfigure = $SDNConfig.natConfigure   
+
+$VerbosePreference = "SilentlyContinue" 
+Import-Module Hyper-V 
+$VerbosePreference = "Continue"
+$ErrorActionPreference = "Stop"
+$WarningPreference = "SilentlyContinue"
+$ProgressPreference = 'SilentlyContinue'
 
 # Download HciBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
 Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile C:\HciBox\VHD\AZSHCI.vhdx
 Invoke-WebRequest https://aka.ms/AAbclsv -OutFile C:\HciBox\VHD\GUI.vhdx
-
-# Import Configuration Module
-$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-Copy-Item $ConfigurationDataFile -Destination .\SDN -Force
 
 # Set VM Host Memory
 $totalPhysicalMemory = (Get-CimInstance -ClassName 'Cim_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1GB
@@ -3316,9 +3232,7 @@ $NCClientCred = new-object -typename System.Management.Automation.PSCredential `
 # Define SDN host Names. Please do not change names as these names are hardcoded in the setup.
 $AzSHOSTs = @("AzSMGMT", "AzSHOST1", "AzSHOST2")
 
-
 # Delete configuration if specified
-
 if ($Delete) {
 
     if ($SDNConfig.MultipleHyperVHosts) {
@@ -3348,24 +3262,6 @@ if ($Delete) {
 
 }
     
-# Set Variables from config file
-
-$NestedVMMemoryinGB = $SDNConfig.NestedVMMemoryinGB
-$guiVHDXPath = $SDNConfig.guiVHDXPath
-$azSHCIVHDXPath = $SDNConfig.azSHCIVHDXPath
-$HostVMPath = $SDNConfig.HostVMPath
-$InternalSwitch = $SDNConfig.InternalSwitch
-$natDNS = $SDNConfig.natDNS
-$natSubnet = $SDNConfig.natSubnet
-$natConfigure = $SDNConfig.natConfigure   
-
-
-$VerbosePreference = "SilentlyContinue" 
-Import-Module Hyper-V 
-$VerbosePreference = "Continue"
-$ErrorActionPreference = "Stop"
-    
-
 # Enable PSRemoting
 
 Write-Verbose "Enabling PS Remoting on client..."
