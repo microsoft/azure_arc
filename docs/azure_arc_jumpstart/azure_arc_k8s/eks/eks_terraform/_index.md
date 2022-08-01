@@ -18,21 +18,13 @@ The following README will guide you on how to use the provided [Terraform](https
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-* [Install](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) and [Configure](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration) AWS CLI
-
-* [Install AWS IAM Authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
-
-* [Install or update Azure CLI to version 2.25.0 and above](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
-
-  ```shell
-  az --version
-  ```
-
 * [Create a free Amazon Web Service's account](https://aws.amazon.com/free/)
 
-* [Install Terraform >=1.0](https://learn.hashicorp.com/terraform/getting-started/install.html)
+* [Create a Terraform Cloud account](https://learn.hashicorp.com/tutorials/terraform/cloud-sign-up?in=terraform/cloud-get-started#create-an-account)
 
-* [Install Kubectl](https://kubernetes.io/docs/tasks/tools/)
+    * Create API Token to get access to Terraform Cloud Workspace. Copy and save your token to use it later.
+
+        ![Screenshot showing how to create an API Token on Terraform Cloud](./trcloud_workspace_token.png)
 
 * Login to Azure CLI
 
@@ -78,6 +70,15 @@ The following README will guide you on how to use the provided [Terraform](https
   az extension update --name connectedk8s
   az extension update --name k8s-configuration
   ```
+* Create a Terraform Cloud Workspace
+  
+  * Login your Terraform Cloud account and create Workspace, workflow type CLI-driven
+
+    ![Screenshot showing how to create Workspace on Terraform Cloud](./trcloud_workspace_create.png)
+    
+  * Define a name for your Workspace, you can type the name "azure_arc".
+
+    ![Screenshot showing how to define a name for Workspace on Terraform Cloud](./trcloud_workspace_name.png)
 
 * Create AWS User IAM Key
 
@@ -103,84 +104,42 @@ The following README will guide you on how to use the provided [Terraform](https
 
     ![Screenshot showing how to reveal the created AWS IAM key](./iam_show_access_key.png)
 
-  * Set your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables, representing your AWS Access Key and AWS Secret Key.
+  * Set your credentials via the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, environment variables on Terraform Cloud, representing your AWS Access Key and AWS Secret Key.
 
-      ```shell
-      export TF_VAR_AWS_ACCESS_KEY_ID="<AWS ACCESS KEY ID>"
-      export TF_VAR_AWS_SECRET_ACCESS_KEY="<AWS ACCESS KEY SECRET>"
-      export TF_VAR_AWS_DEFAULT_REGION="us-west-2"
-      ```
+  * Create variables on your Terraform Cloud Workspace. Variables should be created as a enviroment varibles and sensitive.
+
+    ![Screenshot showing how to create varibles on Terraform Cloud Workscpace](./trcloud_workspace_variables.png)
+    ![Screenshot showing how to set aws varibles on Terraform Cloud Workscpace](./trcloud_workspace_aws_variables.png)
+  
 
 ## Deployment
 
-* Navigate to the folder that has **EKS** terraform binaries.
+* Create a Terraform GitHub Workflow 
 
-  ```shell
-  cd azure_arc_k8s_jumpstart/eks/terraform
-  ```
+    ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_create.png)
 
-* Run the ```terraform init``` command which will initialize Terraform, creating the state file to track our work:
 
-  ![Screenshot showing terraform init being run](./terraform_init.png)
+* Copy and Paste content file "[tf-deploy-eks.yml](!azure_arc_k8s_jumpstart/eks/terraform/github/workflow/tf-deploy-eks.yml)" in your GitHub Workflow.
 
-* Plan the Terraform deployment by running the ```terraform plan -out=infra.out``` command.
-  Wait for the plan to finish:
+    ![Screenshot showing how to update your GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_update.png)
+    
+* Create GitHub Secret called "TF_API_TOKEN" in your GitHub Repo and copy the value of your Terraform Cloud Token
 
-  ![Screenshot showing terraform plan being run](./terraform_plan.png)
+    ![Screenshot showing how to create GitHub Secret](./github_workflow_terraform_secret.png)
 
-  > **NOTE:  Screenshot has been clipped for brevity**
+* Update "[main.tf](!/azure_arc_k8s_jumpstart/eks/terraform/main.tf)" file with your Terraform Cloud Organization Name and Terraform Cloud Workspace Name
 
-* Deploy EKS by running the ```terraform apply "infra.out"``` command.
-  Wait for the plan to finish:
+    ![Screenshot showing how to create GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_update.png)
 
-  ![Screenshot showing terraform apply being run](./terraform_apply.png)
 
-* You will need the configuration output from Terraform in order to use kubectl to interact with your new cluster. Create your kube configuration directory, and output the configuration from Terraform into the config file using the Terraform output command:
+* Run GitHub Workflow to Deploy EKS on your AWS Account, run GitHub Workflow manually. 
 
-  **Mac/Linux**
-  ```shell
-  mkdir ~/.kube/
-  terraform output -raw kubeconfig > ~/.kube/config
-  ```
+    ![Screenshot showing how to run GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_manual_deploy.png)
+    
+* Wait for 12 minutes or more to finish GitHub Workflow. 
 
-  **Windows**
-  ```text
-  mkdir %USERPROFILE%\.kube
-  terraform output -raw kubeconfig > %USERPROFILE%\.kube\config
-  ```
-
-  Check to see if cluster is discoverable by ```kubectl``` by running:
-
-  ```shell
-  kubectl version
-  ```
-
-  Output should look similar to this:
-
-  ```shell
-  Client Version: version.Info{Major:"1", Minor:"23", GitVersion:"v1.23.0", GitCommit:"ab69524f795c42094a6630298ff53f3c3ebab7f4", GitTreeState:"clean", BuildDate:"2021-12-07T18:16:20Z", GoVersion:"go1.17.3", Compiler:"gc", Platform:"windows/amd64"}
-  Server Version: version.Info{Major:"1", Minor:"21+", GitVersion:"v1.21.5-eks-bc4871b", GitCommit:"5236faf39f1b7a7dabea8df12726f25608131aa9", GitTreeState:"clean", BuildDate:"2021-10-29T23:32:16Z", GoVersion:"go1.16.8", Compiler:"gc", Platform:"linux/amd64"}
-  ```
-
-* Configure EKS Nodes to communicate to EKS Control Plane
-
-  Now let’s add the ConfigMap to the cluster from Terraform as well. The ConfigMap is a Kubernetes configuration, in this case for granting access to our EKS cluster. This ConfigMap allows our ec2 instances in the cluster to communicate with the EKS master, as well as allowing our user account access to run commands against the cluster. You’ll run the Terraform output command to a file, and the kubectl apply command to apply that file:
-
-  ```shell
-  terraform output -raw config_map_aws_auth > configmap.yml
-  kubectl apply -f configmap.yml
-  ```
-
-  ![Screenshot showing kubectl apply being run](./kubectl_apply_configmap.png)
-
-  Once this is complete, you should see your nodes from your autoscaling group either starting to join or joined to the cluster. Once the second column reads Ready the node can have deployments pushed to it. Again, your output may vary here:
-
-  ```shell
-  kubectl get nodes -o wide
-  ```
-
-  ![Screenshot showing kubectl get nodes being run](./kubectl_get_nodes.png)
-
+    ![Screenshot showing how to run and finish GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_deploy.png)
+    
 * Verify EKS deployment
 
   Once done, you will have a ready EKS cluster under the ***Elastic Kubernetes Service*** section in your AWS console.
@@ -190,6 +149,8 @@ The following README will guide you on how to use the provided [Terraform](https
   ![Screenshot showing AWS cloud console with EKS cluster](./eks_cluster_console.png)
 
 ## Connecting to Azure Arc
+
+
 
 Now that you have a running EKS cluster, lets connect the EKS cluster to Azure Arc by:
 
