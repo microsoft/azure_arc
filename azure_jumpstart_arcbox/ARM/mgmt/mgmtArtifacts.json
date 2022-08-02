@@ -484,6 +484,15 @@
           },
           "flavor": {
             "value": "[parameters('flavor')]"
+          },
+          "linuxDcrId": {
+            "value": "[resourceId('Microsoft.Insights/dataCollectionRules', 'dcr-linux-arcbox')]"
+          },
+          "windowsDcrId": {
+            "value": "[resourceId('Microsoft.Insights/dataCollectionRules', 'dcr-windows-arcbox')]"
+          },
+          "maintenanceConfigId": {
+            "value": "[resourceId('Microsoft.Maintenance/maintenanceConfigurations', 'ArcBox-MaintenanceConfig')]"
           }
         }
       }
@@ -751,6 +760,45 @@
             ]
           }
         ]
+      }
+    },
+    {
+      "apiVersion": "2021-09-01-preview",
+      "type": "Microsoft.Maintenance/maintenanceConfigurations",
+      "name": "ArcBox-MaintenanceConfig",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "properties": {
+        "maintenanceScope": "InGuestPatch",
+        "installPatches": {
+          "linuxParameters": {
+            "classificationsToInclude": [
+              "Critical",
+              "Security"
+            ],
+            "packageNameMasksToExclude": null,
+            "packageNameMasksToInclude": null
+          },
+          "windowsParameters": {
+            "classificationsToInclude": [
+              "Critical",
+              "Security"
+            ],
+            "kbNumbersToExclude": null,
+            "kbNumbersToInclude": null
+          },
+          "rebootSetting": "NeverReboot"
+        },
+        "extensionProperties": {
+          "InGuestPatchMode": "User"
+        },
+        "maintenanceWindow": {
+          "startDateTime": "2022-08-01 00:00",
+          "duration": "03:55",
+          "timeZone": "Pacific Standard Time",
+          "expirationDateTime": null,
+          "recurEvery": "1Week Saturday"
+        }
       }
     }
   ]

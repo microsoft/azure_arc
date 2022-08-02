@@ -31,6 +31,12 @@
             "metadata": {
                 "description": "The id of the Windows data collection rules"
             }
+        },
+        "maintenanceConfigId": {
+            "type": "string",
+            "metadata": {
+                "description": "The id of the maintenance config for Update Management Center"
+            }
         }
     },
     "variables": {
@@ -97,6 +103,20 @@
                     },
                     "enableProcessesAndDependencies": {
                         "value": true
+                    }
+                }
+            },
+            {
+                "name": "(ArcBox) Configure periodic update assessments",
+                "definitionId": "/providers/Microsoft.Authorization/policyDefinitions/ba0df93e-e4ac-479a-aac2-134bbae39a1a",
+                "flavors": [
+                    "Full",
+                    "ITPro"
+                ],
+                "roleDefinition": "/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c",
+                "parameters": {
+                    "maintenanceConfigurationResourceId": {
+                        "value": "[parameters('maintenanceConfigId')]"
                     }
                 }
             },
