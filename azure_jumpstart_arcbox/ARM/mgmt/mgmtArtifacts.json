@@ -479,7 +479,7 @@
           "azureLocation": {
             "value": "[parameters('location')]"
           },
-          "logAnalyticsWorkspace": {
+          "logAnalyticsWorkspaceId": {
             "value": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
           },
           "flavor": {
