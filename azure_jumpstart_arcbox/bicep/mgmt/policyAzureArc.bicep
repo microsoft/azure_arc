@@ -13,6 +13,9 @@ param linuxDcrId string
 @description('The id of the Windows data collection rules')
 param windowsDcrId string
 
+@description('The id of the maintenance config')
+param maintenanceConfigId string
+
 var policies = [
   {
     name: '(ArcBox) Deploy Linux Azure Monitor agents'
@@ -73,6 +76,18 @@ var policies = [
     parameters: {
       workspaceResourceId: logAnalyticsWorkspaceId
       enableProcessesAndDependencies: true
+    }
+  }
+  {
+    name: '(ArcBox) Configure periodic update assessments'
+    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/ba0df93e-e4ac-479a-aac2-134bbae39a1a'
+    flavors: [
+      'Full'
+      'ITPro'
+    ]
+    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
+    parameters: {
+      maintenanceConfigurationResourceId: maintenanceConfigId
     }
   }
   {

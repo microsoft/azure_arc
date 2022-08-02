@@ -618,6 +618,37 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBas
   }
 }
 
+resource maintenanceConfig 'Microsoft.Maintenance/maintenanceConfigurations@2021-09-01-preview' = {
+  name: 'ArcBox-MaintenanceConfig'
+  location: location
+  properties: {
+    maintenanceScope: 'InGuestPatch'
+    installPatches: {
+      linuxParameters: {
+        classificationsToInclude: [ 'Critical', 'Security' ]
+        packageNameMasksToExclude: null
+        packageNameMasksToInclude: null
+      }
+      windowsParameters: {
+        classificationsToInclude: [ 'Critical', 'Security' ]
+        kbNumbersToExclude: null
+        kbNumbersToInclude: null
+      }
+      rebootSetting: 'Never'
+    }
+    extensionProperties: {
+      InGuestPatchMode: 'User'
+    }
+    maintenanceWindow: {
+      startDateTime: '2022-08-01 00:00'
+      duration: '03:55'
+      timeZone: 'Pacific Standard Time'
+      expirationDateTime: null
+      recurEvery: '1Week Saturday'
+    }
+  }
+}
+
 module policyDeployment './policyAzureArc.bicep' = {
   name: 'policyDeployment'
   params: {
@@ -626,6 +657,7 @@ module policyDeployment './policyAzureArc.bicep' = {
     flavor: flavor
     linuxDcrId: dataCollectionRulesLinux.id
     windowsDcrId: dataCollectionRulesWindows.id
+    maintenanceConfigId: maintenanceConfig.id
   }
 }
 

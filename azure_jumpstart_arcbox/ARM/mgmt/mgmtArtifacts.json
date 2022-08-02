@@ -787,7 +787,7 @@
             "kbNumbersToExclude": null,
             "kbNumbersToInclude": null
           },
-          "rebootSetting": "NeverReboot"
+          "rebootSetting": "Never"
         },
         "extensionProperties": {
           "InGuestPatchMode": "User"
