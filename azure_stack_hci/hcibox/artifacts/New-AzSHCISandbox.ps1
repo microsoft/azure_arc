@@ -2995,7 +2995,7 @@ function New-SDNS2DCluster {
             $SDNConfig = $args[0]
             $AzSHOSTs = @("AzSHOST1", "AzSHOST2")
 
-            Write-Verbose "Creating Cluster: AzStackCluster"
+            Write-Verbose "Creating Cluster: hciboxcluster"
 
             $VerbosePreference = "SilentlyContinue"
 
@@ -3005,7 +3005,7 @@ function New-SDNS2DCluster {
             $VerbosePreference = "Continue"
 
             $ClusterIP = ($SDNConfig.MGMTSubnet.TrimEnd("0/24")) + "252"
-            $ClusterName = "AzStackCluster"
+            $ClusterName = "hciboxcluster"
 
             # Create Cluster
 
@@ -3016,7 +3016,7 @@ function New-SDNS2DCluster {
 
             $VerbosePreference = "Continue"
 
-            # Invoke Command to enable S2D on AzStackCluster        
+            # Invoke Command to enable S2D on hciboxcluster        
             
               Enable-ClusterS2D -Confirm:$false -Verbose
 
@@ -3039,7 +3039,7 @@ function New-SDNS2DCluster {
             
                 FriendlyName            = "S2D_vDISK1" 
                 FileSystem              = 'CSVFS_ReFS'
-                StoragePoolFriendlyName = 'S2D on AzStackCluster'
+                StoragePoolFriendlyName = 'S2D on hciboxcluster'
                 ResiliencySettingName   = 'Mirror'
                 PhysicalDiskRedundancy  = 1
                 AllocationUnitSize = 64KB
@@ -3068,23 +3068,21 @@ function New-SDNS2DCluster {
 
         Write-Verbose "Renaming Storage Network Adapters"
 
-        (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.storageAsubnet.Replace('/24', '')) }).Name = 'StorageA'
-        (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.storageBsubnet.Replace('/24', '')) }).Name = 'StorageB'
-        (Get-Cluster -Name azstackcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.MGMTSubnet.Replace('/24', '')) }).Name = 'Public'
+        (Get-Cluster -Name hciboxcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.storageAsubnet.Replace('/24', '')) }).Name = 'StorageA'
+        (Get-Cluster -Name hciboxcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.storageBsubnet.Replace('/24', '')) }).Name = 'StorageB'
+        (Get-Cluster -Name hciboxcluster | Get-ClusterNetwork | Where-Object { $_.Address -eq ($sdnconfig.MGMTSubnet.Replace('/24', '')) }).Name = 'Public'
 
 
         # Set Allowed Networks for Live Migration
 
         Write-Verbose "Setting allowed networks for Live Migration"
 
-        Get-ClusterResourceType -Name "Virtual Machine" -Cluster AzStackCluster | Set-ClusterParameter -Cluster AzStackCluster -Name MigrationExcludeNetworks `
-            -Value ([String]::Join(";", (Get-ClusterNetwork -Cluster AzStackCluster | Where-Object { $_.Name -notmatch "Storage" }).ID))
+        Get-ClusterResourceType -Name "Virtual Machine" -Cluster hciboxcluster | Set-ClusterParameter -Cluster hciboxcluster -Name MigrationExcludeNetworks `
+            -Value ([String]::Join(";", (Get-ClusterNetwork -Cluster hciboxcluster | Where-Object { $_.Name -notmatch "Storage" }).ID))
 
         } | Out-Null
 
     } 
-
-
 }
 
 function test-internetConnect {

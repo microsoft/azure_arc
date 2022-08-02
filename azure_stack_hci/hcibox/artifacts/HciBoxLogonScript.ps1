@@ -51,7 +51,13 @@ az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 az provider register --namespace Microsoft.AzureStackHCI --wait
 
-#  build cluster .\New-Sandbox
+# Build HCI cluster
+Write-Header "Deploying HCI cluster"
+& "$Env:HciBoxDir\New-AzSHCISandbox.ps1"
+
+# Register HCI cluster
+Write-Header "Registering HCI cluster"
+& "$Env:HciBoxDir\Register-AzSHCI.ps1"
 
 # deploy AKS
 
