@@ -71,14 +71,6 @@
     }
   },
   "variables": {
-    "Updates": {
-      "name": "[concat('Updates', '(', parameters('workspaceName'), ')')]",
-      "galleryName": "Updates"
-    },
-    "ChangeTracking": {
-      "name": "[format('ChangeTracking({0})', parameters('workspaceName'))]",
-      "galleryName": "ChangeTracking"
-    },
     "Security": {
       "name": "[format('Security({0})', parameters('workspaceName'))]",
       "galleryName": "Security"
@@ -376,44 +368,6 @@
         "sku": {
           "name": "[parameters('sku')]"
         }
-      }
-    },
-    {
-      "type": "Microsoft.OperationsManagement/solutions",
-      "apiVersion": "2015-11-01-preview",
-      "location": "[parameters('location')]",
-      "name": "[variables('Updates').name]",
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
-      "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-      ],
-      "properties": {
-        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces/', parameters('workspaceName'))]"
-      },
-      "plan": {
-        "name": "[variables('Updates').name]",
-        "publisher": "Microsoft",
-        "promotionCode": "",
-        "product": "[concat('OMSGallery/', variables('Updates').galleryName)]"
-      }
-    },
-    {
-      "type": "Microsoft.OperationsManagement/solutions",
-      "apiVersion": "2015-11-01-preview",
-      "name": "[variables('ChangeTracking').name]",
-      "location": "[parameters('location')]",
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'ITPro'))]",
-      "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
-      ],
-      "plan": {
-        "name": "[variables('ChangeTracking').name]",
-        "promotionCode": "",
-        "product": "[format('OMSGallery/{0}', variables('ChangeTracking').galleryName)]",
-        "publisher": "Microsoft"
-      },
-      "properties": {
-        "workspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
       }
     },
     {
