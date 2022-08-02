@@ -1,7 +1,7 @@
 @description('Location of your Azure resources')
 param azureLocation string
 
-@description('Name of your log analytics workspace')
+@description('Workspace id of your log analytics workspace')
 param logAnalyticsWorkspaceId string
 
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
@@ -71,8 +71,12 @@ var policies = [
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
     parameters: {
-      workspaceResourceId: logAnalyticsWorkspaceId
-      enableProcessesAndDependencies: true
+      workspaceResourceId: {
+        value: logAnalyticsWorkspaceId
+      }
+      enableProcessesAndDependencies: {
+        value: true
+      }
     }
   }
   {
