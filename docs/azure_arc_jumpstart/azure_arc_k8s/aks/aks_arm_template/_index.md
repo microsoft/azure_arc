@@ -61,7 +61,35 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
 
     > **NOTE: The Jumpstart scenarios are designed with as much ease of use in-mind and adhering to security-related best practices whenever possible. It is optional but highly recommended to scope the service principal to a specific [Azure subscription and resource group](https://docs.microsoft.com/cli/azure/ad/sp?view=azure-cli-latest) as well considering using a [less privileged service principal account](https://docs.microsoft.com/azure/role-based-access-control/best-practices)**
 
-## Deployment
+## Deployment Options and Automation Flow
+
+This Jumpstart scenario provides multiple paths for deploying and configuring resources. Deployment options include:
+
+- Azure portal
+- ARM template via Azure CLI
+
+For you to get familiar with the automation and deployment flow, below is an explanation.
+
+1. User edits the environment variables in the Shell script file (1-time edit) which then be used throughout the deployment.
+
+2. User uploads the script to Azure Cloud Shell and runs the shell script. The script will:
+
+    - Connect to Azure using SPN credentials.
+    - Get AKS credentials.
+    - Install Azure Arc CLI extensions.
+    - Connect the cluster to Azure Arc.
+
+3. User verifies the Arc-enabled Kubernetes cluster.
+
+## Deployment Option 1: Azure portal
+
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_k8s_jumpstart%2Faks%2Farm_template%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
+
+  ![Screenshot showing Azure portal deployment](./01.png)
+
+  ![Screenshot showing Azure portal deployment](./02.png)
+
+## Deployment Option 2: ARM template with Azure CLI
 
 - Before deploying the ARM template, determine which AKS Kubernetes versions are available in your region using the below Azure CLI command.
 
@@ -71,7 +99,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
 
 - The deployment is using the template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/arm_template/azuredeploy.parameters.json) file to match your environment and using one of the available Kubernetes Versions from the previous step.
 
-  ![Screenshot of Azure ARM template](./01.png)
+  ![Screenshot of Azure ARM template](./03.png)
 
 - To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/aks/arm_template) and run the below command:
 
@@ -97,57 +125,45 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
 
 - Once the ARM template deployment is completed, a new AKS cluster in a new Azure resource group is created.
 
-  ![Screenshot of Azure portal showing AKS resource](./02.png)
+  ![Screenshot of Azure portal showing AKS resource](./04.png)
 
-  ![Screenshot of Azure portal showing AKS resource](./03.png)
-
-## Automation Flow
-
-For you to get familiar with the automation and deployment flow, below is an explanation.
-
-- User is editing the environment variables in the Shell script file (1-time edit) which then be used throughout the deployment.
-- User is uploading the script to Azure Cloud Shell and running the shell script. The script will:
-  - Connect to Azure using SPN credentials.
-  - Get AKS credentials.
-  - Install Azure Arc CLI extensions.
-  - Connecting the cluster to Azure Arc.
-- User is verifying the Arc-enabled Kubernetes cluster.
+  ![Screenshot of Azure portal showing AKS resource](./05.png)
 
 ## Connecting to Azure Arc
 
 - Now that you have a running AKS cluster, edit the environment variables section in the included [az_connect_aks](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/arm_template/scripts/az_connect_aks.sh) shell script.
 
-  ![Screenshot of az_connect_aks shell script](./04.png)
+  ![Screenshot of az_connect_aks shell script](./06.png)
 
   For example:
 
-  ![Screenshot of az_connect_aks shell script](./05.png)
+  ![Screenshot of az_connect_aks shell script](./07.png)
 
 - In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the *az_connect_aks* shell script against the AKS cluster. **Make sure Cloud Shell is configured to use Bash.**
 
-  ![Screenshot of Azure Cloud Shell button in Visual Studio Code](./06.png)
+  ![Screenshot of Azure Cloud Shell button in Visual Studio Code](./08.png)
 
 - After editing the environment variables in the [*az_connect_aks*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aks/arm_template/scripts/az_connect_aks.sh) shell script to match your parameters, save the file and then upload it to the Cloud Shell environment and run it using the ```. ./az_connect_aks.sh``` command.
 
   > **NOTE: The extra dot is due to the script having an *export* function and needs to have the vars exported in the same shell session as the other commands.**
 
-  ![Screenshot showing upload of file to Cloud Shell](./07.png)
+  ![Screenshot showing upload of file to Cloud Shell](./09.png)
 
-  ![Screenshot showing upload of file to Cloud Shell](./08.png)
+  ![Screenshot showing upload of file to Cloud Shell](./10.png)
 
 - Once the script run has finished, the AKS cluster will be projected as a new Azure Arc cluster resource.
 
-  ![Screenshot showing Azure portal with Azure Arc-enabled Kubernetes resource](./09.png)
+  ![Screenshot showing Azure portal with Azure Arc-enabled Kubernetes resource](./11.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./10.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./12.png)
 
-  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./11.png)
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./13.png)
 
 ## Delete the deployment
 
 The most straightforward way is to delete the Azure Arc cluster resource via the Azure Portal, just select the cluster and delete it.
 
-![Screenshot showing how to delete Azure Arc-enabled Kubernetes resource](./12.png)
+![Screenshot showing how to delete Azure Arc-enabled Kubernetes resource](./14.png)
 
 If you want to nuke the entire environment, run the below commands.
 
