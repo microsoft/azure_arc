@@ -7,13 +7,11 @@ $ProgressPreference = 'SilentlyContinue'
 $ConfigurationDataFile = '.\AzSHCISandbox-Config.psd1'
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
-Write-Host -ForegroundColor Green -Object "Register the Cluster to Azure Subscription"
+Write-Host "Register the Cluster to Azure Subscription"
 $user = "jumpstart.local\administrator"
 $password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
-#Azure Account Info
-#install modules
 Write-Host "Installing Required Modules" -ForegroundColor Green -BackgroundColor Black
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-WindowsFeature -name RSAT-Clustering-Powershell
@@ -31,7 +29,7 @@ Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $e
 Write-Host "Registering the Cluster" -ForegroundColor Green -BackgroundColor Black
 $armtoken = Get-AzAccessToken
 $graphtoken = Get-AzAccessToken -ResourceTypeName AadGraph
-$clustername = 'hciboxcluster'
-$azureLocation = 'eastus' # hard coded region due to HCI registration region restrictions
+$clustername = 'azstackcluster'
+$azureLocation = 'eastus'
 Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName azshost1 -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup
     
