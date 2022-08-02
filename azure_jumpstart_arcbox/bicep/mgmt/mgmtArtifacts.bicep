@@ -30,14 +30,6 @@ param networkSecurityGroupName string = 'ArcBox-NSG'
 @description('Name of the Bastion Network Security Group')
 param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
 
-var updates = {
-  name: 'Updates(${workspaceName})'
-  galleryName: 'Updates'
-}
-var changeTracking = {
-  name: 'ChangeTracking(${workspaceName})'
-  galleryName: 'ChangeTracking'
-}
 var security = {
   name: 'Security(${workspaceName})'
   galleryName: 'Security'
