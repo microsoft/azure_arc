@@ -761,45 +761,6 @@
           }
         ]
       }
-    },
-    {
-      "apiVersion": "2021-09-01-preview",
-      "type": "Microsoft.Maintenance/maintenanceConfigurations",
-      "name": "ArcBox-MaintenanceConfig",
-      "location": "[parameters('location')]",
-      "tags": {},
-      "properties": {
-        "maintenanceScope": "InGuestPatch",
-        "installPatches": {
-          "linuxParameters": {
-            "classificationsToInclude": [
-              "Critical",
-              "Security"
-            ],
-            "packageNameMasksToExclude": null,
-            "packageNameMasksToInclude": null
-          },
-          "windowsParameters": {
-            "classificationsToInclude": [
-              "Critical",
-              "Security"
-            ],
-            "kbNumbersToExclude": null,
-            "kbNumbersToInclude": null
-          },
-          "rebootSetting": "Never"
-        },
-        "extensionProperties": {
-          "InGuestPatchMode": "User"
-        },
-        "maintenanceWindow": {
-          "startDateTime": "2022-08-01 00:00",
-          "duration": "03:55",
-          "timeZone": "Pacific Standard Time",
-          "expirationDateTime": null,
-          "recurEvery": "1Week Saturday"
-        }
-      }
     }
   ]
 }
