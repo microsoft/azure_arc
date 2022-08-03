@@ -142,15 +142,15 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
     ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_create.png)
 
 
-* Copy and Paste content file "[tf-deploy-eks.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github/workflow/tf-deploy-eks.yml)" in your GitHub Workflow.
+* Copy and Paste content file "[tf-deploy-eks.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github_option/tf-deploy-eks.yml)" in your GitHub Workflow.
 
-    ![Screenshot showing how to update your GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_update.png)
+    ![Screenshot showing how to update your GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_pipeline.png)
     
 * Create GitHub Secret called "TF_API_TOKEN" in your GitHub Repo and copy the value of your Terraform Cloud Token
 
     ![Screenshot showing how to create GitHub Secret](./github_workflow_terraform_secret.png)
 
-* Update "[main.tf](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/main.tf)" file with your Terraform Cloud Organization Name and Terraform Cloud Workspace Name
+* Update "[main.tf](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github_option/main.tf)" file with your Terraform Cloud Organization Name and Terraform Cloud Workspace Name
 
     ![Screenshot showing how to create GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_update.png)
 
@@ -178,7 +178,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
     ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_create.png)
     
     
-* Update your new GitHub Workflow with content file "[connect-eks-and-arc.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github/workflow/connect-eks-and-arc.yml)"
+* Update your new GitHub Workflow with content file "[connect-eks-and-arc.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github_option/connect-eks-and-arc.yml)"
 
     ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_azurearc_update.png)
     
