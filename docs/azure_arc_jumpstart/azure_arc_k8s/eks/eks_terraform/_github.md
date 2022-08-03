@@ -8,7 +8,7 @@ description: >
 
 ## Alternative Deployment: Deploy EKS cluster and connect it to Azure Arc using Terraform and GitHub Actions
 
-The following README will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Amazon Web Services (AWS) [Kubernetes Engine cluster](https://aws.amazon.com/eks/) and connected it as an Azure Arc cluster resource. Alternatively you can deploy this Jumpstart scenario using Command-Line Tools, [here the guide](_index.md).
+The following Jumpstart scenario will guide you on how to use the provided [Terraform](https://www.terraform.io/) plan to deploy an Amazon Web Services (AWS) [Kubernetes Engine cluster](https://aws.amazon.com/eks/) and connected it as an Azure Arc cluster resource. Alternatively you can deploy this Jumpstart scenario using Command-Line Tools, [here the guide](_index.md).
 
 ## Prerequisites
 
