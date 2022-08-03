@@ -223,7 +223,7 @@ sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUST
 # Onboarding the cluster to Azure Arc
 echo ""
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $AZURE_RESOURCE_GROUP --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_arcbox'
+sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_arcbox' --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5"
 
 # Enabling Microsoft Defender for Containers and Container Insights cluster extensions
 echo ""
