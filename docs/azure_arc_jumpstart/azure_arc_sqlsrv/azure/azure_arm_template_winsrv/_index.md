@@ -75,6 +75,7 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
   ```shell
   az provider register --namespace Microsoft.AzureArcData
   az provider register --namespace Microsoft.HybridCompute
+  az provider register --namespace Microsoft.OperationsManagement
   ```
 
   You can monitor the registration process with the following commands:
@@ -82,6 +83,7 @@ By the end of the guide, you will have an Azure VM installed with Windows Server
   ```shell
   az provider show -n Microsoft.AzureArcData -o table
   az provider show -n Microsoft.HybridCompute -o table
+  az provider show -n Microsoft.OperationsManagement -o table
   ```
 
 ## Automation Flow
