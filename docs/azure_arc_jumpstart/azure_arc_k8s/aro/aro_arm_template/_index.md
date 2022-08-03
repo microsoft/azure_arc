@@ -9,6 +9,7 @@ description: >
 ## Deploy an Azure Red Hat OpenShift cluster and connect it to Azure Arc using an Azure ARM template
 
 The following Jumpstart scenario will guide you on how to use the provided [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview) to deploy an [Azure Red Hat OpenShift](https://docs.microsoft.com/azure/openshift/intro-openshift) cluster and connected it as an Azure Arc cluster resource.
+
 ## Prerequisites
 
 - Clone the Azure Arc Jumpstart repository
@@ -75,6 +76,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
   az provider show -n Microsoft.ExtendedLocation -o table
   az provider show -n Microsoft.RedHatOpenShift -o table
   ```
+
 - Check your subscription quota for the DSv3 family.
 
     > **NOTE: Azure Red Hat OpenShift requires a [minimum of 40 cores](/azure/openshift/tutorial-create-cluster#before-you-begin) to create and run an OpenShift cluster.**
@@ -89,20 +91,25 @@ The following Jumpstart scenario will guide you on how to use the provided [Azur
 - Get the Azure Red Hat OpenShift resource provider Id which needs to be assigned with the “Contributor” role.
 
   ```shell
-  az ad sp list --filter "displayname eq 'Azure Red Hat OpenShift RP'" --query "[?appDisplayName=='Azure Red Hat OpenShift RP'].{name: appDisplayName, objectId: objectId}"
+  az ad sp list --filter "displayname eq 'Azure Red Hat OpenShift RP'" --query "[?appDisplayName=='Azure Red Hat OpenShift RP'].{name: appDisplayName, objectId: id}"
   ```
 
   ![Screenshot of Azure resource provider for Aro](./02.png)
 
-## Automation Flow
+## Deployment Options and Automation Flow
+
+This Jumpstart scenario provides multiple paths for deploying and configuring resources. Deployment options include:
+
+- Azure portal
+- ARM template via Azure CLI
 
 For you to get familiar with the automation and deployment flow, below is an explanation.
 
-- User is editing the [ARM template parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.parameters.json) (1-time edit). These parameters values are being used throughout the deployment.
+- User provides the ARM template parameter values, either via the portal or editing the [ARM template parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.parameters.json) (1-time edit). These parameters values are being used throughout the deployment.
 
 - Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.json) will initiate the deployment of the Azure Red Hat OpenShift cluster and the virtual network.
 
-- User is editing the environment variables section in the in the [az_connect_aro.sh script file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/scripts/az_connect_aro.sh) (1-time edit). These variables' values will be used throughout the deployment.
+- User edits the environment variables section in the in the [az_connect_aro.sh script file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/scripts/az_connect_aro.sh) (1-time edit). These variables' values will be used throughout the deployment.
 
 - At a high level, the script will then perform the following tasks:
   - Install the required Azure Arc-enabled Kubernetes required Azure CLI extension
@@ -110,13 +117,19 @@ For you to get familiar with the automation and deployment flow, below is an exp
   - Download and install all the Azure Red Hat OpenShift CLI.
   - Onboard the cluster as an Azure Arc-enabled Kubernetes cluster
 
+## Deployment Option 1: Azure portal
 
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_k8s_jumpstart%2Faro%2Farm_template%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
-## Deployment
+  ![Screenshot showing Azure portal deployment](./03.png)
+
+  ![Screenshot showing Azure portal deployment](./04.png)
+
+## Deployment Option 2: ARM template with Azure CLI
 
 - The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/azuredeploy.parameters.json) file to match your environment.
 
-  ![Screenshot of Azure ARM template](./03.png)
+  ![Screenshot of Azure ARM template](./05.png)
 
   To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/aro/arm_template) and run the below command:
 
@@ -144,35 +157,35 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - Once the ARM template deployment is completed, a new Azure Red Hat OpenShift cluster in a new Azure resource group is created.
 
-  ![Screenshot of Azure Portal showing Aro resource](./04.png)
+  ![Screenshot of Azure Portal showing Aro resource](./06.png)
 
-  ![Screenshot of Azure Portal showing Aro resource](./05.png)
+  ![Screenshot of Azure Portal showing Aro resource](./07.png)
 
 ## Connecting to Azure Arc
 
 - Now that you have a running Azure Red Hat OpenShift cluster, edit the environment variables section in the included [az_connect_aro](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/scripts/az_connect_aro.sh) shell script.
 
-  ![Screenshot of az_connect_aro shell script](./06.png)
+  ![Screenshot of az_connect_aro shell script](./08.png)
 
 - In order to keep your local environment clean and untouched, we will use [Azure Cloud Shell](https://docs.microsoft.com/azure/cloud-shell/overview) (located in the top-right corner of the Azure portal) to run the *az_connect_aro* shell script against the Aro cluster. **Make sure Cloud Shell is configured to use Bash.**
 
-  ![Screenshot of Azure Cloud Shell button in Visual Studio Code](./07.png)
+  ![Screenshot of Azure Cloud Shell button in Visual Studio Code](./09.png)
 
 - After editing the environment variables in the [*az_connect_aro*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/aro/arm_template/scripts/az_connect_aro.sh) shell script to match your parameters, save the file and then upload it to the Cloud Shell environment and run it using the ```. ./az_connect_aro.sh``` command.
 
   > **NOTE: The extra dot is due to the script having an *export* function and needs to have the vars exported in the same shell session as the other commands.**
 
-  ![Screenshot showing upload of file to Cloud Shell](./08.png)
+  ![Screenshot showing upload of file to Cloud Shell](./10.png)
 
-  ![Screenshot showing upload of file to Cloud Shell](./09.png)
+  ![Screenshot showing upload of file to Cloud Shell](./11.png)
 
 - Once the script run has finished, the Aro cluster will be projected as a new Azure Arc-enabled Kubernetes cluster resource.
 
-  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./10.png)
-
-  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./11.png)
-
   ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./12.png)
+
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./13.png)
+
+  ![Screenshot showing Azure Portal with Azure Arc-enabled Kubernetes resource](./14.png)
 
 ## Logging
 
@@ -181,8 +194,9 @@ For ease of troubleshooting and tracking, a deployment log will be created autom
 ```shell
 cat /home/<USER>/jumpstart_logs/onboardARO.log
 ```
+
 ## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
 
-![Screenshot showing how to delete Azure Arc-enabled Kubernetes resource](./13.png)
+![Screenshot showing how to delete Azure Arc-enabled Kubernetes resource](./15.png)
