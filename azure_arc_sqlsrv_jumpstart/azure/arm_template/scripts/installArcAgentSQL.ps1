@@ -341,7 +341,7 @@ if(!$currentRoleAssignment)
 
 Write-Host "Installing SQL Server - Azure Arc extension. This may take 5+ minutes."
 
-$settings = '{ "SqlManagement" : { "IsEnabled" : true }}'
+$settings = @{ SqlManagement = @{ IsEnabled = $true }}
 
 $result = New-AzConnectedMachineExtension -Name "WindowsAgent.SqlServer" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.AzureData" -Settings $settings -ExtensionType "WindowsAgent.SqlServer" -Tag $resourceTags
 
