@@ -142,7 +142,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
     ![Screenshot showing how to create a GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_create.png)
 
 
-* Copy and Paste content file "[tf-deploy-eks.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github_option/tf-deploy-eks.yml)" in your GitHub Workflow.
+* Update GitHub Worflow by copying and pasting content file from "[tf-deploy-eks.yml](https://github.com/oaviles/azure_arc/blob/gh-action_deployment/azure_arc_k8s_jumpstart/eks/terraform/github_option/tf-deploy-eks.yml)" in your GitHub Workflow.
 
     ![Screenshot showing how to update your GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_pipeline.png)
     
