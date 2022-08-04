@@ -7,6 +7,21 @@ param(
     [Bool] $Delete = $false
 ) 
 
+# Set paths
+$Env:HciBoxDir = "C:\HciBox"
+$Env:HciBoxLogsDir = "C:\HciBox\Logs"
+$Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
+$Env:HciBoxKVDir = "C:\HciBox\KeyVault"
+$Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
+$Env:HciBoxIconDir = "C:\HciBox\Icons"
+$Env:HciBoxVHDDir = "C:\HciBox\VHD"
+$Env:HciBoxSDNDir = "C:\HciBox\SDN"
+$Env:HciBoxWACDir = "C:\HciBox\Windows Admin Center"
+$Env:agentScript = "C:\HciBox\agentScript"
+$Env:ToolsDir = "C:\Tools"
+$Env:tempDir = "C:\Temp"
+$Env:VMPath = "C:\VMs"
+
 #region functions
 function Get-HyperVHosts {
     param (
@@ -589,37 +604,30 @@ $azsmgmtProdKey
         if (!$PantherDir) { New-Item -Path ($MountedDrive + ":\Windows\Panther") -ItemType Directory -Force | Out-Null }
     
         Set-Content -Value $UnattendXML -Path ($MountedDrive + ":\Windows\Panther\Unattend.xml") -Force
-    
-        # Inject VMConfigs and create folder structure if host is AzSMGMT
 
         if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
-
             # Creating folder structure on AzSMGMT
-
             Write-Verbose "Creating VMs\Base folder structure on AzSMGMT"
             New-Item -Path ($MountedDrive + ":\VMs\Base") -ItemType Directory -Force | Out-Null
 
+            # Injecting configs into VMs
             Write-Verbose "Injecting VMConfigs to $path"
-            Copy-Item -Path .\AzSHCISandbox-Config.psd1 -Destination ($MountedDrive + ":\") -Recurse -Force
+            Copy-Item -Path "$Env:HciBoxDir\AzSHCISandbox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
             New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
             Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
             Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
-            Copy-Item -Path .\SDN -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path .\SDN -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path '.\Windows Admin Center' -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
-
+            Copy-Item -Path $Env:HciBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+            Copy-Item -Path $Env:HciBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+            Copy-Item -Path $Env:HciBoxWACDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
         }       
-    
-        # Dismount VHDX
 
+        # Dismount VHDX
         Write-Verbose "Dismounting VHDX File at path $path"
-        Dismount-VHD $path
-                                       
+        Dismount-VHD $path                                  
     }    
 }
     
 function Start-AzSHOSTS {
-
     Param(
 
         $VMPlacement
@@ -792,7 +800,7 @@ function Resolve-Applications {
     
 
     # Verify Windows Admin Center
-    $isWAC = Get-ChildItem -Path '.\Windows Admin Center' -Filter *.MSI
+    $isWAC = Get-ChildItem -Path $Env:HciBoxWACDir -Filter *.MSI
     if (!$isWAC) { Write-Error "Please check and ensure that you have correctly copied the Admin Center install file to C:\HciBox\Windows Admin Center." }
 
     # Are we on Server Core?
@@ -3161,8 +3169,8 @@ $starttime = Get-Date
 
 # Import Configuration Module
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-Copy-Item $ConfigurationDataFile -Destination .\SDN -Force
-
+Copy-Item $ConfigurationDataFile -Destination $Env:HciBoxSDNDir -Force
+$hciboxDir = "C:\HciBox"
 # Set Variables from config file
 
 $NestedVMMemoryinGB = $SDNConfig.NestedVMMemoryinGB
