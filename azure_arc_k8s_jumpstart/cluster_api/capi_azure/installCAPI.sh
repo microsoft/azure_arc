@@ -15,11 +15,11 @@ echo ""
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
-  export CLUSTERCTL_VERSION="1.1.5" # Do not change!
+  export CLUSTERCTL_VERSION="1.2.0" # Do not change!
   export CAPI_PROVIDER="azure" # Do not change!
   export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
-  export KUBERNETES_VERSION="1.24.2" # Do not change!
-  export AZURE_DISK_CSI_DRIVER_VERSION="1.19.0"
+  export KUBERNETES_VERSION="1.24.3" # Do not change!
+  export AZURE_DISK_CSI_DRIVER_VERSION="1.21.0"
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
   export WORKER_MACHINE_COUNT="<Workers node count>"
@@ -306,7 +306,7 @@ EOF
   echo ""
 
   echo ""
-  az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --kube-config $CLUSTER_NAME.kubeconfig
+  az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --kube-config $CLUSTER_NAME.kubeconfig --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
   echo ""
 
   # Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver

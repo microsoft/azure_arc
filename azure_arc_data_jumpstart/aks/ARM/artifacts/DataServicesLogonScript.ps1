@@ -92,7 +92,8 @@ az connectedk8s connect --name $connectedClusterName `
                         --location $Env:azureLocation `
                         --tags 'Project=jumpstart_azure_arc_data_services' `
                         --kube-config $Env:KUBECONFIG `
-                        --kube-context $Env:KUBECONTEXT
+                        --kube-context $Env:KUBECONTEXT `
+                        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Start-Sleep -Seconds 10
 
