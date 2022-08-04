@@ -238,6 +238,12 @@ Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
+# Disable Network Profile prompt
+$RegistryPath = "HKLM:\System\CurrentControlSet\Control\Network\NewNetworkWindowOff"
+if (-not (Test-Path $RegistryPath)) {
+    New-Item -Path $RegistryPath -Force | Out-Null
+}
+
 Write-Header "Installing Hyper-V"
 
 # Install Hyper-V and reboot
