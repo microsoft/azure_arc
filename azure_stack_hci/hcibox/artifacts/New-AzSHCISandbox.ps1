@@ -2,7 +2,7 @@
 
 param(
     [Parameter(Mandatory = $true, ParameterSetName = "ConfigurationFile")]
-    [String] $ConfigurationDataFile = '.\AzSHCISandbox-Config.psd1',
+    [String] $ConfigurationDataFile = 'C:\HciBox\AzSHCISandbox-Config.psd1',
     [Parameter(Mandatory = $false, ParameterSetName = "Delete")]
     [Bool] $Delete = $false
 ) 

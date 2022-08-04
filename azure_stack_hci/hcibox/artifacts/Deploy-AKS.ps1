@@ -26,7 +26,7 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
-$ConfigurationDataFile = '.\AzSHCISandbox-Config.psd1'
+$ConfigurationDataFile = 'C:\HciBox\AzSHCISandbox-Config.psd1'
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Generate credential objects

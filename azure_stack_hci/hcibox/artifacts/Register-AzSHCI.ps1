@@ -4,7 +4,7 @@ $ErrorActionPreference = "Stop"
 $ProgressPreference = 'SilentlyContinue'
 
 # Import Configuration Module
-$ConfigurationDataFile = '.\AzSHCISandbox-Config.psd1'
+$ConfigurationDataFile = 'C:\HciBox\AzSHCISandbox-Config.psd1'
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 Write-Host "Register the Cluster to Azure Subscription"

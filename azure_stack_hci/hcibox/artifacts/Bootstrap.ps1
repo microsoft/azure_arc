@@ -174,8 +174,6 @@ New-ItemProperty -Path $RegistryPath -Name $Name -Value $Value -PropertyType DWO
 
 # Disable Network Profile prompt
 $RegistryPath = "HKLM:\System\CurrentControlSet\Control\Network\NewNetworkWindowOff"
-$Name = ""
-$Value = ""
 if (-not (Test-Path $RegistryPath)) {
     New-Item -Path $RegistryPath -Force | Out-Null
 }
