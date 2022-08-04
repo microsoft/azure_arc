@@ -75,7 +75,7 @@ sudo snap install kustomize
 export CLUSTERCTL_VERSION="1.2.0" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
-export KUBERNETES_VERSION="1.24.2" # Do not change!
+export KUBERNETES_VERSION="1.24.3" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.21.0"
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
