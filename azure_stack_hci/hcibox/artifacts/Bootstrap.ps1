@@ -150,7 +150,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/HciBoxLogonScript.ps1") -OutFil
 Invoke-WebRequest ($templateBaseUrl + "artifacts/New-AzSHCISandbox.ps1") -OutFile $Env:HciBoxDir\New-AzSHCISandbox.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Register-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AzSHCISandbox-Config.psd1") -OutFile $Env:HciBoxDir\AzSHCISandbox-Config.psd1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.psd1") -OutFile $Env:HciBoxDir\Deploy-AKS.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.ps1") -OutFile $Env:HciBoxDir\Deploy-AKS.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HciBoxSDNDir\CertHelpers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HciBoxSDNDir\NetworkControllerRESTWrappers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HciBoxSDNDir\NetworkControllerWorkloadHelpers.psm1

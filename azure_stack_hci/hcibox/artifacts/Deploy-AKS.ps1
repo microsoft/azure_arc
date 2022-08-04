@@ -15,15 +15,6 @@ $Env:VMPath = "C:\VMs"
 
 Start-Transcript -Path $Env:HciBoxLogsDir\HciBoxLogonScript.log
 
-$cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory
-
-if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
-    $folder = Get-Item $cliDir.Parent.FullName -ErrorAction SilentlyContinue
-    $folder.Attributes += [System.IO.FileAttributes]::Hidden
-}
-
-$Env:AZURE_CONFIG_DIR = $cliDir.FullName
-
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
 $ConfigurationDataFile = 'C:\HciBox\AzSHCISandbox-Config.psd1'
