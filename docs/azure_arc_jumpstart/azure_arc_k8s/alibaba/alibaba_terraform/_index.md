@@ -189,7 +189,7 @@ The only thing you need to do before executing the Terraform plan is to export t
   connect the cluster:
 
   ```shell
-  az connectedk8s connect --name $AZURE_CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION
+  az connectedk8s connect --name $AZURE_CLUSTER_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
   ```
 
   ![Connect Alibaba cluster to Azure Arc](./09.png)

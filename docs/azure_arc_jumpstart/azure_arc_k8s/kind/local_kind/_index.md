@@ -170,7 +170,7 @@ The following Jumpstart scenario will guide you on how to use [kind](https://kin
 * Deploy the Arc binaries using Azure CLI:
 
   ```shell
-  az connectedk8s connect -n Arc-kind-Demo -g Arc-kind-Demo --tags 'Project=jumpstart_azure_arc_k8s'
+  az connectedk8s connect -n Arc-kind-Demo -g Arc-kind-Demo --tags 'Project=jumpstart_azure_arc_k8s' --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
   ```
 
 * Upon completion, you will have your kind cluster connected as a new Azure Arc Kubernetes cluster resource in a new resource group.

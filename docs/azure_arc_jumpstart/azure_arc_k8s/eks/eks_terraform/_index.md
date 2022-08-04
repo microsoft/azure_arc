@@ -204,7 +204,7 @@ Now that you have a running EKS cluster, lets connect the EKS cluster to Azure A
 * Deploy Arc binaries using Azure CLI:
 
   ```shell
-  az connectedk8s connect --name "Arc-EKS-Demo" --resource-group "Arc-EKS-Demo" --location "eastus" --tags "Project=jumpstart_azure_arc_k8s"
+  az connectedk8s connect --name "Arc-EKS-Demo" --resource-group "Arc-EKS-Demo" --location "eastus" --tags "Project=jumpstart_azure_arc_k8s" --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
   ```
 
 * Upon completion, you will have your EKS cluster connect as a new Azure Arc-enabled Kubernetes resource in a new resource group.

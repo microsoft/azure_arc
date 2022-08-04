@@ -118,13 +118,13 @@ The only thing you need to do before executing the Terraform plan is to create t
 - Using the Azure service principal you've created, run the below command to connect the cluster to Azure Arc.
 
     ```shell
-    az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure resource group name>
+    az connectedk8s connect --name <Name of your cluster as it will be shown in Azure> --resource-group <Azure resource group name> --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
     ```
 
     For example:
 
     ```shell
-    az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo
+    az connectedk8s connect --name arck3sdemo --resource-group Arc-K3s-Demo --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
     ```
 
     ![Successful azconnctedk8s command](./05.png)
