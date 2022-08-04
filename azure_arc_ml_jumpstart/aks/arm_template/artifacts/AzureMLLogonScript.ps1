@@ -92,6 +92,7 @@ az connectedk8s connect --name $connectedClusterName `
                         --resource-group $env:resourceGroup `
                         --location $env:azureLocation `
                         --tags 'Project=jumpstart_azure_arc_ml_services' `
+                        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a" `
 						      --custom-locations-oid '51dfe1e8-70c6-4de5-a08e-e18aff23d815'
                         # This is the Custom Locations Enterprise Application ObjectID from AAD
 

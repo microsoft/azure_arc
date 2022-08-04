@@ -82,7 +82,8 @@ az connectedk8s connect --name $Env:connectedClusterName `
                         --location $Env:azureLocation `
                         --tags "jumpstart_azure_arc_app_services" `
                         --kube-config $Env:KUBECONFIG `
-                        --kube-context $Env:KUBECONTEXT
+                        --kube-context $Env:KUBECONTEXT `
+                        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
