@@ -7,12 +7,6 @@ param logAnalyticsWorkspaceId string
 @description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
 param flavor string
 
-@description('The id of the Linux data collection rules')
-param linuxDcrId string
-
-@description('The id of the Windows data collection rules')
-param windowsDcrId string
-
 var policies = [
   {
     name: '(ArcBox) Deploy Linux Azure Monitor agents'
@@ -33,34 +27,6 @@ var policies = [
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
     parameters: {}
-  }
-  {
-    name: '(ArcBox) Configure Linux machines data collection rules'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/d5c37ce1-5f52-4523-b949-f19bf945b73a'
-    flavors: [
-      'Full'
-      'ITPro'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-    parameters: {
-      dcrResourceId: {
-        value: linuxDcrId
-      }
-    }
-  }
-  {
-    name: '(ArcBox) Configure Windows machines data collection rules'
-    definitionId: '/providers/Microsoft.Authorization/policyDefinitions/c24c537f-2516-4c2f-aac5-2cd26baa3d26'
-    flavors: [
-      'Full'
-      'ITPro'
-    ]
-    roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
-    parameters: {
-      dcrResourceId: {
-        value: windowsDcrId
-      }
-    }
   }
   {
     name: '(ArcBox) Configure VMInsights DCRs'
