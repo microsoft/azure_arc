@@ -131,7 +131,7 @@ foreach ($app in $appsToInstall)
 
 # All flavors
 Write-Host "Fetching artifacts"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/HciBox_wallpaper.png" -OutFile $Env:HciBoxDir\wallpaper.png
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_logo.png" -OutFile $Env:HciBoxDir\wallpaper.png
 Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:HciBoxDir\DeploymentStatus.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HciBoxLogsDir\LogInstructions.txt
 
@@ -145,13 +145,12 @@ Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$E
 
 # Downloading AzSHCI files
 Write-Header "Downloading Azure Stack HCI configuration scripts"
-#Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile $Env:HciBoxVHDDir\AZSHCI.vhdx
-#Invoke-WebRequest https://aka.ms/AAbclsv -OutFile $Env:HciBoxVHDDir\GUI.vhdx
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxWACDir\WindowsAdminCenter.msi
 Invoke-WebRequest ($templateBaseUrl + "artifacts/HciBoxLogonScript.ps1") -OutFile $Env:HciBoxDir\HciBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/New-AzSHCISandbox.ps1") -OutFile $Env:HciBoxDir\New-AzSHCISandbox.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Register-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/AzSHCISandbox-Config.psd1") -OutFile $Env:HciBoxDir\AzSHCISandbox-Config.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.psd1") -OutFile $Env:HciBoxDir\Deploy-AKS.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HciBoxSDNDir\CertHelpers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HciBoxSDNDir\NetworkControllerRESTWrappers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HciBoxSDNDir\NetworkControllerWorkloadHelpers.psm1
