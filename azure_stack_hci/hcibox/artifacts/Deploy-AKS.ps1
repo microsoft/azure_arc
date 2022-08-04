@@ -59,7 +59,7 @@ $aksvar= @{
     AKSCloudConfigdir = "C:\ClusterStorage\S2D_vDISK1\aks\CloudConfig"
     AKSCloudSvcidr = "192.168.1.15/24"
     AKSVlanID="200"
-    AKSResourceGroupName = $env:resourceGroup
+    AKSResourceGroupName = "HCIBox-AKS"
 }
 
 # Install latest versions of Nuget and PowershellGet
@@ -104,5 +104,5 @@ Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
 }
 
 # Create a new workload cluster
-New-AksHciCluster -name "HciBox-AKS" -nodePoolName linuxnodepool -nodecount 1 -osType linux
-Get-AksHciCluster
+#New-AksHciCluster -name "HciBox-AKS" -nodePoolName linuxnodepool -nodecount 1 -osType linux
+#Get-AksHciCluster
