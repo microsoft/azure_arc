@@ -2,9 +2,23 @@
 $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop" 
 $ProgressPreference = 'SilentlyContinue'
+# Set paths
+$Env:HciBoxDir = "C:\HciBox"
+$Env:HciBoxLogsDir = "C:\HciBox\Logs"
+$Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
+$Env:HciBoxKVDir = "C:\HciBox\KeyVault"
+$Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
+$Env:HciBoxIconDir = "C:\HciBox\Icons"
+$Env:HciBoxVHDDir = "C:\HciBox\VHD"
+$Env:HciBoxSDNDir = "C:\HciBox\SDN"
+$Env:HciBoxWACDir = "C:\HciBox\Windows Admin Center"
+$Env:agentScript = "C:\HciBox\agentScript"
+$Env:ToolsDir = "C:\Tools"
+$Env:tempDir = "C:\Temp"
+$Env:VMPath = "C:\VMs"
 
 # Import Configuration Module
-$ConfigurationDataFile = 'C:\HciBox\AzSHCISandbox-Config.psd1'
+$ConfigurationDataFile = "$Env:HciBoxDir\AzSHCISandbox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 Write-Host "Register the Cluster to Azure Subscription"
