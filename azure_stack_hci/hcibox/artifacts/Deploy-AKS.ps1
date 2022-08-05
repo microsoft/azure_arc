@@ -87,9 +87,7 @@ Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
     $vnet = New-AksHciNetworkSetting -name $using:aksvar.AKSvnetname -vSwitchName $using:aksvar.AKSvSwitchName -k8sNodeIpPoolStart $using:aksvar.AKSNodeStartIP -k8sNodeIpPoolEnd $using:aksvar.AKSNodeEndIP -vipPoolStart $using:aksvar.AKSVIPStartIP -vipPoolEnd $using:aksvar.AKSVIPEndIP -ipAddressPrefix $using:aksvar.AKSIPPrefix -gateway $using:aksvar.AKSGWIP -dnsServers $using:aksvar.AKSDNSIP -vlanID $aksvar.vlanid        
     Set-AksHciConfig -imageDir $using:aksvar.AKSImagedir -workingDir $using:aksvar.AKSWorkingdir -cloudConfigLocation $using:aksvar.AKSCloudConfigdir -vnet $vnet -cloudservicecidr $using:aksvar.AKSCloudSvcidr 
     $azurecred = Connect-AzAccount -ServicePrincipal -Subscription $using:context.Subscription.Id -Tenant $using:context.Subscription.TenantId -Credential $using:azureAppCred
-    $armtoken = Get-AzAccessToken
-    $graphtoken = Get-AzAccessToken -ResourceTypeName AadGraph
-    Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:aksvar.AKSResourceGroupName -AccountId $azurecred.Context.Account.Id -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token
+    Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:aksvar.AKSResourceGroupName -Tenant $azurecred.Context.Tenant.Id -Credential $using:azureAppCred
     Write-Host "Ready to Install AKS on HCI Cluster"
     Install-AksHci 
 }
