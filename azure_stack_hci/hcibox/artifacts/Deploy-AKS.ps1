@@ -82,7 +82,7 @@ Invoke-Command -VMName $aksvar.HostList  -Credential $adcred -ScriptBlock {
 }
 
 # Install AksHci - only need to perform the following on one of the nodes
-Write-Header "Prepping AKS Install" -ForegroundColor Green -BackgroundColor Black
+Write-Header "Prepping AKS Install"
 Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
     $vnet = New-AksHciNetworkSetting -name $using:aksvar.AKSvnetname -vSwitchName $using:aksvar.AKSvSwitchName -k8sNodeIpPoolStart $using:aksvar.AKSNodeStartIP -k8sNodeIpPoolEnd $using:aksvar.AKSNodeEndIP -vipPoolStart $using:aksvar.AKSVIPStartIP -vipPoolEnd $using:aksvar.AKSVIPEndIP -ipAddressPrefix $using:aksvar.AKSIPPrefix -gateway $using:aksvar.AKSGWIP -dnsServers $using:aksvar.AKSDNSIP -vlanID $using:aksvar.AKSVlanID        
     Set-AksHciConfig -imageDir $using:aksvar.AKSImagedir -workingDir $using:aksvar.AKSWorkingdir -cloudConfigLocation $using:aksvar.AKSCloudConfigdir -vnet $vnet -cloudservicecidr $using:aksvar.AKSCloudSvcidr 
@@ -92,6 +92,9 @@ Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
     Install-AksHci 
 }
 
-# Create a new workload cluster
-#New-AksHciCluster -name "HciBox-AKS" -nodePoolName linuxnodepool -nodecount 1 -osType linux
-#Get-AksHciCluster
+# Create new AKS workload cluster
+Write-Header "Creating AKS workload cluster"
+Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
+    New-AksHciCluster -name "hcibox-aks" -nodePoolName linuxnodepool -nodecount 1 -osType linux
+    Get-AksHciCluster
+}
