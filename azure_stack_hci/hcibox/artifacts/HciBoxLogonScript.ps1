@@ -61,7 +61,7 @@ Write-Header "Registering HCI cluster"
 
 # deploy AKS
 Write-Header "Deploying AKS"
-# & "$Env:HciBoxDir\Deploy-AKS.ps1"
+& "$Env:HciBoxDir\Deploy-AKS.ps1"
 
 # deploy Data services
 
