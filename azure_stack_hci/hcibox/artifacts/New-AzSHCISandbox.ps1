@@ -3084,12 +3084,12 @@ $natDNS = $SDNConfig.natDNS
 $natSubnet = $SDNConfig.natSubnet
 $natConfigure = $SDNConfig.natConfigure   
 
+Import-Module Hyper-V 
+
 $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
 $WarningPreference = "SilentlyContinue"
 $ProgressPreference = 'SilentlyContinue'
-
-Import-Module Hyper-V 
 
 # Download HciBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
