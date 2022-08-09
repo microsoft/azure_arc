@@ -10,11 +10,11 @@
     MultipleHyperVHostExternalSwitchName = "SDN-Switch"                          # Name of the External Hyper-V VM Switch identical on all hosts.
 
     # VHDX Paths 
-    guiVHDXPath                          = "C:\HciBox\VHD\gui.vhdx"               # This value controls the location of the GUI VHDX.              
+    guiVHDXPath                          = "C:\HciBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
     azsHCIVHDXPath                       = "C:\HciBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. 
     
     # SDN Lab Admin Password
-    SDNAdminPassword                     = "ArcPassword123!!"                          # Password for all local and domain accounts. Do not include special characters in the password otherwise some unattended installs may fail.
+    SDNAdminPassword                     = "ArcPassword123!!"                    # Password for all local and domain accounts. Do not include special characters in the password otherwise some unattended installs may fail.
 
     # VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
@@ -27,7 +27,7 @@
 
     # SDN Lab Domain
     SDNDomainFQDN                        = "jumpstart.local"                      # Limit name (not the .com) to 14 characters as the name will be used as the NetBIOS name. 
-    DCName                               = "jumpstartdc"                            # Name of the domain controller virtual machine (limit to 14 characters)
+    DCName                               = "jumpstartdc"                          # Name of the domain controller virtual machine (limit to 14 characters)
 
     # NAT Configuration
     natHostSubnet                        = "192.168.128.0/24"
@@ -40,7 +40,7 @@
     SDNLABMTU                            = 9014                                   # Controls the MTU for all Hosts. If using multiple physical hosts. Ensure that you have configured MTU on physical nics on the hosts to match this value.
 
     #SDN Provisioning
-    ProvisionNC                          = $false                                  # Provisions Network Controller Automatically.
+    ProvisionNC                          = $false                                 # Provisions Network Controller Automatically.
     ConfigureBGPpeering                  = $true                                  # Peers the GW and MUX VMs with the BGP-ToR-Router automatically if ProvisionNC = $true
 
     ################################################################################################################
