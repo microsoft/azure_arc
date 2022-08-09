@@ -25,13 +25,11 @@ $Env:VMPath = "C:\VMs"
 #region functions
 function Get-HyperVHosts {
     param (
-
         [String[]]$MultipleHyperVHosts,
         [string]$HostVMPath
     )
     
     foreach ($HypervHost in $MultipleHyperVHosts) {
-
         # Check Network Connectivity
         Write-Verbose "Checking Network Connectivity for Host $HypervHost"
         $testconnection = Test-Connection -ComputerName $HypervHost -Quiet -Count 1
@@ -54,7 +52,6 @@ function Get-HyperVHosts {
     
 function Set-HyperVSettings {
     param (
-
         $MultipleHyperVHosts,
         $HostVMPath
     )
@@ -233,9 +230,7 @@ function Select-VMHostPlacement {
     
 function Select-SingleHost {
     Param (
-
         $AzSHOSTs
-
     )
 
     $results = @()
@@ -244,114 +239,82 @@ function Select-SingleHost {
         $results = $results + [pscustomobject]@{AzSHOST = $AzSHOST; VMHost = $env:COMPUTERNAME }
     }
 
-    Return $results
+    return $results
 }
     
 function Copy-VHDXtoHosts {
     Param (
-
         $MultipleHyperVHosts, 
         $guiVHDXPath, 
         $azSHCIVHDXPath, 
         $HostVMPath
-
     )
         
     foreach ($HypervHost in $MultipleHyperVHosts) { 
-
         $DriveLetter = $HostVMPath.Split(':')
         $path = (("\\$HypervHost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]))
         Write-Verbose "Copying $guiVHDXPath to $path"
         Copy-Item -Path $guiVHDXPath -Destination "$path\GUI.vhdx" -Force | Out-Null
         Write-Verbose "Copying $azSHCIVHDXPath to $path"
         Copy-Item -Path $azSHCIVHDXPath -Destination "$path\AzSHCI.vhdx" -Force | Out-Null
-
     }
 }
     
 function Copy-VHDXtoHost {
-
     Param (
-
         $guiVHDXPath, 
         $HostVMPath, 
         $azSHCIVHDXPath
-
     )
 
     Write-Verbose "Copying $guiVHDXPath to $HostVMPath\GUI.VHDX"
     Copy-Item -Path $guiVHDXPath -Destination "$HostVMPath\GUI.VHDX" -Force | Out-Null
     Write-Verbose "Copying $azSHCIVHDXPath to $HostVMPath\AzSHCI.VHDX"
     Copy-Item -Path $azSHCIVHDXPath -Destination "$HostVMPath\AzSHCI.VHDX" -Force | Out-Null
-
-      
-    
 }
     
-function Get-guiVHDXPath {
-    
+function Get-GuiVHDXPath {
     Param (
-
         $guiVHDXPath, 
         $HostVMPath
-
     )
-
     $ParentVHDXPath = $HostVMPath + 'GUI.vhdx'
     return $ParentVHDXPath
-
 }
     
-function Get-azSHCIVHDXPath {
-
+function Get-AzSHCIVHDXPath {
     Param (
-
         $azSHCIVHDXPath, 
         $HostVMPath
-
     )
-
     $ParentVHDXPath = $HostVMPath + 'AzSHCI.vhdx'
     return $ParentVHDXPath
-
 }
     
 function Get-ConsoleVHDXPath {
-
     Param (
-
         $ConsoleVHDXPath, 
         $HostVMPath
-
     )
-
     $ParentVHDXPath = $HostVMPath + 'Console.vhdx'
     return $ParentVHDXPath
-
 }
 
 function New-NestedVM {
-
     Param (
-
         $AzSHOST, 
         $VMHost, 
         $HostVMPath, 
         $VMSwitch,
         $SDNConfig
-
     )
     
-   
     $parentpath = "$HostVMPath\GUI.vhdx"
     $coreparentpath = "$HostVMPath\AzSHCI.vhdx"
-
     $vmMac = Invoke-Command -ComputerName $VMHost -ScriptBlock {    
 
         $VerbosePreference = "SilentlyContinue"
-
         Import-Module Hyper-V
-
         $VerbosePreference = "Continue"
 
         $AzSHOST = $using:AzSHOST
@@ -366,54 +329,42 @@ function New-NestedVM {
         $AzSMGMTMemoryinGB = $SDNConfig.AzSMGMTMemoryinGB
     
         # Create Differencing Disk. Note: AzSMGMT is GUI
-
         if ($AzSHOST -eq "AzSMGMT") {
-
             $VHDX1 = New-VHD -ParentPath $parentpath -Path "$HostVMPath\$AzSHOST.vhdx" -Differencing 
             $VHDX2 = New-VHD -Path "$HostVMPath\$AzSHOST-Data.vhdx" -SizeBytes 268435456000 -Dynamic
             $NestedVMMemoryinGB = $AzSMGMTMemoryinGB
         }
-    
-        Else { 
-           
+        else {  
             $VHDX1 = New-VHD -ParentPath $coreparentpath -Path "$HostVMPath\$AzSHOST.vhdx" -Differencing 
             $VHDX2 = New-VHD -Path "$HostVMPath\$AzSHOST-Data.vhdx" -SizeBytes 268435456000 -Dynamic
     
             # Create S2D Storage       
-
             New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk1.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
             New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk2.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
             New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk3.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
             New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk4.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
             New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk5.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null
             New-VHD -Path "$HostVMPath\$AzSHOST-S2D_Disk6.vhdx" -SizeBytes $S2DDiskSize -Dynamic | Out-Null    
-    
         }    
     
-        #Create Nested VM
-
+        # Create Nested VM
         $params = @{
-
             Name               = $AzSHOST
             MemoryStartupBytes = $NestedVMMemoryinGB 
             VHDPath            = $VHDX1.Path 
             SwitchName         = $VMSwitch
             Generation         = 2
-
         }
-
         New-VM @params | Out-Null
         Add-VMHardDiskDrive -VMName $AzSHOST -Path $VHDX2.Path
     
         if ($AzSHOST -ne "AzSMGMT") {
-
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk1.vhdx" -VMName $AzSHOST | Out-Null
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk2.vhdx" -VMName $AzSHOST | Out-Null
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk3.vhdx" -VMName $AzSHOST | Out-Null
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk4.vhdx" -VMName $AzSHOST | Out-Null
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk5.vhdx" -VMName $AzSHOST | Out-Null
             Add-VMHardDiskDrive -Path "$HostVMPath\$AzSHOST-S2D_Disk6.vhdx" -VMName $AzSHOST | Out-Null
-
         }
     
         Set-VM -Name $AzSHOST -ProcessorCount 4 -AutomaticStartAction Start
@@ -424,43 +375,30 @@ function New-NestedVM {
         Write-Verbose "Virtual Machine FABRIC NIC MAC is = $vmMac"
 
         if ($AzSHOST -ne "AzSMGMT") {
-
             Add-VMNetworkAdapter -VMName $AzSHOST -SwitchName $VMSwitch -DeviceNaming On -Name StorageA
             Add-VMNetworkAdapter -VMName $AzSHOST -SwitchName $VMSwitch -DeviceNaming On -Name StorageB
-
-
         }
 
         Get-VM $AzSHOST | Set-VMProcessor -ExposeVirtualizationExtensions $true
         Get-VM $AzSHOST | Set-VMMemory -DynamicMemoryEnabled $false
         Get-VM $AzSHOST | Get-VMNetworkAdapter | Set-VMNetworkAdapter -MacAddressSpoofing On
 
-        
-
         Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName SDN -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
         Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
 
         if ($AzSHOST -ne "AzSMGMT") {
-
             Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName StorageA -Access -VlanId $SDNConfig.StorageAVLAN 
             Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName StorageB -Access -VlanId $SDNConfig.StorageBVLAN 
-
-
         }
-
 
         Enable-VMIntegrationService -VMName $AzSHOST -Name "Guest Service Interface"
         return $vmMac
-
     }
-    
-    
-    return $vmMac          
 
+    return $vmMac          
 }
     
 function Add-Files {
-    
     Param(
         $VMPlacement, 
         $HostVMPath, 
@@ -470,26 +408,18 @@ function Add-Files {
         $vmMacs
     )
     
-    $corevhdx = 'AzSHCI.vhdx'
-    $guivhdx = 'GUI.vhdx'
-    
     foreach ($AzSHOST in $VMPlacement) {
-    
         # Get Drive Paths 
-
         $HypervHost = $AzSHOST.VMHost
         $DriveLetter = $HostVMPath.Split(':')
         $path = (("\\$HypervHost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]) + "\" + $AzSHOST.AzSHOST + ".vhdx")       
 
         # Install Hyper-V Offline
-
         Write-Verbose "Performing offline installation of Hyper-V to path $path"
         Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
         Start-Sleep -Seconds 20       
 
-    
         # Mount VHDX
-
         Write-Verbose "Mounting VHDX file at $path"
         [string]$MountedDrive = (Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition | Get-Volume).DriveLetter
         $MountedDrive = $MountedDrive.Replace(" ", "")
@@ -497,9 +427,7 @@ function Add-Files {
         # Get Assigned MAC Address so we know what NIC to assign a static IP to
         $vmMac = ($vmMacs | Where-Object { $_.Hostname -eq $AzSHost.AzSHOST }).vmMac
 
-   
         # Inject Answer File
-
         Write-Verbose "Injecting answer file to $path"
     
         $AzSHOSTComputerName = $AzSHOST.AzSHOST
@@ -514,7 +442,6 @@ function Add-Files {
         $azsmgmtProdKey = $null
         if ($AzSHOST.AzSHOST -eq "AzSMGMT") { $azsmgmtProdKey = "<ProductKey>$ProductKey</ProductKey>"}
             
- 
         $UnattendXML = @"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
@@ -1228,7 +1155,7 @@ function Set-AzSMGMT {
 
         # Set VM Path for Physical Hosts
 
-        Try {
+        try {
 
             $AzSHOST1 = $SDNConfig.AzSHOST1IP.Split("/")[0]
             $AzSHOST2 = $SDNConfig.AzSHOST2IP.Split("/")[0]
@@ -1253,7 +1180,7 @@ function Set-AzSMGMT {
 
         }
 
-        Catch {
+        catch {
 
             throw $_
 
@@ -1261,27 +1188,20 @@ function Set-AzSMGMT {
 
         #Add AzSHOSTS to domain
 
-        Try {
+        try {
 
             Write-Verbose "Adding SDN Hosts to the Domain"
             AddAzSHOSTToDomain -IP $AzSHOST1 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST1 -SDNConfig $SDNConfig
             AddAzSHOSTToDomain -IP $AzSHOST2 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST2 -SDNConfig $SDNConfig
-
         }
-
-        Catch {
-
+        catch {
             throw $_
-
         }
-
     } | Out-Null
 
     # Provision Admincenter
-
     Write-Verbose "Provisioning admincenter VM"
     New-AdminCenterVM -SDNConfig $SDNConfig -localCred $localCred -domainCred $domainCred | Out-Null
-
 
 }
 
@@ -1446,7 +1366,6 @@ function New-DCVM {
         Start-VM -Name $VMName | Out-Null
 
         # Wait until the VM is restarted
-
         while ((Invoke-Command -VMName $VMName -Credential $using:domainCred { "Test" } `
                     -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
 
@@ -3093,33 +3012,24 @@ function New-SDNS2DCluster {
     } 
 }
 
-function test-internetConnect {
-
+function Test-InternetConnect {
     $testIP = '1.1.1.1'
     $ErrorActionPreference = "Stop"  
     $intConnect = Test-Connection -ComputerName $testip -Quiet -Count 2
 
     if (!$intConnect) {
-
         Write-Error "Unable to connect to Internet. An Internet connection is required."
-
     }
-
 }
 
-function set-hostnat {
-
+function Set-HostNAT {
     param (
-
         $SDNConfig
     )
 
     $VerbosePreference = "Continue" 
-
     $switchExist = Get-NetAdapter | Where-Object { $_.Name -match $SDNConfig.natHostVMSwitchName }
-
     if (!$switchExist) {
-
         Write-Verbose "Creating Internal NAT Switch: $($SDNConfig.natHostVMSwitchName)"
         # Create Internal VM Switch for NAT
         New-VMSwitch -Name $SDNConfig.natHostVMSwitchName -SwitchType Internal | Out-Null
@@ -3128,16 +3038,12 @@ function set-hostnat {
         # Apply IP Address to new Internal VM Switch
         $intIdx = (Get-NetAdapter | Where-Object { $_.Name -match $SDNConfig.natHostVMSwitchName }).ifIndex
         $natIP = $SDNConfig.natHostSubnet.Replace("0/24", "1")
-
         New-NetIPAddress -IPAddress $natIP -PrefixLength 24 -InterfaceIndex $intIdx | Out-Null
 
         # Create NetNAT
-
         Write-Verbose "Creating new NETNAT"
         New-NetNat -Name $SDNConfig.natHostVMSwitchName  -InternalIPInterfaceAddressPrefix $SDNConfig.natHostSubnet | Out-Null
-
     }
-
 }
 
 function enable-singleSignOn {
@@ -3163,16 +3069,12 @@ function enable-singleSignOn {
 #endregion
    
 #region Main
-    
-#Get Start Time
+
 $starttime = Get-Date
 
 # Import Configuration Module
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 Copy-Item $ConfigurationDataFile -Destination $Env:HciBoxSDNDir -Force
-$hciboxDir = "C:\HciBox"
-# Set Variables from config file
-
 $NestedVMMemoryinGB = $SDNConfig.NestedVMMemoryinGB
 $guiVHDXPath = $SDNConfig.guiVHDXPath
 $azSHCIVHDXPath = $SDNConfig.azSHCIVHDXPath
@@ -3182,74 +3084,48 @@ $natDNS = $SDNConfig.natDNS
 $natSubnet = $SDNConfig.natSubnet
 $natConfigure = $SDNConfig.natConfigure   
 
-$VerbosePreference = "SilentlyContinue" 
-Import-Module Hyper-V 
 $VerbosePreference = "Continue"
 $ErrorActionPreference = "Stop"
 $WarningPreference = "SilentlyContinue"
 $ProgressPreference = 'SilentlyContinue'
 
+Import-Module Hyper-V 
+
 # Download HciBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
-Invoke-WebRequest https://aka.ms/AAd8dvp -OutFile C:\HciBox\VHD\AZSHCI.vhdx
-Invoke-WebRequest https://aka.ms/AAbclsv -OutFile C:\HciBox\VHD\GUI.vhdx
+Invoke-WebRequest https://aka.ms/AAhnqvc -OutFile C:\HciBox\VHD\AZSHCI.vhdx
+Invoke-WebRequest https://aka.ms/AAhnj5y -OutFile C:\HciBox\VHD\GUI.vhdx
 
 # Set VM Host Memory
-$totalPhysicalMemory = (Get-CimInstance -ClassName 'Cim_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1GB
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824
 $SDNConfig.NestedVMMemoryinGB = $availablePhysicalMemory
 
 # Set-Credentials
-$localCred = new-object -typename System.Management.Automation.PSCredential `
-    -argumentlist "Administrator", (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
+$localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
 $domainCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\Administrator"), `
-(ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
+    (ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
 
 $NCAdminCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\NCAdmin"), `
-(ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
-
-$NCClientCred = new-object -typename System.Management.Automation.PSCredential `
-    -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\NCClient"), `
-(ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
+    (ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
 
 # Define SDN host Names. Please do not change names as these names are hardcoded in the setup.
 $AzSHOSTs = @("AzSMGMT", "AzSHOST1", "AzSHOST2")
 
 # Delete configuration if specified
 if ($Delete) {
-
-    if ($SDNConfig.MultipleHyperVHosts) {
-
-        $params = @{
-
-            MultipleHyperVHosts = $SDNConfig.MultipleHyperVHostNames
-            AzSHOSTs            = $AzSHOSTs    
-
-        }       
-
-        $VMPlacement = Select-VMHostPlacement @params
-        $SingleHostDelete = $false
-    }     
-    elseif (!$SDNConfig.MultipleHyperVHosts) { 
-    
-        Write-Verbose "This is a single host installation"
-        $VMPlacement = Select-SingleHost -AzSHOSTs $AzSHOSTs
-        $SingleHostDelete = $true
-
-    }
-
+    Write-Verbose "Deleting cluster..."
+    $VMPlacement = Select-SingleHost -AzSHOSTs $AzSHOSTs
+    $SingleHostDelete = $true
     Delete-AzSHCISandbox -SDNConfig $SDNConfig -VMPlacement $VMPlacement -SingleHostDelete $SingleHostDelete
 
     Write-Verbose "Successfully Removed the Azure Stack HCI Sandbox"
     exit
-
 }
     
 # Enable PSRemoting
-
 Write-Verbose "Enabling PS Remoting on client..."
 $VerbosePreference = "SilentlyContinue"
 Enable-PSRemoting
@@ -3257,284 +3133,114 @@ Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
 $VerbosePreference = "Continue"
 
 # Verify Applications
-
 Resolve-Applications -SDNConfig $SDNConfig
 
 # Verify Internet Connectivity
-test-internetConnect
+Test-InternetConnect
     
-# if single host installation, set up installation parameters
-
-if (!$SDNConfig.MultipleHyperVHosts) {
-
-    Write-Verbose "No Multiple Hyper-V Hosts defined. Using Single Hyper-V Host Installation"
-    Write-Verbose "Testing VHDX Path"
-
-    $params = @{
-
-        guiVHDXPath    = $guiVHDXPath
-        azSHCIVHDXPath = $azSHCIVHDXPath
-    
-    }
-
-    Test-VHDPath @params
-
-    Write-Verbose "Generating Single Host Placement"
-
-    $VMPlacement = Select-SingleHost -AzSHOSTs $AzSHOSTs
-
-    Write-Verbose "Creating Internal Switch"
-
-    $params = @{
-
-        pswitchname = $InternalSwitch
-        SDNConfig   = $SDNConfig
-    
-    }
-
-    New-InternalSwitch @params
-
-    Write-Verbose "Creating NAT Switch"
-
-    set-hostnat -SDNConfig $SDNConfig
-
-    $VMSwitch = $InternalSwitch
-
-    Write-Verbose "Getting local Parent VHDX Path"
-
-    $params = @{
-
-        guiVHDXPath = $guiVHDXPath
-        HostVMPath  = $HostVMPath
-    
-    }
-
-
-    $ParentVHDXPath = Get-guiVHDXPath @params
-
-    Set-LocalHyperVSettings -HostVMPath $HostVMPath
-
-    $params = @{
-
-        azSHCIVHDXPath = $azSHCIVHDXPath
-        HostVMPath     = $HostVMPath
-    
-    }
-
-    $coreParentVHDXPath = Get-azSHCIVHDXPath @params
-
-
+# Set up installation parameters
+Write-Verbose "Testing VHDX Path"
+$params = @{
+    guiVHDXPath    = $guiVHDXPath
+    azSHCIVHDXPath = $azSHCIVHDXPath
 }
-    
-# if multiple host installation, set up installation parameters
+Test-VHDPath @params
 
-if ($SDNConfig.MultipleHyperVHosts) {
+Write-Verbose "Generating Single Host Placement"
+$VMPlacement = Select-SingleHost -AzSHOSTs $AzSHOSTs
 
-    Write-Verbose "Multiple Hyper-V Hosts defined. Using Mutiple Hyper-V Host Installation"
-    Get-PhysicalNICMTU -SDNConfig $SDNConfig
-
-    $params = @{
-
-        MultipleHyperVHosts = $SDNConfig.MultipleHyperVHostNames
-        HostVMPath          = $HostVMPath
-        
-    }
-
-    Get-HyperVHosts @params
-
-    Write-Verbose "Testing VHDX Path"
-
-    $params = @{
-
-        guiVHDXPath    = $guiVHDXPath
-        azSHCIVHDXPath = $azSHCIVHDXPath
-    
-    }
-
-
-    Test-VHDPath @params
-
-    Write-Verbose "Generating Multiple Host Placement"
-
-    $params = @{
-
-        MultipleHyperVHosts = $SDNConfig.MultipleHyperVHostNames
-        AzSHOSTs            = $AzSHOSTs
-    }
-
-    $VMPlacement = Select-VMHostPlacement @params
-
-    Write-Verbose "Getting local Parent VHDX Path"
-
-    $params = @{
-
-        guiVHDXPath = $guiVHDXPath
-        HostVMPath  = $HostVMPath
-    
-    }
-
-    $ParentVHDXPath = Get-guiVHDXPath @params
-
-    $params = @{
-
-        MultipleHyperVHosts = $MultipleHyperVHosts
-        HostVMPath          = $HostVMPath
-    
-    }
-
-    Set-HyperVSettings @params
-
-
-    $params = @{
-
-        azSHCIVHDXPath = $azSHCIVHDXPath
-        HostVMPath     = $HostVMPath
-    
-    }
-
-
-    $coreParentVHDXPath = Get-azSHCIVHDXPath @params
-
-
-    $VMSwitch = $SDNConfig.MultipleHyperVHostExternalSwitchName
-
-    # Write-Verbose "Creating vNIC on $env:COMPUTERNAME"
-    New-HostvNIC -SDNConfig $SDNConfig -localCred $localCred
-
+Write-Verbose "Creating Internal Switch"
+$params = @{
+    pswitchname = $InternalSwitch
+    SDNConfig   = $SDNConfig
 }
-    
-    
-# if multiple host installation, copy the parent VHDX file to the specified Parent VHDX Path
+New-InternalSwitch @params
 
-if ($SDNConfig.MultipleHyperVHosts) {
+Write-Verbose "Creating NAT Switch"
+Set-HostNAT -SDNConfig $SDNConfig
 
-    Write-Verbose "Copying VHDX Files to Host"
+$VMSwitch = $InternalSwitch
 
-    $params = @{
-
-        MultipleHyperVHosts = $SDNConfig.MultipleHyperVHostNames
-        azSHCIVHDXPath      = $azSHCIVHDXPath
-        HostVMPath          = $HostVMPath
-        guiVHDXPath         = $guiVHDXPath 
-
-    }
-
-    Copy-VHDXtoHosts @params
+Write-Verbose "Setting local Parent VHDX Path"
+$params = @{
+    guiVHDXPath = $guiVHDXPath
+    HostVMPath  = $HostVMPath
 }
-    
-    
-# if single host installation, copy the parent VHDX file to the specified Parent VHDX Path
+$ParentVHDXPath = Get-GuiVHDXPath @params
+Set-LocalHyperVSettings -HostVMPath $HostVMPath
 
-if (!$SDNConfig.MultipleHyperVHosts) {
-
-    Write-Verbose "Copying VHDX Files to Host"
-
-    $params = @{
-
-        azSHCIVHDXPath = $azSHCIVHDXPath
-        HostVMPath     = $HostVMPath
-        guiVHDXPath    = $guiVHDXPath 
-    }
-
-    Copy-VHDXtoHost @params
+# Copy the parent VHDX file to the specified Parent VHDX Path
+Write-Verbose "Copying VHDX Files to Host"
+$params = @{
+    azSHCIVHDXPath = $azSHCIVHDXPath
+    HostVMPath     = $HostVMPath
+    guiVHDXPath    = $guiVHDXPath 
 }
-    
-    
+Copy-VHDXtoHost @params
+
 # Create Virtual Machines
-
 $vmMacs = @()
-
 foreach ($VM in $VMPlacement) {
-
     Write-Verbose "Generating the VM: $VM" 
-
     $params = @{
-
         VMHost     = $VM.VMHost
         AzSHOST    = $VM.AzSHOST
         HostVMPath = $HostVMPath
         VMSwitch   = $VMSwitch
         SDNConfig  = $SDNConfig
-
     }
-
     $vmMac = New-NestedVM @params
 
     Write-Verbose "Returned VMMac is $vmMac"
-
     $vmMacs += [pscustomobject]@{
-
         Hostname = $VM.AzSHOST
         vmMAC    = $vmMac
-
-    }
-        
+    }  
 }
     
 # Inject Answer Files and Binaries into Virtual Machines
-
 $params = @{
-
     VMPlacement    = $VMPlacement
     HostVMPath     = $HostVMPath
     SDNConfig      = $SDNConfig
     guiVHDXPath    = $guiVHDXPath
     azSHCIVHDXPath = $azSHCIVHDXPath
     vmMacs         = $vmMacs
-
 }
-
 Add-Files @params
     
 # Start Virtual Machines
-
 Start-AzSHOSTS -VMPlacement $VMPlacement
     
 # Wait for AzSHOSTs to come online
-
 Write-Verbose "Waiting for VMs to provision and then come online"
-
 $params = @{
-
     VMPlacement = $VMPlacement
     localcred   = $localCred
-
 }
-
 Test-AzSHOSTVMConnection @params
     
 # Online and Format Data Volumes on Virtual Machines
-
 $params = @{
-
     VMPlacement = $VMPlacement
     SDNConfig   = $SDNConfig
     localcred   = $localCred
-
 }
-
 New-DataDrive @params
     
 # Install SDN Host Software on NestedVMs
-
 $params = @{
-
     SDNConfig   = $SDNConfig
     VMPlacement = $VMPlacement
     localcred   = $localCred
-
 }
-
 Set-SDNserver @params
     
 # Rename NICs from Ethernet to FABRIC
-
 $params = @{
-
     scriptpath  = 'Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN"}).Name) | Rename-NetAdapter -NewName FABRIC'
     VMPlacement = $VMPlacement
     localcred   = $localCred
-
 }
 
 Start-PowerShellScriptsOnHosts @params
@@ -3570,15 +3276,11 @@ Test-AzSHOSTVMConnection @params
 # Create NAT Virtual Switch on AzSMGMT
 
 if ($natConfigure) {
+    $SwitchName = $SDNConfig.InternalSwitch 
 
-    if (!$SDNConfig.MultipleHyperVHosts) { $SwitchName = $SDNConfig.InternalSwitch }
-    else { $SwitchName = $SDNConfig.MultipleHyperVHostExternalSwitchName }
-    
     Write-Verbose "Creating NAT Switch on switch $SwitchName"
     $VerbosePreference = "SilentlyContinue"
-
     $params = @{
-
         SwitchName  = $SwitchName
         VMPlacement = $VMPlacement
         SDNConfig   = $SDNConfig
@@ -3586,66 +3288,41 @@ if ($natConfigure) {
 
     New-NATSwitch  @params
     $VerbosePreference = "Continue"
-
 }
     
 # Provision AzSMGMT VMs (DC, Router, and AdminCenter)
-
 Write-Verbose  "Configuring Management VM"
-
-
 $params = @{
-
     SDNConfig  = $SDNConfig
     localCred  = $localCred
     domainCred = $domainCred
-
 }
-
 Set-AzSMGMT @params
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
-
 $params = @{
-
     localCred  = $localCred
     domainCred = $domainCred
-
 }
-
 New-HyperConvergedEnvironment @params
 
-
 # Create S2D Cluster
-
 $params = @{
-
     SDNConfig          = $SDNConfig
     DomainCred         = $domainCred
     AzStackClusterNode = 'AzSHOST2'
-
 }
-
-
 New-SDNS2DCluster @params
 
-
-
 # Install and Configure Network Controller if specified
-
 If ($SDNConfig.ProvisionNC) {
-
     $params = @{
-
         SDNConfig  = $SDNConfig
         domainCred = $domainCred
-
     }
-
     New-SDNEnvironment @params
 
     # Add Systems to Windows Admin Center
-
     $fqdn = $SDNConfig.SDNDomainFQDN
 
     $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
