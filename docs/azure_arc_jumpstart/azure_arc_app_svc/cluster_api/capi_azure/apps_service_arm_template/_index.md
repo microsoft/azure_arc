@@ -123,7 +123,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az deployment group create \
     --resource-group <Name of the Azure resource group> \
     --name <The name of this deployment> \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/app_svc_capi/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json \
     --parameters <The *azuredeploy.parameters.json* parameters file location>
     ```
 
@@ -136,7 +136,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
     az deployment group create \
     --resource-group Arc-AppSvc-Demo \
     --name arcappsvc \
-    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/app_svc_capi/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json \
+    --template-uri https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_app_services_jumpstart/cluster_api/capi_azure/ARM/azuredeploy.json \
     --parameters azuredeploy.parameters.json
     ```
 
