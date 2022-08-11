@@ -32,7 +32,7 @@ spec:
     domainServiceAccount: domain-service-account-secret # For AD authentication only
   docker:
     imagePullPolicy: Always
-    imageTag: v1.9.0_2022-07-12
+    imageTag: v1.10.0_2022-08-09
     registry: mcr.microsoft.com
     repository: arcdata
   infrastructure: other # Must be a value in the array [alibaba, aws, azure, gcp, onpremises, other]

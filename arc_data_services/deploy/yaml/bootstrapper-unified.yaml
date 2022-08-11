@@ -326,11 +326,11 @@ spec:
         kubernetes.io/os: linux
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.9.0_2022-07-12
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.10.0_2022-08-09
         imagePullPolicy: Always
         args:
         - -image
-        - mcr.microsoft.com/arcdata/arc-bootstrapper:v1.9.0_2022-07-12
+        - mcr.microsoft.com/arcdata/arc-bootstrapper:v1.10.0_2022-08-09
         - -policy
         - Always
         - -chart
