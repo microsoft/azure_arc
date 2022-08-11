@@ -9,7 +9,7 @@ az login --service-principal --username $Env:spnClientId --password $Env:spnClie
 $Env:TempDir = "C:\Temp"
 $namespace="appservices"
 $extensionName = "arc-app-services"
-$extensionVersion = "0.12.2"
+$extensionVersion = "0.13.1"
 $apiVersion = "2020-07-01-preview"
 $storageClassName = "managed-premium"
 $kubeEnvironmentName=$Env:connectedClusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
@@ -109,7 +109,7 @@ Do {
 Do {
    Write-Host "Waiting for log-processor to become available. Hold tight, this might take a few minutes..."
    Start-Sleep -Seconds 15
-   $logProcessorStatus = $(if(kubectl describe daemonset ($extensionName + "-k8se-log-processor") -n appservices | Select-String "Pods Status:  4 Running" -Quiet){"Ready!"}Else{"Nope"})
+   $logProcessorStatus = $(if(kubectl describe daemonset ($extensionName + "-k8se-log-processor") -n appservices | Select-String "Pods Status:  6 Running" -Quiet){"Ready!"}Else{"Nope"})
    } while ($logProcessorStatus -eq "Nope")
 
 Write-Host "`n"
