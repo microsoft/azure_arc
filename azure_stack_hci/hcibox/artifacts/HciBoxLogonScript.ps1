@@ -65,7 +65,6 @@ Write-Header "Deploying AKS"
 
 # deploy Data services
 
-
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
 using System.Runtime.InteropServices; 
