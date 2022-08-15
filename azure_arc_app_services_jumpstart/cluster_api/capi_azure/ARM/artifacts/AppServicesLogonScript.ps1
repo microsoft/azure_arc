@@ -33,6 +33,7 @@ az account set --subscription $env:subscriptionId
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
 Write-Host "`n"
+az extension add --name "connectedk8s" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
 az extension add --name "appservice-kube" -y
