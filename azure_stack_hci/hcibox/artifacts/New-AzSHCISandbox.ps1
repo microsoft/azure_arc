@@ -421,8 +421,13 @@ function Add-Files {
 
         # Mount VHDX
         Write-Verbose "Mounting VHDX file at $path"
-        [string]$MountedDrive = (Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition | Get-Volume).DriveLetter
-        $MountedDrive = $MountedDrive.Replace(" ", "")
+        if ($AzSHOST.AzSHOST -ne "AzSHOST1") {
+            [string]$MountedDrive = (Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition | Get-Volume).DriveLetter
+            $MountedDrive = $MountedDrive.Replace(" ", "")
+        } else {
+            Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3 | Set-Partition -NewDriveLetter F
+            $MountedDrive = "F"
+        }
 
         # Get Assigned MAC Address so we know what NIC to assign a static IP to
         $vmMac = ($vmMacs | Where-Object { $_.Hostname -eq $AzSHost.AzSHOST }).vmMac
