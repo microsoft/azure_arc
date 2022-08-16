@@ -135,7 +135,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
       "name": "[variables('RoleDeploymentName')]",
-      "subscriptionId": "[concat('/subscriptions/', subscription().subscriptionId)]",
+      "subscriptionId": "[subscription().subscriptionId]",
       "properties": {
         "mode": "Incremental",
         "template": {
@@ -196,7 +196,7 @@
       "apiVersion": "2021-04-01",
       "name": "[concat('Deployment-ArcBox-', parameters('flavor'), '_', parameters('epochTime'))]",
       "dependsOn": [
-        "[variables('SecurityAdminRoleName')]",
+        "[variables('RoleDeploymentName')]"
       ],
       "properties": {
         "mode": "Incremental",
