@@ -255,6 +255,7 @@ jobs:
             az network nic ip-config update --name 'ipconfig1' --nic-name 'ArcBox-Client-NIC' --resource-group ${{ github.event.inputs.resourceGroupName }} --public-ip-address 'ArcBox-Client-PIP'
       - name: Install Open SSH + execute ArcServersLogonScript
         run: |
+          az vm restart -n ArcBox-Client -g  ${{ github.event.inputs.resourceGroupName }}
           az vm run-command invoke -g  ${{ github.event.inputs.resourceGroupName }}  -n ArcBox-Client --command-id RunPowerShellScript --scripts "C:\ArcBox\GHActionDeploy.ps1"
         continue-on-error: true
       - name: Store server host key in cache and create directory
