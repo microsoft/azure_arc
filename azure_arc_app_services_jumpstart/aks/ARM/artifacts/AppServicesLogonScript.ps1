@@ -9,7 +9,7 @@ az login --service-principal --username $Env:spnClientId --password $Env:spnClie
 $Env:TempDir = "C:\Temp"
 $namespace="appservices"
 $extensionName = "arc-app-services"
-$extensionVersion = "0.12.2"
+$extensionVersion = "0.13.1"
 $apiVersion = "2020-07-01-preview"
 $kubeEnvironmentName=$Env:clusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
@@ -45,6 +45,7 @@ Write-Host "`n"
 az config set extension.use_dynamic_install=yes_without_prompt
 # Installing Azure CLI extensions
 Write-Host "`n"
+az extension add --name "connectedk8s" -y
 az extension add --name "k8s-extension" -y
 az extension add --name "customlocation" -y
 az extension add --name "appservice-kube" -y
