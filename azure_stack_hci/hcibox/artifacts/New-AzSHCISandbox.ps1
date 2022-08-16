@@ -421,12 +421,16 @@ function Add-Files {
 
         # Mount VHDX
         Write-Verbose "Mounting VHDX file at $path"
+        [string]$MountedDrive = ""
         if ($AzSHOST.AzSHOST -ne "AzSHOST1") {
-            [string]$MountedDrive = (Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition | Get-Volume).DriveLetter
+            $MountedDrive = (Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition | Get-Volume).DriveLetter
             $MountedDrive = $MountedDrive.Replace(" ", "")
         } else {
-            Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3 | Set-Partition -NewDriveLetter F
-            $MountedDrive = "F"
+            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
+            if (!$partition.DriveLetter) {
+                $MountedDrive = "F"
+                $partition | Set-Partition -NewDriveLetter $MountedDrive
+            }
         }
 
         # Get Assigned MAC Address so we know what NIC to assign a static IP to
@@ -1211,15 +1215,13 @@ function Set-AzSMGMT {
 }
 
 function New-DCVM {
-
     Param (
-
         $SDNConfig,
         $localCred,
         $domainCred
-
     )
 
+    $ErrorActionPreference = "Continue"
     Invoke-Command -VMName AzSMGMT -Credential $domainCred -ScriptBlock {
 
         $SDNConfig = $using:SDNConfig
@@ -1228,9 +1230,6 @@ function New-DCVM {
         $ParentDiskPath = "C:\VMs\Base\"
         $vmpath = "D:\VMs\"
         $OSVHDX = "GUI.vhdx"
-        $coreOSVHDX = "AzSHCI.vhdx"
-        $VMStoragePathforOtherHosts = $SDNConfig.HostVMPath
-        $SourcePath = 'C:\VMConfigs'
         $VMName = $SDNConfig.DCName
 
         $ProgressPreference = "SilentlyContinue"
@@ -1239,66 +1238,46 @@ function New-DCVM {
         $WarningPreference = "SilentlyContinue"
 
         # Create Virtual Machine
-
-        Write-Verbose "Creating $VMName differencing disks"
-        
+        Write-Verbose "Creating $VMName differencing disks"  
         $params = @{
-
             ParentPath = ($ParentDiskPath + $OSVHDX)
             Path       = ($vmpath + $VMName + '\' + $VMName + '.vhdx')
-
         }
-
         New-VHD  @params -Differencing | Out-Null
 
         Write-Verbose "Creating $VMName virtual machine"
-        
         $params = @{
-
             Name       = $VMName
             VHDPath    = ($vmpath + $VMName + '\' + $VMName + '.vhdx')
             Path       = ($vmpath + $VMName)
             Generation = 2
-
         }
-
         New-VM @params | Out-Null
 
         Write-Verbose "Setting $VMName Memory"
-
         $params = @{
-
             VMName               = $VMName
             DynamicMemoryEnabled = $true
             StartupBytes         = $SDNConfig.MEM_DC
             MaximumBytes         = $SDNConfig.MEM_DC
             MinimumBytes         = 500MB
-
         }
-
-
         Set-VMMemory @params | Out-Null
 
         Write-Verbose "Configuring $VMName's networking"
-
         Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter" | Out-Null
-
         $params = @{
-
             VMName       = $VMName
             Name         = $SDNConfig.DCName
             SwitchName   = 'vSwitch-Fabric'
             DeviceNaming = 'On'
-
         }
-
         Add-VMNetworkAdapter @params | Out-Null
         Write-Verbose "Configuring $VMName's settings"
         Set-VMProcessor -VMName $VMName -Count 2 | Out-Null
         Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
 
         # Inject Answer File
-
         Write-Verbose "Mounting and injecting answer file into the $VMName VM."        
         $VerbosePreference = "SilentlyContinue"
 
@@ -1369,12 +1348,14 @@ function New-DCVM {
 
         Write-Verbose "Starting Virtual Machine" 
         Start-VM -Name $VMName | Out-Null
-
+        
         # Wait until the VM is restarted
         while ((Invoke-Command -VMName $VMName -Credential $using:domainCred { "Test" } `
                     -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 1 }
 
         Write-Verbose "Configuring Domain Controller VM and Installing Active Directory."
+        
+        $ErrorActionPreference = "Continue"
 
         Invoke-Command -VMName $VMName -Credential $localCred -ArgumentList $SDNConfig -ScriptBlock {
 
@@ -1406,26 +1387,19 @@ function New-DCVM {
         
             $SecureString = ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force
             Write-Verbose "Installing Active Directory..." 
-
             $params = @{
-
                 DomainName                    = $DomainFQDN
                 DomainMode                    = 'WinThreshold'
                 DatabasePath                  = "C:\Domain"
                 DomainNetBiosName             = $DomainNetBiosName
                 SafeModeAdministratorPassword = $SecureString
-
             }
-
-
             Write-Output $params
-
             
             $VerbosePreference = "SilentlyContinue"
-
-            Install-ADDSForest  @params -InstallDns -Confirm -Force -NoRebootOnCompletion | Out-Null
-
+            Install-ADDSForest  @params -InstallDns -Confirm -Force -NoRebootOnCompletion # | Out-Null
         }
+        $ErrorActionPreference = "Stop"
 
         Write-Verbose "Stopping $VMName"
         Get-VM $VMName | Stop-VM
@@ -1439,7 +1413,9 @@ function New-DCVM {
 
         $VerbosePreference = "Continue"
         Write-Verbose "Configuring User Accounts and Groups in Active Directory"
+        
 
+        $ErrorActionPreference = "Continue"
         Invoke-Command -VMName $VMName -Credential $using:domainCred -ArgumentList $SDNConfig -ScriptBlock {
 
             $SDNConfig = $args[0]
@@ -1554,10 +1530,9 @@ function New-DCVM {
 
             CMD.exe /c "certutil -SetCATemplates +WebServer"
  
-        }
- 
+        }   
     }
-
+    $ErrorActionPreference = "Stop"
 }
 
 function New-RouterVM {
