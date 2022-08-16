@@ -197,10 +197,6 @@
       "name": "[concat('Deployment-ArcBox-', parameters('flavor'), '_', parameters('epochTime'))]",
       "dependsOn": [
         "[variables('SecurityAdminRoleName')]",
-        "[variables('ContributorRoleName')]",
-        "[variables('SecurityReaderRoleName')]",
-        "[variables('MonitoringMetricsRoleName')]",
-        "[variables('UserAccessAdministratorRoleName')]"
       ],
       "properties": {
         "mode": "Incremental",
