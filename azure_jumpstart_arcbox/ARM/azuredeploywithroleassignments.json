@@ -58,20 +58,6 @@
         ],
         "defaultValue": "Full"
       },
-      "githubAccount": {
-        "type": "string",
-        "metadata": {
-          "description": "Target GitHub account"
-        },
-        "defaultValue": "microsoft"
-      },
-      "githubBranch": {
-        "type": "string",
-        "metadata": {
-          "description": "Target GitHub branch"
-        },
-        "defaultValue": "main"
-      },
       "deployBastion": {
         "type": "bool",
         "metadata": {
@@ -120,11 +106,7 @@
             "apiVersion": "2021-04-01",
             "name": "[concat('Deployment-ArcBox-', parameters('flavor'), '_', parameters('epochTime'))]",
             "dependsOn": [
-                "[variables('SecurityAdminRoleName')]",
-                "[variables('ContributorRoleName')]",
-                "[variables('SecurityReaderRoleName')]",
-                "[variables('MonitoringMetricsRoleName')]",
-                "[variables('UserAccessAdministratorRoleName')]"
+                "[variables('ownerRoleName')]"
             ],
             "properties": {
               "mode": "Incremental",
@@ -159,6 +141,9 @@
                 },
                 "deployBastion": {
                   "value": "[parameters('deployBastion')]"
+                },
+                "githubUser": {
+                    "value": "[parameters('githubUser')]"
                 }
               }
             }
