@@ -119,6 +119,7 @@
   },
   "variables": {
     "RoleDeploymentName": "[concat('Deployment-ArcBox-Roles-', parameters('flavor'), '_', parameters('epochTime'))]",
+    "rgLocation": "[resourceGroup().location]",
     "SecurityAdminRoleName": "[parameters('securityAdminRoleGuid')]",
     "ContributorRoleName": "[parameters('contributorRoleGuid')]",
     "SecurityReaderRoleName": "[parameters('securityReaderRoleGuid')]",
@@ -136,6 +137,7 @@
       "apiVersion": "2021-04-01",
       "name": "[variables('RoleDeploymentName')]",
       "subscriptionId": "[subscription().subscriptionId]",
+      "location": "[variables('rgLocation')]",
       "properties": {
         "mode": "Incremental",
         "template": {
