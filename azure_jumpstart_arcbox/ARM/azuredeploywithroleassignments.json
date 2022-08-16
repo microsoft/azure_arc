@@ -96,6 +96,7 @@
             "type": "Microsoft.Authorization/roleAssignments",
             "apiVersion": "2018-09-01-preview",
             "name": "[variables('OwnerRoleName')]",
+            "scope": "[concat('/subscriptions/', subscription().subscriptionId)]"
             "properties": {
                 "roleDefinitionId": "[variables('Owner')]",
                 "principalId": "[parameters('principalId')]"
