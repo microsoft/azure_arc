@@ -11,10 +11,10 @@ spec:
       - name: your-private-registry
       containers:
       - name: bootstrapper
-        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.9.0_2022-07-12
+        image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.10.0_2022-08-09
         imagePullPolicy: Always
         command: ["/opt/bootstrapper/bin/bootstrapper"]
-        args: ["-image", "mcr.microsoft.com/arcdata/arc-bootstrapper:v1.9.0_2022-07-12", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
+        args: ["-image", "mcr.microsoft.com/arcdata/arc-bootstrapper:v1.10.0_2022-08-09", "-policy", "Always", "-chart", "/opt/helm/arcdataservices", "-bootstrap"]
       restartPolicy: Never
       serviceAccountName: sa-arcdata-deployer
   ttlSecondsAfterFinished: 86400 #24 hours
