@@ -77,7 +77,7 @@
         "metadata": {
           "description": "Choice to deploy Bastion to connect to the client VM"
         },
-        "defaultValue": false
+        "defaultValue": true
       },
       "githubUser": {
         "type": "string",
@@ -92,23 +92,7 @@
             "description": "The principal to assign the role to"
         }
       },
-      "securityAdminRoleGuid": {
-        "type": "string",
-        "defaultValue": "[newGuid()]"
-      },
-      "contributorRoleGuid": {
-        "type": "string",
-        "defaultValue": "[newGuid()]"
-      },
-      "securityReaderRoleGuid": {
-        "type": "string",
-        "defaultValue": "[newGuid()]"
-      },
-      "monitoringMetricsRoleGuid": {
-        "type": "string",
-        "defaultValue": "[newGuid()]"
-      },
-      "userAccessAdministratorRoleGuid": {
+      "ownerRoleGuid": {
         "type": "string",
         "defaultValue": "[newGuid()]"
       },
@@ -118,60 +102,16 @@
       } 
     },
     "variables": {
-        "SecurityAdminRoleName": "[parameters('securityAdminRoleGuid')]",
-        "ContributorRoleName": "[parameters('contributorRoleGuid')]",
-        "SecurityReaderRoleName": "[parameters('securityReaderRoleGuid')]",
-        "MonitoringMetricsRoleName": "[parameters('monitoringMetricsRoleGuid')]",
-        "UserAccessAdministratorRoleName": "[parameters('userAccessAdministratorRoleGuid')]",
-        "SecurityAdmin": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'fb1c8493-542b-48eb-b624-b4c8fea62acd')]",
-        "Contributor": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-        "SecurityReader": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '39bc4728-0917-49c7-9d2c-d95423bc2eb4')]",
-        "MonitoringMetricsPublisher": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '3913510d-42f4-4e42-8a64-420c390055eb')]",
-        "UserAccessAdministrator": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]"
+        "OwnerRoleName": "[parameters('ownerRoleGuid')]",
+        "Owner": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]"
     },
     "resources": [
         {
             "type": "Microsoft.Authorization/roleAssignments",
             "apiVersion": "2018-09-01-preview",
-            "name": "[variables('SecurityAdminRoleName')]",
+            "name": "[variables('OwnerRoleName')]",
             "properties": {
-                "roleDefinitionId": "[variables('SecurityAdmin')]",
-                "principalId": "[parameters('principalId')]"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2018-09-01-preview",
-            "name": "[variables('ContributorRoleName')]",
-            "properties": {
-                "roleDefinitionId": "[variables('Contributor')]",
-                "principalId": "[parameters('principalId')]"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2018-09-01-preview",
-            "name": "[variables('SecurityReaderRoleName')]",
-            "properties": {
-                "roleDefinitionId": "[variables('SecurityReader')]",
-                "principalId": "[parameters('principalId')]"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2018-09-01-preview",
-            "name": "[variables('MonitoringMetricsRoleName')]",
-            "properties": {
-                "roleDefinitionId": "[variables('MonitoringMetricsPublisher')]",
-                "principalId": "[parameters('principalId')]"
-            }
-        },
-        {
-            "type": "Microsoft.Authorization/roleAssignments",
-            "apiVersion": "2018-09-01-preview",
-            "name": "[variables('UserAccessAdministratorRoleName')]",
-            "properties": {
-                "roleDefinitionId": "[variables('UserAccessAdministrator')]",
+                "roleDefinitionId": "[variables('Owner')]",
                 "principalId": "[parameters('principalId')]"
             }
         },
@@ -216,6 +156,9 @@
                 },
                 "flavor": {
                   "value": "[parameters('flavor')]"
+                },
+                "deployBastion": {
+                  "value": "[parameters('deployBastion')]"
                 }
               }
             }
