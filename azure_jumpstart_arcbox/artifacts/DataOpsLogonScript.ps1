@@ -25,29 +25,12 @@ $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID 
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
-<#Write-Header "Downloading CAPI K8s Kubeconfig"
+Write-Header "Downloading CAPI K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
-
-# ****Change to AKS - secondary cluster*** Downloading Rancher K3s cluster kubeconfig file
-Write-Header "Downloading K3s Kubeconfig"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
-$context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
-$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-$sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
-
-# ****Change to AKS - DR cluster*** Downloading Rancher K3s cluster kubeconfig file
-Write-Header "Downloading K3s Kubeconfig"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/config"
-$context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
-$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-$sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-k3s"
-#>
 
 # Downloading 'installCAPI.log' log file
 Write-Header "Downloading CAPI Install Logs"
@@ -55,24 +38,18 @@ $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/stag
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
 
-# Downloading 'installK3s.log' log file
-Write-Header "Downloading K3s Install Logs"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-k3s/installK3s.log"
-$sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installK3s.log"
-
-# ***Add all 3 clusters*** Merging kubeconfig files from CAPI and Rancher K3s
-<#Write-Header "Merging CAPI & K3s Kubeconfigs"
+# Merging kubeconfig files from CAPI and AKS
+Write-Header "Merging CAPI & AKS Kubeconfigs"
 Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
-$Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;C:\Users\$Env:USERNAME\.kube\config-k3s"
+$Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;"
 kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
 kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
 Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
-Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config-k3s"
 Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
 $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
+### ************** Get AKS clusters' kubeconfig
 kubectx
-#>
+
 
 # Register Azure providers
 Write-Header "Registering Providers"
