@@ -23,6 +23,52 @@ $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
 #region functions
+
+function Invoke-Request {
+    Param(
+        [Parameter(Mandatory=$True)]
+        [hashtable]$Params,
+        [int]$Retries = 1,
+        [int]$SecondsDelay = 2
+    )
+
+    $Params.Add('UserAgent', 'SomeThingDistinguishableForTheLogs')
+
+    $method = $Params['Method']
+    $url = $Params['Uri']
+    $path = $Params['OutFile']
+
+    $cmd = { Write-Host "$method $url..." -NoNewline; Invoke-WebRequest @Params }
+
+    $retryCount = 0
+    $completed = $false
+    $response = $null
+
+    while (-not $completed) {
+        try {
+            $response = Invoke-Command $cmd -ArgumentList $Params
+            if ($response.StatusCode -ne 200) {
+                throw "Expecting reponse code 200, was: $($response.StatusCode)"
+            }
+            $completed = $true
+        } catch {
+            New-Item -ItemType Directory -Force -Path $Env:HciBoxLogsDir
+            "$(Get-Date -Format G): Request to $url failed. $_" | Out-File -FilePath "$Env:HciBoxLogsDir\Downloads.log" -Encoding utf8 -Append
+            if ($retrycount -ge $Retries) {
+                Write-Warning "Request to $url failed the maximum number of $retryCount times."
+                throw
+            } else {
+                Write-Warning "Request to $url failed. Retrying in $SecondsDelay seconds."
+                Start-Sleep $SecondsDelay
+                $retrycount++
+            }
+        }
+    }
+
+    Write-Host "OK ($($response.StatusCode))"
+    return $response
+}
+
 function Get-HyperVHosts {
     param (
         [String[]]$MultipleHyperVHosts,
@@ -422,15 +468,24 @@ function Add-Files {
         # Mount VHDX
         Write-Verbose "Mounting VHDX file at $path"
         [string]$MountedDrive = ""
-        if ($AzSHOST.AzSHOST -ne "AzSHOST1") {
-            $MountedDrive = (Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition | Get-Volume).DriveLetter
-            $MountedDrive = $MountedDrive.Replace(" ", "")
-        } else {
-            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
+        if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
+            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 4
             if (!$partition.DriveLetter) {
                 $MountedDrive = "F"
                 $partition | Set-Partition -NewDriveLetter $MountedDrive
-            }
+            }  
+            else {
+                $MountedDrive = $partition.DriveLetter
+            } 
+        } else {
+            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
+            if (!$partition.DriveLetter) {
+                $MountedDrive = "G"
+                $partition | Set-Partition -NewDriveLetter $MountedDrive
+            }   
+            else {
+                $MountedDrive = $partition.DriveLetter
+            } 
         }
 
         # Get Assigned MAC Address so we know what NIC to assign a static IP to
@@ -2010,11 +2065,6 @@ function New-AdminCenterVM {
 
         Set-Content -Value $Unattend -Path "C:\TempWACMount\Windows\Panther\Unattend.xml" -Force
 
-        # Enabling Remote Access on Admincenter VM
-        Write-Verbose "Enabling Remote Access"
-        Enable-WindowsOptionalFeature -Path C:\TempWACMount -FeatureName RasRoutingProtocols -All -LimitAccess | Out-Null
-        Enable-WindowsOptionalFeature -Path C:\TempWACMount -FeatureName RemoteAccessPowerShell -All -LimitAccess | Out-Null
-
         # Save Customizations and then dismount.
         Write-Verbose "Dismounting Disk"
         Dismount-WindowsImage -Path "C:\TempWACMount" -Save | Out-Null
@@ -2079,6 +2129,11 @@ function New-AdminCenterVM {
             $VerbosePreference = "SilentlyContinue"
             Import-Module NetAdapter
             $VerbosePreference = "Continue"
+
+            # Enabling Remote Access on Admincenter VM
+            Write-Verbose "Enabling Remote Access"
+            Enable-WindowsOptionalFeature -FeatureName RasRoutingProtocols -All -LimitAccess -Online | Out-Null
+            Enable-WindowsOptionalFeature -FeatureName RemoteAccessPowerShell -All -LimitAccess -Online | Out-Null
 
             Write-Verbose "Configuring WSMAN Trusted Hosts"
             Set-Item WSMan:\localhost\Client\TrustedHosts * -Confirm:$false -Force
@@ -3073,8 +3128,8 @@ $ProgressPreference = 'SilentlyContinue'
 
 # Download HciBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
-Invoke-WebRequest https://aka.ms/AAhnqvc -OutFile C:\HciBox\VHD\AZSHCI.vhdx
-Invoke-WebRequest https://aka.ms/AAhnj5y -OutFile C:\HciBox\VHD\GUI.vhdx
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'Path'='C:\HciBox\VHD\AZSHCI.vhdx'}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'Path'='C:\HciBox\VHD\GUI.vhdx'}
 
 # Set VM Host Memory
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824
