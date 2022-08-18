@@ -47,7 +47,7 @@ kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
 Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
 Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
 $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
-### ************** Get AKS clusters' kubeconfig
+### ************** Get AKS clusters' kubeconfigs
 kubectx
 
 
