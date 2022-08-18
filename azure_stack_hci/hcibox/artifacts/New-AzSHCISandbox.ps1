@@ -1410,7 +1410,7 @@ function New-DCVM {
 
         Write-Verbose "Configuring Domain Controller VM and Installing Active Directory."
         
-        $ErrorActionPreference = "Continue"
+        $ErrorActionPreference = "SilentlyContinue"
 
         Invoke-Command -VMName $VMName -Credential $localCred -ArgumentList $SDNConfig -ScriptBlock {
 
