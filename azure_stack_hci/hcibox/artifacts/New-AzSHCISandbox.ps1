@@ -1987,7 +1987,7 @@ function New-AdminCenterVM {
                     <UnicastIpAddresses>
                         <IpAddress wcm:action="add" wcm:keyValue="1">$IPAddress</IpAddress>
                     </UnicastIpAddresses>
-                    <Identifier>Ethernet</Identifier>
+                    <Identifier>Ethernet 2</Identifier>
                     <Routes>
                         <Route wcm:action="add">
                             <Identifier>1</Identifier>
