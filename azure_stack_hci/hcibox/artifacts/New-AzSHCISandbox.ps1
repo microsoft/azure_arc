@@ -1985,8 +1985,10 @@ function New-AdminCenterVM {
         Write-Verbose "Configuring $VMName's Networking"
         Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter"
         Add-VMNetworkAdapter -VMName $VMName -Name "Fabric" -SwitchName "vSwitch-Fabric" -DeviceNaming On
-        $nic = Get-VMNetworkAdapter -VMName $VMName
-        $macAddress = $nic.MACAddress.insert(2,"-").insert(5,"-").insert(8,"-").insert(11,"-").insert(14,"-")
+        Set-VMNetworkAdapter -VMName $VMName -StaticMacAddress "10155D010B00"
+        # $nic = Get-VMNetworkAdapter -VMName $VMName
+        # Set-VM
+        # $macAddress = $nic.MACAddress.insert(2,"-").insert(5,"-").insert(8,"-").insert(11,"-").insert(14,"-")
     
         # Apply Custom Unattend.xml file
         New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null
@@ -2017,7 +2019,7 @@ function New-AdminCenterVM {
                     <UnicastIpAddresses>
                         <IpAddress wcm:action="add" wcm:keyValue="1">$IPAddress</IpAddress>
                     </UnicastIpAddresses>
-                    <Identifier>$macAddress</Identifier>
+                    <Identifier>10-15-5D-01-0B-00</Identifier>
                     <Routes>
                         <Route wcm:action="add">
                             <Identifier>1</Identifier>
@@ -2033,7 +2035,7 @@ function New-AdminCenterVM {
                     <DNSServerSearchOrder>
                         <IpAddress wcm:action="add" wcm:keyValue="1">$DNS</IpAddress>
                     </DNSServerSearchOrder>
-                    <Identifier>$macAddress</Identifier>
+                    <Identifier>10-15-5D-01-0B-00</Identifier>
                     <DNSDomain>$Domain</DNSDomain>
                     <EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
                 </Interface>
