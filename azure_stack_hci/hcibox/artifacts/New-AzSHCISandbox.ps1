@@ -36,7 +36,6 @@ function Invoke-Request {
 
     $method = $Params['Method']
     $url = $Params['Uri']
-    $path = $Params['OutFile']
 
     $cmd = { Write-Host "$method $url..." -NoNewline; Invoke-WebRequest @Params }
 
@@ -47,9 +46,6 @@ function Invoke-Request {
     while (-not $completed) {
         try {
             $response = Invoke-Command $cmd -ArgumentList $Params
-            if ($response.StatusCode -ne 200) {
-                throw "Expecting reponse code 200, was: $($response.StatusCode)"
-            }
             $completed = $true
         } catch {
             New-Item -ItemType Directory -Force -Path $Env:HciBoxLogsDir
@@ -3128,8 +3124,8 @@ $ProgressPreference = 'SilentlyContinue'
 
 # Download HciBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'Path'='C:\HciBox\VHD\AZSHCI.vhdx'}
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'Path'='C:\HciBox\VHD\GUI.vhdx'}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'='C:\HciBox\VHD\AZSHCI.vhdx'}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'='C:\HciBox\VHD\GUI.vhdx'}
 
 # Set VM Host Memory
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824
