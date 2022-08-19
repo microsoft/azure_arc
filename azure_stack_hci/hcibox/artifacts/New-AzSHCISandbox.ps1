@@ -1943,7 +1943,7 @@ function New-AdminCenterVM {
         Import-Module DISM
         $VerbosePreference = "Continue"
 
-        Write-Verbose "Mounting and Injecting Answer File into the $VMName VM." 
+        Write-Verbose "Mounting $VMName VHD." 
         New-Item -Path "C:\TempWACMount" -ItemType Directory | Out-Null
         Mount-WindowsImage -Path "C:\TempWACMount" -Index 1 -ImagePath (($VHDPath) + ($VMName) + (".vhdx")) | Out-Null
 
@@ -2093,6 +2093,7 @@ function New-AdminCenterVM {
 </unattend>
 "@
 
+        Write-Verbose "Mounting and Injecting Answer File into the $VMName VM." 
         Set-Content -Value $Unattend -Path "C:\TempWACMount\Windows\Panther\Unattend.xml" -Force
 
         # Save Customizations and then dismount.
