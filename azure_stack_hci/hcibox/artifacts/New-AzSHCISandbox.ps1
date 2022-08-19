@@ -1978,6 +1978,7 @@ function New-AdminCenterVM {
                 <Interface wcm:action="add">
                     <Ipv4Settings>
                         <DhcpEnabled>false</DhcpEnabled>
+                        <Metric>20</Metric>
                         <RouterDiscoveryEnabled>true</RouterDiscoveryEnabled>
                     </Ipv4Settings>
                     <UnicastIpAddresses>
