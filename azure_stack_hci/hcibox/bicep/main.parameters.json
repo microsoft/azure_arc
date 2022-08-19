@@ -25,6 +25,12 @@
         },
         "flavor": {
             "value": "Full"
+        },
+        "githubAccount": {
+            "value": "dkirby-ms"
+        },
+        "githubBranch": {
+            "value": "main"
         }
     }
 }
