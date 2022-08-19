@@ -13,7 +13,7 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
-Start-Transcript -Path $Env:HciBoxLogsDir\HciBoxLogonScript.log
+Start-Transcript -Path $Env:HciBoxLogsDir\Deploy-AKS.log
 
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
