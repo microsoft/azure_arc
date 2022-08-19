@@ -1955,6 +1955,39 @@ function New-AdminCenterVM {
         Copy-Item C:\VMs\Base\AzSHCI.vhdx -Destination C:\TempWACMount\VHDs -Force
         Copy-Item C:\VMs\Base\GUI.vhdx  -Destination  C:\TempWACMount\VHDs -Force
 
+        # Create VM
+        Write-Verbose "Creating the $VMName VM."
+
+        $params = @{
+
+            Name       = $VMName
+            VHDPath    = (($VHDPath) + ($VMName) + (".vhdx")) 
+            Path       = $VHDPath
+            Generation = 2
+        }
+
+        New-VM @params | Out-Null
+
+        $memory = $SDNConfig.MEM_WAC
+
+        $params = @{
+
+            VMName               = $VMName
+            DynamicMemoryEnabled = $true
+            StartupBytes         = $SDNConfig.MEM_WAC
+            MaximumBytes         = $SDNConfig.MEM_WAC
+            MinimumBytes         = 500mb 
+        }
+
+        Set-VMMemory @params | Out-Null
+        Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
+
+        Write-Verbose "Configuring $VMName's Networking"
+        Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter"
+        Add-VMNetworkAdapter -VMName $VMName -Name "Fabric" -SwitchName "vSwitch-Fabric" -DeviceNaming On
+        $nic = Get-VMNetworkAdapter -VMName $VMName
+        $macAddress = $nic.MACAddress.insert(2,"-").insert(5,"-").insert(8,"-").insert(11,"-").insert(14,"-")
+    
         # Apply Custom Unattend.xml file
         New-Item -Path C:\TempWACMount\windows -ItemType Directory -Name Panther -Force | Out-Null
         $Password = $SDNConfig.SDNAdminPassword
@@ -1984,7 +2017,7 @@ function New-AdminCenterVM {
                     <UnicastIpAddresses>
                         <IpAddress wcm:action="add" wcm:keyValue="1">$IPAddress</IpAddress>
                     </UnicastIpAddresses>
-                    <Identifier>Ethernet 2</Identifier>
+                    <Identifier>$macAddress</Identifier>
                     <Routes>
                         <Route wcm:action="add">
                             <Identifier>1</Identifier>
@@ -2000,7 +2033,7 @@ function New-AdminCenterVM {
                     <DNSServerSearchOrder>
                         <IpAddress wcm:action="add" wcm:keyValue="1">$DNS</IpAddress>
                     </DNSServerSearchOrder>
-                    <Identifier>Ethernet 2</Identifier>
+                    <Identifier>$macAddress</Identifier>
                     <DNSDomain>$Domain</DNSDomain>
                     <EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
                 </Interface>
@@ -2066,37 +2099,6 @@ function New-AdminCenterVM {
         Write-Verbose "Dismounting Disk"
         Dismount-WindowsImage -Path "C:\TempWACMount" -Save | Out-Null
         Remove-Item "C:\TempWACMount"
-
-        # Create VM
-        Write-Verbose "Creating the $VMName VM."
-
-        $params = @{
-
-            Name       = $VMName
-            VHDPath    = (($VHDPath) + ($VMName) + (".vhdx")) 
-            Path       = $VHDPath
-            Generation = 2
-        }
-
-        New-VM @params | Out-Null
-
-        $memory = $SDNConfig.MEM_WAC
-
-        $params = @{
-
-            VMName               = $VMName
-            DynamicMemoryEnabled = $true
-            StartupBytes         = $SDNConfig.MEM_WAC
-            MaximumBytes         = $SDNConfig.MEM_WAC
-            MinimumBytes         = 500mb 
-        }
-
-        Set-VMMemory @params | Out-Null
-        Set-VM -Name $VMName -AutomaticStartAction Start -AutomaticStopAction ShutDown | Out-Null
-
-        Write-Verbose "Configuring $VMName's Networking"
-        Remove-VMNetworkAdapter -VMName $VMName -Name "Network Adapter"
-        Add-VMNetworkAdapter -VMName $VMName -Name "Fabric" -SwitchName "vSwitch-Fabric" -DeviceNaming On
 
         Write-Verbose "Setting $VMName's VM Configuration"
         Set-VMProcessor -VMName $VMname -Count 4
