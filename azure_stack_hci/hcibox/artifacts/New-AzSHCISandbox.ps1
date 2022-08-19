@@ -2000,7 +2000,7 @@ function New-AdminCenterVM {
                     <DNSServerSearchOrder>
                         <IpAddress wcm:action="add" wcm:keyValue="1">$DNS</IpAddress>
                     </DNSServerSearchOrder>
-                    <Identifier>Ethernet</Identifier>
+                    <Identifier>Ethernet 2</Identifier>
                     <DNSDomain>$Domain</DNSDomain>
                     <EnableAdapterDomainNameRegistration>true</EnableAdapterDomainNameRegistration>
                 </Interface>
