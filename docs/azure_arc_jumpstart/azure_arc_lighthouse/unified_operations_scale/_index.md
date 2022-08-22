@@ -67,7 +67,7 @@ For multitenant organizations, this service also supports Azure Lighthouse to al
 
 To explore this use case, use this Jumpstart scenario to work with tagged Azure Arc-enabled servers in your managed tenants:
 
-- [Apply inventory tagging to Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_inventory_tagging/)
+- [Azure Arc-enabled servers inventory management using Resource Graph Explorer](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_inventory_management/#apply-resource-tags-to-azure-arc-enabled-servers)
 
 ### Monitoring and Alerting
 
