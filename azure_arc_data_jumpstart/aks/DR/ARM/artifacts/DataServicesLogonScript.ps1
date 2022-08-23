@@ -60,18 +60,7 @@ OnboardingCluster -resourceGroup $Env:resourceGroup -clusterName $primaryConnect
 # Monitor pods across arc namespace
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
 
-# Installing Azure Arc-enabled data services extension
-Write-Output "`n"
-Write-Output "Installing Azure Arc-enabled data services extension"
-az k8s-extension create --name arc-data-services `
-    --extension-type microsoft.arcdataservices `
-    --cluster-type connectedClusters `
-    --cluster-name $primaryConnectedClusterName `
-    --resource-group $Env:resourceGroup `
-    --auto-upgrade false `
-    --scope cluster `
-    --release-namespace arc `
-    --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
+InstallingAzureArcEnabledDataServicesExtensionk8s -resourceGroup $Env:resourceGroup -clusterName $primaryConnectedClusterName
 
 Write-Output "`n"
 Do {
@@ -90,13 +79,7 @@ $primaryExtensionId = az k8s-extension show --name arc-data-services `
 
 Start-Sleep -Seconds 20
 
-# Create Custom Location
-az customlocation create --name 'jumpstart-primary-cl' `
-    --resource-group $Env:resourceGroup `
-    --namespace arc `
-    --host-resource-id $primaryConnectedClusterId `
-    --cluster-extension-ids $primaryExtensionId `
-    --kubeconfig $Env:KUBECONFIG
+CreateCustomLocation -jumpstartcl 'jumpstart-primary-cl' -resourceGroup $Env:resourceGroup -connectedClusterId $primaryConnectedClusterId -extensionId $primaryExtensionId -KUBECONFIG $Env:KUBECONFIG
 
 # Deploying Azure Arc Data Controller
 Write-Output "`n"
@@ -142,18 +125,7 @@ kubectx secondary
 Write-Output "`n"
 OnboardingCluster -resourceGroup $Env:resourceGroup -clusterName $secondaryConnectedClusterName -azureLocation $Env:azureLocation -workspaceName $Env:clusterName
 
-# Installing Azure Arc-enabled data services extension
-Write-Output "`n"
-Write-Output "Installing Azure Arc-enabled data services extension"
-az k8s-extension create --name arc-data-services `
-    --extension-type microsoft.arcdataservices `
-    --cluster-type connectedClusters `
-    --cluster-name $secondaryConnectedClusterName `
-    --resource-group $Env:resourceGroup `
-    --auto-upgrade false `
-    --scope cluster `
-    --release-namespace arc `
-    --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
+InstallingAzureArcEnabledDataServicesExtensionk8s -resourceGroup $Env:resourceGroup -clusterName $secondaryConnectedClusterName
 
 $secondaryConnectedClusterId = az connectedk8s show --name $secondaryConnectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 
@@ -165,13 +137,7 @@ $secondaryExtensionId = az k8s-extension show --name arc-data-services `
 
 Start-Sleep -Seconds 20
 
-# Create Custom Location
-az customlocation create --name 'jumpstart-secondary-cl' `
-    --resource-group $Env:resourceGroup `
-    --namespace arc `
-    --host-resource-id $secondaryConnectedClusterId `
-    --cluster-extension-ids $secondaryExtensionId `
-    --kubeconfig $Env:KUBECONFIG
+CreateCustomLocation -jumpstartcl 'jumpstart-secondary-cl' -resourceGroup $Env:resourceGroup -connectedClusterId $secondaryConnectedClusterId -extensionId $secondaryExtensionId -KUBECONFIG $Env:KUBECONFIG
 
 # Deploying Azure Arc Data Controller
 Write-Output "`n"
@@ -208,45 +174,24 @@ if ( $Env:deploySQLMI -eq $true ) {
 
 # Enabling data controller auto metrics & logs upload to log analytics on the primary cluster
 kubectx primary
-Write-Output "`n"
-Write-Output "Enabling data controller auto metrics & logs upload to log analytics on the primary cluster"
-Write-Output "`n"
-$Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name $primaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
-
+EnablingDataControllerAutoMetrics -resourceGroup $Env:resourceGroup -workspaceName $Env:workspaceName -jumpstartdc $primaryDcName
 # Enabling data controller auto metrics & logs upload to log analytics on the secondary cluster
 kubectx secondary
-Write-Output "`n"
-Write-Output "Enabling data controller auto metrics & logs upload to log analytics on the secondary cluster"
-Write-Output "`n"
-$Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-az arcdata dc update --name $secondaryDcName --resource-group $Env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name $secondaryDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
+EnablingDataControllerAutoMetrics -resourceGroup $Env:resourceGroup -workspaceName $Env:workspaceName -jumpstartdc $secondaryDcName
 
 # Applying Azure Data Studio settings template file and operations url shortcut
 if ( $Env:deploySQLMI -eq $true) {
-    Write-Output "`n"
-    Write-Output "Copying Azure Data Studio settings template file"
-    New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-    Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
-    # Creating desktop url shortcuts for built-in Grafana and Kibana services 
+    CopyingAzureDataStudioSettingsRemplateFile -adminUsername $Env:adminUsername -directory $Env:TempDir
+
+    # Creating desktop url shortcuts for built-in Grafana and Kibana services
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     $GrafanaURL = "https://" + $GrafanaURL + ":3000"
-    $Shell = New-Object -ComObject ("WScript.Shell")
-    $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Grafana.url")
-    $Favorite.TargetPath = $GrafanaURL;
-    $Favorite.Save()
-
+    Add-URL-Shortcut-Desktop -url $GrafanaURL -name "Grafana" -USERPROFILE $Env:USERPROFILE
+ 
     $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     $KibanaURL = "https://" + $KibanaURL + ":5601"
-    $Shell = New-Object -ComObject ("WScript.Shell")
-    $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
-    $Favorite.TargetPath = $KibanaURL;
-    $Favorite.Save()
+    Add-URL-Shortcut-Desktop -url $KibanaURL -name "Kibana" -USERPROFILE $Env:USERPROFILE
 }
 
 Write-Output "`n"
@@ -255,24 +200,7 @@ kubectx primary
 Write-Output "`n"
 
 # Changing to Client VM wallpaper
-$imgPath = "$Env:TempDir\wallpaper.png"
-$code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-     public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-         
-         public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
-         }
-    }
- } 
-'@
-
-add-type $code 
-[Win32.Wallpaper]::SetWallpaper($imgPath)
+ChangingToClientVMWallpaper -directory $Env:TempDir
 
 # Kill the open PowerShell monitoring kubectl get pods
 Stop-Process -Id $kubectlMonShell.Id
