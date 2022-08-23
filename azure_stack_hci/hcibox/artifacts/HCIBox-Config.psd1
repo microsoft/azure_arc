@@ -10,8 +10,8 @@
     MultipleHyperVHostExternalSwitchName = "SDN-Switch"                          # Name of the External Hyper-V VM Switch identical on all hosts.
 
     # VHDX Paths 
-    guiVHDXPath                          = "C:\HciBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
-    azsHCIVHDXPath                       = "C:\HciBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. 
+    guiVHDXPath                          = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
+    azsHCIVHDXPath                       = "C:\HCIBox\VHD\azshci.vhdx"           # This value controls the location of the Azure Stack HCI VHDX. 
     
     # SDN Lab Admin Password
     SDNAdminPassword                     = "ArcPassword123!!"                    # Password for all local and domain accounts. Do not include special characters in the password otherwise some unattended installs may fail.

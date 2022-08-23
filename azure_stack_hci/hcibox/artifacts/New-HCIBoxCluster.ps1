@@ -2,22 +2,22 @@
 
 param(
     [Parameter(Mandatory = $true, ParameterSetName = "ConfigurationFile")]
-    [String] $ConfigurationDataFile = 'C:\HciBox\HCIBox-Config.psd1',
+    [String] $ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1',
     [Parameter(Mandatory = $false, ParameterSetName = "Delete")]
     [Bool] $Delete = $false
 ) 
 
 # Set paths
-$Env:HciBoxDir = "C:\HciBox"
-$Env:HciBoxLogsDir = "C:\HciBox\Logs"
-$Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
-$Env:HciBoxKVDir = "C:\HciBox\KeyVault"
-$Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
-$Env:HciBoxIconDir = "C:\HciBox\Icons"
-$Env:HciBoxVHDDir = "C:\HciBox\VHD"
-$Env:HciBoxSDNDir = "C:\HciBox\SDN"
-$Env:HciBoxWACDir = "C:\HciBox\Windows Admin Center"
-$Env:agentScript = "C:\HciBox\agentScript"
+$Env:HCIBoxDir = "C:\HCIBox"
+$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
+$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
+$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
+$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
+$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
+$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
+$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
+$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
+$Env:agentScript = "C:\HCIBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
@@ -48,8 +48,8 @@ function Invoke-Request {
             $response = Invoke-Command $cmd -ArgumentList $Params
             $completed = $true
         } catch {
-            New-Item -ItemType Directory -Force -Path $Env:HciBoxLogsDir
-            "$(Get-Date -Format G): Request to $url failed. $_" | Out-File -FilePath "$Env:HciBoxLogsDir\Downloads.log" -Encoding utf8 -Append
+            New-Item -ItemType Directory -Force -Path $Env:HCIBoxLogsDir
+            "$(Get-Date -Format G): Request to $url failed. $_" | Out-File -FilePath "$Env:HCIBoxLogsDir\Downloads.log" -Encoding utf8 -Append
             if ($retrycount -ge $Retries) {
                 Write-Warning "Request to $url failed the maximum number of $retryCount times."
                 throw
@@ -599,13 +599,13 @@ $azsmgmtProdKey
 
             # Injecting configs into VMs
             Write-Verbose "Injecting VMConfigs to $path"
-            Copy-Item -Path "$Env:HciBoxDir\HCIBox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
+            Copy-Item -Path "$Env:HCIBoxDir\HCIBox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
             New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
             Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
             Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
-            Copy-Item -Path $Env:HciBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path $Env:HciBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
-            Copy-Item -Path $Env:HciBoxWACDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
+            Copy-Item -Path $Env:HCIBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+            Copy-Item -Path $Env:HCIBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
+            Copy-Item -Path $Env:HCIBoxWACDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
         }       
 
         # Dismount VHDX
@@ -787,8 +787,8 @@ function Resolve-Applications {
     
 
     # Verify Windows Admin Center
-    $isWAC = Get-ChildItem -Path $Env:HciBoxWACDir -Filter *.MSI
-    if (!$isWAC) { Write-Error "Please check and ensure that you have correctly copied the Admin Center install file to C:\HciBox\Windows Admin Center." }
+    $isWAC = Get-ChildItem -Path $Env:HCIBoxWACDir -Filter *.MSI
+    if (!$isWAC) { Write-Error "Please check and ensure that you have correctly copied the Admin Center install file to C:\HCIBox\Windows Admin Center." }
 
     # Are we on Server Core?
     $regKey = "hklm:/software/microsoft/windows nt/currentversion"
@@ -3111,7 +3111,7 @@ $starttime = Get-Date
 
 # Import Configuration Module
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-Copy-Item $ConfigurationDataFile -Destination $Env:HciBoxSDNDir -Force
+Copy-Item $ConfigurationDataFile -Destination $Env:HCIBoxSDNDir -Force
 $NestedVMMemoryinGB = $SDNConfig.NestedVMMemoryinGB
 $guiVHDXPath = $SDNConfig.guiVHDXPath
 $azSHCIVHDXPath = $SDNConfig.azSHCIVHDXPath
@@ -3128,10 +3128,10 @@ $ErrorActionPreference = "Stop"
 $WarningPreference = "SilentlyContinue"
 $ProgressPreference = 'SilentlyContinue'
 
-# Download HciBox VHDs
+# Download HCIBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'='C:\HciBox\VHD\AZSHCI.vhdx'}
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'='C:\HciBox\VHD\GUI.vhdx'}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'='C:\HCIBox\VHD\AZSHCI.vhdx'}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'='C:\HCIBox\VHD\GUI.vhdx'}
 
 # Set VM Host Memory
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824

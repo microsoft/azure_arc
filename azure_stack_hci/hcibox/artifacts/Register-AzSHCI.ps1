@@ -3,22 +3,22 @@ $WarningPreference = "SilentlyContinue"
 $ErrorActionPreference = "Stop" 
 $ProgressPreference = 'SilentlyContinue'
 # Set paths
-$Env:HciBoxDir = "C:\HciBox"
-$Env:HciBoxLogsDir = "C:\HciBox\Logs"
-$Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
-$Env:HciBoxKVDir = "C:\HciBox\KeyVault"
-$Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
-$Env:HciBoxIconDir = "C:\HciBox\Icons"
-$Env:HciBoxVHDDir = "C:\HciBox\VHD"
-$Env:HciBoxSDNDir = "C:\HciBox\SDN"
-$Env:HciBoxWACDir = "C:\HciBox\Windows Admin Center"
-$Env:agentScript = "C:\HciBox\agentScript"
+$Env:HCIBoxDir = "C:\HCIBox"
+$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
+$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
+$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
+$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
+$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
+$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
+$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
+$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
+$Env:agentScript = "C:\HCIBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
 # Import Configuration Module
-$ConfigurationDataFile = "$Env:HciBoxDir\HCIBox-Config.psd1"
+$ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 Write-Host "Register the Cluster to Azure Subscription"
@@ -45,5 +45,5 @@ $armtoken = Get-AzAccessToken
 $graphtoken = Get-AzAccessToken -ResourceTypeName AadGraph
 $clustername = 'hciboxcluster'
 $azureLocation = 'eastus'
-Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName azshost1 -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup
+Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName azshost1 -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup -ArcServerResourceGroupName $env:resourceGroup
     
