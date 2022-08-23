@@ -50,7 +50,7 @@ $aksvar= @{
     AKSCloudConfigdir = "C:\ClusterStorage\S2D_vDISK1\aks\CloudConfig"
     AKSCloudSvcidr = "192.168.1.15/24"
     AKSVlanID="200"
-    AKSResourceGroupName = "HCIBox-AKS"
+    AKSResourceGroupName = $env:resourceGroup
 }
 
 # Install latest versions of Nuget and PowershellGet
@@ -78,7 +78,7 @@ Invoke-Command -VMName $aksvar.HostList  -Credential $adcred -ScriptBlock {
     Import-Module Az.Resources
     Import-Module AzureAD
     Import-Module AksHci
-    Initialize-akshcinode
+    Initialize-AksHciNode
 }
 
 # Install AksHci - only need to perform the following on one of the nodes
@@ -92,9 +92,9 @@ Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
     Install-AksHci 
 }
 
-# Create new AKS workload cluster
+# Create new AKS workload cluster and connect it to Azure
 Write-Header "Creating AKS workload cluster"
 Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
     New-AksHciCluster -name "hcibox-aks" -nodePoolName linuxnodepool -nodecount 1 -osType linux
-    Get-AksHciCluster
+    Enable-AksHciArcConnection -name "hcibox-aks"
 }
