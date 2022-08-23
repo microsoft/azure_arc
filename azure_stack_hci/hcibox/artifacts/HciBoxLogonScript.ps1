@@ -53,7 +53,7 @@ az provider register --namespace Microsoft.AzureStackHCI --wait
 
 # Build HCI cluster
 Write-Header "Deploying HCI cluster"
-& "$Env:HciBoxDir\New-AzSHCISandbox.ps1"
+& "$Env:HciBoxDir\New-HCIBoxCluster.ps1"
 
 # Register HCI cluster
 Write-Header "Registering HCI cluster"

@@ -18,7 +18,7 @@ $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
 # Import Configuration Module
-$ConfigurationDataFile = "$Env:HciBoxDir\AzSHCISandbox-Config.psd1"
+$ConfigurationDataFile = "$Env:HciBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 Write-Host "Register the Cluster to Azure Subscription"

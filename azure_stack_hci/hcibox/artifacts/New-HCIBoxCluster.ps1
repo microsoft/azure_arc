@@ -2,7 +2,7 @@
 
 param(
     [Parameter(Mandatory = $true, ParameterSetName = "ConfigurationFile")]
-    [String] $ConfigurationDataFile = 'C:\HciBox\AzSHCISandbox-Config.psd1',
+    [String] $ConfigurationDataFile = 'C:\HciBox\HCIBox-Config.psd1',
     [Parameter(Mandatory = $false, ParameterSetName = "Delete")]
     [Bool] $Delete = $false
 ) 
@@ -599,7 +599,7 @@ $azsmgmtProdKey
 
             # Injecting configs into VMs
             Write-Verbose "Injecting VMConfigs to $path"
-            Copy-Item -Path "$Env:HciBoxDir\AzSHCISandbox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
+            Copy-Item -Path "$Env:HciBoxDir\HCIBox-Config.psd1" -Destination ($MountedDrive + ":\") -Recurse -Force
             New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
             Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
             Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
@@ -826,7 +826,7 @@ function Get-PhysicalNICMTU {
 
                     if ($MTUSetting -ne $SDNConfig.SDNLABMTU) {
     
-                        Write-Error "There is a mismatch in the MTU value for the external switch and the value in the AzSHCISandbox-Config.psd1 data file."  
+                        Write-Error "There is a mismatch in the MTU value for the external switch and the value in the HCIBox-Config.psd1 data file."  
     
                     }
     
@@ -2314,7 +2314,7 @@ CertificateTemplate= WebServer
 
             } -Authentication Credssp
 
-            $SDNConfig = Import-PowerShellDataFile -Path C:\SDN\AzSHCISandbox-Config.psd1
+            $SDNConfig = Import-PowerShellDataFile -Path C:\SDN\HCIBox-Config.psd1
 
             # Install Windows Admin Center
             $pfxThumbPrint = (Get-ChildItem -Path Cert:\LocalMachine\my | Where-Object { $_.FriendlyName -match "Nested SDN Windows Admin Cert" }).Thumbprint
@@ -2839,7 +2839,7 @@ function Add-WACtenants {
         
             # Set Variables
 
-            $SDNConfig = Import-PowerShellDataFile -Path C:\SDN\AzSHCISandbox-Config.psd1
+            $SDNConfig = Import-PowerShellDataFile -Path C:\SDN\HCIBox-Config.psd1
             $fqdn = $SDNConfig.SDNDomainFQDN
             $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
             $VerbosePreference = "Continue"
