@@ -1,5 +1,23 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
+# Function repository
+function OnboardingCluster {
+    param (
+        [string]$resourceGroup,
+        [string]$clusterName,
+        [string]$azureLocation,
+        [string]$workspaceName
+    )
+    az connectedk8s connect --name $clusterName `
+        --resource-group $resourceGroup `
+        --location $azureLocation `
+        --tags 'Project=jumpstart_azure_arc_data_services' `
+        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+    Start-Sleep -Seconds 10
+    $workspaceId = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+    az k8s-extension create --name "azuremonitor-containers" --cluster-name $clusterName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+}
+
 # Deployment environment variables
 $primaryConnectedClusterName = "Arc-DataSvc-AKS-Primary"
 $secondaryConnectedClusterName = "Arc-DataSvc-AKS-Secondary"
@@ -11,67 +29,17 @@ $secondaryDcName = "jumpstart-secondary-dc"
 
 . $Env:tempDir/ArcDataCommonDataServicesLogonScript.ps1 -extraAzExtensions @("customlocation")
 
-# Set default subscription to run commands against
-# "subscriptionId" value comes from clientVM.json ARM template, based on which 
-# subscription user deployed ARM template to. This is needed in case Service 
-# Principal has access to multiple subscriptions, which can break the automation logic
-az account set --subscription $Env:subscriptionId
+SetDefaultSubscription $Env:subscriptionId
 
-# Installing Azure Data Studio extensions
-Write-Output "`n"
-Write-Output "Installing Azure Data Studio Extensions"
-Write-Output "`n"
-$Env:argument1 = "--install-extension"
-$Env:argument2 = "microsoft.azcli"
-$Env:argument3 = "microsoft.azuredatastudio-postgresql"
-$Env:argument4 = "Microsoft.arc"
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
+InstallingAzureDataStudioExtensions @("microsoft.azcli", "microsoft.azuredatastudio-postgresql", "Microsoft.arc")
 
-# Creating Azure Data Studio desktop shortcut
-Write-Output "`n"
-Write-Output "Creating Azure Data Studio Desktop shortcut"
-Write-Output "`n"
 Add-Desktop-Shortcut -shortcutName "Azure Data Studio" -targetPath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -username $Env:adminUsername
 
-# Registering Azure Arc providers
-Write-Output "Registering Azure Arc providers, hold tight..."
-Write-Output "`n"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
-
-az provider show --namespace Microsoft.Kubernetes -o table
-Write-Output "`n"
-az provider show --namespace Microsoft.KubernetesConfiguration -o table
-Write-Output "`n"
-az provider show --namespace Microsoft.ExtendedLocation -o table
-Write-Output "`n"
-az provider show --namespace Microsoft.AzureArcData -o table
-Write-Output "`n"
+RegisteringAzureArcProviders @("Kubernetes", "KubernetesConfiguration", "ExtendedLocation", "AzureArcData")
 
 # Getting AKS cluster credentials kubeconfig file
-Write-Output "Getting AKS cluster credentials for the primary cluster"
-Write-Output "`n"
-az aks get-credentials --resource-group $Env:resourceGroup `
-    --name $primaryClusterName --admin
-Write-Output "`n"
-Write-Output "Checking kubernetes nodes"
-Write-Output "`n"
-kubectl get nodes
-Write-Output "`n"
-
-Write-Output "Getting AKS cluster credentials for the secondary cluster"
-Write-Output "`n"
-az aks get-credentials --resource-group $Env:resourceGroup `
-    --name $secondaryClusterName --admin
-Write-Output "`n"
-Write-Output "Checking kubernetes nodes"
-Write-Output "`n"
-kubectl get nodes
-Write-Output "`n"
+GettingAKSClusterCredentialsKubeconfigFile -resourceGroup $Env:resourceGroup -clusterName $primaryClusterName
+GettingAKSClusterCredentialsKubeconfigFile -resourceGroup $Env:resourceGroup -clusterName $secondaryClusterName
 
 # Creating Kubect aliases
 kubectx primary="$primaryConnectedClusterName-admin"
@@ -87,19 +55,7 @@ Write-Output "Onboarding the primary cluster as an Azure Arc-enabled Kubernetes 
 Write-Output "`n"
 kubectx primary
 Write-Output "`n"
-az connectedk8s connect --name $primaryConnectedClusterName `
-                        --resource-group $Env:resourceGroup `
-                        --location $Env:azureLocation `
-                        --tags 'Project=jumpstart_azure_arc_data_services' `
-                        --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
-
-Start-Sleep -Seconds 10
-
-# Enabling Container Insights cluster extension on primary cluster
-Write-Output "`n"
-Write-Output "Enabling Container Insights cluster extension"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $primaryConnectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-Write-Output "`n"
+OnboardingCluster -resourceGroup $Env:resourceGroup -clusterName $primaryConnectedClusterName -azureLocation $Env:azureLocation -workspaceName $Env:workspaceName
 
 # Monitor pods across arc namespace
 $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
@@ -184,18 +140,7 @@ Write-Output "`n"
 Write-Output "`n"
 kubectx secondary
 Write-Output "`n"
-az connectedk8s connect --name $secondaryConnectedClusterName `
-    --resource-group $Env:resourceGroup `
-    --location $Env:azureLocation `
-    --tags 'Project=jumpstart_azure_arc_data_services'
-
-Start-Sleep -Seconds 10
-
-# Enabling Container Insights cluster extension on secondary cluster
-Write-Output "`n"
-Write-Output "Enabling Container Insights cluster extension"
-az k8s-extension create --name "azuremonitor-containers" --cluster-name $secondaryConnectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-Write-Output "`n"
+OnboardingCluster -resourceGroup $Env:resourceGroup -clusterName $secondaryConnectedClusterName -azureLocation $Env:azureLocation -workspaceName $Env:clusterName
 
 # Installing Azure Arc-enabled data services extension
 Write-Output "`n"
