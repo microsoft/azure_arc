@@ -29,8 +29,6 @@ $adcred = New-Object -TypeName System.Management.Automation.PSCredential -Argume
 $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnClientID, (ConvertTo-SecureString -String $env:spnClientSecret -AsPlainText -Force))
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 $context = Get-AzContext # Azure credential
-$armtoken = Get-AzAccessToken
-$graphtoken = Get-AzAccessToken -ResourceTypeName AadGraph
 
 # AKS parameters - recommended to leave default
 $aksvar= @{

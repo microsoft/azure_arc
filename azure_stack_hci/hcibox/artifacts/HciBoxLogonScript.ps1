@@ -64,6 +64,8 @@ Write-Header "Deploying AKS"
 & "$Env:HciBoxDir\Deploy-AKS.ps1"
 
 # deploy Data services
+# Write-Header "Deploying Azure Arc-enabled data services and SQL Managed Instance"
+# & "$Env:HciBoxDir\Deploy-SQLMI.ps1"
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
