@@ -38,6 +38,21 @@ function RegisteringAzureArcProviders([string[]]$arcProviderList) {
         az provider show --namespace "Microsoft.$app" -o table
     }
 }
+function GettingAKSClusterCredentialsKubeconfigFile() {
+    param (
+        [string]$resourceGroup,
+        [string]$clusterName
+    )
+    Write-Output "Getting AKS cluster credentials for the $clusterName cluster"
+    Write-Output "`n"
+    az aks get-credentials --resource-group $resourceGroup `
+        --name $clusterName --admin
+    Write-Output "`n"
+    Write-Output "Checking kubernetes nodes"
+    Write-Output "`n"
+    kubectl get nodes
+    Write-Output "`n"
+}
 function InstallingAzureArcEnabledDataServicesExtension {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "")]
     param (

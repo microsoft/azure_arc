@@ -5,16 +5,6 @@ function SetEnviromentVariables() {
     # Deployment environment variables
     $Env:connectedClusterName = "Arc-DataSvc-AKS"
 }
-function GettingAKSClusterCredentialsKubeconfigFile([string]$resourceGroup, [string]$clusterName) {
-    Write-Output "Getting AKS cluster credentials"
-    Write-Output "`n"
-    az aks get-credentials --resource-group $resourceGroup --name $clusterName --admin
-
-    Write-Output "Checking kubernetes nodes"
-    Write-Output "`n"
-    kubectl get nodes
-    Write-Output "`n"
-}
 function AKSClusterAsAnAzureArcEnabledKubernetesCluster {
     param (
         [string]$adminUsername,
@@ -59,7 +49,7 @@ Add-Desktop-Shortcut -shortcutName "Azure Data Studio" -targetPath "C:\Program F
 
 RegisteringAzureArcProviders @("Kubernetes", "KubernetesConfiguration", "ExtendedLocation", "AzureArcData")
 
-GettingAKSClusterCredentialsKubeconfigFile $Env:resourceGroup $Env:clusterName
+GettingAKSClusterCredentialsKubeconfigFile -resourceGroup $Env:resourceGroup -clusterName $Env:clusterName
 
 # Onboarding the AKS cluster as an Azure Arc-enabled Kubernetes cluster
 Write-Output "Onboarding the cluster as an Azure Arc-enabled Kubernetes cluster"
