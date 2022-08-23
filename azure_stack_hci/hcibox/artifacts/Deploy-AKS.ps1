@@ -1,23 +1,23 @@
 # Set paths
-$Env:HciBoxDir = "C:\HciBox"
-$Env:HciBoxLogsDir = "C:\HciBox\Logs"
-$Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
-$Env:HciBoxKVDir = "C:\HciBox\KeyVault"
-$Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
-$Env:HciBoxIconDir = "C:\HciBox\Icons"
-$Env:HciBoxVHDDir = "C:\HciBox\VHD"
-$Env:HciBoxSDNDir = "C:\HciBox\SDN"
-$Env:HciBoxWACDir = "C:\HciBox\Windows Admin Center"
-$Env:agentScript = "C:\HciBox\agentScript"
+$Env:HCIBoxDir = "C:\HCIBox"
+$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
+$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
+$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
+$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
+$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
+$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
+$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
+$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
+$Env:agentScript = "C:\HCIBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
-Start-Transcript -Path $Env:HciBoxLogsDir\Deploy-AKS.log
+Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-AKS.log
 
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
-$ConfigurationDataFile = 'C:\HciBox\HCIBox-Config.psd1'
+$ConfigurationDataFile = 'C:\HCIBox\HCIBox-Config.psd1'
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Generate credential objects

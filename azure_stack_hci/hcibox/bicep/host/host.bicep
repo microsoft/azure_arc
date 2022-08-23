@@ -1,8 +1,8 @@
 @description('The name of your Virtual Machine')
-param vmName string = 'HciBox-Client'
+param vmName string = 'HCIBox-Client'
 
 @description('The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster')
-param capiArcDataClusterName string = 'HciBox-CAPI-Data'
+param capiArcDataClusterName string = 'HCIBox-CAPI-Data'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
@@ -23,7 +23,7 @@ param location string = resourceGroup().location
 param subnetId string
 
 param resourceTags object = {
-  Project: 'jumpstart_HciBox'
+  Project: 'jumpstart_HCIBox'
 }
 
 @description('Client id of the service principal')
@@ -69,7 +69,7 @@ param workspaceName string
 @description('The base URL used for accessing artifacts and automation artifacts.')
 param templateBaseUrl string
 
-@description('The flavor of HciBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
+@description('The flavor of HCIBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
 @allowed([
   'Full'
   'ITPro'
@@ -84,12 +84,12 @@ param deployBastion bool = false
 param githubUser string
 
 @description('The name of the K3s cluster')
-param k3sArcClusterName string = 'HciBox-K3s'
+param k3sArcClusterName string = 'HCIBox-K3s'
 
 @description('The domain name of your AD forest')
 param addsDomainName string
 
-var bastionName = 'HciBox-Bastion'
+var bastionName = 'HCIBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
 var networkInterfaceName = '${vmName}-NIC'
 var osDiskType = 'Premium_LRS'

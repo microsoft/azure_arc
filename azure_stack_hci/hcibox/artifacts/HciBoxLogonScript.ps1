@@ -1,19 +1,19 @@
 # Set paths
-$Env:HciBoxDir = "C:\HciBox"
-$Env:HciBoxLogsDir = "C:\HciBox\Logs"
-$Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
-$Env:HciBoxKVDir = "C:\HciBox\KeyVault"
-$Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
-$Env:HciBoxIconDir = "C:\HciBox\Icons"
-$Env:HciBoxVHDDir = "C:\HciBox\VHD"
-$Env:HciBoxSDNDir = "C:\HciBox\SDN"
-$Env:HciBoxWACDir = "C:\HciBox\Windows Admin Center"
-$Env:agentScript = "C:\HciBox\agentScript"
+$Env:HCIBoxDir = "C:\HCIBox"
+$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
+$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
+$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
+$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
+$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
+$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
+$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
+$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
+$Env:agentScript = "C:\HCIBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
-Start-Transcript -Path $Env:HciBoxLogsDir\HciBoxLogonScript.log
+Start-Transcript -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 
 $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory
 
@@ -53,19 +53,19 @@ az provider register --namespace Microsoft.AzureStackHCI --wait
 
 # Build HCI cluster
 Write-Header "Deploying HCI cluster"
-& "$Env:HciBoxDir\New-HCIBoxCluster.ps1"
+& "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
 
 # Register HCI cluster
 Write-Header "Registering HCI cluster"
-& "$Env:HciBoxDir\Register-AzSHCI.ps1"
+& "$Env:HCIBoxDir\Register-AzSHCI.ps1"
 
 # deploy AKS
 Write-Header "Deploying AKS"
-& "$Env:HciBoxDir\Deploy-AKS.ps1"
+& "$Env:HCIBoxDir\Deploy-AKS.ps1"
 
 # deploy Data services
 # Write-Header "Deploying Azure Arc-enabled data services and SQL Managed Instance"
-# & "$Env:HciBoxDir\Deploy-SQLMI.ps1"
+# & "$Env:HCIBoxDir\Deploy-SQLMI.ps1"
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
@@ -84,13 +84,13 @@ namespace Win32{
 '@
 
 Write-Header "Changing Wallpaper"
-$imgPath="$Env:HciBoxDir\wallpaper.png"
+$imgPath="$Env:HCIBoxDir\wallpaper.png"
 Add-Type $code 
 [Win32.Wallpaper]::SetWallpaper($imgPath)
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
-Unregister-ScheduledTask -TaskName "HciBoxLogonScript" -Confirm:$false
+Unregister-ScheduledTask -TaskName "HCIBoxLogonScript" -Confirm:$false
 
 # Executing the deployment logs bundle PowerShell script in a new window
 Write-Header "Uploading Log Bundle"
@@ -100,6 +100,6 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Start-Sleep -Seconds 5
     Write-Host "`n"
     Write-Host "Creating deployment logs bundle"
-    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:HciBoxLogsDir\*.log
+    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:HCIBoxLogsDir\*.log
 }'
 

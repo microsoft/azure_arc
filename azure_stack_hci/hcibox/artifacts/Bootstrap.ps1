@@ -62,36 +62,36 @@ param (
 [System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('addsDomainName', $addsDomainName,[System.EnvironmentVariableTarget]::Machine)
 
-# Creating HciBox path
-Write-Output "Creating HciBox paths"
-$Env:HciBoxDir = "C:\HciBox"
-$Env:HciBoxLogsDir = "C:\HciBox\Logs"
-$Env:HciBoxVMDir = "C:\HciBox\Virtual Machines"
-$Env:HciBoxKVDir = "C:\HciBox\KeyVault"
-$Env:HciBoxGitOpsDir = "C:\HciBox\GitOps"
-$Env:HciBoxIconDir = "C:\HciBox\Icons"
-$Env:HciBoxVHDDir = "C:\HciBox\VHD"
-$Env:HciBoxSDNDir = "C:\HciBox\SDN"
-$Env:HciBoxWACDir = "C:\HciBox\Windows Admin Center"
-$Env:agentScript = "C:\HciBox\agentScript"
+# Creating HCIBox path
+Write-Output "Creating HCIBox paths"
+$Env:HCIBoxDir = "C:\HCIBox"
+$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
+$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
+$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
+$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
+$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
+$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
+$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
+$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
+$Env:agentScript = "C:\HCIBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
-New-Item -Path $Env:HciBoxDir -ItemType directory -Force
-New-Item -Path $Env:HciBoxVHDDir -ItemType directory -Force
-New-Item -Path $Env:HciBoxSDNDir -ItemType directory -Force
-New-Item -Path $Env:HciBoxLogsDir -ItemType directory -Force
-New-Item -Path $Env:HciBoxVMDir -ItemType directory -Force
-New-Item -Path $Env:HciBoxKVDir -ItemType directory -Force
-New-Item -Path $Env:HciBoxGitOpsDir -ItemType directory -Force
-New-Item -Path $Env:HciBoxIconDir -ItemType directory -Force
-New-Item -Path $Env:HciBoxWACDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxVHDDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxSDNDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxLogsDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxVMDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxKVDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxGitOpsDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxIconDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxWACDir -ItemType directory -Force
 New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
 
-Start-Transcript -Path $Env:HciBoxLogsDir\Bootstrap.log
+Start-Transcript -Path $Env:HCIBoxLogsDir\Bootstrap.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -109,7 +109,7 @@ Install-Module -Name Posh-SSH -Force
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
+$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,azure-data-studio'
 
 try {
     choco config get cacheLocation
@@ -131,35 +131,35 @@ foreach ($app in $appsToInstall)
 
 # All flavors
 Write-Host "Fetching artifacts"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_logo.png" -OutFile $Env:HciBoxDir\wallpaper.png
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:HciBoxDir\DeploymentStatus.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HciBoxLogsDir\LogInstructions.txt
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_logo.png" -OutFile $Env:HCIBoxDir\wallpaper.png
+Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:HCIBoxDir\DeploymentStatus.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxLogsDir\LogInstructions.txt
 
-Invoke-WebRequest ($templateBaseUrl + "../tests/GHActionDeploy.ps1") -OutFile "$Env:HciBoxDir\GHActionDeploy.ps1"
-Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$Env:HciBoxDir\OpenSSHDeploy.ps1"
+Invoke-WebRequest ($templateBaseUrl + "../tests/GHActionDeploy.ps1") -OutFile "$Env:HCIBoxDir\GHActionDeploy.ps1"
+Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$Env:HCIBoxDir\OpenSSHDeploy.ps1"
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
 #$Trigger = New-ScheduledTaskTrigger -AtLogOn
-#$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HciBoxDir\MonitorWorkbookLogonScript.ps1
+#$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HCIBoxDir\MonitorWorkbookLogonScript.ps1
 #Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Downloading AzSHCI files
 Write-Header "Downloading Azure Stack HCI configuration scripts"
-Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxWACDir\WindowsAdminCenter.msi
-Invoke-WebRequest ($templateBaseUrl + "artifacts/HciBoxLogonScript.ps1") -OutFile $Env:HciBoxDir\HciBoxLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/New-HCIBoxCluster.ps1") -OutFile $Env:HciBoxDir\New-HCIBoxCluster.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Register-AzSHCI.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBox-Config.psd1") -OutFile $Env:HciBoxDir\HCIBox-Config.psd1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.ps1") -OutFile $Env:HciBoxDir\Deploy-AKS.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-SQLMI.ps1") -OutFile $Env:HciBoxDir\Deploy-SQLMI.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HciBoxSDNDir\CertHelpers.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HciBoxSDNDir\NetworkControllerRESTWrappers.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HciBoxSDNDir\NetworkControllerWorkloadHelpers.psm1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExplorer.ps1") -OutFile $Env:HciBoxSDNDir\SDNExplorer.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpress.ps1") -OutFile $Env:HciBoxSDNDir\SDNExpress.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressModule.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressModule.psm1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFile $Env:HciBoxSDNDir\SDNExpressUI.psm1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HciBoxSDNDir\Single-NC.psd1
+Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HCIBoxWACDir\WindowsAdminCenter.msi
+Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBoxLogonScript.ps1") -OutFile $Env:HCIBoxDir\HCIBoxLogonScript.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/New-HCIBoxCluster.ps1") -OutFile $Env:HCIBoxDir\New-HCIBoxCluster.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HCIBoxDir\Register-AzSHCI.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBox-Config.psd1") -OutFile $Env:HCIBoxDir\HCIBox-Config.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.ps1") -OutFile $Env:HCIBoxDir\Deploy-AKS.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-SQLMI.ps1") -OutFile $Env:HCIBoxDir\Deploy-SQLMI.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HCIBoxSDNDir\CertHelpers.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HCIBoxSDNDir\NetworkControllerRESTWrappers.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HCIBoxSDNDir\NetworkControllerWorkloadHelpers.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExplorer.ps1") -OutFile $Env:HCIBoxSDNDir\SDNExplorer.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpress.ps1") -OutFile $Env:HCIBoxSDNDir\SDNExpress.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressModule.psm1") -OutFile $Env:HCIBoxSDNDir\SDNExpressModule.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/SDNExpressUI.psm1") -OutFile $Env:HCIBoxSDNDir\SDNExpressUI.psm1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/Single-NC.psd1") -OutFile $Env:HCIBoxSDNDir\Single-NC.psd1
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
@@ -183,10 +183,10 @@ if (-not (Test-Path $RegistryPath)) {
 #Enable-WSManCredSSP -Role Server -Force | Out-Null
 #Enable-WSManCredSSP -Role Client -DelegateComputer $Env:COMPUTERNAME -Force | Out-Null
 
-# Creating scheduled task for HciBoxLogonScript.ps1
+# Creating scheduled task for HCIBoxLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HciBoxDir\HciBoxLogonScript.ps1
-Register-ScheduledTask -TaskName "HciBoxLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HCIBoxDir\HCIBoxLogonScript.ps1
+Register-ScheduledTask -TaskName "HCIBoxLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V"
@@ -197,5 +197,5 @@ Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementToo
 # Clean up Bootstrap.log
 Write-Header "Clean up Bootstrap.log"
 Stop-Transcript
-$logSuppress = Get-Content $Env:HciBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $Env:HciBoxLogsDir\Bootstrap.log -Force
+$logSuppress = Get-Content $Env:HCIBoxLogsDir\Bootstrap.log | Where-Object { $_ -notmatch "Host Application: powershell.exe" } 
+$logSuppress | Set-Content $Env:HCIBoxLogsDir\Bootstrap.log -Force

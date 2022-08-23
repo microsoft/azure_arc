@@ -1,13 +1,13 @@
 @description('Name of the VNet')
-param virtualNetworkName string = 'HciBox-VNet'
+param virtualNetworkName string = 'HCIBox-VNet'
 
 @description('Name of the subnet in the virtual network')
-param subnetName string = 'HciBox-Subnet'
+param subnetName string = 'HCIBox-Subnet'
 
 @description('Name for your log analytics workspace')
 param workspaceName string
 
-@description('The flavor of HciBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
+@description('The flavor of HCIBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
 @allowed([
   'Full'
   'ITPro'
@@ -25,10 +25,10 @@ param sku string = 'pergb2018'
 param deployBastion bool = false
 
 @description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'HciBox-NSG'
+param networkSecurityGroupName string = 'HCIBox-NSG'
 
 @description('Name of the Bastion Network Security Group')
-param bastionNetworkSecurityGroupName string = 'HciBox-Bastion-NSG'
+param bastionNetworkSecurityGroupName string = 'HCIBox-Bastion-NSG'
 
 var updates = {
   name: 'Updates(${workspaceName})'
@@ -43,13 +43,13 @@ var security = {
   galleryName: 'Security'
 }
 
-var automationAccountName = 'HciBox-Automation-${uniqueString(resourceGroup().id)}'
+var automationAccountName = 'HCIBox-Automation-${uniqueString(resourceGroup().id)}'
 var subnetAddressPrefix = '172.16.1.0/24'
 var addressPrefix = '172.16.0.0/16'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
-var bastionName = 'HciBox-Bastion'
+var bastionName = 'HCIBox-Bastion'
 var bastionSubnetIpPrefix = '172.16.3.64/26'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
 
