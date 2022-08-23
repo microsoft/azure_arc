@@ -17,7 +17,7 @@ Start-Transcript -Path $Env:HciBoxLogsDir\Deploy-AKS.log
 
 # Import Configuration Module and create Azure login credentials
 Write-Header 'Importing config'
-$ConfigurationDataFile = 'C:\HciBox\AzSHCISandbox-Config.psd1'
+$ConfigurationDataFile = 'C:\HciBox\HCIBox-Config.psd1'
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
 # Generate credential objects

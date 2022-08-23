@@ -147,9 +147,9 @@ Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$E
 Write-Header "Downloading Azure Stack HCI configuration scripts"
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HciBoxWACDir\WindowsAdminCenter.msi
 Invoke-WebRequest ($templateBaseUrl + "artifacts/HciBoxLogonScript.ps1") -OutFile $Env:HciBoxDir\HciBoxLogonScript.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/New-AzSHCISandbox.ps1") -OutFile $Env:HciBoxDir\New-AzSHCISandbox.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/New-HCIBoxCluster.ps1") -OutFile $Env:HciBoxDir\New-HCIBoxCluster.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HciBoxDir\Register-AzSHCI.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/AzSHCISandbox-Config.psd1") -OutFile $Env:HciBoxDir\AzSHCISandbox-Config.psd1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBox-Config.psd1") -OutFile $Env:HciBoxDir\HCIBox-Config.psd1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.ps1") -OutFile $Env:HciBoxDir\Deploy-AKS.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HciBoxSDNDir\CertHelpers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HciBoxSDNDir\NetworkControllerRESTWrappers.ps1
