@@ -54,7 +54,8 @@
       "allowedValues": [
         "Full",
         "ITPro",
-        "DevOps"
+        "DevOps",
+        "DataOps"
       ],
       "defaultValue": "Full"
     },
@@ -104,7 +105,7 @@
         "stagingStorageAccountDeployment",
         "mgmtArtifactsAndPolicyDeployment"
       ],
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'))]",
+      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'),equals(parameters('flavor'),'DataOps'))]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
