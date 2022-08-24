@@ -57,6 +57,7 @@ param deployBastion bool = false
   'Full'
   'ITPro'
   'DevOps'
+  'DataOps'
 ])
 param flavor string
 
