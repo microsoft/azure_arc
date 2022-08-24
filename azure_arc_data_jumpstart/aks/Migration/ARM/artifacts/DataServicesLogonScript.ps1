@@ -6,55 +6,16 @@ $connectedClusterName = "Arc-DataSvc-AKS"
 
 . $Env:tempDir/ArcDataCommonDataServicesLogonScript.ps1 -extraAzExtensions @("customlocation")
 
-# Set default subscription to run commands against
-# "subscriptionId" value comes from clientVM.json ARM template, based on which 
-# subscription user deployed ARM template to. This is needed in case Service 
-# Principal has access to multiple subscriptions, which can break the automation logic
-az account set --subscription $Env:subscriptionId
+SetDefaultSubscription $Env:subscriptionId
 
-# Installing Azure Data Studio extensions
-Write-Output "`n"
-Write-Output "Installing Azure Data Studio Extensions"
-Write-Output "`n"
-$Env:argument1="--install-extension"
-$Env:argument2="microsoft.azcli"
-$Env:argument3="Microsoft.arc"
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
-& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
+InstallingAzureDataStudioExtensions @("microsoft.azcli", "Microsoft.arc")
 
-# Creating Azure Data Studio desktop shortcut
-Write-Output "`n"
-Write-Output "Creating Azure Data Studio Desktop shortcut"
-Write-Output "`n"
 Add-Desktop-Shortcut -shortcutName "Azure Data Studio" -targetPath "C:\Program Files\Azure Data Studio\azuredatastudio.exe" -username $Env:adminUsername
 
-# Registering Azure Arc providers
-Write-Output "Registering Azure Arc providers, hold tight..."
-Write-Output "`n"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
-
-az provider show --namespace Microsoft.Kubernetes -o table
-Write-Output "`n"
-az provider show --namespace Microsoft.KubernetesConfiguration -o table
-Write-Output "`n"
-az provider show --namespace Microsoft.ExtendedLocation -o table
-Write-Output "`n"
-az provider show --namespace Microsoft.AzureArcData -o table
-Write-Output "`n"
+RegisteringAzureArcProviders @("Kubernetes", "KubernetesConfiguration", "ExtendedLocation", "AzureArcData")
 
 # Getting AKS cluster credentials kubeconfig file
-Write-Output "Getting AKS cluster credentials"
-Write-Output "`n"
-az aks get-credentials --resource-group $Env:resourceGroup `
-                       --name $Env:clusterName --admin
-Write-Output "`n"
-Write-Output "Checking kubernetes nodes"
-Write-Output "`n"
-kubectl get nodes
-Write-Output "`n"
+GettingAKSClusterCredentialsKubeconfigFile -resourceGroup $Env:resourceGroup -clusterName $Env:clusterName
 
 # Localize kubeconfig
 $Env:KUBECONTEXT = kubectl config current-context
