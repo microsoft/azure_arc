@@ -187,7 +187,7 @@ if ($flavor -eq "DevOps") {
 # DataOps
 if ($flavor -eq "DataOps") {
     Write-Host "Fetching Artifacts for DataOps Flavor"
-    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DevOpsLogonScript.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DataOpsLogonScript.ps1
 }
 
 # Full
