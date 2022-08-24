@@ -146,6 +146,11 @@ elseif ($flavor -eq "DevOps") {
     Write-Host "Fetching Workbook Template Artifact for DevOps"
     Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookDevOps.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
 }
+elseif ($flavor -eq "DataOps") {
+    Write-Host "Fetching Workbook Template Artifact for DataOps"
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookDataOps.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
+
+}
 else {
     Write-Host "Fetching Workbook Template Artifact for Full"
     Invoke-WebRequest ($templateBaseUrl + "artifacts/mgmtMonitorWorkbookFull.json") -OutFile $Env:ArcBoxDir\mgmtMonitorWorkbook.json
@@ -177,6 +182,12 @@ if ($flavor -eq "DevOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/gitops_scripts/ResetBookstore.ps1") -OutFile $Env:ArcBoxGitOpsDir\ResetBookstore.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/arc.ico") -OutFile $Env:ArcBoxIconDir\arc.ico
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/bookstore.ico") -OutFile $Env:ArcBoxIconDir\bookstore.ico
+}
+
+# DataOps
+if ($flavor -eq "DataOps") {
+    Write-Host "Fetching Artifacts for DataOps Flavor"
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DataOpsLogonScript.ps1
 }
 
 # Full
@@ -228,6 +239,13 @@ if ($flavor -eq "DevOps") {
     $Trigger = New-ScheduledTaskTrigger -AtLogOn 
     $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DevOpsLogonScript.ps1
     Register-ScheduledTask -TaskName "DevOpsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+}
+
+if ($flavor -eq "DataOps") {
+    # Creating scheduled task for DataOpsLogonScript.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn 
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DataOpsLogonScript.ps1
+    Register-ScheduledTask -TaskName "DataOpsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 }
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
