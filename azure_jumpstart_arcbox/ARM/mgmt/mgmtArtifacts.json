@@ -16,6 +16,20 @@
         "description": "Name of the subnet in the virtual network"
       }
     },
+    "aksSubnetName": {
+      "type": "string",
+      "defaultValue": "ArcBox-Subnet",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network"
+      }
+    },
+    "dcSubnetName": {
+      "type": "string",
+      "defaultValue": "ArcBox-DC-Subnet",
+      "metadata": {
+        "description": "Name of the Domain Controller subnet in the virtual network"
+      }
+    },
     "workspaceName": {
       "type": "string",
       "metadata": {
@@ -85,48 +99,94 @@
     },
     "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
+    "addressPrefix": "172.0.0.0/8",
     "subnetAddressPrefix": "172.16.1.0/24",
-    "addressPrefix": "172.16.0.0/16",
+    "aksSubnetPrefix": "172.240.0.0/16",
+    "dcSubnetPrefix": "172.10.0.0/24",
     "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
     "bastionName": "ArcBox-Bastion",
     "bastionSubnetIpPrefix": "172.16.3.64/26",
     "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]",
-    "subnetsWithBastion" : [
+    "subnetsWithBastion": [
       {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('subnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-              }
-            }
-          },
-          {
-            "name": "AzureBastionSubnet",
-            "properties": {
-              "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
-              "networkSecurityGroup" : {
-                "id" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
-              }
-            }
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
           }
+        }
+      },
+      {
+        "name": "[parameters('aksSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('aksSubnetPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      },
+      {
+        "name": "[parameters('dcSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('dcSubnetPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      },
+      {
+        "name": "AzureBastionSubnet",
+        "properties": {
+          "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
+          }
+        }
+      }
     ],
-    "subnetsWithoutBastion" : [
+    "subnetsWithoutBastion": [
       {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('subnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-              }
-            }
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
           }
+        }
+      },
+      {
+        "name": "[parameters('aksSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('aksSubnetPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      },
+      {
+        "name": "[parameters('dcSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('dcSubnetPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      },
     ]
   },
   "resources": [
@@ -322,7 +382,7 @@
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": ["22","3389"]
+              "destinationPortRanges": [ "22", "3389" ]
             }
           },
           {
@@ -348,7 +408,7 @@
               "sourceAddressPrefix": "VirtualNetwork",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": ["8080","5701"]
+              "destinationPortRanges": [ "8080", "5701" ]
             }
           },
           {
@@ -361,7 +421,7 @@
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "Internet",
-              "destinationPortRanges": ["80","443"]
+              "destinationPortRanges": [ "80", "443" ]
             }
           }
         ]
