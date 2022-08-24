@@ -99,7 +99,7 @@ variable "spn_tenant_id" {
 
 variable "deployment_flavor" {
   type        = string
-  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', and 'DevOps'."
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps' and 'DataOps'."
 }
 
 variable "github_username" {
