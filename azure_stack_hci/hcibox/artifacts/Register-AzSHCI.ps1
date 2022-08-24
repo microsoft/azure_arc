@@ -45,5 +45,5 @@ $armtoken = Get-AzAccessToken
 $graphtoken = Get-AzAccessToken -ResourceTypeName AadGraph
 $clustername = 'hciboxcluster'
 $azureLocation = 'eastus'
-Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName azshost1 -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup -ArcServerResourceGroupName $env:resourceGroup
+Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName azshost1 -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup -ArcServerResourceGroupName $env:resourceGroup-ArcServers
     
