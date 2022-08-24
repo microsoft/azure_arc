@@ -74,6 +74,7 @@ param templateBaseUrl string
   'Full'
   'ITPro'
   'DevOps'
+  'DataOps'
 ])
 param flavor string = 'Full'
 
