@@ -20,6 +20,6 @@ microk8s kubectl delete clusterrole hello-arc-helm-prod-helm-operator-crd
 
 microk8s kubectl delete clusterrolebinding hello-arc-helm-prod-helm-operator
 
-microk8s kubectl delete -f  https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.35.0/deploy/static/provider/baremetal/deploy.yaml
+microk8s kubectl delete -f  https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.3.0/deploy/static/provider/baremetal/deploy.yaml
 
 microk8s kubectl delete secret sh.helm.release.v1.azure-arc.v1 -n default
