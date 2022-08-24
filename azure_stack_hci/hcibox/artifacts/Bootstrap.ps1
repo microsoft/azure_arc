@@ -130,13 +130,13 @@ foreach ($app in $appsToInstall)
 }
 
 # All flavors
-Write-Host "Fetching artifacts"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_logo.png" -OutFile $Env:HCIBoxDir\wallpaper.png
-Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:HCIBoxDir\DeploymentStatus.ps1
-Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxLogsDir\LogInstructions.txt
+# Write-Host "Fetching artifacts"
+# Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_logo.png" -OutFile $Env:HCIBoxDir\wallpaper.png
+# Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:HCIBoxDir\DeploymentStatus.ps1
+# Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxLogsDir\LogInstructions.txt
 
-Invoke-WebRequest ($templateBaseUrl + "../tests/GHActionDeploy.ps1") -OutFile "$Env:HCIBoxDir\GHActionDeploy.ps1"
-Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$Env:HCIBoxDir\OpenSSHDeploy.ps1"
+# Invoke-WebRequest ($templateBaseUrl + "../tests/GHActionDeploy.ps1") -OutFile "$Env:HCIBoxDir\GHActionDeploy.ps1"
+# Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$Env:HCIBoxDir\OpenSSHDeploy.ps1"
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
 #$Trigger = New-ScheduledTaskTrigger -AtLogOn
