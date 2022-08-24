@@ -53,21 +53,31 @@ function GettingAKSClusterCredentialsKubeconfigFile() {
     kubectl get nodes
     Write-Output "`n"
 }
+function InstallingAzureArcEnabledDataServicesExtensionk8s {
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "")]
+    param (
+        [string]$resourceGroup,
+        [string]$clusterName
+    )
+    Write-Host  "Installing Azure Arc-enabled data services extension: $clusterName"
+    az k8s-extension create --name arc-data-services `
+        --extension-type microsoft.arcdataservices `
+        --cluster-type connectedClusters `
+        --cluster-name $clusterName `
+        --resource-group $resourceGroup `
+        --auto-upgrade false `
+        --scope cluster `
+        --release-namespace arc `
+        --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
+}
+
 function InstallingAzureArcEnabledDataServicesExtension {
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSAvoidUsingWriteHost", "")]
     param (
         [string]$connectedClusterName,
         [string]$resourceGroup
     )
-    az k8s-extension create --name arc-data-services `
-        --extension-type microsoft.arcdataservices `
-        --cluster-type connectedClusters `
-        --cluster-name $connectedClusterName `
-        --resource-group $resourceGroup `
-        --auto-upgrade false `
-        --scope cluster `
-        --release-namespace arc `
-        --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
+    InstallingAzureArcEnabledDataServicesExtensionk8s -resourceGroup $resourceGroup -clusterName $connectedClusterName
 
     Write-Host "`n"
     Do {
@@ -91,10 +101,11 @@ function CreateCustomLocation {
         [string]$resourceGroup,
         [string]$connectedClusterId,
         [string]$extensionId,
-        [string]$KUBECONFIG
+        [string]$KUBECONFIG,
+        [string]$jumpstartcl = 'jumpstart-cl'
     )
     # Create Custom Location
-    az customlocation create --name 'jumpstart-cl' `
+    az customlocation create --name $jumpstartcl `
         --resource-group $resourceGroup `
         --namespace arc `
         --host-resource-id $connectedClusterId `
@@ -150,15 +161,16 @@ function DeployingAzureArcDataController {
 function EnablingDataControllerAutoMetrics {
     param (
         [string]$resourceGroup,
-        [string]$workspaceName
+        [string]$workspaceName,
+        [string]$jumpstartdc = "jumpstart-dc"
     )
     Write-Output "`n"
     Write-Output "Enabling data controller auto metrics & logs upload to log analytics"
     Write-Output "`n"
     $Env:WORKSPACE_ID = $(az resource show --resource-group $resourceGroup --name $workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
     $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $resourceGroup --workspace-name $workspaceName  --query primarySharedKey -o tsv)
-    az arcdata dc update --name jumpstart-dc --resource-group $resourceGroup --auto-upload-logs true
-    az arcdata dc update --name jumpstart-dc --resource-group $resourceGroup --auto-upload-metrics true
+    az arcdata dc update --name $jumpstartdc --resource-group $resourceGroup --auto-upload-logs true
+    az arcdata dc update --name $jumpstartdc --resource-group $resourceGroup --auto-upload-metrics true
 }
 function CopyingAzureDataStudioSettingsRemplateFile {
     param (
