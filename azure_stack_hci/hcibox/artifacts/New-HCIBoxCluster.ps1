@@ -1505,7 +1505,7 @@ function New-DCVM {
                 GivenName             = 'Jumpstart'
                 Surname               = 'Jumpstart'
                 SamAccountName        = $env:adminUsername
-                UserPrincipalName     = "NCAdmin@$SDNDomainFQDN"
+                UserPrincipalName     = "$env:adminUsername@$SDNDomainFQDN"
                 AccountPassword       = $SecureString
                 Enabled               = $true
                 ChangePasswordAtLogon = $false
@@ -2357,16 +2357,6 @@ CertificateTemplate= WebServer
             $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
             $Shortcut.TargetPath = $TargetFile
             $Shortcut.Save()
-
-            # Create a shortcut for Windows Admin Center
-            Write-Verbose "Creating Shortcut for Windows Admin Center"
-            if ($SDNConfig.WACport -ne "443") { $TargetPath = "https://admincenter." + $SDNConfig.SDNDomainFQDN + ":" + $SDNConfig.WACport }
-            else { $TargetPath = "https://admincenter." + $SDNConfig.SDNDomainFQDN }
-            $ShortcutFile = "C:\Users\Public\Desktop\Windows Admin Center.url"
-            $WScriptShell = New-Object -ComObject WScript.Shell
-            $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
-            $Shortcut.TargetPath = $TargetPath
-            $Shortcut.Save()
     
             # Create Shortcut for Hyper-V Manager
             Write-Verbose "Creating Shortcut for Hyper-V Manager"
@@ -2426,6 +2416,16 @@ CertificateTemplate= WebServer
             Write-Verbose 'Setting Default Broswer on admincenter vm'
             $expression = "SetDefaultBrowser.exe Edge"
             Invoke-Expression $expression
+
+            # Create a shortcut for Windows Admin Center
+            Write-Verbose "Creating Shortcut for Windows Admin Center"
+            if ($SDNConfig.WACport -ne "443") { $TargetPath = "https://admincenter." + $SDNConfig.SDNDomainFQDN + ":" + $SDNConfig.WACport }
+            else { $TargetPath = "https://admincenter." + $SDNConfig.SDNDomainFQDN }
+            $ShortcutFile = "C:\Users\Public\Desktop\Windows Admin Center.url"
+            $WScriptShell = New-Object -ComObject WScript.Shell
+            $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+            $Shortcut.TargetPath = $TargetPath
+            $Shortcut.Save()
 
             # Add Scheduled task to set default browser at login
             $stTrigger = New-ScheduledTaskTrigger -AtLogOn
