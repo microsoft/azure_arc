@@ -20,8 +20,6 @@ $Env:VMPath = "C:\VMs"
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
-
-Write-Host "Register the Cluster to Azure Subscription"
 $user = "jumpstart.local\administrator"
 $password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
@@ -46,4 +44,5 @@ $graphtoken = Get-AzAccessToken -ResourceTypeName AadGraph
 $clustername = 'hciboxcluster'
 $azureLocation = 'eastus'
 Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName azshost1 -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup -ArcServerResourceGroupName $env:resourceGroup-ArcServers
-    
+
+Write-Host "$clustername successfully registered as Az Stack HCI cluster resource in Azure"
