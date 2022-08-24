@@ -102,7 +102,7 @@
     "addressPrefix": "172.0.0.0/8",
     "subnetAddressPrefix": "172.16.1.0/24",
     "aksSubnetPrefix": "172.240.0.0/16",
-    "dcSubnetPrefix": "172.10.0.0/24",
+    "dcSubnetPrefix": "172.16.2.0/24",
     "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
