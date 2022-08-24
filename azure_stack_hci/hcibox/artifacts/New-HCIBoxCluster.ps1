@@ -1474,27 +1474,37 @@ function New-DCVM {
 
             $VerbosePreference = "Continue"
             $ErrorActionPreference = "Stop"
-    
+
             $SecureString = ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force
 
-
             $params = @{
-
                 ComplexityEnabled = $false
                 Identity          = $SDNConfig.SDNDomainFQDN
                 MinPasswordLength = 0
-
             }
-
 
             Set-ADDefaultDomainPasswordPolicy @params
 
             $params = @{
-
                 Name                  = 'NC Admin'
                 GivenName             = 'NC'
                 Surname               = 'Admin'
                 SamAccountName        = 'NCAdmin'
+                UserPrincipalName     = "NCAdmin@$SDNDomainFQDN"
+                AccountPassword       = $SecureString
+                Enabled               = $true
+                ChangePasswordAtLogon = $false
+                CannotChangePassword  = $true
+                PasswordNeverExpires  = $true
+            }
+
+            New-ADUser @params
+
+            $params = @{
+                Name                  = 'Jumpstart User'
+                GivenName             = 'Jumpstart'
+                Surname               = 'Jumpstart'
+                SamAccountName        = $env:adminUsername
                 UserPrincipalName     = "NCAdmin@$SDNDomainFQDN"
                 AccountPassword       = $SecureString
                 Enabled               = $true
@@ -1520,6 +1530,9 @@ function New-DCVM {
             add-ADGroupMember "NCClients" "NCClient"
             add-ADGroupMember "NCClients" "Administrator"
             add-ADGroupMember "NCAdmins" "Administrator"
+            add-ADGroupMember "Domain Admins" $env:adminUsername
+            add-ADGroupMember "NCAdmins" $env:adminUsername
+            add-ADGroupMember "NCClients" $env:adminUsername
 
             # Set Administrator Account Not to Expire
 
