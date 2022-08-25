@@ -2179,7 +2179,9 @@ function New-AdminCenterVM {
             Install-PackageProvider -Name Nuget -MinimumVersion 2.8.5.201 -Force
 
             # Install Azure PowerShell
+            $VerbosePreference = "SilentlyContinue"
             Install-Module -Name Az -AllowClobber -SkipPublisherCheck -Force -Confirm:$false
+            $VerbosePreference = "Continue"
 
             # Stop Server Manager from starting on boot
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\ServerManager" -Name "DoNotOpenServerManagerAtLogon" -Value 1
@@ -2256,8 +2258,6 @@ CertificateTemplate= WebServer
 
             Invoke-Command -ComputerName $WACVMName -ConfigurationName microsoft.SDNNested -ArgumentList $WACVMName, $SDNConfig, $DCFQDN -Credential $WACdomainCred -ScriptBlock {
 
-                $VMName = $args[0]
-                $SDNConfig = $args[1]
                 $DCFQDN = $args[2]
                 $VerbosePreference = "Continue"
                 $ErrorActionPreference = "Stop"
