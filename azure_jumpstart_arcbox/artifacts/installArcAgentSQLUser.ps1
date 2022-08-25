@@ -61,7 +61,7 @@ function Install-PowershellModule() {
 
 # Confirm that Azure powershell module is installed, and install if not present
 #
-if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
+if (-Not (Get-InstalledModule -Name Az -MinimumVersion 8.0.0 -ErrorAction SilentlyContinue)) {
     Install-PowershellModule
     if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
         Write-Warning -Category NotInstalled -Message "Failed to install Azure Powershell Module. Please confirm that Az module is installed before continuing."
@@ -72,7 +72,6 @@ else
 {
     Write-Verbose "Az already installed. Skipping installation."
 }
-
 
 if (-Not (Get-InstalledModule -Name Az.ConnectedMachine -MinimumVersion 0.4.0 -ErrorAction SilentlyContinue)) {
     Write-Host "Installing Az.connectedMachine module."
