@@ -30,6 +30,20 @@
         "description": "Name of the Domain Controller subnet in the virtual network"
       }
     },
+    "drVirtualNetworkName": {
+      "type": "string",
+      "defaultValue": "ArcBox-DR-VNet",
+      "metadata": {
+        "description": "Name of the DR VNet"
+      }
+    },
+    "drSubnetName": {
+      "type": "string",
+      "defaultValue": "ArcBox-DR-Subnet",
+      "metadata": {
+        "description": "Name of the DR subnet in the DR virtual network"
+      }
+    },
     "workspaceName": {
       "type": "string",
       "metadata": {
@@ -109,7 +123,77 @@
     "bastionName": "ArcBox-Bastion",
     "bastionSubnetIpPrefix": "10.16.3.64/26",
     "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]",
+    "primarySubnet": [
+      {
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      }
+    ],
+    "bastionSubnet": [
+      {
+        "name": "AzureBastionSubnet",
+        "properties": {
+          "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
+          }
+        }
+      }
+    ],
+    "dataOpsSubnets": [
+      {
+        "name": "[parameters('aksSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('aksSubnetPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      },
+      {
+        "name": "[parameters('dcSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('dcSubnetPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      }
+    ],
     "subnetsWithBastion": [
+      {
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      },
+      {
+        "name": "AzureBastionSubnet",
+        "properties": {
+          "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
+          }
+        }
+      }
+    ],
+    "subnetsWithBastionDataOps": [
       {
         "name": "[parameters('subnetName')]",
         "properties": {
@@ -164,6 +248,19 @@
             "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
           }
         }
+      }
+    ],
+    "subnetsWithoutBastionDataOps": [
+      {
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
       },
       {
         "name": "[parameters('aksSubnetName')]",
@@ -186,7 +283,7 @@
             "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
           }
         }
-      },
+      }
     ]
   },
   "resources": [
@@ -205,7 +302,17 @@
             "[variables('addressPrefix')]"
           ]
         },
-        "subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
+        //"subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
+        "subnets": "[
+          if(
+            and(not(parameters('deployBastion')),not(equals(parameters('flavor'),'DataOps'))),variables('primarySubnet'),
+            if(
+              and(not(parameters('deployBastion')),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('dataOpsSubnets')),
+              if(
+                and(parameters('deployBastion'),not(equals(parameters('flavor'),'DataOps'))),union(variables('primarySubnet'),variables('bastionSubnet')),
+                if(
+                  and(parameters('deployBastion'),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('bastionSubnet'),variables('dataOpsSubnets')),null()))))
+        ]"
       }
     },
     {
