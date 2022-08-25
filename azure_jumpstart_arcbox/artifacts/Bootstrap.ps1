@@ -278,6 +278,12 @@ if ($flavor -eq "DataOps") {
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
+    # Install Hyper-V and reboot
+    Write-Host "Installing Hyper-V and restart"
+    Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+    Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+    Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+
     # Clean up Bootstrap.log
     Stop-Transcript
     $logSuppress = Get-Content $bootstrapLogFile | Where { $_ -notmatch "Host Application: powershell.exe" }
@@ -286,28 +292,28 @@ if ($flavor -eq "DataOps") {
     # Restart computer
     Restart-Computer
 }
-else{
+else {
 
-# Creating scheduled task for MonitorWorkbookLogonScript.ps1
-$Trigger = New-ScheduledTaskTrigger -AtLogOn
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
-Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+    # Creating scheduled task for MonitorWorkbookLogonScript.ps1
+    $Trigger = New-ScheduledTaskTrigger -AtLogOn
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
+    Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
-# Disabling Windows Server Manager Scheduled Task
-Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+    # Disabling Windows Server Manager Scheduled Task
+    Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 
-Write-Header "Installing Hyper-V"
+    Write-Header "Installing Hyper-V"
 
-# Install Hyper-V and reboot
-Write-Host "Installing Hyper-V and restart"
-Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
-Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
-Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
+    # Install Hyper-V and reboot
+    Write-Host "Installing Hyper-V and restart"
+    Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
+    Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform -NoRestart
+    Install-WindowsFeature -Name Hyper-V -IncludeAllSubFeature -IncludeManagementTools -Restart
 
-# Clean up Bootstrap.log
-Write-Host "Clean up Bootstrap.log"
-Stop-Transcript
-$logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
-$logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
+    # Clean up Bootstrap.log
+    Write-Host "Clean up Bootstrap.log"
+    Stop-Transcript
+    $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
+    $logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
 
 }
