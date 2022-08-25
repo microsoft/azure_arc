@@ -252,7 +252,7 @@ if ($flavor -eq "DevOps") {
 
 if ($flavor -eq "DataOps") {
     # Joining ClientVM to AD DS domain
-    $netbiosname = $addsDomainName.Split(".")[0]
+    $netbiosname = $Env:addsDomainName.Split(".")[0]
     $computername = $env:COMPUTERNAME
 
     $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
