@@ -262,6 +262,7 @@ if ($flavor -eq "DataOps") {
             UserName = "${computername}\${adminUsername}"
             Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
         })
+
     # Creating scheduled task for DataOpsLogonScript.ps1
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
@@ -273,18 +274,19 @@ if ($flavor -eq "DataOps") {
     # services
     # Use $env:username to run task under domain user
     Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
-    
+
     Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
     # Clean up Bootstrap.log
     Stop-Transcript
-    $logSuppress = Get-Content $bootstrapLogFile | Where { $_ -notmatch "Host Application: powershell.exe" } 
+    $logSuppress = Get-Content $bootstrapLogFile | Where { $_ -notmatch "Host Application: powershell.exe" }
     $logSuppress | Set-Content $bootstrapLogFile -Force
 
     # Restart computer
     Restart-Computer
 }
+else{
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
@@ -307,3 +309,5 @@ Write-Host "Clean up Bootstrap.log"
 Stop-Transcript
 $logSuppress = Get-Content $Env:ArcBoxLogsDir\Bootstrap.log | Where { $_ -notmatch "Host Application: powershell.exe" } 
 $logSuppress | Set-Content $Env:ArcBoxLogsDir\Bootstrap.log -Force
+
+}
