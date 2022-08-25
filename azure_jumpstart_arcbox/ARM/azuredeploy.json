@@ -326,7 +326,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('addsVMTemplateUrl')]",
+          "uri": "[variables('mgmtTemplateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
