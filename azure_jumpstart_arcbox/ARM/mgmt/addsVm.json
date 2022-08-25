@@ -66,7 +66,7 @@
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
     "virtualNetworkName" : "ArcBox-VNet",
     "dcSubnetName" : "ArcBox-DC-Subnet",
-    "addsPrivateIPAddress" : "172.16.2.100",
+    "addsPrivateIPAddress" : "10.16.2.100",
     "osDiskType": "Premium_LRS",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('dcSubnetName'))]",
     "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
