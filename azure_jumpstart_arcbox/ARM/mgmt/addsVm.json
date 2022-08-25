@@ -53,68 +53,22 @@
         "description": "The size of the VM"
       }
     },
-    "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "Arc-Data-VNet",
-      "metadata": {
-        "description": "Name of the VNET"
-      }
-    },
-    "subnetName": {
-      "type": "string",
-      "defaultValue": "Arc-Data-Subnet",
-      "metadata": {
-        "description": "Name of the subnet in the virtual network"
-      }
-    },
-    "addsPrivateIPAddress": {
-      "type": "string",
-      "defaultValue": "172.16.1.100",
-      "metadata": {
-        "description": "Static private IP for domain controller"
-      }
-    },
-    "resourceTags": {
-      "type": "object",
-      "defaultValue": {
-        "Project": "jumpstart_azure_arc_data_services"
-      }
-    },
     "templateBaseUrl": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
         "description": "Base URL for ARM template"
       }
-    },
-    "networkSecurityGroupName": {
-      "type": "string",
-      "defaultValue": "Arc-Data-ADDS-NSG",
-      "metadata": {
-        "description": "Name of the Network Security Group"
-      }
-    },
-    "bastionSubnetPrefix": {
-      "type": "string",
-      "defaultValue": "172.16.2.64/26",
-      "metadata": {
-        "description": "Azure Bastion subnet IP prefix"
-      }
-    },   
-    "deployBastion": {
-      "type": "bool",
-      "metadata": {
-        "description": "Choice to deploy Bastion to connect to the client VM"
-      },
-      "defaultValue" : false
-    }    
+    } 
   },
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
+    "virtualNetworkName" : "Arc-Data-VNet",
+    "dcSubnetName" : "Arc-Data-Subnet",
+    "addsPrivateIPAddress" : "172.16.2.100",
     "osDiskType": "Premium_LRS",
-    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-    "nsgRef": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]",
+    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('dcSubnetName'))]",
     "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
   },
   "resources": [
@@ -123,9 +77,6 @@
       "apiVersion": "2021-08-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
-      "dependsOn": [
-            "[variables('nsgRef')]"
-         ],
       "properties": {
         "ipConfigurations": [
           {
@@ -135,13 +86,10 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress":"[parameters('addsPrivateIPAddress')]"
+              "privateIPAddress":"[variables('addsPrivateIPAddress')]"
             }
           }
-        ],
-        "networkSecurityGroup": {
-          "id": "[variables('nsgRef')]"
-        }       
+        ]
       }
     },
      {
@@ -149,7 +97,6 @@
       "apiVersion": "2021-11-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('azureLocation')]",
-      "tags": "[parameters('resourceTags')]",
       "dependsOn": [
         "[variables('networkInterfaceRef')]"
         ],
