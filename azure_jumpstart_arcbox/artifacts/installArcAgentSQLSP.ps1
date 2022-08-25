@@ -31,11 +31,6 @@ $servicePrincipalSecret = $spnClientSecret
 
 $unattended = $servicePrincipalAppId -And $servicePrincipalTenantId -And $servicePrincipalSecret
 
-$azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
-Set-AzContext -Subscription $subId
-
 function Get-AzSPNRoleAssignment {
     param(
         [Parameter(Mandatory=$false)]
@@ -204,7 +199,7 @@ function Install-PowershellModule() {
 
 # Confirm that Azure powershell module is installed, and install if not present
 #
-if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
+if (-Not (Get-InstalledModule -Name Az -MinimumVersion 8.0.0 -ErrorAction SilentlyContinue)) {
     Install-PowershellModule
     if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
         Write-Warning -Category NotInstalled -Message "Failed to install Azure Powershell Module. Please confirm that Az module is installed before continuing."
