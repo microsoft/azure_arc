@@ -11,7 +11,7 @@
     },
     "vmName": {
       "type": "string",
-      "defaultValue": "Arc-Data-ADDS",
+      "defaultValue": "ArcBox-ADDS",
       "metadata": {
         "description": "The name of your Virtual Machine"
       }
