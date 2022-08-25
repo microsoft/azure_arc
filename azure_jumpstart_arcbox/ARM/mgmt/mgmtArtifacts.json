@@ -96,6 +96,13 @@
       "metadata": {
         "description": "Name of the Network Security Group"
       }
+    },
+    "dnsServers": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "DNS Server configuration"
+      }
     }
   },
   "variables": {
@@ -187,6 +194,9 @@
           "addressPrefixes": [
             "[variables('addressPrefix')]"
           ]
+        },
+        "dhcpOptions": {
+          "dnsServers": "[parameters('dnsServers')]"
         },
         "subnets": "[
           if(

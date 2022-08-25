@@ -86,6 +86,13 @@
         "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
       "defaultValue": "microsoft"
+    },
+    "addsDomainName": {
+      "type": "string",
+      "metadata": {
+        "description": "Active directory domain services domain name"
+      },
+      "defaultValue": "jumpstart.local"
     }
   },
   "variables": {
@@ -94,7 +101,8 @@
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]"
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]",
+    "addsVMTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/addsVm.json')]"
   },
   "resources": [
     {
@@ -103,7 +111,8 @@
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
-        "mgmtArtifactsAndPolicyDeployment"
+        "mgmtArtifactsAndPolicyDeployment",
+        "addsVmDeployment"
       ],
       "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'),equals(parameters('flavor'),'DataOps'))]",
       "properties": {
@@ -191,7 +200,8 @@
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
       "dependsOn": [
-        "stagingStorageAccountDeployment"
+        "stagingStorageAccountDeployment",
+        "addsVmDeployment"
       ],
       "properties": {
         "mode": "Incremental",
@@ -270,6 +280,35 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys Active Directory Domain Services Windows VM",
+      "apiVersion": "2021-04-01",
+      "name": "addsVmDeployment",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "dependsOn": [ "mgmtArtifactsAndPolicyDeployment" ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('addsVMTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "windowsAdminUsername": {
+            "value": "[parameters('windowsAdminUsername')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "addsDomainName": {
+            "value": "[parameters('addsDomainName')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
           }
         }
       }
