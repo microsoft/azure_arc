@@ -112,7 +112,7 @@
       "dependsOn": [
         "stagingStorageAccountDeployment",
         "mgmtArtifactsAndPolicyDeployment",
-        "addsVmDeployment"
+        "updateVNetDNSServers"
       ],
       "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'),equals(parameters('flavor'),'DataOps'))]",
       "properties": {
@@ -201,7 +201,7 @@
       "name": "clientVmDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
-        "addsVmDeployment"
+        "updateVNetDNSServers"
       ],
       "properties": {
         "mode": "Incremental",
@@ -307,8 +307,31 @@
           "addsDomainName": {
             "value": "[parameters('addsDomainName')]"
           },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
           "templateBaseUrl": {
             "value": "[variables('templateBaseUrl')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Updates VNet DNS servers after ADDS VM is deployed",
+      "apiVersion": "2021-04-01",
+      "name": "updateVNetDNSServers",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "dependsOn": ["VNETDeployment", "addsVmDeployment"],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('addsVMTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "dnsServers": {
+            "value": ["10.16.2.100", "168.63.129.16"]
           }
         }
       }
