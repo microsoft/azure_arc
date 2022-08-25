@@ -28,37 +28,37 @@ param (
     [string]$automationTriggerAtLogon
 )
 
-[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $spnAuthority,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $azdataUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $azdataPassword,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $acceptEula,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('registryUsername', $registryUsername,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('registryPassword', $registryPassword,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('arcDcName', $arcDcName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('mssqlmiName', $mssqlmiName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('POSTGRES_NAME', $POSTGRES_NAME,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('POSTGRES_WORKER_NODE_COUNT', $POSTGRES_WORKER_NODE_COUNT,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('POSTGRES_DATASIZE', $POSTGRES_DATASIZE,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('POSTGRES_SERVICE_TYPE', $POSTGRES_SERVICE_TYPE,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('capiArcDataClusterName', $capiArcDataClusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('githubUser', $githubUser,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('flavor', $flavor,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('adminUsername', $adminUsername, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnClientSecret', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnTenantId', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('spnAuthority', $spnAuthority, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_ID', $spnClientId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_CLIENT_SECRET', $spnClientSecret, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_TENANT_ID', $spnTenantId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('SPN_AUTHORITY', $spnAuthority, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('resourceGroup', $resourceGroup, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZDATA_USERNAME', $azdataUsername, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('AZDATA_PASSWORD', $azdataPassword, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('ACCEPT_EULA', $acceptEula, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('registryUsername', $registryUsername, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('registryPassword', $registryPassword, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('arcDcName', $arcDcName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('subscriptionId', $subscriptionId, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('azureLocation', $azureLocation, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('mssqlmiName', $mssqlmiName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('POSTGRES_NAME', $POSTGRES_NAME, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('POSTGRES_WORKER_NODE_COUNT', $POSTGRES_WORKER_NODE_COUNT, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('POSTGRES_DATASIZE', $POSTGRES_DATASIZE, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('POSTGRES_SERVICE_TYPE', $POSTGRES_SERVICE_TYPE, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('stagingStorageAccountName', $stagingStorageAccountName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('workspaceName', $workspaceName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('capiArcDataClusterName', $capiArcDataClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('k3sArcClusterName', $k3sArcClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('githubUser', $githubUser, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('flavor', $flavor, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon, [System.EnvironmentVariableTarget]::Machine)
 
 # Creating ArcBox path
 Write-Output "Creating ArcBox path"
@@ -71,6 +71,7 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:agentScript = "C:\ArcBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
+$Env:addsDomainName = "jumpstart.local"
 
 New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
@@ -102,6 +103,12 @@ Install-Module -Name Posh-SSH -Force
 Write-Output "Installing DHCP service"
 Install-WindowsFeature -Name "DHCP" -IncludeManagementTools
 
+#Installing AD DS roles
+if ($flavor -eq "DataOps") {
+    Install-WindowsFeature -Name RSAT-AD-PowerShell
+    Install-WindowsFeature -Name RSAT-DNS-Server
+}
+
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
 $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit'
@@ -118,8 +125,7 @@ Write-Host "Chocolatey Apps Specified"
 
 $appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
 
-foreach ($app in $appsToInstall)
-{
+foreach ($app in $appsToInstall) {
     Write-Host "Installing $app"
     & choco install $app /y -Force | Write-Output
 }
@@ -188,6 +194,7 @@ if ($flavor -eq "DevOps") {
 if ($flavor -eq "DataOps") {
     Write-Host "Fetching Artifacts for DataOps Flavor"
     Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsLogonScript.ps1") -OutFile $Env:ArcBoxDir\DataOpsLogonScript.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/RunAfterClientVMADJoin.ps1") -OutFile $Env:ArcBoxDir\RunAfterClientVMADJoin.ps1
 }
 
 # Full
@@ -242,10 +249,41 @@ if ($flavor -eq "DevOps") {
 }
 
 if ($flavor -eq "DataOps") {
+    # Joining ClientVM to AD DS domain
+    $netbiosname = $addsDomainName.Split(".")[0]
+    $computername = $env:COMPUTERNAME
+
+    $domainCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
+            UserName = "${netbiosname}\${adminUsername}"
+            Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
+        })
+    
+    $localCred = New-Object pscredential -ArgumentList ([pscustomobject]@{
+            UserName = "${computername}\${adminUsername}"
+            Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
+        })
     # Creating scheduled task for DataOpsLogonScript.ps1
-    $Trigger = New-ScheduledTaskTrigger -AtLogOn 
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\DataOpsLogonScript.ps1
-    Register-ScheduledTask -TaskName "DataOpsLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+    # Register schedule task to run after system reboot
+    # schedule task to run after reboot to create reverse DNS lookup
+    $Trigger = New-ScheduledTaskTrigger -AtStartup
+    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\RunAfterClientVMADJoin.ps1"
+    Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
+    Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
+
+    # services
+    # Use $env:username to run task under domain user
+    Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
+    
+    Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
+    Write-Host "Joined Client VM to $addsDomainName domain."
+
+    # Clean up Bootstrap.log
+    Stop-Transcript
+    $logSuppress = Get-Content $bootstrapLogFile | Where { $_ -notmatch "Host Application: powershell.exe" } 
+    $logSuppress | Set-Content $bootstrapLogFile -Force
+
+    # Restart computer
+    Restart-Computer
 }
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
