@@ -170,120 +170,6 @@
           }
         }
       }
-    ],
-    "subnetsWithBastion": [
-      {
-        "name": "[parameters('subnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('subnetAddressPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      },
-      {
-        "name": "AzureBastionSubnet",
-        "properties": {
-          "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
-          }
-        }
-      }
-    ],
-    "subnetsWithBastionDataOps": [
-      {
-        "name": "[parameters('subnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('subnetAddressPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      },
-      {
-        "name": "[parameters('aksSubnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('aksSubnetPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      },
-      {
-        "name": "[parameters('dcSubnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('dcSubnetPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      },
-      {
-        "name": "AzureBastionSubnet",
-        "properties": {
-          "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
-          }
-        }
-      }
-    ],
-    "subnetsWithoutBastion": [
-      {
-        "name": "[parameters('subnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('subnetAddressPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      }
-    ],
-    "subnetsWithoutBastionDataOps": [
-      {
-        "name": "[parameters('subnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('subnetAddressPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      },
-      {
-        "name": "[parameters('aksSubnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('aksSubnetPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      },
-      {
-        "name": "[parameters('dcSubnetName')]",
-        "properties": {
-          "addressPrefix": "[variables('dcSubnetPrefix')]",
-          "privateEndpointNetworkPolicies": "Enabled",
-          "privateLinkServiceNetworkPolicies": "Enabled",
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-          }
-        }
-      }
     ]
   },
   "resources": [
@@ -302,7 +188,6 @@
             "[variables('addressPrefix')]"
           ]
         },
-        //"subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
         "subnets": "[
           if(
             and(not(parameters('deployBastion')),not(equals(parameters('flavor'),'DataOps'))),variables('primarySubnet'),
