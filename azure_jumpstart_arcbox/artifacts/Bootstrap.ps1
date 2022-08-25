@@ -277,7 +277,7 @@ if ($flavor -eq "DataOps") {
     # Use $env:username to run task under domain user
     Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
 
-    Add-Computer -DomainName $addsDomainName -LocalCredential $localCred -Credential $domainCred
+    Add-Computer -DomainName $Env:addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
     # Install Hyper-V and reboot
