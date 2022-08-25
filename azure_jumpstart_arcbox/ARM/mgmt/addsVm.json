@@ -53,23 +53,36 @@
         "description": "The size of the VM"
       }
     },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Azure Bastion"
+      },
+      "defaultValue": false
+    },
     "templateBaseUrl": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
         "description": "Base URL for ARM template"
       }
-    } 
+    }
   },
   "variables": {
     "vmName": "[concat(parameters('vmName'))]",
     "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
-    "virtualNetworkName" : "ArcBox-VNet",
-    "dcSubnetName" : "ArcBox-DC-Subnet",
-    "addsPrivateIPAddress" : "10.16.2.100",
+    "virtualNetworkName": "ArcBox-VNet",
+    "dcSubnetName": "ArcBox-DC-Subnet",
+    "addsPrivateIPAddress": "10.16.2.100",
+    "bastionName": "ArcBox-Bastion",
     "osDiskType": "Premium_LRS",
     "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('dcSubnetName'))]",
-    "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]"
+    "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+    "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
+    "PublicIPNoBastion": {
+      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+    }
+
   },
   "resources": [
     {
@@ -77,6 +90,9 @@
       "apiVersion": "2021-08-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+      ],
       "properties": {
         "ipConfigurations": [
           {
@@ -86,20 +102,37 @@
                 "id": "[variables('subnetRef')]"
               },
               "privateIPAllocationMethod": "Static",
-              "privateIPAddress":"[variables('addsPrivateIPAddress')]"
+              "privateIPAddress": "[variables('addsPrivateIPAddress')]",
+              "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
             }
           }
         ]
       }
     },
-     {
+    {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2021-03-01",
+            "name": "[variables('publicIpAddressName')]",
+            "condition": "[not(parameters('deployBastion'))]",
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "publicIpAllocationMethod": "Static",
+                "publicIPAddressVersion": "IPv4",
+                "idleTimeoutInMinutes": 4
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            }
+        },
+    {
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2021-11-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
         "[variables('networkInterfaceRef')]"
-        ],
+      ],
       "properties": {
         "hardwareProfile": {
           "vmSize": "[parameters('vmSize')]"
@@ -147,7 +180,7 @@
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
       ],
-     "properties": {
+      "properties": {
         "publisher": "Microsoft.Compute",
         "type": "CustomScriptExtension",
         "typeHandlerVersion": "1.10",
