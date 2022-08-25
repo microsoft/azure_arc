@@ -5,6 +5,7 @@
 Import-Module ActiveDirectory
 
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+$Env:ArcBoxDir = "C:\ArcBox"
 Start-Transcript -Path "$Env:ArcBoxLogsDir\RunAfterClientVMADJoin.log"
 
 # Get Activectory Information

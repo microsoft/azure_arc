@@ -76,7 +76,7 @@ Add-DhcpServerv4Scope -Name "ArcBox" `
                       -State Active
 Set-DhcpServerv4OptionValue -ComputerName localhost `
                             -DnsDomain $dnsClient.ConnectionSpecificSuffix `
-                            -DnsServer 168.63.129.16 `
+                            -DnsServer 10.16.2.100 `
                             -Router 10.10.1.1
 Restart-Service dhcpserver
 
