@@ -33,12 +33,8 @@ function Invoke-Request {
     )
 
     $Params.Add('UserAgent', 'SomeThingDistinguishableForTheLogs')
-
-    $method = $Params['Method']
     $url = $Params['Uri']
-
-    $cmd = { Write-Host "$method $url..." -NoNewline; Invoke-WebRequest @Params }
-
+    $cmd = { Invoke-WebRequest @Params }
     $retryCount = 0
     $completed = $false
     $response = $null
@@ -65,52 +61,50 @@ function Invoke-Request {
     return $response
 }
 
-function Get-HyperVHosts {
-    param (
-        [String[]]$MultipleHyperVHosts,
-        [string]$HostVMPath
-    )
+# function Get-HyperVHosts {
+#     param (
+#         [String[]]$MultipleHyperVHosts,
+#         [string]$HostVMPath
+#     )
     
-    foreach ($HypervHost in $MultipleHyperVHosts) {
-        # Check Network Connectivity
-        Write-Verbose "Checking Network Connectivity for Host $HypervHost"
-        $testconnection = Test-Connection -ComputerName $HypervHost -Quiet -Count 1
-        if (!$testconnection) { Write-Error "Failed to ping $HypervHost"; break }
+#     foreach ($HypervHost in $MultipleHyperVHosts) {
+#         # Check Network Connectivity
+#         Write-Verbose "Checking Network Connectivity for Host $HypervHost"
+#         $testconnection = Test-Connection -ComputerName $HypervHost -Quiet -Count 1
+#         if (!$testconnection) { Write-Error "Failed to ping $HypervHost"; break }
     
-        # Check Hyper-V Host 
-        $HypHost = Get-VMHost -ComputerName $HypervHost -ErrorAction Ignore
-        if ($HypHost) { Write-Verbose "$HypervHost Hyper-V Connectivity verified" }
-        if (!$HypHost) { Write-Error "Cannot connect to hypervisor on system $HypervHost"; break }
+#         # Check Hyper-V Host 
+#         $HypHost = Get-VMHost -ComputerName $HypervHost -ErrorAction Ignore
+#         if ($HypHost) { Write-Verbose "$HypervHost Hyper-V Connectivity verified" }
+#         if (!$HypHost) { Write-Error "Cannot connect to hypervisor on system $HypervHost"; break }
     
-        # Check HostVMPath
-        $DriveLetter = $HostVMPath.Split(':')
-        $testpath = Test-Path (("\\$HypervHost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1])) -ErrorAction Ignore
-        if ($testpath) { Write-Verbose "$HypervHost's $HostVMPath path verified" }
-        if (!$testpath) { Write-Error "Cannot connect to $HostVMPath on system $HypervHost"; break }
-
-    }
+#         # Check HostVMPath
+#         $DriveLetter = $HostVMPath.Split(':')
+#         $testpath = Test-Path (("\\$HypervHost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1])) -ErrorAction Ignore
+#         if ($testpath) { Write-Verbose "$HypervHost's $HostVMPath path verified" }
+#         if (!$testpath) { Write-Error "Cannot connect to $HostVMPath on system $HypervHost"; break }
+#     } 
+# } 
     
-} 
+# function Set-HyperVSettings {
+#     param (
+#         $MultipleHyperVHosts,
+#         $HostVMPath
+#     )
     
-function Set-HyperVSettings {
-    param (
-        $MultipleHyperVHosts,
-        $HostVMPath
-    )
-    
-    foreach ($HypervHost in $MultipleHyperVHosts) {
-        Write-Verbose "Configuring Hyper-V Settings on $HypervHost"
-        $params = @{
+#     foreach ($HypervHost in $MultipleHyperVHosts) {
+#         Write-Verbose "Configuring Hyper-V Settings on $HypervHost"
+#         $params = @{
         
-            ComputerName              = $HypervHost
-            VirtualHardDiskPath       = $HostVMPath
-            VirtualMachinePath        = $HostVMPath
-            EnableEnhancedSessionMode = $true
+#             ComputerName              = $HypervHost
+#             VirtualHardDiskPath       = $HostVMPath
+#             VirtualMachinePath        = $HostVMPath
+#             EnableEnhancedSessionMode = $true
 
-        }
-        Set-VMhost @params
-    }  
-}
+#         }
+#         Set-VMhost @params
+#     }  
+# }
     
 function Set-LocalHyperVSettings {
     Param (
@@ -119,27 +113,21 @@ function Set-LocalHyperVSettings {
     )
     
     Write-Verbose "Configuring Hyper-V Settings on localhost"
-
     $params = @{
-
         VirtualHardDiskPath       = $HostVMPath
         VirtualMachinePath        = $HostVMPath
         EnableEnhancedSessionMode = $true
-
     }
-
     Set-VMhost @params  
 }
     
 function New-InternalSwitch {
     Param (
-
         $pswitchname, 
         $SDNConfig
     )
     
     $querySwitch = Get-VMSwitch -Name $pswitchname -ErrorAction Ignore
-    
     if (!$querySwitch) {
         New-VMSwitch -SwitchType Internal -MinimumBandwidthMode None -Name $pswitchname | Out-Null
     
@@ -151,87 +139,67 @@ function New-InternalSwitch {
         $DNS = $SDNConfig.SDNLABDNS
         
         $params = @{
-
             AddressFamily  = "IPv4"
             IPAddress      = $IP
             PrefixLength   = $Prefix
             DefaultGateway = $Gateway
-            
         }
     
         $InternalAdapter | New-NetIPAddress @params | Out-Null
         $InternalAdapter | Set-DnsClientServerAddress -ServerAddresses $DNS | Out-Null
-    
     }
-    
-    Else { 
+    else { 
         Write-Verbose "Internal Switch $pswitchname already exists. Not creating a new internal switch." 
     } 
 }
     
-function New-HostvNIC {
-    param (
+# function New-HostvNIC {
+#     param (
+#         $SDNConfig,
+#         $localCred
+#     )
 
-        $SDNConfig,
-        $localCred
-    )
+#     $ErrorActionPreference = "Stop"
+#     $SBXIP = 250
+#     foreach ($SDNSwitchHost in $SDNConfig.MultipleHyperVHostNames) {
+#         Write-Verbose "Creating vNIC on $SDNSwitchHost"
 
-    $ErrorActionPreference = "Stop"
-
-    $SBXIP = 250
-
-    foreach ($SDNSwitchHost in $SDNConfig.MultipleHyperVHostNames) {
-
-        Write-Verbose "Creating vNIC on $SDNSwitchHost"
-
-        Invoke-Command -ComputerName $SDNSwitchHost -ArgumentList $SDNConfig, $SBXIP -ScriptBlock {
-
-            $SDNConfig = $args[0]
-            $SBXIP = $args[1]
-
-            $vnicName = $SDNConfig.MultipleHyperVHostExternalSwitchName + "-SBXAccess"
+#         Invoke-Command -ComputerName $SDNSwitchHost -ArgumentList $SDNConfig, $SBXIP -ScriptBlock {
+#             $SDNConfig = $args[0]
+#             $SBXIP = $args[1]
+#             $vnicName = $SDNConfig.MultipleHyperVHostExternalSwitchName + "-SBXAccess"
     
-
-            $params = @{
-
-                SwitchName = $SDNConfig.MultipleHyperVHostExternalSwitchName
-                Name       = $vnicName
-
-            }
+#             $params = @{
+#                 SwitchName = $SDNConfig.MultipleHyperVHostExternalSwitchName
+#                 Name       = $vnicName
+#             }
     
-            Add-VMNetworkAdapter -ManagementOS @params | Out-Null
-            
-
-            Set-VMNetworkAdapterVlan -ManagementOS -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
+#             Add-VMNetworkAdapter -ManagementOS @params | Out-Null
+#             Set-VMNetworkAdapterVlan -ManagementOS -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
   
-            $IP = ($SDNConfig.MGMTSubnet.TrimEnd("0/24")) + $SBXIP
-            $prefix = $SDNConfig.MGMTSubnet.Split("/")[1]
-            $gateway = $SDNConfig.BGPRouterIP_MGMT.TrimEnd("/24")
-            $DNS = $SDNConfig.SDNLABDNS
+#             $IP = ($SDNConfig.MGMTSubnet.TrimEnd("0/24")) + $SBXIP
+#             $prefix = $SDNConfig.MGMTSubnet.Split("/")[1]
+#             $gateway = $SDNConfig.BGPRouterIP_MGMT.TrimEnd("/24")
+#             $DNS = $SDNConfig.SDNLABDNS
+#             $NetAdapter = Get-NetAdapter | Where-Object { $_.Name -match $vnicName }[0]
 
-            $NetAdapter = Get-NetAdapter | Where-Object { $_.Name -match $vnicName }[0]
+#             $params = @{
+#                 AddressFamily  = "IPv4"
+#                 IPAddress      = $IP
+#                 PrefixLength   = $Prefix
+#                 DefaultGateway = $Gateway
+#             }
 
-            $params = @{
+#             $NetAdapter | New-NetIPAddress @params | Out-Null
+#             $NetAdapter | Set-DnsClientServerAddress -ServerAddresses $DNS | Out-Null
+#         }
 
-                AddressFamily  = "IPv4"
-                IPAddress      = $IP
-                PrefixLength   = $Prefix
-                DefaultGateway = $Gateway
-            
-            }
-
-            $NetAdapter | New-NetIPAddress @params | Out-Null
-            $NetAdapter | Set-DnsClientServerAddress -ServerAddresses $DNS | Out-Null
-
-        }
-
-        $SBXIP--
-    }
-}
+#         $SBXIP--
+#     }
+# }
     
 function Test-VHDPath {
     Param (
-
         $guiVHDXPath,
         $azSHCIVHDXPath
     )
@@ -242,33 +210,31 @@ function Test-VHDPath {
     if (!$result) { Write-Host "Path $azSHCIVHDXPath was not found!" -ForegroundColor Red ; break }
 }
     
-function Select-VMHostPlacement {
-    Param($MultipleHyperVHosts, $AzSHOSTs)    
+# function Select-VMHostPlacement {
+#     Param (
+#         $MultipleHyperVHosts, 
+#         $AzSHOSTs
+#     )    
     
-    $results = @()
+#     $results = @()
     
-    Write-Host "Note: if using a NAT switch for internet access, please choose the host that has the external NAT Switch for VM: AzSMGMT." `
-        -ForegroundColor Yellow
+#     Write-Host "Note: if using a NAT switch for internet access, please choose the host that has the external NAT Switch for VM: AzSMGMT." -ForegroundColor Yellow
     
-    foreach ($AzSHOST in $AzSHOSTs) {
+#     foreach ($AzSHOST in $AzSHOSTs) {
     
-        Write-Host "`nOn which server should I put $AzSHOST ?" -ForegroundColor Green
+#         Write-Host "`nOn which server should I put $AzSHOST ?" -ForegroundColor Green
+#         $i = 0
+#         foreach ($HypervHost in $MultipleHyperVHosts) {
+#             Write-Host "`n $i. Hyper-V Host: $HypervHost" -ForegroundColor Yellow
+#             $i++
+#         }
     
-        $i = 0
-        foreach ($HypervHost in $MultipleHyperVHosts) {
+#         $MenuOption = Read-Host "`nSelect the Hyper-V Host and then press Enter" 
+#         $results = $results + [pscustomobject]@{AzSHOST = $AzSHOST; VMHost = $MultipleHyperVHosts[$MenuOption] }
+#     }
     
-            Write-Host "`n $i. Hyper-V Host: $HypervHost" -ForegroundColor Yellow
-            $i++
-        }
-    
-        $MenuOption = Read-Host "`nSelect the Hyper-V Host and then press Enter" 
-    
-        $results = $results + [pscustomobject]@{AzSHOST = $AzSHOST; VMHost = $MultipleHyperVHosts[$MenuOption] }
-    
-    }
-    
-    return $results
-}
+#     return $results
+# }
     
 function Select-SingleHost {
     Param (
@@ -277,30 +243,29 @@ function Select-SingleHost {
 
     $results = @()
     foreach ($AzSHOST in $AzSHOSTs) {
-
         $results = $results + [pscustomobject]@{AzSHOST = $AzSHOST; VMHost = $env:COMPUTERNAME }
     }
 
     return $results
 }
     
-function Copy-VHDXtoHosts {
-    Param (
-        $MultipleHyperVHosts, 
-        $guiVHDXPath, 
-        $azSHCIVHDXPath, 
-        $HostVMPath
-    )
+# function Copy-VHDXtoHosts {
+#     Param (
+#         $MultipleHyperVHosts, 
+#         $guiVHDXPath, 
+#         $azSHCIVHDXPath, 
+#         $HostVMPath
+#     )
         
-    foreach ($HypervHost in $MultipleHyperVHosts) { 
-        $DriveLetter = $HostVMPath.Split(':')
-        $path = (("\\$HypervHost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]))
-        Write-Verbose "Copying $guiVHDXPath to $path"
-        Copy-Item -Path $guiVHDXPath -Destination "$path\GUI.vhdx" -Force | Out-Null
-        Write-Verbose "Copying $azSHCIVHDXPath to $path"
-        Copy-Item -Path $azSHCIVHDXPath -Destination "$path\AzSHCI.vhdx" -Force | Out-Null
-    }
-}
+#     foreach ($HypervHost in $MultipleHyperVHosts) { 
+#         $DriveLetter = $HostVMPath.Split(':')
+#         $path = (("\\$HypervHost\") + ($DriveLetter[0] + "$") + ($DriveLetter[1]))
+#         Write-Verbose "Copying $guiVHDXPath to $path"
+#         Copy-Item -Path $guiVHDXPath -Destination "$path\GUI.vhdx" -Force | Out-Null
+#         Write-Verbose "Copying $azSHCIVHDXPath to $path"
+#         Copy-Item -Path $azSHCIVHDXPath -Destination "$path\AzSHCI.vhdx" -Force | Out-Null
+#     }
+# }
     
 function Copy-VHDXtoHost {
     Param (
@@ -616,31 +581,23 @@ $azsmgmtProdKey
     
 function Start-AzSHOSTS {
     Param(
-
         $VMPlacement
-
     )
     
     foreach ($VMHost in $VMPlacement) {
-
         Write-Verbose "Starting VM: $VMHost"
         Start-VM -ComputerName $VMHost.VMhost -Name $VMHost.AzSHOST
-
     }    
 } 
     
 function New-DataDrive {
-
     param (
-
         $VMPlacement, 
-        $SDNConfig,
-        $localCred
-        
+        $SDNConfig
     )
 
     foreach ($SDNVM in $VMPlacement) {
-
+        
         Invoke-Command -ComputerName $SDNVM.VMHost  -ScriptBlock {
 
             $VerbosePreference = "Continue"
@@ -655,7 +612,7 @@ function New-DataDrive {
                 Initialize-Disk -Number 1 | Out-Null
                 New-Partition -DiskNumber 1 -UseMaximumSize -AssignDriveLetter | Out-Null
                 Format-Volume -DriveLetter D | Out-Null
-
+                
             }                      
         }
     }    
@@ -1273,6 +1230,7 @@ function New-DCVM {
     )
 
     $ErrorActionPreference = "Continue"
+    $adminUser = $env:adminUsername
     Invoke-Command -VMName AzSMGMT -Credential $domainCred -ScriptBlock {
 
         $SDNConfig = $using:SDNConfig
@@ -1499,13 +1457,12 @@ function New-DCVM {
             }
 
             New-ADUser @params
-
             $params = @{
                 Name                  = 'Jumpstart User'
                 GivenName             = 'Jumpstart'
                 Surname               = 'Jumpstart'
-                SamAccountName        = $env:adminUsername
-                UserPrincipalName     = "$env:adminUsername@$SDNDomainFQDN"
+                SamAccountName        = $adminUser
+                UserPrincipalName     = "$adminUser@$SDNDomainFQDN"
                 AccountPassword       = $SecureString
                 Enabled               = $true
                 ChangePasswordAtLogon = $false
@@ -3274,7 +3231,6 @@ Test-AzSHOSTVMConnection @params
 $params = @{
     VMPlacement = $VMPlacement
     SDNConfig   = $SDNConfig
-    localcred   = $localCred
 }
 New-DataDrive @params
     
