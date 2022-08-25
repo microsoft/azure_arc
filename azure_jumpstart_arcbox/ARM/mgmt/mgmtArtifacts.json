@@ -311,7 +311,7 @@
               if(
                 and(parameters('deployBastion'),not(equals(parameters('flavor'),'DataOps'))),union(variables('primarySubnet'),variables('bastionSubnet')),
                 if(
-                  and(parameters('deployBastion'),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('bastionSubnet'),variables('dataOpsSubnets')),null()))))
+                  and(parameters('deployBastion'),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('bastionSubnet'),variables('dataOpsSubnets')),variables('primarySubnet')))))
         ]"
       }
     },
