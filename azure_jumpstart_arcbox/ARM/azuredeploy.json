@@ -330,6 +330,18 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
           "dnsServers": {
             "value": ["10.16.2.100", "168.63.129.16"]
           }
