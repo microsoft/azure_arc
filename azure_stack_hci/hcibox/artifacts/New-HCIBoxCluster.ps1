@@ -2274,10 +2274,10 @@ CertificateTemplate= WebServer
 
                 # Request and Accept SSL Certificate
                 Set-Location C:\WACCert
-                certreq -f -new WACCert.inf WACCert.req
-                certreq -config $CertAuth -attrib "CertificateTemplate:webserver" –submit WACCert.req  WACCert.cer 
-                certreq -accept WACCert.cer
-                certutil -store my
+                certreq -q -f -new WACCert.inf WACCert.req
+                certreq -q -config $CertAuth -attrib "CertificateTemplate:webserver" –submit WACCert.req  WACCert.cer 
+                certreq -q -accept WACCert.cer
+                certutil -q -store my
 
                 Set-Location 'C:\'
                 Remove-Item C:\WACCert -Recurse -Force
