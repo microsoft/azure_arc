@@ -124,6 +124,8 @@
     "subnetAddressPrefix": "10.16.1.0/24",
     "aksSubnetPrefix": "10.240.0.0/16",
     "dcSubnetPrefix": "10.16.2.0/24",
+    "drAddressPrefix": "172.16.0.0/12",
+    "drSubnetPrefix": "172.16.0.0/16",
     "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
@@ -208,6 +210,34 @@
                 if(
                   and(parameters('deployBastion'),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('bastionSubnet'),variables('dataOpsSubnets')),variables('primarySubnet')))))
         ]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2021-05-01",
+      "name": "[parameters('drVirtualNetworkName')]",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "dhcpOptions": {
+          "dnsServers": "[parameters('dnsServers')]"
+        },
+        "subnets": [
+          {
+            "name": "[parameters('drSubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('drSubnetPrefix')]"
+            }
+          }
+        ]
       }
     },
     {
