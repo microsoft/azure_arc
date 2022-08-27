@@ -224,7 +224,7 @@
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[variables('addressPrefix')]"
+            "[variables('drAddressPrefix')]"
           ]
         },
         "dhcpOptions": {
