@@ -251,6 +251,48 @@ Write-Host "Enabling Container Insights cluster extension"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $aksConnectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
 Write-Host "`n"
 
+# Monitor pods across arc namespace
+$kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host }}
+
+# Installing Azure Arc-enabled data services extension
+Write-Host "`n"
+Write-Header "Installing Azure Arc-enabled data services extension on primary AKS cluster"
+az k8s-extension create --name arc-data-services `
+                        --extension-type microsoft.arcdataservices `
+                        --cluster-type connectedClusters `
+                        --cluster-name $aksConnectedClusterName `
+                        --resource-group $Env:resourceGroup `
+                        --auto-upgrade false `
+                        --scope cluster `
+                        --release-namespace arc `
+                        --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
+
+Write-Host "`n"
+Do {
+    Write-Host "Waiting for bootstrapper pod, hold tight...(20s sleeping loop)"
+    Start-Sleep -Seconds 20
+    $podStatus = $(if(kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    } while ($podStatus -eq "Nope")
+Write-Host "Bootstrapper pod is ready!"
+Write-Host "`n"
+
+# # Configuring Azure Arc Custom Location on the primary AKS cluster
+Write-Header "Configuring Azure Arc Custom Location on primary AKS cluster"
+$primaryAKSConnectedClusterId = az connectedk8s show --name $aksConnectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
+$primaryExtensionId = az k8s-extension show --name arc-data-services `
+                                     --cluster-type connectedClusters `
+                                     --cluster-name $aksConnectedClusterName `
+                                     --resource-group $Env:resourceGroup `
+                                     --query id -o tsv
+Start-Sleep -Seconds 20
+az customlocation create --name 'arcbox-aks-cl' `
+                         --resource-group $Env:resourceGroup `
+                         --namespace arc `
+                         --host-resource-id $primaryAKSConnectedClusterId `
+                         --cluster-extension-ids $primaryExtensionId `
+                         --kubeconfig $Env:KUBECONFIG
+
+
 
 # Create Kubernetes - Azure Arc Cluster for the DR cluster
 Write-Header "Onboarding the DR AKS cluster as an Azure Arc-enabled Kubernetes cluster"
@@ -264,7 +306,7 @@ az connectedk8s connect --name $aksDRConnectedClusterName-admin `
 
 Start-Sleep -Seconds 10
 
-# Enabling Container Insights cluster extension on primary cluster
+# Enabling Container Insights cluster extension on DR cluster
 Write-Host "`n"
 Write-Host "Enabling Container Insights cluster extension"
 az k8s-extension create --name "azuremonitor-containers" --cluster-name $aksDRConnectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
