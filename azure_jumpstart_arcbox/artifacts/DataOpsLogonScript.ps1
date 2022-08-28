@@ -214,7 +214,8 @@ Write-Host "Getting AKS clusters' credentials"
 Write-Host "`n"
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
-### ************** Get AKS clusters' kubeconfigs
+
+# Getting AKS clusters' credentials
 kubectx AKS="$primaryConnectedClusterName-admin"
 kubectx AKS-DR="$secondaryConnectedClusterName-admin"
 kubectx CAPI=$capiConnectedClusterName
