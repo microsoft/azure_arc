@@ -102,7 +102,8 @@
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
     "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]",
-    "addsVMTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/addsVm.json')]"
+    "addsVMTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/addsVm.json')]",
+    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/aks.json')]"
   },
   "resources": [
     {
@@ -344,6 +345,40 @@
           },
           "dnsServers": {
             "value": ["10.16.2.100", "168.63.129.16"]
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "aksDeployment",
+      "dependsOn": [
+        "stagingStorageAccountDeployment",
+        "mgmtArtifactsAndPolicyDeployment"
+      ],
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('aksTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "spnTenantId": {
+            "value": "[parameters('spnTenantId')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
           }
         }
       }
