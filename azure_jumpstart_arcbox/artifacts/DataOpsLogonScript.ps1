@@ -2,7 +2,9 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
-$connectedClusterName=$Env:capiArcDataClusterName
+$aksConnectedClusterName = "ArcBox-AKS"
+$aksDRConnectedClusterName = "ArcBox-AKS-DR"
+$capiConnectedClusterName= $Env:capiArcDataClusterName
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
 
@@ -19,38 +21,6 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
-# Required for azcopy
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
-
-# Downloading CAPI Kubernetes cluster kubeconfig file
-Write-Header "Downloading CAPI K8s Kubeconfig"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
-$context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
-$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-$sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
-
-# Downloading 'installCAPI.log' log file
-Write-Header "Downloading CAPI Install Logs"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
-$sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
-
-# Merging kubeconfig files from CAPI and AKS
-Write-Header "Merging CAPI & AKS Kubeconfigs"
-Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
-$Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;"
-kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
-kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
-Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
-Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
-$Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
-### ************** Get AKS clusters' kubeconfigs
-kubectx
-
-
 # Register Azure providers
 Write-Header "Registering Providers"
 az provider register --namespace Microsoft.Kubernetes --wait
@@ -58,6 +28,48 @@ az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 
+# Required for azcopy
+$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+
+# Making extension install dynamic
+Write-Header "Installing Azure CLI extensions"
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
+az extension add --name arcdata --system
+az -v
+
+# Installing Azure Data Studio extensions
+Write-Header "Installing Azure Data Studio extensions"
+$Env:argument1="--install-extension"
+$Env:argument2="microsoft.azcli"
+$Env:argument3="microsoft.azuredatastudio-postgresql"
+$Env:argument4="Microsoft.arc"
+
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument2
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument3
+& "C:\Program Files\Azure Data Studio\bin\azuredatastudio.cmd" $Env:argument1 $Env:argument4
+
+# Create Azure Data Studio desktop shortcut
+Write-Header "Creating Azure Data Studio Desktop Shortcut"
+$TargetFile = "C:\Program Files\Azure Data Studio\azuredatastudio.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Azure Data Studio.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+# Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut
+Write-Host "`n"
+Write-Host "Creating Microsoft SQL Server Management Studio (SSMS) desktop shortcut"
+Write-Host "`n"
+$TargetFile = "C:\Program Files (x86)\Microsoft SQL Server Management Studio 18\Common7\IDE\ssms.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\Microsoft SQL Server Management Studio 18.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
 
 ################################################
 # - Created Nested SQL VM
@@ -76,7 +88,7 @@ Add-DhcpServerv4Scope -Name "ArcBox" `
                       -State Active
 Set-DhcpServerv4OptionValue -ComputerName localhost `
                             -DnsDomain $dnsClient.ConnectionSpecificSuffix `
-                            -DnsServer 168.63. 129.16 `
+                            -DnsServer 168.63.129.16 `
                             -Router 10.10.1.1
 Restart-Service dhcpserver
 
@@ -162,3 +174,52 @@ Invoke-Command -VMName ArcBox-SQL -Credential $winCreds -ScriptBlock {
 # Creating Hyper-V Manager desktop shortcut
 Write-Host "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
+
+
+################################################
+# - Arc-enabling Kubernetes clusters
+################################################
+
+# Downloading CAPI Kubernetes cluster kubeconfig file
+Write-Header "Downloading CAPI K8s Kubeconfig"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
+$context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
+$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
+
+# Downloading 'installCAPI.log' log file
+Write-Header "Downloading CAPI Install Logs"
+$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
+$sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
+
+Write-Header "Checking K8s Nodes"
+kubectl get nodes
+
+Write-Host "`n"
+azdata --version
+
+# Merging kubeconfig files from CAPI and AKS
+Write-Header "Merging CAPI & AKS Kubeconfigs"
+Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
+$Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;"
+kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
+kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
+Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
+Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
+$Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
+Write-Host "`n"
+Write-Host "Getting AKS clusters' credentials"
+Write-Host "`n"
+az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
+### ************** Get AKS clusters' kubeconfigs
+kubectx AKS="$primaryConnectedClusterName-admin"
+kubectx AKS-DR="$secondaryConnectedClusterName-admin"
+kubectx CAPI=$capiConnectedClusterName
+kubectx
+
+# Localize kubeconfig
+$Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
+Write-Host "`n"
