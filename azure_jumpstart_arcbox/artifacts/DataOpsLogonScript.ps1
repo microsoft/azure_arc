@@ -89,10 +89,15 @@ Add-DhcpServerv4Scope -Name "ArcBox" `
                       -SubnetMask 255.255.255.0 `
                       -LeaseDuration 1.00:00:00 `
                       -State Active
+
 Set-DhcpServerv4OptionValue -ComputerName localhost `
                             -DnsDomain $dnsClient.ConnectionSpecificSuffix `
-                            -DnsServer 10.16.2.100 `
-                            -Router 10.10.1.1
+                            -DnsServer 168.63.129.16,10.16.2.100 `
+                            -Router 10.10.1.1 `
+                            -Force
+
+
+Add-DhcpServerInDC -DnsName "arcbox-client.jumpstart.local"
 Restart-Service dhcpserver
 
 # Create the NAT network
@@ -213,19 +218,56 @@ Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
 Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
 $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
 Write-Host "`n"
-Write-Host "Getting AKS clusters' credentials"
-Write-Host "`n"
-az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
-az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
 
-kubectx
 
 # Getting AKS clusters' credentials
-kubectx AKS="$primaryConnectedClusterName-admin"
-kubectx AKS-DR="$secondaryConnectedClusterName-admin"
-kubectx CAPI=$capiConnectedClusterName
+az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
+kubectx
 
+kubectx AKS="$aksConnectedClusterName-admin"
+kubectx AKS-DR="$aksDRConnectedClusterName-admin"
+kubectx CAPI="arcbox-capi"
 
 # Localize kubeconfig
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
 Write-Host "`n"
+
+# Create Kubernetes - Azure Arc Cluster for the primary cluster
+Write-Header "Onboarding the primary AKS cluster as an Azure Arc-enabled Kubernetes cluster"
+Write-Host "`n"
+kubectx AKS
+Write-Host "`n"
+az connectedk8s connect --name $aksConnectedClusterName `
+                        --resource-group $Env:resourceGroup `
+                        --location $Env:azureLocation `
+                        --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5"
+
+Start-Sleep -Seconds 10
+
+# Enabling Container Insights cluster extension on primary cluster
+Write-Host "`n"
+Write-Host "Enabling Container Insights cluster extension"
+az k8s-extension create --name "azuremonitor-containers" --cluster-name $aksConnectedClusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+Write-Host "`n"
+
+
+# Create Kubernetes - Azure Arc Cluster for the DR cluster
+Write-Header "Onboarding the DR AKS cluster as an Azure Arc-enabled Kubernetes cluster"
+Write-Host "`n"
+kubectx AKS-DR
+Write-Host "`n"
+az connectedk8s connect --name $aksDRConnectedClusterName-admin `
+                        --resource-group $Env:resourceGroup `
+                        --location $Env:azureLocation `
+                        --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5"
+
+Start-Sleep -Seconds 10
+
+# Enabling Container Insights cluster extension on primary cluster
+Write-Host "`n"
+Write-Host "Enabling Container Insights cluster extension"
+az k8s-extension create --name "azuremonitor-containers" --cluster-name $aksDRConnectedClusterName-admin --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+Write-Host "`n"
+
+
