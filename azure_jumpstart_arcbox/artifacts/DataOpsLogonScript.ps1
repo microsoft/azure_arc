@@ -17,6 +17,14 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+
+# Required for azcopy
+Write-Header "Az PowerShell Login"
+$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+
 # Required for CLI commands
 Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
@@ -27,11 +35,6 @@ az provider register --namespace Microsoft.Kubernetes --wait
 az provider register --namespace Microsoft.KubernetesConfiguration --wait
 az provider register --namespace Microsoft.ExtendedLocation --wait
 az provider register --namespace Microsoft.AzureArcData --wait
-
-# Required for azcopy
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Making extension install dynamic
 Write-Header "Installing Azure CLI extensions"
@@ -88,7 +91,7 @@ Add-DhcpServerv4Scope -Name "ArcBox" `
                       -State Active
 Set-DhcpServerv4OptionValue -ComputerName localhost `
                             -DnsDomain $dnsClient.ConnectionSpecificSuffix `
-                            -DnsServer 168.63.129.16 `
+                            -DnsServer 10.16.2.100 `
                             -Router 10.10.1.1
 Restart-Service dhcpserver
 
@@ -215,11 +218,13 @@ Write-Host "`n"
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
 
+kubectx
+
 # Getting AKS clusters' credentials
 kubectx AKS="$primaryConnectedClusterName-admin"
 kubectx AKS-DR="$secondaryConnectedClusterName-admin"
 kubectx CAPI=$capiConnectedClusterName
-kubectx
+
 
 # Localize kubeconfig
 $Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
