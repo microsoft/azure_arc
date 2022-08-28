@@ -108,30 +108,6 @@
           "description": "The version of Kubernetes"
         },
         "defaultValue" : "1.23.8"
-      },
-      "primaryVnetName": {
-        "type": "string",
-        "metadata": {
-          "description": "primary vnet"
-        }
-      },
-      "secondaryVnetName": {
-        "type": "string",
-        "metadata": {
-          "description": "Seconday cluster vnet"
-        }
-      },
-      "primarySubnetName": {
-        "type": "string",
-        "metadata": {
-          "description": "Primary cluster subnet"
-        }
-      },
-      "secondarySubnetName": {
-        "type": "string",
-        "metadata": {
-          "description": "Secondary cluster subnet"
-        }
       }
     },
     "variables": {
