@@ -290,6 +290,9 @@ if ($flavor -eq "DataOps") {
     Add-Computer -DomainName $Env:addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
+    # Disabling Windows Server Manager Scheduled Task
+    Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
+
     # Install Hyper-V and reboot
     Write-Host "Installing Hyper-V and restart"
     Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
