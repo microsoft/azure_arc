@@ -112,7 +112,8 @@
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
-        "mgmtArtifactsAndPolicyDeployment"
+        "mgmtArtifactsAndPolicyDeployment",
+        "updateVNetDNSServers"
       ],
       "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'),equals(parameters('flavor'),'DataOps'))]",
       "properties": {
@@ -322,7 +323,7 @@
       "apiVersion": "2021-04-01",
       "name": "updateVNetDNSServers",
       "condition": "[equals(parameters('flavor'),'DataOps')]",
-      "dependsOn": ["mgmtArtifactsAndPolicyDeployment", "addsVmDeployment", "ubuntuCAPIDeployment"],
+      "dependsOn": ["mgmtArtifactsAndPolicyDeployment", "addsVmDeployment"],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
