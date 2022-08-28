@@ -355,7 +355,8 @@
       "name": "aksDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
-        "mgmtArtifactsAndPolicyDeployment"
+        "mgmtArtifactsAndPolicyDeployment",
+        "updateVNetDNSServers"
       ],
       "condition": "[equals(parameters('flavor'),'DataOps')]",
       "properties": {
