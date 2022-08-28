@@ -177,7 +177,7 @@
         "apiVersion": "2022-03-02-preview",
         "type": "Microsoft.ContainerService/managedClusters",
         "location": "[parameters('location')]",
-        "name": "[concat(parameters('drClusterName'),'-Secondary')]",
+        "name": "[parameters('drClusterName')]",
         "properties": {
           "kubernetesVersion": "[parameters('kubernetesVersion')]",
           "enableRBAC": "[parameters('enableRBAC')]",
