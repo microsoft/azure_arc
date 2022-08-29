@@ -150,7 +150,7 @@ The following Jumpstart scenario will guide you on how to use the provided [Terr
 
     ![Screenshot showing how to create GitHub Secret](./github_workflow_terraform_secret.png)
 
-* Update "[main.tf](https://github.com/oaviles/azure_arc/blob/eks_ghactions_scenario/azure_arc_k8s_jumpstart/eks/ghactions/main.tf)" file with your Terraform Cloud Organization Name and Terraform Cloud Workspace Name
+* Update "[main.tf](https://github.com/oaviles/azure_arc/blob/eks_ghactions_scenario/azure_arc_k8s_jumpstart/eks/ghactions/terraform/main.tf)" file with your Terraform Cloud Organization Name and Terraform Cloud Workspace Name
 
     ![Screenshot showing how to create GitHub Workflow to deploy EKS using Terraform Cloud](./github_workflow_terraform_update.png)
 
