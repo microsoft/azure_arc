@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "EKS cluster Terraform plan"
-linkTitle: "EKS cluster Terraform plan"
+title: "EKS cluster Terraform plan deployed with GitHub Actions"
+linkTitle: "EKS cluster Terraform plan deployed with GitHub Actions"
 weight: 1
 description: >
 ---
