@@ -1,3 +1,22 @@
+# Set paths
+$Env:HCIBoxDir = "C:\HCIBox"
+$Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
+$Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
+$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
+$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
+$Env:HCIBoxIconDir = "C:\HCIBox\Icons"
+$Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
+$Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
+$Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
+$Env:agentScript = "C:\HCIBox\agentScript"
+$Env:ToolsDir = "C:\Tools"
+$Env:tempDir = "C:\Temp"
+$Env:VMPath = "C:\VMs"
+
+# Import Configuration Module
+$ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
+$SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
+
 Start-Transcript -Path -$Env:HCIBoxLogsDir\Deploy-ArcDataController.log
 
 # Required for CLI commands
@@ -50,7 +69,7 @@ Install-Module -Name AksHci -Confirm:$false -Force -AcceptLicense
 # Setting AKS-HCI kube context
 $connectedClusterName = "hcibox-aks"
 Write-Header "Setting AKS-HCI K8s Kubeconfig and checking K8s nodes"
-Invoke-Command -VMName AzSHOST1 -ScriptBlock {
+Invoke-Command -VMName SDNConfig.HostList[0] -ScriptBlock {
     Get-AksHciCredential -Name $connectedClusterName -configPath "C:\Users\Public\Documents\" -Confirm:$false
     kubectl get nodes
 }
