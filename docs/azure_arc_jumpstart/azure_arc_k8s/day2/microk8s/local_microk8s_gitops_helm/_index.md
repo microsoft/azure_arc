@@ -93,7 +93,7 @@ GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a p
 
 ## Manually setting up an ingress controller on MicroK8s
 
-The demo application that will be deployed later in this scenario relies on an ingress controller. Given that MicroK8s needs [Multipass](https://multipass.run/) on Windows and MacOS, we'll be covering that scenario and assuming Multipass is running.
+The demo application that will be deployed later in this scenario relies on an ingress controller. Given that MicroK8s needs [Multipass](https://multipass.run/) on Windows and MacOS, we'll not be covering that scenario and assuming Multipass is running.
 
 ### NGINX Controller Deployment
 
@@ -155,7 +155,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ### Cluster-level Config
 
-With Cluster-level GitOps config, the goal is to have an "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Meshes, Security products, Monitoring solutions, etc. A very popular example will also be Ingress Controller which is exactly the nginx-ingress controller we will deploy in the next section.
+With Cluster-level GitOps config, the goal is to have an "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Meshes, Security products, Monitoring solutions, etc.
 
 ### Namespace-level Config
 
@@ -289,7 +289,7 @@ To create the GitOps configuration and it's respective Kubernetes resources, we'
 
 ## Cleanup
 
-To delete the GitOps configuration and it's respective Kubernetes resources, we've provided a script in a shell file (Linux, MacOS) and a PowerShell file (Windows). It is recommended to run this script locally, since it also removes elements from the local cluster.
+To delete the GitOps configuration and it's respective Kubernetes resources, we've provided a script in a shell file (Linux, MacOS) and a PowerShell file (Windows).
 
 - Linux and MacOS
 
