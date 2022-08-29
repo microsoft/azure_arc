@@ -30,30 +30,9 @@ $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnCl
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 $context = Get-AzContext # Azure credential
 
-# AKS parameters - recommended to leave default
-$aksvar= @{
-    HostList="AZSHost1", "AZSHOST2"
-    AKSvnetname = "hcibox-vnet"
-    AKSvSwitchName = "sdnSwitch"
-    AKSNodeStartIP = "192.168.200.25"
-    AKSNodeEndIP = "192.168.200.100"
-    AKSVIPStartIP = "192.168.200.125"
-    AKSVIPEndIP = "192.168.200.200"
-    AKSIPPrefix = "192.168.200.0/24"
-    AKSGWIP = "192.168.200.1"
-    AKSDNSIP = "192.168.1.254"
-    AKSCSV="C:\ClusterStorage\S2D_vDISK1"
-    AKSImagedir = "C:\ClusterStorage\S2D_vDISK1\aks\Images"
-    AKSWorkingdir = "C:\ClusterStorage\S2D_vDISK1\aks\Workdir"
-    AKSCloudConfigdir = "C:\ClusterStorage\S2D_vDISK1\aks\CloudConfig"
-    AKSCloudSvcidr = "192.168.1.15/24"
-    AKSVlanID="200"
-    AKSResourceGroupName = $env:resourceGroup
-}
-
 # Install latest versions of Nuget and PowershellGet
 Write-Header "Install latest versions of Nuget and PowershellGet"
-Invoke-Command -VMName $aksvar.HostList -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
     Enable-PSRemoting -Force
     Install-PackageProvider -Name NuGet -Force 
     Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
@@ -63,7 +42,7 @@ Invoke-Command -VMName $aksvar.HostList -Credential $adcred -ScriptBlock {
 # Install necessary AZ modules and initialize akshci on each node
 Write-Header "Install necessary AZ modules plus AksHCI module and initialize akshci on each node"
 
-Invoke-Command -VMName $aksvar.HostList  -Credential $adcred -ScriptBlock {
+Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Write-Host "Installing Required Modules" -ForegroundColor Green -BackgroundColor Black
     
     $ModuleNames="Az.Resources","Az.Accounts", "AzureAD", "AKSHCI"
@@ -80,19 +59,20 @@ Invoke-Command -VMName $aksvar.HostList  -Credential $adcred -ScriptBlock {
 }
 
 # Install AksHci - only need to perform the following on one of the nodes
+$rg = $env:resourceGroup
 Write-Header "Prepping AKS Install"
-Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
-    $vnet = New-AksHciNetworkSetting -name $using:aksvar.AKSvnetname -vSwitchName $using:aksvar.AKSvSwitchName -k8sNodeIpPoolStart $using:aksvar.AKSNodeStartIP -k8sNodeIpPoolEnd $using:aksvar.AKSNodeEndIP -vipPoolStart $using:aksvar.AKSVIPStartIP -vipPoolEnd $using:aksvar.AKSVIPEndIP -ipAddressPrefix $using:aksvar.AKSIPPrefix -gateway $using:aksvar.AKSGWIP -dnsServers $using:aksvar.AKSDNSIP -vlanID $using:aksvar.AKSVlanID        
-    Set-AksHciConfig -imageDir $using:aksvar.AKSImagedir -workingDir $using:aksvar.AKSWorkingdir -cloudConfigLocation $using:aksvar.AKSCloudConfigdir -vnet $vnet -cloudservicecidr $using:aksvar.AKSCloudSvcidr 
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+    $vnet = New-AksHciNetworkSetting -name $using:SDNConfig.AKSvnetname -vSwitchName $using:SDNConfig.AKSvSwitchName -k8sNodeIpPoolStart $using:SDNConfig.AKSNodeStartIP -k8sNodeIpPoolEnd $using:SDNConfig.AKSNodeEndIP -vipPoolStart $using:SDNConfig.AKSVIPStartIP -vipPoolEnd $using:SDNConfig.AKSVIPEndIP -ipAddressPrefix $using:SDNConfig.AKSIPPrefix -gateway $using:SDNConfig.AKSGWIP -dnsServers $using:SDNConfig.AKSDNSIP -vlanID $using:SDNConfig.AKSVlanID        
+    Set-AksHciConfig -imageDir $using:SDNConfig.AKSImagedir -workingDir $using:SDNConfig.AKSWorkingdir -cloudConfigLocation $using:SDNConfig.AKSCloudConfigdir -vnet $vnet -cloudservicecidr $using:SDNConfig.AKSCloudSvcidr 
     $azurecred = Connect-AzAccount -ServicePrincipal -Subscription $using:context.Subscription.Id -Tenant $using:context.Subscription.TenantId -Credential $using:azureAppCred
-    Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:aksvar.AKSResourceGroupName -Tenant $azurecred.Context.Tenant.Id -Credential $using:azureAppCred
+    Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:rg -Tenant $azurecred.Context.Tenant.Id -Credential $using:azureAppCred
     Write-Host "Ready to Install AKS on HCI Cluster"
     Install-AksHci 
 }
 
 # Create new AKS workload cluster and connect it to Azure
 Write-Header "Creating AKS workload cluster"
-Invoke-Command -VMName $aksvar.HostList[0] -Credential $adcred -ScriptBlock  {
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     New-AksHciCluster -name "hcibox-aks" -nodePoolName linuxnodepool -nodecount 1 -osType linux
     Enable-AksHciArcConnection -name "hcibox-aks"
 }
