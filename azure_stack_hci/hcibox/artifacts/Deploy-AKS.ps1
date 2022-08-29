@@ -76,3 +76,5 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     New-AksHciCluster -name "hcibox-aks" -nodePoolName linuxnodepool -nodecount 1 -osType linux
     Enable-AksHciArcConnection -name "hcibox-aks"
 }
+
+Stop-Transcript
