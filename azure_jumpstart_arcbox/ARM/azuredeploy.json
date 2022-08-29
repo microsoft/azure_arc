@@ -113,7 +113,8 @@
       "dependsOn": [
         "stagingStorageAccountDeployment",
         "mgmtArtifactsAndPolicyDeployment",
-        "updateVNetDNSServers"
+        "updateVNetDNSServers",
+        "clientVmDeployment"
       ],
       "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'),equals(parameters('flavor'),'DataOps'))]",
       "properties": {
