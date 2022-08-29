@@ -17,6 +17,8 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
+Start-Transcript -Path -$Env:HCIBoxLogsDir\Register-AzSHCI.log
+
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
@@ -46,3 +48,5 @@ $azureLocation = 'eastus'
 Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName azshost1 -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup -ArcServerResourceGroupName $env:resourceGroup-ArcServers
 
 Write-Host "$clustername successfully registered as Az Stack HCI cluster resource in Azure"
+
+Stop-Transcript

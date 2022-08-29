@@ -1,3 +1,5 @@
+Start-Transcript -Path -$Env:HCIBoxLogsDir\Deploy-ArcDataController.log
+
 # Required for CLI commands
 Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
@@ -127,3 +129,5 @@ az arcdata dc update --name arcbox-dc --resource-group $Env:resourceGroup --auto
 Write-Header "Updating Azure Data Studio Settings"
 New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
 Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+
+Stop-Transcript

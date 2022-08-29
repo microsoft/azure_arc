@@ -3083,6 +3083,8 @@ function enable-singleSignOn {
    
 #region Main
 
+Start-Transcript -Path -$Env:HCIBoxLogsDir\New-HCIBoxCluster.log
+
 $starttime = Get-Date
 
 # Import Configuration Module
@@ -3388,5 +3390,7 @@ Write-Host "Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes)
 $ErrorActionPreference = "Continue"
 $VerbosePreference = "SilentlyContinue"
 $WarningPreference = "Continue"
-    
+
+Stop-Transcript 
+
 #endregion    

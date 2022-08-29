@@ -17,6 +17,8 @@ $Env:VMPath = "C:\VMs"
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
+Start-Transcript -Path -$Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
+
 # Set AD Domain cred
 $user = "jumpstart.local\administrator"
 $password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
@@ -86,3 +88,5 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     az arcappliance create hci --config-file $csv_path\ResourceBridge\hci-appliance.yaml --kubeconfig $env:USERPROFILE\.kube\config
 
 }
+
+Stop-Transcript
