@@ -211,25 +211,9 @@ kubectl get nodes
 Write-Host "`n"
 azdata --version
 
-<# Merging kubeconfig files from CAPI and AKS
-Write-Header "Merging CAPI & AKS Kubeconfigs"
-Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
-$Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;"
-kubectl config view --raw > C:\users\$Env:USERNAME\.kube\config_tmp
-kubectl config get-clusters --kubeconfig=C:\users\$Env:USERNAME\.kube\config_tmp
-Remove-Item -Path "C:\Users\$Env:USERNAME\.kube\config"
-Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users\$Env:USERNAME\.kube\config"
-$Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
-Write-Host "`n"
-
-Start-Sleep -Seconds 5
-#>
-
 # Getting AKS clusters' credentials
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
-
-Start-Sleep -Seconds 10
 
 kubectx aks="$aksConnectedClusterName-admin"
 kubectx aks-dr="$aksDRConnectedClusterName-admin"
