@@ -1458,7 +1458,7 @@ function New-DCVM {
 
             New-ADUser @params
             $params = @{
-                Name                  = 'Jumpstart User'
+                Name                  = $adminUser
                 GivenName             = 'Jumpstart'
                 Surname               = 'Jumpstart'
                 SamAccountName        = $adminUser
