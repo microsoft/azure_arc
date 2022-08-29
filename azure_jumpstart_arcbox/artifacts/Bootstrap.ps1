@@ -261,6 +261,11 @@ if ($flavor -eq "DevOps") {
 }
 
 if ($flavor -eq "DataOps") {
+
+    #Restarting DC
+    Restart-Computer -ComputerName 10.16.2.100 -Force
+    sleep -Seconds 20
+
     # Joining ClientVM to AD DS domain
     $netbiosname = $Env:addsDomainName.Split(".")[0]
     $computername = $env:COMPUTERNAME
