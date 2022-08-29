@@ -276,9 +276,6 @@ if ($flavor -eq "DataOps") {
             Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
         })
 
-    #Restarting DC
-    Restart-Computer -ComputerName 10.16.2.100 -Force -Credential $domainCred
-    Start-Sleep -Seconds 20
     # Creating scheduled task for DataOpsLogonScript.ps1
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
