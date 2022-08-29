@@ -222,20 +222,17 @@ Move-Item -Path "C:\Users\$Env:USERNAME\.kube\config_tmp" -Destination "C:\users
 $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
 Write-Host "`n"
 
+Start-Sleep -Seconds 5
 
 # Getting AKS clusters' credentials
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
 
-sleep -Seconds 10
+Start-Sleep -Seconds 10
 
 kubectx aks="$aksConnectedClusterName-admin"
 kubectx aks-dr="$aksDRConnectedClusterName-admin"
 kubectx capi="arcbox-capi"
-
-# Localize kubeconfig
-$Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
-Write-Host "`n"
 
 # Create Kubernetes - Azure Arc Cluster for the primary cluster
 Write-Header "Onboarding the primary AKS cluster as an Azure Arc-enabled Kubernetes cluster"
