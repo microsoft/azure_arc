@@ -211,7 +211,7 @@ kubectl get nodes
 Write-Host "`n"
 azdata --version
 
-# Merging kubeconfig files from CAPI and AKS
+<# Merging kubeconfig files from CAPI and AKS
 Write-Header "Merging CAPI & AKS Kubeconfigs"
 Copy-Item -Path "C:\Users\$Env:USERNAME\.kube\config" -Destination "C:\Users\$Env:USERNAME\.kube\config.backup"
 $Env:KUBECONFIG="C:\Users\$Env:USERNAME\.kube\config;"
@@ -223,6 +223,7 @@ $Env:KUBECONFIG="C:\users\$Env:USERNAME\.kube\config"
 Write-Host "`n"
 
 Start-Sleep -Seconds 5
+#>
 
 # Getting AKS clusters' credentials
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
