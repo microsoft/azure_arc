@@ -12,7 +12,7 @@
         "value": "direct"
       },
       "controllerName": {
-        "value": "arcbox-dc"
+        "value": "dataControllerName-stage"
       },
       "azdataUsername": {
         "value": "azdataUsername-stage"
