@@ -12,7 +12,7 @@ The following Jumpstart scenario will guide you on how to create [Helm](https://
 
 In this scenario, you will deploy [nginx-ingress controller](https://kubernetes.github.io/ingress-nginx/) and a namespace-level config to deploy the "Hello Arc" web application on your Kubernetes cluster. By doing so, you will be able to make real-time changes to the application and show how the GitOps flow takes effect.
 
-GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a popular open-source toolset. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. The Flux toolkit component Helm Controller is a Kubernetes operator, allowing one to declaratively manage Helm chart releases with Kubernetes manifests. The Operator is aware of the “HelmRelease” Custom Resource Definition (CRD). This HelmRelease points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart.
+GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a popular open-source toolset. Flux is a tool for keeping Kubernetes clusters in sync with sources of configuration (like Git repositories) and automating updates to the configuration when there is new code to deploy. The Flux toolkit component Helm Controller is a Kubernetes operator, allowing one to declaratively manage Helm chart releases with Kubernetes manifests. The Operator is aware of the “HelmRelease” Custom Resource Definition (CRD). This _HelmRelease_ points to a helm chart in a git repo and can optionally contain specific values to input into the helm chart.
 
 > **NOTE: This guide assumes you already deployed MicroK8s and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in the [MicroK8s onboarding guide](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/microk8s/local_microk8s/).**
 
@@ -265,7 +265,7 @@ To create the GitOps configuration and it's respective Kubernetes resources, we'
   
     ![kubectl get pods -n hello-arc -w](./18.png)
 
-  - In **your fork** of the "Azure Arc Jumpstart App" repository, open the _hello-arc.yaml_ file (/hello-arc/releases/app/hello-arc.yaml).
+  - In **your fork** of the "Azure Arc Jumpstart Apps" repository, open the _hello-arc.yaml_ file (/hello-arc/releases/app/hello-arc.yaml).
 
   - Another browser window that has the webpage <http://172.19.174.107:32046> open **(replace with your own values)**.
 
