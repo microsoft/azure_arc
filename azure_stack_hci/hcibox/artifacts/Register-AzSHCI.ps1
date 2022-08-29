@@ -41,7 +41,7 @@ Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $e
 Write-Host "Registering the Cluster" -ForegroundColor Green -BackgroundColor Black
 $armtoken = Get-AzAccessToken
 $graphtoken = Get-AzAccessToken -ResourceTypeName AadGraph
-$clustername = 'hciboxcluster'
+$clustername = 'HCIBox-Cluster'
 $azureLocation = 'eastus'
 Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName azshost1 -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup -ArcServerResourceGroupName $env:resourceGroup-ArcServers
 
