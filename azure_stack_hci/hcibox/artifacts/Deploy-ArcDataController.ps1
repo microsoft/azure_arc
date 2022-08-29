@@ -40,13 +40,18 @@ $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
 
+# Install modules
+Install-PackageProvider -Name NuGet -Force 
+Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
+Install-Module -Name AksHci -Confirm:$false -Force -AcceptLicense
+
 # Setting AKS-HCI kube context
 $connectedClusterName = "hcibox-aks"
-Write-Header "Setting AKS-HCI K8s Kubeconfig"
-Get-AksHciCredential -Name $connectedClusterName
-
-Write-Header "Checking K8s Nodes"
-kubectl get nodes
+Write-Header "Setting AKS-HCI K8s Kubeconfig and checking K8s nodes"
+Invoke-Command -VMName AzSHOST1 -ScriptBlock {
+    Get-AksHciCredential -Name $connectedClusterName -configPath "C:\Users\Public\Documents\" -Confirm:$false
+    kubectl get nodes
+}
 
 # Installing the Azure Arc-enabled data services cluster extension
 Write-Host "Installing the Azure Arc-enabled data services cluster extension"

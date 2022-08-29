@@ -2361,7 +2361,7 @@ CertificateTemplate= WebServer
             Write-Verbose 'Installing Microsft Edge browser in admincenter vm'
             $expression = "choco install microsoft-edge -y"
             Invoke-Expression $expression
-            $ErrorActionPreference = "Stop" 
+            $ErrorActionPreference = "Stop"
             
             # Install Set Default Browser
             Write-Verbose 'Installing setdefaultbrowser in admincenter vm'
@@ -2373,6 +2373,12 @@ CertificateTemplate= WebServer
             Write-Verbose 'Setting Default Broswer on admincenter vm'
             $expression = "SetDefaultBrowser.exe Edge"
             Invoke-Expression $expression
+
+            # Install Kubectl
+            Write-Verbose 'Installing kubectl'
+            $expression = "choco install kubernetes-cli -y"
+            Invoke-Expression $expression
+            $ErrorActionPreference = "Stop" 
 
             # Create a shortcut for Windows Admin Center
             Write-Verbose "Creating Shortcut for Windows Admin Center"

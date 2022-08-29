@@ -4,10 +4,8 @@
     
     # Version 1.0.0
 
-    # Multiple Host Setup Parameters
-    MultipleHyperVHosts                  = $false                                # Set to $true if deploying the Nested VM environment across multiple hosts. Set to $false if deploying to a single host. 
-    MultipleHyperVHostNames              = @("2019SDNn1", "2019SDNn2")           # (Deprecated - May work?) Array of all of the hosts which make up the Nested VM environment. Only 2 or 4 hosts supported 
-    MultipleHyperVHostExternalSwitchName = "SDN-Switch"                          # Name of the External Hyper-V VM Switch identical on all hosts.
+    # HCI host names
+    HostList="AZSHost1", "AZSHOST2"
 
     # VHDX Paths 
     guiVHDXPath                          = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
@@ -121,6 +119,26 @@
     WACport                              = 443
 
     # SDDCInstall
-    SDDCInstall                          = $true 
+    SDDCInstall                          = $true
 
+    # AKS and Resource bridge variables
+    AKSvnetname = "HCIBox-VNET"
+    AKSvSwitchName = "sdnSwitch"
+    AKSNodeStartIP = "192.168.200.25"
+    AKSNodeEndIP = "192.168.200.100"
+    AKSVIPStartIP = "192.168.200.125"
+    AKSVIPEndIP = "192.168.200.200"
+    AKSIPPrefix = "192.168.200.0/24"
+    AKSGWIP = "192.168.200.1"
+    AKSDNSIP = "192.168.1.254"
+    AKSCSV="C:\ClusterStorage\S2D_vDISK1"
+    AKSImagedir = "C:\ClusterStorage\S2D_vDISK1\aks\Images"
+    AKSWorkingdir = "C:\ClusterStorage\S2D_vDISK1\aks\Workdir"
+    AKSCloudConfigdir = "C:\ClusterStorage\S2D_vDISK1\aks\CloudConfig"
+    AKSCloudSvcidr = "192.168.1.15/24"
+    AKSVlanID="200"
+    rbLocation = "eastus"
+    rbCustomLocationName = "hcibox-rb-cl"
+    rbIp = "192.168.200.201"
+    rbCpip = "192.168.200.202"
 }
