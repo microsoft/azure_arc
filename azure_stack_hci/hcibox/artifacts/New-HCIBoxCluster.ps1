@@ -2411,7 +2411,6 @@ function New-HyperConvergedEnvironment {
     Invoke-Command -ComputerName Admincenter -Credential $domainCred -ScriptBlock {
 
         $SDNConfig = $Using:SDNConfig
-        $AzSHOSTs = @("AzSHOST1", "AzSHOST2")
 
         $ErrorActionPreference = "Stop"
         $VerbosePreference = "Continue"
@@ -2420,7 +2419,7 @@ function New-HyperConvergedEnvironment {
             -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
         (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
-        foreach ($AzSHOST in $AzSHOSTs) {
+        foreach ($AzSHOST in $SDNconfig.HostList) {
 
             Write-Verbose "Invoking Command on $AzSHOST"
 
