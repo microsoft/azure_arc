@@ -51,6 +51,8 @@ az provider register --namespace Microsoft.GuestConfiguration --wait
 az provider register --namespace Microsoft.AzureArcData --wait
 az provider register --namespace Microsoft.AzureStackHCI --wait
 
+Stop-Transcript
+
 # Build HCI cluster
 Write-Header "Deploying HCI cluster"
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
@@ -66,6 +68,8 @@ Write-Header "Deploying AKS"
 # deploy Data services
 # Write-Header "Deploying Azure Arc-enabled data services and SQL Managed Instance"
 # & "$Env:HCIBoxDir\Deploy-SQLMI.ps1"
+
+Start-Transcript -Append -Path $Env:HCIBoxLogsDir\HCIBoxLogonScript.log
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
@@ -103,3 +107,4 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:HCIBoxLogsDir\*.log
 }'
 
+Stop-Transcript
