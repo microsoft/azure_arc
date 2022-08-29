@@ -262,10 +262,6 @@ if ($flavor -eq "DevOps") {
 
 if ($flavor -eq "DataOps") {
 
-    #Restarting DC
-    Restart-Computer -ComputerName 10.16.2.100 -Force
-    sleep -Seconds 20
-
     # Joining ClientVM to AD DS domain
     $netbiosname = $Env:addsDomainName.Split(".")[0]
     $computername = $env:COMPUTERNAME
@@ -280,6 +276,9 @@ if ($flavor -eq "DataOps") {
             Password = (ConvertTo-SecureString -String $adminPassword -AsPlainText -Force)[0]
         })
 
+    #Restarting DC
+    Restart-Computer -ComputerName 10.16.2.100 -Force -Credential $domainCred
+    Start-Sleep -Seconds 20
     # Creating scheduled task for DataOpsLogonScript.ps1
     # Register schedule task to run after system reboot
     # schedule task to run after reboot to create reverse DNS lookup
@@ -288,10 +287,8 @@ if ($flavor -eq "DataOps") {
     Register-ScheduledTask -TaskName "RunAfterClientVMADJoin" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
     Write-Host "Registered scheduled task 'RunAfterClientVMADJoin' to run after Client VM AD join."
 
-    # services
-    # Use $env:username to run task under domain user
-    Write-Host "Domain Name: $addsDomainName, Admin User: $adminUsername, NetBios Name: $netbiosname, Computer Name: $computername"
-
+    Write-Host "`n"
+    Write-Host "Joining client VM to domain"
     Add-Computer -DomainName $Env:addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
