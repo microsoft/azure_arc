@@ -1,9 +1,6 @@
 @description('The name of your Virtual Machine')
 param vmName string = 'HCIBox-Client'
 
-@description('The name of the Cluster API workload cluster to be connected as an Azure Arc-enabled Kubernetes cluster')
-param capiArcDataClusterName string = 'HCIBox-CAPI-Data'
-
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
 
@@ -32,33 +29,13 @@ param spnClientId string
 @description('Client secret of the service principal')
 @secure()
 param spnClientSecret string
-param spnAuthority string = environment().authentication.loginEndpoint
 
 @description('Tenant id of the service principal')
 param spnTenantId string
-param azdataUsername string = 'arcdemo'
 
-@secure()
-param azdataPassword string = 'ArcPassword123!!'
-param acceptEula string = 'yes'
-param registryUsername string = 'registryUser'
-
-@secure()
-param registryPassword string = 'registrySecret'
 param arcDcName string = 'arcdatactrl'
+
 param mssqlmiName string = 'arcsqlmidemo'
-
-@description('Name of PostgreSQL server group')
-param postgresName string = 'arcpg'
-
-@description('Number of PostgreSQL worker nodes')
-param postgresWorkerNodeCount int = 3
-
-@description('Size of data volumes in MB')
-param postgresDatasize int = 1024
-
-@description('Choose how PostgreSQL service is accessed through Kubernetes networking interface')
-param postgresServiceType string = 'LoadBalancer'
 
 @description('Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json')
 param stagingStorageAccountName string
@@ -69,25 +46,17 @@ param workspaceName string
 @description('The base URL used for accessing artifacts and automation artifacts.')
 param templateBaseUrl string
 
-@description('The flavor of HCIBox you want to deploy. Valid values are: \'Full\', \'ITPro\'')
-@allowed([
-  'Full'
-  'ITPro'
-  'DevOps'
-])
-param flavor string = 'Full'
-
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
-@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string
+@description('Option to deploy Windows Admin Center with HCIBox')
+param deployWindowsAdminCenter bool = true
 
-@description('The name of the K3s cluster')
-param k3sArcClusterName string = 'HCIBox-K3s'
+@description('Option to deploy AKS-HCI with HCIBox')
+param deployAKSHCI bool = true
 
-@description('The domain name of your AD forest')
-param addsDomainName string
+@description('Option to deploy Resource Bridge with HCIBox')
+param deployResourceBridge bool = true
 
 var bastionName = 'HCIBox-Bastion'
 var publicIpAddressName = deployBastion == false ? '${vmName}-PIP' : '${bastionName}-PIP'
@@ -279,7 +248,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -spnAuthority ${spnAuthority} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azdataUsername ${azdataUsername} -azdataPassword ${azdataPassword} -acceptEula ${acceptEula} -registryUsername ${registryUsername} -registryPassword ${registryPassword} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -POSTGRES_NAME ${postgresName} -POSTGRES_WORKER_NODE_COUNT ${postgresWorkerNodeCount} -POSTGRES_DATASIZE ${postgresDatasize} -POSTGRES_SERVICE_TYPE ${postgresServiceType} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -flavor ${flavor} -capiArcDataClusterName ${capiArcDataClusterName} -k3sArcClusterName ${k3sArcClusterName} -githubUser ${githubUser} -addsDomainName ${addsDomainName}'
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -deployWindowsAdminCenter ${deployWindowsAdminCenter} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge}' 
     }
   }
 }
