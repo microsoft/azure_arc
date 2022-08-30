@@ -335,46 +335,67 @@ $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys
 az arcdata dc update --name $capiDcName --resource-group $Env:resourceGroup --auto-upload-logs true
 az arcdata dc update --name $capiDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
 
-
-kubectx aks
-# Installing Azure Arc-enabled data services extension
-Write-Host "`n"
-Write-Header "Installing Azure Arc-enabled data services extension on primary AKS cluster"
-az k8s-extension create --name arc-data-services `
-    --extension-type microsoft.arcdataservices `
-    --cluster-type connectedClusters `
-    --cluster-name $aksConnectedClusterName `
-    --resource-group $Env:resourceGroup `
-    --auto-upgrade false `
-    --scope cluster `
-    --release-namespace arc `
-    --config Microsoft.CustomLocation.ServiceAccount=sa-arc-bootstrapper `
-
-Write-Host "`n"
-Do {
-    Write-Host "Waiting for bootstrapper pod, hold tight...(20s sleeping loop)"
-    Start-Sleep -Seconds 20
-    $podStatus = $(if (kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
-} while ($podStatus -eq "Nope")
-Write-Host "Bootstrapper pod is ready!"
-Write-Host "`n"
-
-# Configuring Azure Arc Custom Location on the primary AKS cluster
-Write-Header "Configuring Azure Arc Custom Location on primary AKS cluster"
-$connectedClusterId = az connectedk8s show --name $aksConnectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name arc-data-services `
-    --cluster-type connectedClusters `
-    --cluster-name $aksConnectedClusterName `
-    --resource-group $Env:resourceGroup `
-    --query id -o tsv
-Start-Sleep -Seconds 20
-az customlocation create --name 'arcbox-aks-cl' `
-    --resource-group $Env:resourceGroup `
-    --namespace arc `
-    --host-resource-id $connectedClusterId `
-    --cluster-extension-ids $extensionId `
-    --kubeconfig $Env:KUBECONFIG
+# Replacing Azure Data Studio settings template file
+Write-Header "Updating Azure Data Studio Settings"
+New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
 
+# Creating desktop url shortcuts for built-in Grafana and Kibana services
+Write-Header "Creating Grafana & Kibana Shortcuts"
+$GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+$GrafanaURL = "https://"+$GrafanaURL+":3000"
+$Shell = New-Object -ComObject ("WScript.Shell")
+$Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Grafana.url")
+$Favorite.TargetPath = $GrafanaURL;
+$Favorite.Save()
 
+$KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+$KibanaURL = "https://"+$KibanaURL+":5601"
+$Shell = New-Object -ComObject ("WScript.Shell")
+$Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
+$Favorite.TargetPath = $KibanaURL;
+$Favorite.Save()
 
+Stop-Process -Id $kubectlMonShell.Id
+
+# Changing to Jumpstart ArcBox wallpaper
+$code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
+    
+    public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+            
+            public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+            }
+        }
+    } 
+'@
+
+$ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
+
+if(-not $ArcServersLogonScript) {
+    Write-Header "Changing Wallpaper"
+    $imgPath="$Env:ArcBoxDir\wallpaper.png"
+    Add-Type $code
+    [Win32.Wallpaper]::SetWallpaper($imgPath)
+}
+
+# Removing the LogonScript Scheduled Task so it won't run on next reboot
+Write-Header "Removing Logon Task"
+Unregister-ScheduledTask -TaskName "DataOpsLogonScript" -Confirm:$false
+Start-Sleep -Seconds 5
+
+# Executing the deployment logs bundle PowerShell script in a new window
+Write-Header "Uploading Log Bundle"
+Invoke-Expression 'cmd /c start Powershell -Command { 
+    $RandomString = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+    Write-Host "Sleeping for 5 seconds before creating deployment logs bundle..."
+    Start-Sleep -Seconds 5
+    Write-Host "`n"
+    Write-Host "Creating deployment logs bundle"
+    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
+}'
