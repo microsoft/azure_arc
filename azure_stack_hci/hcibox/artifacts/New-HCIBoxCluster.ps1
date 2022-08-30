@@ -3082,7 +3082,7 @@ function enable-singleSignOn {
    
 #region Main
 
-Start-Transcript -Path -$Env:HCIBoxLogsDir\New-HCIBoxCluster.log
+Start-Transcript -Path $Env:HCIBoxLogsDir\New-HCIBoxCluster.log
 
 $starttime = Get-Date
 
