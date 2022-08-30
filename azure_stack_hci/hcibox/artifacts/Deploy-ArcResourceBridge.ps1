@@ -17,7 +17,7 @@ $Env:VMPath = "C:\VMs"
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
-Start-Transcript -Path -$Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
+Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-ArcResourceBridge.log
 
 # Set AD Domain cred
 $user = "jumpstart.local\administrator"

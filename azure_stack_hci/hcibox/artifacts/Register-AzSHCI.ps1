@@ -17,7 +17,7 @@ $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
 $Env:VMPath = "C:\VMs"
 
-Start-Transcript -Path -$Env:HCIBoxLogsDir\Register-AzSHCI.log
+Start-Transcript -Path $Env:HCIBoxLogsDir\Register-AzSHCI.log
 
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"

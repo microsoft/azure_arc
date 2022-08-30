@@ -17,7 +17,7 @@ $Env:VMPath = "C:\VMs"
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 
-Start-Transcript -Path -$Env:HCIBoxLogsDir\Deploy-ArcDataController.log
+Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-ArcDataController.log
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
