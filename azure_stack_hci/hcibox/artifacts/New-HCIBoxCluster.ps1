@@ -1458,11 +1458,11 @@ function New-DCVM {
 
             New-ADUser @params
             $params = @{
-                Name                  = $adminUser
+                Name                  = $using:adminUser
                 GivenName             = 'Jumpstart'
                 Surname               = 'Jumpstart'
-                SamAccountName        = $adminUser
-                UserPrincipalName     = "$adminUser@$SDNDomainFQDN"
+                SamAccountName        = $using:adminUser
+                UserPrincipalName     = "$using:adminUser@$SDNDomainFQDN"
                 AccountPassword       = $SecureString
                 Enabled               = $true
                 ChangePasswordAtLogon = $false
@@ -1487,9 +1487,9 @@ function New-DCVM {
             add-ADGroupMember "NCClients" "NCClient"
             add-ADGroupMember "NCClients" "Administrator"
             add-ADGroupMember "NCAdmins" "Administrator"
-            add-ADGroupMember "Domain Admins" $env:adminUsername
-            add-ADGroupMember "NCAdmins" $env:adminUsername
-            add-ADGroupMember "NCClients" $env:adminUsername
+            add-ADGroupMember "Domain Admins" $using:adminUser
+            add-ADGroupMember "NCAdmins" $using:adminUser
+            add-ADGroupMember "NCClients" $using:adminUser
 
             # Set Administrator Account Not to Expire
 
