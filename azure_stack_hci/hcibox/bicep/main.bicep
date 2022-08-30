@@ -76,7 +76,6 @@ module hostDeployment 'host/host.bicep' = {
     templateBaseUrl: templateBaseUrl
     subnetId: networkDeployment.outputs.subnetId
     deployBastion: deployBastion
-    deployWindowsAdminCenter: deployWindowsAdminCenter
     deployAKSHCI: deployAKSHCI
     deployResourceBridge: deployResourceBridge
     location: location
