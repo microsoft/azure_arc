@@ -253,13 +253,13 @@ foreach ($cluster in $clusters) {
 ################################################
 # - Deploying data services on CAPI cluster
 ################################################
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
 
 foreach ($cluster in $clusters) {
 
     kubectx $cluster.context
     # Installing the Azure Arc-enabled data services cluster extension on the capi cluster
     Write-Host "Installing the Azure Arc-enabled data services cluster extension"
-    $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
     az k8s-extension create --name arc-data-services `
         --extension-type microsoft.arcdataservices `
         --cluster-type connectedClusters `
