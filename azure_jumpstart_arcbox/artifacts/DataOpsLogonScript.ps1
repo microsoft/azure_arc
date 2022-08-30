@@ -326,7 +326,7 @@ foreach ($cluster in $clusters) {
 
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
-& "$Env:ArcBoxDir\DeploySQLMI.ps1"
+& "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
 
 # Enabling data controller auto metrics & logs upload to log analytics
 Write-Header "Enabling Data Controller Metrics & Logs Upload"
