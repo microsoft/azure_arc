@@ -569,6 +569,7 @@
       "type": "Microsoft.OperationsManagement/solutions",
       "apiVersion": "2015-11-01-preview",
       "name": "[variables('Security').name]",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
