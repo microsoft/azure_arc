@@ -1207,7 +1207,7 @@ function Set-AzSMGMT {
 
         try {
 
-            Write-Verbose "Adding SDN Hosts to the Domain"
+            Write-Verbose "Adding HCIBox Hosts to the Domain"
             AddAzSHOSTToDomain -IP $AzSHOST1 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST1 -SDNConfig $SDNConfig
             AddAzSHOSTToDomain -IP $AzSHOST2 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST2 -SDNConfig $SDNConfig
         }
@@ -1232,7 +1232,7 @@ function New-DCVM {
     $ErrorActionPreference = "Continue"
     $adminUser = $env:adminUsername
     Invoke-Command -VMName AzSMGMT -Credential $domainCred -ScriptBlock {
-
+        $adminUser = $using:adminUser
         $SDNConfig = $using:SDNConfig
         $localcred = $using:localcred
         $domainCred = $using:domainCred
@@ -2218,7 +2218,7 @@ ProviderName = "Microsoft RSA SChannel Cryptographic Provider"
 ProviderType = 12 
 SMIME = FALSE 
 RequestType = CMC
-FriendlyName = "Nested SDN Windows Admin Cert"
+FriendlyName = "Nested HCIBox Windows Admin Cert"
 
 [Strings] 
 szOID_SUBJECT_ALT_NAME2 = "2.5.29.17" 
@@ -2288,7 +2288,7 @@ CertificateTemplate= WebServer
             $SDNConfig = Import-PowerShellDataFile -Path C:\SDN\HCIBox-Config.psd1
 
             # Install Windows Admin Center
-            $pfxThumbPrint = (Get-ChildItem -Path Cert:\LocalMachine\my | Where-Object { $_.FriendlyName -match "Nested SDN Windows Admin Cert" }).Thumbprint
+            $pfxThumbPrint = (Get-ChildItem -Path Cert:\LocalMachine\my | Where-Object { $_.FriendlyName -match "Nested HCIBox Windows Admin Cert" }).Thumbprint
             Write-Verbose "Thumbprint: $pfxThumbPrint"
             Write-Verbose "WACPort: $WACPort"
             $WindowsAdminCenterGateway = "https://admincenter." + $fqdn
@@ -2537,7 +2537,7 @@ function New-HyperConvergedEnvironment {
                 
             } 
 
-            Write-Verbose "Rebooting SDN Host $AzSHOST"
+            Write-Verbose "Rebooting HCIBox Host $AzSHOST"
             Start-Sleep -Seconds 60
             Restart-Computer $AzSHOST -Force -Confirm:$false -Credential $using:domainCred
 
@@ -3126,7 +3126,7 @@ $NCAdminCred = new-object -typename System.Management.Automation.PSCredential `
     -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\NCAdmin"), `
     (ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
 
-# Define SDN host Names. Please do not change names as these names are hardcoded in the setup.
+# Define HCIBox host Names. Please do not change names as these names are hardcoded in the setup.
 $AzSHOSTs = @("AzSMGMT", "AzSHOST1", "AzSHOST2")
 
 # Delete configuration if specified
@@ -3242,7 +3242,7 @@ $params = @{
 }
 New-DataDrive @params
     
-# Install SDN Host Software on NestedVMs
+# Install HCIBox Host Software on NestedVMs
 $params = @{
     SDNConfig   = $SDNConfig
     VMPlacement = $VMPlacement
