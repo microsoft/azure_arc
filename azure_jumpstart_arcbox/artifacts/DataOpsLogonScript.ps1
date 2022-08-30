@@ -230,7 +230,7 @@ kubectx capi="arcbox-capi"
 
 
 foreach ($cluster in $clusters) {
-    Write-Header "Onboarding $cluster.clusterName cluster as an Azure Arc-enabled Kubernetes cluster"
+    Write-Header "Onboarding cluster as an Azure Arc-enabled Kubernetes cluster"
     Write-Host "`n"
     if ($cluster.context -ne 'capi') {
         kubectx $cluster.context
@@ -310,7 +310,7 @@ foreach ($cluster in $clusters) {
     (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
     (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
 
-    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController.parameters.json"
+    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-stage.parameters.json"
     Write-Host "`n"
 
     Do {
