@@ -79,9 +79,11 @@ images = [  'arc-bootstrapper',
             'arc-sqlmi',
             'arc-ha-orchestrator',
             'arc-ha-supervisor',
-            'arc-postgres-11',
-            'arc-postgres-12',
-            'arc-security-support'
+            'arc-security-support',
+            'arc-ci-launcher',
+            'arc-sb-plugin',
+            'arc-postgres-14',
+            'arc-postgresql-agent'
         ]
 
 taggedimages = [image + ":" + SOURCE_DOCKER_TAG for image in images]
