@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: arc-ci-launcher
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: arc-ci-launcher
+  namespace: arc-ci-launcher
+imagePullSecrets:
+- name: arcdata-image-pull-secret
+- name: arcdatadev-image-pull-secret
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: arc-ci-launcher
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  # TODO: RBAC-granularize once Connected Cluster least-privilege is available
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: arc-ci-launcher
+    namespace: arc-ci-launcher
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: arc-ci-launcher
+  namespace: arc-ci-launcher
+spec:
+  template:
+    spec:
+      # Logs upload and triggering cleanup
+      terminationGracePeriodSeconds: 90
+      serviceAccountName: arc-ci-launcher
+      volumes:
+      - name: control-patch
+        configMap:
+          name: control-patch
+      - name: test-env
+        secret:
+          secretName: test-env
+      containers:
+      - name: arc-ci-launcher
+        # Placeholder: will be overwritten via yq
+        image: arc-ci-launcher:latest
+        imagePullPolicy: Always
+        # subPath mounts individual files
+        volumeMounts:
+        - name: control-patch
+          mountPath: /launcher/config/patch.json
+          subPath: patch.json
+        - name: test-env
+          mountPath: /launcher/config/.test.env
+          subPath: .test.env
+        env:
+        - name: VERBOSE
+          value: "false"
+        - name: LAUNCHER_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: LAUNCHER_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: IMAGE_PULL_SECRET
+          value: "image-pull-secrets"
+      restartPolicy: Never
+  # Forced to 0 since we don't want ADO to re-trigger deployment on failure
+  backoffLimit: 0
