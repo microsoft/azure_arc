@@ -45,11 +45,6 @@ Install-ADDSForest `
 
 Write-Host "ADDS Deployment successful. Now rebooting computer to finsih setup."
 
-# Add Azure DNS in forwarders
-
-Write-Host "Adding Azure DNS in the forwarders list"
-Add-DnsServerForwarder -IPAddress 168.63.129.16 -PassThru
-
 # schedule task to run after reboot to create reverse DNS lookup
 # $Trigger = New-ScheduledTaskTrigger -AtStartup
 # $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\RunAfterADDSRestart.ps1'
