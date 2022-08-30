@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: arc-ci-launcher
+  namespace: arc-ci-launcher
+spec:
+  template:
+    spec:
+      containers:
+      - name: arc-ci-launcher
+        env:
+          # Change to "true" and the entire launcher will
+          # increase in verbosity, including az cli
+        - name: VERBOSE
+          value: "false"

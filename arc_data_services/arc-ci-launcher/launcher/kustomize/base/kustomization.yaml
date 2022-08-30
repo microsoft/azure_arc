@@ -1,0 +1,40 @@
+resources:
+  - launcher.yaml
+
+secretGenerator:
+- name: test-env
+  namespace: arc-ci-launcher
+  files:
+  - configs/.test.env
+
+# testing purpose
+# These are usual K8s secrets embedded as JSON for use in the launcher pod. We
+# will not be mounting these into the Pod - rather, the Sonobuoy script will
+# query K8s to see if the secret exists  and if so, direct the namespace default
+# sa to use it. The reason we don't mount into pod is because we then have to
+# use filepaths rather than K8s API to perform the cross namespace injection.
+- name: image-pull-secrets
+  namespace: arc-ci-launcher
+  options:
+    disableNameSuffixHash: true
+  files:
+  - configs/arcdata-imagePullSecret.json
+  - configs/arcdatadev-imagePullSecret.json
+
+# These are used to deploy  the actual launcher pod itself, without relying on docker;
+# i.e. we don't depend on docker caching to deploy the actual ci/test containers
+- name: arcdata-image-pull-secret
+  namespace: arc-ci-launcher
+  type: kubernetes.io/dockerconfigjson
+  options:
+    disableNameSuffixHash: true
+  files:
+  - .dockerconfigjson=configs/arcdata-imagePullSecret.json
+
+- name: arcdatadev-image-pull-secret
+  namespace: arc-ci-launcher
+  type: kubernetes.io/dockerconfigjson
+  options:
+    disableNameSuffixHash: true
+  files:
+  - .dockerconfigjson=configs/arcdatadev-imagePullSecret.json
