@@ -14,7 +14,9 @@ param (
 [System.Environment]::SetEnvironmentVariable('domainAdminUsername', $domainAdminUsername,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('domainAdminPassword', $domainAdminPassword,[System.EnvironmentVariableTarget]::Machine)
 
-Start-Transcript -Path "C:\Temp\SetupADDS.log"
+$Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
+
+Start-Transcript -Path "$Env:ArcBoxLogsDir\SetupADDS.log"
 
 # Convert plain text password to secure string
 $secureDomainAdminPassword = $domainAdminPassword | ConvertTo-SecureString -AsPlainText -Force
