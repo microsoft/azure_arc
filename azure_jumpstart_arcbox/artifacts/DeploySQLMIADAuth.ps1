@@ -108,6 +108,7 @@ catch {
 }
 
 # Deploying Azure SQL MI
+Write-Header "Deploying Azure Arc SQL MI"
 
 foreach ($sqlInstance in $sqlInstances) {
     kubectx $sqlInstance.context
