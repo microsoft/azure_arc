@@ -33,10 +33,6 @@ param spnClientSecret string
 @description('Tenant id of the service principal')
 param spnTenantId string
 
-param arcDcName string = 'arcdatactrl'
-
-param mssqlmiName string = 'arcsqlmidemo'
-
 @description('Name for the staging storage account using to hold kubeconfig. This value is passed into the template as an output from mgmtStagingStorage.json')
 param stagingStorageAccountName string
 
@@ -248,7 +244,7 @@ resource vmBootstrap 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' =
       fileUris: [
         uri(templateBaseUrl, 'artifacts/Bootstrap.ps1')
       ]
-      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -arcDcName ${arcDcName} -azureLocation ${location} -mssqlmiName ${mssqlmiName} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -deployWindowsAdminCenter ${deployWindowsAdminCenter} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge}' 
+      commandToExecute: 'powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${windowsAdminUsername} -spnClientId ${spnClientId} -spnClientSecret ${spnClientSecret} -spnTenantId ${spnTenantId} -subscriptionId ${subscription().subscriptionId} -resourceGroup ${resourceGroup().name} -azureLocation ${location} -stagingStorageAccountName ${stagingStorageAccountName} -workspaceName ${workspaceName} -templateBaseUrl ${templateBaseUrl} -deployWindowsAdminCenter ${deployWindowsAdminCenter} -deployAKSHCI ${deployAKSHCI} -deployResourceBridge ${deployResourceBridge}' 
     }
   }
 }
