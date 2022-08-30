@@ -1243,9 +1243,10 @@ function New-DCVM {
         
 
         $ErrorActionPreference = "Continue"
-        Invoke-Command -VMName $VMName -Credential $using:domainCred -ArgumentList $SDNConfig -ScriptBlock {
+        Invoke-Command -VMName $VMName -Credential $using:domainCred -ArgumentList $SDNConfig,$using:adminUser $using:adminUser -ScriptBlock {
 
             $SDNConfig = $args[0]
+            $adminUser = $args[1]
             $SDNDomainFQDN = $SDNConfig.SDNDomainFQDN
 
             $VerbosePreference = "Continue"
@@ -1276,11 +1277,11 @@ function New-DCVM {
 
             New-ADUser @params
             $params = @{
-                Name                  = $using:adminUser
+                Name                  = $adminUser
                 GivenName             = 'Jumpstart'
                 Surname               = 'Jumpstart'
-                SamAccountName        = $using:adminUser
-                UserPrincipalName     = "$using:adminUser@$SDNDomainFQDN"
+                SamAccountName        = $adminUser
+                UserPrincipalName     = "$adminUser@$SDNDomainFQDN"
                 AccountPassword       = $SecureString
                 Enabled               = $true
                 ChangePasswordAtLogon = $false
@@ -1305,9 +1306,9 @@ function New-DCVM {
             add-ADGroupMember "NCClients" "NCClient"
             add-ADGroupMember "NCClients" "Administrator"
             add-ADGroupMember "NCAdmins" "Administrator"
-            add-ADGroupMember "Domain Admins" $using:adminUser
-            add-ADGroupMember "NCAdmins" $using:adminUser
-            add-ADGroupMember "NCClients" $using:adminUser
+            add-ADGroupMember "Domain Admins" $adminUser
+            add-ADGroupMember "NCAdmins" $adminUser
+            add-ADGroupMember "NCClients" $adminUser
 
             # Set Administrator Account Not to Expire
 
