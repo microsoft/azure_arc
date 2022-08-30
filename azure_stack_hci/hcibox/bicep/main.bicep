@@ -20,29 +20,23 @@ param windowsAdminPassword string
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
+@description('Option to deploy Windows Admin Center with HCIBox')
+param deployWindowsAdminCenter bool = true
+
+@description('Option to deploy AKS-HCI with HCIBox')
+param deployAKSHCI bool = true
+
+@description('Option to deploy Resource Bridge with HCIBox')
+param deployResourceBridge bool = true
+
 @description('Target GitHub account')
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
 param githubBranch string = 'main'
 
-@description('The flavor of ArcBox you want to deploy. Valid values are: \'Full\', \'ITPro\', \'DevOps\'')
-@allowed([
-  'Full'
-  'ITPro'
-  'DevOps'
-])
-param flavor string = 'Full'
-
-
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
-
-@description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
-param githubUser string = 'microsoft'
-
-@description('Active Directory domain name')
-param addsDomainName string = 'hcibox.local'
 
 @description('Location to deploy resources')
 param location string = resourceGroup().location
@@ -83,11 +77,11 @@ module hostDeployment 'host/host.bicep' = {
     workspaceName: logAnalyticsWorkspaceName
     stagingStorageAccountName: storageAccountDeployment.outputs.storageAccountName
     templateBaseUrl: templateBaseUrl
-    flavor: flavor
     subnetId: networkDeployment.outputs.subnetId
     deployBastion: deployBastion
-    githubUser: githubUser
+    deployWindowsAdminCenter: deployWindowsAdminCenter
+    deployAKSHCI: deployAKSHCI
+    deployResourceBridge: deployResourceBridge
     location: location
-    addsDomainName: addsDomainName
   }
 }
