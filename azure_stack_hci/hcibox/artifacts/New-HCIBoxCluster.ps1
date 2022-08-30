@@ -2180,6 +2180,7 @@ function New-AdminCenterVM {
 
             # Install Azure PowerShell
             $VerbosePreference = "SilentlyContinue"
+            [Net.ServicePointManager]::SecurityProtocol
             Install-Module -Name Az -AllowClobber -SkipPublisherCheck -Force -Confirm:$false
             $VerbosePreference = "Continue"
 
