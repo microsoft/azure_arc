@@ -1,0 +1,15 @@
+# For Azure Arc Connected Cluster
+# https://docs.microsoft.com/en-us/azure/azure-arc/kubernetes/quickstart-connect-cluster?tabs=azure-cli#prerequisites
+# TODO: Remove this once Connected Cluster rolls this feature out
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: system:openshift:scc:privileged
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:privileged
+subjects:
+- kind: ServiceAccount
+  name: azure-arc-kube-aad-proxy-sa
+  namespace: azure-arc
