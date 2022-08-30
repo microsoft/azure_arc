@@ -1244,7 +1244,7 @@ function New-DCVM {
 
         $ErrorActionPreference = "Continue"
         $SDNConfig.adminUser = $using:adminUser
-        Invoke-Command -VMName $VMName -Credential $using:domainCred -ArgumentList $SDNConfig $using:adminUser -ScriptBlock {
+        Invoke-Command -VMName $VMName -Credential $using:domainCred -ArgumentList $SDNConfig -ScriptBlock {
 
             $SDNConfig = $args[0]
             $SDNDomainFQDN = $SDNConfig.SDNDomainFQDN
