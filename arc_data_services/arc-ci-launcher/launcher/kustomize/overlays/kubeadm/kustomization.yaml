@@ -1,0 +1,11 @@
+bases:
+ - ../../base
+ 
+patchesStrategicMerge:
+ - launcher.yaml
+ 
+configMapGenerator:
+- name: control-patch
+  namespace: arc-ci-launcher
+  files:
+    - configs/patch.json
