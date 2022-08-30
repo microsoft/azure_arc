@@ -207,9 +207,9 @@ if ($flavor -eq "DataOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile $Env:ArcBoxDir\sqlmi.parameters.json
     Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIEndpoints.ps1") -OutFile $Env:ArcBoxDir\SQLMIEndpoints.ps1
     Invoke-WebRequest "https://github.com/ErikEJ/SqlQueryStress/releases/download/102/SqlQueryStress.zip" -OutFile $Env:ArcBoxDir\SqlQueryStress.zip
-    Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile "${tempDir}\adConnector.yaml"
-    Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnectorCMK.yaml") -OutFile "${tempDir}\adConnectorCMK.yaml"
-    Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIADAuthCMK.yaml") -OutFile "${tempDir}\SQLMIADAuthCMK.yaml"
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile $Env:ArcBoxDir\adConnector.yaml
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnectorCMK.yaml") -OutFile $Env:ArcBoxDir\adConnectorCMK.yaml
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIADAuthCMK.yaml") -OutFile $Env:ArcBoxDir\SQLMIADAuthCMK.yaml
 }
 
 # Full
