@@ -20,9 +20,6 @@ param windowsAdminPassword string
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
-@description('Option to deploy Windows Admin Center with HCIBox')
-param deployWindowsAdminCenter bool = true
-
 @description('Option to deploy AKS-HCI with HCIBox')
 param deployAKSHCI bool = true
 
