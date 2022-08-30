@@ -1,0 +1,15 @@
+apiVersion: {{ARC_DATA_API_VERSION}}
+kind: ActiveDirectoryConnector
+metadata:
+  name: adarc
+  namespace: arc
+spec:
+  activeDirectory:
+    realm: {{ADDS_DOMAIN_NAME}}
+    domainControllers:
+      primaryDomainController:
+        hostname: {{ADDS_DC_NAME}}
+  dns:
+    preferK8sDnsForPtrLookups: false
+    nameserverIPAddresses:
+      - {{ADDS_IP_ADDRESS}}
