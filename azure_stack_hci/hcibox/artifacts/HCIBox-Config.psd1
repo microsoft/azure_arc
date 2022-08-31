@@ -122,7 +122,7 @@
     SDDCInstall                          = $true
 
     # AKS and Resource bridge variables
-    AKSvnetname = "HCIBox-VNET"
+    AKSvnetname = "akshcivnet"
     AKSvSwitchName = "sdnSwitch"
     AKSNodeStartIP = "192.168.200.25"
     AKSNodeEndIP = "192.168.200.100"
