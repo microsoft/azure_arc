@@ -25,38 +25,30 @@ $password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainT
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
 # Install AZ Resource Bridge
-Write-Host "Now Preparing to Install Azure Arc Resource Bridge" -ForegroundColor Black -BackgroundColor Green 
+Write-Host "Now Preparing to Install Azure Arc Resource Bridge"
 
 # Install Required Modules
 foreach ($VM in $SDNConfig.HostList) { 
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
-        $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
+        $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; Remove-Item .\AzureCLI.msi
     }
 }
-
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+$csv_path = "C:\ClusterStorage\S2D_vDISK1"
+Invoke-Command -VMName $SDNConfig.HostList[1] -Credential $adcred -ScriptBlock {
     Install-PackageProvider -Name NuGet -Force 
     Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
     Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
 
-    #Install Required Extensions
-    # az extension remove --name arcappliance
-    # az extension remove --name connectedk8s
-    # az extension remove --name k8s-configuration
-    # az extension remove --name k8s-extension
-    # az extension remove --name customlocation
-    # az extension remove --name azurestackhci
+    $ErrorActionPreference = "SilentlyContinue"
     az extension add --upgrade --name arcappliance
     az extension add --upgrade --name connectedk8s
     az extension add --upgrade --name k8s-configuration
     az extension add --upgrade --name k8s-extension
     az extension add --upgrade --name customlocation
     az extension add --upgrade --name azurestackhci
+    $ErrorActionPreference = "Continue"
 
-    $csv_path = "C:\ClusterStorage\S2D_vDISK1"
-    $resource_name = "HCIBox-ResourceBridge"
-
-    New-Item -Path $csv_path -Name "ResourceBridge" -ItemType Directory
+    New-Item -Path $using:csv_path -Name "ResourceBridge" -ItemType Directory
 }
 
 $subId = $env:subscriptionId
@@ -64,29 +56,20 @@ $rg = $env:resourceGroup
 $spnClientId = $env:spnClientId
 $spnSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
+$resource_name = "HCIBox-ResourceBridge"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $csv_path = "C:\ClusterStorage\S2D_vDISK1"
-    $resource_name = "hcibox-arcbridge"
-    New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $resource_name -workDirectory $csv_path\ResourceBridge -controlPlaneIP $using:aksvar.rbCpip  -k8snodeippoolstart $using:aksvar.rbIp -k8snodeippoolend $using:aksvar.rbIp -gateway $using:aksvar.AKSGWIP -dnsservers $using:aksvar.AKSDNSIP -ipaddressprefix $using:aksvar.AKSIPPrefix   
+    New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip  -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix   
 }
-
+$ErrorActionPreference = "SilentlyContinue"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $csv_path = "C:\ClusterStorage\S2D_vDISK1"
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
     az provider register -n Microsoft.ResourceConnector --wait
-    az arcappliance validate hci --config-file $csv_path\ResourceBridge\hci-appliance.yaml
+    az arcappliance validate hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml
+    az arcappliance prepare hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml
+    az arcappliance deploy hci --config-file  $using:csv_path\ResourceBridge\hci-appliance.yaml --outfile $env:USERPROFILE\.kube\config
+    az arcappliance create hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml --kubeconfig $env:USERPROFILE\.kube\config
 }
-    #start-sleep 60
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    $csv_path = "C:\ClusterStorage\S2D_vDISK1"
-    az arcappliance prepare hci --config-file $csv_path\ResourceBridge\hci-appliance.yaml
 
-    #Start-Sleep 60
-    az arcappliance deploy hci --config-file  $csv_path\ResourceBridge\hci-appliance.yaml --outfile $env:USERPROFILE\.kube\config
-
-    #Start-Sleep 60
-    az arcappliance create hci --config-file $csv_path\ResourceBridge\hci-appliance.yaml --kubeconfig $env:USERPROFILE\.kube\config
-
-}
+$ErrorActionPreference = "Continue"
 
 Stop-Transcript

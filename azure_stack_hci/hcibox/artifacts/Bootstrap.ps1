@@ -96,9 +96,8 @@ foreach ($app in $appsToInstall)
     & choco install $app /y -Force | Write-Output
 }
 
-# All flavors
-# Write-Host "Fetching artifacts"
-# Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/img/hcibox_logo.png" -OutFile $Env:HCIBoxDir\wallpaper.png
+Write-Host "Fetching artifacts"
+Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
 # Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:HCIBoxDir\DeploymentStatus.ps1
 # Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxLogsDir\LogInstructions.txt
 

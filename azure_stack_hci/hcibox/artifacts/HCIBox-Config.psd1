@@ -139,6 +139,6 @@
     AKSVlanID="200"
     rbLocation = "eastus"
     rbCustomLocationName = "hcibox-rb-cl"
-    rbIp = "192.168.200.201"
-    rbCpip = "192.168.200.202"
+    rbIp = "192.168.1.199"
+    rbCpip = "192.168.200.199"
 }
