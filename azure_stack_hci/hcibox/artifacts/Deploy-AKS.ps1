@@ -77,4 +77,11 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     Enable-AksHciArcConnection -name "hcibox-aks"
 }
 
+Write-Header "Checking AKS-HCI nodes and running pods"
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+    Get-AksHciCredential -name "hcibox-aks"
+    kubectl get nodes
+    kubectl get pods -A
+}
+
 Stop-Transcript
