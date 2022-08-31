@@ -164,8 +164,8 @@ foreach ($sqlInstance in $sqlInstances) {
     $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_FQDN}}", $sqlmi_fqdn_name)
     $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_PORT}}", $sqlmi_port)
     $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_NAME}}", $sqlMIName)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{PRICING_TIER}}", $pricingTier)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{REPLICA_COUNT}}", $replicas)
+    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{PRICING_TIER}}", 'BusinessCritical')
+    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{REPLICA_COUNT}}", 3)
 
     Set-Content -Path $sqlMIADAuthYAMLFile -Value $sqlMIADAuthContent
     # Deploy SQLMI instance
