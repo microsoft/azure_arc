@@ -259,3 +259,4 @@ sudo -u $adminUsername az storage azcopy blob upload --container $storageContain
 # Restart CAPI Managemnet VM if DataOps
 if [ $flavor = "DataOps" ]; then
   sudo -u $adminUsername az vm restart -g $AZURE_RESOURCE_GROUP -n "ArcBox-CAPI-MGMT" --force
+fi
