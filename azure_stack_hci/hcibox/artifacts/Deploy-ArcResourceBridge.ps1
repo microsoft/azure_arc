@@ -57,19 +57,50 @@ $spnClientId = $env:spnClientId
 $spnSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $resource_name = "HCIBox-ResourceBridge"
+$location = "eastus"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip  -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix   
 }
 $ErrorActionPreference = "SilentlyContinue"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    Write-Host "Deploying Arc Resource Bridge. This will take a while."
     az login --service-principal --username $using:spnClientID --password $using:spnSecret --tenant $using:spnTenantId
     az provider register -n Microsoft.ResourceConnector --wait
     az arcappliance validate hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml
     az arcappliance prepare hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml
     az arcappliance deploy hci --config-file  $using:csv_path\ResourceBridge\hci-appliance.yaml --outfile $env:USERPROFILE\.kube\config
     az arcappliance create hci --config-file $using:csv_path\ResourceBridge\hci-appliance.yaml --kubeconfig $env:USERPROFILE\.kube\config
-}
 
+    $rbReady = $false
+    Do {
+        Write-Host "Waiting on Arc Resource Bridge deployment to complete..."
+        Start-Sleep 60
+        $readiness = az arcappliance show --resource-group $using:rg --name $using:resource_name | ConvertFrom-Json
+        if (($readiness.provisioningState -eq "Succeeded") -and ($readiness.status -eq "Running")) {
+            $rbReady = $true
+        }
+    } Until ($rbReady)
+    Write-Host "Arc Resource Bridge deployment complete."
+
+    # Configuring custom location
+    Write-Host "Creating custom location"
+    $hciClusterId= (Get-AzureStackHci).AzureResourceUri
+    az k8s-extension create --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name hci-vmoperator --extension-type Microsoft.AZStackHCI.Operator --scope cluster --release-namespace helm-operator2 --configuration-settings Microsoft.CustomLocation.ServiceAccount=hci-vmoperator --configuration-protected-settings-file $using:csv_path\ResourceBridge\hci-config.json --configuration-settings HCIClusterID=$hciClusterId --auto-upgrade true
+
+    $clReady = $false
+    Do {
+        Write-Host "Waiting for custom location to provision..."
+        Start-Sleep 10
+        $readiness = az k8s-extension show --cluster-type appliances --cluster-name $using:resource_name --resource-group $using:rg --name hci-vmoperator | ConvertFrom-Json
+        if ($readiness.provisioningState -eq "Succeeded") {
+            $clReady = $true
+        }
+    } Until ($clReady)
+
+    az customlocation create --resource-group $using:rg --name "hcibox-rb-cl" --cluster-extension-ids "/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ResourceConnector/appliances/$using:resource_name/providers/Microsoft.KubernetesConfiguration/extensions/hci-vmoperator" --namespace hci-vmoperator --host-resource-id "/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ResourceConnector/appliances/$using:resource_name" --location $using:location
+    Write-Host "Custom location created."
+}
 $ErrorActionPreference = "Continue"
+
 
 Stop-Transcript
