@@ -46,6 +46,7 @@ $graphtoken = Get-AzAccessToken -ResourceTypeName AadGraph
 $clustername = 'HCIBox-Cluster'
 $azureLocation = 'eastus'
 Register-AzStackHCI -SubscriptionId $env:subscriptionId -ComputerName $SDNConfig.HostList[0] -AccountId $env:spnClientID -ArmAccessToken $armtoken.Token -GraphAccessToken $graphtoken.Token -EnableAzureArcServer -Credential $adcred -Region $azureLocation -ResourceName $clustername -ResourceGroupName $env:resourceGroup -ArcServerResourceGroupName $env:resourceGroup-ArcServers
+Move-Item -Path RegisterHCI_* -Destination $Env:HCIBoxLogsDir\RegisterHCI_PS_Output.log
 
 Write-Host "$clustername successfully registered as Az Stack HCI cluster resource in Azure"
 
