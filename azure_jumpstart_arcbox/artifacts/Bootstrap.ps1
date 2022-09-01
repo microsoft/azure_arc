@@ -210,6 +210,9 @@ if ($flavor -eq "DataOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.yaml") -OutFile $Env:ArcBoxDir\adConnector.yaml
     Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnectorCMK.yaml") -OutFile $Env:ArcBoxDir\adConnectorCMK.yaml
     Invoke-WebRequest ($templateBaseUrl + "artifacts/SQLMIADAuthCMK.yaml") -OutFile $Env:ArcBoxDir\SQLMIADAuthCMK.yaml
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.json") -OutFile $Env:ArcBoxDir\adConnector.json
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.parameters.json") -OutFile $Env:ArcBoxDir\adConnector.parameters.json
+    
 }
 
 # Full

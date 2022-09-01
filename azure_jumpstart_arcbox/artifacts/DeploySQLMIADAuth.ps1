@@ -91,7 +91,7 @@ $sqlmisaupn = $arcsaname + "@" + $dcInfo.domain
 $samaccountname = $arcsaname
 $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
 $domain_name = $dcInfo.domain.ToUpper()
-$sqlmi_port = "32400"
+#$sqlmi_port = "32400"
 
 try {
     New-ADUser -Name $arcsaname `
@@ -132,7 +132,7 @@ foreach ($sqlInstance in $sqlInstances) {
     $b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_USERNAME))
     $b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_PASSWORD))
     # Read YAML file and replace parameter values
-    $adConectorYAMLFile = "$Env:ArcBoxDir\adConnectorCMK.yaml"
+    <#$adConectorYAMLFile = "$Env:ArcBoxDir\adConnectorCMK.yaml"
     $adConnectorContent = Get-Content $adConectorYAMLFile
     $adConnectorContent = $adConnectorContent.Replace("{{ARC_DATA_API_VERSION}}", "arcdata.microsoft.com/v1beta1")
     $adConnectorContent = $adConnectorContent.Replace("{{ADDS_DOMAIN_NAME}}", $dcInfo.domain.ToUpper())
@@ -142,11 +142,32 @@ foreach ($sqlInstance in $sqlInstances) {
     # Now deploy AD connector in AKS with customer managed keytab generated above
     kubectl apply -f $adConectorYAMLFile
     #Wait for the AD connector deploy pods
+    #>
+
+    Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-stage.parameters.json"
+    $adConnectorParams = "$Env:ArcBoxDir\adConnector-stage.parameters.json"
+    $adConnectorName = "adarc"
+    $serviceAccountProvisioning = "automatic"
+
+(Get-Content -Path $adConnectorParams) -replace 'serviceAccountPassword-stage', $arcsapass | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'serviceAccountUsername-stage', $arcsaname | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'connectorName-stage', $adConnectorName | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'domainController-stage', $dcInfo.HostName | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'netbiosDomainName-stage', $domain_netbios_name | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'ouDistinguishedName-stage', $sqlmiOUDN | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'realm-stage', $dcInfo.domain.ToUpper() | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.ToUpper() | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'nameserverIPAddresses-stage', $dcInfo.IPv4Address | Set-Content -Path $adConnectorParams
+
+az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-stage.parameters.json"
+Write-Host "`n"
+
     Write-Host "`n"
     Do {
         Write-Host "Waiting for AD connector deployment. Hold tight, this might take a few minutes...(30s sleeping loop)"
         Start-Sleep -Seconds 30
-        $adcStatus = $(if (kubectl get adc adarc -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+        $adcStatus = $(if (kubectl get adc $adConnectorName -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($adcStatus -eq "Nope")
 
     Write-Host "`n"

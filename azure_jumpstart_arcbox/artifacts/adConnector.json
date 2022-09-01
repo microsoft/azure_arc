@@ -1,0 +1,80 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "serviceAccountPassword": {
+      "type": "String"
+    },
+    "serviceAccountUsername": {
+      "type": "String"
+    },
+    "connectorName": {
+      "type": "String"
+    },
+    "domainController": {
+      "type": "string"
+    },
+    "netbiosDomainName": {
+      "type": "string"
+    },
+    "ouDistinguishedName": {
+      "type": "string"
+    },
+    "realm": {
+      "type": "string"
+    },
+    "serviceAccountProvisioning": {
+      "type": "string"
+    },
+    "domainName": {
+      "type": "string"
+    },
+    "nameserverIPAddresses": {
+      "type": "array"
+    },
+    "apiVersion": {
+      "type": "String"
+    }
+  },
+  "variables": {},
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.AzureArcData/dataControllers/activeDirectoryConnectors",
+      "apiVersion": "[parameters('apiVersion')]",
+      "name": "[parameters('connectorName')]",
+      "properties": {
+        "domainServiceAccountLoginInformation": {
+          "password": "[parameters('serviceAccountPassword')]",
+          "username": "[parameters('serviceAccountUsername')]"
+        },
+        "spec": {
+          "activeDirectory": {
+            "domainControllers": {
+              "primaryDomainController": {
+                "hostname": "[parameters('domainController')]"
+              }
+            },
+            "netbiosDomainName": "[parameters('netbiosDomainName')]",
+            "ouDistinguishedName": "[parameters('ouDistinguishedName')]",
+            "realm": "[parameters('realm')]",
+            "serviceAccountProvisioning": "[parameters('serviceAccountProvisioning')]"
+          },
+          "dns": {
+            "domainName": "[parameters('domainName')]",
+            "nameserverIPAddresses": "[parameters('nameserverIPAddresses')]",
+            "preferK8sDnsForPtrLookups": "false"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
