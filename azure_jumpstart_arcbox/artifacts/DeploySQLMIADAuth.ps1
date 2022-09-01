@@ -57,9 +57,9 @@ $sqlInstances = @(
 
     [pscustomobject]@{instanceName = 'arcboxsqlcapi'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{instanceName = 'arcboxsqlaks'; dataController = 'aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{instanceName = 'arcboxsqlaks'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{instanceName = 'arcboxsqldr'; dataController = 'aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{instanceName = 'arcboxsqldr'; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 $sqlmiouName = "ArcSQLMI"
@@ -91,6 +91,7 @@ $sqlmisaupn = $arcsaname + "@" + $dcInfo.domain
 $samaccountname = $arcsaname
 $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
 $domain_name = $dcInfo.domain.ToUpper()
+$nameserverIPAddresses = @("dcInfo.IPv4Address")
 #$sqlmi_port = "32400"
 
 try {
@@ -107,7 +108,7 @@ catch {
     Write-Host "User $arcsaname already existings in the directory."
 }
 
-# Deploying Active Directory connector
+# Deploying Active Directory connector and Azure Arc SQL MI
 Write-Header "Deploying Active Directory connector"
 
 foreach ($sqlInstance in $sqlInstances) {
@@ -131,22 +132,10 @@ foreach ($sqlInstance in $sqlInstances) {
     # Convert SQL Admin credentials into base64 format
     $b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_USERNAME))
     $b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_PASSWORD))
-    # Read YAML file and replace parameter values
-    <#$adConectorYAMLFile = "$Env:ArcBoxDir\adConnectorCMK.yaml"
-    $adConnectorContent = Get-Content $adConectorYAMLFile
-    $adConnectorContent = $adConnectorContent.Replace("{{ARC_DATA_API_VERSION}}", "arcdata.microsoft.com/v1beta1")
-    $adConnectorContent = $adConnectorContent.Replace("{{ADDS_DOMAIN_NAME}}", $dcInfo.domain.ToUpper())
-    $adConnectorContent = $adConnectorContent.Replace("{{ADDS_DC_NAME}}", $dcInfo.HostName)
-    $adConnectorContent = $adConnectorContent.Replace("{{ADDS_IP_ADDRESS}}", $dcInfo.IPv4Address)
-    Set-Content -Path $adConectorYAMLFile -Value $adConnectorContent
-    # Now deploy AD connector in AKS with customer managed keytab generated above
-    kubectl apply -f $adConectorYAMLFile
-    #Wait for the AD connector deploy pods
-    #>
 
     Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-stage.parameters.json"
     $adConnectorParams = "$Env:ArcBoxDir\adConnector-stage.parameters.json"
-    $adConnectorName = "adarc"
+    $adConnectorName = $sqlInstance.dataController+"/adarc"
     $serviceAccountProvisioning = "automatic"
 
 (Get-Content -Path $adConnectorParams) -replace 'serviceAccountPassword-stage', $arcsapass | Set-Content -Path $adConnectorParams
@@ -157,8 +146,7 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $adConnectorParams) -replace 'ouDistinguishedName-stage', $sqlmiOUDN | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'realm-stage', $dcInfo.domain.ToUpper() | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
-(Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.ToUpper() | Set-Content -Path $adConnectorParams
-(Get-Content -Path $adConnectorParams) -replace 'nameserverIPAddresses-stage', $dcInfo.IPv4Address | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.Tolower() | Set-Content -Path $adConnectorParams
 
 az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-stage.parameters.json"
 Write-Host "`n"
@@ -167,17 +155,18 @@ Write-Host "`n"
     Do {
         Write-Host "Waiting for AD connector deployment. Hold tight, this might take a few minutes...(30s sleeping loop)"
         Start-Sleep -Seconds 30
-        $adcStatus = $(if (kubectl get adc $adConnectorName -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+        $adcStatus = $(if (kubectl get adc adarc -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($adcStatus -eq "Nope")
 
     Write-Host "`n"
     Write-Host "Azure Arc AD connector ready!"
     Write-Host "`n"
 
+    Remove-Item "$Env:ArcBoxDir\adConnector-stage.parameters.json" -Force
     # Deploying Azure Arc SQL Managed Instance
 
     Write-Header "Deploying Azure Arc SQL Managed Instance"
-    $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $sqlInstace.dataController --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+    $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $sqlInstance.dataController --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
     $customLocationId = $(az customlocation show --name $sqlInstance.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
 
     ################################################
@@ -209,8 +198,8 @@ Write-Host "`n"
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'azdataPassword-stage', $Env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'azdataUsername-stage', $env:AZDATA_USERNAME | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'azdataPassword-stage', $env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'serviceType-stage', $ServiceType | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage', $readableSecondaries | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage', $vCoresRequest | Set-Content -Path $SQLParams
@@ -238,41 +227,12 @@ Write-Host "`n"
     Write-Host "Azure Arc SQL Managed Instance is ready!"
     Write-Host "`n"
 
-    Remove-Item "$Env:ArcBoxDir\SQLMI-stage-stage.parameters.json" -Force
+    Remove-Item "$Env:ArcBoxDir\SQLMI-stage.parameters.json" -Force
 
     # Update Service Port from 1433 to Non-Standard
     $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-    kubectl patch svc "$sqlInstance.instanceName-external-svc" -n arc --type merge --patch $payload
+    kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload
     Start-Sleep 5 # To allow the CRD to update
-    # Deploy SQL MI with AD auth
-    <#Copy-Item "$Env:ArcBoxDir\SQLMIADAuthCMK.yaml" -Destination "$Env:ArcBoxDir\SQLMIADAuthCMK-stage.yaml"
-    $sqlMIADAuthYAMLFile = "$Env:ArcBoxDir\SQLMIADAuthCMK-stage.yaml"
-    $sqlMIADAuthContent = Get-Content $sqlMIADAuthYAMLFile
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{ARC_DATA_API_VERSION}}", "sql.arcdata.microsoft.com/v3")
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{B64_SQLMI_ADMIN_USER}}", $b64UserName)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{B64_SQLMI_ADMIN_PWD}}", $b64Password)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{B64_KEYTAB_DATA}}", $b64keytabtext)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_AD_USER}}", $samaccountname)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_FQDN}}", $sqlmi_fqdn_name)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_PORT}}", $sqlmi_port)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{SQLMI_NAME}}", $sqlMIName)
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{PRICING_TIER}}", 'BusinessCritical')
-    $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{REPLICA_COUNT}}", 3)
-
-    Set-Content -Path $sqlMIADAuthYAMLFile -Value $sqlMIADAuthContent
-    # Deploy SQLMI instance
-    kubectl apply -f $sqlMIADAuthYAMLFile
-    Remove-Item "$Env:ArcBoxDir\SQLMIADAuthCMK-stage.yaml" -Force
-    Write-Host "`n"
-    Do {
-        Write-Host "Waiting for SQL Managed Instance with AD authentication. Hold tight, this might take a few minutes...(45s sleeping loop)"
-        Start-Sleep -Seconds 45
-        $sqlmiStatus = $(if (kubectl get SqlManagedInstance $sqlMIName -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($sqlmiStatus -eq "Nope")
-
-    Write-Host "`n"
-    Write-Host "Azure Arc SQL Managed Instance with AD authentication is ready!"
-    Write-Host "`n"
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
@@ -294,8 +254,9 @@ Write-Host "`n"
     $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
 
     Write-Host "SQL Managed Instance with AD authentication endpoint: $sqlmiEndPoint"
-    #>
+    
 }
+<#
 
 # Get public ip of the SQLMI endpoint
 $nodeRG = (az aks show --name $Env:clusterName -g $Env:resourceGroup --query "nodeResourceGroup")
@@ -396,3 +357,5 @@ else {
 
 # Strop transcrip
 Stop-Transcript
+
+#>

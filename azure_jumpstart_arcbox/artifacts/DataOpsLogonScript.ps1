@@ -14,7 +14,7 @@ $clusters = @(
 
     [pscustomobject]@{clusterName = 'ArcBox-AKS'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{clusterName = 'ArcBox-AKS-DR'; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{clusterName = 'ArcBox-AKS-DR'; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 
@@ -85,6 +85,13 @@ $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
 $Shortcut.Save()
+
+# Installing AD RSAT tools
+Write-Host "`n"
+Write-Host "Installing AD RSAT tools"
+get-WindowsFeature | Where-Object {$_.Name -like "RSAT-AD-Tools"} | Install-WindowsFeature
+get-WindowsFeature | Where-Object {$_.Name -like "RSAT-DNS-Server"} | Install-WindowsFeature
+Write-Host "`n"
 
 ################################################
 # - Created Nested SQL VM

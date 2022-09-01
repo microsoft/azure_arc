@@ -37,7 +37,8 @@
       "type": "string"
     },
     "nameserverIPAddresses": {
-      "type": "array"
+      "type": "array",
+      "defaultValue": [ "10.16.2.100" ]
     },
     "apiVersion": {
       "type": "String"
@@ -70,7 +71,7 @@
           "dns": {
             "domainName": "[parameters('domainName')]",
             "nameserverIPAddresses": "[parameters('nameserverIPAddresses')]",
-            "preferK8sDnsForPtrLookups": "false"
+            "preferK8sDnsForPtrLookups": false
           }
         }
       }
