@@ -29,11 +29,11 @@
       "domainName": {
         "value": "domainName-stage"
       },
-      "nameserverIPAddresses": {
-        "value": "nameserverIPAddresses-stage"
-      },
       "apiVersion": {
         "value": "2022-03-01-preview"
+      },
+      "resourceType":{
+        "value": "parentType-stage"
       }
     }
   }
