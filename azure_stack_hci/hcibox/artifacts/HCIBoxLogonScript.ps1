@@ -65,6 +65,10 @@ Write-Header "Registering HCI cluster"
 Write-Header "Deploying AKS"
 & "$Env:HCIBoxDir\Deploy-AKS.ps1"
 
+# Deploy Arc Resource Bridge
+Write-Header "Deploying Arc Resource Bridge"
+& "$Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1"
+
 # deploy Data services
 # Write-Header "Deploying Azure Arc-enabled data services and SQL Managed Instance"
 # & "$Env:HCIBoxDir\Deploy-SQLMI.ps1"

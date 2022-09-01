@@ -5,7 +5,7 @@
     # Version 1.0.0
 
     # HCI host names
-    HostList="AZSHost1", "AZSHOST2"
+    HostList="AZSHOST1", "AZSHOST2"  # DO NOT CHANGE these as they remain hardcoded in places
 
     # VHDX Paths 
     guiVHDXPath                          = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              

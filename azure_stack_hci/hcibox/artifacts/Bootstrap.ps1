@@ -34,8 +34,6 @@ Write-Output "Creating HCIBox paths"
 $Env:HCIBoxDir = "C:\HCIBox"
 $Env:HCIBoxLogsDir = "C:\HCIBox\Logs"
 $Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
-$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
-$Env:HCIBoxGitOpsDir = "C:\HCIBox\GitOps"
 $Env:HCIBoxIconDir = "C:\HCIBox\Icons"
 $Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
 $Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
@@ -50,8 +48,6 @@ New-Item -Path $Env:HCIBoxVHDDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxSDNDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxLogsDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxVMDir -ItemType directory -Force
-New-Item -Path $Env:HCIBoxKVDir -ItemType directory -Force
-New-Item -Path $Env:HCIBoxGitOpsDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxIconDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxWACDir -ItemType directory -Force
 New-Item -Path $Env:ToolsDir -ItemType Directory -Force

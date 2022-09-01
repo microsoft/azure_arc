@@ -24,7 +24,7 @@ $user = "jumpstart.local\administrator"
 $password = ConvertTo-SecureString -String $SDNConfig.SDNAdminPassword -AsPlainText -Force
 $adcred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $password
 
-# Install AZ Resource Bridge
+# Install AZ Resource Bridge and prerequisites
 Write-Host "Now Preparing to Install Azure Arc Resource Bridge"
 
 # Install Required Modules
@@ -58,6 +58,7 @@ $spnSecret = $env:spnClientSecret
 $spnTenantId = $env:spnTenantId
 $resource_name = "HCIBox-ResourceBridge"
 $location = "eastus"
+$custom_location_name = "hcibox-rb-cl"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip  -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix   
 }
@@ -97,10 +98,31 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
         }
     } Until ($clReady)
 
-    az customlocation create --resource-group $using:rg --name "hcibox-rb-cl" --cluster-extension-ids "/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ResourceConnector/appliances/$using:resource_name/providers/Microsoft.KubernetesConfiguration/extensions/hci-vmoperator" --namespace hci-vmoperator --host-resource-id "/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ResourceConnector/appliances/$using:resource_name" --location $using:location
+    az customlocation create --resource-group $using:rg --name $using:custom_location_name --cluster-extension-ids "/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ResourceConnector/appliances/$using:resource_name/providers/Microsoft.KubernetesConfiguration/extensions/hci-vmoperator" --namespace hci-vmoperator --host-resource-id "/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ResourceConnector/appliances/$using:resource_name" --location $using:location
     Write-Host "Custom location created."
 }
 $ErrorActionPreference = "Continue"
 
+# Copy gallery VHDs to hosts
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    New-Item -Name "VHD" -Path $csv_path -ItemType Directory -Force
+    Move-Item -Path "C:\VHD\GUI.vhdx" -Destination "$csv_path\VHD" -Force
+}
 
+$ErrorActionPreference = "SilentlyContinue"
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    $vnetName="sdnSwitch"
+    az azurestackhci virtualnetwork create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --network-type "Transparent" --name $vnetName
+    
+    # $galleryImageName = "ubuntu20"
+    # $galleryImageSourcePath="$using:csv_path\Ubuntu.vhdx"
+    # $osType="Linux"
+    # az azurestackhci galleryimage create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --image-path $galleryImageSourcePath --name $galleryImageName --os-type $osType
+
+    $galleryImageName = "win2k19"
+    $galleryImageSourcePath="$using:csv_path\GUI.vhdx"
+    $osType="Windows"
+    az azurestackhci galleryimage create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --image-path $galleryImageSourcePath --name $galleryImageName --os-type $osType
+}
+$ErrorActionPreference = "Continue"
 Stop-Transcript
