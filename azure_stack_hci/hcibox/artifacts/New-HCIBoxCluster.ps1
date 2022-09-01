@@ -2213,16 +2213,12 @@ CertificateTemplate= WebServer
 }
 
 function New-HyperConvergedEnvironment {
-
     Param (
-
         $localCred,
         $domainCred
-
     )
 
     Invoke-Command -ComputerName Admincenter -Credential $domainCred -ScriptBlock {
-
         $SDNConfig = $Using:SDNConfig
 
         $ErrorActionPreference = "Stop"
@@ -2233,15 +2229,10 @@ function New-HyperConvergedEnvironment {
         (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
         foreach ($AzSHOST in $SDNconfig.HostList) {
-
             Write-Verbose "Invoking Command on $AzSHOST"
-
             Invoke-Command -ComputerName $AzSHOST -ArgumentList $SDNConfig -Credential $using:domainCred  -ScriptBlock {
-
                 function New-sdnSETSwitch {
-
                     param (
-
                         $sdnswitchName, 
                         $sdnswitchIP, 
                         $sdnswitchIPpfx, 
@@ -2249,14 +2240,10 @@ function New-HyperConvergedEnvironment {
                         $sdnswitchGW, 
                         $sdnswitchDNS, 
                         $sdnswitchteammembers
-
                     )
 
                     $VerbosePreference = "Continue"
-
                     Write-Verbose "Creating SET Hyper-V External Switch $sdnswitchName on host $env:COMPUTERNAME"
-
-
                     $params = @{
 
                         Name                  = $sdnswitchName
@@ -2264,9 +2251,7 @@ function New-HyperConvergedEnvironment {
                         NetAdapterName        = $sdnswitchteammembers
                         EnableEmbeddedTeaming = $true
                         MinimumBandwidthMode  = "Weight"
-
                     }
-
                     New-VMSwitch @params | Out-Null
 
                     # Set IP Config
@@ -2274,44 +2259,33 @@ function New-HyperConvergedEnvironment {
                     $sdnswitchNIC = Get-Netadapter | Where-Object { $_.Name -match $sdnswitchName }
 
                     $params = @{
-
                         InterfaceIndex = $sdnswitchNIC.InterfaceIndex
                         IpAddress      = $sdnswitchIP 
                         PrefixLength   = $sdnswitchIPpfx 
                         AddressFamily  = 'IPv4'
                         DefaultGateway = $sdnswitchGW
                         ErrorAction    = 'SilentlyContinue'
-
                     }
 
                     New-NetIPAddress @params | Out-Null
 
                     # Set DNS
-
                     Set-DnsClientServerAddress -InterfaceIndex $sdnswitchNIC.InterfaceIndex -ServerAddresses ($sdnswitchDNS)
 
                     # Set VLAN 
- 
                     Write-Verbose "Setting VLAN ($sdnswitchVLAN) on host vNIC"
-
                     $params = @{
-
                         IsolationMode        = 'Vlan'
                         DefaultIsolationID   = $sdnswitchVLAN 
                         AllowUntaggedTraffic = $true
                         VMNetworkAdapterName = $sdnswitchName
-
                     }
-
                     Set-VMNetworkAdapterIsolation -ManagementOS @params
 
                     # Disable Switch Extensions
-
                     Get-VMSwitchExtension -VMSwitchName $sdnswitchName | Disable-VMSwitchExtension | Out-Null
 
-
                     # Enable Large MTU
-
                     Write-Verbose "Configuring MTU on all Adapters"
                     Get-NetAdapter | Where-Object { $_.Status -eq "Up" } | Set-NetAdapterAdvancedProperty -RegistryValue $SDNConfig.SDNLABMTU -RegistryKeyword "*JumboPacket"   
 
@@ -2329,9 +2303,7 @@ function New-HyperConvergedEnvironment {
 
                 if ($sdnswitchCheck) { Write-Warning "Switch already exists on $env:COMPUTERNAME. Skipping this host." }
                 else {
-
                     $params = @{
-
                         sdnswitchName        = 'sdnSwitch'
                         sdnswitchIP          = $sdnswitchIP
                         sdnswitchIPpfx       = $sdnswitchIPpfx
@@ -2339,34 +2311,22 @@ function New-HyperConvergedEnvironment {
                         sdnswitchGW          = $sdnswitchGW
                         sdnswitchDNS         = $SDNConfig.SDNLABDNS
                         sdnswitchteammembers = $sdnswitchteammembers
-
                     }
-
                     New-sdnSETSwitch  @params | out-null
-
-                }
-
-                
+                }         
             } 
-
             Write-Verbose "Rebooting HCIBox Host $AzSHOST"
             Start-Sleep -Seconds 60
-            Restart-Computer $AzSHOST -Force -Confirm:$false -Credential $using:domainCred
-
+            Restart-Computer $AzSHOST -Force -Confirm:$false -Credential $using:domainCred -Protocol WSMan
         }
 
         # Wait until all the AzSHOSTs have been restarted
-
         foreach ($AzSHOST in $AzSHOSTs) {
-
             Write-Verbose "Checking to see if $AzSHOST is up and online"
             while ((Invoke-Command -ComputerName $AzSHOST -Credential $using:domainCred { "Test" } `
                         -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 60 }
-
         }
-
     }
-
 }
 
 function New-SDNEnvironment {
