@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "serviceAccountPassword": {
+        "value": "serviceAccountPassword-stage"
+      },
+      "serviceAccountUsername": {
+        "value": "serviceAccountUsername-stage"
+      },
+      "connectorName": {
+        "value": "connectorName-stage"
+      },
+      "domainController": {
+        "value": "domainController-stage"
+      },
+      "netbiosDomainName": {
+        "value": "netbiosDomainName-stage"
+      },
+      "ouDistinguishedName": {
+        "value": "ouDistinguishedName-stage"
+      },
+      "realm": {
+        "value": "realm-stage"
+      },
+      "serviceAccountProvisioning": {
+        "value": "serviceAccountProvisioning-stage"
+      },
+      "domainName": {
+        "value": "domainName-stage"
+      },
+      "nameserverIPAddresses": {
+        "value": "nameserverIPAddresses-stage"
+      },
+      "apiVersion": {
+        "value": "2022-03-01-preview"
+      }
+    }
+  }
