@@ -292,7 +292,7 @@ function Add-Files {
         Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
         Start-Sleep -Seconds 20       
 
-        # Mount VHDX
+        # Mount VHDX - bunch of kludgey logic in here to deal with different partition layouts on the GUI and HCI VHD images
         Write-Verbose "Mounting VHDX file at $path"
         [string]$MountedDrive = ""
         if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
@@ -437,7 +437,12 @@ $azsmgmtProdKey
             Copy-Item -Path $Env:HCIBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
             Copy-Item -Path $Env:HCIBoxSDNDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
             Copy-Item -Path $Env:HCIBoxWACDir -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
-        }       
+        }
+
+        if ($AzSHOST.AzSHOST -eq "AzSHOST1") {
+            New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
+            Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
+        }
 
         # Dismount VHDX
         Write-Verbose "Dismounting VHDX File at path $path"
@@ -2911,6 +2916,7 @@ $ProgressPreference = 'SilentlyContinue'
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
 Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'='C:\HCIBox\VHD\AZSHCI.vhdx'}
 Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'='C:\HCIBox\VHD\GUI.vhdx'}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'OutFile'='C:\HCIBox\VHD\Ubuntu.vhdx'}
 
 # Set VM Host Memory
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824
