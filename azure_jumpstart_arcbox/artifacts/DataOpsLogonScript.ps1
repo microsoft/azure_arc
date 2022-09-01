@@ -90,6 +90,12 @@ get-WindowsFeature | Where-Object {$_.Name -like "RSAT-AD-Tools"} | Install-Wind
 get-WindowsFeature | Where-Object {$_.Name -like "RSAT-DNS-Server"} | Install-WindowsFeature
 Write-Host "`n"
 
+# Update CAPI vnet DNS server and restarting VMs
+az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
+az vm restart --ids $(az vm list --resource-group $Env:resourceGroup --query "[?contains(name, 'capi')]" --output table -o tsv)
+
+Start-Sleep -Seconds 10
+
 ################################################
 # - Created Nested SQL VM
 ################################################
@@ -199,12 +205,6 @@ Invoke-Command -VMName ArcBox-SQL -Credential $winCreds -ScriptBlock {
 Write-Host "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-
-# Update CAPI vnet DNS server and restarting VMs
-az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
-az vm restart --ids $(az vm list --resource-group $Env:resourceGroup --query "[?contains(name, 'capi')]" --output table -o tsv)
-
-Start-Sleep -Seconds 20
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Header "Downloading CAPI K8s Kubeconfig"
