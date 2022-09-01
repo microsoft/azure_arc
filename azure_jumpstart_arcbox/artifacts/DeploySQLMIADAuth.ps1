@@ -55,11 +55,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'Arcbox-sql-capi'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{instanceName = 'arcboxsqlcapi'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{instanceName = 'Arcbox-sql-aks'; dataController = 'aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{instanceName = 'arcboxsqlaks'; dataController = 'aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{instanceName = 'Arcbox-sql-dr'; dataController = 'aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{instanceName = 'arcboxsqldr'; dataController = 'aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 $sqlmiouName = "ArcSQLMI"
@@ -107,8 +107,8 @@ catch {
     Write-Host "User $arcsaname already existings in the directory."
 }
 
-# Deploying Azure SQL MI
-Write-Header "Deploying Azure Arc SQL MI"
+# Deploying Active Directory connector
+Write-Header "Deploying Active Directory connector"
 
 foreach ($sqlInstance in $sqlInstances) {
     kubectx $sqlInstance.context
@@ -153,8 +153,79 @@ foreach ($sqlInstance in $sqlInstances) {
     Write-Host "Azure Arc AD connector ready!"
     Write-Host "`n"
 
+    # Deploying Azure Arc SQL Managed Instance
+
+    Write-Header "Deploying Azure Arc SQL Managed Instance"
+    $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $sqlInstace.dataController --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
+    $customLocationId = $(az customlocation show --name $sqlInstance.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
+
+    ################################################
+    # Localize ARM template
+    ################################################
+    $ServiceType = "LoadBalancer"
+    $readableSecondaries = $ServiceType
+
+    # Resource Requests
+    $vCoresRequest = "2"
+    $memoryRequest = "4Gi"
+    $vCoresLimit = "4"
+    $memoryLimit = "8Gi"
+
+    # Storage
+    $StorageClassName = $sqlInstance.storageClassName
+    $dataStorageSize = "5"
+    $logsStorageSize = "5"
+    $dataLogsStorageSize = "5"
+
+    # High Availability
+    $replicas = 3 # Deploy SQL MI "Business Critical" tier
+    #######################################################
+
+    Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+    $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+
+(Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'customLocation-stage', $customLocationId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'subscriptionId-stage', $Env:subscriptionId | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'azdataUsername-stage', $Env:AZDATA_USERNAME | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'azdataPassword-stage', $Env:AZDATA_PASSWORD | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'serviceType-stage', $ServiceType | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'readableSecondaries-stage', $readableSecondaries | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'vCoresRequest-stage', $vCoresRequest | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'memoryRequest-stage', $memoryRequest | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'vCoresLimit-stage', $vCoresLimit | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'memoryLimit-stage', $memoryLimit | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'logsStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataLogStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataSize-stage', $dataStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'logsSize-stage', $logsStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dataLogSize-stage', $dataLogsStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'replicasStage' , $replicas | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' , $sqlInstance.instanceName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'keyTab-stage' , $b64keytabtext | Set-Content -Path $SQLParams
+
+    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+    Write-Host "`n"
+
+    Do {
+        Write-Host "Waiting for SQL Managed Instance. Hold tight, this might take a few minutes...(45s sleeping loop)"
+        Start-Sleep -Seconds 45
+        $dcStatus = $(if (kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+    } while ($dcStatus -eq "Nope")
+    Write-Host "Azure Arc SQL Managed Instance is ready!"
+    Write-Host "`n"
+
+    Remove-Item "$Env:ArcBoxDir\SQLMI-stage-stage.parameters.json" -Force
+
+    # Update Service Port from 1433 to Non-Standard
+    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
+    kubectl patch svc "$sqlInstance.instanceName-external-svc" -n arc --type merge --patch $payload
+    Start-Sleep 5 # To allow the CRD to update
     # Deploy SQL MI with AD auth
-    $sqlMIADAuthYAMLFile = "$Env:ArcBoxDir\SQLMIADAuthCMK.yaml"
+    <#Copy-Item "$Env:ArcBoxDir\SQLMIADAuthCMK.yaml" -Destination "$Env:ArcBoxDir\SQLMIADAuthCMK-stage.yaml"
+    $sqlMIADAuthYAMLFile = "$Env:ArcBoxDir\SQLMIADAuthCMK-stage.yaml"
     $sqlMIADAuthContent = Get-Content $sqlMIADAuthYAMLFile
     $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{ARC_DATA_API_VERSION}}", "sql.arcdata.microsoft.com/v3")
     $sqlMIADAuthContent = $sqlMIADAuthContent.Replace("{{B64_SQLMI_ADMIN_USER}}", $b64UserName)
@@ -170,7 +241,7 @@ foreach ($sqlInstance in $sqlInstances) {
     Set-Content -Path $sqlMIADAuthYAMLFile -Value $sqlMIADAuthContent
     # Deploy SQLMI instance
     kubectl apply -f $sqlMIADAuthYAMLFile
-
+    Remove-Item "$Env:ArcBoxDir\SQLMIADAuthCMK-stage.yaml" -Force
     Write-Host "`n"
     Do {
         Write-Host "Waiting for SQL Managed Instance with AD authentication. Hold tight, this might take a few minutes...(45s sleeping loop)"
@@ -202,9 +273,8 @@ foreach ($sqlInstance in $sqlInstances) {
     $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
 
     Write-Host "SQL Managed Instance with AD authentication endpoint: $sqlmiEndPoint"
+    #>
 }
-
-
 
 # Get public ip of the SQLMI endpoint
 $nodeRG = (az aks show --name $Env:clusterName -g $Env:resourceGroup --query "nodeResourceGroup")

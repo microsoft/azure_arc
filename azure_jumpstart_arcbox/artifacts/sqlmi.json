@@ -36,7 +36,7 @@
     },
     "readableSecondaries": {
       "type": "String"
-    },    
+    },
     "vCoresRequest": {
       "type": "String"
     },
@@ -84,6 +84,14 @@
     },
     "licenseType": {
       "type": "String"
+    },
+    "keyTab":{
+      "type": "String",
+      "defaultValue": ""
+    },
+    "sqlInstanceName":{
+      "type": "string",
+      "defaultValue": "jumpstart-sql"
     }
   },
   "variables": {},
@@ -92,7 +100,7 @@
     {
       "type": "Microsoft.AzureArcData/sqlManagedInstances",
       "apiVersion": "[parameters('apiVersion')]",
-      "name": "jumpstart-sql",
+      "name": "[parameters('sqlInstanceName')]",
       "location": "[parameters('location')]",
       "extendedLocation": {
         "type": "CustomLocation",
@@ -104,6 +112,11 @@
         "tier": "[parameters('pricingTier')]"
       },
       "properties": {
+        "activeDirectoryInformation": {
+          "keytabInformation": {
+            "keytab": "[parameters('keyTab')]"
+          }
+        },
         "admin": "[parameters('admin')]",
         "basicLoginInformation": {
           "username": "[parameters('admin')]",
