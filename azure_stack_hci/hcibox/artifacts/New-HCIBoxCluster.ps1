@@ -2315,17 +2315,17 @@ function New-HyperConvergedEnvironment {
                     New-sdnSETSwitch  @params | out-null
                 }         
             } 
-            Write-Verbose "Rebooting HCIBox Host $AzSHOST"
+            
             Start-Sleep -Seconds 60
-            Restart-Computer $AzSHOST -Force -Confirm:$false -Credential $using:domainCred -Protocol WSMan
-        }
 
-        # Wait until all the AzSHOSTs have been restarted
-        foreach ($AzSHOST in $AzSHOSTs) {
-            Write-Verbose "Checking to see if $AzSHOST is up and online"
-            while ((Invoke-Command -ComputerName $AzSHOST -Credential $using:domainCred { "Test" } `
-                        -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 60 }
         }
+    }
+    # Wait until all the AzSHOSTs have been restarted
+    foreach ($AzSHOST in $AzSHOSTs) {
+        Write-Verbose "Rebooting HCIBox Host $AzSHOST"
+        Restart-Computer $AzSHOST -Force -Confirm:$false -Credential $localCred -Protocol WSMan
+        Write-Verbose "Checking to see if $AzSHOST is up and online"
+        while ((Invoke-Command -ComputerName $AzSHOST -Credential $localCred { "Test" } -ea SilentlyContinue) -ne "Test") { Start-Sleep -Seconds 60 }
     }
 }
 
