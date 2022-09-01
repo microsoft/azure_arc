@@ -4,10 +4,7 @@ $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $aksConnectedClusterName = "ArcBox-AKS"
 $aksDRConnectedClusterName = "ArcBox-AKS-DR"
-#$capiConnectedClusterName = $Env:capiArcDataClusterName
-#$capiDcName = "arcbox-capi-dc"
-#$aksDcName = "arcbox-aks-dc"
-#$aksDRDcName = "arcbox-aksdr-dc"
+
 $clusters = @(
 
     [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
@@ -203,9 +200,11 @@ Write-Host "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
 
-################################################
-# - Arc-enabling Kubernetes clusters
-################################################
+# Update CAPI vnet DNS server and restarting VMs
+az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
+az vm restart --ids $(az vm list --resource-group $Env:resourceGroup --query "[?contains(name, 'capi')]" --output table -o tsv)
+
+Start-Sleep -Seconds 20
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Header "Downloading CAPI K8s Kubeconfig"
@@ -333,7 +332,7 @@ foreach ($cluster in $clusters) {
 
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
-#& "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
+& "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
 
 # Enabling data controller auto metrics & logs upload to log analytics
 Write-Header "Enabling Data Controller Metrics & Logs Upload"
