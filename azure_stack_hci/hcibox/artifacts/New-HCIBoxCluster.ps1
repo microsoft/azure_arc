@@ -3047,9 +3047,10 @@ $endtime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 
 
-Write-Verbose "`nSuccessfully deployed HCIBox"
+Write-Verbose "`nSuccessfully deployed HCIBox cluster." 
+Write-Verbose "Now working on enabling HCIBox features."
 
-Write-Host "Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes." -ForegroundColor Green
+Write-Host "Infrastructure deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes." -ForegroundColor Green
  
 $ErrorActionPreference = "Continue"
 $VerbosePreference = "SilentlyContinue"
