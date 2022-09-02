@@ -375,6 +375,19 @@
               "destinationAddressPrefix": "*",
               "destinationPortRange": "15432"
             }
+          },
+          {
+            "name": "allow_DNS",
+            "properties": {
+              "priority": 1010,
+              "protocol": "UDP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "53"
+            }
           }
         ]
       }
