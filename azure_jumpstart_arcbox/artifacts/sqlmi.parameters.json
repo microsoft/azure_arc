@@ -78,6 +78,18 @@
         },
         "sqlInstanceName": {
             "value": "sqlInstanceName-stage"
+        },
+        "adAccountName":{
+            "value": "adAccountName-stage"
+        },
+        "adConnectorName": {
+            "value": "adConnectorName-stage"
+        },
+        "domainName": {
+            "value": "domainName-stage"
+        },
+        "port":{
+            "value": "port-stage"
         }
     }
 }

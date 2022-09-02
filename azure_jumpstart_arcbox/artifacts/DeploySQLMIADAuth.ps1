@@ -215,6 +215,10 @@ Write-Host "`n"
 (Get-Content -Path $SQLParams) -replace 'replicasStage' , $replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' , $sqlInstance.instanceName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'keyTab-stage' , $b64keytabtext | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'domainName-stage' , $dcInfo.domain.Tolower() | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'port-stage' , "31433" | Set-Content -Path $SQLParams
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     Write-Host "`n"

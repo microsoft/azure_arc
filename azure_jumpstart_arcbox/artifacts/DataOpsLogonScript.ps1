@@ -90,12 +90,6 @@ get-WindowsFeature | Where-Object {$_.Name -like "RSAT-AD-Tools"} | Install-Wind
 get-WindowsFeature | Where-Object {$_.Name -like "RSAT-DNS-Server"} | Install-WindowsFeature
 Write-Host "`n"
 
-# Update CAPI vnet DNS server and restarting VMs
-az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
-az vm restart --no-wait --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv)
-
-Start-Sleep -Seconds 10
-
 ################################################
 # - Created Nested SQL VM
 ################################################
@@ -219,6 +213,12 @@ Write-Header "Downloading CAPI Install Logs"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/installCAPI.log"
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
+
+# Update CAPI vnet DNS server and restarting VMs
+az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
+az vm restart --no-wait --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv)
+
+Start-Sleep -Seconds 30
 
 Write-Header "Checking K8s Nodes"
 kubectl get nodes

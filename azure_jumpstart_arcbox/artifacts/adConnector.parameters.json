@@ -31,9 +31,6 @@
       },
       "apiVersion": {
         "value": "2022-03-01-preview"
-      },
-      "resourceType":{
-        "value": "parentType-stage"
       }
     }
   }
