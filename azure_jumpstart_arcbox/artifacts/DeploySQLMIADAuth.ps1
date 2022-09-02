@@ -55,7 +55,7 @@ else {
 
 $sqlInstances = @(
 
-    #[pscustomobject]@{instanceName = 'arcboxsqlcapi'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{instanceName = 'arcboxsqlcapi'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
     [pscustomobject]@{instanceName = 'arcboxsqlaks'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
