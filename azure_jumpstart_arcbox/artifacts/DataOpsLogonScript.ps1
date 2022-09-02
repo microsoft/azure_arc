@@ -216,7 +216,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\
 
 # Update CAPI vnet DNS server and restarting VMs
 az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
-az vm restart --no-wait --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv)
+#az vm restart --no-wait --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv)
 
 Start-Sleep -Seconds 30
 
