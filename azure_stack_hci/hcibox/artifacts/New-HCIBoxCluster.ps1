@@ -289,7 +289,9 @@ function Add-Files {
 
         # Install Hyper-V Offline
         Write-Verbose "Performing offline installation of Hyper-V to path $path"
+        $VerbosePreference = "SilentlyContinue"
         Install-WindowsFeature -Vhd $path -Name Hyper-V, RSAT-Hyper-V-Tools, Hyper-V-Powershell -Confirm:$false | Out-Null
+        $VerbosePreference = "Continue"
         Start-Sleep -Seconds 20       
 
         # Mount VHDX - bunch of kludgey logic in here to deal with different partition layouts on the GUI and HCI VHD images
@@ -748,7 +750,7 @@ function Set-SDNserver {
                     Write-Verbose "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
                     $VerbosePreference = "SilentlyContinue"
                     Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $localCred | Out-Null 
-
+                    $VerbosePreference = "Continue"
                 }
 
                 # Enable CredSSP and MTU Settings
@@ -1958,38 +1960,48 @@ function New-AdminCenterVM {
             $isAvailable = Get-WindowsFeature | Where-Object { $_.Name -eq 'RSAT-NetworkController' }
 
             if ($isAvailable) {
-
+                Write-Verbose "Installing RSAT-NetworkController"
+                
                 $VerbosePreference = "SilentlyContinue"
                 Import-Module ServerManager
-                $VerbosePreference = "Continue"
-
-                Write-Verbose "Installing RSAT-NetworkController"
                 Install-WindowsFeature -Name RSAT-NetworkController -IncludeAllSubFeature -IncludeManagementTools | Out-Null
-
+                $VerbosePreference = "Continue"
             }
 
             # Install Hyper-V RSAT
             Write-Verbose "Installing Hyper-V RSAT Tools"
+            $VerbosePreference = "SilentlyContinue"
             Install-WindowsFeature -Name RSAT-Hyper-V-Tools -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            $VerbosePreference = "Continue"
 
             # Install RSAT AD Tools
             Write-Verbose "Installing Active Directory RSAT Tools"
+            $VerbosePreference = "SilentlyContinue"
             Install-WindowsFeature -Name  RSAT-ADDS -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            $VerbosePreference = "Continue"
 
             # Install Failover Cluster RSAT Tools
             Write-Verbose "Installing Failover Clustering RSAT Tools"
+            $VerbosePreference = "SilentlyContinue"
             Install-WindowsFeature -Name  RSAT-Clustering-Mgmt, RSAT-Clustering-PowerShell -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            $VerbosePreference = "Continue"
 
             # Install DNS RSAT Tool
             Write-Verbose "Installing DNS Server RSAT Tools"
+            $VerbosePreference = "SilentlyContinue"
             Install-WindowsFeature -Name RSAT-DNS-Server  -IncludeAllSubFeature -IncludeManagementTools | Out-Null
+            $VerbosePreference = "Continue"
 
             # Install VPN Routing
+            $VerbosePreference = "SilentlyContinue"
             Install-RemoteAccess -VPNType RoutingOnly | Out-Null
+            $VerbosePreference = "Continue"
 
             # Install Nuget
+            $VerbosePreference = "SilentlyContinue"
             Install-PackageProvider -Name Nuget -MinimumVersion 2.8.5.201 -Force
-
+            $VerbosePreference = "Continue"
+            
             # Stop Server Manager from starting on boot
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\ServerManager" -Name "DoNotOpenServerManagerAtLogon" -Value 1
             
