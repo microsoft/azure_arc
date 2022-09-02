@@ -92,7 +92,7 @@ Write-Host "`n"
 
 # Update CAPI vnet DNS server and restarting VMs
 az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
-az vm restart --ids $(az vm list -g $Env:resourceGroup --query "[].id" -o tsv) --no-wait
+az vm restart --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv) --no-wait
 
 Start-Sleep -Seconds 10
 
