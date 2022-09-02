@@ -92,6 +92,22 @@
     "sqlInstanceName":{
       "type": "string",
       "defaultValue": "jumpstart-sql"
+    },
+    "adAccountName":{
+      "type": "string",
+      "defaultValue": ""
+    },
+    "adConnectorName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "domainName":{
+      "type": "string",
+      "defaultValue": ""
+    },
+    "port":{
+      "type": "string",
+      "defaultValue": ""
     }
   },
   "variables": {},
@@ -112,11 +128,6 @@
         "tier": "[parameters('pricingTier')]"
       },
       "properties": {
-        "activeDirectoryInformation": {
-          "keytabInformation": {
-            "keytab": "[parameters('keyTab')]"
-          }
-        },
         "admin": "[parameters('admin')]",
         "basicLoginInformation": {
           "username": "[parameters('admin')]",
@@ -128,7 +139,10 @@
             "dev": true,
             "services": {
               "primary": {
-                "type": "[parameters('serviceType')]"
+                "type": "[parameters('serviceType')]",
+                "dnsName": "[parameters('domainName')]",
+                "port": "[parameters('port')]"
+
               },
               "readableSecondaries": {
                 "type": "[parameters('readableSecondaries')]"
@@ -173,6 +187,16 @@
                     "size": "[parameters('dataLogsStorageSize')]"
                   }
                 ]
+              },
+              "security":{
+                 "activeDirectory": {
+                        "accountName": "[parameters('adAccountName')]",
+                        "connector": {
+                            "name": "[parameters('adConnectorName')]",
+                            "namespace": "arc"
+                        },
+                        "keytabSecret": "[parameters('keyTab')]"
+                    }
               }
             },
             "settings": {
