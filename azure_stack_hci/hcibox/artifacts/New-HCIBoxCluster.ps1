@@ -2001,7 +2001,7 @@ function New-AdminCenterVM {
             $VerbosePreference = "SilentlyContinue"
             Install-PackageProvider -Name Nuget -MinimumVersion 2.8.5.201 -Force
             $VerbosePreference = "Continue"
-            
+
             # Stop Server Manager from starting on boot
             Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\ServerManager" -Name "DoNotOpenServerManagerAtLogon" -Value 1
             
@@ -2010,13 +2010,11 @@ function New-AdminCenterVM {
 
             # Create BGP Router
             $params = @{
-
                 BGPIdentifier  = $WACIP
                 LocalASN       = $SDNConfig.WACASN
                 TransitRouting = 'Enabled'
                 ClusterId      = 1
                 RouteReflector = 'Enabled'
-
             }
 
             Add-BgpRouter @params
@@ -2062,7 +2060,6 @@ CertificateTemplate= WebServer
             $fqdn = $SDNConfig.SDNDomainFQDN
 
             $params = @{
-
                 Name                                = 'microsoft.SDNNested'
                 RunAsCredential                     = $Using:domainCred 
                 MaximumReceivedDataSizePerCommandMB = 1000
@@ -2074,7 +2071,6 @@ CertificateTemplate= WebServer
             $VerbosePreference = "Continue"
 
             Write-Verbose "Requesting and installing SSL Certificate" 
-
             Invoke-Command -ComputerName $WACVMName -ConfigurationName microsoft.SDNNested -ArgumentList $WACVMName, $SDNConfig, $DCFQDN -Credential $WACdomainCred -ScriptBlock {
 
                 $DCFQDN = $args[2]
