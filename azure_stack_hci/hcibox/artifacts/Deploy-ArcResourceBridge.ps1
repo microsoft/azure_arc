@@ -34,20 +34,24 @@ foreach ($VM in $SDNConfig.HostList) {
     }
 }
 $csv_path = "C:\ClusterStorage\S2D_vDISK1"
-Invoke-Command -VMName $SDNConfig.HostList[1] -Credential $adcred -ScriptBlock {
-    Install-PackageProvider -Name NuGet -Force 
-    Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
-    Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
+foreach ($VM in $SDNConfig.HostList) {
+    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
+        Install-PackageProvider -Name NuGet -Force 
+        Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
+        Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
+    
+        $ErrorActionPreference = "SilentlyContinue"
+        az extension add --upgrade --name arcappliance
+        az extension add --upgrade --name connectedk8s
+        az extension add --upgrade --name k8s-configuration
+        az extension add --upgrade --name k8s-extension
+        az extension add --upgrade --name customlocation
+        az extension add --upgrade --name azurestackhci
+        $ErrorActionPreference = "Continue"
+    }
+}
 
-    $ErrorActionPreference = "SilentlyContinue"
-    az extension add --upgrade --name arcappliance
-    az extension add --upgrade --name connectedk8s
-    az extension add --upgrade --name k8s-configuration
-    az extension add --upgrade --name k8s-extension
-    az extension add --upgrade --name customlocation
-    az extension add --upgrade --name azurestackhci
-    $ErrorActionPreference = "Continue"
-
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     New-Item -Path $using:csv_path -Name "ResourceBridge" -ItemType Directory
 }
 
