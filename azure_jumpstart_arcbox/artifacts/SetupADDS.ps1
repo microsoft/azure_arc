@@ -50,6 +50,9 @@ Write-Host "ADDS Deployment successful. Now rebooting computer to finsih setup."
 # $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument 'C:\Temp\RunAfterADDSRestart.ps1'
 # Register-ScheduledTask -TaskName "RunAfterADDSRestart" -Trigger $Trigger -User SYSTEM -Action $Action -RunLevel "Highest" -Force
 
+# Add DNS forwarder
+Set-DnsServerForwarder -IPAddress "168.63.129.16" -PassThru
+
 # Reboot computer
 Restart-Computer
 Write-Host "System reboot requested."
