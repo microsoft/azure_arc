@@ -3039,7 +3039,7 @@ $wshshell = New-Object -ComObject WScript.Shell
 $lnk = $wshshell.CreateShortcut("C:\Users\Public\Desktop\AdminCenter.lnk")
 $lnk.TargetPath = "%windir%\system32\mstsc.exe"
 $lnk.Arguments = "/v:AdminCenter"
-$lnk.Description = "AdminCenter link for Azure Stack HCI Sandbox."
+$lnk.Description = "AdminCenter link for HCIBox."
 $lnk.Save()
 
 $endtime = Get-Date
@@ -3047,7 +3047,7 @@ $endtime = Get-Date
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 
 
-Write-Verbose "`nSuccessfully deployed the Azure Stack HCI Sandbox"
+Write-Verbose "`nSuccessfully deployed HCIBox"
 
 Write-Host "Deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes." -ForegroundColor Green
  
