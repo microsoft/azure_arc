@@ -5,7 +5,7 @@
     # Version 1.0.0
 
     # HCI host names
-    HostList="AZSHOST1", "AZSHOST2"  # DO NOT CHANGE these as they remain hardcoded in places
+    HostList                             = "AZSHOST1", "AZSHOST2"  # DO NOT CHANGE these as they remain hardcoded in places
 
     # VHDX Paths 
     guiVHDXPath                          = "C:\HCIBox\VHD\gui.vhdx"              # This value controls the location of the GUI VHDX.              
@@ -35,7 +35,7 @@
     natDNS                               = "1.1.1.1"                              # DNS address for forwarding from Domain Controller. Using Cloudflare DNS.
 
     # Global MTU
-    SDNLABMTU                            = 9014                                   # Controls the MTU for all Hosts. If using multiple physical hosts. Ensure that you have configured MTU on physical nics on the hosts to match this value.
+    SDNLABMTU                            = 9014                                   # Controls the MTU for all Hosts. 
 
     #SDN Provisioning
     ProvisionNC                          = $false                                 # Provisions Network Controller Automatically.
@@ -53,7 +53,7 @@
     MEM_GRE                              = 2GB                                     # Memory provided for the gre-target VM
     MEM_IPSEC                            = 2GB                                     # Memory provided for the ipsec-target VM
 
-    #Cluster S2D Storage Disk Size (per disk)
+    # Cluster S2D Storage Disk Size (per disk)
     S2D_Disk_Size                        = 100GB                                    # Disk size for each of the 4 dynamic VHD disks attached to the 3 AzSHOST VMs that will be used to create the SDNCLUSTER
 
     # SDN Host IPs
@@ -71,7 +71,7 @@
     # SDN Lab Gateway
     SDNLABRoute                          = "192.168.1.1"
 
-    #Management IPs for Console and Domain Controller
+    # Management IPs for Console and Domain Controller
     DCIP                                 = "192.168.1.254/24"
     CONSOLEIP                            = "192.168.1.10/24"
     WACIP                                = "192.168.1.9/24"
@@ -122,23 +122,23 @@
     SDDCInstall                          = $true
 
     # AKS and Resource bridge variables
-    AKSvnetname = "akshcivnet"
-    AKSvSwitchName = "sdnSwitch"
-    AKSNodeStartIP = "192.168.200.25"
-    AKSNodeEndIP = "192.168.200.100"
-    AKSVIPStartIP = "192.168.200.125"
-    AKSVIPEndIP = "192.168.200.200"
-    AKSIPPrefix = "192.168.200.0/24"
-    AKSGWIP = "192.168.200.1"
-    AKSDNSIP = "192.168.1.254"
-    AKSCSV="C:\ClusterStorage\S2D_vDISK1"
-    AKSImagedir = "C:\ClusterStorage\S2D_vDISK1\aks\Images"
-    AKSWorkingdir = "C:\ClusterStorage\S2D_vDISK1\aks\Workdir"
-    AKSCloudConfigdir = "C:\ClusterStorage\S2D_vDISK1\aks\CloudConfig"
-    AKSCloudSvcidr = "192.168.1.15/24"
-    AKSVlanID="200"
-    rbLocation = "eastus"
-    rbCustomLocationName = "hcibox-rb-cl"
-    rbIp = "192.168.1.199"
-    rbCpip = "192.168.200.199"
+    AKSvnetname                          = "akshcivnet"
+    AKSvSwitchName                       = "sdnSwitch"
+    AKSNodeStartIP                       = "192.168.200.25"
+    AKSNodeEndIP                         = "192.168.200.100"
+    AKSVIPStartIP                        = "192.168.200.125"
+    AKSVIPEndIP                          = "192.168.200.200"
+    AKSIPPrefix                          = "192.168.200.0/24"
+    AKSGWIP                              = "192.168.200.1"
+    AKSDNSIP                             = "192.168.1.254"
+    AKSCSV                               = "C:\ClusterStorage\S2D_vDISK1"
+    AKSImagedir                          = "C:\ClusterStorage\S2D_vDISK1\aks\Images"
+    AKSWorkingdir                        = "C:\ClusterStorage\S2D_vDISK1\aks\Workdir"
+    AKSCloudConfigdir                    = "C:\ClusterStorage\S2D_vDISK1\aks\CloudConfig"
+    AKSCloudSvcidr                       = "192.168.1.15/24"
+    AKSVlanID                            = "200"
+    rbLocation                           = "eastus"
+    rbCustomLocationName                 = "hcibox-rb-cl"
+    rbIp                                 = "192.168.1.199"
+    rbCpip                               = "192.168.200.199"
 }

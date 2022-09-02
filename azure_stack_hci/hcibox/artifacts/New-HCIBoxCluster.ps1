@@ -2329,7 +2329,7 @@ function New-HyperConvergedEnvironment {
         }
     }
     # Wait until all the AzSHOSTs have been restarted
-    foreach ($AzSHOST in $AzSHOSTs) {
+    foreach ($AzSHOST in $SDNconfig.HostList) {
         Write-Verbose "Rebooting HCIBox Host $AzSHOST"
         Restart-Computer $AzSHOST -Force -Confirm:$false -Credential $localCred -Protocol WSMan
         Write-Verbose "Checking to see if $AzSHOST is up and online"
