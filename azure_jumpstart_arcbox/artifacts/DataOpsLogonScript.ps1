@@ -7,7 +7,7 @@ $aksDRConnectedClusterName = "ArcBox-AKS-DR"
 
 $clusters = @(
 
-    #[pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
     [pscustomobject]@{clusterName = 'ArcBox-AKS'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
