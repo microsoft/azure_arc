@@ -131,94 +131,95 @@
         "activeDirectoryInformation": {
           "keytabInformation": {
             "keytab": "[parameters('keyTab')]"
-          },
-          "admin": "[parameters('admin')]",
-          "basicLoginInformation": {
-            "username": "[parameters('admin')]",
-            "password": "[parameters('password')]"
-          },
-          "licenseType": "[parameters('licenseType')]",
-          "k8sRaw": {
-            "spec": {
-              "dev": true,
-              "services": {
-                "primary": {
-                  "type": "[parameters('serviceType')]",
-                  "dnsName": "[parameters('domainName')]",
-                  "port": "[parameters('port')]"
+          }
+        },
+        "admin": "[parameters('admin')]",
+        "basicLoginInformation": {
+          "username": "[parameters('admin')]",
+          "password": "[parameters('password')]"
+        },
+        "licenseType": "[parameters('licenseType')]",
+        "k8sRaw": {
+          "spec": {
+            "dev": true,
+            "services": {
+              "primary": {
+                "type": "[parameters('serviceType')]",
+                "dnsName": "[parameters('domainName')]",
+                "port": "[parameters('port')]"
 
-                },
-                "readableSecondaries": {
-                  "type": "[parameters('readableSecondaries')]"
-                }
               },
-              "replicas": "[parameters('replicas')]",
-              "scheduling": {
-                "default": {
-                  "resources": {
-                    "requests": {
-                      "cpu": "[parameters('vCoresRequest')]",
-                      "memory": "[parameters('memoryRequest')]"
-                    },
-                    "limits": {
-                      "cpu": "[parameters('vCoresLimit')]",
-                      "memory": "[parameters('memoryLimit')]"
-                    }
+              "readableSecondaries": {
+                "type": "[parameters('readableSecondaries')]"
+              }
+            },
+            "replicas": "[parameters('replicas')]",
+            "scheduling": {
+              "default": {
+                "resources": {
+                  "requests": {
+                    "cpu": "[parameters('vCoresRequest')]",
+                    "memory": "[parameters('memoryRequest')]"
+                  },
+                  "limits": {
+                    "cpu": "[parameters('vCoresLimit')]",
+                    "memory": "[parameters('memoryLimit')]"
                   }
-                }
-              },
-              "storage": {
-                "data": {
-                  "volumes": [
-                    {
-                      "className": "[parameters('dataStorageClassName')]",
-                      "size": "[parameters('dataStorageSize')]"
-                    }
-                  ]
-                },
-                "logs": {
-                  "volumes": [
-                    {
-                      "className": "[parameters('logsStorageClassName')]",
-                      "size": "[parameters('logsStorageSize')]"
-                    }
-                  ]
-                },
-                "datalogs": {
-                  "volumes": [
-                    {
-                      "className": "[parameters('dataLogsStorageClassName')]",
-                      "size": "[parameters('dataLogsStorageSize')]"
-                    }
-                  ]
-                },
-                "security": {
-                  "activeDirectory": {
-                    "accountName": "[parameters('adAccountName')]",
-                    "connector": {
-                      "name": "[parameters('adConnectorName')]",
-                      "namespace": "arc"
-                    },
-                    "keytabSecret": "[parameters('keyTab')]"
-                  }
-                }
-              },
-              "settings": {
-                "azure": {
-                  "location": "[parameters('location')]",
-                  "resourceGroup": "[parameters('resourceGroup')]",
-                  "subscription": "[parameters('subscriptionId')]"
                 }
               }
             },
-            "metadata": {
-              "namespace": "[parameters('namespace')]"
+            "storage": {
+              "data": {
+                "volumes": [
+                  {
+                    "className": "[parameters('dataStorageClassName')]",
+                    "size": "[parameters('dataStorageSize')]"
+                  }
+                ]
+              },
+              "logs": {
+                "volumes": [
+                  {
+                    "className": "[parameters('logsStorageClassName')]",
+                    "size": "[parameters('logsStorageSize')]"
+                  }
+                ]
+              },
+              "datalogs": {
+                "volumes": [
+                  {
+                    "className": "[parameters('dataLogsStorageClassName')]",
+                    "size": "[parameters('dataLogsStorageSize')]"
+                  }
+                ]
+              },
+              "security": {
+                "activeDirectory": {
+                  "accountName": "[parameters('adAccountName')]",
+                  "connector": {
+                    "name": "[parameters('adConnectorName')]",
+                    "namespace": "arc"
+                  },
+                  "keytabSecret": "[parameters('keyTab')]"
+                }
+              }
             },
-            "status": {}
+            "settings": {
+              "azure": {
+                "location": "[parameters('location')]",
+                "resourceGroup": "[parameters('resourceGroup')]",
+                "subscription": "[parameters('subscriptionId')]"
+              }
+            }
           },
-          "dataControllerId": "[parameters('dataControllerId')]"
-        }
+          "metadata": {
+            "namespace": "[parameters('namespace')]"
+          },
+          "status": {}
+        },
+        "dataControllerId": "[parameters('dataControllerId')]"
       }
+    }
   ],
   "outputs": {}
 }
