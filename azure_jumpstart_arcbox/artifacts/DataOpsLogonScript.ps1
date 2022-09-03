@@ -214,8 +214,31 @@ $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/stag
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
 
-# Update CAPI vnet DNS server and restarting VMs
+# Update CAPI vnet DNS server
 az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
+
+#VNet peering with CAPI vnet
+$dcVnetId=$(az network vnet show `
+  --resource-group $Env:resourceGroup `
+  --name "ArcBox-VNet" `
+  --query id --out tsv)
+
+$capiVnetId=$(az network vnet show `
+  --resource-group $Env:resourceGroup `
+  --name "arcbox-capi-data-vnet" `
+  --query id --out tsv)
+
+az network vnet peering create --name "dcVnet-CapiVnet" `
+  --resource-group $Env:resourceGroup `
+  --vnet-name "ArcBox-VNet" `
+  --remote-vnet $capiVnetId `
+  --allow-vnet-access
+
+az network vnet peering create --name "CapiVnet-dcVnet" `
+  --resource-group $Env:resourceGroup `
+  --vnet-name "arcbox-capi-data-vnet" `
+  --remote-vnet $dcVnetId `
+  --allow-vnet-access
 #az vm restart --no-wait --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv)
 
 Start-Sleep -Seconds 30
