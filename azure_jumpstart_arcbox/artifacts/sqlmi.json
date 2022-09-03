@@ -85,15 +85,15 @@
     "licenseType": {
       "type": "String"
     },
-    "keyTab":{
+    "keyTab": {
       "type": "String",
       "defaultValue": ""
     },
-    "sqlInstanceName":{
+    "sqlInstanceName": {
       "type": "string",
       "defaultValue": "jumpstart-sql"
     },
-    "adAccountName":{
+    "adAccountName": {
       "type": "string",
       "defaultValue": ""
     },
@@ -101,11 +101,11 @@
       "type": "string",
       "defaultValue": ""
     },
-    "domainName":{
+    "domainName": {
       "type": "string",
       "defaultValue": ""
     },
-    "port":{
+    "port": {
       "type": "string",
       "defaultValue": ""
     }
@@ -128,93 +128,97 @@
         "tier": "[parameters('pricingTier')]"
       },
       "properties": {
-        "admin": "[parameters('admin')]",
-        "basicLoginInformation": {
-          "username": "[parameters('admin')]",
-          "password": "[parameters('password')]"
-        },
-        "licenseType": "[parameters('licenseType')]",
-        "k8sRaw": {
-          "spec": {
-            "dev": true,
-            "services": {
-              "primary": {
-                "type": "[parameters('serviceType')]",
-                "dnsName": "[parameters('domainName')]",
-                "port": "[parameters('port')]"
+        "activeDirectoryInformation": {
+          "keytabInformation": {
+            "keytab": "[parameters('keyTab')]"
+          },
+          "admin": "[parameters('admin')]",
+          "basicLoginInformation": {
+            "username": "[parameters('admin')]",
+            "password": "[parameters('password')]"
+          },
+          "licenseType": "[parameters('licenseType')]",
+          "k8sRaw": {
+            "spec": {
+              "dev": true,
+              "services": {
+                "primary": {
+                  "type": "[parameters('serviceType')]",
+                  "dnsName": "[parameters('domainName')]",
+                  "port": "[parameters('port')]"
 
+                },
+                "readableSecondaries": {
+                  "type": "[parameters('readableSecondaries')]"
+                }
               },
-              "readableSecondaries": {
-                "type": "[parameters('readableSecondaries')]"
-              }
-            },
-            "replicas": "[parameters('replicas')]",
-            "scheduling": {
-              "default": {
-                "resources": {
-                  "requests": {
-                    "cpu": "[parameters('vCoresRequest')]",
-                    "memory": "[parameters('memoryRequest')]"
-                  },
-                  "limits": {
-                    "cpu": "[parameters('vCoresLimit')]",
-                    "memory": "[parameters('memoryLimit')]"
+              "replicas": "[parameters('replicas')]",
+              "scheduling": {
+                "default": {
+                  "resources": {
+                    "requests": {
+                      "cpu": "[parameters('vCoresRequest')]",
+                      "memory": "[parameters('memoryRequest')]"
+                    },
+                    "limits": {
+                      "cpu": "[parameters('vCoresLimit')]",
+                      "memory": "[parameters('memoryLimit')]"
+                    }
                   }
+                }
+              },
+              "storage": {
+                "data": {
+                  "volumes": [
+                    {
+                      "className": "[parameters('dataStorageClassName')]",
+                      "size": "[parameters('dataStorageSize')]"
+                    }
+                  ]
+                },
+                "logs": {
+                  "volumes": [
+                    {
+                      "className": "[parameters('logsStorageClassName')]",
+                      "size": "[parameters('logsStorageSize')]"
+                    }
+                  ]
+                },
+                "datalogs": {
+                  "volumes": [
+                    {
+                      "className": "[parameters('dataLogsStorageClassName')]",
+                      "size": "[parameters('dataLogsStorageSize')]"
+                    }
+                  ]
+                },
+                "security": {
+                  "activeDirectory": {
+                    "accountName": "[parameters('adAccountName')]",
+                    "connector": {
+                      "name": "[parameters('adConnectorName')]",
+                      "namespace": "arc"
+                    },
+                    "keytabSecret": "[parameters('keyTab')]"
+                  }
+                }
+              },
+              "settings": {
+                "azure": {
+                  "location": "[parameters('location')]",
+                  "resourceGroup": "[parameters('resourceGroup')]",
+                  "subscription": "[parameters('subscriptionId')]"
                 }
               }
             },
-            "storage": {
-              "data": {
-                "volumes": [
-                  {
-                    "className": "[parameters('dataStorageClassName')]",
-                    "size": "[parameters('dataStorageSize')]"
-                  }
-                ]
-              },
-              "logs": {
-                "volumes": [
-                  {
-                    "className": "[parameters('logsStorageClassName')]",
-                    "size": "[parameters('logsStorageSize')]"
-                  }
-                ]
-              },
-              "datalogs": {
-                "volumes": [
-                  {
-                    "className": "[parameters('dataLogsStorageClassName')]",
-                    "size": "[parameters('dataLogsStorageSize')]"
-                  }
-                ]
-              },
-              "security":{
-                 "activeDirectory": {
-                        "accountName": "[parameters('adAccountName')]",
-                        "connector": {
-                            "name": "[parameters('adConnectorName')]",
-                            "namespace": "arc"
-                        },
-                        "keytabSecret": "[parameters('keyTab')]"
-                    }
-              }
+            "metadata": {
+              "namespace": "[parameters('namespace')]"
             },
-            "settings": {
-              "azure": {
-                "location": "[parameters('location')]",
-                "resourceGroup": "[parameters('resourceGroup')]",
-                "subscription": "[parameters('subscriptionId')]"
-              }
-            }
+            "status": {}
           },
-          "metadata": {
-            "namespace": "[parameters('namespace')]"
-          },
-          "status": {}
-        },
-        "dataControllerId": "[parameters('dataControllerId')]"
+          "dataControllerId": "[parameters('dataControllerId')]"
+        }
       }
-    }
   ],
   "outputs": {}
 }
