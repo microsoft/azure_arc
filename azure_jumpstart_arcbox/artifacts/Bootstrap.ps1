@@ -129,7 +129,7 @@ $appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
 
 foreach ($app in $appsToInstall) {
     Write-Host "Installing $app"
-    if($app == "kubernetes-helm"){
+    if($app -eq "kubernetes-helm"){
         & choco install $app /y --version=3.6.3 -Force | Write-Output
     }
     else{
