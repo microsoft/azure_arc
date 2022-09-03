@@ -129,7 +129,13 @@ $appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
 
 foreach ($app in $appsToInstall) {
     Write-Host "Installing $app"
-    & choco install $app /y -Force | Write-Output
+    if($app == "kubernetes-helm"){
+        & choco install $app /y --version 3.6.3 -Force | Write-Output
+    }
+    else{
+        & choco install $app /y -Force | Write-Output
+    }
+    
 }
 
 Write-Header "Fetching GitHub Artifacts"
