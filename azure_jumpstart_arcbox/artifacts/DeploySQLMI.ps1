@@ -63,7 +63,6 @@ $SQLParams = "$Env:ArcBoxDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , "" | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "" | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'domainName-stage' , "" | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'port-stage' , "" | Set-Content -Path $SQLParams
 
 az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI.parameters.json"
 Write-Host "`n"

@@ -87,9 +87,6 @@
         },
         "domainName": {
             "value": "domainName-stage"
-        },
-        "port":{
-            "value": "port-stage"
         }
     }
 }
