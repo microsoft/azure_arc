@@ -270,7 +270,7 @@ foreach ($cluster in $clusters) {
             --location $Env:azureLocation `
             --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5"
     
-        Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 20
     
         # Enabling Container Insights cluster extension on primary AKS cluster
         Write-Host "`n"
