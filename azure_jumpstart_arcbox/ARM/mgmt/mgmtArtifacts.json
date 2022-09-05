@@ -234,7 +234,10 @@
           {
             "name": "[parameters('drSubnetName')]",
             "properties": {
-              "addressPrefix": "[variables('drSubnetPrefix')]"
+              "addressPrefix": "[variables('drSubnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              }
             }
           }
         ]
