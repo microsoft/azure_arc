@@ -218,7 +218,7 @@ Write-Host "`n"
 (Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'domainName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'port-stage' , "31433" | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'port-stage' , "11433" | Set-Content -Path $SQLParams
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     Write-Host "`n"
@@ -234,10 +234,11 @@ Write-Host "`n"
     Remove-Item "$Env:ArcBoxDir\SQLMI-stage.parameters.json" -Force
 
     # Update Service Port from 1433 to Non-Standard
-    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
+    <#$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
     kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload
     Start-Sleep 5 # To allow the CRD to update
-
+    #>
+    
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
     kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
