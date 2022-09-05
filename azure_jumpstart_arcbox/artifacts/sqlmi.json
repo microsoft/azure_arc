@@ -104,10 +104,6 @@
     "domainName": {
       "type": "string",
       "defaultValue": ""
-    },
-    "port": {
-      "type": "string",
-      "defaultValue": ""
     }
   },
   "variables": {},
@@ -145,8 +141,7 @@
             "services": {
               "primary": {
                 "type": "[parameters('serviceType')]",
-                "dnsName": "[parameters('domainName')]",
-                "port": "[parameters('port')]"
+                "dnsName": "[parameters('domainName')]"
 
               },
               "readableSecondaries": {

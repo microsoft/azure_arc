@@ -55,11 +55,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'arcboxsqlcapi'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{instanceName = 'capi-sql-pr'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{instanceName = 'arcboxsqlaks'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{instanceName = 'aks-sql-pr'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{instanceName = 'arcboxsqldr'; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{instanceName = 'aksdr-sql-pr'; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 $sqlmiouName = "ArcSQLMI"
@@ -92,7 +92,7 @@ $samaccountname = $arcsaname
 $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
 $domain_name = $dcInfo.domain.ToUpper()
 $nameserverIPAddresses = @("dcInfo.IPv4Address")
-#$sqlmi_port = "32400"
+$sqlmi_port = "11433"
 
 try {
     New-ADUser -Name $arcsaname `
@@ -135,7 +135,7 @@ foreach ($sqlInstance in $sqlInstances) {
 
     Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-stage.parameters.json"
     $adConnectorParams = "$Env:ArcBoxDir\adConnector-stage.parameters.json"
-    $adConnectorName = $sqlInstance.dataController+"/adarc"
+    $adConnectorName = $sqlInstance.dataController + "/adarc"
     $serviceAccountProvisioning = "automatic"
 
 (Get-Content -Path $adConnectorParams) -replace 'serviceAccountPassword-stage', $arcsapass | Set-Content -Path $adConnectorParams
@@ -148,8 +148,8 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.Tolower() | Set-Content -Path $adConnectorParams
 
-az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-stage.parameters.json"
-Write-Host "`n"
+    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-stage.parameters.json"
+    Write-Host "`n"
 
     Write-Host "`n"
     Do {
@@ -218,7 +218,6 @@ Write-Host "`n"
 (Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'domainName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'port-stage' , "11433" | Set-Content -Path $SQLParams
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     Write-Host "`n"
@@ -233,12 +232,11 @@ Write-Host "`n"
 
     Remove-Item "$Env:ArcBoxDir\SQLMI-stage.parameters.json" -Force
 
-    # Update Service Port from 1433 to Non-Standard
-    <#$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-    kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload
-    Start-Sleep 5 # To allow the CRD to update
-    #>
-    
+    #Update Service Port from 1433 to Non-Standard on primary cluster
+    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
+    kubectl patch svc "$sqlMIName-pr-external-svc" -n arc --type merge --patch $payload
+    Start-Sleep -Seconds 5 # To allow the CRD to update 
+
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
     kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
