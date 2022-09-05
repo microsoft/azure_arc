@@ -191,6 +191,16 @@ foreach ($sqlInstance in $sqlInstances) {
     $replicas = 3 # Deploy SQL MI "Business Critical" tier
     #######################################################
 
+az sql mi-arc create `
+--name $sqlInstance.instanceName `
+--ad-connector-name "adarc" `
+--license-type "BusinessCritical" `
+--keytab-secret $b64keytabtext `
+--ad-account-name $arcsaname `
+--primary-dns-name $sqlmi_fqdn_name `
+--custom-location $sqlInstance.customLocation `
+--resource-group $Env:resourceGroup
+<#
     Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
 
@@ -216,7 +226,7 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' , $sqlInstance.instanceName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'keyTab-stage' , $b64keytabtext | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , adarc | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'domainName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
@@ -231,7 +241,7 @@ foreach ($sqlInstance in $sqlInstances) {
     Write-Host "`n"
 
     Remove-Item "$Env:ArcBoxDir\SQLMI-stage.parameters.json" -Force
-
+#>
     #Update Service Port from 1433 to Non-Standard on primary cluster
     $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
     kubectl patch svc "$sqlMIName-pr-external-svc" -n arc --type merge --patch $payload

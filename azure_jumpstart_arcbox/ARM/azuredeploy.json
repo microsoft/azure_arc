@@ -112,7 +112,8 @@
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
-        "mgmtArtifactsAndPolicyDeployment"
+        "mgmtArtifactsAndPolicyDeployment",
+        "updateVNetDNSServers"
       ],
       "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'),equals(parameters('flavor'),'DataOps'))]",
       "properties": {
@@ -343,7 +344,7 @@
             "value": "[parameters('deployBastion')]"
           },
           "dnsServers": {
-            "value": ["10.16.2.100", "168.63.129.16"]
+            "value": ["10.16.2.100","168.63.129.16"]
           }
         }
       }
