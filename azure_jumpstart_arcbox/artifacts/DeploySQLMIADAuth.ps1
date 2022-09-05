@@ -364,3 +364,27 @@ else {
 Stop-Transcript
 
 #>
+
+# Creating distributed DAG
+Write-Header "Configuring Disaster Recovery"
+Write-Host "Configuring the primary cluster DAG"
+New-Item -Path "$Env:ArcBoxDir/sqlcerts" -ItemType Directory
+Write-Host "`n"
+kubectx $sqlInstances[0].context
+$primaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[0].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
+az sql mi-arc get-mirroring-cert --name $sqlInstances[0].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+Write-Host "`n"
+
+Write-Host "Configuring the secondary cluster DAG"
+Write-Host "`n"
+kubectx $sqlInstances[1].context
+$secondaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[1].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
+az sql mi-arc get-mirroring-cert --name $sqlInstances[1].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+Write-Host "`n"
+
+Write-Host "`n"
+kubectx $sqlInstances[0].context
+az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primarycr --mi $sqlInstances[0].instanceName --role primary --partner-mi $sqlInstances[1].instanceName  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+Write-Host "`n"
+kubectx kubectx $sqlInstances[1].context
+az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[1].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
