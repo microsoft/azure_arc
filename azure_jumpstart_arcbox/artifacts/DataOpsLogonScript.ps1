@@ -86,8 +86,8 @@ $Shortcut.Save()
 # Installing AD RSAT tools
 Write-Host "`n"
 Write-Host "Installing AD RSAT tools"
-get-WindowsFeature | Where-Object {$_.Name -like "RSAT-AD-Tools"} | Install-WindowsFeature
-get-WindowsFeature | Where-Object {$_.Name -like "RSAT-DNS-Server"} | Install-WindowsFeature
+get-WindowsFeature | Where-Object { $_.Name -like "RSAT-AD-Tools" } | Install-WindowsFeature
+get-WindowsFeature | Where-Object { $_.Name -like "RSAT-DNS-Server" } | Install-WindowsFeature
 Write-Host "`n"
 
 ################################################
@@ -215,36 +215,33 @@ $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\installCAPI.log"
 
 # Update CAPI vnet DNS server
-az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
+#az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
 
 #VNet peering with CAPI vnet
-$dcVnetId=$(az network vnet show `
-  --resource-group $Env:resourceGroup `
-  --name "ArcBox-VNet" `
-  --query id --out tsv)
+$dcVnetId = $(az network vnet show `
+        --resource-group $Env:resourceGroup `
+        --name "ArcBox-VNet" `
+        --query id --out tsv)
 
-$capiVnetId=$(az network vnet show `
-  --resource-group $Env:resourceGroup `
-  --name "arcbox-capi-data-vnet" `
-  --query id --out tsv)
+$capiVnetId = $(az network vnet show `
+        --resource-group $Env:resourceGroup `
+        --name "arcbox-capi-data-vnet" `
+        --query id --out tsv)
 
 az network vnet peering create --name "dcVnet-CapiVnet" `
-  --resource-group $Env:resourceGroup `
-  --vnet-name "ArcBox-VNet" `
-  --remote-vnet $capiVnetId `
-  --allow-vnet-access
+    --resource-group $Env:resourceGroup `
+    --vnet-name "ArcBox-VNet" `
+    --remote-vnet $capiVnetId `
+    --allow-vnet-access
 
 az network vnet peering create --name "CapiVnet-dcVnet" `
-  --resource-group $Env:resourceGroup `
-  --vnet-name "arcbox-capi-data-vnet" `
-  --remote-vnet $dcVnetId `
-  --allow-vnet-access
+    --resource-group $Env:resourceGroup `
+    --vnet-name "arcbox-capi-data-vnet" `
+    --remote-vnet $dcVnetId `
+    --allow-vnet-access
 #az vm restart --no-wait --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv)
 
-Start-Sleep -Seconds 30
-
-Write-Header "Checking K8s Nodes"
-kubectl get nodes
+Start-Sleep -Seconds 10
 
 Write-Host "`n"
 azdata --version
@@ -257,11 +254,15 @@ kubectx aks="$aksConnectedClusterName-admin"
 kubectx aks-dr="$aksDRConnectedClusterName-admin"
 kubectx capi="arcbox-capi"
 
+Start-Sleep -Seconds 10
 
 foreach ($cluster in $clusters) {
-    Write-Header "Onboarding cluster as an Azure Arc-enabled Kubernetes cluster"
-    Write-Host "`n"
     if ($cluster.context -ne 'capi') {
+        Write-Header "Onboarding cluster as an Azure Arc-enabled Kubernetes cluster"
+        Write-Host "Checking K8s Nodes"
+        Write-Host "`n"
+        kubectl get nodes
+        Write-Host "`n"
         kubectx $cluster.context
         Write-Host "`n"
         az connectedk8s connect --name $cluster.clusterName `
@@ -373,14 +374,14 @@ Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$E
 # Creating desktop url shortcuts for built-in Grafana and Kibana services
 Write-Header "Creating Grafana & Kibana Shortcuts"
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-$GrafanaURL = "https://"+$GrafanaURL+":3000"
+$GrafanaURL = "https://" + $GrafanaURL + ":3000"
 $Shell = New-Object -ComObject ("WScript.Shell")
 $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Grafana.url")
 $Favorite.TargetPath = $GrafanaURL;
 $Favorite.Save()
 
 $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-$KibanaURL = "https://"+$KibanaURL+":5601"
+$KibanaURL = "https://" + $KibanaURL + ":5601"
 $Shell = New-Object -ComObject ("WScript.Shell")
 $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
@@ -406,9 +407,9 @@ namespace Win32{
 
 $ArcServersLogonScript = Get-WmiObject win32_process -filter 'name="powershell.exe"' | Select-Object CommandLine | ForEach-Object { $_ | Select-String "ArcServersLogonScript.ps1" }
 
-if(-not $ArcServersLogonScript) {
+if (-not $ArcServersLogonScript) {
     Write-Header "Changing Wallpaper"
-    $imgPath="$Env:ArcBoxDir\wallpaper.png"
+    $imgPath = "$Env:ArcBoxDir\wallpaper.png"
     Add-Type $code
     [Win32.Wallpaper]::SetWallpaper($imgPath)
 }
