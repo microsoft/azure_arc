@@ -248,6 +248,9 @@ azdata --version
 
 # Getting AKS clusters' credentials
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
+
+Start-Sleep -Seconds 10
+
 az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
 
 kubectx aks="$aksConnectedClusterName-admin"
