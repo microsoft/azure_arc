@@ -55,11 +55,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'capi-sql-pr'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{instanceName = 'capi-sql'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{instanceName = 'aks-sql-pr'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{instanceName = 'aks-sql'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{instanceName = 'aksdr-sql-pr'; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{instanceName = 'aksdr-sql'; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 $sqlmiouName = "ArcSQLMI"
@@ -199,7 +199,8 @@ az sql mi-arc create `
 --ad-account-name $arcsaname `
 --primary-dns-name $sqlmi_fqdn_name `
 --custom-location $sqlInstance.customLocation `
---resource-group $Env:resourceGroup
+--resource-group $Env:resourceGroup `
+--primary-port-number "1433"
 <#
     Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
@@ -244,7 +245,7 @@ az sql mi-arc create `
 #>
     #Update Service Port from 1433 to Non-Standard on primary cluster
     $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
-    kubectl patch svc "$sqlMIName-pr-external-svc" -n arc --type merge --patch $payload
+    kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update 
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
