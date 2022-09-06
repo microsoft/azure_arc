@@ -2201,6 +2201,9 @@ CertificateTemplate= WebServer
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
 
+            # Set Edge as default browser
+            Invoke-Expression -Command "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe Edge"
+
             # Create a shortcut for Windows Admin Center
             Write-Verbose "Creating Shortcut for Windows Admin Center"
             if ($SDNConfig.WACport -ne "443") { $TargetPath = "https://admincenter." + $SDNConfig.SDNDomainFQDN + ":" + $SDNConfig.WACport }
@@ -3046,10 +3049,8 @@ $endtime = Get-Date
 
 $timeSpan = New-TimeSpan -Start $starttime -End $endtime
 
-
 Write-Verbose "`nSuccessfully deployed HCIBox cluster." 
 Write-Verbose "Now working on enabling HCIBox features."
-
 Write-Host "Infrastructure deployment time was $($timeSpan.Hours) hour and $($timeSpan.Minutes) minutes." -ForegroundColor Green
  
 $ErrorActionPreference = "Continue"
