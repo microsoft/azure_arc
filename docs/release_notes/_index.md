@@ -41,6 +41,7 @@ weight: 3
     - clusterctrl: v1.1.5 --> v1.2.0
     - CAPZ K8s: v1.24.2 --> v1.24.3
     - Azure Disk CSI Driver: v1.19.9 --> 1.21.0
+- [Enhancement: correlation-id for tracking #1314](https://github.com/microsoft/azure_arc/issues/1314)
 
 ## July 2022
 
