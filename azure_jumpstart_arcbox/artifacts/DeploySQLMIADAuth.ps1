@@ -200,7 +200,8 @@ az sql mi-arc create `
 --primary-dns-name $sqlmi_fqdn_name `
 --custom-location $sqlInstance.customLocation `
 --resource-group $Env:resourceGroup `
---primary-port-number "1433"
+--primary-port-number "1433" `
+--secondary-port-number "1433"
 <#
     Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
@@ -246,6 +247,7 @@ az sql mi-arc create `
     #Update Service Port from 1433 to Non-Standard on primary cluster
     $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
     kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload
+    kubectl patch svc "$sqlMIName-secondary-external-svc" -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update 
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
