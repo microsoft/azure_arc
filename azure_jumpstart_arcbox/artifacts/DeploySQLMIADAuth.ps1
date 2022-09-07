@@ -174,7 +174,7 @@ foreach ($sqlInstance in $sqlInstances) {
     # Localize ARM template
     ################################################
     $ServiceType = "LoadBalancer"
-    #$readableSecondaries = $ServiceType
+    $readableSecondaries = $ServiceType
 
     # Resource Requests
     $vCoresRequest = "2"
