@@ -136,10 +136,8 @@ foreach ($sqlInstance in $sqlInstances) {
     Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-stage.parameters.json"
     $adConnectorParams = "$Env:ArcBoxDir\adConnector-stage.parameters.json"
     $adConnectorName = $sqlInstance.dataController + "/adarc"
-    $serviceAccountProvisioning = "automatic"
+    $serviceAccountProvisioning = "manual"
 
-(Get-Content -Path $adConnectorParams) -replace 'serviceAccountPassword-stage', $arcsapass | Set-Content -Path $adConnectorParams
-(Get-Content -Path $adConnectorParams) -replace 'serviceAccountUsername-stage', $arcsaname | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'connectorName-stage', $adConnectorName | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'domainController-stage', $dcInfo.HostName | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'netbiosDomainName-stage', $domain_netbios_name | Set-Content -Path $adConnectorParams
@@ -183,15 +181,16 @@ foreach ($sqlInstance in $sqlInstances) {
 
     # Storage
     $StorageClassName = $sqlInstance.storageClassName
-    $dataStorageSize = "40"
-    $logsStorageSize = "40"
-    $dataLogsStorageSize = "40"
+    $dataStorageSize = "30"
+    $logsStorageSize = "10"
+    $dataLogsStorageSize = "30"
+    $backupsStorageSize = "30"
 
     # High Availability
     $replicas = 3 # Deploy SQL MI "Business Critical" tier
     #######################################################
 
-az sql mi-arc create `
+<#az sql mi-arc create `
 --name $sqlInstance.instanceName `
 --ad-connector-name "adarc" `
 --license-type "BusinessCritical" `
@@ -202,7 +201,8 @@ az sql mi-arc create `
 --resource-group $Env:resourceGroup `
 --primary-port-number "1433" `
 --secondary-port-number "1433"
-<#
+#>
+
     Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
 
@@ -221,15 +221,17 @@ az sql mi-arc create `
 (Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'logsStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'backupsStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataSize-stage', $dataStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'logsSize-stage', $logsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogSize-stage', $dataLogsStorageSize | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'backupsStorageSize-stage', $backupsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' , $replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' , $sqlInstance.instanceName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'keyTab-stage' , $b64keytabtext | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , adarc | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'domainName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dnsName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     Write-Host "`n"
@@ -243,7 +245,7 @@ az sql mi-arc create `
     Write-Host "`n"
 
     Remove-Item "$Env:ArcBoxDir\SQLMI-stage.parameters.json" -Force
-#>
+
     #Update Service Port from 1433 to Non-Standard on primary cluster
     $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
     kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload

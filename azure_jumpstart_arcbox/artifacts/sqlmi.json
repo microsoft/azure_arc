@@ -70,6 +70,12 @@
     "dataLogsStorageClassName": {
       "type": "String"
     },
+    "backupsStorageClassName": {
+      "type": "String"
+    },
+    "backupsStorageSize": {
+      "type": "String"
+    },
     "replicas": {
       "type": "Int"
     },
@@ -101,9 +107,12 @@
       "type": "string",
       "defaultValue": ""
     },
-    "domainName": {
+    "dnsName": {
       "type": "string",
       "defaultValue": ""
+    },
+    "port": {
+      "type": "int"
     }
   },
   "variables": {},
@@ -124,11 +133,6 @@
         "tier": "[parameters('pricingTier')]"
       },
       "properties": {
-        "activeDirectoryInformation": {
-          "keytabInformation": {
-            "keytab": "[parameters('keyTab')]"
-          }
-        },
         "admin": "[parameters('admin')]",
         "basicLoginInformation": {
           "username": "[parameters('admin')]",
@@ -141,7 +145,8 @@
             "services": {
               "primary": {
                 "type": "[parameters('serviceType')]",
-                "dnsName": "[parameters('domainName')]"
+                "dnsName": "[parameters('dnsName')]",
+                "port": "[parameters('port')]"
 
               },
               "readableSecondaries": {
@@ -188,15 +193,23 @@
                   }
                 ]
               },
-              "security": {
-                "activeDirectory": {
-                  "accountName": "[parameters('adAccountName')]",
-                  "connector": {
-                    "name": "[parameters('adConnectorName')]",
-                    "namespace": "arc"
-                  },
-                  "keytabSecret": "[parameters('keyTab')]"
-                }
+              "backups": {
+                "volumes": [
+                  {
+                    "className": "[parameters('backupsStorageClassName')]",
+                    "size": "[parameters('backupsStorageSize')]"
+                  }
+                ]
+              }
+            },
+            "security": {
+              "activeDirectory": {
+                "accountName": "[parameters('adAccountName')]",
+                "connector": {
+                  "name": "[parameters('adConnectorName')]",
+                  "namespace": "arc"
+                },
+                "keytabSecret": "[parameters('keyTab')]"
               }
             },
             "settings": {

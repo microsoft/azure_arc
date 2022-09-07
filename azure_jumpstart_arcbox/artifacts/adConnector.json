@@ -9,12 +9,6 @@
         "description": "Location for all resources"
       }
     },
-    "serviceAccountPassword": {
-      "type": "String"
-    },
-    "serviceAccountUsername": {
-      "type": "String"
-    },
     "connectorName": {
       "type": "String"
     },
@@ -31,7 +25,8 @@
       "type": "string"
     },
     "serviceAccountProvisioning": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "manual"
     },
     "domainName": {
       "type": "string"
@@ -39,6 +34,14 @@
     "nameserverIPAddresses": {
       "type": "array",
       "defaultValue": [ "10.16.2.100" ]
+    },
+    "replicas":{
+      "type": "int",
+      "defaultValue": 2
+    },
+    "preferK8sDnsForPtrLookups":{
+      "type": "bool",
+      "defaultValue": false
     },
     "apiVersion": {
       "type": "String"
@@ -52,12 +55,9 @@
       "apiVersion": "[parameters('apiVersion')]",
       "name": "[parameters('connectorName')]",
       "properties": {
-        "domainServiceAccountLoginInformation": {
-          "password": "[parameters('serviceAccountPassword')]",
-          "username": "[parameters('serviceAccountUsername')]"
-        },
         "spec": {
           "activeDirectory": {
+            "serviceAccountProvisioning": "[parameters('serviceAccountProvisioning')]",
             "domainControllers": {
               "primaryDomainController": {
                 "hostname": "[parameters('domainController')]"
@@ -65,13 +65,13 @@
             },
             "netbiosDomainName": "[parameters('netbiosDomainName')]",
             "ouDistinguishedName": "[parameters('ouDistinguishedName')]",
-            "realm": "[parameters('realm')]",
-            "serviceAccountProvisioning": "[parameters('serviceAccountProvisioning')]"
+            "realm": "[parameters('realm')]"
           },
           "dns": {
             "domainName": "[parameters('domainName')]",
             "nameserverIPAddresses": "[parameters('nameserverIPAddresses')]",
-            "preferK8sDnsForPtrLookups": false
+            "preferK8sDnsForPtrLookups": "[parameters('preferK8sDnsForPtrLookups')]",
+            "replicas": "[parameters('replicas')]"
           }
         }
       }

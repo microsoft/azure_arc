@@ -85,8 +85,17 @@
         "adConnectorName": {
             "value": "adConnectorName-stage"
         },
-        "domainName": {
-            "value": "domainName-stage"
+        "dnsName": {
+            "value": "dnsName-stage"
+        },
+        "port": {
+            "value": "port-stage"
+        },
+        "backupsStorageClassName": {
+            "value": "backupsStorageClassName-stage"
+        },
+        "backupsStorageSize": {
+            "value": "backupsStorageSize-stage"
         }
     }
 }
