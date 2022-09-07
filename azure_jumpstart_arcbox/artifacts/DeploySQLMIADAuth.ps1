@@ -92,7 +92,7 @@ $samaccountname = $arcsaname
 $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
 $domain_name = $dcInfo.domain.ToUpper()
 $nameserverIPAddresses = @("dcInfo.IPv4Address")
-$sqlmi_port = "11433"
+$sqlmi_port = 11433
 
 try {
     New-ADUser -Name $arcsaname `
@@ -138,6 +138,8 @@ foreach ($sqlInstance in $sqlInstances) {
     $adConnectorName = $sqlInstance.dataController + "/adarc"
     $serviceAccountProvisioning = "manual"
 
+(Get-Content -Path $adConnectorParams) -replace 'serviceAccountUserName-stage', $arcsaname | Set-Content -Path $adConnectorParams
+(Get-Content -Path $adConnectorParams) -replace 'serviceAccountPassword-stage', $arcsapass | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'connectorName-stage', $adConnectorName | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'domainController-stage', $dcInfo.HostName | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'netbiosDomainName-stage', $domain_netbios_name | Set-Content -Path $adConnectorParams
@@ -145,6 +147,7 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $adConnectorParams) -replace 'realm-stage', $dcInfo.domain.ToUpper() | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.Tolower() | Set-Content -Path $adConnectorParams
+
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-stage.parameters.json"
     Write-Host "`n"
@@ -171,7 +174,7 @@ foreach ($sqlInstance in $sqlInstances) {
     # Localize ARM template
     ################################################
     $ServiceType = "LoadBalancer"
-    $readableSecondaries = $ServiceType
+    #$readableSecondaries = $ServiceType
 
     # Resource Requests
     $vCoresRequest = "2"
@@ -232,6 +235,7 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dnsName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'port-stage' , $sqlmi_port | Set-Content -Path $SQLParams
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     Write-Host "`n"
