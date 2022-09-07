@@ -55,8 +55,8 @@
       "name": "[parameters('connectorName')]",
       "properties": {
         "domainServiceAccountLoginInformation": {
-          "username": "[parameters('serviceAccountUserName')]",
-          "password": "[parameters('serviceAccountPassword')]"
+          "password": "[parameters('serviceAccountPassword')]",
+          "username": "[parameters('serviceAccountUserName')]"
         },
         "spec": {
           "activeDirectory": {
