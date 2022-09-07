@@ -133,6 +133,11 @@
         "tier": "[parameters('pricingTier')]"
       },
       "properties": {
+        "activeDirectoryInformation": {
+          "keytabInformation": {
+            "keytab": "string"
+          }
+        },
         "admin": "[parameters('admin')]",
         "basicLoginInformation": {
           "username": "[parameters('admin')]",

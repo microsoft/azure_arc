@@ -5,6 +5,12 @@
       "connectorName": {
         "value": "connectorName-stage"
       },
+      "serviceAccountUserName":{
+        "value": "serviceAccountUserName-stage"
+      },
+      "serviceAccountPassword":{
+        "value": "serviceAccountPassword-stage"
+      },
       "domainController": {
         "value": "domainController-stage"
       },

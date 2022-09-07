@@ -2,14 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "Location for all resources"
-      }
-    },
     "connectorName": {
+      "type": "String"
+    },
+    "serviceAccountPassword": {
+      "type": "String"
+    },
+    "serviceAccountUserName": {
       "type": "String"
     },
     "domainController": {
@@ -35,11 +34,11 @@
       "type": "array",
       "defaultValue": [ "10.16.2.100" ]
     },
-    "replicas":{
+    "replicas": {
       "type": "int",
       "defaultValue": 2
     },
-    "preferK8sDnsForPtrLookups":{
+    "preferK8sDnsForPtrLookups": {
       "type": "bool",
       "defaultValue": false
     },
@@ -55,6 +54,10 @@
       "apiVersion": "[parameters('apiVersion')]",
       "name": "[parameters('connectorName')]",
       "properties": {
+        "domainServiceAccountLoginInformation": {
+          "username": "[parameters('serviceAccountUserName')]",
+          "password": "[parameters('serviceAccountPassword')]"
+        },
         "spec": {
           "activeDirectory": {
             "serviceAccountProvisioning": "[parameters('serviceAccountProvisioning')]",
