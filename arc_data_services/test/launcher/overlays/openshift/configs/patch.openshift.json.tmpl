@@ -1,0 +1,40 @@
+{
+    "patch": [
+        {
+            "op": "add",
+            "path": "spec.docker",
+            "value": {
+                "registry": "$DOCKER_REGISTRY",
+                "repository": "$DOCKER_REPOSITORY",
+                "imageTag": "$DOCKER_TAG",
+                "imagePullPolicy": "$DOCKER_IMAGE_POLICY"
+            }
+        },        
+        {
+            "op": "add",
+            "path": "spec.storage.data.className",
+            "value": "$KUBERNETES_STORAGECLASS"
+        },  
+        {
+            "op": "add",
+            "path": "spec.storage.logs.className",
+            "value": "$KUBERNETES_STORAGECLASS"
+        },
+        {
+            "op": "add",
+            "path": "spec.monitoring",
+            "value": {
+              "enableOpenTelemetry": true
+            }
+        },
+        {
+            "op": "add",
+            "path": "spec.security",
+            "value": {
+                "allowDumps": false,
+                "allowNodeMetricsCollection": false,
+                "allowPodMetricsCollection": false
+            }
+        }                       
+    ]
+}
