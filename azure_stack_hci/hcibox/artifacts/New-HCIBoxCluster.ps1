@@ -2218,7 +2218,9 @@ CertificateTemplate= WebServer
             $stTrigger = New-ScheduledTaskTrigger -AtLogOn
             $stTrigger.Delay = 'PT1M'
             $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Edge'
-            Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Force
+            $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+            $settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
+            Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Settings $settings -Principal $principal -Force
         } 
     } 
 }
