@@ -2221,6 +2221,25 @@ CertificateTemplate= WebServer
             $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
             $settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
             Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Settings $settings -Principal $principal -Force
+
+            # Disable Edge 'First Run' Setup
+            $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+            $desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
+            $firstRunRegistryName  = 'HideFirstRunExperience'
+            $firstRunRegistryValue = '0x00000001'
+            $savePasswordRegistryName = 'PasswordManagerEnabled'
+            $savePasswordRegistryValue = '0x00000000'
+            $autoArrangeRegistryName = 'FFlags'
+            $autoArrangeRegistryValue = '1075839525'
+
+            if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
+                New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
+            }
+
+            New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
+            New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
+            Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
+
         } 
     } 
 }

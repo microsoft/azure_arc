@@ -157,6 +157,24 @@ $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HCIBoxDir\HCIBoxLogonScript.ps1
 Register-ScheduledTask -TaskName "HCIBoxLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
 
+# Disable Edge 'First Run' Setup
+$edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+$desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
+$firstRunRegistryName  = 'HideFirstRunExperience'
+$firstRunRegistryValue = '0x00000001'
+$savePasswordRegistryName = 'PasswordManagerEnabled'
+$savePasswordRegistryValue = '0x00000000'
+$autoArrangeRegistryName = 'FFlags'
+$autoArrangeRegistryValue = '1075839525'
+
+if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
+    New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
+}
+
+New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
+New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
+Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
+
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V"
 Enable-WindowsOptionalFeature -Online -FeatureName Containers -All -NoRestart
