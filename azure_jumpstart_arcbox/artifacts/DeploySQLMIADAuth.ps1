@@ -190,8 +190,8 @@ foreach ($sqlInstance in $sqlInstances) {
 
 
 
-Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
-$SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+    Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+    $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
@@ -259,8 +259,26 @@ $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
 
     Remove-Item $keytab_file -Force
     write-host "`n"
-    Write-Host "SQL Managed Instance with AD authentication endpoint: $sqlmiEndPoint"
     
+    # Get public ip of the SQLMI endpoint
+    $sqlmiIpaddress = kubectl get svc -n arc "$sqlMIName-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
+
+    # Write endpoint information in the file
+    $filename = "SQLMIEndpoints.txt"
+    $file = New-Item -Path $Env:TempDir -Name $filename -ItemType "file"
+    $Endpoints = $file.FullName
+
+    Add-Content $Endpoints "Primary SQL Managed Instance external endpoint DNS name for AD Authentication:"
+    $sqlmiEndPoint | Add-Content $Endpoints
+
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "SQL Managed Instance username:"
+    $env:AZDATA_USERNAME | Add-Content $Endpoints
+
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "SQL Managed Instance password:"
+    $env:AZDATA_PASSWORD | Add-Content $Endpoints
 }
 <#
 
