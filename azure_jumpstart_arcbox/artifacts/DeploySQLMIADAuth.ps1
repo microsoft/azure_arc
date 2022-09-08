@@ -84,6 +84,11 @@ catch {
 # Deploying Active Directory connector and Azure Arc SQL MI
 Write-Header "Deploying Active Directory connector"
 
+# Creating endpoints file
+$filename = "SQLMIEndpoints.txt"
+$file = New-Item -Path $Env:ArcBoxDir -Name $filename -ItemType "file"
+$Endpoints = $file.FullName
+
 foreach ($sqlInstance in $sqlInstances) {
     kubectx $sqlInstance.context
     $sqlMIName = $sqlInstance.instanceName
@@ -265,11 +270,8 @@ foreach ($sqlInstance in $sqlInstances) {
     Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
 
     # Write endpoint information in the file
-    $filename = "SQLMIEndpoints.txt"
-    $file = New-Item -Path $Env:TempDir -Name $filename -ItemType "file"
-    $Endpoints = $file.FullName
 
-    Add-Content $Endpoints "Primary SQL Managed Instance external endpoint DNS name for AD Authentication:"
+    Add-Content $Endpoints "$sqlMIName SQL Managed Instance external endpoint DNS name for AD Authentication:"
     $sqlmiEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
@@ -279,6 +281,7 @@ foreach ($sqlInstance in $sqlInstances) {
     Add-Content $Endpoints ""
     Add-Content $Endpoints "SQL Managed Instance password:"
     $env:AZDATA_PASSWORD | Add-Content $Endpoints
+    Add-Content $Endpoints ""
 }
 <#
 
