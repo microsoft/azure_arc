@@ -2190,20 +2190,12 @@ CertificateTemplate= WebServer
             $expression = "choco install setdefaultbrowser -y"
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
-                          
-            # Add Edge to list of browsers
-            Write-Verbose 'Setting Default Broswer on admincenter vm'
-            $expression = "SetDefaultBrowser.exe Edge"
-            Invoke-Expression $expression
 
             # Install Kubectl
             Write-Verbose 'Installing kubectl'
             $expression = "choco install kubernetes-cli -y"
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
-
-            # Set Edge as default browser
-            Invoke-Expression -Command "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe Edge"
 
             # Create a shortcut for Windows Admin Center
             Write-Verbose "Creating Shortcut for Windows Admin Center"
