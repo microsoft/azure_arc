@@ -443,7 +443,8 @@ $azsmgmtProdKey
 
         if ($AzSHOST.AzSHOST -eq "AzSHOST1") {
             New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
-            Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
+            Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
+            Copy-Item -Path "$Env:HCIBoxVHDDir\Ubuntu.vhdx" - Destination ($MountedDrive + ":\VHD") -Recurse -Force
         }
 
         # Dismount VHDX
@@ -2795,9 +2796,11 @@ $ProgressPreference = 'SilentlyContinue'
 
 # Download HCIBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'='C:\HCIBox\VHD\AZSHCI.vhdx'}
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'='C:\HCIBox\VHD\GUI.vhdx'}
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'OutFile'='C:\HCIBox\VHD\Ubuntu.vhdx'}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'="$env:HCIBoxVHDDir\AZSHCI.vhdx"}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'="$env:HCIBoxVHDDir\GUI.vhdx"}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'OutFile'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
+Expand-Archive -Path $env:HCIBoxVHDDir\Ubuntu.vhdx.zip -DestinationPath $env:HCIBoxVHDDir
+Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination $env:HCIBoxVHDDir\Ubuntu.vhdx
 
 # Set VM Host Memory
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824
