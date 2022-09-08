@@ -89,13 +89,7 @@
             "value": "dnsName-stage"
         },
         "port": {
-            "value": "port-stage"
-        },
-        "backupsStorageClassName": {
-            "value": "backupsStorageClassName-stage"
-        },
-        "backupsStorageSize": {
-            "value": "backupsStorageSize-stage"
+            "value": port-stage
         }
     }
 }

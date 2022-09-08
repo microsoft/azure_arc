@@ -70,12 +70,6 @@
     "dataLogsStorageClassName": {
       "type": "String"
     },
-    "backupsStorageClassName": {
-      "type": "String"
-    },
-    "backupsStorageSize": {
-      "type": "String"
-    },
     "replicas": {
       "type": "Int"
     },
@@ -197,14 +191,6 @@
                     "size": "[parameters('dataLogsStorageSize')]"
                   }
                 ]
-              },
-              "backups": {
-                "volumes": [
-                  {
-                    "className": "[parameters('backupsStorageClassName')]",
-                    "size": "[parameters('backupsStorageSize')]"
-                  }
-                ]
               }
             },
             "security": {
@@ -213,8 +199,7 @@
                 "connector": {
                   "name": "[parameters('adConnectorName')]",
                   "namespace": "arc"
-                },
-                "keytabSecret": "[parameters('keyTab')]"
+                }
               }
             },
             "settings": {
