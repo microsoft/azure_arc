@@ -135,7 +135,7 @@
       "properties": {
         "activeDirectoryInformation": {
           "keytabInformation": {
-            "keytab": "string"
+            "keytab": "[parameters('keyTab')]"
           }
         },
         "admin": "[parameters('admin')]",
