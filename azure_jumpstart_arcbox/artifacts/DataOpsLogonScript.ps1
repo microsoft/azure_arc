@@ -317,9 +317,9 @@ foreach ($cluster in $clusters) {
     Write-Header "Configuring Azure Arc Custom Location"
     $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
     $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-    Start-Sleep -Seconds 20
     az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
 
+    Start-Sleep -Seconds 20
     # Deploying Azure Arc Data Controller on the capi cluster
     Write-Header "Deploying Azure Arc Data Controller"
 
