@@ -5,20 +5,11 @@
       "connectorName": {
         "value": "connectorName-stage"
       },
-      "serviceAccountUserName":{
-        "value": "serviceAccountUserName-stage"
-      },
-      "serviceAccountPassword":{
-        "value": "serviceAccountPassword-stage"
-      },
       "domainController": {
         "value": "domainController-stage"
       },
       "netbiosDomainName": {
         "value": "netbiosDomainName-stage"
-      },
-      "ouDistinguishedName": {
-        "value": "ouDistinguishedName-stage"
       },
       "realm": {
         "value": "realm-stage"

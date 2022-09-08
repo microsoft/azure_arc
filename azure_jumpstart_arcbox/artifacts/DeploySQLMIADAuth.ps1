@@ -81,33 +81,6 @@ catch {
     New-ADOrganizationalUnit -Name $sqlmiouName -Path $dcInfo.DefaultPartition -ProtectedFromAccidentalDeletion $False
 }
 
-
-# Create dedicated service account for AD connector
-$arcsaname = "sa-sqlmi-cmk"
-$arcsapass = "ArcDSA#Pwd123$"
-$arcsasecpass = $arcsapass | ConvertTo-SecureString -AsPlainText -Force
-$sqlmisaupn = $arcsaname + "@" + $dcInfo.domain
-
-$samaccountname = $arcsaname
-$domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
-$domain_name = $dcInfo.domain.ToUpper()
-$nameserverIPAddresses = @("dcInfo.IPv4Address")
-$sqlmi_port = 11433
-
-try {
-    New-ADUser -Name $arcsaname `
-        -UserPrincipalName $sqlmisaupn `
-        -Path $sqlmiOUDN `
-        -AccountPassword $arcsasecpass `
-        -Enabled $true `
-        -ChangePasswordAtLogon $false `
-        -PasswordNeverExpires $true
-}
-catch {
-    # User already exists
-    Write-Host "User $arcsaname already existings in the directory."
-}
-
 # Deploying Active Directory connector and Azure Arc SQL MI
 Write-Header "Deploying Active Directory connector"
 
@@ -115,6 +88,31 @@ foreach ($sqlInstance in $sqlInstances) {
     kubectx $sqlInstance.context
     $sqlMIName = $sqlInstance.instanceName
     $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
+
+    # Create dedicated service account for AD connector
+    $arcsaname = "sa-$sqlMIName"
+    $arcsapass = "ArcDSA#Pwd123$"
+    $arcsasecpass = $arcsapass | ConvertTo-SecureString -AsPlainText -Force
+    $sqlmisaupn = $arcsaname + "@" + $dcInfo.domain
+
+    $samaccountname = $arcsaname
+    $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
+    $domain_name = $dcInfo.domain.ToUpper()
+    $sqlmi_port = 11433
+
+    try {
+        New-ADUser -Name $arcsaname `
+            -UserPrincipalName $sqlmisaupn `
+            -Path $sqlmiOUDN `
+            -AccountPassword $arcsasecpass `
+            -Enabled $true `
+            -ChangePasswordAtLogon $false `
+            -PasswordNeverExpires $true
+    }
+    catch {
+        # User already exists
+        Write-Host "User $arcsaname already existings in the directory."
+    }
     # Geneate key tab
     setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
     setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
@@ -138,12 +136,9 @@ foreach ($sqlInstance in $sqlInstances) {
     $adConnectorName = $sqlInstance.dataController + "/adarc"
     $serviceAccountProvisioning = "manual"
 
-(Get-Content -Path $adConnectorParams) -replace 'serviceAccountUserName-stage', $arcsaname | Set-Content -Path $adConnectorParams
-(Get-Content -Path $adConnectorParams) -replace 'serviceAccountPassword-stage', $arcsapass | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'connectorName-stage', $adConnectorName | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'domainController-stage', $dcInfo.HostName | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'netbiosDomainName-stage', $domain_netbios_name | Set-Content -Path $adConnectorParams
-(Get-Content -Path $adConnectorParams) -replace 'ouDistinguishedName-stage', $sqlmiOUDN | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'realm-stage', $dcInfo.domain.ToUpper() | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'serviceAccountProvisioning-stage', $serviceAccountProvisioning | Set-Content -Path $adConnectorParams
 (Get-Content -Path $adConnectorParams) -replace 'domainName-stage', $dcInfo.domain.Tolower() | Set-Content -Path $adConnectorParams
@@ -193,21 +188,10 @@ foreach ($sqlInstance in $sqlInstances) {
     $replicas = 3 # Deploy SQL MI "Business Critical" tier
     #######################################################
 
-<#az sql mi-arc create `
---name $sqlInstance.instanceName `
---ad-connector-name "adarc" `
---license-type "BusinessCritical" `
---keytab-secret $b64keytabtext `
---ad-account-name $arcsaname `
---primary-dns-name $sqlmi_fqdn_name `
---custom-location $sqlInstance.customLocation `
---resource-group $Env:resourceGroup `
---primary-port-number "1433" `
---secondary-port-number "1433"
-#>
 
-    Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
-    $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+
+Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+$SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
@@ -224,11 +208,9 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $SQLParams) -replace 'dataStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'logsStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'backupsStorageClassName-stage', $StorageClassName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataSize-stage', $dataStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'logsSize-stage', $logsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogSize-stage', $dataLogsStorageSize | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'backupsStorageSize-stage', $backupsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' , $replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' , $sqlInstance.instanceName | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'keyTab-stage' , $b64keytabtext | Set-Content -Path $SQLParams
@@ -275,6 +257,8 @@ foreach ($sqlInstance in $sqlInstances) {
     # Retrieving SQL MI connection endpoint
     $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
 
+    Remove-Item $keytab_file -Force
+    write-host "`n"
     Write-Host "SQL Managed Instance with AD authentication endpoint: $sqlmiEndPoint"
     
 }

@@ -3,21 +3,12 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "connectorName": {
-      "type": "String"
-    },
-    "serviceAccountPassword": {
-      "type": "String"
-    },
-    "serviceAccountUserName": {
-      "type": "String"
+      "type": "string"
     },
     "domainController": {
       "type": "string"
     },
     "netbiosDomainName": {
-      "type": "string"
-    },
-    "ouDistinguishedName": {
       "type": "string"
     },
     "realm": {
@@ -54,10 +45,6 @@
       "apiVersion": "[parameters('apiVersion')]",
       "name": "[parameters('connectorName')]",
       "properties": {
-        "domainServiceAccountLoginInformation": {
-          "password": "[parameters('serviceAccountPassword')]",
-          "username": "[parameters('serviceAccountUserName')]"
-        },
         "spec": {
           "activeDirectory": {
             "serviceAccountProvisioning": "[parameters('serviceAccountProvisioning')]",
@@ -67,7 +54,6 @@
               }
             },
             "netbiosDomainName": "[parameters('netbiosDomainName')]",
-            "ouDistinguishedName": "[parameters('ouDistinguishedName')]",
             "realm": "[parameters('realm')]"
           },
           "dns": {
