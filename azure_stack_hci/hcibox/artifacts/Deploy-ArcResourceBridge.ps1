@@ -109,7 +109,7 @@ $ErrorActionPreference = "Continue"
 
 # Copy gallery VHDs to hosts
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    New-Item -Name "VHD" -Path $csv_path -ItemType Directory -Force
+    New-Item -Name "VHD" -Path $using:csv_path -ItemType Directory -Force
     Move-Item -Path "C:\VHD\GUI.vhdx" -Destination "$csv_path\VHD" -Force
 }
 
