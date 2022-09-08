@@ -444,7 +444,7 @@ $azsmgmtProdKey
         if ($AzSHOST.AzSHOST -eq "AzSHOST1") {
             New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
             Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
-            Copy-Item -Path "$Env:HCIBoxVHDDir\Ubuntu.vhdx" - Destination ($MountedDrive + ":\VHD") -Recurse -Force
+            Copy-Item -Path "$Env:HCIBoxVHDDir\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
         }
 
         # Dismount VHDX
