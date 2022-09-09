@@ -404,7 +404,20 @@
               "destinationAddressPrefix": "*",
               "destinationPortRange": "53"
             }
-          }
+          },
+          {
+            "name": "allow_SQLMI_mirroring_traffic",
+            "properties": {
+              "priority": 1012,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "5022 "
+            }
+          },
         ]
       }
     },
