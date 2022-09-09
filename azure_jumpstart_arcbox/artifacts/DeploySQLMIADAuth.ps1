@@ -118,6 +118,9 @@ foreach ($sqlInstance in $sqlInstances) {
         # User already exists
         Write-Host "User $arcsaname already existings in the directory."
     }
+
+    Start-Sleep -Seconds 10
+
     # Geneate key tab
     setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
     setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
@@ -237,12 +240,14 @@ foreach ($sqlInstance in $sqlInstances) {
 
     Remove-Item "$Env:ArcBoxDir\SQLMI-stage.parameters.json" -Force
 
+    <#
     #Update Service Port from 1433 to Non-Standard on primary cluster
     $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
     kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload
     kubectl patch svc "$sqlMIName-secondary-external-svc" -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update 
-
+    #>
+    
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
     kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
@@ -408,5 +413,5 @@ Write-Host "`n"
 kubectx $sqlInstances[0].context
 az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primarycr --mi $sqlInstances[0].instanceName --role primary --partner-mi $sqlInstances[1].instanceName  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
-kubectx kubectx $sqlInstances[1].context
+kubectx $sqlInstances[1].context
 az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[1].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
