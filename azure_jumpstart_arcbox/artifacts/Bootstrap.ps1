@@ -23,6 +23,8 @@ param (
     [string]$workspaceName,
     [string]$capiArcDataClusterName,
     [string]$k3sArcClusterName,
+    [string]$aksArcClusterName,
+    [string]$aksdrArcClusterName,
     [string]$githubUser,
     [string]$templateBaseUrl,
     [string]$flavor,
@@ -62,6 +64,11 @@ param (
 [System.Environment]::SetEnvironmentVariable('flavor', $flavor, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('automationTriggerAtLogon', $automationTriggerAtLogon, [System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('addsDomainName', "jumpstart.local", [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('aksArcClusterName', $aksArcClusterName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('aksdrArcClusterName', $aksdrArcClusterName, [System.EnvironmentVariableTarget]::Machine)
+
+
+
 
 # Creating ArcBox path
 Write-Output "Creating ArcBox path"

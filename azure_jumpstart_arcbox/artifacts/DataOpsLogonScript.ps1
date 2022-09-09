@@ -2,16 +2,14 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
-$aksConnectedClusterName = "ArcBox-AKS"
-$aksDRConnectedClusterName = "ArcBox-AKS-DR"
 
 $clusters = @(
 
     [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{clusterName = 'ArcBox-AKS'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{clusterName = 'ArcBox-AKS-DR'; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 
