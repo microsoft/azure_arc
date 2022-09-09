@@ -289,6 +289,68 @@ foreach ($sqlInstance in $sqlInstances) {
     $env:AZDATA_PASSWORD | Add-Content $Endpoints
     Add-Content $Endpoints ""
 }
+
+Write-Header "Creating Azure Data Studio settings for SQL Managed Instance connection with AD Authentication"
+
+$settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
+
+$capi= $sqlInstances[0].instanceName +".jumpstart.local" + ",$sqlmi_port"
+$aks= $sqlInstances[1].instanceName +".jumpstart.local" + ",$sqlmi_port"
+$aksdr= $sqlInstances[2].instanceName +".jumpstart.local" + ",$sqlmi_port"
+
+$templateContent = @"
+{
+    "options": {
+      "connectionName": $capi,
+      "server": "$sqlmiEndPoint",
+      "database": "",
+      "authenticationType": "Integrated",
+      "applicationName": "azdata",
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "databaseDisplayName": ""
+    },
+    "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+    "providerName": "MSSQL",
+    "savePassword": true,
+    "id": "ac333479-a04b-436b-88ab-3b314a201295"
+},
+{
+    "options": {
+        "connectionName": $aks,
+        "server": "$sqlmiEndPoint",
+        "database": "",
+        "authenticationType": "Integrated",
+        "applicationName": "azdata",
+        "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+        "databaseDisplayName": ""
+      },
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "providerName": "MSSQL",
+      "savePassword": true,
+      "id": "ac333479-a04b-436b-88ab-3b314a201295"
+},
+{
+    "options": {
+        "connectionName": $aksdr,
+        "server": "$sqlmiEndPoint",
+        "database": "",
+        "authenticationType": "Integrated",
+        "applicationName": "azdata",
+        "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+        "databaseDisplayName": ""
+      },
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "providerName": "MSSQL",
+      "savePassword": true,
+      "id": "ac333479-a04b-436b-88ab-3b314a201295"
+}
+"@
+
+Write-Host "Creating Azure Data Studio connections settings template file $settingsTemplateJson"
+
+$settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
+$settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
+ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 <#
 
 # Get public ip of the SQLMI endpoint
@@ -418,5 +480,5 @@ kubectx $sqlInstances[2].context
 az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[2].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
 
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
-$cnameRecord = $sqlInstances[0].instanceName+".jumpstart.local"
+$cnameRecord = $sqlInstances[0].instanceName + ".jumpstart.local"
 Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
