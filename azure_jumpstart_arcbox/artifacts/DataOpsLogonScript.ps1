@@ -245,14 +245,14 @@ Write-Host "`n"
 azdata --version
 
 # Getting AKS clusters' credentials
-az aks get-credentials --resource-group $Env:resourceGroup --name $aksConnectedClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
 
 Start-Sleep -Seconds 10
 
-az aks get-credentials --resource-group $Env:resourceGroup --name $aksDRConnectedClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
 
-kubectx aks="$aksConnectedClusterName-admin"
-kubectx aks-dr="$aksDRConnectedClusterName-admin"
+kubectx aks="$Env:aksArcClusterName-admin"
+kubectx aks-dr="$Env:aksdrArcClusterName-admin"
 kubectx capi="arcbox-capi"
 
 Start-Sleep -Seconds 10
