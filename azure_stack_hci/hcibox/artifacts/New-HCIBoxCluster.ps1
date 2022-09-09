@@ -2228,6 +2228,9 @@ CertificateTemplate= WebServer
             if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
                 New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
             }
+            if (-NOT (Test-Path -Path $desktopSettingsRegistryPath)) {
+                New-Item -Path $desktopSettingsRegistryPath -Force | Out-Null
+            }
 
             New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
             New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
