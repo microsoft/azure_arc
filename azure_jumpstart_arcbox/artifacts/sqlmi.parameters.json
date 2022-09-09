@@ -71,7 +71,7 @@
             "value": "BusinessCritical"
         },        
         "licenseType": {
-            "value": "LicenseIncluded"
+            "value": "licenseType-stage"
         },
         "keyTab": {
             "value": "keyTab-stage"
