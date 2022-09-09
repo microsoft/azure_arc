@@ -247,7 +247,7 @@ foreach ($sqlInstance in $sqlInstances) {
     kubectl patch svc "$sqlMIName-secondary-external-svc" -n arc --type merge --patch $payload
     Start-Sleep -Seconds 5 # To allow the CRD to update 
     #>
-    
+
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
     kubectl exec $podname -c arc-sqlmi -n arc -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $env:AZDATA_USERNAME -P "$env:AZDATA_PASSWORD" -Q "CREATE LOGIN [${domain_netbios_name}\$env:adminUsername] FROM WINDOWS"
@@ -404,14 +404,14 @@ Write-Host "`n"
 
 Write-Host "Configuring the secondary cluster DAG"
 Write-Host "`n"
-kubectx $sqlInstances[1].context
-$secondaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[1].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
-az sql mi-arc get-mirroring-cert --name $sqlInstances[1].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+kubectx $sqlInstances[2].context
+$secondaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[2].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
+az sql mi-arc get-mirroring-cert --name $sqlInstances[2].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
 
 Write-Host "`n"
 kubectx $sqlInstances[0].context
-az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primarycr --mi $sqlInstances[0].instanceName --role primary --partner-mi $sqlInstances[1].instanceName  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primarycr --mi $sqlInstances[0].instanceName --role primary --partner-mi $sqlInstances[2].instanceName  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
 Write-Host "`n"
-kubectx $sqlInstances[1].context
-az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[1].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+kubectx $sqlInstances[2].context
+az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[2].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
