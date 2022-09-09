@@ -290,6 +290,36 @@ foreach ($sqlInstance in $sqlInstances) {
     Add-Content $Endpoints ""
 }
 
+
+# Creating distributed DAG
+Write-Header "Configuring Disaster Recovery"
+Write-Host "Configuring the primary cluster DAG"
+New-Item -Path "$Env:ArcBoxDir/sqlcerts" -ItemType Directory
+Write-Host "`n"
+kubectx $sqlInstances[0].context
+$primaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[0].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
+az sql mi-arc get-mirroring-cert --name $sqlInstances[0].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+Write-Host "`n"
+
+Write-Host "Configuring the secondary cluster DAG"
+Write-Host "`n"
+kubectx $sqlInstances[2].context
+$secondaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[2].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
+az sql mi-arc get-mirroring-cert --name $sqlInstances[2].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+Write-Host "`n"
+
+Write-Host "`n"
+kubectx $sqlInstances[0].context
+az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primarycr --mi $sqlInstances[0].instanceName --role primary --partner-mi $sqlInstances[2].instanceName  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
+Write-Host "`n"
+kubectx $sqlInstances[2].context
+az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[2].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
+$cnameRecord = $sqlInstances[0].instanceName + ".jumpstart.local"
+Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
+
+
 Write-Header "Creating Azure Data Studio settings for SQL Managed Instance connection with AD Authentication"
 
 $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
@@ -351,6 +381,17 @@ Write-Host "Creating Azure Data Studio connections settings template file $setti
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
+
+
+Write-Host "`n"
+Write-Host "Creating SQLMI Endpoints file Desktop shortcut"
+Write-Host "`n"
+$TargetFile = $Endpoints
+$ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQLMI Endpoints.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
 <#
 
 # Get public ip of the SQLMI endpoint
@@ -455,30 +496,5 @@ Stop-Transcript
 
 #>
 
-# Creating distributed DAG
-Write-Header "Configuring Disaster Recovery"
-Write-Host "Configuring the primary cluster DAG"
-New-Item -Path "$Env:ArcBoxDir/sqlcerts" -ItemType Directory
-Write-Host "`n"
-kubectx $sqlInstances[0].context
-$primaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[0].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
-az sql mi-arc get-mirroring-cert --name $sqlInstances[0].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
-Write-Host "`n"
-
-Write-Host "Configuring the secondary cluster DAG"
-Write-Host "`n"
-kubectx $sqlInstances[2].context
-$secondaryMirroringEndpoint = $(az sql mi-arc show -n $sqlInstances[2].instanceName --k8s-namespace arc --use-k8s -o tsv --query 'status.endpoints.mirroring')
-az sql mi-arc get-mirroring-cert --name $sqlInstances[2].instanceName --cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
-Write-Host "`n"
-
-Write-Host "`n"
-kubectx $sqlInstances[0].context
-az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primarycr --mi $sqlInstances[0].instanceName --role primary --partner-mi $sqlInstances[2].instanceName  --partner-mirroring-url "tcp://$secondaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlsecondary.pem" --k8s-namespace arc --use-k8s
-Write-Host "`n"
-kubectx $sqlInstances[2].context
-az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[2].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
-
-Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
-$cnameRecord = $sqlInstances[0].instanceName + ".jumpstart.local"
-Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
+# Strop transcrip
+Stop-Transcript
