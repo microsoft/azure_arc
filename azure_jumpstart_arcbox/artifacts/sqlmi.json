@@ -149,7 +149,8 @@
 
               },
               "readableSecondaries": {
-                "type": "[parameters('readableSecondaries')]"
+                "type": "[parameters('readableSecondaries')]",
+                "port": "[parameters('port')]"
               }
             },
             "replicas": "[parameters('replicas')]",
