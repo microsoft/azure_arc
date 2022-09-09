@@ -226,6 +226,7 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dnsName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'port-stage' , $sqlmi_port | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'licenseType-stage' , $sqlInstance.licenseType | Set-Content -Path $SQLParams
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
     Write-Host "`n"

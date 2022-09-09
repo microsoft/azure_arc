@@ -83,7 +83,8 @@
       "type": "String"
     },
     "licenseType": {
-      "type": "String"
+      "type": "String",
+      "defaultValue": "LicenseIncluded"
     },
     "keyTab": {
       "type": "String",
