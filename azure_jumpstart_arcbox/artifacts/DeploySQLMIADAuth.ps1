@@ -277,7 +277,7 @@ foreach ($sqlInstance in $sqlInstances) {
 
     # Write endpoint information in the file
 
-    Add-Content $Endpoints "$sqlMIName SQL Managed Instance external endpoint DNS name for AD Authentication:"
+    Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
     $sqlmiEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
@@ -416,3 +416,7 @@ az sql instance-failover-group-arc create --shared-name ArcBoxDag --name primary
 Write-Host "`n"
 kubectx $sqlInstances[2].context
 az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[2].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
+
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
+$cnameRecord = $sqlInstances[0].instanceName+".jumpstart.local"
+Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00

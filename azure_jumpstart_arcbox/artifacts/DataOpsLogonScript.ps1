@@ -362,11 +362,14 @@ Write-Header "Deploying SQLMI"
 & "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
 
 # Enabling data controller auto metrics & logs upload to log analytics
-Write-Header "Enabling Data Controller Metrics & Logs Upload"
-$Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-az arcdata dc update --name $capiDcName --resource-group $Env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name $capiDcName --resource-group $Env:resourceGroup --auto-upload-metrics true
+foreach ($cluster in $clusters) {
+    Write-Header "Enabling Data Controller Metrics & Logs Upload"
+    $Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+    $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
+    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
+    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
+}
+
 
 # Replacing Azure Data Studio settings template file
 Write-Header "Updating Azure Data Studio Settings"
