@@ -258,12 +258,15 @@ foreach ($sqlInstance in $sqlInstances) {
     Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
-    Write-Host "`n"
-    Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
-    kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
-    Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
-    kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P "$Env:AZDATA_PASSWORD" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
-    Write-Host "Restoring AdventureWorks database completed."
+    if ($sqlMIName -ne 'aksdr-sql') {
+        Write-Host "`n"
+        Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
+        kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
+        Write-Host "Restoring AdventureWorks database for MS SQL. (2/2)"
+        kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P "$Env:AZDATA_PASSWORD" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
+        Write-Host "Restoring AdventureWorks database completed."
+    }
+    
 
     # Retrieving SQL MI connection endpoint
     $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
@@ -315,18 +318,17 @@ Write-Host "`n"
 kubectx $sqlInstances[2].context
 az sql instance-failover-group-arc create --shared-name ArcBoxDag --name secondarycr --mi $sqlInstances[2].instanceName --role secondary --partner-mi $sqlInstances[0].instanceName  --partner-mirroring-url "tcp://$primaryMirroringEndpoint" --partner-mirroring-cert-file "$Env:ArcBoxDir/sqlcerts/sqlprimary.pem" --k8s-namespace arc --use-k8s
 
-Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
 $cnameRecord = $sqlInstances[0].instanceName + ".jumpstart.local"
-Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
+Add-DnsServerResourceRecordCName -Name "ArcBoxDag" -ComputerName $dcInfo.HostName -HostNameAlias $cnameRecord -ZoneName jumpstart.local -TimeToLive 00:05:00
 
 
 Write-Header "Creating Azure Data Studio settings for SQL Managed Instance connection with AD Authentication"
 
 $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 
-$capi= $sqlInstances[0].instanceName +".jumpstart.local" + ",$sqlmi_port"
-$aks= $sqlInstances[1].instanceName +".jumpstart.local" + ",$sqlmi_port"
-$aksdr= $sqlInstances[2].instanceName +".jumpstart.local" + ",$sqlmi_port"
+$capi = $sqlInstances[0].instanceName + ".jumpstart.local" + ",$sqlmi_port"
+$aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
+$aksdr = $sqlInstances[2].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 
 $templateContent = @"
 {
