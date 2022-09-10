@@ -331,7 +331,7 @@ $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $aksdr = $sqlInstances[2].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 
 $templateContent = @"
-{
+[{
     "options": {
       "connectionName": $capi,
       "server": "$sqlmiEndPoint",
@@ -375,7 +375,7 @@ $templateContent = @"
       "providerName": "MSSQL",
       "savePassword": true,
       "id": "ac333479-a04b-436b-88ab-3b314a201295"
-}
+}]
 "@
 
 Write-Host "Creating Azure Data Studio connections settings template file $settingsTemplateJson"
