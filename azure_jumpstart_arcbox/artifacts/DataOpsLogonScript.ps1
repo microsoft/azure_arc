@@ -12,7 +12,7 @@ $clusters = @(
 
     [pscustomobject]@{clusterName = $Env:aksArcClusterName+$guid ; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName+$guid ; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName+$guid ; dataController = 'arcbox-aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 ### To be removed ###
