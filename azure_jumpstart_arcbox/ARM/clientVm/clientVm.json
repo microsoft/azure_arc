@@ -195,14 +195,14 @@
             "metadata": {
                 "description": "The name of the AKS cluster"
             },
-            "defaultValue": "ArcBox-AKS"
+            "defaultValue": "ArcBox-AKS-Data"
         },
         "aksdrArcClusterName": {
             "type": "string",
             "metadata": {
                 "description": "The name of the AKS DR cluster"
             },
-            "defaultValue": "ArcBox-AKS-DR"
+            "defaultValue": "ArcBox-AKS-DR-Data"
         }
     },
     "variables": {
