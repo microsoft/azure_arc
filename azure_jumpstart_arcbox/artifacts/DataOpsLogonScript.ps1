@@ -368,13 +368,6 @@ foreach ($cluster in $clusters) {
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
 }
 
-
-# Replacing Azure Data Studio settings template file
-Write-Header "Updating Azure Data Studio Settings"
-New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
-
-
 # Creating desktop url shortcuts for built-in Grafana and Kibana services
 Write-Header "Creating Grafana & Kibana Shortcuts"
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
