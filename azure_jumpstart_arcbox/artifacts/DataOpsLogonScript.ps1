@@ -3,7 +3,22 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
+
+### To be removed ###
+$guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
+
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName+$guid; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName+$guid ; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName+$guid ; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+
+)
+### To be removed ###
+
+
+<#$clusters = @(
 
     [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
@@ -11,7 +26,7 @@ $clusters = @(
 
     [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
-)
+)#>
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
 
