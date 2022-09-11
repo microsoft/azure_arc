@@ -14,7 +14,7 @@
             "op": "add",
             "path": "spec.storage.data.className",
             "value": "$KUBERNETES_STORAGECLASS"
-        },
+        },  
         {
             "op": "add",
             "path": "spec.storage.logs.className",
@@ -22,10 +22,12 @@
         },
         {
             "op": "add",
-            "path": "spec.monitoring",
+            "path": "spec.security",
             "value": {
-              "enableOpenTelemetry": true
+                "allowDumps": false,
+                "allowNodeMetricsCollection": false,
+                "allowPodMetricsCollection": false
             }
-        }
+        }                       
     ]
 }
