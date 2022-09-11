@@ -383,9 +383,9 @@ $settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject 
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 
 Write-Host "`n"
-    Write-Host "Copying Azure Data Studio settings template file"
-    New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-    Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+Write-Host "Copying Azure Data Studio settings template file"
+New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
 Write-Host "`n"
 Write-Header "Creating SQLMI Endpoints file Desktop shortcut"
