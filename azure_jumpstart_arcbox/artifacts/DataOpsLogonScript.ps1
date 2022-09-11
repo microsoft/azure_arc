@@ -8,7 +8,7 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
 
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName+$guid; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
     [pscustomobject]@{clusterName = $Env:aksArcClusterName+$guid ; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
