@@ -62,7 +62,7 @@
         "value": "mcr.microsoft.com"
       },
       "dockerRepository": {
-        "value": "arcdata/test"
+        "value": "arcdata/preview"
       },
       "dataStorageClass": {
         "value": "managed-premium"
