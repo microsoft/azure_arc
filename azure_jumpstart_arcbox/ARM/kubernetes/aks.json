@@ -4,14 +4,14 @@
     "parameters": {
       "aksClusterName": {
         "type": "string",
-        "defaultValue": "ArcBox-AKS",
+        "defaultValue": "ArcBox-AKS-Data",
         "metadata": {
           "description": "The name of the Kubernetes cluster resource"
         }
       },
       "drClusterName": {
         "type": "string",
-        "defaultValue": "ArcBox-AKS-DR",
+        "defaultValue": "ArcBox-AKS-DR-Data",
         "metadata": {
           "description": "The name of the Kubernetes cluster resource"
         }
