@@ -36,7 +36,7 @@
     },
     "readableSecondaries": {
       "type": "String"
-    },    
+    },
     "vCoresRequest": {
       "type": "String"
     },
@@ -83,7 +83,31 @@
       "type": "String"
     },
     "licenseType": {
-      "type": "String"
+      "type": "String",
+      "defaultValue": "LicenseIncluded"
+    },
+    "keyTab": {
+      "type": "String",
+      "defaultValue": ""
+    },
+    "sqlInstanceName": {
+      "type": "string",
+      "defaultValue": "jumpstart-sql"
+    },
+    "adAccountName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "adConnectorName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "dnsName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "port": {
+      "type": "int"
     }
   },
   "variables": {},
@@ -92,7 +116,7 @@
     {
       "type": "Microsoft.AzureArcData/sqlManagedInstances",
       "apiVersion": "[parameters('apiVersion')]",
-      "name": "jumpstart-sql",
+      "name": "[parameters('sqlInstanceName')]",
       "location": "[parameters('location')]",
       "extendedLocation": {
         "type": "CustomLocation",
@@ -104,6 +128,11 @@
         "tier": "[parameters('pricingTier')]"
       },
       "properties": {
+        "activeDirectoryInformation": {
+          "keytabInformation": {
+            "keytab": "[parameters('keyTab')]"
+          }
+        },
         "admin": "[parameters('admin')]",
         "basicLoginInformation": {
           "username": "[parameters('admin')]",
@@ -115,10 +144,14 @@
             "dev": true,
             "services": {
               "primary": {
-                "type": "[parameters('serviceType')]"
+                "type": "[parameters('serviceType')]",
+                "dnsName": "[parameters('dnsName')]",
+                "port": "[parameters('port')]"
+
               },
               "readableSecondaries": {
-                "type": "[parameters('readableSecondaries')]"
+                "type": "[parameters('readableSecondaries')]",
+                "port": "[parameters('port')]"
               }
             },
             "replicas": "[parameters('replicas')]",
@@ -160,6 +193,15 @@
                     "size": "[parameters('dataLogsStorageSize')]"
                   }
                 ]
+              }
+            },
+            "security": {
+              "activeDirectory": {
+                "accountName": "[parameters('adAccountName')]",
+                "connector": {
+                  "name": "[parameters('adConnectorName')]",
+                  "namespace": "arc"
+                }
               }
             },
             "settings": {

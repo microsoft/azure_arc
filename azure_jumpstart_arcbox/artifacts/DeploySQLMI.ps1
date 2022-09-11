@@ -5,6 +5,7 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\DeploySQL.log
 
 # Deployment environment variables
 $controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
+$sqlInstanceName = "jumpstart-sql"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "`n"
@@ -31,6 +32,7 @@ $StorageClassName = "managed-premium"
 $dataStorageSize = "5"
 $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
+$backupsStorageSize = "30"
 
 # High Availability
 $replicas = 3 # Deploy SQL MI "Business Critical" tier
@@ -57,6 +59,14 @@ $SQLParams = "$Env:ArcBoxDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'logsSize-stage',$logsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' ,$sqlInstanceName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'keyTab-stage' , "" | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , "" | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "" | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dnsName-stage' , "" | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'port-stage' , 1433 | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'licenseType-stage' , "" | Set-Content -Path $SQLParams
+
 
 az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI.parameters.json"
 Write-Host "`n"
