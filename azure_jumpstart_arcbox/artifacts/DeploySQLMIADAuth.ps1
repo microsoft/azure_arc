@@ -333,8 +333,8 @@ $aksdr = $sqlInstances[2].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $templateContent = @"
 [{
     "options": {
-      "connectionName": $capi,
-      "server": "$sqlmiEndPoint",
+      "connectionName": "ArcBox-Capi",
+      "server": "$capi",
       "database": "",
       "authenticationType": "Integrated",
       "applicationName": "azdata",
@@ -348,8 +348,8 @@ $templateContent = @"
 },
 {
     "options": {
-        "connectionName": $aks,
-        "server": "$sqlmiEndPoint",
+        "connectionName": "ArcBox-AKS",
+        "server": "$aks",
         "database": "",
         "authenticationType": "Integrated",
         "applicationName": "azdata",
@@ -363,8 +363,8 @@ $templateContent = @"
 },
 {
     "options": {
-        "connectionName": $aksdr,
-        "server": "$sqlmiEndPoint",
+        "connectionName": "ArcBox-AKS-DR",
+        "server": "$aksdr",
         "database": "",
         "authenticationType": "Integrated",
         "applicationName": "azdata",
@@ -378,12 +378,14 @@ $templateContent = @"
 }]
 "@
 
-Write-Header "Creating Azure Data Studio connections settings template file $settingsTemplateJson"
-
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 
+Write-Host "`n"
+    Write-Host "Copying Azure Data Studio settings template file"
+    New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+    Copy-Item -Path "$Env:ArcBoxDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
 Write-Host "`n"
 Write-Header "Creating SQLMI Endpoints file Desktop shortcut"
