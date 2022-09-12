@@ -30,6 +30,9 @@ $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnCl
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 $context = Get-AzContext # Azure credential
 
+Register-AzResourceProvider -ProviderNamespace Microsoft.Kubernetes -Confirm:$false
+Register-AzResourceProvider -ProviderNamespace Microsoft.KubernetesConfiguration -Confirm:$false
+
 # Install latest versions of Nuget and PowershellGet
 Write-Header "Install latest versions of Nuget and PowershellGet"
 Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
@@ -43,7 +46,7 @@ Invoke-Command -VMName $SDNConfig.HostList -Credential $adcred -ScriptBlock {
 Write-Header "Install necessary AZ modules plus AksHCI module and initialize akshci on each node"
 
 Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
-    Write-Host "Installing Required Modules" -ForegroundColor Green -BackgroundColor Black
+    Write-Host "Installing Required Modules"
     
     $ModuleNames="Az.Resources","Az.Accounts", "AzureAD", "AKSHCI"
     foreach ($ModuleName in $ModuleNames){
@@ -65,7 +68,7 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     $vnet = New-AksHciNetworkSetting -name $using:SDNConfig.AKSvnetname -vSwitchName $using:SDNConfig.AKSvSwitchName -k8sNodeIpPoolStart $using:SDNConfig.AKSNodeStartIP -k8sNodeIpPoolEnd $using:SDNConfig.AKSNodeEndIP -vipPoolStart $using:SDNConfig.AKSVIPStartIP -vipPoolEnd $using:SDNConfig.AKSVIPEndIP -ipAddressPrefix $using:SDNConfig.AKSIPPrefix -gateway $using:SDNConfig.AKSGWIP -dnsServers $using:SDNConfig.AKSDNSIP -vlanID $using:SDNConfig.AKSVlanID        
     Set-AksHciConfig -imageDir $using:SDNConfig.AKSImagedir -workingDir $using:SDNConfig.AKSWorkingdir -cloudConfigLocation $using:SDNConfig.AKSCloudConfigdir -vnet $vnet -cloudservicecidr $using:SDNConfig.AKSCloudSvcidr -controlPlaneVmSize Standard_D4s_v3
     $azurecred = Connect-AzAccount -ServicePrincipal -Subscription $using:context.Subscription.Id -Tenant $using:context.Subscription.TenantId -Credential $using:azureAppCred
-    Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:rg -Tenant $azurecred.Context.Tenant.Id -Credential $using:azureAppCred
+    Set-AksHciRegistration -subscriptionId $azurecred.Context.Subscription.Id -resourceGroupName $using:rg -Tenant $azurecred.Context.Tenant.Id -Credential $using:azureAppCred -Region "eastus"
     Write-Host "Ready to Install AKS on HCI Cluster"
     Install-AksHci 
 }
