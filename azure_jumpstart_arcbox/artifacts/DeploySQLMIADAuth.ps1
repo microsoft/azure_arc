@@ -329,12 +329,13 @@ $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 $capi = $sqlInstances[0].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $aksdr = $sqlInstances[2].instanceName + ".jumpstart.local" + ",$sqlmi_port"
+$arcboxDag = "ArcBoxDag.jumpstart.local" + ",$sqlmi_port"
 
 $templateContent = @"
 [{
     "options": {
-      "connectionName": "ArcBox-Capi",
-      "server": "$capi",
+      "connectionName": "ArcBoxDAG",
+      "server": "$arcboxDag",
       "database": "",
       "authenticationType": "Integrated",
       "applicationName": "azdata",
