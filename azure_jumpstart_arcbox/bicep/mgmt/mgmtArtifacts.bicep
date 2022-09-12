@@ -4,6 +4,18 @@ param virtualNetworkName string = 'ArcBox-VNet'
 @description('Name of the subnet in the virtual network')
 param subnetName string = 'ArcBox-Subnet'
 
+@description('Name of the subnet in the virtual network')
+param aksSubnetName string = 'ArcBox-AKS-Subnet'
+
+@description('Name of the Domain Controller subnet in the virtual network')
+param dcSubnetName string = 'ArcBox-DC-Subnet'
+
+@description('Name of the DR VNet')
+param drVirtualNetworkName string = 'ArcBox-DR-VNet'
+
+@description('Name of the DR subnet in the DR virtual network')
+param drSubnetName string = 'ArcBox-DR-Subnet'
+
 @description('Name for your log analytics workspace')
 param workspaceName string
 
@@ -12,6 +24,7 @@ param workspaceName string
   'Full'
   'ITPro'
   'DevOps'
+  'DataOps'
 ])
 param flavor string
 
@@ -30,6 +43,9 @@ param networkSecurityGroupName string = 'ArcBox-NSG'
 @description('Name of the Bastion Network Security Group')
 param bastionNetworkSecurityGroupName string = 'ArcBox-Bastion-NSG'
 
+@description('DNS Server configuration')
+param dnsServers array = []
+
 var updates = {
   name: 'Updates(${workspaceName})'
   galleryName: 'Updates'
@@ -44,14 +60,66 @@ var security = {
 }
 
 var automationAccountName = 'ArcBox-Automation-${uniqueString(resourceGroup().id)}'
-var subnetAddressPrefix = '172.16.1.0/24'
-var addressPrefix = '172.16.0.0/16'
+var subnetAddressPrefix = '10.16.1.0/24'
+var addressPrefix = '10.16.0.0/16'
+var aksSubnetPrefix = '10.16.76.0/22'
+var dcSubnetPrefix = '10.16.2.0/24'
+var drAddressPrefix = '172.16.0.0/16'
+var drSubnetPrefix = '172.16.128.0/17'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 var bastionSubnetName = 'AzureBastionSubnet'
 var bastionSubnetRef = '${arcVirtualNetwork.id}/subnets/${bastionSubnetName}'
 var bastionName = 'ArcBox-Bastion'
-var bastionSubnetIpPrefix = '172.16.3.64/26'
+var bastionSubnetIpPrefix = '10.16.3.64/26'
 var bastionPublicIpAddressName = '${bastionName}-PIP'
+var primarySubnet = [
+  {
+    name: subnetName
+    properties: {
+      addressPrefix: subnetAddressPrefix
+      privateEndpointNetworkPolicies: 'Enabled'
+      privateLinkServiceNetworkPolicies: 'Enabled'
+      networkSecurityGroup: {
+        id: networkSecurityGroup.name
+      }
+    }
+  }
+]
+var bastionSubnet = [
+  {
+    name: 'AzureBastionSubnet'
+    properties: {
+      addressPrefix: bastionSubnetIpPrefix
+      networkSecurityGroup: {
+        id: bastionNetworkSecurityGroup.name
+      }
+    }
+  }
+]
+var dataOpsSubnets = [
+  {
+    name: aksSubnetName
+    properties: {
+      addressPrefix: aksSubnetPrefix
+      privateEndpointNetworkPolicies: 'Enabled'
+      privateLinkServiceNetworkPolicies: 'Enabled'
+      networkSecurityGroup: {
+        id: networkSecurityGroup.name
+      }
+    }
+  }
+  {
+    name: dcSubnetName
+    properties: {
+      addressPrefix: dcSubnetPrefix
+      privateEndpointNetworkPolicies: 'Enabled'
+      privateLinkServiceNetworkPolicies: 'Enabled'
+      networkSecurityGroup: {
+        id: networkSecurityGroup.name
+      }
+    }
+  }
+]
 
 resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   name: virtualNetworkName
@@ -62,40 +130,64 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         addressPrefix
       ]
     }
-    subnets: deployBastion == true ? [
+    dhcpOptions: {
+      dnsServers: dnsServers
+    }
+    subnets: deployBastion == false && flavor != 'DataOps' ? primarySubnet : deployBastion == false && flavor == 'Dataops' ? union(primarySubnet,dataOpsSubnets) : deployBastion == true && flavor != 'DataOps' ? union(primarySubnet,bastionSubnet) : deployBastion == true && flavor == 'DataOps' ? union(primarySubnet,bastionSubnet,dataOpsSubnets) : primarySubnet
+  }
+}
+
+resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+  name: drVirtualNetworkName
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        drAddressPrefix
+      ]
+    }
+    dhcpOptions: {
+      dnsServers: dnsServers
+    }
+    subnets: [
       {
-        name: subnetName
+        name: drSubnetName
         properties: {
-          addressPrefix: subnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
+          addressPrefix: drSubnetPrefix
           networkSecurityGroup: {
-            id: networkSecurityGroup.id
-          }
-        }
-      }
-      {
-        name: 'AzureBastionSubnet'
-        properties: {
-          addressPrefix: bastionSubnetIpPrefix
-          networkSecurityGroup: {
-            id: bastionNetworkSecurityGroup.id
-          }
-        }
-      }
-    ] : [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: subnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-          networkSecurityGroup: {
-            id: networkSecurityGroup.id
+            id: networkSecurityGroup.name
           }
         }
       }
     ]
+  }
+}
+
+resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-08-01' = if (flavor == 'DataOps') {
+  parent: arcVirtualNetwork
+  name: 'peering-to-DR-vnet'
+  properties: {
+    allowVirtualNetworkAccess: true
+    allowForwardedTraffic: true
+    allowGatewayTransit: false
+    useRemoteGateways: false
+    remoteVirtualNetwork: {
+      id: drVirtualNetwork.id
+    }
+  }
+}
+
+resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-08-01' = if (flavor == 'DataOps') {
+  parent: drVirtualNetwork
+  name: 'peering-to-primary-vnet'
+  properties: {
+    allowVirtualNetworkAccess: true
+    allowForwardedTraffic: true
+    allowGatewayTransit: false
+    useRemoteGateways: false
+    remoteVirtualNetwork: {
+      id: arcVirtualNetwork.id
+    }
   }
 }
 
@@ -193,6 +285,45 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '15432'
+        }
+      }
+      {
+        name: 'allow_DNS_UDP'
+        properties: {
+          priority: 1010
+          protocol: 'UDP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '53'
+        }
+      }
+      {
+        name: 'allow_DNS_TCP'
+        properties: {
+          priority: 1011
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '53'
+        }
+      }
+      {
+        name: 'allow_SQLMI_mirroring_traffic'
+        properties: {
+          priority: 1012
+          protocol: 'TCP'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '5022'
         }
       }
     ]
