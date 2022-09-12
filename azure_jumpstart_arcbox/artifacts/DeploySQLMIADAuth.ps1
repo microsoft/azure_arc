@@ -326,14 +326,14 @@ Write-Header "Creating Azure Data Studio settings for SQL Managed Instance conne
 
 $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 
-$capi = $sqlInstances[0].instanceName + ".jumpstart.local" + ",$sqlmi_port"
+#$capi = $sqlInstances[0].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
-$aksdr = $sqlInstances[2].instanceName + ".jumpstart.local" + ",$sqlmi_port"
+#$aksdr = $sqlInstances[2].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $arcboxDag = "ArcBoxDag.jumpstart.local" + ",$sqlmi_port"
 
-$templateContent = @"
-[{
-    "options": {
+$dagConnection = @"
+{
+ "options": {
       "connectionName": "ArcBoxDAG",
       "server": "$arcboxDag",
       "database": "",
@@ -346,7 +346,11 @@ $templateContent = @"
     "providerName": "MSSQL",
     "savePassword": true,
     "id": "ac333479-a04b-436b-88ab-3b314a201295"
-},
+}
+"@
+
+
+$aksConnection = @"
 {
     "options": {
         "connectionName": "ArcBox-AKS",
@@ -361,26 +365,13 @@ $templateContent = @"
       "providerName": "MSSQL",
       "savePassword": true,
       "id": "ac333479-a04b-436b-88ab-3b314a201295"
-},
-{
-    "options": {
-        "connectionName": "ArcBox-AKS-DR",
-        "server": "$aksdr",
-        "database": "",
-        "authenticationType": "Integrated",
-        "applicationName": "azdata",
-        "groupId": "C777F06B-202E-4480-B475-FA416154D458",
-        "databaseDisplayName": ""
-      },
-      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
-      "providerName": "MSSQL",
-      "savePassword": true,
-      "id": "ac333479-a04b-436b-88ab-3b314a201295"
-}]
+}
 "@
 
+
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
-$settingsTemplateJson.'datasource.connections' = ConvertFrom-Json -InputObject $templateContent
+$settingsTemplateJson.'datasource.connections'[0] = ConvertFrom-Json -InputObject $dagConnection
+$settingsTemplateJson.'datasource.connections'[1] = ConvertFrom-Json -InputObject $aksConnection
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 
 Write-Host "`n"
