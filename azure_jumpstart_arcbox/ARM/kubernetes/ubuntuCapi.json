@@ -124,7 +124,8 @@
             "allowedValues": [
                 "Full",
                 "ITPro",
-                "DevOps"
+                "DevOps",
+                "DataOps"
             ]
         }
     },
