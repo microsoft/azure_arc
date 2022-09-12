@@ -2,7 +2,7 @@
 param addsDomainName string = 'jumpstart.local'
 
 @description('The name of your Virtual Machine')
-param vmName string = 'ArcBox-ADDS'
+param clientVMName string = 'ArcBox-ADDS'
 
 @description('Username for the Virtual Machine')
 param windowsAdminUsername string = 'arcdemo'
@@ -28,8 +28,7 @@ param deployBastion bool = false
 @description('Base URL for ARM template')
 param templateBaseUrl string = ''
 
-var vmName_var = concat(vmName)
-var networkInterfaceName = '${vmName}-NIC'
+var networkInterfaceName = '${clientVMName}-NIC'
 var virtualNetworkName = 'ArcBox-VNet'
 var dcSubnetName = 'ArcBox-DC-Subnet'
 var addsPrivateIPAddress = '10.16.2.100'
@@ -37,7 +36,7 @@ var bastionName = 'ArcBox-Bastion'
 var osDiskType = 'Premium_LRS'
 var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, dcSubnetName)
 var networkInterfaceRef = networkInterface.id
-var publicIpAddressName = ((!deployBastion) ? '${vmName}-PIP' : '${bastionName}-PIP')
+var publicIpAddressName = ((!deployBastion) ? '${clientVMName}-PIP' : '${bastionName}-PIP')
 var PublicIPNoBastion = {
   id: publicIpAddress.id
 }
@@ -76,8 +75,8 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (
   }
 }
 
-resource vmName_resource 'Microsoft.Compute/virtualMachines@2021-11-01' = {
-  name: vmName_var
+resource clientVM 'Microsoft.Compute/virtualMachines@2021-11-01' = {
+  name: clientVMName
   location: azureLocation
   properties: {
     hardwareProfile: {
@@ -85,7 +84,7 @@ resource vmName_resource 'Microsoft.Compute/virtualMachines@2021-11-01' = {
     }
     storageProfile: {
       osDisk: {
-        name: '${vmName_var}-OSDisk'
+        name: '${clientVMName}-OSDisk'
         caching: 'ReadWrite'
         createOption: 'fromImage'
         managedDisk: {
@@ -108,7 +107,7 @@ resource vmName_resource 'Microsoft.Compute/virtualMachines@2021-11-01' = {
       ]
     }
     osProfile: {
-      computerName: vmName_var
+      computerName: clientVMName
       adminUsername: windowsAdminUsername
       adminPassword: windowsAdminPassword
       windowsConfiguration: {
@@ -120,7 +119,7 @@ resource vmName_resource 'Microsoft.Compute/virtualMachines@2021-11-01' = {
 }
 
 resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
-  parent: vmName_resource
+  parent: clientVM
   name: 'DeployADDS'
   location: azureLocation
   properties: {
