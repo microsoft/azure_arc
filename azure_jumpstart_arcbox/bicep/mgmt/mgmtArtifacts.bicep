@@ -80,7 +80,7 @@ var primarySubnet = [
       privateEndpointNetworkPolicies: 'Enabled'
       privateLinkServiceNetworkPolicies: 'Enabled'
       networkSecurityGroup: {
-        id: networkSecurityGroup.name
+        id: networkSecurityGroup.id
       }
     }
   }
@@ -91,7 +91,7 @@ var bastionSubnet = [
     properties: {
       addressPrefix: bastionSubnetIpPrefix
       networkSecurityGroup: {
-        id: bastionNetworkSecurityGroup.name
+        id: bastionNetworkSecurityGroup.id
       }
     }
   }
@@ -104,7 +104,7 @@ var dataOpsSubnets = [
       privateEndpointNetworkPolicies: 'Enabled'
       privateLinkServiceNetworkPolicies: 'Enabled'
       networkSecurityGroup: {
-        id: networkSecurityGroup.name
+        id: networkSecurityGroup.id
       }
     }
   }
@@ -115,7 +115,7 @@ var dataOpsSubnets = [
       privateEndpointNetworkPolicies: 'Enabled'
       privateLinkServiceNetworkPolicies: 'Enabled'
       networkSecurityGroup: {
-        id: networkSecurityGroup.name
+        id: networkSecurityGroup.id
       }
     }
   }
@@ -155,7 +155,7 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
         properties: {
           addressPrefix: drSubnetPrefix
           networkSecurityGroup: {
-            id: networkSecurityGroup.name
+            id: networkSecurityGroup.id
           }
         }
       }

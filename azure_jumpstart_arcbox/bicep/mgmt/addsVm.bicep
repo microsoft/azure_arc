@@ -29,21 +29,21 @@ param deployBastion bool = false
 param templateBaseUrl string = ''
 
 var vmName_var = concat(vmName)
-var networkInterfaceName_var = '${vmName}-NIC'
+var networkInterfaceName = '${vmName}-NIC'
 var virtualNetworkName = 'ArcBox-VNet'
 var dcSubnetName = 'ArcBox-DC-Subnet'
 var addsPrivateIPAddress = '10.16.2.100'
 var bastionName = 'ArcBox-Bastion'
 var osDiskType = 'Premium_LRS'
 var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, dcSubnetName)
-var networkInterfaceRef = networkInterfaceName.id
+var networkInterfaceRef = networkInterface.id
 var publicIpAddressName_var = ((!deployBastion) ? '${vmName}-PIP' : '${bastionName}-PIP')
 var PublicIPNoBastion = {
   id: publicIpAddressName.id
 }
 
-resource networkInterfaceName 'Microsoft.Network/networkInterfaces@2021-08-01' = {
-  name: networkInterfaceName_var
+resource networkInterface 'Microsoft.Network/networkInterfaces@2021-08-01' = {
+  name: networkInterfaceName
   location: azureLocation
   properties: {
     ipConfigurations: [
