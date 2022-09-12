@@ -50,4 +50,16 @@ Move-Item -Path RegisterHCI_* -Destination $Env:HCIBoxLogsDir\RegisterHCI_PS_Out
 
 Write-Host "$clustername successfully registered as Az Stack HCI cluster resource in Azure"
 
+# Move Node VMs to main HCIBox resource group
+# $SourceRG = "$env:resourceGroup-ArcServers"
+# $DestRG = $env:resourceGroup
+# Write-Host "Moving node resources to main HCIBox resource group"
+# foreach ($Node in $SDNConfig.HostList) {
+#     $arcNode = Get-AzResource -ResourceGroupName $SourceRG -ResourceType Microsoft.HybridCompute/machines -Name $Node
+#     Write-Host "Moving $Node to $env:resourceGroup"
+#     Move-AzResource -DestinationResourceGroupName $DestRG -ResourceId $arcNode.ResourceId -Confirm:$false -Force
+#     Start-Sleep 15
+# }
+# Remove-AzResourceGroup -Name "$env:resourceGroup-ArcServers" -Confirm:$false -Force
+
 Stop-Transcript

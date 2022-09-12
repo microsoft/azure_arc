@@ -109,8 +109,9 @@ $ErrorActionPreference = "Continue"
 
 # Copy gallery VHDs to hosts
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    New-Item -Name "VHD" -Path $csv_path -ItemType Directory -Force
-    Move-Item -Path "C:\VHD\GUI.vhdx" -Destination "$csv_path\VHD" -Force
+    New-Item -Name "VHD" -Path $using:csv_path -ItemType Directory -Force
+    Move-Item -Path "C:\VHD\GUI.vhdx" -Destination "$using:csv_path\VHD\GUI.vhdx" -Force
+    Move-Item -Path "C:\VHD\Ubuntu.vhdx" -Destination "$using:csv_path\VHD\Ubuntu.vhdx" -Force
 }
 
 $ErrorActionPreference = "SilentlyContinue"
@@ -118,13 +119,13 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     $vnetName="sdnSwitch"
     az azurestackhci virtualnetwork create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --network-type "Transparent" --name $vnetName
     
-    # $galleryImageName = "ubuntu20"
-    # $galleryImageSourcePath="$using:csv_path\Ubuntu.vhdx"
-    # $osType="Linux"
-    # az azurestackhci galleryimage create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --image-path $galleryImageSourcePath --name $galleryImageName --os-type $osType
+    $galleryImageName = "ubuntu20"
+    $galleryImageSourcePath="$using:csv_path\VHD\Ubuntu.vhdx"
+    $osType="Linux"
+    az azurestackhci galleryimage create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --image-path $galleryImageSourcePath --name $galleryImageName --os-type $osType
 
     $galleryImageName = "win2k19"
-    $galleryImageSourcePath="$using:csv_path\GUI.vhdx"
+    $galleryImageSourcePath="$using:csv_path\VHD\GUI.vhdx"
     $osType="Windows"
     az azurestackhci galleryimage create --subscription $using:subId --resource-group $using:rg --extended-location name="/subscriptions/$using:subId/resourceGroups/$using:rg/providers/Microsoft.ExtendedLocation/customLocations/$using:custom_location_name" type="CustomLocation" --location $using:location --image-path $galleryImageSourcePath --name $galleryImageName --os-type $osType
 }
