@@ -137,6 +137,9 @@ module addsVmDeployment 'mgmt/addsVm.bicep' = if (flavor == 'DataOps'){
     templateBaseUrl: templateBaseUrl
     azureLocation: location
   }
+  dependsOn:[
+    mgmtArtifactsAndPolicyDeployment
+  ]
 }
 
 module updateVNetDNSServers 'mgmt/mgmtArtifacts.bicep' = if (flavor == 'DataOps'){
