@@ -128,8 +128,8 @@ variable "deployment_flavor" {
   default     = "Full"
 
   validation {
-    condition     = contains(["Full", "ITPro", "DevOps"], var.deployment_flavor)
-    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', and 'DevOps'."
+    condition     = contains(["Full", "ITPro", "DevOps", "DataOps"], var.deployment_flavor)
+    error_message = "Valid options for Deployment Flavor: 'Full', 'ITPro', 'DevOps' and 'DataOps'."
   }
 }
 ##############################################################################
@@ -206,7 +206,7 @@ module "client_vm" {
 
 module "capi_vm" {
   source = "./modules/kubernetes/ubuntuCapi"
-  count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
+  count  = contains(["Full", "DevOps", "DataOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
   vm_name              = var.capi_vm_name

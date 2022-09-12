@@ -16,6 +16,34 @@
         "description": "Name of the subnet in the virtual network"
       }
     },
+    "aksSubnetName": {
+      "type": "string",
+      "defaultValue": "ArcBox-AKS-Subnet",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network"
+      }
+    },
+    "dcSubnetName": {
+      "type": "string",
+      "defaultValue": "ArcBox-DC-Subnet",
+      "metadata": {
+        "description": "Name of the Domain Controller subnet in the virtual network"
+      }
+    },
+    "drVirtualNetworkName": {
+      "type": "string",
+      "defaultValue": "ArcBox-DR-VNet",
+      "metadata": {
+        "description": "Name of the DR VNet"
+      }
+    },
+    "drSubnetName": {
+      "type": "string",
+      "defaultValue": "ArcBox-DR-Subnet",
+      "metadata": {
+        "description": "Name of the DR subnet in the DR virtual network"
+      }
+    },
     "workspaceName": {
       "type": "string",
       "metadata": {
@@ -68,6 +96,13 @@
       "metadata": {
         "description": "Name of the Network Security Group"
       }
+    },
+    "dnsServers": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "DNS Server configuration"
+      }
     }
   },
   "variables": {
@@ -85,48 +120,65 @@
     },
     "policyTemplate": "[uri(parameters('templateBaseUrl'), 'ARM/mgmt/policyAzureArcBuiltins.json')]",
     "automationAccountName": "[concat('ArcBox-Automation-', uniquestring(resourceGroup().id))]",
-    "subnetAddressPrefix": "172.16.1.0/24",
-    "addressPrefix": "172.16.0.0/16",
+    "addressPrefix": "10.16.0.0/16",
+    "subnetAddressPrefix": "10.16.1.0/24",
+    "aksSubnetPrefix": "10.16.76.0/22",
+    "dcSubnetPrefix": "10.16.2.0/24",
+    "drAddressPrefix": "172.16.0.0/16",
+    "drSubnetPrefix": "172.16.128.0/17",
     "automationAccountLocation": "[if(equals(parameters('location'), 'eastus'), 'eastus2', if(equals(parameters('location'), 'eastus2'), 'eastus', parameters('location')))]",
     "bastionSubnetName": "AzureBastionSubnet",
     "bastionSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), variables('bastionSubnetName'))]",
     "bastionName": "ArcBox-Bastion",
-    "bastionSubnetIpPrefix": "172.16.3.64/26",
+    "bastionSubnetIpPrefix": "10.16.3.64/26",
     "bastionPublicIpAddressName": "[concat(variables('bastionName'), '-PIP' )]",
-    "subnetsWithBastion" : [
+    "primarySubnet": [
       {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('subnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-              }
-            }
-          },
-          {
-            "name": "AzureBastionSubnet",
-            "properties": {
-              "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
-              "networkSecurityGroup" : {
-                "id" : "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
-              }
-            }
+        "name": "[parameters('subnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('subnetAddressPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
           }
+        }
+      }
     ],
-    "subnetsWithoutBastion" : [
+    "bastionSubnet": [
       {
-            "name": "[parameters('subnetName')]",
-            "properties": {
-              "addressPrefix": "[variables('subnetAddressPrefix')]",
-              "privateEndpointNetworkPolicies": "Enabled",
-              "privateLinkServiceNetworkPolicies": "Enabled",
-              "networkSecurityGroup": {
-                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
-              }
-            }
+        "name": "AzureBastionSubnet",
+        "properties": {
+          "addressPrefix": "[variables('bastionSubnetIpPrefix')]",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('bastionNetworkSecurityGroupName'))]"
           }
+        }
+      }
+    ],
+    "dataOpsSubnets": [
+      {
+        "name": "[parameters('aksSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('aksSubnetPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      },
+      {
+        "name": "[parameters('dcSubnetName')]",
+        "properties": {
+          "addressPrefix": "[variables('dcSubnetPrefix')]",
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+          }
+        }
+      }
     ]
   },
   "resources": [
@@ -145,7 +197,88 @@
             "[variables('addressPrefix')]"
           ]
         },
-        "subnets": "[if(not(parameters('deployBastion')),variables('subnetsWithoutBastion'),variables('subnetsWithBastion'))]"
+        "dhcpOptions": {
+          "dnsServers": "[parameters('dnsServers')]"
+        },
+        "subnets": "[
+          if(
+            and(not(parameters('deployBastion')),not(equals(parameters('flavor'),'DataOps'))),variables('primarySubnet'),
+            if(
+              and(not(parameters('deployBastion')),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('dataOpsSubnets')),
+              if(
+                and(parameters('deployBastion'),not(equals(parameters('flavor'),'DataOps'))),union(variables('primarySubnet'),variables('bastionSubnet')),
+                if(
+                  and(parameters('deployBastion'),equals(parameters('flavor'),'DataOps')),union(variables('primarySubnet'),variables('bastionSubnet'),variables('dataOpsSubnets')),variables('primarySubnet')))))
+        ]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2021-05-01",
+      "name": "[parameters('drVirtualNetworkName')]",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('drAddressPrefix')]"
+          ]
+        },
+        "dhcpOptions": {
+          "dnsServers": "[parameters('dnsServers')]"
+        },
+        "subnets": [
+          {
+            "name": "[parameters('drSubnetName')]",
+            "properties": {
+              "addressPrefix": "[variables('drSubnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "apiVersion": "2021-08-01",
+      "name": "[format('{0}/peering-to-DR-vnet', parameters('virtualNetworkName'))]",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('drVirtualNetworkName'))]"
+      ],
+      "properties": {
+        "allowVirtualNetworkAccess": true,
+        "allowForwardedTraffic": true,
+        "allowGatewayTransit": false,
+        "useRemoteGateways": false,
+        "remoteVirtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('drVirtualNetworkName'))]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "apiVersion": "2021-08-01",
+      "name": "[format('{0}/peering-to-primary-vnet', parameters('drVirtualNetworkName'))]",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/', parameters('drVirtualNetworkName'))]"
+      ],
+      "properties": {
+        "allowVirtualNetworkAccess": true,
+        "allowForwardedTraffic": true,
+        "allowGatewayTransit": false,
+        "useRemoteGateways": false,
+        "remoteVirtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]"
+        }
       }
     },
     {
@@ -245,7 +378,46 @@
               "destinationAddressPrefix": "*",
               "destinationPortRange": "15432"
             }
-          }
+          },
+          {
+            "name": "allow_DNS_UDP",
+            "properties": {
+              "priority": 1010,
+              "protocol": "UDP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "53"
+            }
+          },
+          {
+            "name": "allow_DNS_TCP",
+            "properties": {
+              "priority": 1011,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "53"
+            }
+          },
+          {
+            "name": "allow_SQLMI_mirroring_traffic",
+            "properties": {
+              "priority": 1012,
+              "protocol": "TCP",
+              "access": "Allow",
+              "direction": "Inbound",
+              "sourceAddressPrefix": "*",
+              "sourcePortRange": "*",
+              "destinationAddressPrefix": "*",
+              "destinationPortRange": "5022 "
+            }
+          },
         ]
       }
     },
@@ -322,7 +494,7 @@
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": ["22","3389"]
+              "destinationPortRanges": [ "22", "3389" ]
             }
           },
           {
@@ -348,7 +520,7 @@
               "sourceAddressPrefix": "VirtualNetwork",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "VirtualNetwork",
-              "destinationPortRanges": ["8080","5701"]
+              "destinationPortRanges": [ "8080", "5701" ]
             }
           },
           {
@@ -361,7 +533,7 @@
               "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "Internet",
-              "destinationPortRanges": ["80","443"]
+              "destinationPortRanges": [ "80", "443" ]
             }
           }
         ]

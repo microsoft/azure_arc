@@ -128,6 +128,7 @@ $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-
 
 $dataControllerParams = "$Env:ArcBoxDir\dataController.parameters.json"
 
+(Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', "arcbox-dc" | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$Env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$Env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataPassword-stage',$Env:AZDATA_PASSWORD | Set-Content -Path $dataControllerParams
