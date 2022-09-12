@@ -37,9 +37,9 @@ var bastionName = 'ArcBox-Bastion'
 var osDiskType = 'Premium_LRS'
 var subnetRef = resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetworkName, dcSubnetName)
 var networkInterfaceRef = networkInterface.id
-var publicIpAddressName_var = ((!deployBastion) ? '${vmName}-PIP' : '${bastionName}-PIP')
+var publicIpAddressName = ((!deployBastion) ? '${vmName}-PIP' : '${bastionName}-PIP')
 var PublicIPNoBastion = {
-  id: publicIpAddressName.id
+  id: publicIpAddress.id
 }
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2021-08-01' = {
@@ -62,8 +62,8 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-08-01' = {
   }
 }
 
-resource publicIpAddressName 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (!deployBastion) {
-  name: publicIpAddressName_var
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (!deployBastion) {
+  name: publicIpAddressName
   location: azureLocation
   properties: {
     publicIPAllocationMethod: 'Static'
