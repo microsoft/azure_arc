@@ -49,7 +49,7 @@
     MEM_DC                               = 2GB                                     # Memory provided for the Domain Controller VM
     MEM_BGP                              = 2GB                                     # Memory provided for the BGP-ToR-Router
     MEM_Console                          = 3GB                                     # Memory provided for the Windows 10 Console VM
-    MEM_WAC                              = 4GB                                     # Memory provided for the Windows Admin Center VM
+    MEM_WAC                              = 8GB                                     # Memory provided for the Windows Admin Center VM
     MEM_GRE                              = 2GB                                     # Memory provided for the gre-target VM
     MEM_IPSEC                            = 2GB                                     # Memory provided for the ipsec-target VM
 
