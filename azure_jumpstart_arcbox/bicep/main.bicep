@@ -135,7 +135,7 @@ module addsVmDeployment 'mgmt/addsVm.bicep' = if (flavor == 'DataOps'){
     addsDomainName: addsDomainName
     deployBastion: deployBastion
     templateBaseUrl: templateBaseUrl
-    azureLocation: resourceGroup().location
+    azureLocation: location
   }
 }
 
@@ -145,7 +145,7 @@ module updateVNetDNSServers 'mgmt/mgmtArtifacts.bicep' = if (flavor == 'DataOps'
     workspaceName: logAnalyticsWorkspaceName
     flavor: flavor
     deployBastion: deployBastion
-    location: resourceGroup().location
+    location: location
     dnsServers: [
     '10.16.2.100'
     '168.63.129.16'
@@ -163,7 +163,7 @@ module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
     sshRSAPublicKey: sshRSAPublicKey
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
-    location: resourceGroup().location
+    location: location
   }
   dependsOn: [
     updateVNetDNSServers
