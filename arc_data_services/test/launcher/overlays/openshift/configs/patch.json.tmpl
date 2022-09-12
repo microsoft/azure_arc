@@ -4,12 +4,12 @@
             "op": "add",
             "path": "spec.docker",
             "value": {
-                "registry": "$DOCKER_REGISTRY",
-                "repository": "$DOCKER_REPOSITORY",
+                "registry": "mcr.microsoft.com",
+                "repository": "arcdata",
                 "imageTag": "$DOCKER_TAG",
-                "imagePullPolicy": "$DOCKER_IMAGE_POLICY"
+                "imagePullPolicy": "Always"
             }
-        },        
+        },    
         {
             "op": "add",
             "path": "spec.storage.data.className",
