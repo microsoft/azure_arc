@@ -379,7 +379,7 @@ $templateContent = @"
 "@
 
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
-$settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $templateContent
+$settingsTemplateJson.'datasource.connections' = ConvertFrom-Json -InputObject $templateContent
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 
 Write-Host "`n"
