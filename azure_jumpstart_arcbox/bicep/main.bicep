@@ -37,13 +37,16 @@ param flavor string = 'Full'
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'arcbox_dataOps'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
 
 @description('User github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps')
 param githubUser string = 'microsoft'
+
+@description('Active directory domain services domain name')
+param addsDomainName string = 'jumpstart.local'
 
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
@@ -64,6 +67,9 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     azureLocation: location
     flavor: flavor
   }
+  dependsOn: [
+    updateVNetDNSServers
+  ]
 }
 
 module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 'Full' || flavor == 'DevOps') {
@@ -99,6 +105,9 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     githubUser: githubUser
     location: location
   }
+  dependsOn: [
+    updateVNetDNSServers
+  ]
 }
 
 module stagingStorageAccountDeployment 'mgmt/mgmtStagingStorage.bicep' = {
@@ -116,4 +125,52 @@ module mgmtArtifactsAndPolicyDeployment 'mgmt/mgmtArtifacts.bicep' = {
     deployBastion: deployBastion
     location: location
   }
+}
+
+module addsVmDeployment 'mgmt/addsVm.bicep' = if (flavor == 'DataOps'){
+  name: 'addsVmDeployment'
+  params: {
+    windowsAdminUsername : windowsAdminUsername
+    windowsAdminPassword : windowsAdminPassword
+    addsDomainName: addsDomainName
+    deployBastion: deployBastion
+    templateBaseUrl: templateBaseUrl
+    azureLocation: location
+  }
+  dependsOn:[
+    mgmtArtifactsAndPolicyDeployment
+  ]
+}
+
+module updateVNetDNSServers 'mgmt/mgmtArtifacts.bicep' = if (flavor == 'DataOps'){
+  name: 'updateVNetDNSServers'
+  params: {
+    workspaceName: logAnalyticsWorkspaceName
+    flavor: flavor
+    deployBastion: deployBastion
+    location: location
+    dnsServers: [
+    '10.16.2.100'
+    '168.63.129.16'
+    ]
+  }
+  dependsOn: [
+    addsVmDeployment
+    mgmtArtifactsAndPolicyDeployment
+  ]
+}
+
+module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
+  name: 'aksDeployment'
+  params: {
+    sshRSAPublicKey: sshRSAPublicKey
+    spnClientId: spnClientId
+    spnClientSecret: spnClientSecret
+    location: location
+  }
+  dependsOn: [
+    updateVNetDNSServers
+    stagingStorageAccountDeployment
+    mgmtArtifactsAndPolicyDeployment
+  ]
 }
