@@ -443,7 +443,8 @@ $azsmgmtProdKey
 
         if ($AzSHOST.AzSHOST -eq "AzSHOST1") {
             New-Item -Path ($MountedDrive + ":\VHD") -ItemType Directory -Force | Out-Null
-            Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
+            Copy-Item -Path "$Env:HCIBoxVHDDir\GUI.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force            
+            Copy-Item -Path "$Env:HCIBoxVHDDir\Ubuntu.vhdx" -Destination ($MountedDrive + ":\VHD") -Recurse -Force
         }
 
         # Dismount VHDX
@@ -2189,20 +2190,12 @@ CertificateTemplate= WebServer
             $expression = "choco install setdefaultbrowser -y"
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
-                          
-            # Add Edge to list of browsers
-            Write-Verbose 'Setting Default Broswer on admincenter vm'
-            $expression = "SetDefaultBrowser.exe Edge"
-            Invoke-Expression $expression
 
             # Install Kubectl
             Write-Verbose 'Installing kubectl'
             $expression = "choco install kubernetes-cli -y"
             Invoke-Expression $expression
             $ErrorActionPreference = "Stop" 
-
-            # Set Edge as default browser
-            Invoke-Expression -Command "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe Edge"
 
             # Create a shortcut for Windows Admin Center
             Write-Verbose "Creating Shortcut for Windows Admin Center"
@@ -2218,7 +2211,31 @@ CertificateTemplate= WebServer
             $stTrigger = New-ScheduledTaskTrigger -AtLogOn
             $stTrigger.Delay = 'PT1M'
             $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Edge'
-            Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Force
+            $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+            $settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
+            Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Settings $settings -Principal $principal -Force
+
+            # Disable Edge 'First Run' Setup
+            $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+            $desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
+            $firstRunRegistryName  = 'HideFirstRunExperience'
+            $firstRunRegistryValue = '0x00000001'
+            $savePasswordRegistryName = 'PasswordManagerEnabled'
+            $savePasswordRegistryValue = '0x00000000'
+            $autoArrangeRegistryName = 'FFlags'
+            $autoArrangeRegistryValue = '1075839525'
+
+            if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
+                New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
+            }
+            if (-NOT (Test-Path -Path $desktopSettingsRegistryPath)) {
+                New-Item -Path $desktopSettingsRegistryPath -Force | Out-Null
+            }
+
+            New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
+            New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
+            Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
+
         } 
     } 
 }
@@ -2774,9 +2791,11 @@ $ProgressPreference = 'SilentlyContinue'
 
 # Download HCIBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'='C:\HCIBox\VHD\AZSHCI.vhdx'}
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'='C:\HCIBox\VHD\GUI.vhdx'}
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'OutFile'='C:\HCIBox\VHD\Ubuntu.vhdx'}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'="$env:HCIBoxVHDDir\AZSHCI.vhdx"}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'="$env:HCIBoxVHDDir\GUI.vhdx"}
+Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'OutFile'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
+Expand-Archive -Path $env:HCIBoxVHDDir\Ubuntu.vhdx.zip -DestinationPath $env:HCIBoxVHDDir
+Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination $env:HCIBoxVHDDir\Ubuntu.vhdx
 
 # Set VM Host Memory
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824

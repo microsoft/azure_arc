@@ -113,6 +113,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/New-HCIBoxCluster.ps1") -OutFil
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Register-AzSHCI.ps1") -OutFile $Env:HCIBoxDir\Register-AzSHCI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBox-Config.psd1") -OutFile $Env:HCIBoxDir\HCIBox-Config.psd1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-AKS.ps1") -OutFile $Env:HCIBoxDir\Deploy-AKS.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Uninstall-AKS.ps1") -OutFile $Env:HCIBoxDir\Uninstall-AKS.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-ArcDataController.ps1") -OutFile $Env:HCIBoxDir\Deploy-ArcDataController.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-SQLMI.ps1") -OutFile $Env:HCIBoxDir\Deploy-SQLMI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-ArcResourceBridge.ps1") -OutFile $Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1
@@ -155,6 +156,24 @@ Enable-WSManCredSSP -Role Client -DelegateComputer $Env:COMPUTERNAME -Force | Ou
 $Trigger = New-ScheduledTaskTrigger -AtLogOn
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HCIBoxDir\HCIBoxLogonScript.ps1
 Register-ScheduledTask -TaskName "HCIBoxLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
+
+# Disable Edge 'First Run' Setup
+$edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+$desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
+$firstRunRegistryName  = 'HideFirstRunExperience'
+$firstRunRegistryValue = '0x00000001'
+$savePasswordRegistryName = 'PasswordManagerEnabled'
+$savePasswordRegistryValue = '0x00000000'
+$autoArrangeRegistryName = 'FFlags'
+$autoArrangeRegistryValue = '1075839525'
+
+if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
+    New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
+}
+
+New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
+New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
+Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
 # Install Hyper-V and reboot
 Write-Header "Installing Hyper-V"

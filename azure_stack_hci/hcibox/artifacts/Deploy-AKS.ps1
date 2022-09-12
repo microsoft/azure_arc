@@ -73,14 +73,13 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
 # Create new AKS workload cluster and connect it to Azure
 Write-Header "Creating AKS workload cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    New-AksHciCluster -name "hcibox-aks" -nodePoolName linuxnodepool -nodecount 1 -osType linux
-    Enable-AksHciArcConnection -name "hcibox-aks"
+    New-AksHciCluster -name $using:SDNConfig.AKSworkloadClusterName -nodePoolName linuxnodepool -nodecount 1 -osType linux
+    Enable-AksHciArcConnection -name $using:SDNConfig.AKSworkloadClusterName
 }
 
-# Commenting until we can workaround the lack of -Force/confirm
 Write-Header "Checking AKS-HCI nodes and running pods"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    Get-AksHciCredential -name "hcibox-aks" -Confirm:$false
+    Get-AksHciCredential -name $using:SDNConfig.AKSworkloadClusterName -Confirm:$false
     kubectl get nodes
     kubectl get pods -A
 }
