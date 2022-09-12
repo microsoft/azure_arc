@@ -133,7 +133,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
     dhcpOptions: {
       dnsServers: dnsServers
     }
-    subnets: deployBastion == false && flavor != 'DataOps' ? primarySubnet : deployBastion == false && flavor == 'Dataops' ? union(primarySubnet,dataOpsSubnets) : deployBastion == true && flavor != 'DataOps' ? union(primarySubnet,bastionSubnet) : deployBastion == true && flavor == 'DataOps' ? union(primarySubnet,bastionSubnet,dataOpsSubnets) : primarySubnet
+    subnets: (deployBastion == false && flavor != 'DataOps') ? primarySubnet : (deployBastion == false && flavor == 'DataOps') ? union(primarySubnet,dataOpsSubnets) : (deployBastion == true && flavor != 'DataOps') ? union(primarySubnet,bastionSubnet) : (deployBastion == true && flavor == 'DataOps') ? union(primarySubnet,bastionSubnet,dataOpsSubnets) : primarySubnet
   }
 }
 
