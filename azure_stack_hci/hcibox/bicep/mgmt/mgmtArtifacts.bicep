@@ -20,7 +20,7 @@ var security = {
   galleryName: 'Security'
 }
 
-var automationAccountName = 'ArcBox-Automation-${uniqueString(resourceGroup().id)}'
+var automationAccountName = 'HCIBox-Automation-${uniqueString(resourceGroup().id)}'
 var automationAccountLocation = ((location == 'eastus') ? 'eastus2' : ((location == 'eastus2') ? 'eastus' : location))
 
 resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
@@ -30,20 +30,6 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
     sku: {
       name: sku
     }
-  }
-}
-
-resource updatesWorkpace 'Microsoft.OperationsManagement/solutions@2015-11-01-preview'= {
-  location: location
-  name: updates.name
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: updates.name
-    publisher: 'Microsoft'
-    promotionCode: ''
-    product: 'OMSGallery/${updates.galleryName}'
   }
 }
 
@@ -57,20 +43,6 @@ resource VMInsightsMicrosoftOperationalInsights 'Microsoft.OperationsManagement/
     name: 'VMInsights(${split(workspace.id, '/')[8]})'
     product: 'OMSGallery/VMInsights'
     promotionCode: ''
-    publisher: 'Microsoft'
-  }
-}
-
-resource changeTrackingGallery 'Microsoft.OperationsManagement/solutions@2015-11-01-preview' = {
-  name: changeTracking.name
-  location: location
-  properties: {
-    workspaceResourceId: workspace.id
-  }
-  plan: {
-    name: changeTracking.name
-    promotionCode: ''
-    product: 'OMSGallery/${changeTracking.galleryName}'
     publisher: 'Microsoft'
   }
 }
