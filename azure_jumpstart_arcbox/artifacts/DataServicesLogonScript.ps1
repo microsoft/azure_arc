@@ -114,10 +114,11 @@ Write-Host "`n"
 
 # Configuring Azure Arc Custom Location on the cluster 
 Write-Header "Configuring Azure Arc Custom Location"
+$customlocationName="arcbox-cl" + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name 'arcbox-cl' --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
+az customlocation create --name $customlocationName --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
 
 # Deploying Azure Arc Data Controller
 Write-Header "Deploying Azure Arc Data Controller"
