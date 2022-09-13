@@ -1,0 +1,15 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: {{ .Release.Namespace }}:cr-arc-metricsdc-reader
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - nodes/stats
+  - nodes/proxy
+  verbs:
+  - get
