@@ -7,14 +7,6 @@ param location string = resourceGroup().location
 @description('SKU, leave default pergb2018')
 param sku string = 'pergb2018'
 
-var updates = {
-  name: 'Updates(${workspaceName})'
-  galleryName: 'Updates'
-}
-var changeTracking = {
-  name: 'ChangeTracking(${workspaceName})'
-  galleryName: 'ChangeTracking'
-}
 var security = {
   name: 'Security(${workspaceName})'
   galleryName: 'Security'
