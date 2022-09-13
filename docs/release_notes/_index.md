@@ -9,6 +9,40 @@ weight: 3
 
 **Release notes will be released around the first week of each month and will cover the previous month.**
 
+## August 2022
+
+### Release highlights
+
+- Added Azure Arc-enabled Kubernetes correlation-id for onboarding tracking
+- Updated Azure Arc-enabled Kubernetes scenarios
+- Cluster API-related versions bump
+- Bug fixes
+- Doc fixes
+
+### Azure Arc-enabled servers
+
+- [Doc fix: Link under Unified Operations doc broken #1324](https://github.com/microsoft/azure_arc/issues/1324)
+
+### Azure Arc-enabled SQL Server
+
+- [Bug fix: SQL VM On-Boarding Fixes v3 #1328](https://github.com/microsoft/azure_arc/pull/1328)
+
+### Azure Arc-enabled Kubernetes
+
+- [Updated scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/microk8s/local_microk8s_gitops_helm/)
+- [Enhancement: Add Deploy to Azure button to ARO scenario #1310](https://github.com/microsoft/azure_arc/issues/1310)
+- [Enhancement: Added Deploy to Azure Button to K3s scenario #1312](https://github.com/microsoft/azure_arc/issues/1312)
+- [Enhancement: correlation-id for tracking #1314](https://github.com/microsoft/azure_arc/issues/1314)
+
+### Jumpstart ArcBox
+
+- [Enhancement: CAPI versions bump #1315](https://github.com/microsoft/azure_arc/issues/1315)
+  - Versions bump
+    - clusterctrl: v1.1.5 --> v1.2.0
+    - CAPZ K8s: v1.24.2 --> v1.24.3
+    - Azure Disk CSI Driver: v1.19.9 --> 1.21.0
+- [Enhancement: correlation-id for tracking #1314](https://github.com/microsoft/azure_arc/issues/1314)
+
 ## July 2022
 
 ### Release highlights
