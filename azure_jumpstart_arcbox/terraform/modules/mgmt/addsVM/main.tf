@@ -1,3 +1,7 @@
+variable "resource_group_name" {
+  type        = string
+  description = "Azure Resource Group"
+}
 variable "adds_Domain_Name" {
   type        = string
   description = "The FQDN of the domain'"
@@ -48,8 +52,8 @@ variable "template_base_url" {
 
 locals {
   bastion_name           = "ArcBox-Bastion"
-  public_ip_name         = var.deploy_bastion == false ? "${var.vm_name}-PIP" : "${local.bastion_name}-PIP"
-  network_interface_name = "${var.client_VM_Name}-NIC"
+  public_ip_name         = var.deploy_bastion == false ? "${var.adds_VM_Name}-PIP" : "${local.bastion_name}-PIP"
+  network_interface_name = "${var.adds_VM_Name}-NIC"
   virtual_network_name   = "ArcBox-VNet"
   dc_subnet_name         = "ArcBox-DC-Subnet"
   adds_private_ip_address  = "10.16.2.100"
@@ -64,8 +68,8 @@ data "azurerm_resource_group" "rg" {
 }
 
 data "azurerm_subnet" "subnet" {
-  name                 = var.dc_subnet_name
-  virtual_network_name = var.virtual_network_name
+  name                 = local.dc_subnet_name
+  virtual_network_name = local.virtual_network_name
   resource_group_name  = data.azurerm_resource_group.rg.name
 }
 
@@ -103,14 +107,14 @@ resource "azurerm_virtual_machine" "adds" {
     version   = "latest"
   }
   storage_os_disk {
-    name              = "${var.vm_name}-OS_Disk"
+    name              = "${var.adds_VM_Name}-OS_Disk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Premium_LRS"
     disk_size_gb      = 1024
   }
   os_profile {
-    computer_name  = var.vm_name
+    computer_name  = var.adds_VM_Name
     admin_username = var.windows_Admin_Username
     admin_password = var.windows_Admin_password
   }

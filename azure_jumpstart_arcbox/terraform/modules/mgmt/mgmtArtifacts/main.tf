@@ -18,25 +18,25 @@ variable "subnet_name" {
   description = "ArcBox subnet name."
 }
 
-variable "aksSubnetName " {
+variable "aksSubnetName" {
   type        = string
   description = "ArcBox AKS subnet name."
   default     = "ArcBox-AKS-Subnet"
 }
 
-variable "dcSubnetName  " {
+variable "dcSubnetName" {
   type        = string
   description = "ArcBox DC subnet name."
   default     = "ArcBox-AKS-DC"
 }
 
-variable "drVirtualNetworkName  " {
+variable "drVirtualNetworkName" {
   type        = string
   description = "DR Virtual network."
   default     = "ArcBox-DR-VNet"
 }
 
-variable "drSubnetName   " {
+variable "drSubnetName" {
   type        = string
   description = "ArcBox DR subnet name."
   default     = "ArcBox-DR-Subnet"
@@ -60,7 +60,7 @@ variable "deployment_flavor" {
 }
 
 variable "dnsServers" {
-  type        = list()
+  type        = list(string)
   description = "DNS Server configuration."
 }
 
@@ -69,7 +69,7 @@ locals {
   subnet_address_prefix      = "10.16.1.0/24"
   aksSubnetPrefix            = "10.16.76.0/22"
   dcSubnetPrefix             = "10.16.2.0/24"
-  drAddressPrefix            = "172.16.0.0/16"
+  drAddressPrefix            = ["172.16.0.0/16"]
   drSubnetPrefix             = "172.16.128.0/17"
   bastionSubnetName          = "AzureBastionSubnet"
   nsg_name                   = "ArcBox-NSG"
@@ -151,7 +151,7 @@ resource "azurerm_subnet" "AzureBastionSubnet" {
 }
 
 resource "azurerm_subnet" "aksSubnet" {
-  count                = var.flavor == "DataOps" ? 1 : 0
+  count                = var.deployment_flavor == "DataOps" ? 1 : 0
   name                 = "aksSubnetName"
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
@@ -159,7 +159,7 @@ resource "azurerm_subnet" "aksSubnet" {
 }
 
 resource "azurerm_subnet" "dcSubnet" {
-  count                = var.flavor == "DataOps" ? 1 : 0
+  count                = var.deployment_flavor == "DataOps" ? 1 : 0
   name                 = "dcSubnetName"
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
@@ -173,15 +173,13 @@ resource "azurerm_subnet_network_security_group_association" "BastionSubnetNsg" 
 }
 
 resource "azurerm_subnet_network_security_group_association" "aksSubnetNsg" {
-  count                     = var.flavor == "DataOps" ? 1 : 0
   subnet_id                 = azurerm_subnet.aksSubnet[0].id
-  network_security_group_id = azurerm_network_security_group.nsg[0].id
+  network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "dcSubnetNsg" {
-  count                     = var.flavor == "DataOps" ? 1 : 0
   subnet_id                 = azurerm_subnet.dcSubnet[0].id
-  network_security_group_id = azurerm_network_security_group.nsg[0].id
+  network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 resource "azurerm_network_security_group" "nsg" {
@@ -198,22 +196,24 @@ resource "azurerm_network_security_group" "bastion_nsg" {
 }
 
 resource "azurerm_virtual_network_peering" "virtualNetworkName_peering_to_DR_vnet" {
-  count                     = var.flavor == "DataOps" ? 1 : 0
+  count                     = var.deployment_flavor == "DataOps" ? 1 : 0
+  resource_group_name       = data.azurerm_resource_group.rg.name
   name                      = "peering-to-DR-vnet"
   virtual_network_name      = azurerm_virtual_network.vnet.name
   allow_forwarded_traffic   = true
-  allowallow_gateway_transit= false
-  useuse_remote_gateways    = false
+  allow_gateway_transit     = false
+  use_remote_gateways       = false
   remote_virtual_network_id = azurerm_virtual_network.drVnet.id
 }
 
-resource "azurerm_virtual_network_peering" "drVirtualNetworkName_peering_to_primary_vnet " {
-  count                     = var.flavor == "DataOps" ? 1 : 0
+resource "azurerm_virtual_network_peering" "drVirtualNetworkName_peering_to_primary_vnet" {
+  count                     = var.deployment_flavor == "DataOps" ? 1 : 0
+  resource_group_name       = data.azurerm_resource_group.rg.name
   name                      = "peering-to-primary-vnet"
   virtual_network_name      = azurerm_virtual_network.drVnet.name
   allow_forwarded_traffic   = true
-  allowallow_gateway_transit= false
-  useuse_remote_gateways    = false
+  allow_gateway_transit     = false
+  use_remote_gateways       = false
   remote_virtual_network_id = azurerm_virtual_network.vnet.id
 }
 

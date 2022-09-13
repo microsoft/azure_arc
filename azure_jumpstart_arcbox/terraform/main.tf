@@ -121,7 +121,7 @@ variable "deploy_bastion" {
   default     = false
 }
 
-variable "addsDomainName " {
+variable "addsDomainName" {
   type        = string
   description = "Active directory domain services domain name"
   default     = "jumpstart.local"
@@ -167,13 +167,14 @@ module "management_artifacts" {
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
   deployment_flavor    = var.deployment_flavor
+  dnsServers           = []
 
   depends_on = [azurerm_resource_group.rg]
 }
 
-module "update_vnet_dns_servers " {
-  count = var.deployment_flavor == "DataOps" ? 1 : 0
-  source = "./modules/mgmt/mgmtArtifacts"
+module "update_vnet_dns_servers" {
+  count                = var.deployment_flavor == "DataOps" ? 1 : 0
+  source               = "./modules/mgmt/mgmtArtifacts"
   resource_group_name  = azurerm_resource_group.rg.name
   spn_client_id        = var.spn_client_id
   virtual_network_name = var.virtual_network_name
@@ -181,6 +182,7 @@ module "update_vnet_dns_servers " {
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
   deployment_flavor    = var.deployment_flavor
+  dnsServers           = ["10.16.2.100", "168.63. 129.16"]
 
   depends_on = [
     module.management_artifacts,
@@ -223,18 +225,19 @@ module "client_vm" {
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage
+    module.management_storage,
+    module.update_vnet_dns_servers
   ]
 }
 
 module "adds_vm" {
-  source = "./modules/addsVM"
-
-  adds_Domain_Name     = var.addsDomainName
-  deploy_bastion       = var.deploy_bastion
+  source                 = "./modules/mgmt/addsVM"
+  resource_group_name    = azurerm_resource_group.rg.name
+  adds_Domain_Name       = var.addsDomainName
+  deploy_bastion         = var.deploy_bastion
   windows_Admin_Username = var.client_admin_username
   windows_Admin_password = var.client_admin_password
-  template_base_url    = local.template_base_url
+  template_base_url      = local.template_base_url
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
@@ -264,7 +267,8 @@ module "capi_vm" {
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage
+    module.management_storage,
+    module.update_vnet_dns_servers
   ]
 }
 
@@ -290,5 +294,22 @@ module "rancher_vm" {
     azurerm_resource_group.rg,
     module.management_artifacts,
     module.management_storage
+  ]
+}
+
+module "aks_clusters" {
+  source = "./modules/kubernetes/aks"
+  count  = var.deployment_flavor == "DataOps" ? 1 : 0
+
+  resource_group_name = azurerm_resource_group.rg.name
+  spn_client_id       = var.spn_client_id
+  spn_client_secret   = var.spn_client_secret
+  ssh_rsa_public_key  = var.client_admin_ssh
+
+  depends_on = [
+    azurerm_resource_group.rg,
+    module.management_artifacts,
+    module.management_storage,
+    module.update_vnet_dns_servers
   ]
 }
