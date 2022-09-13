@@ -71,13 +71,13 @@ variable "github_username" {
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
-  default     = "microsoft"
+  default     = "sebassem"
 }
 
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "main"
+  default     = "arcbox_dataops_terraform"
 }
 
 variable "spn_client_id" {
@@ -119,6 +119,12 @@ variable "deploy_bastion" {
   type        = bool
   description = "Choice to deploy Azure Bastion"
   default     = false
+}
+
+variable "addsDomainName " {
+  type        = string
+  description = "Active directory domain services domain name"
+  default     = "jumpstart.local"
 }
 
 ### This should be swapped to a lower-case value to avoid case sensitivity ###
@@ -165,6 +171,23 @@ module "management_artifacts" {
   depends_on = [azurerm_resource_group.rg]
 }
 
+module "update_vnet_dns_servers " {
+  count = var.deployment_flavor == "DataOps" ? 1 : 0
+  source = "./modules/mgmt/mgmtArtifacts"
+  resource_group_name  = azurerm_resource_group.rg.name
+  spn_client_id        = var.spn_client_id
+  virtual_network_name = var.virtual_network_name
+  subnet_name          = var.subnet_name
+  workspace_name       = var.workspace_name
+  deploy_bastion       = var.deploy_bastion
+  deployment_flavor    = var.deployment_flavor
+
+  depends_on = [
+    module.management_artifacts,
+    module.adds_vm
+  ]
+}
+
 module "management_policy" {
   source = "./modules/mgmt/mgmtPolicy"
 
@@ -197,6 +220,21 @@ module "client_vm" {
   github_branch        = var.github_branch
   deploy_bastion       = var.deploy_bastion
 
+  depends_on = [
+    azurerm_resource_group.rg,
+    module.management_artifacts,
+    module.management_storage
+  ]
+}
+
+module "adds_vm" {
+  source = "./modules/addsVM"
+
+  adds_Domain_Name     = var.addsDomainName
+  deploy_bastion       = var.deploy_bastion
+  windows_Admin_Username = var.client_admin_username
+  windows_Admin_password = var.client_admin_password
+  template_base_url    = local.template_base_url
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
