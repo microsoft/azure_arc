@@ -1,0 +1,86 @@
+# This file needs to match the CRD defined in the postgres plug-in in the controller.
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: postgresqls.arcdata.microsoft.com
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+  group: arcdata.microsoft.com
+  versions:
+  - name: v1beta1
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: ".status.state"
+    - name: Ready-Pods
+      type: string
+      jsonPath: ".status.readyPods"
+    - name: Primary-Endpoint
+      type: string
+      jsonPath: ".status.primaryEndpoint"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
+  - name: v1beta2
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: ".status.state"
+    - name: Ready-Pods
+      type: string
+      jsonPath: ".status.readyPods"
+    - name: Primary-Endpoint
+      type: string
+      jsonPath: ".status.primaryEndpoint"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
+  - name: v1beta3
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: ".status.state"
+    - name: Ready-Pods
+      type: string
+      jsonPath: ".status.readyPods"
+    - name: Primary-Endpoint
+      type: string
+      jsonPath: ".status.primaryEndpoint"
+    - name: Age
+      type: date
+      jsonPath: ".metadata.creationTimestamp"
+  conversion:
+    strategy: None
+  names:
+    kind: PostgreSql
+    plural: postgresqls
+    shortNames:
+    - postgres
+  scope: Namespaced

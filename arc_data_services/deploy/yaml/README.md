@@ -53,7 +53,7 @@ echo -n this is my password|base64
 The base64 encoded values can be decoded using similar steps. On Windows, the following PowerShell snippet can be used to decode the base64 encoded string:
 
 ```powershell
-$ENCODED_PASSWORD = 'dGhpcyBpcyBteSBwYXNzd29yZA=='
+$ENCODED_PASSWORD = '<YourEncodedPasswordHere>'
 $PASSWORD = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($ENCODED_PASSWORD))
 Write-Output $PASSWORD
 ```
@@ -61,7 +61,7 @@ Write-Output $PASSWORD
 On Linux, the following bash shell command can be used to decode a base64 encoded string:
 
 ```bash
-echo -n dGhpcyBpcyBteSBwYXNzd29yZA==|base64 -d
+echo -n <YourEncodedPasswordHere>|base64 -d
 ```
 
 ## [RBAC samples](./rbac)
