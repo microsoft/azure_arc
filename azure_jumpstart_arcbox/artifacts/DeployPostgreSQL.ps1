@@ -1,3 +1,8 @@
+Param(
+  [Parameter(Mandatory=$true)]
+  [string]$customlocationName
+)
+
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 
@@ -12,7 +17,7 @@ Write-Host "Deploying Azure Arc PostgreSQL"
 Write-Host "`n"
 
 $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
-$customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name $customlocationName --resource-group $Env:resourceGroup --query id -o tsv)
 
 ################################################
 # Localize ARM template
