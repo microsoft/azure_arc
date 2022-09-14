@@ -174,13 +174,13 @@ resource "azurerm_subnet_network_security_group_association" "BastionSubnetNsg" 
 }
 
 resource "azurerm_subnet_network_security_group_association" "aksSubnetNsg" {
-  count                     = var.deploy_bastion == true ? 1 : 0
+  count                = var.deployment_flavor == "DataOps" ? 1 : 0
   subnet_id                 = azurerm_subnet.aksSubnet[0].id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "dcSubnetNsg" {
-  count                     = var.deploy_bastion == true ? 1 : 0
+  count                = var.deployment_flavor == "DataOps" ? 1 : 0
   subnet_id                 = azurerm_subnet.dcSubnet[0].id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
@@ -206,14 +206,14 @@ resource "azurerm_virtual_network_peering" "virtualNetworkName_peering_to_DR_vne
   allow_forwarded_traffic   = true
   allow_gateway_transit     = false
   use_remote_gateways       = false
-  remote_virtual_network_id = azurerm_virtual_network.drVnet.id
+  remote_virtual_network_id = azurerm_virtual_network.drVnet[0].id
 }
 
 resource "azurerm_virtual_network_peering" "drVirtualNetworkName_peering_to_primary_vnet" {
   count                     = var.deployment_flavor == "DataOps" ? 1 : 0
   resource_group_name       = data.azurerm_resource_group.rg.name
   name                      = "peering-to-primary-vnet"
-  virtual_network_name      = azurerm_virtual_network.drVnet.name
+  virtual_network_name      = azurerm_virtual_network.drVnet[0].name
   allow_forwarded_traffic   = true
   allow_gateway_transit     = false
   use_remote_gateways       = false
