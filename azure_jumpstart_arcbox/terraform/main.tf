@@ -167,12 +167,12 @@ module "management_artifacts" {
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
   deployment_flavor    = var.deployment_flavor
-  dnsServers           = []
+  dns_servers           = []
 
   depends_on = [azurerm_resource_group.rg]
 }
 
-module "update_vnet_dns_servers" {
+/*module "update_vnet_dns_servers" {
   count                = var.deployment_flavor == "DataOps" ? 1 : 0
   source               = "./modules/mgmt/mgmtArtifacts"
   resource_group_name  = azurerm_resource_group.rg.name
@@ -182,13 +182,13 @@ module "update_vnet_dns_servers" {
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
   deployment_flavor    = var.deployment_flavor
-  dnsServers           = ["10.16.2.100", "168.63. 129.16"]
+  dns_servers           = ["10.16.2.100", "168.63. 129.16"]
 
   depends_on = [
     module.management_artifacts,
     module.adds_vm
   ]
-}
+}*/
 
 module "management_policy" {
   source = "./modules/mgmt/mgmtPolicy"
@@ -225,8 +225,7 @@ module "client_vm" {
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage,
-    module.update_vnet_dns_servers
+    module.management_storage
   ]
 }
 
@@ -268,8 +267,7 @@ module "capi_vm" {
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage,
-    module.update_vnet_dns_servers
+    module.management_storage
   ]
 }
 
@@ -311,7 +309,6 @@ module "aks_clusters" {
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage,
-    module.update_vnet_dns_servers
+    module.management_storage
   ]
 }

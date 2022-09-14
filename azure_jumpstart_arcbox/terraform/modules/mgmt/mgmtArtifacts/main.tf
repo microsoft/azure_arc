@@ -18,25 +18,25 @@ variable "subnet_name" {
   description = "ArcBox subnet name."
 }
 
-variable "aksSubnetName" {
+variable "aks_subnet_name" {
   type        = string
   description = "ArcBox AKS subnet name."
   default     = "ArcBox-AKS-Subnet"
 }
 
-variable "dcSubnetName" {
+variable "dc_subnet_name" {
   type        = string
   description = "ArcBox DC subnet name."
-  default     = "ArcBox-AKS-DC"
+  default     = "ArcBox-DC-Subnet"
 }
 
-variable "drVirtualNetworkName" {
+variable "dr_virtual_network_name" {
   type        = string
   description = "DR Virtual network."
   default     = "ArcBox-DR-VNet"
 }
 
-variable "drSubnetName" {
+variable "dr_subnet_name" {
   type        = string
   description = "ArcBox DR subnet name."
   default     = "ArcBox-DR-Subnet"
@@ -59,7 +59,7 @@ variable "deployment_flavor" {
   description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps' and 'DataOps'."
 }
 
-variable "dnsServers" {
+variable "dns_servers" {
   type        = list(string)
   description = "DNS Server configuration."
 }
@@ -117,7 +117,7 @@ resource "azurerm_virtual_network" "vnet" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   address_space       = local.vnet_address_space
-  dns_servers         = var.dnsServers
+  dns_servers         = var.dns_servers
 
   subnet {
     name           = var.subnet_name
@@ -129,14 +129,14 @@ resource "azurerm_virtual_network" "vnet" {
 
 resource "azurerm_virtual_network" "drVnet" {
   count               = var.deployment_flavor == "DataOps" ? 1 : 0
-  name                = var.drVirtualNetworkName
+  name                = var.dr_virtual_network_name
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   address_space       = local.drAddressPrefix
-  dns_servers         = var.dnsServers
+  dns_servers         = var.dns_servers
 
   subnet {
-    name           = var.drSubnetName
+    name           = var.dr_subnet_name
     address_prefix = local.drSubnetPrefix
     security_group = azurerm_network_security_group.nsg.id
   }
@@ -153,7 +153,7 @@ resource "azurerm_subnet" "AzureBastionSubnet" {
 
 resource "azurerm_subnet" "aksSubnet" {
   count                = var.deployment_flavor == "DataOps" ? 1 : 0
-  name                 = "aksSubnetName"
+  name                 = var.aks_subnet_name
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = [local.aksSubnetPrefix]
@@ -161,7 +161,7 @@ resource "azurerm_subnet" "aksSubnet" {
 
 resource "azurerm_subnet" "dcSubnet" {
   count                = var.deployment_flavor == "DataOps" ? 1 : 0
-  name                 = "dcSubnetName"
+  name                 = var.dc_subnet_name
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = [local.dcSubnetPrefix]
