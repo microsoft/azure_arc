@@ -792,6 +792,7 @@ function Set-AzSMGMT {
 
     # Sleep to get around race condition on fast systems
     Start-Sleep -Seconds 10
+    $VerbosePreference = "Continue"
 
     Invoke-Command -ComputerName azsmgmt -Credential $localCred  -ScriptBlock {
 

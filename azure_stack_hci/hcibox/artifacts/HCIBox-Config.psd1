@@ -16,7 +16,7 @@
 
     # VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
-    NestedVMMemoryinGB                   = 30GB                                  # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
+    NestedVMMemoryinGB                   = 32GB                                  # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
     AzSMGMTMemoryinGB                    = 16GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
     InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the SDN Lab VMs will use in Single Host mode. This only applies when using a single host.
 
@@ -49,7 +49,7 @@
     MEM_DC                               = 2GB                                     # Memory provided for the Domain Controller VM
     MEM_BGP                              = 2GB                                     # Memory provided for the BGP-ToR-Router
     MEM_Console                          = 3GB                                     # Memory provided for the Windows 10 Console VM
-    MEM_WAC                              = 4GB                                     # Memory provided for the Windows Admin Center VM
+    MEM_WAC                              = 8GB                                     # Memory provided for the Windows Admin Center VM
     MEM_GRE                              = 2GB                                     # Memory provided for the gre-target VM
     MEM_IPSEC                            = 2GB                                     # Memory provided for the ipsec-target VM
 
@@ -122,7 +122,7 @@
     SDDCInstall                          = $true
 
     # AKS and Resource bridge variables
-    AKSworkloadClusterName               = "hcibox-aks" # lowercase only
+    AKSworkloadClusterName               = "hcibox-aks-14kvy" # lowercase only
     AKSvnetname                          = "akshcivnet"
     AKSvSwitchName                       = "sdnSwitch"
     AKSNodeStartIP                       = "192.168.200.25"
