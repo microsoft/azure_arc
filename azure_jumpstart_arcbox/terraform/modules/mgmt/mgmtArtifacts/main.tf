@@ -128,6 +128,7 @@ resource "azurerm_virtual_network" "vnet" {
 }
 
 resource "azurerm_virtual_network" "drVnet" {
+  count               = var.deployment_flavor == "DataOps" ? 1 : 0
   name                = var.drVirtualNetworkName
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -173,13 +174,13 @@ resource "azurerm_subnet_network_security_group_association" "BastionSubnetNsg" 
 }
 
 resource "azurerm_subnet_network_security_group_association" "aksSubnetNsg" {
-  count                = var.deploy_bastion == true ? 1 : 0
+  count                     = var.deploy_bastion == true ? 1 : 0
   subnet_id                 = azurerm_subnet.aksSubnet[0].id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "dcSubnetNsg" {
-  count                = var.deploy_bastion == true ? 1 : 0
+  count                     = var.deploy_bastion == true ? 1 : 0
   subnet_id                 = azurerm_subnet.dcSubnet[0].id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
