@@ -232,6 +232,7 @@ module "client_vm" {
 
 module "adds_vm" {
   source                 = "./modules/mgmt/addsVM"
+  count  = var.deployment_flavor == "DataOps" ? 1 : 0
   resource_group_name    = azurerm_resource_group.rg.name
   adds_Domain_Name       = var.addsDomainName
   deploy_bastion         = var.deploy_bastion
