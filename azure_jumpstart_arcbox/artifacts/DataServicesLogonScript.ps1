@@ -153,8 +153,8 @@ Write-Host "`n"
 
 Write-Header "Deploying SQLMI & PostgreSQL"
 # Deploy SQL MI and PostgreSQL data services
-& "$Env:ArcBoxDir\DeploySQLMI.ps1" $customlocationName
-& "$Env:ArcBoxDir\DeployPostgreSQL.ps1" $customlocationName
+& "$Env:ArcBoxDir\DeploySQLMI.ps1" -customlocationName $customlocationName
+& "$Env:ArcBoxDir\DeployPostgreSQL.ps1" -customlocationName $customlocationName
 
 # Enabling data controller auto metrics & logs upload to log analytics
 Write-Header "Enabling Data Controller Metrics & Logs Upload"
