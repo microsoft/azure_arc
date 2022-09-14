@@ -143,6 +143,7 @@
               "count": "[parameters('agentCount')]",
               "vmSize": "[parameters('agentVMSize')]",
               "osType": "[parameters('osType')]",
+              "osDiskType" : "Ephemeral",
               "storageProfile": "ManagedDisks",
               "type": "VirtualMachineScaleSets",
               "vnetSubnetID": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'),variables('aksSubnetName'))]"

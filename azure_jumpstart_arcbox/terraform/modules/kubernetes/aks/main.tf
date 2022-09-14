@@ -133,8 +133,8 @@ resource "azurerm_kubernetes_cluster" "aks_primary" {
   default_node_pool {
     name            = "agentpool"
     vm_size         = var.agent_vm_size
-    os_disk_size_gb = var.os_disk_size_gb
     node_count      = var.agent_count
+    os_disk_type =  "Ephemeral"
     type            = "VirtualMachineScaleSets"
     vnet_subnet_id  = data.azurerm_subnet.aks_subnet.id
   }
