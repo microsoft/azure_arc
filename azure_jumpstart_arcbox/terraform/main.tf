@@ -304,6 +304,7 @@ module "aks_clusters" {
   resource_group_name = azurerm_resource_group.rg.name
   spn_client_id       = var.spn_client_id
   spn_client_secret   = var.spn_client_secret
+  spn_tenant_id        = var.spn_tenant_id
   ssh_rsa_public_key  = var.client_admin_ssh
 
   depends_on = [
