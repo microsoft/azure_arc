@@ -1,8 +1,3 @@
-Param(
-  [Parameter(Mandatory=$true)]
-  [string]$customlocationName
-)
-
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "$Env:ArcBoxDir\Logs"
 
@@ -16,6 +11,7 @@ Write-Host "`n"
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
+$customLocationName = (Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType Microsoft.ExtendedLocation/customLocations).Name
 $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
 $customLocationId = $(az customlocation show --name $customlocationName --resource-group $Env:resourceGroup --query id -o tsv)
 
