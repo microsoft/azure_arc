@@ -67,6 +67,11 @@ data "azurerm_resource_group" "rg" {
   name = var.resource_group_name
 }
 
+data "azurerm_virtual_network" "vnet" {
+  name = local.virtual_network_name
+  resource_group_name = var.resource_group_name
+}
+
 data "azurerm_subnet" "subnet" {
   name                 = local.dc_subnet_name
   virtual_network_name = local.virtual_network_name
@@ -135,9 +140,17 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
   settings = <<SETTINGS
     {
       "fileUris": [
-          "${var.template_base_url}artifacts/Bootstrap.ps1"
+          "${var.template_base_url}artifacts/SetupADDS.ps1"
       ],
       "commandToExecute": "powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1 -domainName ${var.adds_Domain_Name} -domainAdminUsername  ${var.windows_Admin_Username} -domainAdminPassword  ${var.windows_Admin_password} -templateBaseUrl ${var.template_base_url}"
     }
 SETTINGS
+}
+
+resource "azurerm_virtual_network_dns_servers" "update_dns_servers" {
+  virtual_network_id = data.azurerm_virtual_network.vnet.id
+  dns_servers        = ["10.16.2.100", "168.63. 129.16"]
+  depends_on = [
+    azurerm_virtual_machine.adds
+  ]
 }
