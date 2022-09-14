@@ -50,7 +50,7 @@ variable "linux_admin_Username" {
   default     = "arcdemo"
 }
 
-variable "ssh_rsa_public_key " {
+variable "ssh_rsa_public_key" {
   type        = string
   description = "Configure all linux machines with the SSH RSA public key string. Your key should include three parts, for example ssh-rsa AAAAB...snip...UcyupgH azureuser@linuxvm"
 }
@@ -91,7 +91,7 @@ locals {
   service_cidr_secondary = "172.20.64.0/19"
   dns_service_ip_secondary = "172.20.64.10"
   docker_bridge_cidr_secondary = "192.168.0.1/16"
-  virtual_network_Name = "ArcBox-VNet"
+  virtual_network_name = "ArcBox-VNet"
   aks_subnet_name = "ArcBox-AKS-Subnet"
   dr_virtual_network_name = "ArcBox-DR-VNet"
   dr_subnet_name = "ArcBox-DR-Subnet"
@@ -117,22 +117,19 @@ data "azurerm_subnet" "aks_dr_subnet" {
 }
 
 resource "azurerm_kubernetes_cluster" "aks_primary" {
-    location = data.azurerm_resource_group.location
+    location = data.azurerm_resource_group.rg.location
+    resource_group_name = data.azurerm_resource_group.rg.name
     name = var.aks_cluster_name
     identity {
       type = "SystemAssigned"
     }
     kubernetes_version = var.Kubernetes_version
     role_based_access_control_enabled = var.enable_rbac
-    ddns_prefix = var.dns_prefix_primary
-    azure_active_directory_role_based_access_control = {
-        managed = true
-    }
+    dns_prefix = var.dns_prefix_primary
     default_node_pool {
       name = "agentpool"
       vm_size = var.agent_vm_size
       os_disk_size_gb = var.os_disk_size_gb
-      os_disk_type = var.os_disk_type
       node_count = var.agent_count
       type = "VirtualMachineScaleSets"
       vnet_subnet_id = data.azurerm_subnet.aks_subnet.id
@@ -141,37 +138,34 @@ resource "azurerm_kubernetes_cluster" "aks_primary" {
       network_plugin = "azure"
       service_cidr = local.service_cidr_primary
       dns_service_ip = local.dns_service_ip_primary
-      docdocker_bridge_cidr = local.docker_bridge_cidr_primary
+      docker_bridge_cidr = local.docker_bridge_cidr_primary
     }
     linux_profile {
       admin_username = var.linux_admin_Username
-      sssh_key {
+      ssh_key {
         key_data = var.ssh_rsa_public_key
       }
     }
     service_principal {
       client_id = var.spn_client_id
-      cclient_secret = var.spn_client_secret
+      client_secret = var.spn_client_secret
     }
 }
 
 resource "azurerm_kubernetes_cluster" "aks_dr_primary" {
-    location = data.azurerm_resource_group.location
+    location = data.azurerm_resource_group.rg.location
+    resource_group_name = data.azurerm_resource_group.rg.name
     name = var.aks_dr_cluster_name
     identity {
       type = "SystemAssigned"
     }
     kubernetes_version = var.Kubernetes_version
     role_based_access_control_enabled = var.enable_rbac
-    ddns_prefix = var.dns_prefix_primary
-    azure_active_directory_role_based_access_control = {
-        managed = true
-    }
+    dns_prefix = var.dns_prefix_primary
     default_node_pool {
       name = "agentpool"
       vm_size = var.agent_vm_size
       os_disk_size_gb = var.os_disk_size_gb
-      os_disk_type = var.os_disk_type
       node_count = var.agent_count
       type = "VirtualMachineScaleSets"
       vnet_subnet_id = data.azurerm_subnet.aks_dr_subnet.id
@@ -180,16 +174,16 @@ resource "azurerm_kubernetes_cluster" "aks_dr_primary" {
       network_plugin = "azure"
       service_cidr = local.service_cidr_secondary
       dns_service_ip = local.dns_service_ip_secondary
-      docdocker_bridge_cidr = local.docker_bridge_cidr_secondary
+      docker_bridge_cidr = local.docker_bridge_cidr_secondary
     }
     linux_profile {
       admin_username = var.linux_admin_Username
-      sssh_key {
+      ssh_key {
         key_data = var.ssh_rsa_public_key
       }
     }
     service_principal {
       client_id = var.spn_client_id
-      cclient_secret = var.spn_client_secret
+      client_secret = var.spn_client_secret
     }
 }

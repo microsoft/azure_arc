@@ -60,13 +60,7 @@ $SQLParams = "$Env:ArcBoxDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'dataLogSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' ,$sqlInstanceName | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'keyTab-stage' , "" | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , "" | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "" | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'dnsName-stage' , "" | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'port-stage' , 1433 | Set-Content -Path $SQLParams
-(Get-Content -Path $SQLParams) -replace 'licenseType-stage' , "LicenseIncluded" | Set-Content -Path $SQLParams
-
+(Get-Content -Path $SQLParams) -replace 'port-stage' , 11433 | Set-Content -Path $SQLParams
 
 az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI.parameters.json"
 Write-Host "`n"
@@ -80,9 +74,9 @@ Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard
-$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
-Start-Sleep 5 # To allow the CRD to update
+#$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
+#kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
+#Start-Sleep 5 # To allow the CRD to update
 
 # Downloading demo database and restoring onto SQL MI
 $podname = "jumpstart-sql-0"
