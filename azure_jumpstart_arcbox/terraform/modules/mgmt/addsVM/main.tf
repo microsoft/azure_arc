@@ -51,13 +51,13 @@ variable "template_base_url" {
 }
 
 locals {
-  bastion_name           = "ArcBox-Bastion"
-  public_ip_name         = var.deploy_bastion == false ? "${var.adds_VM_Name}-PIP" : "${local.bastion_name}-PIP"
-  network_interface_name = "${var.adds_VM_Name}-NIC"
-  virtual_network_name   = "ArcBox-VNet"
-  dc_subnet_name         = "ArcBox-DC-Subnet"
-  adds_private_ip_address  = "10.16.2.100"
-  os_disk_type = "Premium_LRS"
+  bastion_name            = "ArcBox-Bastion"
+  public_ip_name          = var.deploy_bastion == false ? "${var.adds_VM_Name}-PIP" : "${local.bastion_name}-PIP"
+  network_interface_name  = "${var.adds_VM_Name}-NIC"
+  virtual_network_name    = "ArcBox-VNet"
+  dc_subnet_name          = "ArcBox-DC-Subnet"
+  adds_private_ip_address = "10.16.2.100"
+  os_disk_type            = "Premium_LRS"
 }
 
 data "azurerm_subscription" "primary" {
@@ -68,7 +68,7 @@ data "azurerm_resource_group" "rg" {
 }
 
 data "azurerm_virtual_network" "vnet" {
-  name = local.virtual_network_name
+  name                = local.virtual_network_name
   resource_group_name = var.resource_group_name
 }
 
@@ -149,8 +149,8 @@ SETTINGS
 
 resource "azurerm_virtual_network_dns_servers" "update_dns_servers" {
   virtual_network_id = data.azurerm_virtual_network.vnet.id
-  dns_servers        = ["10.16.2.100", "168.63. 129.16"]
+  dns_servers        = ["10.16.2.100", "168.63.129.16"]
   depends_on = [
-    azurerm_virtual_machine.adds
+    azurerm_virtual_machine_extension.custom_script
   ]
 }
