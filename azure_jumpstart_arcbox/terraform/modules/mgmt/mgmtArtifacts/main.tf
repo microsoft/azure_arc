@@ -173,11 +173,13 @@ resource "azurerm_subnet_network_security_group_association" "BastionSubnetNsg" 
 }
 
 resource "azurerm_subnet_network_security_group_association" "aksSubnetNsg" {
+  count                = var.deploy_bastion == true ? 1 : 0
   subnet_id                 = azurerm_subnet.aksSubnet[0].id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "dcSubnetNsg" {
+  count                = var.deploy_bastion == true ? 1 : 0
   subnet_id                 = azurerm_subnet.dcSubnet[0].id
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
