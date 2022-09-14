@@ -66,35 +66,42 @@ variable "spn_client_secret" {
   sensitive   = true
 }
 
+variable "spn_tenant_id" {
+  type        = string
+  description = "Tenant Id"
+}
+
+
+
 variable "enable_rbac" {
   type        = bool
   description = "boolean flag to turn on and off of RBAC"
-  default = true
+  default     = true
 }
 
 variable "os_type" {
   type        = string
   description = "The type of operating system"
-  default = "Linux"
+  default     = "Linux"
 }
 
 variable "Kubernetes_version" {
   type        = string
   description = "The version of Kubernetes"
-  default = "1.23.8"
+  default     = "1.23.8"
 }
 
 locals {
-  service_cidr_primary = "10.20.64.0/19"
-  dns_service_ip_primary = "10.20.64.10"
-  docker_bridge_cidr_primary = "172.17.0.1/16"
-  service_cidr_secondary = "172.20.64.0/19"
-  dns_service_ip_secondary = "172.20.64.10"
+  service_cidr_primary         = "10.20.64.0/19"
+  dns_service_ip_primary       = "10.20.64.10"
+  docker_bridge_cidr_primary   = "172.17.0.1/16"
+  service_cidr_secondary       = "172.20.64.0/19"
+  dns_service_ip_secondary     = "172.20.64.10"
   docker_bridge_cidr_secondary = "192.168.0.1/16"
-  virtual_network_name = "ArcBox-VNet"
-  aks_subnet_name = "ArcBox-AKS-Subnet"
-  dr_virtual_network_name = "ArcBox-DR-VNet"
-  dr_subnet_name = "ArcBox-DR-Subnet"
+  virtual_network_name         = "ArcBox-VNet"
+  aks_subnet_name              = "ArcBox-AKS-Subnet"
+  dr_virtual_network_name      = "ArcBox-DR-VNet"
+  dr_subnet_name               = "ArcBox-DR-Subnet"
 }
 
 data "azurerm_subscription" "primary" {
@@ -117,73 +124,75 @@ data "azurerm_subnet" "aks_dr_subnet" {
 }
 
 resource "azurerm_kubernetes_cluster" "aks_primary" {
-    location = data.azurerm_resource_group.rg.location
-    resource_group_name = data.azurerm_resource_group.rg.name
-    name = var.aks_cluster_name
-    identity {
-      type = "SystemAssigned"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  name                = var.aks_cluster_name
+  kubernetes_version                = var.Kubernetes_version
+  role_based_access_control_enabled = var.enable_rbac
+  dns_prefix                        = var.dns_prefix_primary
+  default_node_pool {
+    name            = "agentpool"
+    vm_size         = var.agent_vm_size
+    os_disk_size_gb = var.os_disk_size_gb
+    node_count      = var.agent_count
+    type            = "VirtualMachineScaleSets"
+    vnet_subnet_id  = data.azurerm_subnet.aks_subnet.id
+  }
+  network_profile {
+    network_plugin     = "azure"
+    service_cidr       = local.service_cidr_primary
+    dns_service_ip     = local.dns_service_ip_primary
+    docker_bridge_cidr = local.docker_bridge_cidr_primary
+  }
+  linux_profile {
+    admin_username = var.linux_admin_Username
+    ssh_key {
+      key_data = var.ssh_rsa_public_key
     }
-    kubernetes_version = var.Kubernetes_version
-    role_based_access_control_enabled = var.enable_rbac
-    dns_prefix = var.dns_prefix_primary
-    default_node_pool {
-      name = "agentpool"
-      vm_size = var.agent_vm_size
-      os_disk_size_gb = var.os_disk_size_gb
-      node_count = var.agent_count
-      type = "VirtualMachineScaleSets"
-      vnet_subnet_id = data.azurerm_subnet.aks_subnet.id
-    }
-    network_profile {
-      network_plugin = "azure"
-      service_cidr = local.service_cidr_primary
-      dns_service_ip = local.dns_service_ip_primary
-      docker_bridge_cidr = local.docker_bridge_cidr_primary
-    }
-    linux_profile {
-      admin_username = var.linux_admin_Username
-      ssh_key {
-        key_data = var.ssh_rsa_public_key
-      }
-    }
-    service_principal {
-      client_id = var.spn_client_id
-      client_secret = var.spn_client_secret
-    }
+  }
+  azure_active_directory_role_based_access_control {
+    managed   = true
+    tenant_id = var.spn_tenant_id
+  }
+  service_principal {
+    client_id     = var.spn_client_id
+    client_secret = var.spn_client_secret
+  }
 }
 
 resource "azurerm_kubernetes_cluster" "aks_dr_primary" {
-    location = data.azurerm_resource_group.rg.location
-    resource_group_name = data.azurerm_resource_group.rg.name
-    name = var.aks_dr_cluster_name
-    identity {
-      type = "SystemAssigned"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  name                = var.aks_dr_cluster_name
+  kubernetes_version                = var.Kubernetes_version
+  role_based_access_control_enabled = var.enable_rbac
+  dns_prefix                        = var.dns_prefix_primary
+  default_node_pool {
+    name            = "agentpool"
+    vm_size         = var.agent_vm_size
+    os_disk_size_gb = var.os_disk_size_gb
+    node_count      = var.agent_count
+    type            = "VirtualMachineScaleSets"
+    vnet_subnet_id  = data.azurerm_subnet.aks_dr_subnet.id
+  }
+  network_profile {
+    network_plugin     = "azure"
+    service_cidr       = local.service_cidr_secondary
+    dns_service_ip     = local.dns_service_ip_secondary
+    docker_bridge_cidr = local.docker_bridge_cidr_secondary
+  }
+  linux_profile {
+    admin_username = var.linux_admin_Username
+    ssh_key {
+      key_data = var.ssh_rsa_public_key
     }
-    kubernetes_version = var.Kubernetes_version
-    role_based_access_control_enabled = var.enable_rbac
-    dns_prefix = var.dns_prefix_primary
-    default_node_pool {
-      name = "agentpool"
-      vm_size = var.agent_vm_size
-      os_disk_size_gb = var.os_disk_size_gb
-      node_count = var.agent_count
-      type = "VirtualMachineScaleSets"
-      vnet_subnet_id = data.azurerm_subnet.aks_dr_subnet.id
-    }
-    network_profile {
-      network_plugin = "azure"
-      service_cidr = local.service_cidr_secondary
-      dns_service_ip = local.dns_service_ip_secondary
-      docker_bridge_cidr = local.docker_bridge_cidr_secondary
-    }
-    linux_profile {
-      admin_username = var.linux_admin_Username
-      ssh_key {
-        key_data = var.ssh_rsa_public_key
-      }
-    }
-    service_principal {
-      client_id = var.spn_client_id
-      client_secret = var.spn_client_secret
-    }
+  }
+  service_principal {
+    client_id     = var.spn_client_id
+    client_secret = var.spn_client_secret
+  }
+  azure_active_directory_role_based_access_control {
+    managed   = true
+    tenant_id = var.spn_tenant_id
+  }
 }
