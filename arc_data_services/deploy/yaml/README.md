@@ -31,8 +31,8 @@ For data services:
 1. [Create Azure SQL Managed Instance](./sqlmi.yaml)
 This yaml file creates the SQL Managed Instance resource(s). The administrator username and password for the Managed instance is specified using a secret. The secret should be named using the format *\<instance-name\>-login-secret*. The secret values should be base64 encoded strings. See instructions under [Creating base64 encoded strings](#creating-base64-encoded-strings).
 
-1. [Create Azure PostgreSQL Hyperscale](./postgresql.yaml)
-This yaml file creates the PostgreSQL Hyperscale resource(s).The administrator username and password for the PostgreSQL instance is specified using a secret. The secret should be named using the format *\<instance-name\>-login-secret*. The secret values should be base64 encoded strings. See instructions under [Creating base64 encoded strings](#creating-base64-encoded-strings).
+1. [Create Azure PostgreSQL Server](./postgresql.yaml)
+This yaml file creates the PostgreSQL server resource(s).The administrator username and password for the PostgreSQL instance is specified using a secret. The secret should be named using the format *\<instance-name\>-login-secret*. The secret values should be base64 encoded strings. See instructions under [Creating base64 encoded strings](#creating-base64-encoded-strings).
 
 ### Creating base64 encoded strings
 
