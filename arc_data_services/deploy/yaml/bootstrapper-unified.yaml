@@ -341,5 +341,6 @@ spec:
       imagePullSecrets:
       - name: arc-private-registry
       restartPolicy: Never
+      serviceAccountName: sa-arcdata-deployer
   ttlSecondsAfterFinished: 86400 #24 hours
   backoffLimit: 0
