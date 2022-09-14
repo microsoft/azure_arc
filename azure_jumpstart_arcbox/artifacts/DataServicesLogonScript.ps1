@@ -114,16 +114,16 @@ Write-Host "`n"
 
 # Configuring Azure Arc Custom Location on the cluster 
 Write-Header "Configuring Azure Arc Custom Location"
-# $customlocationName="arcbox-cl" + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
+$customlocationName = "arcbox-cl" + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name "arcbox-cl" --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
+az customlocation create --name $customlocationName --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
 
 # Deploying Azure Arc Data Controller
 Write-Header "Deploying Azure Arc Data Controller"
 
-$customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name $customlocationName --resource-group $Env:resourceGroup --query id -o tsv)
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
@@ -153,8 +153,8 @@ Write-Host "`n"
 
 Write-Header "Deploying SQLMI & PostgreSQL"
 # Deploy SQL MI and PostgreSQL data services
-& "$Env:ArcBoxDir\DeploySQLMI.ps1"
-& "$Env:ArcBoxDir\DeployPostgreSQL.ps1"
+& "$Env:ArcBoxDir\DeploySQLMI.ps1" $customlocationName
+& "$Env:ArcBoxDir\DeployPostgreSQL.ps1" $customlocationName
 
 # Enabling data controller auto metrics & logs upload to log analytics
 Write-Header "Enabling Data Controller Metrics & Logs Upload"
