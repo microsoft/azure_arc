@@ -140,7 +140,7 @@ resource "azurerm_kubernetes_cluster" "aks_primary" {
   linux_profile {
     admin_username = var.linux_admin_Username
     ssh_key {
-      key_data = var.ssh_rsa_public_key
+      key_data = file(var.ssh_rsa_public_key)
     }
   }
   azure_active_directory_role_based_access_control {
@@ -176,7 +176,7 @@ resource "azurerm_kubernetes_cluster" "aks_dr_primary" {
   linux_profile {
     admin_username = var.linux_admin_Username
     ssh_key {
-      key_data = var.ssh_rsa_public_key
+      key_data = file(var.ssh_rsa_public_key)
     }
   }
   service_principal {
