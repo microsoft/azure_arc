@@ -149,8 +149,8 @@ locals {
 }
 
 resource "random_string" "guid" {
-  length           = 4
-  special          = true
+  length  = 4
+  special = true
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -212,10 +212,10 @@ module "client_vm" {
   github_repo                  = var.github_repo
   github_branch                = var.github_branch
   deploy_bastion               = var.deploy_bastion
-  capi_arc_data_cluster_name   = "${local.capi_arc_data_cluster_name}${random_string.guid.result}"
-  k3s_arc_cluster_name         = "${local.k3s_arc_data_cluster_name}${random_string.guid.result}"
-  aks_arc_data_cluster_name    = "${local.aks_arc_data_cluster_name}${random_string.guid.result}"
-  aks_dr_arc_data_cluster_name = "${local.aks_dr_arc_data_cluster_name}${random_string.guid.result}"
+  capi_arc_data_cluster_name   = "${local.capi_arc_data_cluster_name}-${random_string.guid.result}"
+  k3s_arc_cluster_name         = "${local.k3s_arc_data_cluster_name}-${random_string.guid.result}"
+  aks_arc_data_cluster_name    = "${local.aks_arc_data_cluster_name}-${random_string.guid.result}"
+  aks_dr_arc_data_cluster_name = "${local.aks_dr_arc_data_cluster_name}-${random_string.guid.result}"
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -306,6 +306,8 @@ module "aks_clusters" {
   spn_client_secret   = var.spn_client_secret
   spn_tenant_id       = var.spn_tenant_id
   ssh_rsa_public_key  = var.client_admin_ssh
+  aks_cluster_name    = local.aks_arc_data_cluster_name
+  aks_dr_cluster_name = local.aks_dr_arc_data_cluster_name
 
   depends_on = [
     azurerm_resource_group.rg,
