@@ -2226,6 +2226,29 @@ CertificateTemplate= WebServer
             $autoArrangeRegistryName = 'FFlags'
             $autoArrangeRegistryValue = '1075839525'
 
+            # Set HCIBox wallpaper
+            Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/azure_arc/main/img/hcibox_wallpaper.png" -OutFile C:\VHDs\wallpaper.png
+            # Changing to Jumpstart ArcBox wallpaper
+            $code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
+    
+    public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+            
+            public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+            }
+        }
+    } 
+'@
+
+            Write-Header "Changing Wallpaper"
+            $imgPath="C:\VHDs\wallpaper.png"
+            Add-Type $code 
+            [Win32.Wallpaper]::SetWallpaper($imgPath)
+
             if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
                 New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
             }

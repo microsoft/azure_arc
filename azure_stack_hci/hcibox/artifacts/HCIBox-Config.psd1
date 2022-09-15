@@ -1,6 +1,6 @@
 @{
 
-    # This is the PowerShell datafile used to provide configuration information for the SDN Nested lab environment. Product keys and password are not encrypted and will be available on all hosts during installation.
+    # This is the PowerShell datafile used to provide configuration information for the HCIBox environment. Product keys and password are not encrypted and will be available on all hosts during installation.
     
     # Version 1.0.0
 
@@ -18,7 +18,7 @@
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
     NestedVMMemoryinGB                   = 70GB                                  # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
     AzSMGMTMemoryinGB                    = 32GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
-    InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the SDN Lab VMs will use in Single Host mode. This only applies when using a single host.
+    InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode. This only applies when using a single host.
 
     # ProductKeys
     GUIProductKey                        = "WMDGN-G9PQG-XVVXX-R3X43-63DFG"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
