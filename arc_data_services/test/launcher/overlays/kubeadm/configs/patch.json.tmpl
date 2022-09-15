@@ -1,0 +1,24 @@
+{
+    "patch": [
+        {
+            "op": "add",
+            "path": "spec.docker",
+            "value": {
+                "registry": "mcr.microsoft.com",
+                "repository": "arcdata",
+                "imageTag": "$DOCKER_TAG",
+                "imagePullPolicy": "Always"
+            }
+        },        
+        {
+            "op": "add",
+            "path": "spec.storage.data.className",
+            "value": "$KUBERNETES_STORAGECLASS"
+        },
+        {
+            "op": "add",
+            "path": "spec.storage.logs.className",
+            "value": "$KUBERNETES_STORAGECLASS"
+        }
+    ]
+}
