@@ -71,13 +71,13 @@ variable "github_username" {
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
-  default     = "sebassem"
+  default     = "microsoft"
 }
 
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "arcbox_dataops_terraform"
+  default     = "arcbox_dataops"
 }
 
 variable "spn_client_id" {
@@ -306,8 +306,8 @@ module "aks_clusters" {
   spn_client_secret   = var.spn_client_secret
   spn_tenant_id       = var.spn_tenant_id
   ssh_rsa_public_key  = var.client_admin_ssh
-  aks_cluster_name    = local.aks_arc_data_cluster_name
-  aks_dr_cluster_name = local.aks_dr_arc_data_cluster_name
+  aks_cluster_name    = "${local.aks_arc_data_cluster_name}-${random_string.guid.result}"
+  aks_dr_cluster_name = "${local.aks_dr_arc_data_cluster_name}-${random_string.guid.result}"
 
   depends_on = [
     azurerm_resource_group.rg,
