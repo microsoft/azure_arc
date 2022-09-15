@@ -81,7 +81,6 @@ resource aksClusterName_resource 'Microsoft.ContainerService/managedClusters@202
         name: 'agentpool'
         mode: 'System'
         osDiskSizeGB: osDiskSizeGB
-        osDiskType : 'Ephemeral'
         count: agentCount
         vmSize: agentVMSize
         osType: osType

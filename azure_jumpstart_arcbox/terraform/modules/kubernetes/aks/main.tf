@@ -26,12 +26,6 @@ variable "dns_prefix_secondary" {
   default     = "arcdata"
 }
 
-variable "os_disk_size_gb" {
-  type        = number
-  description = "Disk size (in GB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize"
-  default     = 0
-}
-
 variable "agent_count" {
   type        = number
   description = "The number of nodes for the cluster"
@@ -134,7 +128,6 @@ resource "azurerm_kubernetes_cluster" "aks_primary" {
     name            = "agentpool"
     vm_size         = var.agent_vm_size
     node_count      = var.agent_count
-    os_disk_type =  "Ephemeral"
     type            = "VirtualMachineScaleSets"
     vnet_subnet_id  = data.azurerm_subnet.aks_subnet.id
   }
@@ -170,7 +163,6 @@ resource "azurerm_kubernetes_cluster" "aks_dr_primary" {
   default_node_pool {
     name            = "agentpool"
     vm_size         = var.agent_vm_size
-    os_disk_size_gb = var.os_disk_size_gb
     node_count      = var.agent_count
     type            = "VirtualMachineScaleSets"
     vnet_subnet_id  = data.azurerm_subnet.aks_dr_subnet.id
