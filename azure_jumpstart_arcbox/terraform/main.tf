@@ -150,7 +150,7 @@ locals {
 
 resource "random_string" "guid" {
   length  = 4
-  special = true
+  special = false
 }
 
 resource "azurerm_resource_group" "rg" {
