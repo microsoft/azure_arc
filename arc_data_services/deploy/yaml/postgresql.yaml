@@ -11,12 +11,6 @@ kind: PostgreSql
 metadata:
   name: pg1
 spec:
-  engine:
-    version: 12
-    extensions:
-    - name: citus
-  scale:
-    workers: 3
   scheduling:
     default:
       resources:
