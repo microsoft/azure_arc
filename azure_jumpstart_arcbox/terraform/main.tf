@@ -213,7 +213,7 @@ module "client_vm" {
   github_branch                = var.github_branch
   deploy_bastion               = var.deploy_bastion
   capi_arc_data_cluster_name   = local.capi_arc_data_cluster_name
-  k3s_arc_data_cluster_name    = local.k3s_arc_data_cluster_name
+  k3s_arc_cluster_name    = local.k3s_arc_data_cluster_name
   aks_arc_data_cluster_name    = local.aks_arc_data_cluster_name
   aks_dr_arc_data_cluster_name = local.aks_dr_arc_data_cluster_name
 
