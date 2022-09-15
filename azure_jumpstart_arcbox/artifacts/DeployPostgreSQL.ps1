@@ -65,7 +65,7 @@ $pgControllerPodName = "jumpstartps-0"
     Do {
         Write-Host "Waiting for PostgreSQL. Hold tight, this might take a few minutes...(45s sleeping loop)"
         Start-Sleep -Seconds 45
-        $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
+        $buildService = $(if((kubectl get pods -n arc | Select-String $pgControllerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
 
 Start-Sleep -Seconds 60
