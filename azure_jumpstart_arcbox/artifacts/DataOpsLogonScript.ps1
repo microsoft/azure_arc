@@ -231,6 +231,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\
 #az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
 
 #VNet peering with CAPI vnet
+$capiVnetName = $clusters[0].clusterName + '-vnet'
 $dcVnetId = $(az network vnet show `
         --resource-group $Env:resourceGroup `
         --name "ArcBox-VNet" `
@@ -238,7 +239,7 @@ $dcVnetId = $(az network vnet show `
 
 $capiVnetId = $(az network vnet show `
         --resource-group $Env:resourceGroup `
-        --name "arcbox-capi-data-vnet" `
+        --name $capiVnetName `
         --query id --out tsv)
 
 az network vnet peering create --name "dcVnet-CapiVnet" `
@@ -249,10 +250,9 @@ az network vnet peering create --name "dcVnet-CapiVnet" `
 
 az network vnet peering create --name "CapiVnet-dcVnet" `
     --resource-group $Env:resourceGroup `
-    --vnet-name "arcbox-capi-data-vnet" `
+    --vnet-name $capiVnetName `
     --remote-vnet $dcVnetId `
     --allow-vnet-access
-#az vm restart --no-wait --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv)
 
 Start-Sleep -Seconds 10
 
