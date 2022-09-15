@@ -260,7 +260,7 @@ module "capi_vm" {
   workspace_name             = var.workspace_name
   deploy_bastion             = var.deploy_bastion
   deployment_flavor          = var.deployment_flavor
-  capi_arc_data_cluster_name = "${local.capi_arc_data_cluster_name}${random_string.guid.result}"
+  capi_arc_data_cluster_name = "${local.capi_arc_data_cluster_name}-${random_string.guid.result}"
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -276,7 +276,7 @@ module "rancher_vm" {
   count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = "${local.k3s_arc_data_cluster_name}${random_string.guid.result}"
+  vm_name              = "${local.k3s_arc_data_cluster_name}-${random_string.guid.result}"
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   template_base_url    = local.template_base_url
