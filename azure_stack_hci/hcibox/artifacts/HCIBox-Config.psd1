@@ -17,7 +17,7 @@
     # VM Configuration
     HostVMPath                           = "V:\VMs"                              # This value controls the path where the Nested VMs will be stored on all hosts.
     NestedVMMemoryinGB                   = 70GB                                  # This value controls the amount of RAM for each Nested Hyper-V Host (AzSHOST1-2).
-    AzSMGMTMemoryinGB                    = 24GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
+    AzSMGMTMemoryinGB                    = 32GB                                  # This value controls the amount of RAM for the AzSMGMT Nested VM which contains only the Console, Router, Admincenter, and DC VMs.
     InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the SDN Lab VMs will use in Single Host mode. This only applies when using a single host.
 
     # ProductKeys
@@ -122,7 +122,7 @@
     SDDCInstall                          = $true
 
     # AKS and Resource bridge variables
-    AKSworkloadClusterName               = "hcibox-aks-16kvy" # lowercase only
+    AKSworkloadClusterName               = "hcibox-aks-19kvy" # lowercase only
     AKSvnetname                          = "akshcivnet"
     AKSvSwitchName                       = "sdnSwitch"
     AKSNodeStartIP                       = "192.168.200.25"
