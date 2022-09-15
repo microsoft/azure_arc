@@ -141,7 +141,16 @@ variable "deployment_flavor" {
 ##############################################################################
 
 locals {
-  template_base_url = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_jumpstart_arcbox/"
+  template_base_url            = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_jumpstart_arcbox/"
+  capi_arc_data_cluster_name   = join("ArcBox-CAPI-Data", random_integer.guid.result)
+  k3s_arc_data_cluster_name    = join(var.rancher_vm_name, random_integer.guid.result)
+  aks_arc_data_cluster_name    = join("ArcBox-AKS-Data", random_integer.guid.result)
+  aks_dr_arc_data_cluster_name = join("ArcBox-AKS-DR-Data", random_integer.guid.result)
+}
+
+resource "random_integer" "guid" {
+  min = 1000
+  max = 5000
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -167,28 +176,10 @@ module "management_artifacts" {
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
   deployment_flavor    = var.deployment_flavor
-  dns_servers           = []
+  dns_servers          = []
 
   depends_on = [azurerm_resource_group.rg]
 }
-
-/*module "update_vnet_dns_servers" {
-  count                = var.deployment_flavor == "DataOps" ? 1 : 0
-  source               = "./modules/mgmt/mgmtArtifacts"
-  resource_group_name  = azurerm_resource_group.rg.name
-  spn_client_id        = var.spn_client_id
-  virtual_network_name = var.virtual_network_name
-  subnet_name          = var.subnet_name
-  workspace_name       = var.workspace_name
-  deploy_bastion       = var.deploy_bastion
-  deployment_flavor    = var.deployment_flavor
-  dns_servers           = ["10.16.2.100", "168.63. 129.16"]
-
-  depends_on = [
-    module.management_artifacts,
-    module.adds_vm
-  ]
-}*/
 
 module "management_policy" {
   source = "./modules/mgmt/mgmtPolicy"
@@ -204,23 +195,27 @@ module "management_policy" {
 module "client_vm" {
   source = "./modules/clientVm"
 
-  resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = var.client_vm_name
-  virtual_network_name = var.virtual_network_name
-  subnet_name          = var.subnet_name
-  template_base_url    = local.template_base_url
-  storage_account_name = module.management_storage.storage_account_name
-  workspace_name       = var.workspace_name
-  spn_client_id        = var.spn_client_id
-  spn_client_secret    = var.spn_client_secret
-  spn_tenant_id        = var.spn_tenant_id
-  deployment_flavor    = var.deployment_flavor
-  admin_username       = var.client_admin_username
-  admin_password       = var.client_admin_password
-  github_username      = var.github_username
-  github_repo          = var.github_repo
-  github_branch        = var.github_branch
-  deploy_bastion       = var.deploy_bastion
+  resource_group_name          = azurerm_resource_group.rg.name
+  vm_name                      = var.client_vm_name
+  virtual_network_name         = var.virtual_network_name
+  subnet_name                  = var.subnet_name
+  template_base_url            = local.template_base_url
+  storage_account_name         = module.management_storage.storage_account_name
+  workspace_name               = var.workspace_name
+  spn_client_id                = var.spn_client_id
+  spn_client_secret            = var.spn_client_secret
+  spn_tenant_id                = var.spn_tenant_id
+  deployment_flavor            = var.deployment_flavor
+  admin_username               = var.client_admin_username
+  admin_password               = var.client_admin_password
+  github_username              = var.github_username
+  github_repo                  = var.github_repo
+  github_branch                = var.github_branch
+  deploy_bastion               = var.deploy_bastion
+  capi_arc_data_cluster_name   = local.capi_arc_data_cluster_name
+  k3s_arc_data_cluster_name    = local.k3s_arc_data_cluster_name
+  aks_arc_data_cluster_name    = local.aks_arc_data_cluster_name
+  aks_dr_arc_data_cluster_name = local.aks_dr_arc_data_cluster_name
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -231,7 +226,7 @@ module "client_vm" {
 
 module "adds_vm" {
   source                 = "./modules/mgmt/addsVM"
-  count  = var.deployment_flavor == "DataOps" ? 1 : 0
+  count                  = var.deployment_flavor == "DataOps" ? 1 : 0
   resource_group_name    = azurerm_resource_group.rg.name
   adds_Domain_Name       = var.addsDomainName
   deploy_bastion         = var.deploy_bastion
@@ -249,20 +244,21 @@ module "capi_vm" {
   source = "./modules/kubernetes/ubuntuCapi"
   count  = contains(["Full", "DevOps", "DataOps"], var.deployment_flavor) ? 1 : 0
 
-  resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = var.capi_vm_name
-  virtual_network_name = var.virtual_network_name
-  subnet_name          = var.subnet_name
-  template_base_url    = local.template_base_url
-  storage_account_name = module.management_storage.storage_account_name
-  spn_client_id        = var.spn_client_id
-  spn_client_secret    = var.spn_client_secret
-  spn_tenant_id        = var.spn_tenant_id
-  admin_username       = var.client_admin_username
-  admin_ssh_key        = var.client_admin_ssh
-  workspace_name       = var.workspace_name
-  deploy_bastion       = var.deploy_bastion
-  deployment_flavor    = var.deployment_flavor
+  resource_group_name        = azurerm_resource_group.rg.name
+  vm_name                    = var.capi_vm_name
+  virtual_network_name       = var.virtual_network_name
+  subnet_name                = var.subnet_name
+  template_base_url          = local.template_base_url
+  storage_account_name       = module.management_storage.storage_account_name
+  spn_client_id              = var.spn_client_id
+  spn_client_secret          = var.spn_client_secret
+  spn_tenant_id              = var.spn_tenant_id
+  admin_username             = var.client_admin_username
+  admin_ssh_key              = var.client_admin_ssh
+  workspace_name             = var.workspace_name
+  deploy_bastion             = var.deploy_bastion
+  deployment_flavor          = var.deployment_flavor
+  capi_arc_data_cluster_name = local.capi_arc_data_cluster_name
 
   depends_on = [
     azurerm_resource_group.rg,
@@ -276,7 +272,7 @@ module "rancher_vm" {
   count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = var.rancher_vm_name
+  vm_name              = local.k3s_arc_data_cluster_name
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   template_base_url    = local.template_base_url
@@ -303,7 +299,7 @@ module "aks_clusters" {
   resource_group_name = azurerm_resource_group.rg.name
   spn_client_id       = var.spn_client_id
   spn_client_secret   = var.spn_client_secret
-  spn_tenant_id        = var.spn_tenant_id
+  spn_tenant_id       = var.spn_tenant_id
   ssh_rsa_public_key  = var.client_admin_ssh
 
   depends_on = [
