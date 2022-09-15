@@ -1,0 +1,70 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: sqlmanagedinstancereprovisionreplicatasks.tasks.sql.arcdata.microsoft.com
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+  group: tasks.sql.arcdata.microsoft.com
+  versions:
+  - name: v1beta1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        properties:
+          apiVersion:
+            type: string
+          kind:
+            type: string
+          spec:
+            properties:
+              replicaName:
+                type: string
+            type: object
+          status:
+            properties:
+              endpoints:
+                additionalProperties:
+                  type: string
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
+              healthState:
+                type: string
+              lastUpdateTime:
+                format: date-time
+                type: string
+              message:
+                type: string
+              observedGeneration:
+                type: integer
+              percentComplete:
+                type: integer
+              reason:
+                type: string
+              runningVersion:
+                type: string
+              state:
+                type: string
+            type: object
+        type: object
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - jsonPath: .status.state
+      name: Status
+      type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+  conversion:
+    strategy: None
+  names:
+    kind: SqlManagedInstanceReprovisionReplicaTask
+    singular: sqlmanagedinstancereprovisionreplicatask
+    plural: sqlmanagedinstancereprovisionreplicatasks
+    shortNames:
+      - sqlmireprovisionreplicatask
+  scope: Namespaced
