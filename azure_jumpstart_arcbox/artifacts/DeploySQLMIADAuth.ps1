@@ -198,8 +198,8 @@ foreach ($sqlInstance in $sqlInstances) {
 
 
 
-    Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
-    $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+    Copy-Item "$Env:ArcBoxDir\sqlmiAD.parameters.json" -Destination "$Env:ArcBoxDir\sqlmiAD-stage.parameters.json"
+    $SQLParams = "$Env:ArcBoxDir\sqlmiAD-stage.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
@@ -228,7 +228,7 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $SQLParams) -replace 'port-stage' , $sqlmi_port | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'licenseType-stage' , $sqlInstance.licenseType | Set-Content -Path $SQLParams
 
-    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\sqlmiAD.json" --parameters "$Env:ArcBoxDir\sqlmiAD-stage.parameters.json"
     Write-Host "`n"
 
     Do {
@@ -239,15 +239,7 @@ foreach ($sqlInstance in $sqlInstances) {
     Write-Host "Azure Arc SQL Managed Instance is ready!"
     Write-Host "`n"
 
-    Remove-Item "$Env:ArcBoxDir\SQLMI-stage.parameters.json" -Force
-
-    <#
-    #Update Service Port from 1433 to Non-Standard on primary cluster
-    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
-    kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload
-    kubectl patch svc "$sqlMIName-secondary-external-svc" -n arc --type merge --patch $payload
-    Start-Sleep -Seconds 5 # To allow the CRD to update 
-    #>
+    Remove-Item "$Env:ArcBoxDir\sqlmiAD-stage.parameters.json" -Force
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"

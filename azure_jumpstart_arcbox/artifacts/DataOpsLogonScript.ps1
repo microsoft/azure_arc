@@ -5,14 +5,14 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
 
 ### To be removed ###
-$guid= get-random -Minimum 1000 -Maximum 3000
+#$guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
 
     [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName+$guid ; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName+$guid ; dataController = 'arcbox-aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 ### To be removed ###
