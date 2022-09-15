@@ -60,7 +60,6 @@ az deployment group create --resource-group $Env:resourceGroup --template-file "
 Write-Host "`n"
 
 # Ensures postgres container is initiated and ready to accept restores
-# $pgControllerPodName = "jumpstartpsc0-0"
 $pgWorkerPodName = "jumpstartps-0"
 
     Do {
