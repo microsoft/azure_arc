@@ -1,6 +1,8 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
-$connectedClusterName=$Env:capiArcDataClusterName
+# $connectedClusterName=$Env:capiArcDataClusterName
+$connectedClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "CAPI" | Where-Object { $_ -ne "" }
+$connectedClusterName=$connectedClusterName -replace "`n",""
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataServicesLogonScript.log
 

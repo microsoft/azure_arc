@@ -4,6 +4,8 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxKVDir = "C:\ArcBox\KeyVault"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
+$Env:capiArcDataClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "CAPI" | Where-Object { $_ -ne "" }
+$Env:capiArcDataClusterName=$Env:capiArcDataClusterName -replace "`n",""
 
 $osmRelease = "v1.1.1"
 $osmMeshName = "osm"
