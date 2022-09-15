@@ -142,15 +142,15 @@ variable "deployment_flavor" {
 
 locals {
   template_base_url            = "https://raw.githubusercontent.com/${var.github_repo}/azure_arc/${var.github_branch}/azure_jumpstart_arcbox/"
-  capi_arc_data_cluster_name   = join("ArcBox-CAPI-Data", random_integer.guid.result)
-  k3s_arc_data_cluster_name    = join(var.rancher_vm_name, random_integer.guid.result)
-  aks_arc_data_cluster_name    = join("ArcBox-AKS-Data", random_integer.guid.result)
-  aks_dr_arc_data_cluster_name = join("ArcBox-AKS-DR-Data", random_integer.guid.result)
+  capi_arc_data_cluster_name   = "ArcBox-CAPI-Data"
+  k3s_arc_data_cluster_name    = var.rancher_vm_name
+  aks_arc_data_cluster_name    = "ArcBox-AKS-Data"
+  aks_dr_arc_data_cluster_name = "ArcBox-AKS-DR-Data"
 }
 
-resource "random_integer" "guid" {
-  min = 1000
-  max = 5000
+resource "random_string" "guid" {
+  length           = 4
+  special          = true
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -212,15 +212,17 @@ module "client_vm" {
   github_repo                  = var.github_repo
   github_branch                = var.github_branch
   deploy_bastion               = var.deploy_bastion
-  capi_arc_data_cluster_name   = local.capi_arc_data_cluster_name
-  k3s_arc_cluster_name         = local.k3s_arc_data_cluster_name
-  aks_arc_data_cluster_name    = local.aks_arc_data_cluster_name
-  aks_dr_arc_data_cluster_name = local.aks_dr_arc_data_cluster_name
+  capi_arc_data_cluster_name   = "${local.capi_arc_data_cluster_name}${random_string.guid.result}"
+  k3s_arc_cluster_name         = "${local.k3s_arc_data_cluster_name}${random_string.guid.result}"
+  aks_arc_data_cluster_name    = "${local.aks_arc_data_cluster_name}${random_string.guid.result}"
+  aks_dr_arc_data_cluster_name = "${local.aks_dr_arc_data_cluster_name}${random_string.guid.result}"
 
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage
+    module.management_storage,
+    random_string.guid,
+    module.adds_vm
   ]
 }
 
@@ -258,12 +260,14 @@ module "capi_vm" {
   workspace_name             = var.workspace_name
   deploy_bastion             = var.deploy_bastion
   deployment_flavor          = var.deployment_flavor
-  capi_arc_data_cluster_name = local.capi_arc_data_cluster_name
+  capi_arc_data_cluster_name = "${local.capi_arc_data_cluster_name}${random_string.guid.result}"
 
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage
+    module.management_storage,
+    random_string.guid,
+    module.adds_vm
   ]
 }
 
@@ -272,7 +276,7 @@ module "rancher_vm" {
   count  = contains(["Full", "DevOps"], var.deployment_flavor) ? 1 : 0
 
   resource_group_name  = azurerm_resource_group.rg.name
-  vm_name              = local.k3s_arc_data_cluster_name
+  vm_name              = "${local.k3s_arc_data_cluster_name}${random_string.guid.result}"
   virtual_network_name = var.virtual_network_name
   subnet_name          = var.subnet_name
   template_base_url    = local.template_base_url
@@ -288,7 +292,8 @@ module "rancher_vm" {
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage
+    module.management_storage,
+    random_string.guid
   ]
 }
 
@@ -305,6 +310,7 @@ module "aks_clusters" {
   depends_on = [
     azurerm_resource_group.rg,
     module.management_artifacts,
-    module.management_storage
+    module.management_storage,
+    module.adds_vm
   ]
 }
