@@ -56,7 +56,7 @@
       "value": "Always"
     },
     "dockerImageTag": {
-      "value": "v1.10.0_2022-08-09"
+      "value": "v1.11.0_2022-09-13"
     },
     "dockerRegistry": {
       "value": "mcr.microsoft.com"
@@ -83,7 +83,7 @@
       "value": 30080
     },
     "apiVersion": {
-      "value": "2021-11-01"
+      "value": "2022-03-01-preview"
     },
     "infrastructure": {
       "value": "aws"
