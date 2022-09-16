@@ -3,11 +3,6 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$CName = "dataops"
-$certdns = "$CName.jumpstart.local"
-$password = "arcbox"
-$appNamespace = "arc"
-
 ### To be removed ###
 #$guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
@@ -366,6 +361,10 @@ Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
 & "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
 
+Write-Header "Deploying App"
+# Deploy App
+& "$Env:ArcBoxDir\DataOpsAppScript.ps1"
+
 # Enabling data controller auto metrics & logs upload to log analytics
 foreach ($cluster in $clusters) {
     Write-Header "Enabling Data Controller Metrics & Logs Upload"
@@ -392,126 +391,6 @@ $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
 Stop-Process -Id $kubectlMonShell.Id
-
-################################################
-# - Deploying App on CAPI cluster
-################################################
-
-Write-Header "Deploying App"
-# Deploy App
-$cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
-$certPassword = ConvertTo-SecureString -String $password -Force -AsPlainText
-Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$CName.pfx" -Password $certPassword
-Import-PfxCertificate -FilePath "$Env:TempDir\$CName.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
-
-openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -nocerts -out "$Env:TempDir\$CName.key" -password pass:$password -passout pass:$password
-openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -clcerts -nokeys -out "$Env:TempDir\$CName.crt" -password pass:$password 
-openssl rsa -in "$Env:TempDir\$CName.key" -out "$Env:TempDir\$CName-dec.key" -passin pass:$password
-
-# Create k8s secret for App Ingress in both clusters
-kubectx capi
-kubectl -n $appNamespace create secret tls "$CName-secret" --key "$Env:TempDir\$CName-dec.key" --cert "$Env:TempDir\$CName.crt"
-kubectx aks-dr
-kubectl -n $appNamespace create secret tls "$CName-secret" --key "$Env:TempDir\$CName-dec.key"--cert "$Env:TempDir\$CName.crt"
-
-# Deploy NGINX Ingress Controller
-kubectx capi
-helm repo add nginx-stable https://helm.nginx.com/stable
-helm repo update
-helm install dataops-ingress nginx-stable/nginx-ingress
-
-# Add DNS Record for CAPI App
-$dcInfo = Get-ADDomainController
-$appIpaddress = kubectl get svc "dataops-ingress-nginx-ingress" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-capi" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
-Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-capi.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
-
-# Deploy the App
-$appCAPI = @"
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: web-app
-  labels:
-    app: web
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: web
-  template:
-    metadata:
-      labels:
-        app: web
-    spec:
-      containers:
-      - name: web
-        image: arcjumpstart.azurecr.io/demoapp
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - name: secrets
-          mountPath: /app/secrets
-          readOnly: true
-      volumes:
-      - name: secrets
-        secret:
-          secretName: capi-sql-login-secret
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: web-app-service
-spec:
-  selector:
-    app: web
-  type: ClusterIP
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-
-"@
-Write-Header "Deploying App Resource"
-$appCAPI | kubectl apply -n $appNamespace -f -
-
-# Deploy an Ingress Resource for the app
-$appIngress = @"
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress-tls
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-spec:
-  tls:
-  - hosts:
-    - "$certdns"
-    secretName: "$CName-secret"
-  rules:
-  - host: "$certdns"
-    http:
-      paths:
-      - pathType: ImplementationSpecific
-        backend:
-          service:
-            name: web-app-service
-            port:
-              number: 80
-        path: /
-"@
-Write-Header "Deploying App Ingress Resource"
-$appIngress | kubectl apply -n $appNamespace -f -
-
-# Creating CAPI Hello Arc Icon on Desktop
-$shortcutLocation = "$Env:Public\Desktop\Bookstore.lnk"
-$wScriptShell = New-Object -ComObject WScript.Shell
-$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-$shortcut.TargetPath = "https://$certdns"
-$shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
-$shortcut.WindowStyle = 3
-$shortcut.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
