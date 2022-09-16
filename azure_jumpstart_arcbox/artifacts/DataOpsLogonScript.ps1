@@ -3,8 +3,8 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$certname = "dataops"
-$certdns = "$certname.jumpstart.local"
+$CName = "dataops"
+$certdns = "$CName.jumpstart.local"
 $password = "arcbox"
 $appNamespace = "arc"
 
@@ -401,29 +401,30 @@ Write-Header "Deploying App"
 # Deploy App
 $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
 $certPassword = ConvertTo-SecureString -String $password -Force -AsPlainText
-Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
-Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
+Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$CName.pfx" -Password $certPassword
+Import-PfxCertificate -FilePath "$Env:TempDir\$CName.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
 
-openssl pkcs12 -in "$Env:TempDir\$certname.pfx" -nocerts -out "$Env:TempDir\$certname.key" -password pass:$password -passout pass:$password
-openssl pkcs12 -in "$Env:TempDir\$certname.pfx" -clcerts -nokeys -out "$Env:TempDir\$certname.crt" -password pass:$password 
-openssl rsa -in "$Env:TempDir\$certname.key" -out "$Env:TempDir\$certname-dec.key" -passin pass:$password
+openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -nocerts -out "$Env:TempDir\$CName.key" -password pass:$password -passout pass:$password
+openssl pkcs12 -in "$Env:TempDir\$CName.pfx" -clcerts -nokeys -out "$Env:TempDir\$CName.crt" -password pass:$password 
+openssl rsa -in "$Env:TempDir\$CName.key" -out "$Env:TempDir\$CName-dec.key" -passin pass:$password
 
 # Create k8s secret for App Ingress in both clusters
 kubectx capi
-kubectl -n $appNamespace create secret tls "$certname-secret" --key "$Env:TempDir\$certname.key" --cert "$Env:TempDir\$certname.crt"
+kubectl -n $appNamespace create secret tls "$CName-secret" --key "$Env:TempDir\$CName-dec.key" --cert "$Env:TempDir\$CName.crt"
 kubectx aks-dr
-kubectl -n $appNamespace create secret tls "$certname-secret" --key "$Env:TempDir\$certname.key" --cert "$Env:TempDir\$certname.crt"
+kubectl -n $appNamespace create secret tls "$CName-secret" --key "$Env:TempDir\$CName-dec.key"--cert "$Env:TempDir\$CName.crt"
 
 # Deploy NGINX Ingress Controller
 kubectx capi
 helm repo add nginx-stable https://helm.nginx.com/stable
 helm repo update
-helm install nginx-ingress nginx-stable/nginx-ingress
+helm install dataops-ingress nginx-stable/nginx-ingress
 
 # Add DNS Record for CAPI App
 $dcInfo = Get-ADDomainController
-$appIpaddress = kubectl get svc "nginx-ingress-nginx-ingress" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $certname -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
+$appIpaddress = kubectl get svc "dataops-ingress-nginx-ingress" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-capi" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
+Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-capi.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
 
 # Deploy the App
 $appCAPI = @"
@@ -474,7 +475,6 @@ spec:
 Write-Header "Deploying App Resource"
 $appCAPI | kubectl apply -n $appNamespace -f -
 
-
 # Deploy an Ingress Resource for the app
 $appIngress = @"
 apiVersion: networking.k8s.io/v1
@@ -488,7 +488,7 @@ spec:
   tls:
   - hosts:
     - "$certdns"
-    secretName: "$certname-secret"
+    secretName: "$CName-secret"
   rules:
   - host: "$certdns"
     http:
@@ -503,6 +503,15 @@ spec:
 "@
 Write-Header "Deploying App Ingress Resource"
 $appIngress | kubectl apply -n $appNamespace -f -
+
+# Creating CAPI Hello Arc Icon on Desktop
+$shortcutLocation = "$Env:Public\Desktop\Bookstore.lnk"
+$wScriptShell = New-Object -ComObject WScript.Shell
+$shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+$shortcut.TargetPath = "https://$certdns"
+$shortcut.IconLocation="$Env:ArcBoxIconDir\bookstore.ico, 0"
+$shortcut.WindowStyle = 3
+$shortcut.Save()
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
