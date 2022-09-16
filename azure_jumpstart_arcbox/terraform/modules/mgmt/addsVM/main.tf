@@ -100,7 +100,8 @@ resource "azurerm_network_interface" "nic" {
   ip_configuration {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = local.adds_private_ip_address
     public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }
