@@ -1,6 +1,5 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
-# $connectedClusterName=$Env:capiArcDataClusterName
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataServicesLogonScript.log
 
 # Required for azcopy and Get-AzResource
