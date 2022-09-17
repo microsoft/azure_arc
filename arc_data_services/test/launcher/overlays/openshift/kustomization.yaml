@@ -1,0 +1,11 @@
+bases:
+ - ../../base
+
+configMapGenerator:
+- name: control-patch
+  namespace: arc-ci-launcher
+  files:
+    - configs/patch.json
+
+resources:
+ - scc.yaml

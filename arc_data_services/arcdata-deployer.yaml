@@ -176,9 +176,11 @@ rules:
   - failovergroups.sql.arcdata.microsoft.com
   - kafkas.arcdata.microsoft.com
   - monitors.arcdata.microsoft.com
+  - otelcollectors.arcdata.microsoft.com
   - postgresqls.arcdata.microsoft.com
   - sqlmanagedinstancerestoretasks.tasks.sql.arcdata.microsoft.com
   - sqlmanagedinstances.sql.arcdata.microsoft.com
+  - telemetryrouters.arcdata.microsoft.com
   resources:
   - customresourcedefinitions
   verbs:

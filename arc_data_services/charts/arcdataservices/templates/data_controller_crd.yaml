@@ -1,0 +1,97 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: datacontrollers.arcdata.microsoft.com
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  annotations:
+    helm.sh/resource-policy: "keep"
+spec:
+  group: arcdata.microsoft.com
+  versions:
+  - name: v1beta1
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: .status.state
+  - name: v1
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: .status.state
+  - name: v2
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: .status.state
+  - name: v3
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: .status.state
+  - name: v4
+    served: true
+    storage: false
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: .status.state
+  - name: v5
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
+    subresources:
+      status: {}
+    additionalPrinterColumns:
+    - name: State
+      type: string
+      jsonPath: .status.state
+  conversion:
+    strategy: None
+  names:
+    kind: DataController
+    plural: datacontrollers
+    shortNames:
+    - arcdc
+  scope: Namespaced
