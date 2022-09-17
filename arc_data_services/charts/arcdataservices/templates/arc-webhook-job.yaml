@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app.kubernetes.io/name: arc-webhook-job
+  name: {{- include "webhookjob.name" . }}
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+      - command:
+        - /opt/webhook/bin/deploy_webhook
+        - --namespace
+        - {{ .Release.Namespace }}
+        image: {{ .Values.systemDefaultValues.image }}
+        imagePullPolicy: {{ .Values.systemDefaultValues.imagePullPolicy }}
+        name: bootstrapper
+      imagePullSecrets:
+      - name: {{ .Values.systemDefaultValues.imagePullSecret }}
+      restartPolicy: Never
+      serviceAccountName: sa-arc-webhook-job
