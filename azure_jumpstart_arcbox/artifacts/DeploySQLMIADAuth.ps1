@@ -55,11 +55,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'capi-sql'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{instanceName = 'capi-sql'; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{instanceName = 'aks-sql'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{instanceName = 'aks-sql'; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = 'arcbox-aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 $sqlmiouName = "ArcSQLMI"
@@ -188,7 +188,7 @@ foreach ($sqlInstance in $sqlInstances) {
     # Storage
     $StorageClassName = $sqlInstance.storageClassName
     $dataStorageSize = "30"
-    $logsStorageSize = "10"
+    $logsStorageSize = "30"
     $dataLogsStorageSize = "30"
     $backupsStorageSize = "30"
 
@@ -262,6 +262,7 @@ foreach ($sqlInstance in $sqlInstances) {
 
     # Retrieving SQL MI connection endpoint
     $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
+    $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.secondary}'
 
     Remove-Item $keytab_file -Force
     write-host "`n"
@@ -274,6 +275,9 @@ foreach ($sqlInstance in $sqlInstances) {
 
     Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
     $sqlmiEndPoint | Add-Content $Endpoints
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "$sqlMIName secondary external endpoint DNS name for AD Authentication:"
+    $sqlmiSecondaryEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
     Add-Content $Endpoints "SQL Managed Instance username:"
@@ -376,6 +380,21 @@ Write-Header "Creating SQLMI Endpoints file Desktop shortcut"
 Write-Host "`n"
 $TargetFile = $Endpoints
 $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQLMI Endpoints.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+
+# Unzip SqlQueryStress
+Expand-Archive -Path $Env:ArcBoxDir\SqlQueryStress.zip -DestinationPath $Env:ArcBoxDir\SqlQueryStress
+
+# Create SQLQueryStress desktop shortcut
+Write-Host "`n"
+Write-Host "Creating SQLQueryStress Desktop shortcut"
+Write-Host "`n"
+$TargetFile = "$Env:ArcBoxDir\SqlQueryStress\SqlQueryStress.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\SqlQueryStress.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
