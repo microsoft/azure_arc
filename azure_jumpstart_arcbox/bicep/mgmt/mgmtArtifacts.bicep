@@ -121,7 +121,7 @@ var dataOpsSubnets = [
   }
 ]
 
-resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
   name: virtualNetworkName
   location: location
   properties: {
@@ -137,7 +137,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
+resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
   name: drVirtualNetworkName
   location: location
   properties: {
@@ -163,7 +163,7 @@ resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = {
   }
 }
 
-resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-08-01' = if (flavor == 'DataOps') {
+resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-01-01' = if (flavor == 'DataOps') {
   parent: arcVirtualNetwork
   name: 'peering-to-DR-vnet'
   properties: {
@@ -177,7 +177,7 @@ resource virtualNetworkName_peering_to_DR_vnet 'Microsoft.Network/virtualNetwork
   }
 }
 
-resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-08-01' = if (flavor == 'DataOps') {
+resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2022-01-01' = if (flavor == 'DataOps') {
   parent: drVirtualNetwork
   name: 'peering-to-primary-vnet'
   properties: {
@@ -191,7 +191,7 @@ resource drVirtualNetworkName_peering_to_primary_vnet 'Microsoft.Network/virtual
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = {
   name: networkSecurityGroupName
   location: location
   properties: {
@@ -330,7 +330,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-03-0
   }
 }
 
-resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-05-01' = if (deployBastion == true) {
+resource bastionNetworkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-01' = if (deployBastion == true) {
   name: bastionNetworkSecurityGroupName
   location: location
   properties: {
@@ -542,7 +542,7 @@ resource workspaceAutomation 'Microsoft.OperationalInsights/workspaces/linkedSer
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (deployBastion == true) {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2022-01-01' = if (deployBastion == true) {
   name: bastionPublicIpAddressName
   location: location
   properties: {
@@ -555,7 +555,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (
   }
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2021-05-01' = if (deployBastion == true) {
+resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = if (deployBastion == true) {
   name: bastionName
   location: location
   properties: {
