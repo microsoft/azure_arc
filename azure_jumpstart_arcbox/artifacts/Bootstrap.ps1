@@ -300,11 +300,6 @@ if ($flavor -eq "DataOps") {
     Add-Computer -DomainName $Env:addsDomainName -LocalCredential $localCred -Credential $domainCred
     Write-Host "Joined Client VM to $addsDomainName domain."
 
-    # Creating scheduled task for MonitorWorkbookLogonScript.ps1
-    $Trigger = New-ScheduledTaskTrigger -AtLogOn
-    $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
-    Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
-
     # Disabling Windows Server Manager Scheduled Task
     Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask
 

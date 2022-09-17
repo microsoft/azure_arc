@@ -29,10 +29,16 @@ $cimsession = New-CimSession -Credential $adminCredential
 # Creating scheduled task for DataServicesLogonScript.ps1
 $Trigger = New-ScheduledTaskTrigger -AtLogOn -User $adminuser
 $Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\DataOpsLogonScript.ps1"
+$WorkbookAction = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "$Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1"
 
 # Register schedule task under local account
 Register-ScheduledTask -TaskName "DataOpsLogonScript" -Trigger $Trigger -Action $Action -RunLevel "Highest" -CimSession $cimsession -Force
 Write-Host "Registered scheduled task 'DataOpsLogonScript' to run at user logon."
+
+# Creating scheduled task for MonitorWorkbookLogonScript.ps1
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
+Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -Action $WorkbookAction -RunLevel "Highest" -CimSession $cimsession -Force
+
 
 # Delete schedule task
 schtasks.exe /delete /f /tn RunAfterClientVMADJoin
