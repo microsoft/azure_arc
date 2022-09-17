@@ -262,6 +262,7 @@ foreach ($sqlInstance in $sqlInstances) {
 
     # Retrieving SQL MI connection endpoint
     $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
+    $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.secondary}'
 
     Remove-Item $keytab_file -Force
     write-host "`n"
@@ -274,6 +275,9 @@ foreach ($sqlInstance in $sqlInstances) {
 
     Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
     $sqlmiEndPoint | Add-Content $Endpoints
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "$sqlMIName secondary external endpoint DNS name for AD Authentication:"
+    $sqlmiSecondaryEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
     Add-Content $Endpoints "SQL Managed Instance username:"
