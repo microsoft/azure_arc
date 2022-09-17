@@ -36,7 +36,7 @@ variable "windows_OS_version" {
 variable "vm_size" {
   type        = string
   description = "The size of the VM."
-  default     = "Standard_D2s_v4"
+  default     = "Standard_B2ms"
 }
 
 variable "deploy_bastion" {
