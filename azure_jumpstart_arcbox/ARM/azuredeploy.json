@@ -93,6 +93,13 @@
         "description": "Active directory domain services domain name"
       },
       "defaultValue": "jumpstart.local"
+    },
+    "guid":{
+      "type": "string",
+      "metadata": {
+        "description": "Random GUID for cluster names"
+      },
+      "defaultValue": "[substring(newGuid(),0,4)]"
     }
   },
   "variables": {
@@ -103,7 +110,11 @@
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
     "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]",
     "addsVMTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/addsVm.json')]",
-    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/aks.json')]"
+    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/aks.json')]",
+    "capiArcDataClusterName": "[concat('ArcBox-CAPI-Data','-',parameters('guid'))]",
+    "k3sArcDataClusterName": "[concat('ArcBox-K3s','-',parameters('guid'))]",
+    "aksArcDataClusterName": "[concat('ArcBox-AKS-Data','-',parameters('guid'))]",
+    "aksDrArcDataClusterName": "[concat('ArcBox-AKS-DR-Data','-',parameters('guid'))]"
   },
   "resources": [
     {
@@ -149,6 +160,9 @@
           },
           "flavor": {
             "value": "[parameters('flavor')]"
+          },
+          "capiArcDataClusterName" : {
+            "value": "[variables('capiArcDataClusterName')]"
           }
         }
       }
@@ -192,6 +206,9 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
+          },
+          "vmName":{
+            "value": "[variables('k3sArcDataClusterName')]"
           }
         }
       }
@@ -243,6 +260,18 @@
           },
           "githubUser": {
             "value": "[parameters('githubUser')]"
+          },
+          "capiArcDataClusterName": {
+            "value": "[variables('capiArcDataClusterName')]"
+          },
+          "k3sArcClusterName": {
+            "value": "[variables('k3sArcDataClusterName')]"
+          },
+          "aksArcClusterName": {
+            "value": "[variables('aksArcDataClusterName')]"
+          },
+          "aksdrArcClusterName": {
+            "value": "[variables('aksDrArcDataClusterName')]"
           }
         }
       }
@@ -323,7 +352,7 @@
       "apiVersion": "2021-04-01",
       "name": "updateVNetDNSServers",
       "condition": "[equals(parameters('flavor'),'DataOps')]",
-      "dependsOn": ["mgmtArtifactsAndPolicyDeployment", "addsVmDeployment"],
+      "dependsOn": [ "mgmtArtifactsAndPolicyDeployment", "addsVmDeployment" ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -344,7 +373,7 @@
             "value": "[parameters('deployBastion')]"
           },
           "dnsServers": {
-            "value": ["10.16.2.100","168.63.129.16"]
+            "value": [ "10.16.2.100", "168.63.129.16" ]
           }
         }
       }
@@ -374,6 +403,12 @@
           },
           "spnClientSecret": {
             "value": "[parameters('spnClientSecret')]"
+          },
+          "aksClusterName" : {
+            "value": "[variables('aksArcDataClusterName')]"
+          },
+          "drClusterName":{
+            "value": "[variables('aksDrArcDataClusterName')]"
           }
         }
       }
