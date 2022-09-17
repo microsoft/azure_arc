@@ -32,6 +32,9 @@ foreach ($cluster in @('capi', 'aks-dr')) {
     helm install dataops-ingress nginx-stable/nginx-ingress
 }
 
+# Switch kubectl context to capi
+kubectx $sqlInstance
+
 Write-Header "Adding CName Record for App"
 $dcInfo = Get-ADDomainController
 Do
@@ -42,8 +45,6 @@ Do
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
 Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
 
-# Switch kubectl context to capi
-kubectx $sqlInstance
 # Deploy the App and service
 $appCAPI = @"
 apiVersion: apps/v1
