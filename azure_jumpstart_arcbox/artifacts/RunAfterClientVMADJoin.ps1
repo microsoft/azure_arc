@@ -36,9 +36,8 @@ Register-ScheduledTask -TaskName "DataOpsLogonScript" -Trigger $Trigger -Action 
 Write-Host "Registered scheduled task 'DataOpsLogonScript' to run at user logon."
 
 # Creating scheduled task for MonitorWorkbookLogonScript.ps1
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:ArcBoxDir\MonitorWorkbookLogonScript.ps1
 Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -Action $WorkbookAction -RunLevel "Highest" -CimSession $cimsession -Force
-
+Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript' to run at user logon."
 
 # Delete schedule task
 schtasks.exe /delete /f /tn RunAfterClientVMADJoin
