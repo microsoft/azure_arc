@@ -5,28 +5,16 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
 
 ### To be removed ###
-$guid= get-random -Minimum 1000 -Maximum 3000
+#$guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
 
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName+$guid ; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName+$guid ; dataController = 'arcbox-aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
-### To be removed ###
-
-
-<#$clusters = @(
-
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
-
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
-
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aksdr-dc'; customLocation = 'arcbox-aksdr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
-
-)#>
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
 
@@ -231,6 +219,7 @@ azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "$Env:ArcBoxLogsDir\
 #az network vnet update -g $Env:resourceGroup -n "arcbox-capi-data-vnet" --dns-servers 10.16.2.100
 
 #VNet peering with CAPI vnet
+$capiVnetName = $clusters[0].clusterName + '-vnet'
 $dcVnetId = $(az network vnet show `
         --resource-group $Env:resourceGroup `
         --name "ArcBox-VNet" `
@@ -238,7 +227,7 @@ $dcVnetId = $(az network vnet show `
 
 $capiVnetId = $(az network vnet show `
         --resource-group $Env:resourceGroup `
-        --name "arcbox-capi-data-vnet" `
+        --name $capiVnetName `
         --query id --out tsv)
 
 az network vnet peering create --name "dcVnet-CapiVnet" `
@@ -249,10 +238,9 @@ az network vnet peering create --name "dcVnet-CapiVnet" `
 
 az network vnet peering create --name "CapiVnet-dcVnet" `
     --resource-group $Env:resourceGroup `
-    --vnet-name "arcbox-capi-data-vnet" `
+    --vnet-name $capiVnetName `
     --remote-vnet $dcVnetId `
     --allow-vnet-access
-#az vm restart --no-wait --ids $(az vm list -g $Env:resourceGroup --query "[?contains(name, 'capi')].id" -o tsv)
 
 Start-Sleep -Seconds 10
 

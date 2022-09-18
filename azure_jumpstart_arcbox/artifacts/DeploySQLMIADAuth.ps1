@@ -55,11 +55,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'capi-sql'; dataController = 'arcbox-capi-dc'; customLocation = 'arcbox-capi-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{instanceName = 'capi-sql'; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{instanceName = 'aks-sql'; dataController = 'arcbox-aks-dc'; customLocation = 'arcbox-aks-cl' ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{instanceName = 'aks-sql'; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = 'arcbox-aks-dr-dc'; customLocation = 'arcbox-aks-dr-cl' ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 $sqlmiouName = "ArcSQLMI"
@@ -124,7 +124,7 @@ foreach ($sqlInstance in $sqlInstances) {
     # Geneate key tab
     setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
     setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
-    $keytab_file = "$Env:ArcBoxDir\mssql.keytab"
+    $keytab_file = "$Env:ArcBoxDir\$sqlMIName.keytab"
     ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /out $keytab_file -setpass -setupn /pass $arcsapass
     ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
     ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
@@ -188,7 +188,7 @@ foreach ($sqlInstance in $sqlInstances) {
     # Storage
     $StorageClassName = $sqlInstance.storageClassName
     $dataStorageSize = "30"
-    $logsStorageSize = "10"
+    $logsStorageSize = "30"
     $dataLogsStorageSize = "30"
     $backupsStorageSize = "30"
 
@@ -198,8 +198,8 @@ foreach ($sqlInstance in $sqlInstances) {
 
 
 
-    Copy-Item "$Env:ArcBoxDir\SQLMI.parameters.json" -Destination "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
-    $SQLParams = "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+    Copy-Item "$Env:ArcBoxDir\sqlmiAD.parameters.json" -Destination "$Env:ArcBoxDir\sqlmiAD-stage.parameters.json"
+    $SQLParams = "$Env:ArcBoxDir\sqlmiAD-stage.parameters.json"
 
 (Get-Content -Path $SQLParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataControllerId-stage', $dataControllerId | Set-Content -Path $SQLParams
@@ -228,7 +228,7 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $SQLParams) -replace 'port-stage' , $sqlmi_port | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'licenseType-stage' , $sqlInstance.licenseType | Set-Content -Path $SQLParams
 
-    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI-stage.parameters.json"
+    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\sqlmiAD.json" --parameters "$Env:ArcBoxDir\sqlmiAD-stage.parameters.json"
     Write-Host "`n"
 
     Do {
@@ -239,15 +239,7 @@ foreach ($sqlInstance in $sqlInstances) {
     Write-Host "Azure Arc SQL Managed Instance is ready!"
     Write-Host "`n"
 
-    Remove-Item "$Env:ArcBoxDir\SQLMI-stage.parameters.json" -Force
-
-    <#
-    #Update Service Port from 1433 to Non-Standard on primary cluster
-    $payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433},{\"name\":\"port-mssql-mirroring\",\"port\":5022,\"targetPort\":5022}]}}'
-    kubectl patch svc "$sqlMIName-external-svc" -n arc --type merge --patch $payload
-    kubectl patch svc "$sqlMIName-secondary-external-svc" -n arc --type merge --patch $payload
-    Start-Sleep -Seconds 5 # To allow the CRD to update 
-    #>
+    Remove-Item "$Env:ArcBoxDir\sqlmiAD-stage.parameters.json" -Force
 
     # Create windows account in SQLMI to support AD authentication and grant sysadmin role
     $podname = "${sqlMIName}-0"
@@ -270,8 +262,7 @@ foreach ($sqlInstance in $sqlInstances) {
 
     # Retrieving SQL MI connection endpoint
     $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.primary}'
-
-    Remove-Item $keytab_file -Force
+    $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc -o=jsonpath='{.status.endpoints.secondary}'
     write-host "`n"
     
     # Get public ip of the SQLMI endpoint
@@ -282,6 +273,9 @@ foreach ($sqlInstance in $sqlInstances) {
 
     Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
     $sqlmiEndPoint | Add-Content $Endpoints
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "$sqlMIName secondary external endpoint DNS name for AD Authentication:"
+    $sqlmiSecondaryEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
     Add-Content $Endpoints "SQL Managed Instance username:"
@@ -384,6 +378,21 @@ Write-Header "Creating SQLMI Endpoints file Desktop shortcut"
 Write-Host "`n"
 $TargetFile = $Endpoints
 $ShortcutFile = "C:\Users\$env:adminUsername\Desktop\SQLMI Endpoints.lnk"
+$WScriptShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
+$Shortcut.TargetPath = $TargetFile
+$Shortcut.Save()
+
+
+# Unzip SqlQueryStress
+Expand-Archive -Path $Env:ArcBoxDir\SqlQueryStress.zip -DestinationPath $Env:ArcBoxDir\SqlQueryStress
+
+# Create SQLQueryStress desktop shortcut
+Write-Host "`n"
+Write-Host "Creating SQLQueryStress Desktop shortcut"
+Write-Host "`n"
+$TargetFile = "$Env:ArcBoxDir\SqlQueryStress\SqlQueryStress.exe"
+$ShortcutFile = "C:\Users\$Env:adminUsername\Desktop\SqlQueryStress.lnk"
 $WScriptShell = New-Object -ComObject WScript.Shell
 $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
 $Shortcut.TargetPath = $TargetFile
