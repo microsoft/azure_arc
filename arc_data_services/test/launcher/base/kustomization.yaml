@@ -1,0 +1,13 @@
+resources:
+  - launcher.yaml
+
+secretGenerator:
+- name: test-env
+  namespace: arc-ci-launcher
+  files:
+  - configs/.test.env
+
+images:
+- name: arc-ci-launcher
+  newName: mcr.microsoft.com/arcdata/arc-ci-launcher
+  newTag: v1.11.0_2022-09-13

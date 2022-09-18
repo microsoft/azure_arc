@@ -176,8 +176,6 @@ module "management_artifacts" {
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
   deployment_flavor    = var.deployment_flavor
-  dns_servers          = []
-
   depends_on = [azurerm_resource_group.rg]
 }
 

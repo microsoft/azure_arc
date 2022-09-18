@@ -36,7 +36,7 @@ variable "windows_OS_version" {
 variable "vm_size" {
   type        = string
   description = "The size of the VM."
-  default     = "Standard_D2s_v4"
+  default     = "Standard_B2ms"
 }
 
 variable "deploy_bastion" {
@@ -100,7 +100,8 @@ resource "azurerm_network_interface" "nic" {
   ip_configuration {
     name                          = "ipconfig1"
     subnet_id                     = data.azurerm_subnet.subnet.id
-    private_ip_address_allocation = "Dynamic"
+    private_ip_address_allocation = "Static"
+    private_ip_address            = local.adds_private_ip_address
     public_ip_address_id          = var.deploy_bastion == false ? azurerm_public_ip.pip[0].id : null
   }
 }

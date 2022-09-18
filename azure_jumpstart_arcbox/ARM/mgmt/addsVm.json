@@ -48,7 +48,7 @@
     },
     "vmSize": {
       "type": "string",
-      "defaultValue": "Standard_D2s_v4",
+      "defaultValue": "Standard_B2ms",
       "metadata": {
         "description": "The size of the VM"
       }
@@ -87,7 +87,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/networkInterfaces",
-      "apiVersion": "2021-08-01",
+      "apiVersion": "2022-01-01",
       "name": "[variables('networkInterfaceName')]",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
@@ -111,7 +111,7 @@
     },
     {
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2021-03-01",
+            "apiVersion": "2022-01-01",
             "name": "[variables('publicIpAddressName')]",
             "condition": "[not(parameters('deployBastion'))]",
             "location": "[parameters('azureLocation')]",
@@ -127,7 +127,7 @@
         },
     {
       "type": "Microsoft.Compute/virtualMachines",
-      "apiVersion": "2021-11-01",
+      "apiVersion": "2022-03-01",
       "name": "[variables('vmName')]",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
@@ -175,7 +175,7 @@
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(variables('vmName'),'/DeployADDS')]",
-      "apiVersion": "2021-11-01",
+      "apiVersion": "2022-03-01",
       "location": "[parameters('azureLocation')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
