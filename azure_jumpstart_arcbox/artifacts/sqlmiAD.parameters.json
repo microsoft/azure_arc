@@ -88,6 +88,9 @@
         "dnsName": {
             "value": "dnsName-stage"
         },
+        "dnsNameSecondary":{
+            "value": "dnsNameSecondary-stage"
+        },
         "port": {
             "value": port-stage
         }

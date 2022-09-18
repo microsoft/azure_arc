@@ -93,6 +93,7 @@ foreach ($sqlInstance in $sqlInstances) {
     kubectx $sqlInstance.context
     $sqlMIName = $sqlInstance.instanceName
     $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
+    $sqlmi_secondary_fqdn_name = = $sqlMIName + "-secondary." + $dcInfo.domain
 
     # Create dedicated service account for AD connector
     $arcsaname = "sa-$sqlMIName"
@@ -225,6 +226,7 @@ foreach ($sqlInstance in $sqlInstances) {
 (Get-Content -Path $SQLParams) -replace 'adAccountName-stage' , $arcsaname | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'adConnectorName-stage' , "adarc" | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dnsName-stage' , $sqlmi_fqdn_name | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'dnsNameSecondary-stage' , $sqlmi_secondary_fqdn_name | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'port-stage' , $sqlmi_port | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'licenseType-stage' , $sqlInstance.licenseType | Set-Content -Path $SQLParams
 
@@ -269,6 +271,10 @@ foreach ($sqlInstance in $sqlInstances) {
     $sqlmiIpaddress = kubectl get svc -n arc "$sqlMIName-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
 
+    # Get public ip of the secondary SQLMI endpoint
+    $sqlmiSecondaryIpaddress = kubectl get svc -n arc "$sqlMIName-secondary-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+    Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
+ 
     # Write endpoint information in the file
 
     Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
