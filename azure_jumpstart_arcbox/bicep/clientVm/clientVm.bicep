@@ -102,7 +102,7 @@ var PublicIPNoBastion = {
   id: publicIpAddress.id
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: networkInterfaceName
   location: location
   properties: {
@@ -121,7 +121,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-03-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (deployBastion == false) {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (deployBastion == false) {
   name: publicIpAddressName
   location: location
   properties: {
