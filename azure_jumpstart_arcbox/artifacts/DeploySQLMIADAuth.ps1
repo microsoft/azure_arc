@@ -93,7 +93,7 @@ foreach ($sqlInstance in $sqlInstances) {
     kubectx $sqlInstance.context
     $sqlMIName = $sqlInstance.instanceName
     $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
-    $sqlmi_secondary_fqdn_name = = $sqlMIName + "-secondary." + $dcInfo.domain
+    $sqlmi_secondary_fqdn_name = $sqlMIName + "-secondary." + $dcInfo.domain
 
     # Create dedicated service account for AD connector
     $arcsaname = "sa-$sqlMIName"
