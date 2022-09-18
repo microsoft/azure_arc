@@ -3,7 +3,6 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-
 ### To be removed ###
 #$guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
@@ -361,6 +360,10 @@ foreach ($cluster in $clusters) {
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
 & "$Env:ArcBoxDir\DeploySQLMIADAuth.ps1"
+
+Write-Header "Deploying App"
+# Deploy App
+& "$Env:ArcBoxDir\DataOpsAppScript.ps1"
 
 # Enabling data controller auto metrics & logs upload to log analytics
 foreach ($cluster in $clusters) {
