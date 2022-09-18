@@ -1,0 +1,4 @@
+systemDefaultValues:
+  image: mcr.microsoft.com/arcdata/arc-bootstrapper:v1.11.0_2022-09-13
+  imagePullPolicy: Always
+  imagePullSecret: arc-private-registry
