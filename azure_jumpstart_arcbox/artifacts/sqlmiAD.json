@@ -106,6 +106,10 @@
       "type": "string",
       "defaultValue": ""
     },
+    "dnsNameSecondary": {
+      "type": "string",
+      "defaultValue": ""
+    },
     "port": {
       "type": "int"
     }
@@ -151,6 +155,7 @@
               },
               "readableSecondaries": {
                 "type": "[parameters('readableSecondaries')]",
+                "dnsName": "[parameters('dnsNameSecondary')]",
                 "port": "[parameters('port')]"
               }
             },
