@@ -1,8 +1,12 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
-$connectedClusterName=$Env:capiArcDataClusterName
-
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataServicesLogonScript.log
+
+# Required for azcopy and Get-AzResource
+Write-Header "Az PowerShell Login"
+$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".data" -ItemType Directory
 
@@ -13,13 +17,10 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
-Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+$connectedClusterName=(Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType microsoft.kubernetes/connectedclusters).Name | Select-String "CAPI" | Where-Object { $_ -ne "" }
+$connectedClusterName=$connectedClusterName -replace "`n",""
 
-# Required for azcopy
-Write-Header "Az PowerShell Login"
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
@@ -114,15 +115,16 @@ Write-Host "`n"
 
 # Configuring Azure Arc Custom Location on the cluster 
 Write-Header "Configuring Azure Arc Custom Location"
+$customlocationName = "arcbox-cl" + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
 $connectedClusterId = az connectedk8s show --name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
 Start-Sleep -Seconds 20
-az customlocation create --name 'arcbox-cl' --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
+az customlocation create --name $customlocationName --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
 
 # Deploying Azure Arc Data Controller
 Write-Header "Deploying Azure Arc Data Controller"
 
-$customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name $customlocationName --resource-group $Env:resourceGroup --query id -o tsv)
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
