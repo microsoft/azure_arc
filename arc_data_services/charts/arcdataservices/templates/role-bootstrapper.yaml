@@ -1,0 +1,152 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: role-bootstrapper
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - persistentvolumeclaims
+  - secrets
+  verbs:
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - events
+  - persistentvolumeclaims
+  - secrets
+  - serviceaccounts
+  - services
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - replicasets
+  - statefulsets
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  - rolebindings
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+- apiGroups:
+  - arcdata.microsoft.com
+  resources:
+  - monitors
+  - otelcollectors
+  - telemetryrouters
+  - kafkas
+  verbs:
+  - create
+  - patch
+  - update
+- apiGroups:
+  - sql.arcdata.microsoft.com
+  - tasks.sql.arcdata.microsoft.com
+  - tasks.arcdata.microsoft.com
+  - arcdata.microsoft.com
+  resources:
+  - activedirectoryconnectors
+  - datacontrollers
+  - exporttasks
+  - kafkas
+  - monitors
+  - otelcollectors
+  - telemetryrouters
+  - postgresqls
+  - sqlmanagedinstances
+  - sqlmanagedinstancerestoretasks
+  - sqlmanagedinstancereprovisionreplicatasks
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - sql.arcdata.microsoft.com
+  - tasks.sql.arcdata.microsoft.com
+  - tasks.arcdata.microsoft.com
+  - arcdata.microsoft.com
+  resources:
+  - activedirectoryconnectors/status
+  - datacontrollers/status
+  - exporttasks/status
+  - kafkas/status
+  - monitors/status
+  - otelcollectors/status
+  - telemetryrouters/status
+  - postgresqls/status
+  - sqlmanagedinstances/status
+  - sqlmanagedinstancerestoretasks/status
+  - sqlmanagedinstancereprovisionreplicatasks/status
+  verbs:
+  - patch
+  - update
+- apiGroups:
+  - sql.arcdata.microsoft.com
+  resources:
+  - failovergroups
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - sql.arcdata.microsoft.com
+  resources:
+  - failovergroups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - clusterconfig.azure.com
+  resources:
+  - azureclusteridentityrequests
+  verbs:
+  - create
+  - delete
+  - get
+- apiGroups:
+  - clusterconfig.azure.com
+  resources:
+  - azureclusteridentityrequests/status
+  verbs:
+  - patch
+  - update

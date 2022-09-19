@@ -83,28 +83,7 @@
       "type": "String"
     },
     "licenseType": {
-      "type": "String",
-      "defaultValue": "LicenseIncluded"
-    },
-    "keyTab": {
-      "type": "String",
-      "defaultValue": ""
-    },
-    "sqlInstanceName": {
-      "type": "string",
-      "defaultValue": "jumpstart-sql"
-    },
-    "adAccountName": {
-      "type": "string",
-      "defaultValue": ""
-    },
-    "adConnectorName": {
-      "type": "string",
-      "defaultValue": ""
-    },
-    "dnsName": {
-      "type": "string",
-      "defaultValue": ""
+      "type": "String"
     },
     "port": {
       "type": "int"
@@ -116,7 +95,7 @@
     {
       "type": "Microsoft.AzureArcData/sqlManagedInstances",
       "apiVersion": "[parameters('apiVersion')]",
-      "name": "[parameters('sqlInstanceName')]",
+      "name": "jumpstart-sql",
       "location": "[parameters('location')]",
       "extendedLocation": {
         "type": "CustomLocation",
@@ -128,11 +107,6 @@
         "tier": "[parameters('pricingTier')]"
       },
       "properties": {
-        "activeDirectoryInformation": {
-          "keytabInformation": {
-            "keytab": "[parameters('keyTab')]"
-          }
-        },
         "admin": "[parameters('admin')]",
         "basicLoginInformation": {
           "username": "[parameters('admin')]",
@@ -145,9 +119,7 @@
             "services": {
               "primary": {
                 "type": "[parameters('serviceType')]",
-                "dnsName": "[parameters('dnsName')]",
                 "port": "[parameters('port')]"
-
               },
               "readableSecondaries": {
                 "type": "[parameters('readableSecondaries')]",
@@ -193,15 +165,6 @@
                     "size": "[parameters('dataLogsStorageSize')]"
                   }
                 ]
-              }
-            },
-            "security": {
-              "activeDirectory": {
-                "accountName": "[parameters('adAccountName')]",
-                "connector": {
-                  "name": "[parameters('adConnectorName')]",
-                  "namespace": "arc"
-                }
               }
             },
             "settings": {
