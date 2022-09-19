@@ -118,7 +118,8 @@
             "dev": true,
             "services": {
               "primary": {
-                "type": "[parameters('serviceType')]"
+                "type": "[parameters('serviceType')]",
+                "port": "11443"
               },
               "readableSecondaries": {
                 "type": "[parameters('readableSecondaries')]"

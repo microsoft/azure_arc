@@ -202,7 +202,7 @@ Do {
     } while ($sqlmiStatus -eq "Nope")
 
 Write-Host "`n"
-Write-Host "Azure Arc SQL Managed Instance with AD authentication is ready!"
+Write-Host "Azure Arc-enabled SQL Managed Instance with AD authentication is ready!"
 Write-Host "`n"
 
 # Create windows account in SQLMI to support AD authentication and grant sysadmin role
