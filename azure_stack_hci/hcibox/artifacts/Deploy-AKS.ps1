@@ -69,7 +69,7 @@ for($i = 0; $i -lt $prefixLen; $i++)
 {
     $namingPrefix += [char]$rand.Next(97,122)
 }
-$clusterName = $SDNConfig.AKSworkloadClusterName + $namingPrefix
+$clusterName = $SDNConfig.AKSworkloadClusterName + "-" + $namingPrefix
 [System.Environment]::SetEnvironmentVariable('AKSClusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
 
 # Install AksHci - only need to perform the following on one of the nodes
