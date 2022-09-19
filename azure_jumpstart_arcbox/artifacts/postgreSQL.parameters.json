@@ -39,7 +39,7 @@
             "value": "coordinatorMemoryLimit-stage"
         },
         "postgresEngineVersion": {
-            "value": 12
+            "value": 14
         },
         "dataStorageSize": {
             "value": "dataSize-stage"
@@ -66,13 +66,6 @@
         },
         "numWorkers": {
             "value": numWorkersStage
-        },
-        "extensions": {
-            "value": [
-                {
-                    "name": "citus"
-                }
-            ]
         },
         "apiVersion": {
             "value": "2022-03-01-preview"
