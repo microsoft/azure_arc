@@ -38,6 +38,7 @@ function BITSRequest {
         Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
     }
     Complete-BitsTransfer $download.JobId
+    Write-Progress -Activity "Downloading File $filename..." -Status "Ready" -Completed
     $ProgressPreference = "SilentlyContinue"
 }
 
@@ -2797,7 +2798,7 @@ $ProgressPreference = 'SilentlyContinue'
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
 BITSRequest -Params @{'Uri'='https://aka.ms/AAhnqvc'; 'Filename'="$env:HCIBoxVHDDir\AZSHCI.vhdx" }
 BITSRequest -Params @{'Uri'='https://aka.ms/AAhnj5y'; 'Filename'="$env:HCIBoxVHDDir\GUI.vhdx"}
-BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'OutFile'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
+BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'Filename'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
 Expand-Archive -Path $env:HCIBoxVHDDir\Ubuntu.vhdx.zip -DestinationPath $env:HCIBoxVHDDir
 Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination $env:HCIBoxVHDDir\Ubuntu.vhdx
 
