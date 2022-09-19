@@ -291,16 +291,17 @@ foreach ($sqlInstance in $sqlInstances) {
 
     Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
     $sqlmiEndPoint | Add-Content $Endpoints
+
     Add-Content $Endpoints ""
     Add-Content $Endpoints "$sqlMIName secondary external endpoint DNS name for AD Authentication:"
     $sqlmiSecondaryEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
-    Add-Content $Endpoints "SQL Managed Instance username:"
+    Add-Content $Endpoints "SQL Managed Instance SQL login username:"
     $env:AZDATA_USERNAME | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
-    Add-Content $Endpoints "SQL Managed Instance password:"
+    Add-Content $Endpoints "SQL Managed Instance SQL login password:"
     $env:AZDATA_PASSWORD | Add-Content $Endpoints
     Add-Content $Endpoints ""
 }
