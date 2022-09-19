@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: dbconnecttest
-        image: arcjumpstart.azurecr.io/databaseconnectiontest
+        image: azurearcjumpstart.azurecr.io/databaseconnectiontest
         volumeMounts:
         - name: secrets
           mountPath: /app/secrets
@@ -33,12 +33,17 @@ spec:
       volumes:
       - name: secrets
         secret:
-          secretName: $sqlInstance-login-secret
+          secretName: $sqlInstance-sql-login-secret
 
 "@
 Write-Header "Deploying DB Connect Test App"
 $appCAPI | kubectl apply -n $appNamespace -f -
 
+Do {
+  Write-Host "Waiting for App pod, hold tight..."
+  Start-Sleep -Seconds 5
+  $podStatus = $(if(kubectl get pods -n $appNamespace | Select-String "dbconnecttest-app" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+} while ($podStatus -eq "Nope")
 
 # Stop transcript
 Stop-Transcript
