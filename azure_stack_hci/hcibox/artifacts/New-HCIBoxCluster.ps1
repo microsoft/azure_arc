@@ -2225,7 +2225,7 @@ namespace Win32{
     } 
 '@
 
-            Write-Header "Changing Wallpaper"
+            Write-Verbose "Changing Wallpaper"
             $imgPath="C:\VHDs\wallpaper.png"
             Add-Type $code 
             [Win32.Wallpaper]::SetWallpaper($imgPath)
