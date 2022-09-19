@@ -35,7 +35,7 @@ function BITSRequest {
     $ProgressPreference = "Continue"
     while ($download.JobState -ne "Transferred") {
         [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
-        Write-Progress -Activity "Downloading File..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
+        Write-Progress -Activity "Downloading File $filename..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
     }
     Complete-BitsTransfer $download.JobId
     $ProgressPreference = "SilentlyContinue"
