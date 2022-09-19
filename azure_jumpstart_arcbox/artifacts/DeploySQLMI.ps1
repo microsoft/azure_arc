@@ -12,9 +12,8 @@ Write-Host "`n"
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
-$customLocationName = (Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType Microsoft.ExtendedLocation/customLocations).Name
 $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
-$customLocationId = $(az customlocation show --name $customlocationName --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name "$Env:capiArcDataClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 
 ################################################
 # Localize ARM template
@@ -33,7 +32,6 @@ $StorageClassName = "managed-premium"
 $dataStorageSize = "5"
 $logsStorageSize = "5"
 $dataLogsStorageSize = "5"
-$backupsStorageSize = "30"
 
 # High Availability
 $replicas = 3 # Deploy SQL MI "Business Critical" tier
