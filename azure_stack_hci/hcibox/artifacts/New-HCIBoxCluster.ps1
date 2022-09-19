@@ -24,43 +24,23 @@ $Env:VMPath = "C:\VMs"
 
 #region functions
 
-function Invoke-Request {
+function BITSRequest {
     Param(
         [Parameter(Mandatory=$True)]
-        [hashtable]$Params,
-        [int]$Retries = 1,
-        [int]$SecondsDelay = 2
+        [hashtable]$Params
     )
-
-    $Params.Add('UserAgent', 'SomeThingDistinguishableForTheLogs')
     $url = $Params['Uri']
-    $cmd = { Invoke-WebRequest @Params }
-    $retryCount = 0
-    $completed = $false
-    $response = $null
-
-    while (-not $completed) {
-        try {
-            $response = Invoke-Command $cmd -ArgumentList $Params
-            $completed = $true
-        } catch {
-            New-Item -ItemType Directory -Force -Path $Env:HCIBoxLogsDir
-            "$(Get-Date -Format G): Request to $url failed. $_" | Out-File -FilePath "$Env:HCIBoxLogsDir\Downloads.log" -Encoding utf8 -Append
-            if ($retrycount -ge $Retries) {
-                Write-Warning "Request to $url failed the maximum number of $retryCount times."
-                throw
-            } else {
-                Write-Warning "Request to $url failed. Retrying in $SecondsDelay seconds."
-                Start-Sleep $SecondsDelay
-                $retrycount++
-            }
-        }
+    $filename = $Params['Filename']
+    $download = Start-BitsTransfer -Source $url -Destination $filename -Asynchronous
+    $ProgressPreference = "Continue"
+    while ($download.JobState -ne "Transferred") {
+        [int] $dlProgress = ($download.BytesTransferred / $download.BytesTotal) * 100;
+        Write-Progress -Activity "Downloading File..." -Status "$dlProgress% Complete:" -PercentComplete $dlProgress; 
     }
-
-    Write-Host "OK ($($response.StatusCode))"
-    return $response
+    Complete-BitsTransfer $download.JobId
+    $ProgressPreference = "SilentlyContinue"
 }
-    
+
 function Set-LocalHyperVSettings {
     Param (
 
@@ -2815,9 +2795,9 @@ $ProgressPreference = 'SilentlyContinue'
 
 # Download HCIBox VHDs
 Write-Verbose "Downloading HCIBox VHDs. This will take a while..."
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnqvc'; 'OutFile'="$env:HCIBoxVHDDir\AZSHCI.vhdx"}
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://aka.ms/AAhnj5y'; 'OutFile'="$env:HCIBoxVHDDir\GUI.vhdx"}
-Invoke-Request -Params @{ 'Method'='GET'; 'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'OutFile'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
+BITSRequest -Params @{'Uri'='https://aka.ms/AAhnqvc'; 'Filename'="$env:HCIBoxVHDDir\AZSHCI.vhdx" }
+BITSRequest -Params @{'Uri'='https://aka.ms/AAhnj5y'; 'Filename'="$env:HCIBoxVHDDir\GUI.vhdx"}
+BITSRequest -Params @{'Uri'='https://partner-images.canonical.com/hyper-v/desktop/focal/current/ubuntu-focal-hyperv-amd64-ubuntu-desktop-hyperv.vhdx.zip'; 'OutFile'="$env:HCIBoxVHDDir\Ubuntu.vhdx.zip"}
 Expand-Archive -Path $env:HCIBoxVHDDir\Ubuntu.vhdx.zip -DestinationPath $env:HCIBoxVHDDir
 Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination $env:HCIBoxVHDDir\Ubuntu.vhdx
 
