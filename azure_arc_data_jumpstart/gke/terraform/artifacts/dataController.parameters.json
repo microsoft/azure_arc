@@ -83,7 +83,7 @@
             "value": 30080
         },
         "apiVersion": {
-          "value": "2021-11-01"
+          "value": "2022-03-01-preview"
         },
         "infrastructure": {
           "value": "gcp"
