@@ -65,28 +65,13 @@
             }
         },
         "apiVersion": {
-            "value": "2022-03-01-preview"
+            "value": "2021-11-01"
         },
         "pricingTier": {
             "value": "BusinessCritical"
         },        
         "licenseType": {
-            "value": "licenseType-stage"
-        },
-        "keyTab": {
-            "value": "keyTab-stage"
-        },
-        "sqlInstanceName": {
-            "value": "sqlInstanceName-stage"
-        },
-        "adAccountName":{
-            "value": "adAccountName-stage"
-        },
-        "adConnectorName": {
-            "value": "adConnectorName-stage"
-        },
-        "dnsName": {
-            "value": "dnsName-stage"
+            "value": "LicenseIncluded"
         },
         "port": {
             "value": port-stage

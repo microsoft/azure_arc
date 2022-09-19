@@ -37,7 +37,7 @@ param flavor string = 'Full'
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'arcbox_dataOps'
+param githubBranch string = 'arcbox_dataops'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false
@@ -48,9 +48,16 @@ param githubUser string = 'microsoft'
 @description('Active directory domain services domain name')
 param addsDomainName string = 'jumpstart.local'
 
+@description('Random GUID for cluster names')
+param guid string = substring(newGuid(),0,4)
+
 var templateBaseUrl = 'https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_jumpstart_arcbox/'
 
 var location = resourceGroup().location
+var capiArcDataClusterName = 'ArcBox-CAPI-Data-${guid}'
+var k3sArcDataClusterName = 'ArcBox-K3s-${guid}'
+var aksArcDataClusterName = 'ArcBox-AKS-Data-${guid}'
+var aksDrArcDataClusterName = 'ArcBox-AKS-DR-Data-${guid}'
 
 module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full' || flavor == 'DevOps' || flavor == 'DataOps') {
   name: 'ubuntuCAPIDeployment'
@@ -66,6 +73,7 @@ module ubuntuCAPIDeployment 'kubernetes/ubuntuCapi.bicep' = if (flavor == 'Full'
     deployBastion: deployBastion
     azureLocation: location
     flavor: flavor
+    capiArcDataClusterName : capiArcDataClusterName
   }
   dependsOn: [
     updateVNetDNSServers
@@ -85,6 +93,7 @@ module ubuntuRancherDeployment 'kubernetes/ubuntuRancher.bicep' = if (flavor == 
     subnetId: mgmtArtifactsAndPolicyDeployment.outputs.subnetId
     deployBastion: deployBastion
     azureLocation: location
+    vmName : k3sArcDataClusterName
   }
 }
 
@@ -104,6 +113,10 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
     deployBastion: deployBastion
     githubUser: githubUser
     location: location
+    k3sArcClusterName : k3sArcDataClusterName
+    capiArcDataClusterName : capiArcDataClusterName
+    aksArcClusterName : aksArcDataClusterName
+    aksdrArcClusterName : aksDrArcDataClusterName
   }
   dependsOn: [
     updateVNetDNSServers
@@ -167,6 +180,8 @@ module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
     spnClientId: spnClientId
     spnClientSecret: spnClientSecret
     location: location
+    aksClusterName : aksArcDataClusterName
+    drClusterName : aksDrArcDataClusterName
   }
   dependsOn: [
     updateVNetDNSServers

@@ -1,0 +1,8 @@
+# Any env files
+*.env
+
+# Any generated patch config files
+patch.json
+
+# Any imagePullSecret
+*imagePullSecret.json
