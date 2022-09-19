@@ -30,10 +30,11 @@ $azureAppCred = (New-Object System.Management.Automation.PSCredential $env:spnCl
 Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 
 # Uninstall AksHci - only need to perform the following on one of the nodes
+$clusterName = $env:AKSClusterName
 Write-Header "Removing AKS-HCI workload cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    Disable-AksHciArcConnection -name $using:SDNConfig.AKSworkloadClusterName
-    Remove-AksHciCluster -name $using:SDNConfig.AKSworkloadClusterName -Confirm:$false
+    Disable-AksHciArcConnection -name $using:clusterName
+    Remove-AksHciCluster -name $using:clusterName -Confirm:$false
 }
 
 Write-Header "Uninstalling AKS-HCI management plane"
