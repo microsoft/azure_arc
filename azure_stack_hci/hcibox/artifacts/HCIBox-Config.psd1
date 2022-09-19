@@ -122,7 +122,7 @@
     SDDCInstall                          = $true
 
     # AKS and Resource bridge variables
-    AKSworkloadClusterName               = "hcibox-aks-19kvy" # lowercase only
+    AKSworkloadClusterName               = "hcibox-aks" # lowercase only
     AKSvnetname                          = "akshcivnet"
     AKSvSwitchName                       = "sdnSwitch"
     AKSNodeStartIP                       = "192.168.200.25"
