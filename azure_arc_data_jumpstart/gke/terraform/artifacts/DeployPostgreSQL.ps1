@@ -3,8 +3,8 @@ Start-Transcript -Path C:\Temp\deployPostgreSQL.log
 # Deployment environment variables
 $controllerName = "jumpstart-dc"
 
-# Deploying Azure Arc SQL Managed Instance
-Write-Host "Deploying Azure Arc PostgreSQL"
+# Deploying Deploying Azure Arc-enabled PostgreSQL
+Write-Host "Deploying Azure Arc-enabled PostgreSQL"
 Write-Host "`n"
 
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
@@ -55,13 +55,12 @@ az deployment group create --resource-group $env:resourceGroup --template-file "
 Write-Host "`n"
 
 # Ensures postgres container is initiated and ready to accept restores
-$pgCoordinatorPodName = "jumpstartpsc0-0"
-$pgWorkerPodName = "jumpstartpsw0-0"
+$pgWorkerPodName = "jumpstartps-0"
 
     Do {
         Write-Host "Waiting for PostgreSQL. Hold tight, this might take a few minutes..."
         Start-Sleep -Seconds 45
-        $buildService = $(if((kubectl get pods -n arc | Select-String $pgCoordinatorPodName| Select-String "Running" -Quiet) -and (kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
+        $buildService = $(if((kubectl get pods -n arc | Select-String $pgWorkerPodName| Select-String "Running" -Quiet)){"Ready!"}Else{"Nope"})
     } while ($buildService -eq "Nope")
 
 Start-Sleep -Seconds 60
