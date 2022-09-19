@@ -1,8 +1,13 @@
 $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $connectedClusterName=$Env:capiArcDataClusterName
-
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataServicesLogonScript.log
+
+# Required for azcopy and Get-AzResource
+Write-Header "Az PowerShell Login"
+$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".data" -ItemType Directory
 
@@ -14,12 +19,6 @@ if(-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))
 $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
-
-# Required for azcopy
-Write-Header "Az PowerShell Login"
-$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Required for CLI commands
 Write-Header "Az CLI Login"
@@ -123,6 +122,7 @@ az customlocation create --name "$Env:capiArcDataClusterName-cl" --resource-grou
 Write-Header "Deploying Azure Arc Data Controller"
 
 $customLocationId = $(az customlocation show --name "$Env:capiArcDataClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
