@@ -6,13 +6,13 @@ weight: 4
 
 ## Jumpstart ArcBox for DataOps
 
-ArcBox for DataOps is a special "flavor" of ArcBox that is intended for users who want to experience Azure Arc-enabled Data services capabilities in a sandbox environment.
+ArcBox for DataOps is a special "flavor" of ArcBox that is intended for users who want to experience Azure Arc-enabled SQL Managed Instance capabilities in a sandbox environment.
 
-![ArcBox architecture diagram](./arch_DataOps.png)
+![ArcBox architecture diagram](./arc_dataops.png)
 
 ### Use cases
 
-- Sandbox environment for getting hands-on with Azure Arc technologies and [Azure Arc-enabled Kubernetes landing zone accelerator](https://aka.ms/ArcK8sLZSandbox)
+- Sandbox environment for getting hands-on with Azure Arc technologies and [Azure Arc-enabled SQL Managed Instance landing zone accelerator](PLACEHOLDER)
 - Accelerator for Proof-of-concepts or pilots
 - Training solution for Azure Arc skills development
 - Demo environment for customer presentations or events
@@ -23,20 +23,21 @@ ArcBox for DataOps is a special "flavor" of ArcBox that is intended for users wh
 
 ### Azure Arc-enabled Kubernetes
 
-ArcBox for DataOps deploys two Kubernetes clusters to give you multiple options for exploring Azure Arc-enabled Kubernetes capabilities and potential integrations.
+ArcBox for DataOps deploys three Kubernetes clusters to give you multiple options for exploring Azure Arc-enabled Kubernetes capabilities and potential integrations.
 
-- _**ArcBox-CAPI-Data**_ - A single-node Rancher K3s cluster which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider for Azure (CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster. The workload cluster is onboarded as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys multiple [GitOps configurations](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DataOps/#gitops-configurations) on this cluster for you, so you have an easy way to get started exploring GitOps capabilities.
-- _**ArcBox-K3s**_ - One single-node Rancher K3s cluster running on an Azure virtual machine. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox provides the user with [PowerShell scripts](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DataOps/#additional-optional-scenarios-on-the-arcbox-k3s-cluster) that can be manually run to apply GitOps configurations on this cluster.
+- _**ArcBox-CAPI-Data-xxxx**_ - A single-node Rancher K3s cluster which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider for Azure (CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster. The workload cluster is onboarded as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys an Azure Arc Data Controller, an Active Directory connector and an Azure Arc-enabled SQL Managed Instance on top of the connected cluster.
+- _**ArcBox-AKS-Data-xxxx**_ - An AKS cluster that is connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys an Azure Arc Data Controller, an Active Directory connector and an Azure Arc-enabled SQL Managed Instance on top of the connected cluster.
+- _**ArcBox-AKS--DR-Data-xxxx**_ - An AKS cluster that is deployed in a separate virtual network, designating a disaster recovery site. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys an Azure Arc Data Controller, an Active Directory connector and an Azure Arc-enabled SQL Managed Instance on top of the connected cluster. This cluster is then configured with _ArcBox-CAPI-Data-xxxx_ to be part of a distributed availability group for disaster recovery.
 
 ### Sample applications
 
-ArcBox for DataOps deploys two sample applications on the _ArcBox-CAPI-Data_ cluster. The cluster has multiple [GitOps configurations](https://docs.microsoft.com/azure/azure-arc/kubernetes/conceptual-gitops-flux2) that deploy and configure the sample apps. You can use your own fork of the [sample applications GitHub repo](https://github.com/microsoft/azure-arc-jumpstart-apps) to experiment with GitOps configuration flows.
+ArcBox for DataOps deploys two sample applications on the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS--DR-Data-xxxx_ clusters.
 
 The sample applications included in ArcBox are:
 
-- [Hello-Arc](https://github.com/microsoft/azure-arc-jumpstart-apps/tree/main/hello-arc) - A simple Node.js web application. ArcBox will deploy **three Kubernetes pod replicas** of the _Hello-Arc_ application in the _hello-arc_ namespace onto the _ArcBox-CAPI-Data_ cluster.
+- **Bookstore** - An MVC web application. ArcBox will deploy **one Kubernetes pod replica** of the _Bookstore_ application in the _arc_ namespace onto the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS--DR-Data-xxxx_ clusters.
 
-- [Bookstore](https://release-v0-11.docs.openservicemesh.io/docs/getting_started/quickstart/manual_demo/) - A sample microservices Golang (Go) application. ArcBox will deploy the following **five different Kubernetes pods** as part of the Bookstore app.
+- **DB Connection app** - An MVC application. ArcBox will deploy **one Kubernetes pod replica** as part of the Bookstore app.
 
   - _bookbuyer_ is an HTTP client making requests to bookstore.
   - _bookstore_ is a server, which responds to HTTP requests. It is also a client making requests to the _bookwarehouse_ service.
@@ -48,6 +49,7 @@ The _bookbuyer_, _bookstore_, and _bookwarehouse_ pods will be in separate Kuber
 
 ### Azure Monitor integration
 
+ArcBox deploys metrics and logs upload to Azure Monitor for the deployed data services, in addition to the out-of-the-box Grafana and Kibana dashboards that get deployed as part of Arc-enabled Data services.
 
 ### Hybrid Unified Operations
 
@@ -73,15 +75,15 @@ ArcBox provides multiple paths for deploying and configuring ArcBox resources. D
 ArcBox uses an advanced automation flow to deploy and configure all necessary resources with minimal user interaction. The previous diagrams provide an overview of the deployment flow. A high-level summary of the deployment is:
 
 - User deploys the primary ARM template (_azuredeploy.json_), Bicep file (_main.bicep_), or Terraform plan (_main.tf_). These objects contain several nested objects that will run simultaneously.
-  - Client virtual machine ARM template/plan - deploys the Client Windows VM. This is a Windows Server VM that comes preconfigured with kubeconfig files to work with the two Kubernetes clusters, as well multiple tools such as VSCode to make working with ArcBox simple and easy.
+  - Client virtual machine ARM template/plan - deploys a domain-joined Client Windows VM. This is a Windows Server VM that comes preconfigured with kubeconfig files to work with the three Kubernetes clusters, as well multiple tools such as VSCode, Azure Data Studio and SQL Server Management Studio to make working with ArcBox simple and easy.
   - Storage account template/plan - used for staging files in automation scripts.
-  - Management artifacts template/plan - deploys Azure Log Analytics workspace, its required Solutions, and Azure Policy artifacts.
-- User remotes into Client Windows VM, which automatically kicks off multiple scripts that:
-  - Deploys OSM Extension on the _ArcBox-CAPI-Data_ cluster, create application namespaces and add namespaces to OSM control plane.
-  - Applies five GitOps configurations on the _ArcBox-CAPI-Data_ cluster to deploy nginx-ingress controller, Hello Arc web application, Bookstore application and Bookstore RBAC/OSM configurations.
-  - Creates certificate with DNS name _arcbox.DataOps.com_ and imports to Azure Key Vault.
-  - Deploys Azure Key Vault Secrets Provider extension on the _ArcBox-CAPI-Data_ cluster.
-  - Configures Ingress for Hello-Arc and Bookstore application with a self-signed TLS certificate from the Azure Key Vault.  
+  - Management artifacts template/plan - deploys Azure Log Analytics workspace, its required Solutions, a domain controller and two virtual networks.
+- User remotes into the Client Windows VM using domain credentials, which automatically kicks off multiple scripts that:
+  - Onboards the AKS clusters to Azure Arc as Arc-enabled Kubernetes clusters.
+  - Deploys a data controller, AD connector and an Azure Arc-enabled SQL Managed Instance on each cluster.
+  - Creates the necessary DNS records for the Azure Arc-enabled SQL Managed Instance's endpoints.
+  - Configures a distributed availability group between the Azure Arc-enabled SQL Managed Instances deployed on the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS-DR-Data-xxxx_ clusters.
+  - Deploys the _Bookstore_ application on the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS-DR-Data-xxxx_ clusters.
   - Deploy an Azure Monitor workbook that provides example reports and metrics for monitoring and visualizing ArcBox's various components.
 
 ## Prerequisites
@@ -111,7 +113,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - Korea Central
   - Southeast Asia
 
-- **ArcBox DataOps requires 30 B-series vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
+- **ArcBox DataOps requires 42 B-series vCPUs and 56 DSv4 vCPUs** when deploying with default parameters such as VM series/size. Ensure you have sufficient vCPU quota available in your Azure subscription and the region where you plan to deploy ArcBox. You can use the below Az CLI command to check your vCPU utilization.
 
   ```shell
   az vm list-usage --location <your location> --output table
@@ -132,21 +134,12 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing az vm list-skus with restrictions](./list_skus.png)
 
-- Fork the [sample applications GitHub repo](https://github.com/microsoft/azure-arc-jumpstart-apps) to your own GitHub account. You will use this forked repo to make changes to the sample apps that will be applied using GitOps configurations. The name of your GitHub account is passed as a parameter to the template files so take note of your GitHub user name.
-
-  ![Screenshot showing forking sample apps repo](./apps_fork01.png)
-
-  ![Screenshot showing forking sample apps repo](./apps_fork02.png)
-
-- The name of your GitHub account is passed as the _`githubUser`_ parameter to the template files so take note of your GitHub user name in your forked repo.
-
-  ![Screenshot showing forking sample apps repo](./apps_fork03.png)
-
 - Create an Azure service principal (SP). To deploy ArcBox, an Azure service principal assigned with multiple role-based access control (RBAC) roles is required:
 
   - "Contributor" - Required for provisioning Azure resources
   - "Security admin" - Required for installing Microsoft Defender for Cloud Azure Arc-enabled Kubernetes extension and dismiss alerts
   - "Security reader" - Required for being able to view Azure Arc-enabled Kubernetes Cloud Defender extension findings
+  - "Monitoring Metrics Publisher" - Required for being Azure Arc-enabled data services billing, monitoring metrics, and logs management
 
     To create it login to your Azure account run the below commands (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
@@ -165,6 +158,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Contributor" --scopes /subscriptions/$subscriptionId
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security admin" --scopes /subscriptions/$subscriptionId
     az ad sp create-for-rbac -n "JumpstartArcBox" --role "Security reader" --scopes /subscriptions/$subscriptionId
+    az ad sp create-for-rbac -n "JumpstartArcBox" --role "Monitoring Metrics Publisher" --scopes /subscriptions/$subscriptionId
     ```
 
     Output should look similar to this.
@@ -190,7 +184,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
 ## Deployment Option 1: Azure portal
 
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_jumpstart_arcbox%2FARM%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Farcbox_dataops%2Fazure_jumpstart_arcbox%2FARM%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
   ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy01.png)
 
@@ -206,7 +200,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- Edit the [azuredeploy.parameters.json](https://github.com/microsoft/azure_arc/blob/main/azure_jumpstart_arcbox/ARM/azuredeploy.parameters.json) ARM template parameters file and supply some values for your environment.
+- Edit the [azuredeploy.parameters.json](https://github.com/microsoft/azure_arc/blob/arcbox_dataops/azure_jumpstart_arcbox/ARM/azuredeploy.parameters.json) ARM template parameters file and supply some values for your environment.
   - _`sshRSAPublicKey`_ - Your SSH public key
   - _`spnClientId`_ - Your Azure service principal id
   - _`spnClientSecret`_ - Your Azure service principal secret
@@ -215,11 +209,12 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - _`logAnalyticsWorkspaceName`_ - Name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "DataOps" to specify that you want to deploy the DataOps flavor of ArcBox
+  - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
   - _`githubUser`_ - Specify the name of your GitHub account where you cloned the Sample Apps repo
 
   ![Screenshot showing example parameters](./parameters.png)
 
-- Now you will deploy the ARM template. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_jumpstart_arcbox) and run the below command:
+- Now you will deploy the ARM template. Navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/arcbox_dataops/azure_jumpstart_arcbox) and run the below command:
 
   ```shell
   az group create --name <Name of the Azure resource group> --location <Azure Region>
@@ -247,7 +242,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az bicep upgrade
   ```
 
-- Edit the [main.parameters.json](https://github.com/microsoft/azure_arc/blob/main/azure_jumpstart_arcbox/bicep/main.parameters.json) template parameters file and supply some values for your environment.
+- Edit the [main.parameters.json](https://github.com/microsoft/azure_arc/blob/arcbox_dataops/azure_jumpstart_arcbox/bicep/main.parameters.json) template parameters file and supply some values for your environment.
   - _`sshRSAPublicKey`_ - Your SSH public key
   - _`spnClientId`_ - Your Azure service principal id
   - _`spnClientSecret`_ - Your Azure service principal secret
@@ -398,376 +393,25 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 ## Using ArcBox
 
-After deployment is complete, it's time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI, or similar) or from inside the _ArcBox-Client_ virtual machine. When remoted into the VM, here are some things to try:
+After deployment is complete, it's time to start exploring ArcBox. Most interactions with ArcBox will take place either from Azure itself (Azure portal, CLI, or similar) or from inside the _ArcBox-Client_ virtual machine using Azure Data Studio or SQL Server Management Studio. When remoted into the VM, here are some things to try:
 
-### Key Vault integration
+### Azure Arc-enabled SQL Managed Instance stress simulation
 
- ArcBox uses Azure Key Vault to store the TLS certificate used by the sample Hello-Arc and OSM applications. Here are some things to try to explore this integration with Key Vault further:
+### Azure Arc-enabled SQL Managed Instance monitoring using Grafana and Kibana
 
-- Configure Azure Key Vault to allow your access to certificates.
+### Application
 
-  - Navigate to the deployed Key Vault in the Azure portal and open the "Access Policies" blade
+### High availability
 
-    ![Screenshot showing Azure Arc extensions ](./capi_keyvault01.png)
+### Point-in-time restore
 
-  - Click "Add access policy" and in the dropdown for "Certificate Permissions" check Get and List.
-
-    ![Screenshot showing Azure Arc extensions ](./capi_keyvault02.png)
-
-  - Next to "Select principal" Click "None selected" and search for your user name and select it. Click "Add".
-
-    ![Screenshot showing Azure Arc extensions ](./capi_keyvault03.png)
-
-  - Click "Save" to commit the changes.
-
-    ![Screenshot showing Azure Arc extensions ](./capi_keyvault04.png)
-
-- Open the extension tab section of the _ArcBox-CAPI-Data_ cluster resource in the Azure portal. You can now see that Azure Key Vault Secrets Provider, Flux (GitOps), and Open Service Mesh extensions are installed.
-
-  ![Screenshot showing Azure Arc extensions ](./capi_keyvault05.png)
-
-- Click on the _CAPI Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.DataOps.com_ used from the Key Vault.
-
-  ![Screenshot showing Hello-Arc desktop Icon](./capi_keyvault06.png)
-
-  ![Screenshot showing Hello-Arc App](./capi_keyvault07.png)
-
-- Validate that Key Vault certificate is being used by comparing the certificate thumbprint reported in the browser with your certificate thumbprint in Key Vault. Click on the lock icon and then select "Connection is secure".
-
-  ![Screenshot showing Hello-Arc certificate](./capi_keyvault08.png)
-
-- Click on the certificate icon.
-
-  ![Screenshot showing Hello-Arc certificate](./capi_keyvault09.png)
-
-- Open the "Details" tab to view the thumprint of the certificate.
-
-  ![Screenshot showing Hello-Arc certificate](./capi_keyvault10.png)
-
-- Browse to the certificate "ingress-cert" in Key Vault to view and compare the thumbprint.
-
-  ![Screenshot showing Hello-Arc certificate](./capi_keyvault11.png)
-
-### GitOps configurations
-
-ArcBox deploys multiple GitOps configurations on the _ArcBox-CAPI-Data_ workload cluster. Click on the GitOps tab of the cluster to explore these configurations:
-
-- You can now see the five GitOps configurations on the _ArcBox-CAPI-Data_ cluster.
-
-  - config-nginx to deploy NGINX-ingress controller.
-  - config-bookstore to deploy the "Bookstore" application.
-  - config-bookstore-rbac to deploy the "Bookstore" application RBAC.
-  - config-bookstore-osm to deploy the "Bookstore" application open service mesh traffic split policy.
-  - config-helloarc to deploy the "Hello Arc" web application.
-
-  ![Screenshot showing Azure Arc GitOps configurations](./capi_gitops01.png)
-
-- We have installed the “Tab Auto Refresh” extension for the browser. This will help you to show the real-time changes on the application in an automated way. Open "CAPI Hello-Arc" application to configure the “Tab Auto Refresh” extension for the browser to refresh every 3 seconds.
-
-  ![Screenshot showing Hello-Arc app](./capi_gitops02.png)
-
-  ![Screenshot showing Tab Auto Refresh ](./capi_gitops03.png)
-
-- To show the GitOps flow for the Hello-Arc application open two side-by-side windows.
-
-  - A browser window with the open Hello-Arc application _`https://arcbox.DataOps.com/`_ URL.
-  - PowerShell running the command _`kubectl get pods -n hello-arc -w`_ command.
-  
-    The result should look like this:
-
-    ![Screenshot showing Hello-Arc app and shell](./capi_gitops04.png)
-
-- In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`hello_arc.yaml`_ file (_`/hello-arc/yaml/hello_arc.yaml`_), change the text under the “MESSAGE” section and commit the change.
-  
-    ![Screenshot showing hello-arc repo](./capi_gitops05.png)
-  
-- Upon committing the changes, notice how the Kubernetes pods rolling upgrade will begin. Once the pods are up & running, refresh the browser, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
-  
-    ![Screenshot showing Hello-Arc app and shell GitOps](./capi_gitops06.png)
-
-### RBAC configurations
-
-ArcBox deploys Kubernetes RBAC configuration on the bookstore application for limiting access to deployed Kubernetes resources. You can explore this configuration by following these steps:
-
-- Show Kubernetes RBAC Role and Role binding applied using GitOps Configuration.
-
-  - Review the [RBAC configuration](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/k8s-rbac-sample/namespace/namespacerole.yaml) applied to the _ArcBox-CAPI-Data_ cluster.  
-  
-  - Show the bookstore namespace Role and Role Binding.
-  
-    ```shell
-    kubectl --namespace bookstore get role
-    kubectl --namespace bookstore get rolebindings.rbac.authorization.k8s.io
-    ```
-
-    ![Screenshot showing bookstore RBAC get Role](./capi_rbac01.png)
-
-  - Validate the RBAC role to get the pods as user "Jane".
-
-    ```shell
-    kubectl --namespace bookstore get pods --as=jane
-    ```
-
-    ![Screenshot showing bookstore RBAC get pods](./capi_rbac02.png)
-
-  - To test the RBAC role assignment, as user "Jane", try to delete the pods. As you can see, the operation fails since Jane is assigned with the role of "pod-reader".
-  
-    The "pod-reader" role only allows _get_, _watch_ and _list_ Kubernetes operations permissions in the _bookstore_ namespace but does not allow for _delete_ operations permissions.
-
-      ```shell
-      $pod=kubectl --namespace bookstore get pods --selector=app=bookstore --output="jsonpath={.items..metadata.name}"
-      kubectl --namespace bookstore delete pods $pod --as=jane
-      ```
-
-      ![Screenshot showing bookstore RBAC delete pods](./capi_rbac03.png)
-
-  - Optionally, you can test the access using [auth can-i](https://kubernetes.io/docs/reference/access-authn-authz/authorization/#checking-api-access) command to validate RBAC access.
-  
-    ```shell
-    kubectl --namespace bookstore auth can-i get pods --as=jane
-    kubectl --namespace bookstore auth can-i delete pods --as=jane
-    ```
-  
-    ![Screenshot showing bookstore RBAC auth can-i pods](./capi_rbac04.png)
-
-### OSM Traffic Split using GitOps
-
-ArcBox uses a GitOps configuration on the OSM bookstore application to split traffic to the bookstore APIs using weighted load balancing. Follow these steps to explore this capability further:
-
-  ![Diagram of OSM bookstore app architecture](./osm_bookstore_architecture.png)
-
-  ![Diagram of OSM bookstore app traffic split](./smi_traffic_split.png)
-
-- Review the [OSM Traffic Split Policy](https://github.com/microsoft/azure-arc-jumpstart-apps/blob/main/bookstore/osm-sample/traffic-split.yaml) applied to the _ArcBox-CAPI-Data_ cluster  
-
-- To show OSM traffic split, open below windows.
-
-  - PowerShell running the below commands to show the bookbuyer pod logs.
-  
-    ```powershell
-    $pod=kubectl --namespace bookbuyer get pods --selector=app=bookbuyer --output="jsonpath={.items..metadata.name}"
-    kubectl --namespace bookbuyer logs $pod bookbuyer -f | Select-String Identity:
-    ```
-
-  - Click on the _CAPI Bookstore_ icon on the desktop to open bookstore applications.
-
-    ![Screenshot showing Bookstore desktop Icon](./capi_osm01.png)
-
-    ![Screenshot showing Bookstore Apps](./capi_osm02.png)
-
-  - Move the browser tabs and PowerShell window, so the end result should look like this:
-  
-    ![Screenshot showing Bookstore Apps and shell 01](./capi_osm03.png)
-
-  - The count for the books sold from the bookstore-v2 browser window should remain at 0. This is because the current traffic split policy is configured as weighted 100 for bookstore as well because the bookbuyer client is sending traffic to the bookstore service and no application is sending requests to the bookstore-v2 service.
-
-    ![Screenshot showing Bookstore apps and shell 02](./capi_osm04.png)
-
-- In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`traffic-split.yaml`_ file (_`/bookstore/osm-sample/traffic-split.yaml`_), update the bookstore weight to "75" and bookstore-v2 weight to "25" and commit the change.
-
-  ![Screenshot showing Bookstore repo Traffic split 01](./capi_osm05.png)
-
-- Wait for the changes to propagate and observe the counters increment for bookstore and bookstore-v2 as well. 
-
-  We have updated the Service Mesh Interface (SMI) Traffic Split policy to direct 75 percent of the traffic sent to the root bookstore service and 25 percent to the bookstore-v2 service by modifying the weight fields for the bookstore-v2 backend. Also, observe the changes on the bookbuyer pod logs in the PowerShell window.
-
-  ![Screenshot showing Bookstore apps and shell GitOps and OSM 01](./capi_osm06.png)
-
-- You can verify the traffic split policy by running the below command and examine the Backends properties.
-
-  ```shell
-  kubectl describe trafficsplit bookstore-split -n bookstore
-  ```
-
-  ![Screenshot showing Bookstore repo Traffic split 02](./capi_osm07.png)
-
-- In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`traffic-split.yaml`_ file (_`/bookstore/osm-sample/traffic-split.yaml`_), update the bookstore weight to "0" and bookstore weight to "100" and commit the change.
-
-  ![Screenshot showing Bookstore repo Traffic split 02](./capi_osm08.png)
-
-- Wait for the changes to propagate and observe the counters increment for bookstore-v2 and freeze for bookstore. Also, observe pod logs to validate bookbuyer is sending all the traffic to bookstore-v2.
-
-  ![Screenshot showing Bookstore apps and shell GitOps and OSM 02](./capi_osm09.png)
-
-- Optional, you may want to reset the traffic split demo to start over with the counters at zero. If so, follow the below steps to reset the bookstore counters.
-  
-  - Browse to the _ResetBookstore.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
-    - Connect to _ArcBox-CAPI-Data_ cluster
-    - Deploy a Kubernetes Ingress resource for each bookstore apps reset API
-    - Invoke bookstore apps rest API to reset the counter
-  
-  - Before we run the reset script, did you update the Traffic split on GitHub? In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`traffic-split.yaml`_ file (_`/bookstore/osm-sample/traffic-split.yaml`_), update the bookstore weight to "100" and bookstore weight to "0" and commit the change.
-
-    ![Screenshot showing Bookstore repo Traffic split rest](./capi_osm10.png)
-
-  - Right click _ResetBookstore.ps1_ script and select Run with PowerShell to execute the script.
-  
-    ![Screenshot showing Script execution reset](./capi_osm11.png)
-
-  - Counters for Bookbuyer, Bookstore-v1, and Bookstore-v2 will reset.
-
-    ![Screenshot showing Bookstore apps and shell GitOps and OSM reset](./capi_osm12.png)
-
-### Microsoft Defender for Cloud
-
-After you have finished the deployment of ArcBox, you can verify that Microsoft Defender for Cloud is working properly and alerting on security threats by running the below command to simulate an alert on the _ArcBox-CAPI-Data_ workload cluster:
-
-  ```bash
-  kubectx arcbox-capi
-  kubectl get pods --namespace=asc-alerttest-662jfi039n
-  ```
-
-After a period of time (typically less than an hour), Microsoft Defender for Cloud will detect this event and trigger a security alert that you will see in the Azure portal under Microsoft Defender for Cloud's security alerts and also on the security tab of your Azure Arc-enabled Kubernetes cluster.
-
-![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert01.png)
-
-![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert02.png)
-
-![Screenshot security alert in Microsoft Defender for Cloud](./defender_alert03.png)
-
-> **NOTE: This feature requires Microsoft Defender for Cloud to be [enabled on your Azure subscription](https://docs.microsoft.com/azure/defender-for-cloud/enable-enhanced-security).**
+### Disaster Recovery
 
 ### Additional optional scenarios on the _ArcBox-K3s_ cluster
 
-Optionally, you can explore additional GitOps and RBAC scenarios in a manual fashion using the _ArcBox-K3s_ cluster. When remoted into the _ArcBox-Client_ virtual machine, here are some things to try:
+#### Azure Arc-enabled SQL Managed Instance scaling
 
-- Browse to the Azure portal and notice how currently there is no GitOps configuration and Flux extension installed on the _ArcBox-K3s_ cluster.
-  
-  ![Screenshot showing K3s cluster extensions](./k3s_gitops01.png)
-
-  ![Screenshot showing K3s cluster GitOps](./k3s_gitops02.png)
-
-- Deploy multiple GitOps configurations on the _ArcBox-K3s_ cluster.
-
-  - Browse to the _K3sGitOps.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
-    - Log in to your Azure subscription using your previously created service principal credentials
-    - Connect to _ArcBox-K3s_ cluster
-    - Create the GitOps configurations to install the Flux extension as well deploying the NGINX ingress controller and the “Hello Arc” application
-    - Create a certificate with _arcbox.k3sDataOps.com_ DNS name and import to Azure Key Vault
-    - Deploy the Azure Key Vault k8s extension instance
-    - Create Kubernetes _SecretProviderClass_ to fetch the secrets from Azure Key Vault
-    - Deploy a Kubernetes Ingress resource referencing the Secret created by the CSI driver
-    - Create an icon for the Hello-Arc application on the desktop
-  
-  - Optionally, you can open the script with VSCode to review.
-  
-    ![Screenshot showing Script VSCode](./k3s_gitops03.png)
-
-    ![Screenshot showing Script VSCode](./k3s_gitops04.png)
-  
-  - Right click _K3sGitOps.ps1_ script and select Run with PowerShell to execute the script. This will take about 5-10 minutes to run.
-  
-    ![Screenshot showing Script execution](./k3s_gitops05.png)
-
-  - You can verify that Azure Key Vault Secrets Provider and the Flux (GitOps) extensions are now installed under the extension tab section of the _ArcBox-K3s_ cluster resource in the Azure portal.
-
-    ![Screenshot showing K3s cluster extensions](./k3s_gitops06.png)
-
-  - You can verify below GitOps configurations applied on the _ArcBox-K3s_ cluster.
-  
-    - config-nginx to deploy NGINX-ingress controller
-    - config-helloarc to deploy the "Hello Arc" web application
-  
-    ![Screenshot showing Azure Arc GitOps configurations](./k3s_gitops07.png)
-
-  - Click on the _K3s Hello-Arc_ icon on the desktop to open Hello-Arc application and validate the Ingress certificate _arcbox.k3sDataOps.com_ used from Key Vault.
-  
-    ![Screenshot showing Hello-Arc App Icon](./k3s_gitops08.png)
-
-    ![Screenshot showing Hello-Arc App](./k3s_gitops09.png)
-  
-  - To show the GitOps flow for the Hello-Arc application open two side-by-side windows.
-
-    - A browser window with the open Hello-Arc application _`https://k3sDataOps.DataOps.com/`_ URL.
-    - PowerShell running the command _`kubectl get pods -n hello-arc -w`_ command.
-  
-        ```shell
-        kubectx arcbox-k3s
-        kubectl get pods -n hello-arc -w
-        ```
-
-      The result should look like this:
-  
-      ![Screenshot showing Hello-Arc app and shell](./k3s_gitops10.png)
-  
-    - In your fork of the “Azure Arc Jumpstart Apps” GitHub repository, open the _`hello_arc.yaml`_ file (_`/hello-arc/yaml/hello_arc.yaml`_). Change the replica to 2 and text under the “MESSAGE” section and commit the change.
-
-      ![Screenshot showing hello-arc repo](./k3s_gitops11.png)
-
-    - Upon committing the changes, notice how the Kubernetes pods rolling upgrade will begin. Once the pods are up and running, refresh the browser, the new “Hello Arc” application version window will show the new message, showing the rolling upgrade is completed and the GitOps flow is successful.
-
-      ![Screenshot showing Hello-Arc app and shell GitOps](./k3s_gitops12.png)
-
-- Deploy Kubernetes RBAC configuration on the Hello-Arc application to limit access to deployed Kubernetes resources.
-
-  - Browse to the _K3sRBAC.ps1_ script placed under _C:\ArcBox\GitOps_. The script will:
-    - Log in to your Azure subscription using your previously created service principal credentials
-    - Connect to _ArcBox-K3s_ cluster
-    - Create the GitOps configurations to deploy the RBAC configurations for _hello-arc_ namespace and cluster scope
-
-  - Right click _K3sGitOps.ps1_ script and select Run with PowerShell to execute the script.
-  
-    ![Screenshot showing Hello-Arc App](./k3s_rbac01.png)
-
-  - You can can verify below GitOps configurations applied on the _ArcBox-K3s_ cluster.
-  
-    - _config-helloarc-rbac_ to deploy the _hello-arc_ namespace RBAC.
-  
-      ![Screenshot showing Azure Arc GitOps RBAC](./k3s_rbac02.png)
-
-  - Show the _hello-arc_ namespace Role and Role Binding.
-  
-    ```shell
-    kubectx arcbox-k3s
-    kubectl --namespace hello-arc get role
-    kubectl --namespace hello-arc get rolebindings.rbac.authorization.k8s.io
-    ```
-
-    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac03.png)
-
-  - Validate the namespace RBAC role to get the pods as user Jane.
-
-    ```shell
-    kubectl --namespace hello-arc get pods --as=jane
-    ```
-
-    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac04.png)
-
-  - To test the RBAC role assignment, as user "Jane", try to delete the pods. As you can see, the operation fails since Jane is assigned with the role of "pod-reader".
-
-    The "pod-reader" role only allows _get_, _watch_ and _list_ Kubernetes operations permissions in the _hello-arc_ namespace but does not allow for _delete_ operations permissions.
-
-    ```powershell
-    $pod=kubectl --namespace hello-arc get pods --selector=app=hello-arc --output="jsonpath={.items..metadata.name}"
-    kubectl --namespace hello-arc delete pods $pod --as=jane
-    ```
-
-    ![Screenshot showing hello-arc RBAC delete pods](./k3s_rbac05.png)
-
-  - Show the Cluster Role and Role Binding.
-  
-    ```shell
-    kubectl get clusterrole | Select-String secret-reader
-    kubectl get clusterrolebinding | Select-String read-secrets-global
-    ```
-
-    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac06.png)
-
-  - Validate the cluster role to get the secrets as user Dave.
-
-    ```shell
-    kubectl get secrets --as=dave
-    ```
-
-    ![Screenshot showing hello-arc RBAC get pods](./k3s_rbac07.png)
-
-  - Test the RBAC role assignment to check if Dave can create the secrets. The operation should fail, as the user Dave is assigned to the role of secret-reader. The secret-reader role only allows get, watch and list permissions.
-
-    ```shell
-    kubectl create secret generic arcbox-secret --from-literal=username=arcdemo --as=dave
-    ```
-
-    ![Screenshot showing hello-arc RBAC delete pods](./k3s_rbac08.png)
+#### Migration to Azure Arc-enabled SQL Managed Instance
 
 ### ArcBox Azure Monitor workbook
 

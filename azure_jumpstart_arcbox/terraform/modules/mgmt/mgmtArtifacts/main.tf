@@ -321,7 +321,7 @@ resource "azurerm_network_security_rule" "allow_DNS_UDP" {
   name                        = "allow_DNS_UDP"
   access                      = "Allow"
   priority                    = 1010
-  source_address_prefix       = "*"
+  source_address_prefix       = "VirtualNetwork"
   destination_port_range      = "53"
   source_port_range           = "*"
   protocol                    = "UDP"
@@ -335,7 +335,7 @@ resource "azurerm_network_security_rule" "allow_DNS_TCP" {
   name                        = "allow_DNS_TCP"
   access                      = "Allow"
   priority                    = 1011
-  source_address_prefix       = "*"
+  source_address_prefix       = "VirtualNetwork"
   destination_port_range      = "53"
   source_port_range           = "*"
   protocol                    = "TCP"
