@@ -49,15 +49,15 @@ Move-Item -Path RegisterHCI_* -Destination $Env:HCIBoxLogsDir\RegisterHCI_PS_Out
 Write-Host "$clustername successfully registered as Az Stack HCI cluster resource in Azure"
 
 # Register MMA extension on nodes
-Write-Host "Deploying monitoring agent on HCI host nodes"
-$workspace = Get-AzOperationalInsightsWorkspace -Name $env:workspaceName -ResourceGroupName $env:resourceGroup
-$key = Get-AzOperationalInsightsWorkspaceSharedKey -Name $env:workspaceName -ResourceGroupName $env:resourceGroup
-$Setting = @{ "workspaceId" = $workspace.CustomerId }
-$protectedSetting = @{ "workspaceKey" = $key.PrimarySharedKey }
-foreach ($VM in $SDNConfig.HostList) {
-    New-AzConnectedMachineExtension -Name MicrosoftMonitoringAgent -ResourceGroupName $env:resourceGroup-ArcServers -MachineName $VM -Location $env:azureLocation -Publisher "Microsoft.EnterpriseCloud.Monitoring" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
-}
-New-AzStackHciExtension -ArcSettingName "default" -ClusterName $clustername -Name "MicrosoftMonitoringAgent" -ResourceGroupName $env:resourceGroup -ExtensionParameterType "MicrosoftMonitoringAgent" -ExtensionParameterSetting $Setting -ExtensionParameterProtectedSetting $protectedSetting
+# Write-Host "Deploying monitoring agent on HCI host nodes"
+# $workspace = Get-AzOperationalInsightsWorkspace -Name $env:workspaceName -ResourceGroupName $env:resourceGroup
+# $key = Get-AzOperationalInsightsWorkspaceSharedKey -Name $env:workspaceName -ResourceGroupName $env:resourceGroup
+# $Setting = @{ "workspaceId" = $workspace.CustomerId }
+# $protectedSetting = @{ "workspaceKey" = $key.PrimarySharedKey }
+# foreach ($VM in $SDNConfig.HostList) {
+#     New-AzConnectedMachineExtension -Name MicrosoftMonitoringAgent -ResourceGroupName $env:resourceGroup-ArcServers -MachineName $VM -Location $env:azureLocation -Publisher "Microsoft.EnterpriseCloud.Monitoring" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
+# }
+# New-AzStackHciExtension -ArcSettingName "default" -ClusterName $clustername -Name "MicrosoftMonitoringAgent" -ResourceGroupName $env:resourceGroup -ExtensionParameterType "MicrosoftMonitoringAgent" -ExtensionParameterSetting $Setting -ExtensionParameterProtectedSetting $protectedSetting
 
 # Set up cluster cloud witness
 $storageKey = Get-AzStorageAccountKey -Name $env:stagingStorageAccountName -ResourceGroup $env:resourceGroup
@@ -65,17 +65,5 @@ $saName = $env:stagingStorageAccountName
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     Set-ClusterQuorum –Cluster "hciboxcluster" -CloudWitness -AccountName $using:saName -AccessKey $using:storageKey[0].value
 }
-
-# Move Node VMs to main HCIBox resource group
-# $SourceRG = "$env:resourceGroup-ArcServers"
-# $DestRG = $env:resourceGroup
-# Write-Host "Moving node resources to main HCIBox resource group"
-# foreach ($Node in $SDNConfig.HostList) {
-#     $arcNode = Get-AzResource -ResourceGroupName $SourceRG -ResourceType Microsoft.HybridCompute/machines -Name $Node
-#     Write-Host "Moving $Node to $env:resourceGroup"
-#     Move-AzResource -DestinationResourceGroupName $DestRG -ResourceId $arcNode.ResourceId -Confirm:$false -Force
-#     Start-Sleep 15
-# }
-# Remove-AzResourceGroup -Name "$env:resourceGroup-ArcServers" -Confirm:$false -Force
 
 Stop-Transcript
