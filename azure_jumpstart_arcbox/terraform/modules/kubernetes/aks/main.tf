@@ -35,7 +35,7 @@ variable "agent_count" {
 variable "agent_vm_size" {
   type        = string
   description = "The size of the VM."
-  default     = "Standard_D8s_v5"
+  default     = "Standard_D8s_v4"
 }
 
 variable "linux_admin_Username" {
@@ -82,7 +82,7 @@ variable "os_type" {
 variable "Kubernetes_version" {
   type        = string
   description = "The version of Kubernetes"
-  default     = "1.23.8"
+  default     = "1.24.3"
 }
 
 locals {

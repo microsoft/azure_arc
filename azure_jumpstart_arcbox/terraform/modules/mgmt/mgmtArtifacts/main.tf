@@ -62,6 +62,7 @@ variable "deployment_flavor" {
 variable "dns_servers" {
   type        = list(string)
   description = "DNS Server configuration."
+  default = []
 }
 
 locals {
@@ -117,8 +118,7 @@ resource "azurerm_virtual_network" "vnet" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   address_space       = local.vnet_address_space
-  dns_servers         = var.dns_servers
-
+  
   subnet {
     name           = var.subnet_name
     address_prefix = local.subnet_address_prefix
@@ -133,7 +133,6 @@ resource "azurerm_virtual_network" "drVnet" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   address_space       = local.drAddressPrefix
-  dns_servers         = var.dns_servers
 
   subnet {
     name           = var.dr_subnet_name
@@ -322,7 +321,7 @@ resource "azurerm_network_security_rule" "allow_DNS_UDP" {
   name                        = "allow_DNS_UDP"
   access                      = "Allow"
   priority                    = 1010
-  source_address_prefix       = "*"
+  source_address_prefix       = "VirtualNetwork"
   destination_port_range      = "53"
   source_port_range           = "*"
   protocol                    = "UDP"
@@ -336,7 +335,7 @@ resource "azurerm_network_security_rule" "allow_DNS_TCP" {
   name                        = "allow_DNS_TCP"
   access                      = "Allow"
   priority                    = 1011
-  source_address_prefix       = "*"
+  source_address_prefix       = "VirtualNetwork"
   destination_port_range      = "53"
   source_port_range           = "*"
   protocol                    = "TCP"

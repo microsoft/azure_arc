@@ -37,7 +37,7 @@ param flavor string = 'Full'
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'arcbox_dataOps'
+param githubBranch string = 'arcbox_dataops'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false

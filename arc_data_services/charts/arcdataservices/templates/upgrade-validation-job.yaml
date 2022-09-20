@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+  name: upgrade-validation-job
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+      - command:
+        - /opt/bootstrapper/bin/bootstrapper
+        - -validateUpgrade
+        - -namespace
+        - {{ .Release.Namespace }}
+        - -image
+        - {{ .Values.systemDefaultValues.image }}
+        image: {{ .Values.systemDefaultValues.image }}
+        name: bootstrapper
+      imagePullSecrets:
+      - name: {{ .Values.systemDefaultValues.imagePullSecret }}
+      restartPolicy: Never
+      serviceAccountName: sa-arc-bootstrapper

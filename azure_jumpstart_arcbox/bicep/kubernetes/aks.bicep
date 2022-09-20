@@ -24,7 +24,7 @@ param osDiskSizeGB int = 0
 param agentCount int = 3
 
 @description('The size of the Virtual Machine')
-param agentVMSize string = 'Standard_D8s_v5'
+param agentVMSize string = 'Standard_D8s_v4'
 
 @description('User name for the Linux Virtual Machines')
 param linuxAdminUsername string = 'arcdemo'
@@ -50,7 +50,7 @@ param enableRBAC bool = true
 param osType string = 'Linux'
 
 @description('The version of Kubernetes')
-param kubernetesVersion string = '1.23.8'
+param kubernetesVersion string = '1.24.3'
 
 var serviceCidr_primary = '10.20.64.0/19'
 var dnsServiceIP_primary = '10.20.64.10'
