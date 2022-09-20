@@ -65,7 +65,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: arcjumpstart.azurecr.io/demoapp
+        image: azurearcjumpstart.azurecr.io/demoapp
         ports:
         - containerPort: 80
         volumeMounts:
@@ -122,6 +122,12 @@ spec:
 "@
 Write-Header "Deploying App Ingress Resource"
 $appIngress | kubectl apply -n $appNamespace -f -
+
+Do {
+  Write-Host "Waiting for Web App pod, hold tight..."
+  Start-Sleep -Seconds 240
+  $podStatus = $(if(kubectl get pods -n $appNamespace | Select-String "web-app" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+} while ($podStatus -eq "Nope")
 
 # Creating CAPI Bookstore Arc Icon on Desktop
 $shortcutLocation = "$Env:Public\Desktop\Bookstore.lnk"
