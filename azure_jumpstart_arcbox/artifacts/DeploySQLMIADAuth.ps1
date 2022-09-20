@@ -288,12 +288,16 @@ foreach ($sqlInstance in $sqlInstances) {
     Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
  
     # Write endpoint information in the file
-
-    Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
+    
+    $SQLInstanceName = $sqlInstance.context.toupper()
+    
+    Add-Content $Endpoints "======================================================================"
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"
     $sqlmiEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
-    Add-Content $Endpoints "$sqlMIName secondary external endpoint DNS name for AD Authentication:"
+    Add-Content $Endpoints "$SQLInstanceName secondary external endpoint DNS name for AD Authentication:"
     $sqlmiSecondaryEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
@@ -303,6 +307,9 @@ foreach ($sqlInstance in $sqlInstances) {
     Add-Content $Endpoints ""
     Add-Content $Endpoints "SQL Managed Instance SQL login password:"
     $env:AZDATA_PASSWORD | Add-Content $Endpoints
+    Add-Content $Endpoints ""
+    
+    Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
 }
 
