@@ -20,7 +20,7 @@ param windowsOSVersion string = '2022-datacenter-g2'
 param azureLocation string = resourceGroup().location
 
 @description('The size of the VM')
-param vmSize string = 'Standard_D2s_v4'
+param vmSize string = 'Standard_B2ms'
 
 @description('Choice to deploy Azure Bastion')
 param deployBastion bool = false
@@ -41,7 +41,7 @@ var PublicIPNoBastion = {
   id: publicIpAddress.id
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2021-08-01' = {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: networkInterfaceName
   location: azureLocation
   properties: {
@@ -61,7 +61,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-08-01' = {
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (!deployBastion) {
+resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2022-01-01' = if (!deployBastion) {
   name: publicIpAddressName
   location: azureLocation
   properties: {
@@ -75,7 +75,7 @@ resource publicIpAddress 'Microsoft.Network/publicIpAddresses@2021-03-01' = if (
   }
 }
 
-resource clientVM 'Microsoft.Compute/virtualMachines@2021-11-01' = {
+resource clientVM 'Microsoft.Compute/virtualMachines@2022-03-01' = {
   name: clientVMName
   location: azureLocation
   properties: {
@@ -118,7 +118,7 @@ resource clientVM 'Microsoft.Compute/virtualMachines@2021-11-01' = {
   }
 }
 
-resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2021-11-01' = {
+resource vmName_DeployADDS 'Microsoft.Compute/virtualMachines/extensions@2022-03-01' = {
   parent: clientVM
   name: 'DeployADDS'
   location: azureLocation

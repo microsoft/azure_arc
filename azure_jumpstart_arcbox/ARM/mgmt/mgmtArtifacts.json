@@ -184,7 +184,7 @@
   "resources": [
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2022-01-01",
       "name": "[parameters('virtualNetworkName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -214,7 +214,7 @@
     },
     {
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2022-01-01",
       "name": "[parameters('drVirtualNetworkName')]",
       "condition": "[equals(parameters('flavor'),'DataOps')]",
       "location": "[parameters('location')]",
@@ -245,7 +245,7 @@
     },
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-      "apiVersion": "2021-08-01",
+      "apiVersion": "2022-01-01",
       "name": "[format('{0}/peering-to-DR-vnet', parameters('virtualNetworkName'))]",
       "condition": "[equals(parameters('flavor'),'DataOps')]",
       "dependsOn": [
@@ -264,7 +264,7 @@
     },
     {
       "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-      "apiVersion": "2021-08-01",
+      "apiVersion": "2022-01-01",
       "name": "[format('{0}/peering-to-primary-vnet', parameters('drVirtualNetworkName'))]",
       "condition": "[equals(parameters('flavor'),'DataOps')]",
       "dependsOn": [
@@ -283,7 +283,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2022-01-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -386,7 +386,7 @@
               "protocol": "UDP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "53"
@@ -399,7 +399,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "*",
+              "sourceAddressPrefix": "VirtualNetwork",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "53"
@@ -423,7 +423,7 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2022-01-01",
       "name": "[parameters('bastionNetworkSecurityGroupName')]",
       "condition": "[parameters('deployBastion')]",
       "location": "[parameters('location')]",
@@ -681,7 +681,7 @@
     },
     {
       "type": "Microsoft.Network/publicIpAddresses",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2022-01-01",
       "name": "[variables('bastionPublicIpAddressName')]",
       "condition": "[parameters('deployBastion')]",
       "location": "[parameters('location')]",
@@ -699,7 +699,7 @@
       "condition": "[parameters('deployBastion')]",
       "name": "[variables('bastionName')]",
       "location": "[parameters('location')]",
-      "apiVersion": "2021-05-01",
+      "apiVersion": "2022-01-01",
       "dependsOn": [
         "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
         "[resourceId('Microsoft.Network/publicIPAddresses', variables('bastionPublicIpAddressName'))]"

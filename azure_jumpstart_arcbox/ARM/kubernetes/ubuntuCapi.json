@@ -142,7 +142,7 @@
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2021-03-01",
+            "apiVersion": "2022-01-01",
             "name": "[variables('networkInterfaceName')]",
             "location": "[parameters('azureLocation')]",
             "dependsOn": [
@@ -165,7 +165,7 @@
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2021-03-01",
+            "apiVersion": "2022-01-01",
             "name": "[variables('publicIpAddressName')]",
             "condition": "[not(parameters('deployBastion'))]",
             "location": "[parameters('azureLocation')]",
