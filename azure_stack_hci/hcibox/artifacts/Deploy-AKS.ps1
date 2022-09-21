@@ -61,6 +61,17 @@ Invoke-Command -VMName $SDNConfig.HostList  -Credential $adcred -ScriptBlock {
     Initialize-AksHciNode
 }
 
+# Generate unique name for workload cluster
+$rand = New-Object System.Random
+$prefixLen = 5
+[string]$namingPrefix = ''
+for($i = 0; $i -lt $prefixLen; $i++)
+{
+    $namingPrefix += [char]$rand.Next(97,122)
+}
+$clusterName = $SDNConfig.AKSworkloadClusterName + "-" + $namingPrefix
+[System.Environment]::SetEnvironmentVariable('AKSClusterName', $clusterName,[System.EnvironmentVariableTarget]::Machine)
+
 # Install AksHci - only need to perform the following on one of the nodes
 $rg = $env:resourceGroup
 Write-Header "Prepping AKS Install"
@@ -73,16 +84,16 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
     Install-AksHci 
 }
 
-# Create new AKS workload cluster and connect it to Azure
-Write-Header "Creating AKS workload cluster"
+# Create new AKS target cluster and connect it to Azure
+Write-Header "Creating AKS target cluster"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    New-AksHciCluster -name $using:SDNConfig.AKSworkloadClusterName -nodePoolName linuxnodepool -nodecount 1 -osType linux
-    Enable-AksHciArcConnection -name $using:SDNConfig.AKSworkloadClusterName
+    New-AksHciCluster -name $using:clusterName -nodePoolName linuxnodepool -nodecount 1 -osType linux
+    Enable-AksHciArcConnection -name $using:clusterName
 }
 
 Write-Header "Checking AKS-HCI nodes and running pods"
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
-    Get-AksHciCredential -name $using:SDNConfig.AKSworkloadClusterName -Confirm:$false
+    Get-AksHciCredential -name $using:clusterName -Confirm:$false
     kubectl get nodes
     kubectl get pods -A
 }

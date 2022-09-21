@@ -37,6 +37,7 @@ $Env:HCIBoxVMDir = "C:\HCIBox\Virtual Machines"
 $Env:HCIBoxIconDir = "C:\HCIBox\Icons"
 $Env:HCIBoxVHDDir = "C:\HCIBox\VHD"
 $Env:HCIBoxSDNDir = "C:\HCIBox\SDN"
+$Env:HCIBoxKVDir = "C:\HCIBox\KeyVault"
 $Env:HCIBoxWACDir = "C:\HCIBox\Windows Admin Center"
 $Env:agentScript = "C:\HCIBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
@@ -117,6 +118,7 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/Uninstall-AKS.ps1") -OutFile $E
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-ArcDataController.ps1") -OutFile $Env:HCIBoxDir\Deploy-ArcDataController.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-SQLMI.ps1") -OutFile $Env:HCIBoxDir\Deploy-SQLMI.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-ArcResourceBridge.ps1") -OutFile $Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1
+Invoke-WebRequest ($templateBaseUrl + "artifacts/Deploy-GitOps.ps1") -OutFile $Env:HCIBoxDir\Deploy-GitOps.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/CertHelpers.ps1") -OutFile $Env:HCIBoxSDNDir\CertHelpers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerRESTWrappers.ps1") -OutFile $Env:HCIBoxSDNDir\NetworkControllerRESTWrappers.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/SDN/NetworkControllerWorkloadHelpers.psm1") -OutFile $Env:HCIBoxSDNDir\NetworkControllerWorkloadHelpers.psm1
