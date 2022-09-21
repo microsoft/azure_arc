@@ -16,8 +16,8 @@ echo "Log in to Azure with Service Principal & Getting AKS credentials (kubeconf
 az login --service-principal --username $appId --password $password --tenant $tenantId
 az aks get-credentials --name $arcClusterName --resource-group $resourceGroup --overwrite-existing
 
-# Deleting GitOps Configurations from Azure Arc Kubernetes cluster
-echo "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
+# Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster
+echo "Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster"
 az k8s-configuration flux delete --name config-nginx --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --force -y
 az k8s-configuration flux delete --name config-helloarc --cluster-name $arcClusterName --resource-group $resourceGroup --cluster-type connectedClusters --force -y
 
