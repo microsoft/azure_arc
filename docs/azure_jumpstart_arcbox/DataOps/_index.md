@@ -37,15 +37,7 @@ The sample applications included in ArcBox are:
 
 - **Bookstore** - An MVC web application. ArcBox will deploy **one Kubernetes pod replica** of the _Bookstore_ application in the _arc_ namespace onto the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS--DR-Data-xxxx_ clusters.
 
-- **DB Connection app** - An MVC application. ArcBox will deploy **one Kubernetes pod replica** as part of the Bookstore app.
-
-  - _bookbuyer_ is an HTTP client making requests to bookstore.
-  - _bookstore_ is a server, which responds to HTTP requests. It is also a client making requests to the _bookwarehouse_ service.
-  - _bookwarehouse_ is a server and should respond only to _bookstore_.
-  - _mysql_ is a MySQL database only reachable by _bookwarehouse_.
-  - _bookstore-v2_ - this is the same container as the first bookstore, but for [Open Service Mesh (OSM)](#open-service-mesh-integration) traffic split scenario we will assume that it is a new version of the app we need to upgrade to.
-
-The _bookbuyer_, _bookstore_, and _bookwarehouse_ pods will be in separate Kubernetes namespaces with the same names. _mysql_ will be in the _bookwarehouse_ namespace. _bookstore-v2_ will be in the _bookstore_ namespace.
+- **DB Connection app** - An MVC application. ArcBox will deploy **one Kubernetes pod replica** as part of the DB connection app and an Ingress controller to demonstrate the active connections to the different Azure Arc-enabled SQL Managed Instances replicas.
 
 ### Azure Monitor integration
 
@@ -210,7 +202,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`logAnalyticsWorkspaceName`_ - Name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "DataOps" to specify that you want to deploy the DataOps flavor of ArcBox
   - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
-  - _`githubUser`_ - Specify the name of your GitHub account where you cloned the Sample Apps repo
 
   ![Screenshot showing example parameters](./parameters.png)
 
@@ -252,7 +243,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`logAnalyticsWorkspaceName`_ - Name for the ArcBox Log Analytics workspace
   - _`flavor`_ - Use the value "DataOps" to specify that you want to deploy the DataOps flavor of ArcBox
   - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
-  - _`githubUser`_ - Specify the name of your GitHub account where you cloned the Sample Apps repo
 
   ![Screenshot showing example parameters](./parameters.png)
 
@@ -302,7 +292,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - _`client_admin_username`_ - Admin username for Windows & Linux VMs
   - _`client_admin_password`_ - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - **_`workspace_name`_** - Unique name for the ArcBox Log Analytics workspace
-  - _`github_username`_ - Specify the name of your GitHub account where you cloned the Sample Apps repo
 
   > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
 
@@ -381,7 +370,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
 #### The Logon scripts
 
-- Once you log into the _ArcBox-Client_ VM, multiple automated scripts will open and start running. These scripts usually take 10-20 minutes to finish, and once completed, the script windows will close automatically. At this point, the deployment is complete.
+- Once you log into the _ArcBox-Client_ VM, multiple automated scripts will open and start running. These scripts usually take 60-90 minutes to finish, and once completed, the script windows will close automatically. At this point, the deployment is complete.
 
   ![Screenshot showing ArcBox-Client](./automation.png)
 
@@ -397,7 +386,61 @@ After deployment is complete, it's time to start exploring ArcBox. Most interact
 
 ### Azure Arc-enabled SQL Managed Instance stress simulation
 
-### Azure Arc-enabled SQL Managed Instance monitoring using Grafana and Kibana
+Included in ArcBox, is a dedicated SQL stress simulation tool named SqlQueryStress automatically installed for you on the Client VM. SqlQueryStress will allow you to generate load on the Azure Arc-enabled SQL Managed Instance that can be done used to showcase how the SQL database and services are performing as well to highlight operational practices described in the next section.
+
+- To start with, open the SqlQueryStress desktop shortcut and connect to the CAPI SQL Managed Instance primary endpoint IP address. This can be found in the SQLMI Endpoints text file desktop shortcut that was created for you.
+
+  ![Screenshot showing SQL Stress application](./sql_stress_start.png)
+
+  ![Screenshot showing SQL MI endpoints file](./sqlmi-endpoint_file.png)
+
+- To connect, use "Integrated Authentication" and select the deployed sample AdventureWorks database (you can use the “Test” button to check the connection).
+
+  ![Screenshot showing SQL MI connection](./sql_stress_connection.png)
+
+- To generate some load, we will be running a simple stored procedure. Copy the below procedure and change the number of iterations you want it to run as well as the number of threads to generate even more load on the database. In addition, change the delay between queries to 1ms for allowing the stored procedure to run for a while.
+
+    ```sql
+    exec [dbo].[uspGetEmployeeManagers] @BusinessEntityID = 8
+    ```
+
+- As you can see from the example below, the configuration settings are 100,000 iterations, five threads per iteration, and a 1ms delay between queries. These configurations should allow you to have the stress test running for a while.
+
+  ![Screenshot showing SQLstress stored procedure](./sql_stress_sp.png)
+
+  ![Screenshot showing SQLstress running](./sql_stress_running.png)
+
+### Azure Arc-enabled SQL Managed Instance monitoring using Grafana
+
+When deploying Azure Arc-enabled SQL Managed Instance, a [Grafana](https://grafana.com/) instance is also automatically deployed on the same Kubernetes cluster and include built-in dashboards for both Kubernetes infrastructure as well SQL Managed Instance monitoring.
+
+- Now that you have the SqlQueryStress stored procedure running and generating load, we can look how this is shown in the the built-in Grafana dashboard. As part of the automation, a new URL desktop shortcut simply named "Grafana" was created.
+
+  ![Screenshot showing Grafana desktop shortcut](./grafana_icon.png)
+
+- [Optional] The IP address for this instance represents the Kubernetes LoadBalancer external IP that was provision as part of Azure Arc-enabled data services. Use the _kubectl get svc -n arc_ command to view the metricsui external service IP address.
+
+  ![Screenshot showing Grafana Ip address](./grafana_ip_address.png)
+
+- To log in, use the same username and password that is in the SQLMI Endpoints text file desktop shortcut
+
+  ![Screenshot showing Grafana login page](./grafana_login_page.png)
+
+- Navigate to the built-in "SQL Managed Instance Metrics" dashboard.
+
+  ![Screenshot showing Grafana metrics page](./grafana_metrics_dashboard.png)
+
+  ![Screenshot showing Grafana metrics page](./grafana_sql_mi_metrics.png)
+
+- Change the dashboard time range to "Last 5 minutes" and re-run the stress test using SqlQueryStress (in case it was already finished).
+
+  ![Screenshot showing changing time frame to last 5 minutes in grafana dashboard](./grafana_time_range.png)
+
+- You can now see how the SQL graphs are starting to show increased activity and load on the database instance.
+
+  ![Screenshot showing changing increased CPU and memory activity in grafana dashboard](./grafana_increased_activity.png)
+
+  ![Screenshot showing changing increased database activity in grafana dashboard](./grafana_database_activity.png)
 
 ### Application
 
@@ -504,11 +547,72 @@ The _ArcBox-CAPI-Data-xxxx_ and the _ArcBox_AKS_DR_Data-xxxx_ clusters are deplo
 
   ![Screenshot showing bookstore app records](./aksdr_bookstore04.png)
 
-### Additional optional scenarios on the _ArcBox-K3s_ cluster
+### Additional optional scenarios on the _ArcBox-AKS-Data-xxxx_ cluster
 
 #### Azure Arc-enabled SQL Managed Instance scaling
 
 #### Migration to Azure Arc-enabled SQL Managed Instance
+
+As part of ArcBox, a SQL Server is deployed in a nested VM on the Client VM to allow you to test migrating a database to Azure Arc-enabled SQL Managed Instance.
+
+- To connect to the source SQL instance on the nested VM, you can find the connection details in the Azure Data Studio.
+
+  ![Screenshot showing the nested SQL Server in Azure Data Studio](./sql_server_azure_data_studio.png)
+
+  ![Screenshot showing the nested SQL Server connection in Azure Data Studio](./sql_server_azure_data_studio_connection.png)
+
+- You can also connect using Microsoft SQL Server Management Studio (SSMS).
+
+  ![Screenshot showing Microsoft SQL Server Management Studio (SSMS)](./ssms_start.png)
+
+- Connect to the AKS SQL MI Managed Instance primary endpoint IP address. This can be found in the SQLMI Endpoints text file desktop shortcut and select the authentication to be _Windows Authentication_.
+
+  ![Screenshot showing connection to AKS SQL MI using Microsoft SQL Server Management Studio (SSMS)](./ssms_aks_connection.png)
+
+- Connect also to the nested SQL server using the details you got from Azure Data Studio. Use the username and password you entered when provisioning ArcBox.
+
+  ![Screenshot showing opening a new connection on the SQL server using Microsoft SQL Server Management Studio (SSMS)](./ssms_connect.png)
+
+  ![Screenshot showing connection to the nested SQL server using Microsoft SQL Server Management Studio (SSMS)](./ssms_nested_sql.png)
+
+- You can see that _AdventureWorks_ database is only available in the nested SQL Server.
+
+  ![Screenshot showing the databases view for both servers in the Microsoft SQL Server Management Studio (SSMS)](./ssms_db_comparison.png)
+
+- Expand the nested SQL instance and navigate to the AdventureWorks database and execute the following query, use the same username and password as the previous step.
+
+  ```sql
+  BACKUP DATABASE AdventureWorksLT2019
+  TO DISK = 'C:\temp\AdventureWorksLT2019.bak'
+  WITH FORMAT, MEDIANAME = 'AdventureWorksLT2019' ;
+  GO
+  ```
+  ![Screenshot showing a new in the Microsoft SQL Server Management Studio (SSMS)](./ssms_new_query.png)
+
+  ![Screenshot showing running a backup query in the Microsoft SQL Server Management Studio (SSMS)](./ssms_db_backup_complete.png)
+
+- To migrate the backup created to SQL MI, open a new PowerShell ISE session and use the following PowerShell snippet to:
+  - Copy the created backup to the client VM from the nested SQL VM
+  - Copy the backup to the Azure Arc-enabled SQL Managed Instance pod
+Initiate the backup restore process
+
+  ```powershell
+  Set-Location -Path c:\temp
+  $nestedWindowsUsername = "Administrator"
+  $nestedWindowsPassword = "ArcDemo123!!"
+  $secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
+  $winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
+  $session = New-PSSession -VMName Arcbox-SQL -Credential $winCreds
+  Copy-Item -FromSession $session -Path C:\temp\AdventureWorksLT2019.bak -Destination C:\Temp\AdventureWorksLT2019.bak
+  kubectx aks
+  kubectl cp ./AdventureWorksLT2019.bak aks-sql-0:var/opt/mssql/data/AdventureWorksLT2019.bak -n arc -c arc-sqlmi
+  kubectl exec aks-sql-0 -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P $Env:AZDATA_PASSWORD -Q "RESTORE DATABASE AdventureWorksLT2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorksLT2019.bak' WITH MOVE 'AdventureWorksLT2012_Data' TO '/var/opt/mssql/data/AdventureWorksLT2012.mdf', MOVE 'AdventureWorksLT2012_Log' TO '/var/opt/mssql/data/AdventureWorksLT2012_log.ldf'"
+  ```
+  ![Screenshot showing a PowerShell command to copy and restore the database backup to SQL MI](./powershell_db_restore.png)
+
+- Navigate to the Azure Arc-enabled SQL Managed Instance in the Microsoft SQL Server Management Studio (SSMS) and you can see that the AdventureWorks database has been restored successfully.
+
+  ![Screenshot showing the restored DB on SQL MI](./ssms_db_restore_complete.png)
 
 ### ArcBox Azure Monitor workbook
 
@@ -523,6 +627,9 @@ The following tools are including on the _ArcBox-Client_ VM.
 - kubectl, kubectx, helm
 - Chocolatey
 - Visual Studio Code
+- Microsoft SQL Server Management Studio
+- Azure Data Studio
+- SQL StressTest application
 - Putty
 - 7zip
 - Terraform
@@ -530,15 +637,13 @@ The following tools are including on the _ArcBox-Client_ VM.
 - ZoomIt
 
 ### Next steps
-  
+
 ArcBox is a sandbox that can be used for a large variety of use cases, such as an environment for testing and training or a kickstarter for proof of concept projects. Ultimately, you are free to do whatever you wish with ArcBox. Some suggested next steps for you to try in your ArcBox are:
 
-- Use the included kubectx to switch contexts between the two Kubernetes clusters
-- Deploy new GitOps configurations with Azure Arc-enabled Kubernetes
-- Build policy initiatives that apply to your Azure Arc-enabled resources
-- Write and test custom policies that apply to your Azure Arc-enabled resources
-- Incorporate your own tooling and automation into the existing automation framework
-- Build a certificate/secret/key management strategy with your Azure Arc resources
+- Use the included kubectx to switch contexts between the three Kubernetes clusters
+- Explore the different visualizations in Grafana
+- Scale the SQL MI instance's cores and memory up and down
+- Test failover and failback  scenarios to and from the DR instance
 
 ## Clean up the deployment
 
@@ -547,8 +652,6 @@ To clean up your deployment, simply delete the resource group using Azure CLI or
 ```shell
 az group delete -n <name of your resource group>
 ```
-
-![Screenshot showing az group delete](./az_delete.png)
 
 ![Screenshot showing group delete from Azure portal](./portal_delete.png)
 
@@ -562,42 +665,37 @@ Occasionally deployments of ArcBox may fail at various stages. Common reasons fo
 
       ![Screenshot showing SSH public key example](./ssh_example.png)
 
-- Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 52 available. See the [prerequisites](#prerequisites) section for more details.
+- Not enough vCPU quota available in your target Azure region - check vCPU quota and ensure you have at least 98 available. See the [prerequisites](#prerequisites) section for more details.
 - Target Azure region does not support all required Azure services - ensure you are running ArcBox in one of the supported regions listed in the above section "ArcBox Azure Region Compatibility".
 
 ### Exploring logs from the _ArcBox-Client_ virtual machine
 
-Occasionally, you may need to review log output from scripts that run on the _ArcBox-Client_, _ArcBox-CAPI-MGMT_ or _ArcBox-K3s_ virtual machines in case of deployment failures. To make troubleshooting easier, the ArcBox deployment scripts collect all relevant logs in the _C:\ArcBox\Logs_ folder on _ArcBox-Client_. A short description of the logs and their purpose can be seen in the list below:
+Occasionally, you may need to review log output from scripts that run on the _ArcBox-Client_and the _ArcBox-CAPI-MGMT_ virtual machines in case of deployment failures. To make troubleshooting easier, the ArcBox deployment scripts collect all relevant logs in the _C:\ArcBox\Logs_ folder on _ArcBox-Client_. A short description of the logs and their purpose can be seen in the list below:
 
 | Logfile | Description |
 | ------- | ----------- |
 | _C:\ArcBox\Logs\Bootstrap.log_ | Output from the initial bootstrapping script that runs on _ArcBox-Client_. |
 | _C:\ArcBox\Logs\DataOpsLogonScript.log_ | Output of _DataOpsLogonScript.ps1_ which configures the Hyper-V host and guests and onboards the guests as Azure Arc-enabled servers. |
 | _C:\ArcBox\Logs\installCAPI.log_ | Output from the custom script extension which runs on _ArcBox-CAPI-MGMT_ and configures the Cluster API for Azure cluster and onboards it as an Azure Arc-enabled Kubernetes cluster. If you encounter ARM deployment issues with _ubuntuCapi.json_ then review this log. |
-| _C:\ArcBox\Logs\installK3s.log_ | Output from the custom script extension which runs on _ArcBox-K3s_ and configures the Rancher cluster and onboards it as an Azure Arc-enabled Kubernetes cluster. If you encounter ARM deployment issues with _ubuntuRancher.json_ then review this log. |
 | _C:\ArcBox\Logs\MonitorWorkbookLogonScript.log_ | Output from _MonitorWorkbookLogonScript.ps1_ which deploys the Azure Monitor workbook. |
-| _C:\ArcBox\Logs\K3sGitOps.log_ | Output from K3sGitOps.ps1 which deploys GitOps configurations on _ArcBox-K3s_. This script must be manually run by the user. Therefore the log is only present if the user has run the script. |
-| _C:\ArcBox\Logs\K3sRBAC.log_ | Output from K3sRBAC.ps1 which deploys GitOps RBAC configurations on _ArcBox-K3s_. This script must be manually run by the user. Therefore the log is only present if the user has run the script. |
+|_C:\ArcBox\Logs\DeploySQLMIADAuth.log_ | Output from the _DeploySQLMIADAuth.ps1_ script which deploys the AD connector and SQL MI|
+| _C:\ArcBox\Logs\DataOpsAppScript.ps1_ | Output from the _DataOpsAppScript.ps1_ script which deploys the book store application |
 
   ![Screenshot showing ArcBox logs folder on ArcBox-Client](./troubleshoot_logs.png)
 
 ### Exploring installation logs from the Linux virtual machines
 
-In the case of a failed deployment, pointing to a failure in either the _ubuntuRancherDeployment_ or the _ubuntuCAPIDeployment_ Azure deployments, an easy way to explore the deployment logs is available directly from the associated virtual machines.
+In the case of a failed deployment, pointing to a failure in the _ubuntuCAPIDeployment_ Azure deployment, an easy way to explore the deployment logs is available directly from the associated virtual machine.
 
-- Depending on which deployment failed, connect using SSH to the associated virtual machine public IP:
+- Connect using SSH to the associated virtual machine public IP:
   - _ubuntuCAPIDeployment_ - _ArcBox-CAPI-MGMT_ virtual machine.
-  - _ubuntuRancherDeployment_ - _ArcBox-K3s_ virtual machine.
 
     ![Screenshot showing ArcBox-CAPI-MGMT virtual machine public IP](./arcbox_capi_mgmt_vm_ip.png)
-
-    ![Screenshot showing ArcBox-K3s virtual machine public IP](./arcbox_k3s_vm_ip.png)
 
     > **NOTE: Port 22 is not open by default in ArcBox deployments. You will need to [create an NSG rule](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DataOps/#connecting-directly-with-rdp) to allow network access to port 22, or use Azure Bastion or JIT to connect to the VM.**
 
 - As described in the message of the day (motd), depending on which virtual machine you logged into, the installation log can be found in the *jumpstart_logs* folder. This installation logs can help determine the root cause for the failed deployment.
   - _ArcBox-CAPI-MGMT_ log path: *jumpstart_logs/installCAPI.log*
-  - _ArcBox-K3s_ log path: *jumpstart_logs/installK3s.log*
 
       ![Screenshot showing login and the message of the day](./login_motd.png)
 
@@ -608,7 +706,3 @@ In the case of a failed deployment, pointing to a failure in either the _ubuntuR
   ![Screenshot showing az login error](./az_login_error.png)
 
 If you are still having issues deploying ArcBox, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on GitHub and include a detailed description of your issue, the Azure region you are deploying to, the flavor of ArcBox you are trying to deploy. Inside the _C:\ArcBox\Logs_ folder you can also find instructions for uploading your logs to an Azure storage account for review by the Jumpstart team.
-
-### Known issues
-
-- Microsoft Defender is not enabled for _ArcBox-CAPI-Data_ connected cluster.
