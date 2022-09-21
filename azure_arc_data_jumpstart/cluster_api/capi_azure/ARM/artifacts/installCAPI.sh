@@ -70,11 +70,11 @@ sudo snap install kubectl --classic
 sudo snap install kustomize
 
 # Set CAPI deployment environment variables
-export CLUSTERCTL_VERSION="1.2.0" # Do not change!
+export CLUSTERCTL_VERSION="1.2.1" # Do not change!
 export CAPI_PROVIDER="azure" # Do not change!
-export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
-export KUBERNETES_VERSION="1.24.3" # Do not change!
-export AZURE_DISK_CSI_DRIVER_VERSION="1.21.0"
+export CAPI_PROVIDER_VERSION="1.5.0" # Do not change!
+export KUBERNETES_VERSION="1.24.4" # Do not change!
+export AZURE_DISK_CSI_DRIVER_VERSION="1.22.0" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
@@ -217,6 +217,8 @@ sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUST
 # Onboarding the cluster to Azure Arc
 echo ""
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $AZURE_RESOURCE_GROUP --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
+export guid=$(echo $RANDOM | md5sum | head -c 4; echo;)
+export arcK8sClusterName=$(echo "${arcK8sClusterName}"-"${guid}")
 sudo -u $adminUsername az connectedk8s connect --name $arcK8sClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_azure_arc_data_services' --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 # Enabling Microsoft Defender for Containers and Container Insights cluster extensions

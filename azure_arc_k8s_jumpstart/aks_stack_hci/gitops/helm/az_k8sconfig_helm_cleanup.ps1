@@ -16,8 +16,8 @@ az account set --subscription $subscriptionId
 Write-Host "Getting AKS on HCI credentials (kubeconfig)"
 Get-AksHciCredential -Name $ClusterName 
 
-# Deleting GitOps Configurations from Azure Arc Kubernetes cluster
-Write-Host "Deleting GitOps Configurations from Azure Arc Kubernetes cluster"
+# Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster
+Write-Host "Deleting GitOps Configurations from Azure Arc-enabled Kubernetes cluster"
 az k8s-configuration delete --name hello-arc --cluster-name $ClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
 az k8s-configuration delete --name nginx-ingress --cluster-name $ClusterName --resource-group $resourceGroup --cluster-type connectedClusters -y
 
