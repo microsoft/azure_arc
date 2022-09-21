@@ -265,7 +265,7 @@ Start-Sleep -Seconds 10
     Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
-    if ($sqlMIName -ne $sqlInstances[2].instanceName) {
+    if ($sqlMIName -eq $sqlInstances[0].instanceName) {
         Write-Host "`n"
         Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
         kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
@@ -347,10 +347,10 @@ Write-Header "Creating Azure Data Studio settings for SQL Managed Instance conne
 
 $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 
-#$capi = $sqlInstances[0].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
-#$aksdr = $sqlInstances[2].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $arcboxDag = "ArcBoxDag.jumpstart.local" + ",$sqlmi_port"
+$sa_username = $env:AZDATA_USERNAME
+$sa_password = $env:AZDATA_PASSWORD
 
 $dagConnection = @"
 {
@@ -389,10 +389,33 @@ $aksConnection = @"
 }
 "@
 
+$sqlServerConnection = @"
+{
+    "options": {
+        "connectionName": "SQL Server",
+        "server": "10.10.1.100",
+        "database": "",
+        "authenticationType": "SqlLogin",
+        "user": "$sa_username",
+        "password": "$sa_password",
+        "applicationName": "azdata",
+        "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+        "databaseDisplayName": ""
+      },
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "providerName": "MSSQL",
+      "savePassword": true,
+      "id": "ac333479-a04b-436b-88ab-3b314a201295"
+}
+"@
+
+
+
 
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections'[0] = ConvertFrom-Json -InputObject $dagConnection
 $settingsTemplateJson.'datasource.connections'[1] = ConvertFrom-Json -InputObject $aksConnection
+$settingsTemplateJson.'datasource.connections'[2] = ConvertFrom-Json -InputObject $sqlServerConnection
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 
 Write-Host "`n"
