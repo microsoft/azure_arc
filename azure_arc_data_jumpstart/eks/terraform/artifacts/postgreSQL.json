@@ -72,9 +72,6 @@
     "numWorkers": {
       "type": "Int"
     },
-    "extensions": {
-      "type": "Array"
-    },
     "apiVersion": {
       "type": "String"
     }
@@ -102,8 +99,7 @@
           "kind": "postgresql",
           "spec": {
             "engine": {
-              "version": "[parameters('postgresEngineVersion')]",
-              "extensions": "[parameters('extensions')]"
+              "version": "[parameters('postgresEngineVersion')]"
             },
             "scale": {
               "workers": "[parameters('numWorkers')]"
@@ -139,7 +135,8 @@
           },
             "services": {
               "primary": {
-                "type": "[parameters('serviceType')]"
+                "type": "[parameters('serviceType')]",
+                "port": "15432"
               }
             },
             "storage": {

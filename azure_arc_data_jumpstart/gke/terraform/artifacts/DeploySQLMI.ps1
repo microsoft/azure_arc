@@ -3,8 +3,8 @@ Start-Transcript -Path C:\Temp\deploySQL.log
 # Deployment environment variables
 $controllerName = "jumpstart-dc"
 
-# Deploying Azure Arc SQL Managed Instance
-Write-Host "Deploying Azure Arc SQL Managed Instance"
+# Deploying Azure Arc-enabled SQL Managed Instance
+Write-Host "Deploying Azure Arc-enabled SQL Managed Instance"
 Write-Host "`n"
 
 $customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
@@ -63,7 +63,7 @@ Do {
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get sqlmanagedinstances -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
-Write-Host "Azure Arc SQL Managed Instance is ready!"
+Write-Host "Azure Arc-enabled SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Downloading demo database and restoring onto SQL MI
