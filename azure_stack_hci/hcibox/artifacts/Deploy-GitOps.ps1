@@ -115,7 +115,7 @@ Write-Host "Generating a TLS Certificate"
 $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
 $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
 Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C:\VHD\$certname.pfx" -FileSource Host
+Copy-VMFile AzSMGMT -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C:\VHD\$certname.pfx" -FileSource Host
 Invoke-Command -VMName AzSMGMT -Credential $adcred -ScriptBlock {
     $certname = $using:certname
     $certPassword = $using:certPassword
@@ -170,8 +170,8 @@ Write-Header "Creating Desktop Icons"
 
 # # Creating CAPI Hello Arc Icon on Desktop
 Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/arc.ico") -OutFile $Env:HCIBoxIconDir\arc.ico
-Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxIconDir\arc.ico" -DestinationPath "C:\VHD\arc.ico" -FileSource Host
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+Copy-VMFile AzSMGMT -SourcePath "$Env:HCIBoxIconDir\arc.ico" -DestinationPath "C:\VHD\arc.ico" -FileSource Host
+Invoke-Command -VMName AzSMGMT -Credential $adcred -ScriptBlock {
     Copy-VMFile AdminCenter -SourcePath "C:\VHD\arc.ico" -DestinationPath "C:\VMConfigs\arc.ico" -FileSource Host
     $certdns = $using:certdns
     Invoke-Command -VMName AdminCenter -Credential $using:adcred -ScriptBlock {
