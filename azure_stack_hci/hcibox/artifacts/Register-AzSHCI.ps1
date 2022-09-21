@@ -60,6 +60,7 @@ Write-Host "$clustername successfully registered as Az Stack HCI cluster resourc
 # New-AzStackHciExtension -ArcSettingName "default" -ClusterName $clustername -Name "MicrosoftMonitoringAgent" -ResourceGroupName $env:resourceGroup -ExtensionParameterType "MicrosoftMonitoringAgent" -ExtensionParameterSetting $Setting -ExtensionParameterProtectedSetting $protectedSetting
 
 # Set up cluster cloud witness
+Connect-AzAccount -ServicePrincipal -Subscription $env:subscriptionId -Tenant $env:spnTenantId -Credential $azureAppCred
 $storageKey = Get-AzStorageAccountKey -Name $env:stagingStorageAccountName -ResourceGroup $env:resourceGroup
 $saName = $env:stagingStorageAccountName
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
