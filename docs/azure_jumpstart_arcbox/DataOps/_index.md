@@ -401,6 +401,107 @@ After deployment is complete, it's time to start exploring ArcBox. Most interact
 
 ### Application
 
+ArcBox deploys bookstore application on the _ArcBox-CAPI-Data_ workload cluster.
+
+- Click on the _Bookstore_ icon on the desktop to open _Bookstore_ application.
+
+  ![Screenshot showing bookstore icon](./capi_bookstore01.png)
+
+  ![Screenshot showing bookstore app](./capi_bookstore02.png)
+
+- The App creates a new Database _demo_ and inserts 4 records. Click on the books tab to review the records.
+
+  ![Screenshot showing bookstore app records](./capi_bookstore03.png)
+
+- Open _Azure Data Studio_ and query the _demo_ DB to review the records inserted in the database.
+
+  ![Screenshot showing Azure Data Studio](./capi_bookstore04.png)
+
+  ![Screenshot showing Azure Data Studio records](./capi_bookstore05.png)
+
+  ![Screenshot showing Azure Data Studio records query](./capi_bookstore06.png)
+
+- Arcbox deploys the Bookstore app service, creates the Ingress and creates a DNS record to resolve to CAPI cluster Ingress IP. Open PowerShell and run below commands to validate.
+
+  ```shell
+  kubectx capi
+  kubectl --namespace arc get ingress
+  nslookup dataops.jumpstart.local
+  ```
+
+  ![Screenshot showing bookstore app DNS record](./capi_bookstore07.png)
+
+#### SQL Managed Instance failover
+
+When deploying Azure Arc-enabled SQL Managed Instance in an availability group, three SQL pods replicas will be deployed to assemble the availability group. The availability group includes three Kubernetes replicas with a primary and two secondaries with all CRUD operations for the availability group are managed internally, including creating the availability group or joining replicas to the availability group created.
+
+  ![Screenshot showing SQL MI pods](./capi_bookstore08.png)
+
+- Right click and run the _DataOpsTestAppScript.ps1_ script placed under _C:\ArcBox\DataOps_. The script will deploy the DB Connection App.
+
+  ![Screenshot showing DB Connection App script](./capi_bookstore09.png)
+
+- DB Connection App connects to SQL MI Primary and inserts new book every second, and logs information of server it is connected to. Open PowerShell and run the below commands and follow the logs.
+
+  ```shell
+  $pod=kubectl --namespace arc get pods --selector=app=dbconnecttest --output="jsonpath={.items..metadata.name}"
+  kubectl --namespace arc logs $pod -f
+  ```
+  
+  ![Screenshot showing DB Connection App logs 01](./capi_bookstore10.png)
+  
+  ![Screenshot showing DB Connection App logs 02](./capi_bookstore11.png)
+
+- To test that failover between the replicas, we will simulate a “crash” that will trigger an HA event and will force one of the secondary replicas to get promoted to a primary replica. Open two side-by-side PowerShell sessions. On the left side session review the deployed pods. The right-side session will be used to follow the DB Connection App logs. Delete the Primary replica by running below commands.
+
+  ```shell
+  kubectl --namespace arc get pods
+  kubectl --namespace arc delete pod capi-sql-0
+  ```
+
+  ![Screenshot showing SQL MI failover 01](./capi_bookstore12.png)
+
+- It might take a few minutes for the availability group to return to an healthy state. The secondary replica and _capi-sql-1_ was promoted to primary and DB Connection App is able to insert new records in the database.
+
+  ![Screenshot showing SQL MI failover 02](./capi_bookstore13.png)
+
+- Open _Azure Data Studio_ and query the _demo_ DB to review the records inserted in the database. Also,review the data inserted in App browser.
+
+  ![Screenshot showing bookstore app DB records](./capi_bookstore14.png)
+
+  ![Screenshot showing bookstore app](./capi_bookstore15.png)
+
+#### DR failover
+
+Use _az sql instance-failover-group-arc_ command to initiate a failover from primary to secondary. The following command initiates a failover from the primary instance to the secondary instance
+
+- Open PowerShell and run below commands to initiate the failover.
+
+  ```shell
+  kubectx capi
+  az sql instance-failover-group-arc update --name primarycr --role secondary --k8s-namespace arc --use-k8s
+  ```
+
+  ![Screenshot showing bookstore app](./aksdr_bookstore01.png)
+
+- Right click and run the _DataOpsAppDRScript.ps1_ script placed under _C:\ArcBox\DataOps_.
+
+  ![Screenshot showing bookstore app](./aksdr_bookstore02.png)
+
+- The DR script deploys the Bookstore app service, creates the Ingress and creates a DNS record to resolve to AKS DR cluster Ingress IP. Open PowerShell and run below commands to validate.
+
+  ```shell
+  kubectx aks-dr
+  kubectl --namespace arc get ingress
+  nslookup dataops.jumpstart.local
+  ```
+
+  ![Screenshot showing bookstore app records](./aksdr_bookstore03.png)
+
+- Now that we perform a successful failover, we can re-validate and make sure replication still works as expected.
+
+  ![Screenshot showing bookstore app records](./aksdr_bookstore04.png)
+
 ### High availability
 
 ### Point-in-time restore
