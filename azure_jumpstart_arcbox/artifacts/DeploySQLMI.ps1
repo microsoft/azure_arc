@@ -11,8 +11,9 @@ Write-Host "`n"
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
+$customLocationName = (Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType Microsoft.ExtendedLocation/customLocations).Name
 $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
-$customLocationId = $(az customlocation show --name "arcbox-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name $customlocationName --resource-group $Env:resourceGroup --query id -o tsv)
 
 ################################################
 # Localize ARM template
@@ -69,11 +70,6 @@ Do {
 Write-Host "Azure Arc SQL Managed Instance is ready!"
 Write-Host "`n"
 
-# Update Service Port from 1433 to Non-Standard
-$payload = '{\"spec\":{\"ports\":[{\"name\":\"port-mssql-tds\",\"port\":11433,\"targetPort\":1433}]}}'
-kubectl patch svc jumpstart-sql-external-svc -n arc --type merge --patch $payload
-Start-Sleep 5 # To allow the CRD to update
-
 # Downloading demo database and restoring onto SQL MI
 $podname = "jumpstart-sql-0"
 Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
@@ -85,6 +81,7 @@ kubectl exec $podname -n arc -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S loca
 Write-Host ""
 Write-Host "Creating Azure Data Studio settings for SQL Managed Instance connection"
 $settingsTemplate = "$Env:ArcBoxDir\settingsTemplate.json"
+
 # Retrieving SQL MI connection endpoint
 $sqlstring = kubectl get sqlmanagedinstances jumpstart-sql -n arc -o=jsonpath='{.status.primaryEndpoint}'
 
