@@ -81,6 +81,7 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $Env:agentScript = "C:\ArcBox\agentScript"
 $Env:ToolsDir = "C:\Tools"
 $Env:tempDir = "C:\Temp"
+$Env:ArcBoxDataOpsDir = "C:\ArcBox\DataOps"
 
 New-Item -Path $Env:ArcBoxDir -ItemType directory -Force
 New-Item -Path $Env:ArcBoxLogsDir -ItemType directory -Force
@@ -91,6 +92,7 @@ New-Item -Path $Env:ArcBoxIconDir -ItemType directory -Force
 New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
+New-Item -Path $Env:ArcBoxDataOpsDir -ItemType directory -Force
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\Bootstrap.log
 
@@ -219,7 +221,8 @@ if ($flavor -eq "DataOps") {
     Invoke-WebRequest ($templateBaseUrl + "artifacts/adConnector.parameters.json") -OutFile $Env:ArcBoxDir\adConnector.parameters.json
     Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsAppScript.ps1") -OutFile $Env:ArcBoxDir\DataOpsAppScript.ps1
     Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/bookstore.ico") -OutFile $Env:ArcBoxIconDir\bookstore.ico
-    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsAppDRScript.ps1") -OutFile $Env:ArcBoxDir\DataOpsAppDRScript.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsAppDRScript.ps1") -OutFile $Env:ArcBoxDataOpsDir\DataOpsAppDRScript.ps1
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/DataOpsTestAppScript.ps1") -OutFile $Env:ArcBoxDataOpsDir\DataOpsTestAppScript.ps1
 
     
 }
