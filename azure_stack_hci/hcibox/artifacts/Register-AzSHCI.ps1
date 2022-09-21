@@ -63,7 +63,7 @@ Write-Host "$clustername successfully registered as Az Stack HCI cluster resourc
 $storageKey = Get-AzStorageAccountKey -Name $env:stagingStorageAccountName -ResourceGroup $env:resourceGroup
 $saName = $env:stagingStorageAccountName
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    Set-ClusterQuorum –Cluster "hciboxcluster" -CloudWitness -AccountName $using:saName -AccessKey $using:storageKey[0].value
+    Set-ClusterQuorum -Cluster "hciboxcluster" -CloudWitness -AccountName $using:saName -AccessKey $using:storageKey[0].value
 }
 
 Stop-Transcript
