@@ -386,7 +386,7 @@
               "protocol": "UDP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "VirtualNetwork",
+              "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "53"
@@ -399,7 +399,7 @@
               "protocol": "TCP",
               "access": "Allow",
               "direction": "Inbound",
-              "sourceAddressPrefix": "VirtualNetwork",
+              "sourceAddressPrefix": "*",
               "sourcePortRange": "*",
               "destinationAddressPrefix": "*",
               "destinationPortRange": "53"
