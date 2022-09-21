@@ -115,7 +115,15 @@ Write-Host "Generating a TLS Certificate"
 $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
 $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
 Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
-Import-PfxCertificate -FilePath "$Env:TempDir\$certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $certPassword
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C:\VHD\$certname.pfx" -FileSource Host
+Invoke-Command -VMName AzSMGMT -Credential $adcred -ScriptBlock {
+    $certname = $using:certname
+    $certPassword = $using:certPassword
+    Copy-VMFile AdminCenter -SourcePath "C:\VHD\$certname.pfx" -DestinationPath "C:\VMConfigs\$certname.pfx" -FileSource Host
+    Invoke-Command -VMName AdminCenter -Credential $using:adcred -ScriptBlock {
+        Import-PfxCertificate -FilePath "C:\VMConfigs\$using:certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $using:certPassword
+    }
+}
 
 Write-Host "Importing the TLS certificate to Key Vault"
 az keyvault certificate import --vault-name $Env:keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
@@ -154,22 +162,25 @@ $clientSecret = $env:spnClientSecret
 }
 
 # Insert into HOSTS file
-# Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$ip`t$certdns" -Force
-# This needs to go into WAC VM
-# Cert also needs to be imported to WAC VM
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$using:ip`t$using:certdns" -Force
+}
 
 Write-Header "Creating Desktop Icons"
 
 # # Creating CAPI Hello Arc Icon on Desktop
-# $shortcutLocation = "$Env:Public\Desktop\CAPI Hello-Arc.lnk"
-# $wScriptShell = New-Object -ComObject WScript.Shell
-# $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-# $shortcut.TargetPath = "https://$certdns"
-# $shortcut.IconLocation="$Env:ArcBoxIconDir\arc.ico, 0"
-# $shortcut.WindowStyle = 3
-# $shortcut.Save()
-
-
-
-
-
+Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/arc.ico") -OutFile $Env:HCIBoxIconDir\arc.ico
+Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxIconDir\arc.ico" -DestinationPath "C:\VHD\arc.ico" -FileSource Host
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+    Copy-VMFile AdminCenter -SourcePath "C:\VHD\arc.ico" -DestinationPath "C:\VMConfigs\arc.ico" -FileSource Host
+    $certdns = $using:certdns
+    Invoke-Command -VMName AdminCenter -Credential $using:adcred -ScriptBlock {
+        $shortcutLocation = "$Env:Public\Desktop\Hello-Arc.lnk"
+        $wScriptShell = New-Object -ComObject WScript.Shell
+        $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+        $shortcut.TargetPath = "https://$using:certdns"
+        $shortcut.IconLocation="C:\VMConfigs\arc.ico, 0"
+        $shortcut.WindowStyle = 3
+        $shortcut.Save()
+    }
+}
