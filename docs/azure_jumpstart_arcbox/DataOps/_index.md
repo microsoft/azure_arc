@@ -542,6 +542,7 @@ To view backups of full, differential, and transaction logs wait for more than 1
 
 - In order to restore database you need to find the last well known backup copy that you would like to restore. You can list all the available backups by running the following SQL query in **msdb** database.
 
+```sql
 SELECT TOP (1000) [backup_set_id]
       ,[database_name]
       ,[backup_start_date]
@@ -553,6 +554,7 @@ SELECT TOP (1000) [backup_set_id]
       ,[last_valid_restore_time]
   FROM [msdb].[dbo].[backupset]
   WHERE database_name = 'AdventureWorks2019'
+```
 
 - Run this query in Azure Data Studio to display available backups. Right click **msdb**, select New Query and copy paste above query in the query editor and click Run.
 
