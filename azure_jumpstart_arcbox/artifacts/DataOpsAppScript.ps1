@@ -2,7 +2,7 @@ $Env:ArcBoxDir = "C:\ArcBox"
 $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-$CName = "dataops"
+$CName = "jumpstartbooks"
 $certdns = "$CName.jumpstart.local"
 $password = "arcbox"
 $appNamespace = "arc"
