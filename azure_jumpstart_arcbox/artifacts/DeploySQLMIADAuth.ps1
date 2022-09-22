@@ -201,10 +201,9 @@ Start-Sleep -Seconds 10
 
     # Storage
     $StorageClassName = $sqlInstance.storageClassName
-    $dataStorageSize = "30"
-    $logsStorageSize = "30"
-    $dataLogsStorageSize = "30"
-    $backupsStorageSize = "30"
+    $dataStorageSize = "30Gi"
+    $logsStorageSize = "30Gi"
+    $dataLogsStorageSize = "30Gi"
 
     # High Availability
     $replicas = 3 # Deploy SQL MI "Business Critical" tier
