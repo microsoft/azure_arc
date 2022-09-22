@@ -29,9 +29,9 @@ $memoryLimit = "8Gi"
 
 # Storage
 $StorageClassName = "managed-premium"
-$dataStorageSize = "5"
-$logsStorageSize = "5"
-$dataLogsStorageSize = "5"
+$dataStorageSize = "5Gi"
+$logsStorageSize = "5Gi"
+$dataLogsStorageSize = "5Gi"
 
 # High Availability
 $replicas = 3 # Deploy SQL MI "Business Critical" tier
