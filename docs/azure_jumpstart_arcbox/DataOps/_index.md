@@ -405,6 +405,78 @@ After deployment is complete, it's time to start exploring ArcBox. Most interact
 
 ### Point-in-time restore
 
+Arc-enabled SQL Managed Instance is deployed as part of the ArcBox_DataOps deployment. By default [automatic backups](/azure/azure-arc/data/point-in-time-restore#automatic-backups) of the databases is enabled in Arc-enabled SQL MI . Full backup is performed when a new database is created or restored and subsequent full backups are performed weekly. Differential backups are taken every 12 hours and transaction log backups every 5 minutes. Default retention period of these backups is 7 days and is [configurable](/azure/azure-arc/data/point-in-time-restore#configure-retention-period).
+
+This article provides instructions on how to perform point in time restore from the automatic backups available in Arc-enabled SQL MI to recover lost or corrupted data.
+
+To view backups of full, differential, and transaction logs wait for more than 12 hours after deploying the ArcBox DataOps or Full flavor. Once these backups are available follow instructions below to perform a point in time restore of database.
+
+- Once you login to the ArcBox-Client VM using RDP or bastion host, locate Azure Data Studio icon on the desktop and open.
+
+![Open Azure Data Studio](./sqlmi-pitr-azdatastudio.png)
+
+- Click on ArcBoxDAG to connect to the **capi-sql** Arc-enabled SQL MI and view databases. Right click and select **Manage** to view databases. Alternatively you can expand ArcBoxDAG connection to view databases.
+
+![View Arc-enabled SQL MI databases](./sqlmi-pitr-azdatastudio-capisql.png)
+
+![View Arc-enabled SQL MI databases](./sqlmi-pitr-databases.png)
+
+- In order to restore database you need to find the last well known backup copy that you would like to restore. You can list all the available backups by running the following SQL query in **msdb** database.
+
+SELECT TOP (1000) [backup_set_id]
+      ,[database_name]
+      ,[backup_start_date]
+      ,[backup_finish_date]
+      ,[type]
+      ,[backup_size]
+      ,[server_name]
+      ,[machine_name]
+      ,[last_valid_restore_time]
+  FROM [msdb].[dbo].[backupset]
+  WHERE database_name = 'AdventureWorks2019'
+
+- Run this query in Azure Data Studio to display available backups. Right click **msdb**, select New Query and copy paste above query in the query editor and click Run.
+
+![View Arc-enabled SQL MI databases](./sqlmi-pitr-backuplist.png)
+
+- Identify the backup set that you would like to restore and make note of the **backup_finish_date** value to use in the restore step. Modify the date format as **2022-09-20T23:14:13.000000Z**
+
+- Connect to the Arc data controller to restore database using Azure Data Studio. Click on the Connect controller button under Azure Arc Controllers to connecting to an existing data controller.
+
+![Connect to Azure Arc Data Controller](./sqlmi-pitr-connect-datacontroller.png)
+
+- Specify **arc** as namespace, leave the default values and click on Connect
+
+![Connect to Azure Arc Data Controller details](./sqlmi-pitr-connect-datacontroller-details.png)
+
+- Once connection is successful, expand Azure Arc Controllers, expand **arcbox-capi-dc** to view Arc-enabled SQL MI
+
+![Azure Arc Data Controller](./sqlmi-pitr-datacontroller.png)
+
+- Right click on capi-sql Arc-enabled SQL MI and select Manage.
+
+![Azure Arc Data Controller Manage SQL MI](./sqlmi-pitr-connect-datacontroller-manage.png)
+
+- Click on Connect to Server and enter database username and password to connect to the database to view databases.
+
+![Azure Arc Data Controller Manage SQL MI](./sqlmi-pitr-connect-to-sqlmi.png)
+
+- Click on Backups to view databases and available backups to restore
+
+![Azure Arc-enabled SQL MI databases](./sqlmi-pitr-database-list.png)
+
+- Click on Restore link as shown below to restore AdeventureWorks2019 database.
+
+![Azure Arc-enabled SQL MI database restore](./sqlmi-pitr-database-select-restore.png)
+
+- Specify target database name to restore and backup set datetime that is noted down in the previous steps and click on Restore.
+
+![Azure Arc-enabled SQL MI target database restore](./sqlmi-pitr-targetdb.png)
+
+- Wait until database restore operation is complete and refresh ArcBoxDAG connection to refresh and view restored database.
+
+![Azure Arc-enabled SQL MI restored database](./sqlmi-pitr-restored-database.png)
+
 ### Disaster Recovery
 
 ### Additional optional scenarios on the _ArcBox-K3s_ cluster
