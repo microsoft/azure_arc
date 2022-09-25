@@ -7,11 +7,11 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 #$guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
 
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi'; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config" }
 
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-aks"}
 
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' ; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-aksdr"}
 
 )
 
@@ -247,11 +247,11 @@ Write-Host "`n"
 azdata --version
 
 # Getting AKS clusters' credentials
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file "C:\Users\$Env:USERNAME\.kube\config-aks"
 
 Start-Sleep -Seconds 10
 
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file "C:\Users\$Env:USERNAME\.kube\config-aksdr"
 
 kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
@@ -267,13 +267,13 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     #kubectx $cluster.context
     Write-Host "Checking K8s Nodes"
     Write-Host "`n"
-    kubectl get nodes
+    kubectl get nodes --kubeconfig $PSItem.kubeconfig
     Write-Host "`n"
     az connectedk8s connect --name $PSItem.clusterName `
         --resource-group $Env:resourceGroup `
         --location $Env:azureLocation `
         --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-        --kube-context $PSItem.context
+        --kube-config $PSItem.kubeconfig
 
     Start-Sleep -Seconds 20
 
@@ -312,9 +312,9 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
 ################################################
 # - Deploying data services on CAPI cluster
 ################################################
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc --context "capi"; Start-Sleep -Seconds 5; Clear-Host } }
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc --context "aks"; Start-Sleep -Seconds 5; Clear-Host } }
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc --context "aks-dr"; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks"; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr"; Start-Sleep -Seconds 5; Clear-Host } }
 
 
 $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
@@ -337,7 +337,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     Do {
         Write-Host "Waiting for bootstrapper pod, hold tight..."
         Start-Sleep -Seconds 20
-        $podStatus = $(if (kubectl get pods -n arc --context $PSItem.context| Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
+        $podStatus = $(if (kubectl get pods -n arc --kube-config $PSItem.kubeconfig | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($podStatus -eq "Nope")
     Write-Host "Bootstrapper pod is ready!"
     Write-Host "`n"
@@ -346,7 +346,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     Write-Header "Configuring Azure Arc Custom Location"
     $connectedClusterId = az connectedk8s show --name $PSItem.clusterName --resource-group $Env:resourceGroup --query id -o tsv
     $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $PSItem.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-    az customlocation create --name $PSItem.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
+    az customlocation create --name $PSItem.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kube-config $PSItem.kubeconfig
 
     Start-Sleep -Seconds 20
     # Deploying Azure Arc Data Controller on the capi cluster
@@ -378,7 +378,7 @@ $clusters | Foreach-Object -ThrottleLimit 5 -Parallel {
     Do {
         Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
         Start-Sleep -Seconds 45
-        $dcStatus = $(if (kubectl get datacontroller -n arc --context $PSItem.context | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+        $dcStatus = $(if (kubectl get datacontroller -n arc --kube-config $PSItem.kubeconfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
     } while ($dcStatus -eq "Nope")
     Write-Host "Azure Arc data controller is ready!"
     Write-Host "`n"
