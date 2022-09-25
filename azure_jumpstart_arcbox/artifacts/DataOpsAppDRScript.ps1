@@ -7,6 +7,9 @@ $sqlInstance = "aks-dr"
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsAppDRScript.log
 
+# Switch kubectl context to AKS DR
+kubectx $sqlInstance
+
 Write-Header "Adding CName Record for App"
 $dcInfo = Get-ADDomainController
 Do
@@ -17,8 +20,6 @@ Do
 Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$CName-$sqlInstance" -AllowUpdateAny -IPv4Address $appIpaddress -TimeToLive 01:00:00 -AgeRecord
 Add-DnsServerResourceRecordCName -Name $CName -ComputerName $dcInfo.HostName -HostNameAlias "$CName-$sqlInstance.jumpstart.local" -ZoneName jumpstart.local -TimeToLive 00:05:00
 
-# Switch kubectl context to capi
-kubectx $sqlInstance
 # Deploy the App and service
 $appCAPI = @"
 apiVersion: apps/v1
@@ -39,7 +40,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: arcjumpstart.azurecr.io/demoapp:dr
+        image: azurearcjumpstart.azurecr.io/demoapp:dr
         ports:
         - containerPort: 80
         volumeMounts:
@@ -99,8 +100,8 @@ $appIngress | kubectl apply -n $appNamespace -f -
 
 Do {
     Write-Host "Waiting for Web App pod, hold tight..."
-    Start-Sleep -Seconds 300
-    $podStatus = $(if(kubectl get pods -n arc | Select-String "web-app" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
+    Start-Sleep -Seconds 240
+    $podStatus = $(if(kubectl get pods -n $appNamespace | Select-String "web-app" | Select-String "Running" -Quiet){"Ready!"}Else{"Nope"})
 } while ($podStatus -eq "Nope")
 
 # Stop transcript
