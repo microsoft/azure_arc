@@ -7,11 +7,11 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 #$guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
 
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi'; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config" }
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi'; kubeconfig = "C:\Users\$Env:USERNAME\.kube\config" }
 
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-aks"}
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeconfig = "C:\Users\$Env:USERNAME\.kube\config-aks"}
 
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' ; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-aksdr"}
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' ; kubeconfig = "C:\Users\$Env:USERNAME\.kube\config-aksdr"}
 
 )
 
