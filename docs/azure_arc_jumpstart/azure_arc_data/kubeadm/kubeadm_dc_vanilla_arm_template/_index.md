@@ -10,7 +10,7 @@ description: >
 
 The following Jumpstart scenario will guide you on how to deploy a "Ready to Go" environment so you can start using Azure Arc Data Services and deploy Azure data services on single-node Kubernetes cluster deployed with [Kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) in az Azure Ubuntu VM, using [Azure ARM Template](https://docs.microsoft.com/azure/azure-resource-manager/templates/overview).
 
-By the end of this scenario, you will an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
+By the end of this scenario, you will have an Ubuntu VM deployed with an Azure Arc Data Controller and a Microsoft Windows Server 2022 (Datacenter) Azure VM, installed & pre-configured with all the required tools needed to work with Azure Arc Data Services.
 
 > **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
@@ -77,9 +77,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 * Deploy a single-node Kubernetes cluster using Kubeadm.
 * Deploy the Azure Arc Data Controller on that cluster.
-* Once Ubuntu VM deployment has finished, the main ARM template will call a secondary ARM template which is depended on a successful Ubuntu VM deployment.
+* Once the Ubuntu VM deployment has finished, the main ARM template will call a secondary ARM template which is dependent on a successful Ubuntu VM deployment.
 * Secondary ARM template will deploy a client Windows Server 2019 VM.
-* As part of the Windows Server 2019 VM deployment, there are 2 script executions; First PowerShell script [ClientTools.ps1](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/ClientTools.ps1) at deployment runtime using the ARM *CustomScriptExtension* module and the second PowerShell script *LogonScript.ps1* on user first logon to Windows.
+* As part of the Windows Server 2019 VM deployment, there are 2 script executions; The first PowerShell script [ClientTools.ps1](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/scripts/ClientTools.ps1) runs at deployment runtime using the ARM *CustomScriptExtension* module and the second PowerShell script *LogonScript.ps1* runs on the user's first logon to Windows.
 
 * Runtime script will:
 
@@ -102,7 +102,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment
 
-As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible on deploying Ubuntu VM install with Kubernetes and the Data Controller. Once Ubuntu VM deployment has finished, the template will then automatically execute another template which will deploy the Windows Server Azure VM which will be automatically connected to the Kubernetes cluster.
+As mentioned, this deployment will leverage ARM templates. You will deploy a single template, responsible for deploying the Ubuntu VM with Kubernetes installed and the Data Controller. Once the Ubuntu VM deployment has finished, the template will then automatically execute another template which will deploy the Windows Server Azure VM which will automatically connect to the Kubernetes cluster.
 
 * The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [*azuredeploy.parameters.json*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/arm_template/azuredeploy.parameters.example.json).
 
@@ -172,7 +172,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
     Let the script to run it's course and **do not close** the PowerShell session, this will be done for you once completed. **The logon script run time is approximately 30s long**.  
 
-    Once the script will finish it's run, the logon script PowerShell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
+    Once the script finishes it's run, the logon script PowerShell session will be closed and the *kubeconfig* is copied to the *.kube* folder of the Windows user profile, the client VM will be ready to use.
 
     ![PowerShell logon script run](./05.png)
 
