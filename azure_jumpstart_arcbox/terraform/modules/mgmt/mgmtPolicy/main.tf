@@ -53,14 +53,14 @@ locals {
           id     = "/providers/Microsoft.Authorization/policyDefinitions/708b60a6-d253-4fe0-9114-4be4c00f012c"
           params = {}
           role   = "Log Analytics Contributor"
-          flavor = [ "Full", "DevOps" ]
+          flavor = [ "Full", "DevOps" , "DataOps" ]
       },
       {
           name   = "(ArcBox) Tag resources"
           id     = "/providers/Microsoft.Authorization/policyDefinitions/4f9dc7db-30c1-420c-b61a-e1d640128d26"
           params = { "tagName": { "value": "project" }, "tagValue": { "value": "jumpstart_arcbox" }}
           role   = "Tag Contributor"
-          flavor = [ "Full", "DevOps", "ITPro"  ]
+          flavor = [ "Full", "DevOps", "ITPro" , "DataOps" ]
       }
   ]
 }
