@@ -152,6 +152,8 @@ foreach ($sqlInstance in $sqlInstances) {
     $b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_USERNAME))
     $b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_PASSWORD))
 
+    Start-Sleep -Seconds 10
+
     Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-stage.parameters.json"
     $adConnectorParams = "$Env:ArcBoxDir\adConnector-stage.parameters.json"
     $adConnectorName = $sqlInstance.dataController + "/adarc"
