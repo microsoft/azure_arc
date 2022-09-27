@@ -55,11 +55,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'capi-sql'; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{instanceName = 'capi-sql'; dataController = "$Env:capiArcDataClusterName-dc"; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{instanceName = 'aks-sql'; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{instanceName = 'aks-sql'; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 $sqlmiouName = "ArcSQLMI"
@@ -125,11 +125,23 @@ foreach ($sqlInstance in $sqlInstances) {
     # Geneate key tab
     setspn -A MSSQLSvc/${sqlmi_fqdn_name} ${domain_netbios_name}\${samaccountname}
     setspn -A MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
+
+    # Secondary instance spn
+    setspn -A MSSQLSvc/${sqlmi_secondary_fqdn_name} ${domain_netbios_name}\${samaccountname}
+    setspn -A MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port} ${domain_netbios_name}\${samaccountname}
+
     $keytab_file = "$Env:ArcBoxDir\$sqlMIName.keytab"
     ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /out $keytab_file -setpass -setupn /pass $arcsapass
     ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
     ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
     ktpass /princ MSSQLSvc/${sqlmi_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+    
+    # Generate Keytab for secondary
+    ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+    ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+    ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+    ktpass /princ MSSQLSvc/${sqlmi_secondary_fqdn_name}:${sqlmi_port}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
+    
     ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
     ktpass /princ ${samaccountname}@${domain_name} /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser ${domain_netbios_name}\${samaccountname} /in $keytab_file /out $keytab_file -setpass -setupn /pass $arcsapass
     # Convert key tab file into base64 data
@@ -139,6 +151,8 @@ foreach ($sqlInstance in $sqlInstances) {
     # Convert SQL Admin credentials into base64 format
     $b64UserName = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_USERNAME))
     $b64Password = [System.Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($env:AZDATA_PASSWORD))
+
+    Start-Sleep -Seconds 10
 
     Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-stage.parameters.json"
     $adConnectorParams = "$Env:ArcBoxDir\adConnector-stage.parameters.json"
@@ -154,7 +168,6 @@ foreach ($sqlInstance in $sqlInstances) {
 
 
     az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\adConnector.json" --parameters "$Env:ArcBoxDir\adConnector-stage.parameters.json"
-    Write-Host "`n"
 
     Write-Host "`n"
     Do {
@@ -188,10 +201,9 @@ foreach ($sqlInstance in $sqlInstances) {
 
     # Storage
     $StorageClassName = $sqlInstance.storageClassName
-    $dataStorageSize = "30"
-    $logsStorageSize = "30"
-    $dataLogsStorageSize = "30"
-    $backupsStorageSize = "30"
+    $dataStorageSize = "30Gi"
+    $logsStorageSize = "30Gi"
+    $dataLogsStorageSize = "30Gi"
 
     # High Availability
     $replicas = 3 # Deploy SQL MI "Business Critical" tier
@@ -252,7 +264,7 @@ foreach ($sqlInstance in $sqlInstances) {
     Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
-    if ($sqlMIName -ne $sqlInstances[2].instanceName) {
+    if ($sqlMIName -eq $sqlInstances[0].instanceName) {
         Write-Host "`n"
         Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
         kubectl exec $podname -n arc -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
@@ -276,20 +288,28 @@ foreach ($sqlInstance in $sqlInstances) {
     Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
  
     # Write endpoint information in the file
-
-    Add-Content $Endpoints "$sqlMIName external endpoint DNS name for AD Authentication:"
-    $sqlmiEndPoint | Add-Content $Endpoints
+    
+    $SQLInstanceName = $sqlInstance.context.toupper()
+    
+    Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
-    Add-Content $Endpoints "$sqlMIName secondary external endpoint DNS name for AD Authentication:"
+    Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"
+    $sqlmiEndPoint | Add-Content $Endpoints
+
+    Add-Content $Endpoints ""
+    Add-Content $Endpoints "$SQLInstanceName secondary external endpoint DNS name for AD Authentication:"
     $sqlmiSecondaryEndPoint | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
-    Add-Content $Endpoints "SQL Managed Instance username:"
+    Add-Content $Endpoints "SQL Managed Instance SQL login username:"
     $env:AZDATA_USERNAME | Add-Content $Endpoints
 
     Add-Content $Endpoints ""
-    Add-Content $Endpoints "SQL Managed Instance password:"
+    Add-Content $Endpoints "SQL Managed Instance SQL login password:"
     $env:AZDATA_PASSWORD | Add-Content $Endpoints
+    Add-Content $Endpoints ""
+    
+    Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
 }
 
@@ -326,10 +346,10 @@ Write-Header "Creating Azure Data Studio settings for SQL Managed Instance conne
 
 $settingsTemplateFile = "$Env:ArcBoxDir\settingsTemplate.json"
 
-#$capi = $sqlInstances[0].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $aks = $sqlInstances[1].instanceName + ".jumpstart.local" + ",$sqlmi_port"
-#$aksdr = $sqlInstances[2].instanceName + ".jumpstart.local" + ",$sqlmi_port"
 $arcboxDag = "ArcBoxDag.jumpstart.local" + ",$sqlmi_port"
+$sa_username = $env:AZDATA_USERNAME
+$sa_password = $env:AZDATA_PASSWORD
 
 $dagConnection = @"
 {
@@ -368,10 +388,33 @@ $aksConnection = @"
 }
 "@
 
+$sqlServerConnection = @"
+{
+    "options": {
+        "connectionName": "SQL Server",
+        "server": "10.10.1.100",
+        "database": "",
+        "authenticationType": "SqlLogin",
+        "user": "$sa_username",
+        "password": "$sa_password",
+        "applicationName": "azdata",
+        "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+        "databaseDisplayName": ""
+      },
+      "groupId": "C777F06B-202E-4480-B475-FA416154D458",
+      "providerName": "MSSQL",
+      "savePassword": true,
+      "id": "ac333479-a04b-436b-88ab-3b314a201295"
+}
+"@
+
+
+
 
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections'[0] = ConvertFrom-Json -InputObject $dagConnection
 $settingsTemplateJson.'datasource.connections'[1] = ConvertFrom-Json -InputObject $aksConnection
+$settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $sqlServerConnection
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 
 Write-Host "`n"
