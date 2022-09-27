@@ -280,9 +280,6 @@ foreach ($cluster in $clusters) {
             az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$using:workspaceId
             Write-Host "`n"
         }
-        
-    
-        
     }
 }
 
@@ -290,15 +287,15 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
     Write-Host -NoNewLine "."
     Start-Sleep -Seconds 10
 }
-write-host "Successfully connected clusters"
+write-host "Successfully Arc-enabled the Kubernetes clusters"
 get-job -name arcbox | remove-job
 
 ################################################
 # - Deploying data services on CAPI cluster
 ################################################
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
 
 foreach ($cluster in $clusters) {
+    $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc --context $cluster.context; Start-Sleep -Seconds 5; Clear-Host } }
     # Installing the Azure Arc-enabled data services cluster extension on the capi cluster
     Start-Job -Name arcbox -ScriptBlock {
         $cluster = $using:cluster
