@@ -414,7 +414,7 @@ $sqlServerConnection = @"
 $settingsTemplateJson = Get-Content $settingsTemplateFile | ConvertFrom-Json
 $settingsTemplateJson.'datasource.connections'[0] = ConvertFrom-Json -InputObject $dagConnection
 $settingsTemplateJson.'datasource.connections'[1] = ConvertFrom-Json -InputObject $aksConnection
-$settingsTemplateJson.'datasource.connections'[2] = ConvertFrom-Json -InputObject $sqlServerConnection
+$settingsTemplateJson.'datasource.connections' += ConvertFrom-Json -InputObject $sqlServerConnection
 ConvertTo-Json -InputObject $settingsTemplateJson -Depth 3 | Set-Content -Path $settingsTemplateFile
 
 Write-Host "`n"
