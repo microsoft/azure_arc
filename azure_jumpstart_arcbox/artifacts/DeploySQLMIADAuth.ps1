@@ -55,11 +55,11 @@ else {
 
 $sqlInstances = @(
 
-    [pscustomobject]@{instanceName = 'capi-sql'; dataController = 'arcbox-capi-dc'; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{instanceName = 'capi-sql'; dataController = "$Env:capiArcDataClusterName-dc"; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
 
-    [pscustomobject]@{instanceName = 'aks-sql'; dataController = 'arcbox-aks-dc'; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{instanceName = 'aks-sql'; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
 
-    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = 'arcbox-aks-dr-dc'; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
+    [pscustomobject]@{instanceName = 'aks-dr-sql'; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
 
 )
 $sqlmiouName = "ArcSQLMI"
