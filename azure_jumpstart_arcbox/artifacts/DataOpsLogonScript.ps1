@@ -245,9 +245,6 @@ azdata --version
 
 # Getting AKS clusters' credentials
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file c:\users\arcdemo\.kube\config-aks
-
-Start-Sleep -Seconds 10
-
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file c:\users\arcdemo\.kube\config-aksdr
 
 Start-Sleep -Seconds 10
@@ -255,20 +252,21 @@ Start-Sleep -Seconds 10
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
-        Write-Host "`n"
-        kubectl get nodes --context $cluster.context
         Start-Job -Name arcbox -ScriptBlock {
             $cluster = $using:cluster
             Write-Host "`n"
             Write-Host "Checking K8s Nodes"
+            kubectl get nodes --kubeconfig $cluster.kubeConfig
             Write-Host "`n"
             Write-Host "`n"
+            $cluster.kubeConfig
             az connectedk8s connect --name $cluster.clusterName `
                 --resource-group $Env:resourceGroup `
                 --location $Env:azureLocation `
                 --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-                --kube-context $cluster.context
-            Start-Sleep -Seconds 20
+                --kube-config $cluster.kubeConfig
+
+            Start-Sleep -Seconds 10
     
             # Enabling Container Insights cluster extension on primary AKS cluster
             Write-Host "`n"
