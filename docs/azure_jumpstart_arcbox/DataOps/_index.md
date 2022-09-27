@@ -27,15 +27,15 @@ ArcBox for DataOps deploys three Kubernetes clusters to give you multiple option
 
 - _**ArcBox-CAPI-Data-xxxx**_ - A single-node Rancher K3s cluster which is then transformed to a [Cluster API](https://cluster-api.sigs.k8s.io/user/concepts.html) management cluster using the Cluster API Provider for Azure (CAPZ), and a workload cluster (_ArcBox-CAPI-Data_) is deployed onto the management cluster. The workload cluster is onboarded as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys an Azure Arc Data Controller, an Active Directory connector and an Azure Arc-enabled SQL Managed Instance on top of the connected cluster.
 - _**ArcBox-AKS-Data-xxxx**_ - An AKS cluster that is connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys an Azure Arc Data Controller, an Active Directory connector and an Azure Arc-enabled SQL Managed Instance on top of the connected cluster.
-- _**ArcBox-AKS--DR-Data-xxxx**_ - An AKS cluster that is deployed in a separate virtual network, designating a disaster recovery site. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys an Azure Arc Data Controller, an Active Directory connector and an Azure Arc-enabled SQL Managed Instance on top of the connected cluster. This cluster is then configured with _ArcBox-CAPI-Data-xxxx_ to be part of a distributed availability group for disaster recovery.
+- _**ArcBox-AKS-DR-Data-xxxx**_ - An AKS cluster that is deployed in a separate virtual network, designating a disaster recovery site. This cluster is then connected to Azure as an Azure Arc-enabled Kubernetes resource. ArcBox automatically deploys an Azure Arc Data Controller, an Active Directory connector and an Azure Arc-enabled SQL Managed Instance on top of the connected cluster. This cluster is then configured with _ArcBox-CAPI-Data-xxxx_ to be part of a distributed availability group for disaster recovery.
 
 ### Sample applications
 
-ArcBox for DataOps deploys two sample applications on the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS--DR-Data-xxxx_ clusters.
+ArcBox for DataOps deploys two sample applications on the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS-DR-Data-xxxx_ clusters.
 
 The sample applications included in ArcBox are:
 
-- **Bookstore** - An MVC web application. ArcBox will deploy **one Kubernetes pod replica** of the _Bookstore_ application in the _arc_ namespace onto the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS--DR-Data-xxxx_ clusters.
+- **Bookstore** - An MVC web application. ArcBox will deploy **one Kubernetes pod replica** of the _Bookstore_ application in the _arc_ namespace onto the _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS-DR-Data-xxxx_ clusters.
 
 - **DB Connection app** - An MVC application. ArcBox will deploy **one Kubernetes pod replica** as part of the DB connection app and an Ingress controller to demonstrate the active connections to the different Azure Arc-enabled SQL Managed Instances replicas.
 
@@ -45,7 +45,7 @@ ArcBox deploys metrics and logs upload to Azure Monitor for the deployed data se
 
 ### Hybrid Unified Operations
 
-ArcBox deploys several management and operations services that work with ArcBox's Azure Arc resources. These resources include an an Azure Automation account, an Azure Log Analytics workspace, an Azure Monitor workbook, Azure Policy assignments for deploying Kubernetes cluster monitoring and security extensions on the included clusters, Azure Policy assignment for adding tags to resources, and a storage account used for staging resources needed for the deployment automation.
+ArcBox allows you to experience various Azure Arc-enabled SQL Managed Instance unified operations like Point-in-Time restore, disaster recovery, high availability, monitoring and migration. Once deployed, you will be able to connect to the SQL instances deployed on the three clusters and test different operations with the aid of a bookstore application.
 
 ## ArcBox Azure Consumption Costs
 
@@ -189,7 +189,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - Clone the Azure Arc Jumpstart repository
 
     ```shell
-    git clone https://github.com/microsoft/azure_arc.git
+    git clone https://github.com/microsoft/azure_arc.git -b arcbox_dataops
     ```
 
 - Edit the [azuredeploy.parameters.json](https://github.com/microsoft/azure_arc/blob/arcbox_dataops/azure_jumpstart_arcbox/ARM/azuredeploy.parameters.json) ARM template parameters file and supply some values for your environment.
@@ -224,7 +224,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - Clone the Azure Arc Jumpstart repository
 
   ```shell
-  git clone https://github.com/microsoft/azure_arc.git
+  git clone https://github.com/microsoft/azure_arc.git -b arcbox_dataops
   ```
 
 - Upgrade to latest Bicep version
@@ -259,7 +259,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 - Clone the Azure Arc Jumpstart repository
 
   ```shell
-  git clone https://github.com/microsoft/azure_arc.git
+  git clone https://github.com/microsoft/azure_arc.git -b arcbox_dataops
   ```
 
 - Download and install the latest version of Terraform [here](https://www.terraform.io/downloads.html)
@@ -289,8 +289,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - **_`client_admin_ssh`_** - SSH public key path, used for Linux VMs
   - **_`deployment_flavor`_** - Use the value "DataOps" to specify that you want to deploy the DataOps flavor of ArcBox
   - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
-  - _`client_admin_username`_ - Admin username for Windows & Linux VMs
-  - _`client_admin_password`_ - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - **_`client_admin_username`_** - Admin username for Windows & Linux VMs
+  - **_`client_admin_password`_** - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - **_`workspace_name`_** - Unique name for the ArcBox Log Analytics workspace
 
   > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
@@ -524,7 +524,7 @@ When deploying Azure Arc-enabled SQL Managed Instance in the Business critical t
 
 ### Point-in-time restore
 
-Arc-enabled SQL Managed Instance is deployed as part of the ArcBox_DataOps deployment. By default [automatic backups](/azure/azure-arc/data/point-in-time-restore#automatic-backups) of the databases is enabled in Arc-enabled SQL MI . Full backup is performed when a new database is created or restored and subsequent full backups are performed weekly. Differential backups are taken every 12 hours and transaction log backups every 5 minutes. Default retention period of these backups is 7 days and is [configurable](/azure/azure-arc/data/point-in-time-restore#configure-retention-period).
+Arc-enabled SQL Managed Instance is deployed as part of ArcBox deployment. By default [automatic backups](/azure/azure-arc/data/point-in-time-restore#automatic-backups) of the databases is enabled in Arc-enabled SQL MI . Full backup is performed when a new database is created or restored and subsequent full backups are performed weekly. Differential backups are taken every 12 hours and transaction log backups every 5 minutes. Default retention period of these backups is 7 days and is [configurable](/azure/azure-arc/data/point-in-time-restore#configure-retention-period).
 
 This article provides instructions on how to perform point in time restore from the automatic backups available in Arc-enabled SQL MI to recover lost or corrupted data.
 
@@ -600,7 +600,7 @@ SELECT TOP (1000) [backup_set_id]
 
 ### Disaster Recovery
 
-The _ArcBox-CAPI-Data-xxxx_ and the _ArcBox_AKS_DR_Data-xxxx_ clusters are deployed into a distributed availability group to simulate two different sites. Use the _az sql instance-failover-group-arc_ command to initiate a failover from the primary SQL instance to the secondary DR instance.
+The _ArcBox-CAPI-Data-xxxx_ and the _ArcBox-AKS-DR-Data-xxxx_ clusters are deployed into a distributed availability group to simulate two different sites. Use the _az sql instance-failover-group-arc_ command to initiate a failover from the primary SQL instance to the secondary DR instance.
 
 - Open PowerShell and run below commands to initiate the failover.
 
@@ -750,7 +750,7 @@ Occasionally deployments of ArcBox may fail at various stages. Common reasons fo
 
 ### Exploring logs from the _ArcBox-Client_ virtual machine
 
-Occasionally, you may need to review log output from scripts that run on the _ArcBox-Client_and the _ArcBox-CAPI-MGMT_ virtual machines in case of deployment failures. To make troubleshooting easier, the ArcBox deployment scripts collect all relevant logs in the _C:\ArcBox\Logs_ folder on _ArcBox-Client_. A short description of the logs and their purpose can be seen in the list below:
+Occasionally, you may need to review log output from scripts that run on the _ArcBox-Client_ and the _ArcBox-CAPI-MGMT_ virtual machines in case of deployment failures. To make troubleshooting easier, the ArcBox deployment scripts collect all relevant logs in the _C:\ArcBox\Logs_ folder on _ArcBox-Client_. A short description of the logs and their purpose can be seen in the list below:
 
 | Logfile | Description |
 | ------- | ----------- |
