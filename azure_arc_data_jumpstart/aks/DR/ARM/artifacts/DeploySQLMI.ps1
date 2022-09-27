@@ -5,9 +5,9 @@ $Env:TempDir = "C:\Temp"
 $primaryControllerName = "jumpstart-primary-dc"
 $secondaryControllerName = "jumpstart-secondary-dc"
 
-# Deploying Azure Arc SQL Managed Instance
+# Deploying Azure Arc-enabled SQL Managed Instance
 Write-Host "`n"
-Write-Host "Deploying Azure Arc SQL Managed Instance"
+Write-Host "Deploying Azure Arc-enabled SQL Managed Instance"
 Write-Host "`n"
 
 $primaryCustomLocationId = $(az customlocation show --name "jumpstart-primary-cl" --resource-group $env:resourceGroup --query id -o tsv)
@@ -91,7 +91,7 @@ Do {
     } while ($dcStatus -eq "Nope")
 
 Write-Host "`n"
-Write-Host "Primary Azure Arc SQL Managed Instance is ready!"
+Write-Host "Primary Azure Arc-enabled SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on primary cluster
@@ -152,7 +152,7 @@ Do {
     } while ($dcStatus -eq "Nope")
 
 Write-Host "`n"
-Write-Host "Secondary Azure Arc SQL Managed Instance is ready!"
+Write-Host "Secondary Azure Arc-enabled SQL Managed Instance is ready!"
 Write-Host "`n"
 
 # Update Service Port from 1433 to Non-Standard on secondary cluster
