@@ -122,7 +122,7 @@ if ($flavor -eq "DataOps") {
 
 # Installing tools
 Write-Header "Installing Chocolatey Apps"
-$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,openssl.light'
+$chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,git,7zip,kubectx,terraform,putty.install,kubernetes-helm,ssms,dotnetcore-3.1-sdk,setdefaultbrowser,zoomit,openssl.light,pwsh'
 
 try {
     choco config get cacheLocation
@@ -141,6 +141,14 @@ foreach ($app in $appsToInstall) {
     & choco install $app /y -Force | Write-Output
     
 }
+
+# Copy PowerShell Profile and Reload for Powershell 7 in case of DataOps
+if ($flavor -eq "DataOps") {
+    $pwshHome = "C:\Program Files\PowerShell\7"
+    Invoke-WebRequest ($templateBaseUrl + "artifacts/PSProfile.ps1") -OutFile "$pwshHome\Profile.ps1"
+    .$pwshHome\Profile.ps1
+}
+
 
 Write-Header "Fetching GitHub Artifacts"
 
