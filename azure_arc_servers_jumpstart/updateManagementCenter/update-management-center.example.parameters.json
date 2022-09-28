@@ -6,7 +6,7 @@
             "value": "westeurope" // Location of your Azure Arc-enabled server
         },
         "arcEnabledServer": {
-            "value": "Arc-Alsanch" // Name of your Azure Arc-enabled server
+            "value": "Arc-Win-Demo" // Name of your Azure Arc-enabled server
         },
         "osType": {
             "value": "Windows" // Operating System of your Azure Arc-enabled server: Windows or Linux
