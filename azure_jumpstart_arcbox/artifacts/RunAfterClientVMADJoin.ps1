@@ -29,9 +29,8 @@ az config set extension.use_dynamic_install=yes_without_prompt
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file "$Env:ArcBoxDir\config"
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file "$Env:ArcBoxDir\config"
 
-Start-Sleep -Seconds 10
-
 $clusters = ($Env:aksArcClusterName ,$Env:aksdrArcClusterName)
+$clusters[0]
 foreach ($cluster in $clusters){
     $cluster
     $context = "$cluster-admin"
