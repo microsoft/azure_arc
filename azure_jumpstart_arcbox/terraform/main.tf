@@ -220,7 +220,8 @@ module "client_vm" {
     module.management_artifacts,
     module.management_storage,
     random_string.guid,
-    module.adds_vm
+    module.adds_vm,
+    module.aks_clusters
   ]
 }
 
