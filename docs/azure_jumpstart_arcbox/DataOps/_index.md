@@ -739,6 +739,7 @@ az group delete -n <name of your resource group>
 
 Occasionally deployments of ArcBox may fail at various stages. Common reasons for failed deployments include:
 
+- If you have logged into the Client VM and the automation scripts aren't running, you might have logged into the Client VM without using the format <username>@jumpstart.local. You would need to manually run the _DataOpsLogonScript_ scheduled task or re-deploy ArcBox.
 - Invalid service principal id, service principal secret or service principal Azure tenant ID provided in _azuredeploy.parameters.json_ file.
 - Invalid SSH public key provided in _azuredeploy.parameters.json_ file.
   - An example SSH public key is shown here. Note that the public key includes "ssh-rsa" at the beginning. The entire value should be included in your _azuredeploy.parameters.json_ file.
