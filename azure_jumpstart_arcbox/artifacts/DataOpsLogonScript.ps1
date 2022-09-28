@@ -251,11 +251,11 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcC
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
 
-Start-Sleep -Seconds 10
-
 kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
 kubectx capi="arcbox-capi"
+
+Start-Sleep -Seconds 10
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
@@ -265,6 +265,10 @@ foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
         Start-Job -Name arcbox -ErrorAction SilentlyContinue -ScriptBlock {
             $cluster = $using:cluster
+            Write-Host "`n"
+            $cluster.context
+            Write-Host "`n"
+            $cluster.clusterName
             Write-Host "`n"
             az connectedk8s connect --name $cluster.clusterName `
                 --resource-group $Env:resourceGroup `
