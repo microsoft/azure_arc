@@ -36,11 +36,11 @@ Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
 
 # Register Azure providers
-Write-Header "Registering Providers"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
+#Write-Header "Registering Providers"
+#az provider register --namespace Microsoft.Kubernetes --wait
+#az provider register --namespace Microsoft.KubernetesConfiguration --wait
+#az provider register --namespace Microsoft.ExtendedLocation --wait
+#az provider register --namespace Microsoft.AzureArcData --wait
 
 # Making extension install dynamic
 Write-Header "Installing Azure CLI extensions"

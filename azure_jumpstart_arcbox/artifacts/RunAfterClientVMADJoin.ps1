@@ -59,8 +59,8 @@ Write-Header "Installing Azure CLI extensions"
 az config set extension.use_dynamic_install=yes_without_prompt
 
 # Getting AKS clusters' credentials
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file "$Env:ArcBoxDir\config"
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file "$Env:ArcBoxDir\config"
 
 $clusters = $(az aks list --resource-group $Env:resourceGroup --query [].name --output tsv)
 foreach ($cluster in $clusters){
@@ -81,6 +81,6 @@ foreach ($cluster in $clusters){
             Write-Host "`n"
 }
 
-Remove-Item "c:\users\$Env:adminUsername\.kube\config" -Force
+Remove-Item "$Env:ArcBoxDir\config" -Force
 
 Stop-Transcript
