@@ -64,6 +64,7 @@ $sqlInstances = @(
 )
 $sqlmiouName = "ArcSQLMI"
 $sqlmiOUDN = "OU=" + $sqlmiouName + "," + $dcInfo.DefaultPartition
+$sqlmi_port = 11433
 
 # Create ArcSQLMI OU
 try {
@@ -91,6 +92,11 @@ $Endpoints = $file.FullName
 
 foreach ($sqlInstance in $sqlInstances) {
     Start-Job -Name arcbox -ErrorAction SilentlyContinue -ScriptBlock {
+    $dcInfo = $using:dcInfo
+    $Endpoints = $using:Endpoints
+    $sqlmiOUDN = $using:sqlmiOUDN
+    $sqlInstances = $using:sqlInstances
+    $sqlmi_port = $using:sqlmi_port
         $sqlInstance = $using:sqlInstance
         $sqlMIName = $sqlInstance.instanceName
         $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
@@ -105,7 +111,6 @@ foreach ($sqlInstance in $sqlInstances) {
         $samaccountname = $arcsaname
         $domain_netbios_name = $dcInfo.domain.split('.')[0].ToUpper();
         $domain_name = $dcInfo.domain.ToUpper()
-        $sqlmi_port = 11433
 
         try {
             New-ADUser -Name $arcsaname `
@@ -317,25 +322,7 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 }
 
 Get-Job -name arcbox | Remove-Job
-write-host "Successfully deployed Azure Arc Data Controllers"
 
-# Consolidate kube config files
-# Downloading CAPI Kubernetes cluster kubeconfig file
-Write-Header "Downloading CAPI K8s Kubeconfig"
-$sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
-$context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
-$sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
-$sourceFile = $sourceFile + $sas
-azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
-
-# Merge AKS kubce configs
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
-Start-Sleep -Seconds 10
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
-
-kubectx aks="$Env:aksArcClusterName-admin"
-kubectx aks-dr="$Env:aksdrArcClusterName-admin"
-kubectx capi="arcbox-capi"
 
 # Creating distributed DAG
 Write-Header "Configuring Disaster Recovery"
