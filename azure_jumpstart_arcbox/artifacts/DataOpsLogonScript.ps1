@@ -196,7 +196,6 @@ Invoke-Command -VMName ArcBox-SQL -Credential $winCreds -ScriptBlock {
 Write-Host "Creating Hyper-V Shortcut"
 Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
 
-
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Header "Downloading CAPI K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
@@ -255,7 +254,7 @@ kubectx aks="$Env:aksArcClusterName-admin"
 kubectx aks-dr="$Env:aksdrArcClusterName-admin"
 kubectx capi="arcbox-capi"
 
-Start-Sleep -Seconds 10
+<#Start-Sleep -Seconds 10
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
@@ -274,7 +273,7 @@ foreach ($cluster in $clusters) {
                 --resource-group $Env:resourceGroup `
                 --location $Env:azureLocation `
                 --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-                --kube-context $cluster.context
+                --kube-config $cluster.kubeConfig
 
             Start-Sleep -Seconds 10
     
@@ -293,6 +292,8 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 }
 write-host "Successfully Arc-enabled the Kubernetes clusters"
 get-job -name arcbox | remove-job
+
+#>
 
 ################################################
 # - Deploying data services on CAPI cluster

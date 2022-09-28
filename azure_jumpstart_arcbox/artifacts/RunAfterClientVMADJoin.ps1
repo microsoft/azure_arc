@@ -42,4 +42,45 @@ Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript' to run at use
 # Delete schedule task
 schtasks.exe /delete /f /tn RunAfterClientVMADJoin
 
+# Onboarding AKS clusters to Azure Arc
+# Required for CLI commands
+Write-Header "Az CLI Login"
+az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+
+# Register Azure providers
+Write-Header "Registering Providers"
+az provider register --namespace Microsoft.Kubernetes --wait
+az provider register --namespace Microsoft.KubernetesConfiguration --wait
+az provider register --namespace Microsoft.ExtendedLocation --wait
+az provider register --namespace Microsoft.AzureArcData --wait
+
+# Making extension install dynamic
+Write-Header "Installing Azure CLI extensions"
+az config set extension.use_dynamic_install=yes_without_prompt
+
+# Getting AKS clusters' credentials
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
+
+$clusters = $(az aks list --resource-group $Env:resourceGroup --query [].name --output tsv)
+foreach ($cluster in $clusters){
+    $context = "$cluster-admin"
+    kubectl get nodes
+    az connectedk8s connect --name $cluster `
+                --resource-group $Env:resourceGroup `
+                --location $Env:azureLocation `
+                --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+                --kube-context $context
+
+            Start-Sleep -Seconds 10
+
+            # Enabling Container Insights cluster extension on primary AKS cluster
+            Write-Host "`n"
+            Write-Host "Enabling Container Insights cluster extension"
+            az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+            Write-Host "`n"
+}
+
+Remove-Item "c:\users\$Env:adminUsername\.kube\config" -Force
+
 Stop-Transcript
