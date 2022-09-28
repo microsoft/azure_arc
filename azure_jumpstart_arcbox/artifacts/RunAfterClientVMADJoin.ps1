@@ -65,12 +65,12 @@ az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcC
 $clusters = $(az aks list --resource-group $Env:resourceGroup --query [].name --output tsv)
 foreach ($cluster in $clusters){
     $context = "$cluster-admin"
-    kubectl get nodes
     az connectedk8s connect --name $cluster `
                 --resource-group $Env:resourceGroup `
                 --location $Env:azureLocation `
                 --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-                --kube-context $context
+                --kube-context $context `
+                --kube-config "$Env:ArcBoxDir\config"
 
             Start-Sleep -Seconds 10
 
