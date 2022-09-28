@@ -2,17 +2,23 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "osType": {
-            "type": "string",
-            "metadata": {
-                "description": "Operating System of your Azure Arc-enabled server: Windows or Linux."
-            }
-        },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location of your Azure Arc-enabled server."
+            }
+        },
+        "arcEnabledServer": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of your Azure Arc-enabled server."
+            }
+        },
+        "osType": {
+            "type": "string",
+            "metadata": {
+                "description": "Operating System of your Azure Arc-enabled server: Windows or Linux."
             }
         },
         "maintenanceConfigName": {
@@ -29,17 +35,18 @@
                 "description": "Gets or sets maintenanceScope of the configuration."
             }
         },
-        "arcEnabledServer": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of your Azure Arc-enabled server."
-            }
-        },
         "maintenanceAssignment": {
             "type": "string",
             "defaultValue": "maintenanceAssignment",
             "metadata": {
                 "description": "Name of the maintenance assignment"
+            }
+        },
+        "maintenanceTimeZone": {
+            "type": "string",
+            "defaultValue": "Romance Standard Time",
+            "metadata": {
+                "description": "Timezone of the maintenance configuration"
             }
         },
         "baseTime": {
@@ -125,9 +132,9 @@
                     "InGuestPatchMode": "User"
                 },
                 "maintenanceWindow": {
-                    "startDateTime": "[variables('add1Day')]",
+                    "startDateTime": "2022-09-28 15:00",
                     "duration": "03:55",
-                    "timeZone": "Romance Standard Time",
+                    "timeZone": "[parameters('maintenanceTimeZone')]",
                     "expirationDateTime": null,
                     "recurEvery": "1Day"
                 }
