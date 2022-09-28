@@ -59,10 +59,7 @@
         "PolicyDefinitionID": "/providers/Microsoft.Authorization/policyDefinitions/bfea026e-043f-4ff4-9d1b-bf301ca7ff46",
         "PolicyAssignmentName": "[guid(variables('PolicyDefinitionID'), parameters('osType'))]",
         "PolicyAssignmentDisplayName": "(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers",
-        "add1Day": "[dateTimeAdd(parameters('baseTime'), 'P1D')]",
-        "add3Years": "[dateTimeAdd(parameters('baseTime'), 'P3Y')]",
-        "subtract9Days": "[dateTimeAdd(parameters('baseTime'), '-P9D')]",
-        "add1Hour": "[dateTimeAdd(parameters('baseTime'), 'PT5H')]"
+        "add1Day": "[dateTimeAdd(parameters('baseTime'), 'P1D', 'yyyy-MM-dd hh:mm')]"
     },
     "resources": [
         {
@@ -132,7 +129,7 @@
                     "InGuestPatchMode": "User"
                 },
                 "maintenanceWindow": {
-                    "startDateTime": "2022-09-28 15:00",
+                    "startDateTime": "[variables('add1Day')]",
                     "duration": "03:55",
                     "timeZone": "[parameters('maintenanceTimeZone')]",
                     "expirationDateTime": null,
@@ -173,19 +170,5 @@
             },
             "tags": {}
         }
-    ],
-    "outputs": {
-        "add3YearsOutput": {
-            "value": "[variables('add3Years')]",
-            "type": "string"
-        },
-        "subtract9DaysOutput": {
-            "value": "[variables('subtract9Days')]",
-            "type": "string"
-        },
-        "add1HourOutput": {
-            "value": "[variables('add1Hour')]",
-            "type": "string"
-        }
-    }
+    ]
 }
