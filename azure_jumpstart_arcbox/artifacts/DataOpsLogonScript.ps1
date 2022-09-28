@@ -251,15 +251,13 @@ Start-Sleep -Seconds 10
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
+    Write-Host "Checking K8s Nodes"
+    kubectl get nodes --kubeconfig $cluster.kubeConfig
+    Write-Host "`n"
     if ($cluster.context -ne 'capi') {
         Start-Job -Name arcbox -ErrorAction SilentlyContinue -ScriptBlock {
             $cluster = $using:cluster
             Write-Host "`n"
-            Write-Host "Checking K8s Nodes"
-            kubectl get nodes --kubeconfig $cluster.kubeConfig
-            Write-Host "`n"
-            Write-Host "`n"
-            $cluster.kubeConfig
             az connectedk8s connect --name $cluster.clusterName `
                 --resource-group $Env:resourceGroup `
                 --location $Env:azureLocation `
