@@ -90,7 +90,7 @@ $file = New-Item -Path $Env:ArcBoxDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
 
 foreach ($sqlInstance in $sqlInstances) {
-    Start-Job -Name arcbox -ScriptBlock {
+    Start-Job -Name arcbox -ErrorAction SilentlyContinue -ScriptBlock {
         $sqlInstance = $using:sqlInstance
         $sqlMIName = $sqlInstance.instanceName
         $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
