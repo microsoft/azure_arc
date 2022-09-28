@@ -29,25 +29,25 @@ az config set extension.use_dynamic_install=yes_without_prompt
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file "$Env:ArcBoxDir\config"
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file "$Env:ArcBoxDir\config"
 
-$clusters = ($Env:aksArcClusterName ,$Env:aksdrArcClusterName)
+$clusters = ($Env:aksArcClusterName , $Env:aksdrArcClusterName)
 $clusters[0]
-foreach ($cluster in $clusters){
+foreach ($cluster in $clusters) {
     $cluster
     $context = "$cluster-admin"
     az connectedk8s connect --name $cluster `
-                --resource-group $Env:resourceGroup `
-                --location $Env:azureLocation `
-                --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-                --kube-context $context `
-                --kube-config "$Env:ArcBoxDir\config"
+        --resource-group $Env:resourceGroup `
+        --location $Env:azureLocation `
+        --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+        --kube-context $context `
+        --kube-config "$Env:ArcBoxDir\config"
 
-            Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 10
 
-            # Enabling Container Insights cluster extension on primary AKS cluster
-            Write-Host "`n"
-            Write-Host "Enabling Container Insights cluster extension"
-            az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-            Write-Host "`n"
+    # Enabling Container Insights cluster extension on primary AKS cluster
+    Write-Host "`n"
+    Write-Host "Enabling Container Insights cluster extension"
+    az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+    Write-Host "`n"
 }
 
 Remove-Item "$Env:ArcBoxDir\config" -Force
