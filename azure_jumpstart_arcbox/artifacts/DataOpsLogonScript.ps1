@@ -204,6 +204,7 @@ $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-capi"
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
 # Downloading 'installCAPI.log' log file
 Write-Header "Downloading CAPI Install Logs"
@@ -247,7 +248,14 @@ azdata --version
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file c:\users\arcdemo\.kube\config-aks
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file c:\users\arcdemo\.kube\config-aksdr
 
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
+
 Start-Sleep -Seconds 10
+
+kubectx aks="$Env:aksArcClusterName-admin"
+kubectx aks-dr="$Env:aksdrArcClusterName-admin"
+kubectx capi="arcbox-capi"
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
@@ -262,7 +270,7 @@ foreach ($cluster in $clusters) {
                 --resource-group $Env:resourceGroup `
                 --location $Env:azureLocation `
                 --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-                --kube-config $cluster.kubeConfig
+                --kube-context $cluster.context
 
             Start-Sleep -Seconds 10
     
