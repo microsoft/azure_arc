@@ -22,12 +22,6 @@
         },
         "deployBastion": {
             "value": false
-        },
-        "githubAccount": {
-            "value": "microsoft"
-        },
-        "githubBranch": {
-            "value": "feature_azschi"
         }
     }
 }
