@@ -97,6 +97,10 @@ foreach ($sqlInstance in $sqlInstances) {
     $sqlmiOUDN = $using:sqlmiOUDN
     $sqlInstances = $using:sqlInstances
     $sqlmi_port = $using:sqlmi_port
+    $context = $sqlInstance.context
+
+    Start-Transcript -Path "$Env:ArcBoxLogsDir\SQLMI-$context.log"
+
         $sqlInstance = $using:sqlInstance
         $sqlMIName = $sqlInstance.instanceName
         $sqlmi_fqdn_name = $sqlMIName + "." + $dcInfo.domain
@@ -155,7 +159,7 @@ foreach ($sqlInstance in $sqlInstances) {
         # Grant permission to DSA account on SQLMI OU
 
         Start-Sleep -Seconds 10
-        $context = $sqlInstance.context
+
         Copy-Item "$Env:ArcBoxDir\adConnector.parameters.json" -Destination "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
         $adConnectorParams = "$Env:ArcBoxDir\adConnector-$context-stage.parameters.json"
         $adConnectorName = $sqlInstance.dataController + "/adarc"
@@ -312,6 +316,7 @@ foreach ($sqlInstance in $sqlInstances) {
     Add-Content $Endpoints "======================================================================"
     Add-Content $Endpoints ""
 
+    Stop-Transcript
     }
 
 }
