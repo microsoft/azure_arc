@@ -29,9 +29,9 @@ Please review the [Update Management Center supported OS documentation](https://
 
 ## Prerequisites
 
-- As mentioned, this scenario starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshots below, you can see a Windows and a Linux server that have been connected with Azure Arc and are visible as resources in Azure.
+- As mentioned, this scenario starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshot below, you can see a Windows and a Linux server that have been connected with Azure Arc and are visible as resources in Azure:
 
-    ![Screenshot Azure Arc-enabled servers](./40.png)
+    ![Screenshot Azure Arc-enabled servers](./1.png)
 
 - [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
 
@@ -44,7 +44,7 @@ This Jumpstart scenario provides multiple paths for deploying and configuring re
 - Azure portal
 - ARM template via Azure CLI
 
-The steps below will help you get familiar with the automation and deployment flow.
+The steps below will help you get familiar with the automation and deployment flow:
 
 1. User provides the ARM template parameter values, either via the portal or editing the parameters file. These parameter values are being used throughout the deployment.
 
@@ -54,9 +54,9 @@ The steps below will help you get familiar with the automation and deployment fl
 
 ## Deployment Option 1: Azure portal
 
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided on the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json).
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided in the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json).
 
-  ![Screenshot showing Azure portal deployment](./60.png)
+  ![Screenshot showing Azure portal deployment](./2.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -68,11 +68,11 @@ As mentioned, this deployment will leverage ARM templates.
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- Edit the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json) providing the values that match your configuration as described above.
+- Edit the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json) providing the values that match your configuration as described below:
 
-    ![Screenshot ARM template parameters file](./41.png)
+    ![Screenshot ARM template parameters file](./3.png)
 
-  > **NOTE: For the *maintenanceTimeZone* parameter, the list of timezones can be obtained by executing [System.TimeZoneInfo]::GetSystemTimeZones() in PowerShell. Example: Pacific Standard Time, Romance Standard Time, Middle East Standard Time.**
+  > **NOTE: For the *maintenanceTimeZone* parameter, the list of timezones can be obtained by executing *[System.TimeZoneInfo]::GetSystemTimeZones()* in PowerShell. Example: Pacific Standard Time, Romance Standard Time, Middle East Standard Time.**
 
 - Deploy the [*ARM template*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center-template.json) by running the following command, specifying the resource group where you have your Azure Arc-enabled servers:
 
@@ -84,7 +84,7 @@ As mentioned, this deployment will leverage ARM templates.
 
 - Once the template has completed its run, you should see an output as follows:
 
-    ![Screenshot ARM template execution output](./42.png)
+    ![Screenshot ARM template execution output](./4.png)
 
 ## Update Assessment
 
@@ -92,57 +92,59 @@ In the resource group that you specified as a parameter, there will be a new pol
 
 - Go to your **resource group** and click on **Policies**:
 
-    ![Resource Group - Policies](./43.png)
+    ![Resource Group - Policies](./5.png)
 
 - You will see the *(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers* policy assigned. Then, click on **Remediation**:
 
-    ![Policy for checking missing updates](./44.png)
+    ![Policy for checking missing updates](./6.png)
 
 - Right click on the policy *(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers* policy assigned. Then, click on **Remediate**:
 
-    ![Policy for checking missing updates - Remediation](./45.png)
+    ![Policy for checking missing updates - Remediation](./7.png)
 
 - You will see your Azure Arc-enabled server as a resource to be remediated. Click on the **Remediate** button:
 
-    ![Policy for checking missing updates - trigger remediation](./46.png)
+    ![Policy for checking missing updates - trigger remediation](./8.png)
 
 - You can see the status of the **Remediation task** and the number of resources remediated:
 
-    ![Policy for checking missing updates - remediation completed](./51.png)
+    ![Policy for checking missing updates - remediation completed](./9.png)
 
-- You will need to wait some time until the first update assessment is run.
+  > **NOTE: You will need to wait some time until the first update assessment is run.**
 
-- Go back to your **Azure Arc-enabled server** and click on **Extensions**. You will see that a new extension has been installed. Update management center relies on this Azure extension designed to provide all the functionality required to interact with the operating system to manage the assessment and application of updates. This extension is automatically installed when you initiate any update management center operations such as check for updates, install one time update, periodic assessment on your machine.
+- On the update assessment task is run, go back to your **Azure Arc-enabled server** and click on **Extensions**. You will see that a new extension has been installed. Update management center relies on this Azure extension designed to provide all the functionality required to interact with the operating system to manage the assessment and application of updates.
 
-    ![Update Management Center extension](./52.png)
+    ![Update Management Center extension](./10.png)
 
 - Click on **Updates**. Under **Recommended updates**, you will see which are the missing updates on this machine:
 
-    ![Missing updates](./53.png)
+    ![Missing updates](./11.png)
 
-- If you click on the **History** tab, you will see the details related the update assessment and operations:
+- If you click on the **History** tab, you will see the details related to the updates assessment and operations:
 
-    ![Update assessment history](./54.png)
+    ![Update assessment history](./12.png)
 
 ## Update Deployment
 
-On the other hand, a new **Maintenance Configuration** resource is created, which allows you to schedule recurring update deployments on your Azure Arc-enabled servers.
+On the other hand, as part of this scenario, a new **Maintenance Configuration** resource is created. It allows you to schedule recurring updates deployments on your Azure Arc-enabled servers.
 
 - Go to your **resource group** and click on the new **Maintenance Configuration** resource:
 
-    ![New maintenance configuration resource](./47.png)
+    ![New maintenance configuration resource](./13.png)
 
-- Review the following **Maintenance Configuration** settings: **Machines**, which include the Azure Arc-enabled server; **Schedule** of the maintenance configuration resource (it will start one day after you deploy this scenario); and **Updates** settings:
+- Review the following **Maintenance Configuration** settings: **Machines**, which includes the Azure Arc-enabled server; **Schedule** of the maintenance configuration resource (it will start one day after you deploy this scenario); and **Updates** settings:
 
-    ![Maintenance configuration resource - machines](./48.png)
+    ![Maintenance configuration resource - machines](./14.png)
 
-    ![Maintenance configuration resource - schedule](./49.png)
+    ![Maintenance configuration resource - schedule](./15.png)
 
-    ![Maintenance configuration resource - updates](./50.png)
+    ![Maintenance configuration resource - updates](./16.png)
 
-- Once the **Schedule** triggers the **Maintenance Configuration**, you will be able to see the results. Go back to your **Azure Arc-enabled server**, click on **Updates**, **History**:
+- Once the **Schedule** triggers the **Maintenance Configuration**, you will be able to see the results. Go back to your **Azure Arc-enabled server**, click on **Updates**, and then on **History**:
 
-PDTEEE
+    ![Update deployment history](./17.png)
+
+    ![Update deployment history details](./18.png)
 
 ## Update Management Center
 
@@ -151,23 +153,23 @@ Moreover, you can instantly deploy critical updates to help secure your machines
 
 - On the top bar search, type **Update Management Center** and click on it:
 
-    ![Update Management Center](./55.png)
+    ![Update Management Center](./19.png)
 
-- **Overview** shows you the current updates status summary of your hybrid environment:
+- The **Overview** blade shows you the current updates status of your hybrid environment:
 
-    ![Update Management Center - Overview](./56.png)
+    ![Update Management Center - Overview](./20.png)
 
 - If you click on **Machines**, you will get more details per each individual machine:
 
-    ![Update Management Center - Machines](./57.png)
+    ![Update Management Center - Machines](./21.png)
 
 - Moreover, **History** shows you all the updates activities on your hybrid environment:
 
-    ![Update Management Center - History](./58.png)
+    ![Update Management Center - History](./22.png)
 
 - Lastly, under the **Workbooks** section, there is a built-in workbook that provides an unified view for your current updates status:
 
-    ![Update Management Center - Workbooks](./59.png)
+    ![Update Management Center - Workbooks](./23.png)
 
 ## Clean up environment
 
