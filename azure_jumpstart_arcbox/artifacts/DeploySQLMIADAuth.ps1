@@ -91,12 +91,13 @@ $file = New-Item -Path $Env:ArcBoxDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
 
 foreach ($sqlInstance in $sqlInstances) {
-    Start-Job -Name arcbox -ErrorAction SilentlyContinue -ScriptBlock {
+    Start-Job -Name arcbox -WarningAction SilentlyContinue -ScriptBlock {
     $dcInfo = $using:dcInfo
     $Endpoints = $using:Endpoints
     $sqlmiOUDN = $using:sqlmiOUDN
     $sqlInstances = $using:sqlInstances
     $sqlmi_port = $using:sqlmi_port
+    $sqlInstance = $using:sqlInstance
     $context = $sqlInstance.context
 
     Start-Transcript -Path "$Env:ArcBoxLogsDir\SQLMI-$context.log"
