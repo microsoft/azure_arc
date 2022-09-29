@@ -94,7 +94,7 @@ Write-Host "`n"
 Write-Header "Creating Nested SQL VM"
 $localSQLUser = $Env:AZDATA_USERNAME
 $localSQLPassword = $Env:AZDATA_PASSWORD
-Start-Job -Name nestedSQL -ScriptBlock {
+Invoke-Command -JobName nestedSQL -AsJob -ComputerName localhost -ScriptBlock{
     Start-Transcript -Path "$Env:ArcBoxLogsDir\NestedSQL.log"
     # Install and configure DHCP service (used by Hyper-V nested VMs)
     Write-Host "Configuring DHCP Service"
@@ -199,6 +199,7 @@ Start-Job -Name nestedSQL -ScriptBlock {
     Stop-Transcript
 }
 
+
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Header "Downloading CAPI K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
@@ -270,7 +271,8 @@ foreach ($cluster in $clusters) {
             --resource-group $Env:resourceGroup `
             --location $Env:azureLocation `
             --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-            --kube-config $cluster.kubeConfig
+            --kube-config $cluster.kubeConfig `
+            --only-show-errors
 
         Start-Sleep -Seconds 10
 
@@ -319,7 +321,7 @@ foreach ($cluster in $clusters) {
 
         $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
         $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig
+        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
 
         Start-Sleep -Seconds 20
 
