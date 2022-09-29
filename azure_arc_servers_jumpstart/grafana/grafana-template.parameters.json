@@ -11,7 +11,7 @@
         "grafanaName": {
           "value": "<name of your azuremanaged grafana instance>" // Name of your Azure Managed Grafana instance
         },
-        "principalId": {
+        "grafanaAdminprincipalId": {
            "value": "<objectId of aad user added as grafana admin>" // ObjectId of AAD user added as Grafana Admin
         }
   }
