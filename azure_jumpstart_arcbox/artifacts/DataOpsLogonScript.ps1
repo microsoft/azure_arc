@@ -399,8 +399,14 @@ foreach ($cluster in $clusters) {
     Write-Header "Enabling Data Controller Metrics & Logs Upload"
     $Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
     $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
-    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
+    try {
+        az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
+        az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
+    }
+    catch {
+        write-host "Permissions not granted to enable auto-upload!"
+    }
+
 }
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services
