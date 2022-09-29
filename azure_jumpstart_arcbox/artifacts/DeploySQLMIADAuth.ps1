@@ -91,7 +91,7 @@ $file = New-Item -Path $Env:ArcBoxDir -Name $filename -ItemType "file"
 $Endpoints = $file.FullName
 
 foreach ($sqlInstance in $sqlInstances) {
-    Start-Job -Name arcbox -WarningAction SilentlyContinue -ScriptBlock {
+    Start-Job -Name arcbox -ScriptBlock {
     $dcInfo = $using:dcInfo
     $Endpoints = $using:Endpoints
     $sqlmiOUDN = $using:sqlmiOUDN
@@ -323,7 +323,7 @@ foreach ($sqlInstance in $sqlInstances) {
 }
 
 while ($(Get-Job -Name arcbox).State -eq 'Running') {
-    Receive-Job -Name arcbox
+    Receive-Job -Name arcbox -WarningAction SilentlyContinue
     Start-Sleep -Seconds 10
 }
 

@@ -331,7 +331,7 @@ $kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl 
 
 Write-Header "Deploying Azure Arc Data Controller"
 foreach ($cluster in $clusters) {
-    Start-Job -Name arcbox -WarningAction SilentlyContinue -ScriptBlock {
+    Start-Job -Name arcbox -ScriptBlock {
         $cluster = $using:cluster
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
@@ -400,7 +400,7 @@ foreach ($cluster in $clusters) {
 }
 
 while ($(Get-Job -Name arcbox).State -eq 'Running') {
-    Receive-Job -Name arcbox
+    Receive-Job -Name arcbox -WarningAction SilentlyContinue
     Start-Sleep -Seconds 10
 }
 
