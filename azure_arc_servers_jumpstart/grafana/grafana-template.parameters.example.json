@@ -11,7 +11,7 @@
         "grafanaName": {
           "value": "grafana-ama-jumpstart" // Name of your Azure Managed Grafana instance
         },
-        "principalId": {
+        "grafanaAdminprincipalId": {
            "value": "c017a8d6-2a9b-44ca-b5ab-56798f709eec" // ObjectId of AAD user added as Grafana Admin
         }
     }
