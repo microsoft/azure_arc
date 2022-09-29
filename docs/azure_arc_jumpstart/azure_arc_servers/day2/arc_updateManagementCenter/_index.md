@@ -31,7 +31,7 @@ Please review the [Update Management Center supported OS documentation](https://
 
 - As mentioned, this scenario starts at the point where you already deployed and connected VMs or servers to Azure Arc. In the screenshot below, you can see a Windows and a Linux server that have been connected with Azure Arc and are visible as resources in Azure:
 
-    ![Screenshot Azure Arc-enabled servers](./1.png)
+    ![Screenshot Azure Arc-enabled servers](./01.png)
 
 - [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
 
@@ -56,7 +56,7 @@ The steps below will help you get familiar with the automation and deployment fl
 
 - Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided in the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json).
 
-  ![Screenshot showing Azure portal deployment](./2.png)
+  ![Screenshot showing Azure portal deployment](./02.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -70,7 +70,7 @@ As mentioned, this deployment will leverage ARM templates.
 
 - Edit the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json) providing the values that match your configuration as described below:
 
-    ![Screenshot ARM template parameters file](./3.png)
+    ![Screenshot ARM template parameters file](./03.png)
 
   > **NOTE: For the *maintenanceTimeZone* parameter, the list of timezones can be obtained by executing *[System.TimeZoneInfo]::GetSystemTimeZones()* in PowerShell. Example: Pacific Standard Time, Romance Standard Time, Middle East Standard Time.**
 
@@ -84,7 +84,7 @@ As mentioned, this deployment will leverage ARM templates.
 
 - Once the template has completed its run, you should see an output as follows:
 
-    ![Screenshot ARM template execution output](./4.png)
+    ![Screenshot ARM template execution output](./04.png)
 
 ## Update Assessment
 
@@ -92,23 +92,23 @@ In the resource group that you specified as a parameter, there will be a new pol
 
 - Go to your **resource group** and click on **Policies**:
 
-    ![Resource Group - Policies](./5.png)
+    ![Resource Group - Policies](./05.png)
 
 - You will see the *(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers* policy assigned. Then, click on **Remediation**:
 
-    ![Policy for checking missing updates](./6.png)
+    ![Policy for checking missing updates](./06.png)
 
 - Right click on the policy *(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers* policy assigned. Then, click on **Remediate**:
 
-    ![Policy for checking missing updates - Remediation](./7.png)
+    ![Policy for checking missing updates - Remediation](./07.png)
 
 - You will see your Azure Arc-enabled server as a resource to be remediated. Click on the **Remediate** button:
 
-    ![Policy for checking missing updates - trigger remediation](./8.png)
+    ![Policy for checking missing updates - trigger remediation](./08.png)
 
 - You can see the status of the **Remediation task** and the number of resources remediated:
 
-    ![Policy for checking missing updates - remediation completed](./9.png)
+    ![Policy for checking missing updates - remediation completed](./09.png)
 
   > **NOTE: You will need to wait some time until the first update assessment is run.**
 
