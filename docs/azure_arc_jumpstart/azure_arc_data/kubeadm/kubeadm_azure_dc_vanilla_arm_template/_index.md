@@ -32,7 +32,7 @@ By the end of this scenario, you will have a Kubeadm Kubernetes cluster deployed
 
 - Create Azure service principal (SP). To deploy this scenario, an Azure service principal assigned with the following RBAC role is required:
 
-  - "Owner" - Required for provisioning Azure resources, installing the Azure-Arc enabled Kubernetes Microsoft Cloud Defender for Containers cluster extension (incl. dismissing alerts and being able to view  findings), interact with Azure Arc-enabled data services billing, monitoring metrics, and logs management and creating role assignment for the Monitoring Metrics Publisher role.
+  - "Owner" - Required for provisioning Azure resources, interact with Azure Arc-enabled data services billing, monitoring metrics, and logs management and creating role assignment for the Monitoring Metrics Publisher role.
 
     To create it login to your Azure account run the below command (this can also be done in [Azure Cloud Shell](https://shell.azure.com/).
 
@@ -71,8 +71,8 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - Main [_azuredeploy_ ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/azuredeploy.json) will initiate the deployment of the linked ARM templates:
 
-  - [_VNET_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/cluster_api/capi_azure/ARM/VNET.json) - Deploys a VNET and Subnet for Client and K8s VMs.
-  - [_ubuntuKubeadm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/ubuntuKubeadm.json) - Deploys two Ubuntu Linux VMs and Azure Load Balancer which will be transformed into a 
+  - [_VNET_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/VNET.json) - Deploys a VNET and Subnet for Client and K8s VMs.
+  - [_ubuntuKubeadm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/ubuntuKubeadm.json) - Deploys two Ubuntu Linux VMs which will be transformed into a 
   - Kubeadm management cluster (a single control-plane and a single Worker node) using the [_installKubeadm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/artifacts/installKubeadm.sh) and the [_installKubeadmWorker_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/artifacts/installKubeadmWorker.sh) shell scripts. This Kubeadm cluster will be used by the rest of the Azure Arc-enabled data services automation deploy.
   - [_clientVm_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/clientVm.json) - Deploys the client Windows VM. This is where all user interactions with the environment are made from.
   - [_mgmtStagingStorage_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/mgmtStagingStorage.json) - Used for staging files in automation scripts.
@@ -87,17 +87,17 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 - The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/artifacts/azuredeploy.parameters.example.json).
 
   - _`sshRSAPublicKey`_ - Your SSH public key
-  - _'spnClientId'_ - Your Azure service principal id
-  - _'spnClientSecret'_ - Your Azure service principal secret
-  - _'spnTenantId'_ - Your Azure tenant id
-  - _'windowsAdminUsername'_ - Client Windows VM Administrator name
-  - _'windowsAdminPassword'_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
-  - _'myIpAddress'_ - Your local IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and K3s Rancher VM.
-  - _'logAnalyticsWorkspaceName'_ - Unique name for the deployment log analytics workspace.
-  - _'deploySQLMI'_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller vanilla scenario we leave it set to _**false**_.
-  - _'SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this data controller vanilla scenario we leave it set to _**false**_.
-  - _'deployPostgreSQL'_ - Boolean that sets whether or not to deploy PostgreSQL, for this data controller vanilla scenario we leave it set to _**false**_.
-  - _'deployBastion'_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
+  - _`spnClientId`_ - Your Azure service principal id
+  - _`spnClientSecret`_ - Your Azure service principal secret
+  - _`spnTenantId`_ - Your Azure tenant id
+  - _`windowsAdminUsername`_ - Client Windows VM Administrator name
+  - _`windowsAdminPassword`_ - Client Windows VM Password. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - _`myIpAddress`_ - Your local IP address. This is used to allow remote RDP and SSH connections to the client Windows VM and K3s Rancher VM.
+  - _`logAnalyticsWorkspaceName`_ - Unique name for the deployment log analytics workspace.
+  - _`deploySQLMI`_ - Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller vanilla scenario we leave it set to _**false**_.
+  - _`SQLMIHA`_ - Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this data controller vanilla scenario we leave it set to _**false**_.
+  - _`deployPostgreSQL`_ - Boolean that sets whether or not to deploy PostgreSQL, for this data controller vanilla scenario we leave it set to _**false**_.
+  - _`deployBastion`_ - Choice (true | false) to deploy Azure Bastion or not to connect to the client VM.
 
 - To deploy the ARM template, navigate to the local cloned [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_data_jumpstart/kubeadm/azure/ARM) and run the below command:
 
@@ -189,7 +189,7 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 ## Cluster extensions
 
-In this scenario, four Azure Arc-enabled Kubernetes cluster extensions were installed:
+In this scenario, two Azure Arc-enabled Kubernetes cluster extensions were installed:
 
 - _azuremonitor-containers_ - The Azure Monitor Container Insights cluster extension. To learn more about it, you can check our Jumpstart ["Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extensions"](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/) scenario.
 
