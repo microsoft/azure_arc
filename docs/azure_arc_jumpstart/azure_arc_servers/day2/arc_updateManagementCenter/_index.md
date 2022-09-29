@@ -54,19 +54,9 @@ The steps below will help you get familiar with the automation and deployment fl
 
 ## Deployment Option 1: Azure portal
 
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2Fazuremonitoragent%2Fama-windows-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided on the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json).
 
-  ![Screenshot showing Azure portal deployment](./04.png)
-
-  ![Screenshot showing Azure portal deployment](./05.png)
-
-- To match your configuration you will need to provide:
-
-  - The **subscription**, **resource group**, **Computer name** and **location** where you registered the Azure Arc-enabled server:
-
-    ![Screenshot Azure Arc-enabled server location](./08.png)
-
-  - The **Log Analytics workspace name** that will be created.
+  ![Screenshot showing Azure portal deployment](./60.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
