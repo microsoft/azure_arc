@@ -120,7 +120,6 @@ module clientVmDeployment 'clientVm/clientVm.bicep' = {
   }
   dependsOn: [
     updateVNetDNSServers
-    aksDeployment
   ]
 }
 
