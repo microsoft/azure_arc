@@ -92,8 +92,9 @@ Write-Host "`n"
 ################################################
 
 Write-Header "Creating Nested SQL VM"
-Start-Job -Name NestedSQL -ScriptBlock {
-    $ErrorActionPreference = "SilentlyContinue"
+$localSQLUser = $Env:AZDATA_USERNAME
+$localSQLPassword = $Env:AZDATA_PASSWORD
+Start-Job -Name nestedSQL -ScriptBlock {
     Start-Transcript -Path "$Env:ArcBoxLogsDir\NestedSQL.log"
     # Install and configure DHCP service (used by Hyper-V nested VMs)
     Write-Host "Configuring DHCP Service"
@@ -176,8 +177,6 @@ Start-Job -Name NestedSQL -ScriptBlock {
 
     # Configuring the local SQL VM
     Write-Host "Setting local SQL authentication and adding a SQL login"
-    $localSQLUser = $Env:AZDATA_USERNAME
-    $localSQLPassword = $Env:AZDATA_PASSWORD
     Invoke-Command -VMName ArcBox-SQL -Credential $winCreds -ScriptBlock {
         Install-Module -Name SqlServer -AllowClobber -Force
         $server = "localhost"
