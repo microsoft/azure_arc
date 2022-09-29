@@ -120,11 +120,19 @@ In the resource group that you specified as a parameter, there will be a new pol
 
     ![Policy for checking missing updates - remediation completed](./51.png)
 
-mostrar extensions instaladas. if you click on extensions...
+- You will need to wait some time until the first update assessment is run.
 
-mostrar updates de la maquina encontradas
+- Go back to your **Azure Arc-enabled server** and click on **Extensions**. You will see that a new extension has been installed. Update management center relies on this Azure extension designed to provide all the functionality required to interact with the operating system to manage the assessment and application of updates. This extension is automatically installed when you initiate any update management center operations such as check for updates, install one time update, periodic assessment on your machine.
 
-mostrar el history
+    ![Update Management Center extension](./52.png)
+
+- Click on **Updates**. Under **Recommended updates**, you will see which are the missing updates on this machine:
+
+    ![Missing updates](./53.png)
+
+- If you click on the **History** tab, you will see the details related the update assessment and operations:
+
+    ![Update assessment history](./54.png)
 
 ## Update Deployment
 
@@ -142,13 +150,39 @@ On the other hand, a new **Maintenance Configuration** resource is created, whic
 
     ![Maintenance configuration resource - updates](./50.png)
 
-MOSTRAR VISTA GENERAL UPDATE MANAGEMENT CENTER
+- Once the **Schedule** triggers the **Maintenance Configuration**, you will be able to see the results. Go back to your **Azure Arc-enabled server**, click on **Updates**, **History**:
+
+PDTEEE
+
+## Update Management Center
+
+From **Update Management Center**, you can oversee the update compliance for your entire fleet of machines in Azure, on-premises, and other cloud environments.
+Moreover, you can instantly deploy critical updates to help secure your machines.
+
+- On the top bar search, type **Update Management Center** and click on it:
+
+    ![Update Management Center](./55.png)
+
+- **Overview** shows you the current updates status summary of your hybrid environment:
+
+    ![Update Management Center - Overview](./56.png)
+
+- If you click on **Machines**, you will get more details per each individual machine:
+
+    ![Update Management Center - Machines](./57.png)
+
+- Moreover, **History** shows you all the updates activities on your hybrid environment:
+
+    ![Update Management Center - History](./58.png)
+
+- Lastly, under the **Workbooks** section, there is a built-in workbook that provides an unified view for your current updates status:
+
+    ![Update Management Center - Workbooks](./59.png)
 
 ## Clean up environment
 
 Complete the following steps to clean up your environment:
 
-- [Remove Data Collection Rule Association](https://docs.microsoft.com/powershell/module/az.monitor/remove-azdatacollectionruleassociation?view=azps-8.1.0)
-- [Remove Data Collection Rule](https://docs.microsoft.com/powershell/module/az.monitor/remove-azdatacollectionrule?view=azps-8.1.0)
-- [Uninstall Azure Monitor Agent (AMA)](https://docs.microsoft.com/azure/azure-monitor/agents/azure-monitor-agent-manage?tabs=ARMAgentPowerShell%2CPowerShellWindows%2CPowerShellWindowsArc%2CCLIWindows%2CCLIWindowsArc#uninstall-on-azure-arc-enabled-servers)
-- [Delete the Log Analytics workspace](https://docs.microsoft.com/en-us/azure/azure-monitor/logs/delete-workspace#powershell)
+- [Delete a maintenance configuration](https://learn.microsoft.com/azure/virtual-machines/maintenance-configurations-cli#delete-a-maintenance-configuration)
+- [Remove extension on Azure Arc-enabled server](https://learn.microsoft.com/azure/azure-arc/servers/manage-vm-extensions-cli#remove-extensions)
+- [Delete Azure Policy Assignment](https://learn.microsoft.com/cli/azure/policy/assignment?view=azure-cli-latest#az-policy-assignment-delete)
