@@ -92,7 +92,7 @@ Write-Host "`n"
 ################################################
 
 Write-Header "Creating Nested SQL VM"
-Start-Job -Name arcbox -ScriptBlock {
+Start-Job -Name NestedSQL -ScriptBlock {
     $ErrorActionPreference = "SilentlyContinue"
     Start-Transcript -Path "$Env:ArcBoxLogsDir\NestedSQL.log"
     # Install and configure DHCP service (used by Hyper-V nested VMs)
@@ -198,11 +198,6 @@ Start-Job -Name arcbox -ScriptBlock {
     Write-Host "Creating Hyper-V Shortcut"
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
     Stop-Transcript
-}
-
-while ($(Get-Job -Name arcbox).State -eq 'Running') {
-    Receive-Job -Name arcbox -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 10
 }
 
 # Downloading CAPI Kubernetes cluster kubeconfig file
@@ -456,6 +451,12 @@ if (-not $ArcServersLogonScript) {
     Add-Type $code
     [Win32.Wallpaper]::SetWallpaper($imgPath)
 }
+
+while ($(Get-Job -Name nestedSQL).State -eq 'Running') {
+    Start-Sleep -Seconds 10
+}
+
+Get-Job -Name nestedSQL | Remove-Job
 
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
