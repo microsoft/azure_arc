@@ -92,6 +92,7 @@ $Endpoints = $file.FullName
 
 foreach ($sqlInstance in $sqlInstances) {
     Start-Job -Name arcbox -ScriptBlock {
+    $ErrorActionPreference = 'SilentlyContinue'
     $dcInfo = $using:dcInfo
     $Endpoints = $using:Endpoints
     $sqlmiOUDN = $using:sqlmiOUDN
@@ -269,7 +270,7 @@ foreach ($sqlInstance in $sqlInstances) {
     Write-Host "Granted sysadmin role to user account ${domain_netbios_name}\$env:AZDATA_USERNAME in SQLMI instance."
 
     # Downloading demo database and restoring onto SQL MI
-    if ($sqlMIName -eq $sqlInstances[0].instanceName) {
+    if ($sqlMIName -eq "capi-sql") {
         Write-Host "`n"
         Write-Host "Downloading AdventureWorks database for MS SQL... (1/2)"
         kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- wget https://github.com/Microsoft/sql-server-samples/releases/download/adventureworks/AdventureWorks2019.bak -O /var/opt/mssql/data/AdventureWorks2019.bak 2>&1 | Out-Null
