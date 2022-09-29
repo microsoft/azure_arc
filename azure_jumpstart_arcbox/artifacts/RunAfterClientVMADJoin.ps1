@@ -8,50 +8,6 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxDir = "C:\ArcBox"
 Start-Transcript -Path "$Env:ArcBoxLogsDir\RunAfterClientVMADJoin.log"
 
-
-# Onboarding AKS clusters to Azure Arc
-# Required for CLI commands
-Write-Header "Az CLI Login"
-az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
-
-# Register Azure providers
-Write-Header "Registering Providers"
-az provider register --namespace Microsoft.Kubernetes --wait
-az provider register --namespace Microsoft.KubernetesConfiguration --wait
-az provider register --namespace Microsoft.ExtendedLocation --wait
-az provider register --namespace Microsoft.AzureArcData --wait
-
-# Making extension install dynamic
-Write-Header "Installing Azure CLI extensions"
-az config set extension.use_dynamic_install=yes_without_prompt
-
-# Getting AKS clusters' credentials
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file "$Env:ArcBoxDir\config"
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file "$Env:ArcBoxDir\config"
-
-$clusters = ($Env:aksArcClusterName , $Env:aksdrArcClusterName)
-$clusters[0]
-foreach ($cluster in $clusters) {
-    $cluster
-    $context = "$cluster-admin"
-    az connectedk8s connect --name $cluster `
-        --resource-group $Env:resourceGroup `
-        --location $Env:azureLocation `
-        --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-        --kube-context $context `
-        --kube-config "$Env:ArcBoxDir\config"
-
-    Start-Sleep -Seconds 10
-
-    # Enabling Container Insights cluster extension on primary AKS cluster
-    Write-Host "`n"
-    Write-Host "Enabling Container Insights cluster extension"
-    az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-    Write-Host "`n"
-}
-
-Remove-Item "$Env:ArcBoxDir\config" -Force
-
 # Get Activectory Information
 $netbiosname = $Env:addsDomainName.Split('.')[0].ToUpper()
 
