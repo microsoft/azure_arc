@@ -51,6 +51,7 @@ New-Item -Path $Env:HCIBoxLogsDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxVMDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxIconDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxWACDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxKVDir -ItemType directory -Force
 New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
