@@ -86,7 +86,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 As mentioned, this deployment will leverage ARM templates. You will deploy a single template that will initiate the entire automation for this scenario.
 
-- The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/azuredeploy.parameters.json) file located in your local cloned repository folder.
+- The deployment is using the ARM template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/azuredeploy.parameters.json) file located in your local cloned repository folder. An example parameters file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/kubeadm/azure/ARM/azuredeploy.parameters.example.json).
 
   - _`sshRSAPublicKey`_ - Your SSH public key
   - _`spnClientId`_ - Your Azure service principal id
