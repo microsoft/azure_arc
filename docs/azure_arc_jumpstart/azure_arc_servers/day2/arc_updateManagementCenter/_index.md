@@ -151,7 +151,7 @@ As part of this scenario, a new **Maintenance Configuration** resource is create
 ## Update Management Center
 
 From the **Update Management Center**, you can oversee the update compliance for your entire fleet of machines in Azure, on-premises, and other cloud environments.
-Moreover, you can instantly deploy critical updates to help secure your machines.
+You can also instantly deploy critical updates to help secure your machines.
 
 - On the top bar search, type **Update Management Center** and click on it:
 
