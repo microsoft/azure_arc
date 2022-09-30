@@ -88,7 +88,9 @@ As mentioned, this deployment will leverage ARM templates.
 
 ## Update Assessment
 
-In the resource group that you specified as a parameter, there will be a new policy assignment, *(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers*. This policy, once it's remediated, enables Periodic Assessment. Periodic Assessment is a setting on your machine that enables you to see the latest updates available for your machines and removes the hassle of performing assessment manually every time you need to check the update status. Once you enable this setting, update management center fetches updates on your machine once every 24 hours.
+In the resource group that you specified as a parameter, there will be a new policy assignment named "_(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers_". This policy, once it's remediated, enables Periodic Assessment. 
+
+Periodic Assessment is a setting on your machine that enables you to see the latest updates available for your machines and removes the hassle of performing assessment manually every time you need to check the update status. Once you enable this setting, update management center fetches updates on your machine once every 24 hours.
 
 - Go to your **resource group** and click on **Policies**:
 
