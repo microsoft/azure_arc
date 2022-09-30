@@ -10,7 +10,7 @@ if ($Env:flavor -eq 'DataOps') {
     ################################################
     # - Created Nested SQL VM
     ################################################
-    Start-Transcript -Path $Env:ArcBoxLogsDir\nestedSQLLogonScript.log
+    Start-Transcript -Path $Env:ArcBoxLogsDir\NestedSqlLogonScript.log
     $host.ui.RawUI.WindowTitle = 'Nested SQL Server VM'
     Write-Header "Creating Nested SQL VM"
 
