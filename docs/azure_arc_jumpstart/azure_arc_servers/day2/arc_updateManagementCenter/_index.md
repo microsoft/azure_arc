@@ -72,7 +72,7 @@ As mentioned, this deployment will leverage ARM templates.
 
     ![Screenshot of ARM template parameters file](./03.png)
 
-  > **NOTE: For the *maintenanceTimeZone* parameter, the list of timezones can be obtained by executing *[System.TimeZoneInfo]::GetSystemTimeZones()* in PowerShell. Example: Pacific Standard Time, Romance Standard Time, Middle East Standard Time.**
+  > **NOTE: For the _maintenanceTimeZone_ parameter, the list of time zones can be obtained by executing _[System.TimeZoneInfo]::GetSystemTimeZones()_ in PowerShell. Example: Pacific Standard Time, Romance Standard Time, Middle East Standard Time.**
 
 - Deploy the [*ARM template*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center-template.json) by running the following command, specifying the resource group where you have your Azure Arc-enabled servers:
 
