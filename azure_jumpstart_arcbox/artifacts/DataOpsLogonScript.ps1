@@ -149,10 +149,9 @@ Start-Sleep -Seconds 10
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
-    Write-Host "Checking K8s Nodes"
-    kubectl get nodes --kubeconfig $cluster.kubeConfig
-    Write-Host "`n"
     if ($cluster.context -ne 'capi') {
+        Write-Host "Checking K8s Nodes"
+        kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
         az connectedk8s connect --name $cluster.clusterName `
             --resource-group $Env:resourceGroup `
@@ -252,7 +251,7 @@ foreach ($cluster in $clusters) {
 
 while ($(Get-Job -Name arcbox).State -eq 'Running') {
     Receive-Job -Name arcbox -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 5
 }
 
 Get-Job -name arcbox | Remove-Job
@@ -301,6 +300,7 @@ foreach ($cluster in $clusters) {
 }
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services
+kubectx $clusters[0].context
 Write-Header "Creating Grafana & Kibana Shortcuts"
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 $GrafanaURL = "https://" + $GrafanaURL + ":3000"
@@ -345,15 +345,11 @@ if (-not $ArcServersLogonScript) {
     [Win32.Wallpaper]::SetWallpaper($imgPath)
 }
 
-while ($(Get-Job -Name nestedSQL).State -eq 'Running') {
-    Start-Sleep -Seconds 10
-}
-
-Get-Job -Name nestedSQL | Remove-Job
-
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "DataOpsLogonScript" -Confirm:$false
+Unregister-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Confirm:$false
+Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 # Executing the deployment logs bundle PowerShell script in a new window

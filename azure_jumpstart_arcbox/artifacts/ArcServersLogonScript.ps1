@@ -4,12 +4,14 @@ $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 $agentScript = "$Env:ArcBoxDir\agentScript"
 
-Start-Transcript -Path $Env:ArcBoxLogsDir\ArcServersLogonScript.log
+
 
 if ($Env:flavor -eq 'DataOps') {
     ################################################
     # - Created Nested SQL VM
     ################################################
+    Start-Transcript -Path $Env:ArcBoxLogsDir\nestedSQLLogonScript.log
+    $host.ui.RawUI.WindowTitle = 'Nested SQL Server VM'
     Write-Header "Creating Nested SQL VM"
 
     # Install and configure DHCP service (used by Hyper-V nested VMs)
@@ -114,9 +116,10 @@ if ($Env:flavor -eq 'DataOps') {
     # Creating Hyper-V Manager desktop shortcut
     Write-Host "Creating Hyper-V Shortcut"
     Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
+    Stop-Transcript
 }
 else {
+    Start-Transcript -Path $Env:ArcBoxLogsDir\ArcServersLogonScript.log
     $cliDir = New-Item -Path "$Env:ArcBoxDir\.cli\" -Name ".servers" -ItemType Directory
 
     if (-not $($cliDir.Parent.Attributes.HasFlag([System.IO.FileAttributes]::Hidden))) {
@@ -404,5 +407,6 @@ namespace Win32{
     Write-Host "Creating deployment logs bundle"
     7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:ArcBoxLogsDir\*.log
 }'
+Stop-Transcript
 
 }

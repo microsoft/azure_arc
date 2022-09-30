@@ -333,7 +333,7 @@ foreach ($sqlInstance in $sqlInstances) {
 
 while ($(Get-Job -Name arcbox).State -eq 'Running') {
     Receive-Job -Name arcbox -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 5
 }
 
 Get-Job -name arcbox | Remove-Job
