@@ -54,7 +54,7 @@ The steps below will help you get familiar with the automation and deployment fl
 
 ## Deployment Option 1: Azure portal
 
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided in the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json).
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided in the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json).
 
   ![Screenshot of Azure portal deployment](./02.png)
 
@@ -68,7 +68,7 @@ As mentioned, this deployment will leverage ARM templates.
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- Edit the [*parameters file*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json) providing the values that match your configuration as described below:
+- Edit the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json) providing the values that match your configuration as described below:
 
     ![Screenshot of ARM template parameters file](./03.png)
 
@@ -88,7 +88,7 @@ As mentioned, this deployment will leverage ARM templates.
 
 ## Update Assessment
 
-In the resource group that you specified as a parameter, there will be a new policy assignment named "_(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers_". This policy, once it's remediated, enables Periodic Assessment. 
+In the resource group that you specified as a parameter, there will be a new policy assignment named "_(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers_". This policy, once it's remediated, enables Periodic Assessment.
 
 Periodic Assessment is a setting on your machine that enables you to see the latest updates available for your machines and removes the hassle of performing assessment manually every time you need to check the update status. Once you enable this setting, update management center fetches updates on your machine once every 24 hours.
 
@@ -96,11 +96,11 @@ Periodic Assessment is a setting on your machine that enables you to see the lat
 
     ![Screenshot of Resource Group - Policies](./05.png)
 
-- You will see the *(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers* policy assigned. Then, click on **Remediation**:
+- You will see the _(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers_ policy assigned. Then, click on **Remediation**:
 
     ![Screenshot of Policy for checking missing updates](./06.png)
 
-- Right click on the policy *(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers* policy assigned. Then, click on **Remediate**:
+- Right click on the policy _(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers_ policy assigned. Then, click on **Remediate**:
 
     ![Screenshot of Policy for checking missing updates - Remediation](./07.png)
 
