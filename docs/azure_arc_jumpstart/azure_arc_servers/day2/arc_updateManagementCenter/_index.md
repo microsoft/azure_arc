@@ -134,7 +134,7 @@ As part of this scenario, a new **Maintenance Configuration** resource is create
 
     ![Screenshot of new maintenance configuration resource](./13.png)
 
-- Review the following **Maintenance Configuration** settings: **Machines**, which includes the Azure Arc-enabled server; **Schedule** of the maintenance configuration resource (it will start one day after you deploy this scenario); and **Updates** settings:
+- Review the following **Maintenance Configuration** settings: **Machines**, which includes the Azure Arc-enabled server; **Schedule** of the maintenance configuration resource (it will start one day after you deploy this scenario), and **Updates** settings:
 
     ![Screenshot of Maintenance configuration resource - machines](./14.png)
 
