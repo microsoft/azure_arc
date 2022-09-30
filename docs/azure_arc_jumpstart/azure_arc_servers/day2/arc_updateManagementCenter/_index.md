@@ -114,7 +114,7 @@ Periodic Assessment is a setting on your machine that enables you to see the lat
 
   > **NOTE: You will need to wait some time until the first update assessment is run.**
 
-- On the update assessment task is run, go back to your **Azure Arc-enabled server** and click on **Extensions**. You will see that a new extension has been installed. Update management center relies on this Azure extension designed to provide all the functionality required to interact with the operating system to manage the assessment and application of updates.
+- On the update assessment task is run, go back to your **Azure Arc-enabled server** and click on **Extensions**, you will see that a new extension has been installed. Update management center relies on this Azure extension designed to provide all the functionality required to interact with the operating system to manage the assessment and application of updates.
 
     ![Screenshot of Update Management Center extension](./10.png)
 
