@@ -177,6 +177,61 @@ You can also instantly deploy critical updates to help secure your machines.
 
 Complete the following steps to clean up your environment:
 
-- [Delete a maintenance configuration](https://learn.microsoft.com/azure/virtual-machines/maintenance-configurations-cli#delete-a-maintenance-configuration)
-- [Remove extension on Azure Arc-enabled server](https://learn.microsoft.com/azure/azure-arc/servers/manage-vm-extensions-cli#remove-extensions)
-- [Delete Azure Policy Assignment](https://learn.microsoft.com/cli/azure/policy/assignment?view=azure-cli-latest#az-policy-assignment-delete)
+- [Delete the Azure Policy Assignment](https://learn.microsoft.com/cli/azure/policy/assignment?view=azure-cli-latest#az-policy-assignment-delete)
+
+  - First, get the Policy assignment name from its Assignment ID:
+  
+    ![Screenshot of Policy Assignment ID](./24.png)
+
+  - Run the following command:
+
+    ```shell
+    az policy assignment delete \
+    --name <Policy Assignment ID> \
+    --scope <Resource Group ID>
+    ```
+
+- [Delete the maintenance configuration](https://learn.microsoft.com/azure/virtual-machines/maintenance-configurations-cli#delete-a-maintenance-configuration)
+
+  - Run the following command:
+  
+    ```shell
+    az maintenance configuration delete \
+    --subscription <Subscription ID> \
+    -g <Name of the Azure resource group> \
+    --resource-name <Name of the maintenance configuration resource>
+    ```
+
+- [Remove the extensions on Azure Arc-enabled server](https://learn.microsoft.com/azure/azure-arc/servers/manage-vm-extensions-cli#remove-extensions)
+
+  - For **Windows** machines, run the following two commands:
+  
+    ```shell
+    az connectedmachine extension delete \
+    --machine-name <Name of the Azure Arc-enabled server> \
+    --name "WindowsPatchExtension" \
+    -g <Name of the Azure resource group>
+    ```
+
+    ```shell
+    az connectedmachine extension delete \
+    --machine-name <Name of the Azure Arc-enabled server> \
+    --name "WindowsOsUpdateExtension" \
+    -g <Name of the Azure resource group>
+    ```
+
+  - For **Linux** machines, run the following two commands:
+  
+    ```shell
+    az connectedmachine extension delete \
+    --machine-name <Name of the Azure Arc-enabled server> \
+    --name "LinuxPatchExtension" \
+    -g <Name of the Azure resource group>
+    ```
+
+    ```shell
+    az connectedmachine extension delete \
+    --machine-name <Name of the Azure Arc-enabled server> \
+    --name "LinuxOsUpdateExtension" \
+    -g <Name of the Azure resource group>
+    ```
