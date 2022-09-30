@@ -33,7 +33,7 @@ Please review the [Update Management Center supported OS documentation](https://
 
     ![Screenshot Azure Arc-enabled servers](./01.png)
 
-- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.14 or later. Use ```az --version``` to check your current installed version.
+- [Install or update Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Azure CLI should be running version 2.36 or later. Use ```az --version``` to check your current installed version.
 
 - To complete this scenario, the user or service principal running the automation need these minimum RBAC permissions: *Resource Policy Contributor* and *Microsoft.Resources/deployments/** on the resource group where you have your Azure Arc-enabled servers.
 
