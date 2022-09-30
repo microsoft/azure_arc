@@ -128,7 +128,7 @@ Periodic Assessment is a setting on your machine that enables you to see the lat
 
 ## Update Deployment
 
-On the other hand, as part of this scenario, a new **Maintenance Configuration** resource is created. It allows you to schedule recurring updates deployments on your Azure Arc-enabled servers.
+As part of this scenario, a new **Maintenance Configuration** resource is created. It allows you to schedule recurring updates deployments on your Azure Arc-enabled servers.
 
 - Go to your **resource group** and click on the new **Maintenance Configuration** resource:
 
