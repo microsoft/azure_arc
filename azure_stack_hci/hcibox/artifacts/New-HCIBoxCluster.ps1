@@ -1026,6 +1026,7 @@ function Set-AzSMGMT {
 
     # Provision Admincenter
     Write-Verbose "Provisioning admincenter VM"
+    $domainCred = new-object -typename System.Management.Automation.PSCredential -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "$env:adminUsername"), (ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
     New-AdminCenterVM -SDNConfig $SDNConfig -localCred $localCred -domainCred $domainCred | Out-Null
 
 }
@@ -1039,7 +1040,7 @@ function New-DCVM {
 
     $ErrorActionPreference = "Continue"
     $adminUser = $env:adminUsername
-    Invoke-Command -VMName AzSMGMT -Credential $domainCred -ScriptBlock {
+    Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
         $adminUser = $using:adminUser
         $SDNConfig = $using:SDNConfig
         $localcred = $using:localcred
@@ -2812,7 +2813,7 @@ Move-Item -Path $env:HCIBoxVHDDir\livecd.ubuntu-desktop-hyperv.vhdx -Destination
 $localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
 $domainCred = new-object -typename System.Management.Automation.PSCredential `
-    -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "$env:adminUsername"), `
+    -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\Administrator"), `
     (ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
 
 $NCAdminCred = new-object -typename System.Management.Automation.PSCredential `
