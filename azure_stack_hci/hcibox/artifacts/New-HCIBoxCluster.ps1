@@ -1879,7 +1879,7 @@ function New-AdminCenterVM {
 
         # Refresh Domain Cred
         $domainCred = new-object -typename System.Management.Automation.PSCredential `
-            -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
+            -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\$env:adminUsername"), `
         (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
         # Wait until the VM is restarted
