@@ -115,13 +115,16 @@ Write-Host "Generating a TLS Certificate"
 $cert = New-SelfSignedCertificate -DnsName $certdns -KeyAlgorithm RSA -KeyLength 2048 -NotAfter (Get-Date).AddYears(1) -CertStoreLocation "Cert:\CurrentUser\My"
 $certPassword = ConvertTo-SecureString -String "arcbox" -Force -AsPlainText
 Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath "$Env:TempDir\$certname.pfx" -Password $certPassword
-Copy-VMFile AzSMGMT -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C:\VHD\$certname.pfx" -FileSource Host
-Invoke-Command -VMName AzSMGMT -Credential $adcred -ScriptBlock {
-    $certname = $using:certname
+Copy-VMFile AzSMGMT -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C:\VMConfigs\$certname.pfx" -FileSource Host
+$localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
+Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
+    $certname2 = $using:certname
     $certPassword = $using:certPassword
-    Copy-VMFile AdminCenter -SourcePath "C:\VHD\$certname.pfx" -DestinationPath "C:\VMConfigs\$certname.pfx" -FileSource Host
+    Copy-VMFile AdminCenter -SourcePath "C:\VMConfigs\$certname.pfx" -DestinationPath "C:\VHDs\$certname.pfx" -FileSource Host
+    Enable-VMIntegrationService -VMName AdminCenter -Name "Guest Service Interface"
     Invoke-Command -VMName AdminCenter -Credential $using:adcred -ScriptBlock {
-        Import-PfxCertificate -FilePath "C:\VMConfigs\$using:certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $using:certPassword
+        Write-Verbose $using:certname2
+        Import-PfxCertificate -FilePath "C:\VHDs\$using:certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $using:certPassword
     }
 }
 
@@ -162,8 +165,12 @@ $clientSecret = $env:spnClientSecret
 }
 
 # Insert into HOSTS file
-Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
-    Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$using:ip`t$using:certdns" -Force
+Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
+    $ip2 = $using:ip
+    $certdns2 = $using:certdns
+    Invoke-Command -VMName AdminCenter -Credential $adcred -ScriptBlock {
+        Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$using:ip2`t$using:certdns" -Force
+    }
 }
 
 Write-Header "Creating Desktop Icons"
