@@ -1026,7 +1026,7 @@ function Set-AzSMGMT {
 
     # Provision Admincenter
     Write-Verbose "Provisioning admincenter VM"
-    $domainCred = new-object -typename System.Management.Automation.PSCredential -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "$env:adminUsername"), (ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
+    $domainCred = new-object -typename System.Management.Automation.PSCredential -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\$env:adminUsername"), (ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
     New-AdminCenterVM -SDNConfig $SDNConfig -localCred $localCred -domainCred $domainCred | Out-Null
 
 }
