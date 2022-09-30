@@ -66,7 +66,7 @@
         }
     },
     "variables": {
-        "grafanaAdminRoleAssignmentName": "[guid(parameters('principalId'), variables('grafanaAdminRole'), resourceGroup().id)]",
+        "grafanaAdminRoleAssignmentName": "[guid(parameters('grafanaAdminprincipalId'), variables('grafanaAdminRole'), resourceGroup().id)]",
         "monitoringReaderRoleAssignmentName": "[guid(variables('monitoringReaderRole'), variables('WorkspaceResourceId'))]",
         "grafanaAdminRole": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '22926164-76b3-42b3-bc55-97df8dab3e41')]",
         "monitoringReaderRole": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', '43d0d8ad-25c7-4714-9337-8ba259a9fe05')]",
