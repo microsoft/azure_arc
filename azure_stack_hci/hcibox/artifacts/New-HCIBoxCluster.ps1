@@ -279,9 +279,9 @@ function Add-Files {
         Write-Verbose "Mounting VHDX file at $path"
         [string]$MountedDrive = ""
         if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
-            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 4
+            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
             if (!$partition.DriveLetter) {
-                $MountedDrive = "F"
+                $MountedDrive = "X"
                 $partition | Set-Partition -NewDriveLetter $MountedDrive
             }  
             else {
@@ -290,7 +290,7 @@ function Add-Files {
         } else {
             $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
             if (!$partition.DriveLetter) {
-                $MountedDrive = "G"
+                $MountedDrive = "Y"
                 $partition | Set-Partition -NewDriveLetter $MountedDrive
             }   
             else {
@@ -1026,6 +1026,7 @@ function Set-AzSMGMT {
 
     # Provision Admincenter
     Write-Verbose "Provisioning admincenter VM"
+    $domainCred = new-object -typename System.Management.Automation.PSCredential -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\$env:adminUsername"), (ConvertTo-SecureString $SDNConfig.SDNAdminPassword  -AsPlainText -Force)
     New-AdminCenterVM -SDNConfig $SDNConfig -localCred $localCred -domainCred $domainCred | Out-Null
 
 }
@@ -1039,7 +1040,7 @@ function New-DCVM {
 
     $ErrorActionPreference = "Continue"
     $adminUser = $env:adminUsername
-    Invoke-Command -VMName AzSMGMT -Credential $domainCred -ScriptBlock {
+    Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
         $adminUser = $using:adminUser
         $SDNConfig = $using:SDNConfig
         $localcred = $using:localcred
@@ -1681,6 +1682,8 @@ function New-AdminCenterVM {
 
     )
 
+    $domainAdminUsername = $env:adminUsername
+
     Invoke-Command -VMName AzSMGMT -Credential $localCred -ScriptBlock {
 
         $VMName = "admincenter"
@@ -1879,7 +1882,7 @@ function New-AdminCenterVM {
 
         # Refresh Domain Cred
         $domainCred = new-object -typename System.Management.Automation.PSCredential `
-            -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
+            -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\$using:domainAdminUsername"), `
         (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
         # Wait until the VM is restarted
@@ -2161,17 +2164,17 @@ CertificateTemplate= WebServer
             New-ItemProperty -Path $WUKey -Name AUOptions -PropertyType Dword -Value 2 `
                 -Force | Out-Null  
         
-            # Install Edge
-            Write-Verbose 'Installing Microsft Edge browser in admincenter vm'
-            $expression = "choco install microsoft-edge -y"
-            Invoke-Expression $expression
-            $ErrorActionPreference = "Stop"
+            # # Install Edge
+            # Write-Verbose 'Installing Microsft Edge browser in admincenter vm'
+            # $expression = "choco install microsoft-edge -y"
+            # Invoke-Expression $expression
+            # $ErrorActionPreference = "Stop"
             
-            # Install Set Default Browser
-            Write-Verbose 'Installing setdefaultbrowser in admincenter vm'
-            $expression = "choco install setdefaultbrowser -y"
-            Invoke-Expression $expression
-            $ErrorActionPreference = "Stop" 
+            # # Install Set Default Browser
+            # Write-Verbose 'Installing setdefaultbrowser in admincenter vm'
+            # $expression = "choco install setdefaultbrowser -y"
+            # Invoke-Expression $expression
+            # $ErrorActionPreference = "Stop" 
 
             # Install Kubectl
             Write-Verbose 'Installing kubectl'
@@ -2189,13 +2192,13 @@ CertificateTemplate= WebServer
             $Shortcut.TargetPath = $TargetPath
             $Shortcut.Save()
 
-            # Add Scheduled task to set default browser at login
-            $stTrigger = New-ScheduledTaskTrigger -AtLogOn
-            $stTrigger.Delay = 'PT1M'
-            $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Edge'
-            $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-            $settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
-            Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Settings $settings -Principal $principal -Force
+            # # Add Scheduled task to set default browser at login
+            # $stTrigger = New-ScheduledTaskTrigger -AtLogOn
+            # $stTrigger.Delay = 'PT1M'
+            # $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Edge'
+            # $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+            # $settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
+            # Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Settings $settings -Principal $principal -Force
 
             # Disable Edge 'First Run' Setup
             $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
@@ -2206,29 +2209,6 @@ CertificateTemplate= WebServer
             $savePasswordRegistryValue = '0x00000000'
             $autoArrangeRegistryName = 'FFlags'
             $autoArrangeRegistryValue = '1075839525'
-
-            # Set HCIBox wallpaper
-            Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/azure_arc/main/img/hcibox_wallpaper.png" -OutFile C:\VHDs\wallpaper.png
-            # Changing to Jumpstart ArcBox wallpaper
-            $code = @' 
-using System.Runtime.InteropServices; 
-namespace Win32{ 
-    
-    public class Wallpaper{ 
-        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-            static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-            
-            public static void SetWallpaper(string thePath){ 
-            SystemParametersInfo(20,0,thePath,3); 
-            }
-        }
-    } 
-'@
-
-            Write-Verbose "Changing Wallpaper"
-            $imgPath="C:\VHDs\wallpaper.png"
-            Add-Type $code 
-            [Win32.Wallpaper]::SetWallpaper($imgPath)
 
             if (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
                 New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
@@ -2241,7 +2221,29 @@ namespace Win32{
             New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
             Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
-        } 
+#             # Set HCIBox wallpaper
+#             Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/azure_arc/main/img/hcibox_wallpaper.png" -OutFile C:\VHDs\wallpaper.png
+#             $code = @' 
+# using System.Runtime.InteropServices; 
+# namespace Win32{ 
+    
+#     public class Wallpaper{ 
+#         [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+#             static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+            
+#             public static void SetWallpaper(string thePath){ 
+#             SystemParametersInfo(20,0,thePath,3); 
+#             }
+#         }
+#     } 
+# '@
+
+#             Write-Verbose "Changing Wallpaper"
+#             $imgPath="C:\VHDs\wallpaper.png"
+#             Add-Type $code 
+#             [Win32.Wallpaper]::SetWallpaper($imgPath)
+
+#         } 
     } 
 }
 
