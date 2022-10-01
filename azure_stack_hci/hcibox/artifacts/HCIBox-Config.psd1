@@ -21,7 +21,7 @@
     InternalSwitch                       = "InternalSwitch"                      # Name of internal switch that the HCIBox VMs will use in Single Host mode. This only applies when using a single host.
 
     # ProductKeys
-    GUIProductKey                        = "WMDGN-G9PQG-XVVXX-R3X43-63DFG"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
+    GUIProductKey                        = "WX4NM-KYWYW-QJJR4-XV3QB-6VM33"        # Product key for Windows Server 2019 (Desktop Experience) Datacenter Installation
 
     # SDN Lab Domain
     SDNDomainFQDN                        = "jumpstart.local"                      # Limit name (not the .com) to 14 characters as the name will be used as the NetBIOS name. 
