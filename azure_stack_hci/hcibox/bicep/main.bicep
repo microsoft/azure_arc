@@ -30,7 +30,7 @@ param deployResourceBridge bool = true
 param githubAccount string = 'microsoft'
 
 @description('Target GitHub branch')
-param githubBranch string = 'main'
+param githubBranch string = 'feature_azschi'
 
 @description('Choice to deploy Bastion to connect to the client VM')
 param deployBastion bool = false

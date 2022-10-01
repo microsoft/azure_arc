@@ -1,5 +1,6 @@
 param (
     [string]$adminUsername,
+    [string]$adminPassword,
     [string]$spnClientId,
     [string]$spnClientSecret,
     [string]$spnTenantId,
@@ -51,6 +52,7 @@ New-Item -Path $Env:HCIBoxLogsDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxVMDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxIconDir -ItemType directory -Force
 New-Item -Path $Env:HCIBoxWACDir -ItemType directory -Force
+New-Item -Path $Env:HCIBoxKVDir -ItemType directory -Force
 New-Item -Path $Env:ToolsDir -ItemType Directory -Force
 New-Item -Path $Env:tempDir -ItemType directory -Force
 New-Item -Path $Env:agentScript -ItemType directory -Force
@@ -93,21 +95,8 @@ foreach ($app in $appsToInstall)
     & choco install $app /y -Force | Write-Output
 }
 
-Write-Host "Fetching artifacts"
-Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
-# Invoke-WebRequest ($templateBaseUrl + "artifacts/DeploymentStatus.ps1") -OutFile $Env:HCIBoxDir\DeploymentStatus.ps1
-# Invoke-WebRequest ($templateBaseUrl + "artifacts/LogInstructions.txt") -OutFile $Env:HCIBoxLogsDir\LogInstructions.txt
-
-# Invoke-WebRequest ($templateBaseUrl + "../tests/GHActionDeploy.ps1") -OutFile "$Env:HCIBoxDir\GHActionDeploy.ps1"
-# Invoke-WebRequest ($templateBaseUrl + "../tests/OpenSSHDeploy.ps1") -OutFile "$Env:HCIBoxDir\OpenSSHDeploy.ps1"
-
-# Creating scheduled task for MonitorWorkbookLogonScript.ps1
-#$Trigger = New-ScheduledTaskTrigger -AtLogOn
-#$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Env:HCIBoxDir\MonitorWorkbookLogonScript.ps1
-#Register-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Trigger $Trigger -User $adminUsername -Action $Action -RunLevel "Highest" -Force
-
-# Downloading AzSHCI files
 Write-Header "Downloading Azure Stack HCI configuration scripts"
+Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/azure_arc/main/img/hcibox_wallpaper.png" -OutFile $Env:HCIBoxDir\wallpaper.png
 Invoke-WebRequest https://aka.ms/wacdownload -OutFile $Env:HCIBoxWACDir\WindowsAdminCenter.msi
 Invoke-WebRequest ($templateBaseUrl + "artifacts/HCIBoxLogonScript.ps1") -OutFile $Env:HCIBoxDir\HCIBoxLogonScript.ps1
 Invoke-WebRequest ($templateBaseUrl + "artifacts/New-HCIBoxCluster.ps1") -OutFile $Env:HCIBoxDir\New-HCIBoxCluster.ps1
@@ -131,6 +120,9 @@ Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.json") -OutFile 
 Invoke-WebRequest ($templateBaseUrl + "artifacts/dataController.parameters.json") -OutFile $Env:HCIBoxDir\dataController.parameters.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.json") -OutFile $Env:HCIBoxDir\sqlmi.json
 Invoke-WebRequest ($templateBaseUrl + "artifacts/sqlmi.parameters.json") -OutFile $Env:HCIBoxDir\sqlmi.parameters.json
+
+# Replace password placeholder
+(Get-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1) -replace '%staging-password%',$adminPassword | Set-Content -Path $Env:HCIBoxDir\HCIBox-Config.psd1
 
 # Disabling Windows Server Manager Scheduled Task
 Get-ScheduledTask -TaskName ServerManager | Disable-ScheduledTask

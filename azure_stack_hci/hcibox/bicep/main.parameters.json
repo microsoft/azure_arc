@@ -9,25 +9,19 @@
             "value": "<your service principal secret>"
         },
         "spnTenantId": {
-            "value": "<your spn tenant id>"
+            "value": "<your service principal tenant id>"
         },
         "windowsAdminUsername": {
             "value": "arcdemo"
         },
         "windowsAdminPassword": {
-            "value": "<your windows admin password>"
+            "value": "ArcPassword123!!"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "<your unique Log Analytics workspace name>"
+            "value": "HCIBox-Workspace"
         },
         "deployBastion": {
             "value": false
-        },
-        "githubAccount": {
-            "value": "dkirby-ms"
-        },
-        "githubBranch": {
-            "value": "main"
         }
     }
 }
