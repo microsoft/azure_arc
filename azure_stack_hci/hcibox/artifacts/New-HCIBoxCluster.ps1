@@ -2164,17 +2164,17 @@ CertificateTemplate= WebServer
             New-ItemProperty -Path $WUKey -Name AUOptions -PropertyType Dword -Value 2 `
                 -Force | Out-Null  
         
-            # Install Edge
-            Write-Verbose 'Installing Microsft Edge browser in admincenter vm'
-            $expression = "choco install microsoft-edge -y"
-            Invoke-Expression $expression
-            $ErrorActionPreference = "Stop"
+            # # Install Edge
+            # Write-Verbose 'Installing Microsft Edge browser in admincenter vm'
+            # $expression = "choco install microsoft-edge -y"
+            # Invoke-Expression $expression
+            # $ErrorActionPreference = "Stop"
             
-            # Install Set Default Browser
-            Write-Verbose 'Installing setdefaultbrowser in admincenter vm'
-            $expression = "choco install setdefaultbrowser -y"
-            Invoke-Expression $expression
-            $ErrorActionPreference = "Stop" 
+            # # Install Set Default Browser
+            # Write-Verbose 'Installing setdefaultbrowser in admincenter vm'
+            # $expression = "choco install setdefaultbrowser -y"
+            # Invoke-Expression $expression
+            # $ErrorActionPreference = "Stop" 
 
             # Install Kubectl
             Write-Verbose 'Installing kubectl'
@@ -2192,13 +2192,13 @@ CertificateTemplate= WebServer
             $Shortcut.TargetPath = $TargetPath
             $Shortcut.Save()
 
-            # Add Scheduled task to set default browser at login
-            $stTrigger = New-ScheduledTaskTrigger -AtLogOn
-            $stTrigger.Delay = 'PT1M'
-            $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Edge'
-            $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-            $settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
-            Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Settings $settings -Principal $principal -Force
+            # # Add Scheduled task to set default browser at login
+            # $stTrigger = New-ScheduledTaskTrigger -AtLogOn
+            # $stTrigger.Delay = 'PT1M'
+            # $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Edge'
+            # $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+            # $settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
+            # Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Settings $settings -Principal $principal -Force
 
             # Disable Edge 'First Run' Setup
             $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
