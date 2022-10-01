@@ -279,9 +279,9 @@ function Add-Files {
         Write-Verbose "Mounting VHDX file at $path"
         [string]$MountedDrive = ""
         if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
-            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 4
+            $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
             if (!$partition.DriveLetter) {
-                $MountedDrive = "F"
+                $MountedDrive = "X"
                 $partition | Set-Partition -NewDriveLetter $MountedDrive
             }  
             else {
@@ -290,7 +290,7 @@ function Add-Files {
         } else {
             $partition = Mount-VHD -Path $path -Passthru | Get-Disk | Get-Partition -PartitionNumber 3
             if (!$partition.DriveLetter) {
-                $MountedDrive = "G"
+                $MountedDrive = "Y"
                 $partition | Set-Partition -NewDriveLetter $MountedDrive
             }   
             else {
