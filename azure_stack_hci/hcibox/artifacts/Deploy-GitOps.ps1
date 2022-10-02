@@ -23,7 +23,7 @@ $certdns = "hcibox.devops.com"
 
 $appClonedRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
 
-#Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
 
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
@@ -125,6 +125,7 @@ Invoke-Command -ComputerName AdminCenter -Credential $adcred -ScriptBlock {
     Import-PfxCertificate -FilePath "C:\VHDs\$using:certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $using:certPassword
 }
 
+
 Write-Host "Importing the TLS certificate to Key Vault"
 az keyvault certificate import --vault-name $keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
 
@@ -147,7 +148,7 @@ Write-Header "Creating Ingress Controller"
 Copy-VMFile $SDNConfig.HostList[0] -SourcePath "$Env:HCIBoxKVDir\hello-arc.yaml" -DestinationPath "C:\VHD\hello-arc.yaml" -FileSource Host
 $clientId = $env:spnClientID
 $clientSecret = $env:spnClientSecret
-[string]$ip = Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
+Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     foreach ($namespace in @('hello-arc')) {
         # Create the Kubernetes secret with the service principal credentials
         kubectl create secret generic secrets-store-creds --namespace $namespace --from-literal clientid=$using:clientId --from-literal clientsecret=$using:clientSecret
@@ -156,37 +157,33 @@ $clientSecret = $env:spnClientSecret
         # Deploy Key Vault resources and Ingress for Book Store and Hello-Arc App
         kubectl --namespace $namespace apply -f "C:\VHD\hello-arc.yaml"
     }
-
+}
+[string]$ip = Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     $ip = kubectl get service/ingress-nginx-controller --namespace $using:ingressNamespace --output=jsonpath='{.status.loadBalancer.ingress[0].ip}'
     return $ip
 }
-
 # Insert into HOSTS file
-Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
-    $ip2 = $using:ip
-    $certdns2 = $using:certdns
-    Invoke-Command -VMName AdminCenter -Credential $adcred -ScriptBlock {
-        Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$using:ip2`t$using:certdns2" -Force
-    }
+Invoke-Command -ComputerName AdminCenter -Credential $adcred -ScriptBlock {
+    Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$using:ip`t$using:certdns" -Force
 }
 
 Write-Header "Creating Desktop Icons"
 
 # # Creating CAPI Hello Arc Icon on Desktop
-Invoke-WebRequest ($templateBaseUrl + "artifacts/icons/arc.ico") -OutFile $Env:HCIBoxIconDir\arc.ico
-Copy-VMFile AzSMGMT -SourcePath "$Env:HCIBoxIconDir\arc.ico" -DestinationPath "C:\VHD\arc.ico" -FileSource Host
-Invoke-Command -VMName AzSMGMT -Credential $adcred -ScriptBlock {
-    Copy-VMFile AdminCenter -SourcePath "C:\VHD\arc.ico" -DestinationPath "C:\VMConfigs\arc.ico" -FileSource Host
-    $certdns = $using:certdns
-    Invoke-Command -VMName AdminCenter -Credential $using:adcred -ScriptBlock {
-        $shortcutLocation = "$Env:Public\Desktop\Hello-Arc.lnk"
-        $wScriptShell = New-Object -ComObject WScript.Shell
-        $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
-        $shortcut.TargetPath = "https://$using:certdns"
-        $shortcut.IconLocation="C:\VMConfigs\arc.ico, 0"
-        $shortcut.WindowStyle = 3
-        $shortcut.Save()
-    }
+Invoke-WebRequest ($env:templateBaseUrl + "artifacts/icons/arc.ico") -OutFile $Env:HCIBoxIconDir\arc.ico
+Copy-VMFile AzSMGMT -SourcePath "$Env:HCIBoxIconDir\arc.ico" -DestinationPath "C:\VMConfigs\arc.ico" -FileSource Host
+Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
+    Copy-VMFile AdminCenter -SourcePath "C:\VMConfigs\arc.ico" -DestinationPath "C:\VHDs\arc.ico" -FileSource Host
+}
+
+Invoke-Command -ComputerName AdminCenter -Credential $adcred -ScriptBlock {
+    $shortcutLocation = "$Env:Public\Desktop\Hello-Arc.lnk"
+    $wScriptShell = New-Object -ComObject WScript.Shell
+    $shortcut = $wScriptShell.CreateShortcut($shortcutLocation)
+    $shortcut.TargetPath = "https://$using:certdns"
+    $shortcut.IconLocation="C:\VHDs\arc.ico, 0"
+    $shortcut.WindowStyle = 3
+    $shortcut.Save()
 }
 
 Stop-Transcript
