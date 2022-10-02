@@ -58,7 +58,7 @@ if ($Env:flavor -eq 'DataOps') {
     $sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
     $Env:AZCOPY_BUFFER_GB = 4
     Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-    azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" --check-length=false --log-level=ERROR
+    azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" --check-length=false --cap-mbps 1200 --log-level=ERROR
 
 
     # Create the nested SQL VM
