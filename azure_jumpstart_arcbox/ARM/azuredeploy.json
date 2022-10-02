@@ -219,8 +219,7 @@
       "name": "clientVmDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
-        "updateVNetDNSServers",
-        "aksDeployment"
+        "updateVNetDNSServers"
       ],
       "properties": {
         "mode": "Incremental",
