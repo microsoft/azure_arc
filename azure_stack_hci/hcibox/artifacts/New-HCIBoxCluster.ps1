@@ -2163,18 +2163,6 @@ CertificateTemplate= WebServer
             New-Item -Path $WUKey -Force | Out-Null
             New-ItemProperty -Path $WUKey -Name AUOptions -PropertyType Dword -Value 2 `
                 -Force | Out-Null  
-        
-            # # Install Edge
-            # Write-Verbose 'Installing Microsft Edge browser in admincenter vm'
-            # $expression = "choco install microsoft-edge -y"
-            # Invoke-Expression $expression
-            # $ErrorActionPreference = "Stop"
-            
-            # # Install Set Default Browser
-            # Write-Verbose 'Installing setdefaultbrowser in admincenter vm'
-            # $expression = "choco install setdefaultbrowser -y"
-            # Invoke-Expression $expression
-            # $ErrorActionPreference = "Stop" 
 
             # Install Kubectl
             Write-Verbose 'Installing kubectl'
@@ -2191,14 +2179,6 @@ CertificateTemplate= WebServer
             $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile)
             $Shortcut.TargetPath = $TargetPath
             $Shortcut.Save()
-
-            # # Add Scheduled task to set default browser at login
-            # $stTrigger = New-ScheduledTaskTrigger -AtLogOn
-            # $stTrigger.Delay = 'PT1M'
-            # $stAction = New-ScheduledTaskAction -Execute "C:\ProgramData\chocolatey\bin\SetDefaultBrowser.exe" -Argument 'Edge'
-            # $principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-            # $settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
-            # Register-ScheduledTask -Action $stAction -Trigger $stTrigger -TaskName SetDefaultBrowser -Settings $settings -Principal $principal -Force
 
             # Disable Edge 'First Run' Setup
             $edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
@@ -2220,30 +2200,7 @@ CertificateTemplate= WebServer
             New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Value $firstRunRegistryValue -PropertyType DWORD -Force
             New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
             Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
-
-#             # Set HCIBox wallpaper
-#             Invoke-WebRequest "https://raw.githubusercontent.com/dkirby-ms/azure_arc/main/img/hcibox_wallpaper.png" -OutFile C:\VHDs\wallpaper.png
-#             $code = @' 
-# using System.Runtime.InteropServices; 
-# namespace Win32{ 
-    
-#     public class Wallpaper{ 
-#         [DllImport("user32.dll", CharSet=CharSet.Auto)] 
-#             static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
-            
-#             public static void SetWallpaper(string thePath){ 
-#             SystemParametersInfo(20,0,thePath,3); 
-#             }
-#         }
-#     } 
-# '@
-
-#             Write-Verbose "Changing Wallpaper"
-#             $imgPath="C:\VHDs\wallpaper.png"
-#             Add-Type $code 
-#             [Win32.Wallpaper]::SetWallpaper($imgPath)
-
-#         } 
+        }
     } 
 }
 
