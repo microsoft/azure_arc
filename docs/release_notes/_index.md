@@ -381,7 +381,7 @@ weight: 3
 
 - [Bug fix: Creating data controller for the November release using kubectl #876](https://github.com/microsoft/azure_arc/issues/876)
 
-# 2021
+## 2021
 
 ### December 2021
 
