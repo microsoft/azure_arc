@@ -37,7 +37,7 @@ $csv_path = "C:\ClusterStorage\S2D_vDISK1"
 foreach ($VM in $SDNConfig.HostList) {
     Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
         Install-PackageProvider -Name NuGet -Force 
-        Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
+        # Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
         Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
     
         $ErrorActionPreference = "SilentlyContinue"
