@@ -9,6 +9,35 @@ weight: 3
 
 **Release notes will be released around the first week of each month and will cover the previous month.**
 
+# 2022
+
+## September 2022
+
+### Release highlights
+
+- New and updated Azure Arc-enabled servers scenarios
+- New and updated Azure Arc-enabled data services scenarios
+- Bug fixes
+
+### Azure Arc-enabled servers
+
+- [New scenario: Onboard Azure Arc-enabled servers to Update Management Center](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_updatemanagementcenter/)
+
+### Azure Arc-enabled data services
+
+- [Updated scenario: Deploy a vanilla Azure Arc Data Controller in directly connected mode on Kubeadm Kubernetes cluster with Azure provider using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_azure_dc_vanilla_arm_template/)
+- [New scenario: Deploy Azure Arc-enabled SQL Managed Instance in directly connected mode on Kubeadm Kubernetes cluster with Azure provider using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_azure_mssql_mi_arm_template/)
+- [New scenario: Deploy Azure Arc-enabled PostgreSQL in directly connected mode on Cluster API Kubernetes cluster with Azure provider using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_azure_postgresql_arm_template/)
+- [Bug fix: Bootstrapping through yaml fails #1346](https://github.com/microsoft/azure_arc/issues/1346)
+
+### Azure Arc-enabled app services
+
+- [Bug fix: App Service (Container) ARM Template: AppServicesLoginScript stuck waiting for log processor #1320](https://github.com/microsoft/azure_arc/issues/1320)
+
+### Jumpstart ArcBox
+
+- [Bug fix: "MyIpAddress" parameter not available in ArcBox #1395](https://github.com/microsoft/azure_arc/issues/1395)
+
 ## August 2022
 
 ### Release highlights
@@ -351,6 +380,8 @@ weight: 3
 - [Enhancement: Add support for data controller auto-upload logs and metrics #901](https://github.com/microsoft/azure_arc/issues/901)
 
 - [Bug fix: Creating data controller for the November release using kubectl #876](https://github.com/microsoft/azure_arc/issues/876)
+
+# 2021
 
 ## December 2021
 
