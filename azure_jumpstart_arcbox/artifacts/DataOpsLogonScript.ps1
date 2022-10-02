@@ -169,6 +169,8 @@ foreach ($cluster in $clusters) {
         Write-Host "Enabling Azure Policy cluster extension"
         az k8s-extension create --name "azurepolicy" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type Microsoft.PolicyInsights
         Write-Host "`n"
+        Write-Host "Enabling Defender for Cloud cluster extension"
+        az k8s-extension create --name "microsoft.azuredefender.kubernetes" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type microsoft.azuredefender.kubernetes
     }
 }
 
