@@ -37,6 +37,7 @@ $Env:AZURE_CONFIG_DIR = $cliDir.FullName
 # Required for CLI commands
 Write-Header "Az CLI Login"
 az login --service-principal --username $Env:spnClientID --password $Env:spnClientSecret --tenant $Env:spnTenantId
+az config set extension.use_dynamic_install=yes_without_prompt
 
 # Required for azcopy
 $azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
@@ -44,7 +45,7 @@ $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID 
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Setting kubeconfig
-$clusterName = $env:AKSClusterName
+$clusterName = az connectedk8s list --resource-group HCIBox --query "[].{Name:name} | [? contains(Name,'hcibox')]" --output tsv
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     kubectl get nodes
@@ -56,17 +57,17 @@ Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  
 # Create random 13 character string for Key Vault name
 $strLen = 13
 $randStr = (-join ((0x30..0x39) + (0x61..0x7A) | Get-Random -Count $strLen | ForEach-Object {[char]$_}))
-$Env:keyVaultName = "HCIBox-KV-$randStr"
+$keyVaultName = "HCIBox-KV-$randStr"
 
-[System.Environment]::SetEnvironmentVariable('keyVaultName', $Env:keyVaultName, [System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('keyVaultName', $keyVaultName, [System.EnvironmentVariableTarget]::Machine)
 
 # Create Azure Key Vault
 Write-Header "Creating Azure KeyVault"
-az keyvault create --name $Env:keyVaultName --resource-group $Env:resourceGroup --location $Env:azureLocation
+az keyvault create --name $keyVaultName --resource-group $Env:resourceGroup --location $Env:azureLocation
 
 # Allow SPN to import certificates into Key Vault
 Write-Header "Setting KeyVault Access Policies"
-az keyvault set-policy --name $Env:keyVaultName --spn $Env:spnClientID --key-permissions --secret-permissions get --certificate-permissions get list import
+az keyvault set-policy --name $keyVaultName --spn $Env:spnClientID --key-permissions --secret-permissions get --certificate-permissions get list import
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
@@ -129,7 +130,7 @@ Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
 }
 
 Write-Host "Importing the TLS certificate to Key Vault"
-az keyvault certificate import --vault-name $Env:keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
+az keyvault certificate import --vault-name $keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
 
 Write-Host "Installing Azure Key Vault Kubernetes extension instance"
 az k8s-extension create --name 'akvsecretsprovider' --extension-type Microsoft.AzureKeyVaultSecretsProvider --scope cluster --cluster-name $clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --release-train preview --release-namespace kube-system --configuration-settings 'secrets-store-csi-driver.enableSecretRotation=true' 'secrets-store-csi-driver.syncSecret.enabled=true'
@@ -139,7 +140,7 @@ Invoke-WebRequest ($env:templateBaseUrl + "artifacts/devops_ingress/hello-arc.ya
 Get-ChildItem -Path $Env:HCIBoxKVDir |
     ForEach-Object {
         (Get-Content -path $_.FullName -Raw) -Replace '\{JS_CERTNAME}', $certname | Set-Content -Path $_.FullName
-        (Get-Content -path $_.FullName -Raw) -Replace '\{JS_KEYVAULTNAME}', $Env:keyVaultName | Set-Content -Path $_.FullName
+        (Get-Content -path $_.FullName -Raw) -Replace '\{JS_KEYVAULTNAME}', $keyVaultName | Set-Content -Path $_.FullName
         (Get-Content -path $_.FullName -Raw) -Replace '\{JS_HOST}', $certdns | Set-Content -Path $_.FullName
         (Get-Content -path $_.FullName -Raw) -Replace '\{JS_TENANTID}', $Env:spnTenantId | Set-Content -Path $_.FullName
     }
@@ -169,7 +170,7 @@ Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
     $ip2 = $using:ip
     $certdns2 = $using:certdns
     Invoke-Command -VMName AdminCenter -Credential $adcred -ScriptBlock {
-        Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$using:ip2`t$using:certdns" -Force
+        Add-Content -Path $Env:windir\System32\drivers\etc\hosts -Value "`n`t$using:ip2`t$using:certdns2" -Force
     }
 }
 
@@ -191,3 +192,5 @@ Invoke-Command -VMName AzSMGMT -Credential $adcred -ScriptBlock {
         $shortcut.Save()
     }
 }
+
+Stop-Transcript
