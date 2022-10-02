@@ -148,41 +148,29 @@ kubectx capi="arcbox-capi"
 Start-Sleep -Seconds 10
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
-az extension add --name connectedk8s
 foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
-        Start-Job -Name arcbox -ScriptBlock {
-            $cluster = $using:cluster
-            Write-Host "Checking K8s Nodes"
-            kubectl get nodes --kubeconfig $cluster.kubeConfig
-            Write-Host "`n"
-            az connectedk8s connect --name $cluster.clusterName `
-                --resource-group $Env:resourceGroup `
-                --location $Env:azureLocation `
-                --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-                --kube-config $cluster.kubeConfig
+        Write-Host "Checking K8s Nodes"
+        kubectl get nodes --kubeconfig $cluster.kubeConfig
+        Write-Host "`n"
+        az connectedk8s connect --name $cluster.clusterName `
+            --resource-group $Env:resourceGroup `
+            --location $Env:azureLocation `
+            --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+            --kube-config $cluster.kubeConfig
 
-            Start-Sleep -Seconds 10
+        Start-Sleep -Seconds 10
 
-            # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
-            Write-Host "`n"
-            Write-Host "Enabling Container Insights cluster extension"
-            az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-            Write-Host "`n"
-            Write-Host "Enabling Azure Policy cluster extension"
-            az k8s-extension create --name "azurepolicy" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type Microsoft.PolicyInsights
-            Write-Host "`n"
-        }
+        # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
+        Write-Host "`n"
+        Write-Host "Enabling Container Insights cluster extension"
+        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+        Write-Host "`n"
+        Write-Host "Enabling Azure Policy cluster extension"
+        az k8s-extension create --name "azurepolicy" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type Microsoft.PolicyInsights
+        Write-Host "`n"
     }
 }
-
-while ($(Get-Job -Name arcbox).State -eq 'Running') {
-    Receive-Job -Name arcbox -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 5
-}
-
-Get-Job -name arcbox | Remove-Job
-write-host "Successfully onboarded clusters to Azure"
 
 ################################################
 # - Deploying data services on CAPI cluster

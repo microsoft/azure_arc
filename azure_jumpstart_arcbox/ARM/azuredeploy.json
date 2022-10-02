@@ -413,5 +413,11 @@
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+    "clientVmLogonUserName": {
+      "type": "string",
+      "value": "[concat(parameters('windowsAdminUsername'),'@',parameters('addsDomainName'))]"
+    }
+  }
 }
