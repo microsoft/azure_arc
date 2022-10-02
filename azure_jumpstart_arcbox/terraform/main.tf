@@ -314,3 +314,7 @@ module "aks_clusters" {
     module.adds_vm
   ]
 }
+
+output "clientVmLogonUserName" {
+  value = "${var.client_admin_username}@${var.addsDomainName}"
+}
