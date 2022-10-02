@@ -81,6 +81,7 @@ var policies = [
     flavors: [
       'Full'
       'DevOps'
+      'DataOps'
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
     parameters: {}
