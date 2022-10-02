@@ -161,12 +161,14 @@ foreach ($cluster in $clusters) {
 
         Start-Sleep -Seconds 10
 
-        # Enabling Container Insights cluster extension on primary AKS cluster
+        # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"
         Write-Host "Enabling Container Insights cluster extension"
         az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
         Write-Host "`n"
-
+        Write-Host "Enabling Azure Policy cluster extension"
+        az k8s-extension create --name "azurepolicy" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type Microsoft.PolicyInsights
+        Write-Host "`n"
     }
 }
 
