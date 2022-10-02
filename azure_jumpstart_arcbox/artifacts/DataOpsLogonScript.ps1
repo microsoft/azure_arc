@@ -354,7 +354,6 @@ if (-not $ArcServersLogonScript) {
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "DataOpsLogonScript" -Confirm:$false
-Unregister-ScheduledTask -TaskName "MonitorWorkbookLogonScript" -Confirm:$false
 Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
