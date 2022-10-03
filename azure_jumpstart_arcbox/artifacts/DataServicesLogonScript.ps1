@@ -160,7 +160,7 @@ Write-Header "Deploying SQLMI & PostgreSQL"
 Write-Header "Enabling Data Controller Metrics & Logs Upload"
 $Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-$Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $connectedClusterName --cluster-type connectedClusters --name ads-extension | convertFrom-json).identity.principalId
+$Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $connectedClusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
 az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
 az arcdata dc update --name arcbox-dc --resource-group $Env:resourceGroup --auto-upload-logs true
 az arcdata dc update --name arcbox-dc --resource-group $Env:resourceGroup --auto-upload-metrics true
