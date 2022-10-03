@@ -166,11 +166,8 @@ foreach ($cluster in $clusters) {
         Write-Host "Enabling Container Insights cluster extension"
         az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
         Write-Host "`n"
-        Write-Host "Enabling Azure Policy on AKS clusters"
-        az aks enable-addons --addons azure-policy --name $cluster.clusterName --resource-group $Env:resourceGroup --no-wait
-        Write-Host "`n"
         Write-Host "Enabling Defender for Containers on AKS clusters"
-        az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName --no-wait
+        az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
     }
 }
 
