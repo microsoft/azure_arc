@@ -44,6 +44,10 @@ Write-Host "Registered scheduled task 'MonitorWorkbookLogonScript' to run at use
 Register-ScheduledTask -TaskName "ArcServersLogonScript" -Trigger $Trigger -Action $nestedSQLAction -RunLevel "Highest" -CimSession $cimsession -Force
 Write-Host "Registered scheduled task 'ArcServersLogonScript' to run at user logon."
 
+#Disable local account
+$account=(Get-LocalGroupMember -Group "Administrators" | where {$_.PrincipalSource -eq "Local"}).name.split('\')[1]
+net user $account /active:no
+
 # Delete schedule task
 schtasks.exe /delete /f /tn RunAfterClientVMADJoin
 
