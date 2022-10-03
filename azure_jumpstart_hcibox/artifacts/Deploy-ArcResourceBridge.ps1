@@ -39,7 +39,10 @@ foreach ($VM in $SDNConfig.HostList) {
         Install-PackageProvider -Name NuGet -Force 
         # Install-Module -Name PowershellGet -Force -Confirm:$false -SkipPublisherCheck
         Install-Module -Name ArcHci -Force -Confirm:$false -SkipPublisherCheck -AcceptLicense
-    
+    }
+}
+foreach ($VM in $SDNConfig.HostList) {
+    Invoke-Command -VMName $VM -Credential $adcred -ScriptBlock {
         $ErrorActionPreference = "SilentlyContinue"
         az extension add --upgrade --name arcappliance
         az extension add --upgrade --name connectedk8s
