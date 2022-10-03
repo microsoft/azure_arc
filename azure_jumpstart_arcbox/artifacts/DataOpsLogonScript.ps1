@@ -164,13 +164,10 @@ foreach ($cluster in $clusters) {
         # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
         Write-Host "`n"
         Write-Host "Enabling Container Insights cluster extension"
-        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId --no-wait
         Write-Host "`n"
         Write-Host "Enabling Azure Policy cluster extension"
-        az k8s-extension create --name "azurepolicy" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type Microsoft.PolicyInsights
-        Write-Host "`n"
-        Write-Host "Enabling Defender for Cloud cluster extension"
-        az k8s-extension create --name "microsoft.azuredefender.kubernetes" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type microsoft.azuredefender.kubernetes
+        az k8s-extension create --name "azurepolicy" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type Microsoft.PolicyInsights --no-wait
     }
 }
 
