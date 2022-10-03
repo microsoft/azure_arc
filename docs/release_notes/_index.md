@@ -9,9 +9,38 @@ weight: 3
 
 **Release notes will be released around the first week of each month and will cover the previous month.**
 
-## August 2022
+## 2022
 
-### Release highlights
+### September 2022
+
+#### Release highlights
+
+- New and updated Azure Arc-enabled servers scenarios
+- New and updated Azure Arc-enabled data services scenarios
+- Bug fixes
+
+#### Azure Arc-enabled servers
+
+- [New scenario: Onboard Azure Arc-enabled servers to Update Management Center](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_updatemanagementcenter/)
+
+#### Azure Arc-enabled data services
+
+- [Updated scenario: Deploy a vanilla Azure Arc Data Controller in directly connected mode on Kubeadm Kubernetes cluster with Azure provider using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_azure_dc_vanilla_arm_template/)
+- [New scenario: Deploy Azure Arc-enabled SQL Managed Instance in directly connected mode on Kubeadm Kubernetes cluster with Azure provider using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_azure_mssql_mi_arm_template/)
+- [New scenario: Deploy Azure Arc-enabled PostgreSQL in directly connected mode on Cluster API Kubernetes cluster with Azure provider using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/kubeadm/kubeadm_azure_postgresql_arm_template/)
+- [Bug fix: Bootstrapping through yaml fails #1346](https://github.com/microsoft/azure_arc/issues/1346)
+
+#### Azure Arc-enabled app services
+
+- [Bug fix: App Service (Container) ARM Template: AppServicesLoginScript stuck waiting for log processor #1320](https://github.com/microsoft/azure_arc/issues/1320)
+
+#### Jumpstart ArcBox
+
+- [Bug fix: "MyIpAddress" parameter not available in ArcBox #1395](https://github.com/microsoft/azure_arc/issues/1395)
+
+### August 2022
+
+#### Release highlights
 
 - Added Azure Arc-enabled Kubernetes correlation-id for onboarding tracking
 - Updated Azure Arc-enabled Kubernetes scenarios
@@ -19,22 +48,22 @@ weight: 3
 - Bug fixes
 - Doc fixes
 
-### Azure Arc-enabled servers
+#### Azure Arc-enabled servers
 
 - [Doc fix: Link under Unified Operations doc broken #1324](https://github.com/microsoft/azure_arc/issues/1324)
 
-### Azure Arc-enabled SQL Server
+#### Azure Arc-enabled SQL Server
 
 - [Bug fix: SQL VM On-Boarding Fixes v3 #1328](https://github.com/microsoft/azure_arc/pull/1328)
 
-### Azure Arc-enabled Kubernetes
+#### Azure Arc-enabled Kubernetes
 
 - [Updated scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on MicroK8s as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/microk8s/local_microk8s_gitops_helm/)
 - [Enhancement: Add Deploy to Azure button to ARO scenario #1310](https://github.com/microsoft/azure_arc/issues/1310)
 - [Enhancement: Added Deploy to Azure Button to K3s scenario #1312](https://github.com/microsoft/azure_arc/issues/1312)
 - [Enhancement: correlation-id for tracking #1314](https://github.com/microsoft/azure_arc/issues/1314)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - [Enhancement: CAPI versions bump #1315](https://github.com/microsoft/azure_arc/issues/1315)
   - Versions bump
@@ -43,9 +72,9 @@ weight: 3
     - Azure Disk CSI Driver: v1.19.9 --> 1.21.0
 - [Enhancement: correlation-id for tracking #1314](https://github.com/microsoft/azure_arc/issues/1314)
 
-## July 2022
+### July 2022
 
-### Release highlights
+#### Release highlights
 
 - New ["Azure Arc Jumpstart commitment to open-source software"](https://azurearcjumpstart.io/oss/) page added
 - New Azure Arc-enabled servers scenarios
@@ -54,25 +83,25 @@ weight: 3
 - Multiple ArcBox enhancements
 - Bug fixes
 
-### Azure Arc-enabled servers
+#### Azure Arc-enabled servers
 
 - [New scenario: Deploy the Azure Monitor Agent (AMA) on Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_azuremonitoragent/)
 
-### Azure Arc-enabled Kubernetes
+#### Azure Arc-enabled Kubernetes
 
 - [New scenario: Deploy an application using the Dapr Cluster extension for Azure Arc-enabled Kubernetes cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/developer/dapr/dapr_statestore/)
 - [Updated scenario: Deploy AKS cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/aks_terraform/)
 - [Updated scenario: Deploy Rancher k3s on an Azure VM and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/azure_terraform/)
 - [Bug fix: AKS 1.23.3 is not supported anymore #1293](https://github.com/microsoft/azure_arc/issues/1293)
 
-### Azure Arc-enabled data services
+#### Azure Arc-enabled data services
 
 - [Updated scenario: Deploy a vanilla Azure Arc Data Controller in a directly connected mode on EKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_dc_vanilla_terraform/)
 - [Updated scenario: Deploy Azure SQL Managed Instance in directly connected mode on EKS using a Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_mssql_mi_terraform/)
 - [Updated scenario: Deploy Azure PostgreSQL in directly connected mode on EKS using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/eks/eks_postgres_terraform/)
 - [Bug fix: AKS 1.23.3 is not supported anymore #1293](https://github.com/microsoft/azure_arc/issues/1293)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - [Enhancement: CAPZ/ArcBox Optimizations #1277](https://github.com/microsoft/azure_arc/pull/1277)
   - Versions bump
@@ -86,9 +115,9 @@ weight: 3
   - ARM/Bicep API versions bump
   - Docs updates to reflect capacity requirements
 
-## June 2022
+### June 2022
 
-### Release highlights
+#### Release highlights
 
 - Updated Azure Arc-enabled servers scenarios
 - Updated Azure Arc-enabled SQL server scenario
@@ -97,7 +126,7 @@ weight: 3
 - [Bump Azure Arc Data Controller images to May 2022 release](https://github.com/microsoft/azure_arc/pull/1247)
 - Bug fixes
 
-### Azure Arc-enabled servers
+#### Azure Arc-enabled servers
 
 - [Updated scenario: Monitoring, Alerting, and Visualization on Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_monitoring/)
 - [Updated scenario: Added Azure Bastion support for Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/azure/azure_arm_template_winsrv/)
@@ -105,11 +134,11 @@ weight: 3
 - [Updated scenario: Deploy a GCP Windows instance and connect it to Azure Arc using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/gcp/gcp_terraform_windows/)
 - [Enhancement: Add Deploy to Azure button to ARM based deployments for Azure Arc-enabled servers #1249](https://github.com/microsoft/azure_arc/issues/1249)
 
-### Azure Arc-enabled VMware
+#### Azure Arc-enabled VMware vSphere
 
 - [New scenario: Create a Windows VMware VM to an Azure Arc-enabled vSphere cluster using ARM templates](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_vsphere/day2/vmware_arm_template_win/)
 
-### Azure Arc-enabled Kubernetes
+#### Azure Arc-enabled Kubernetes
 
 - [New scenario: Integrate Azure Monitor Container Insights and recommended alerts with an Azure Arc-enabled K8s cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/container_insights/)
 - [New scenario: Integrate Azure Policy with an Azure Arc-enabled K8s cluster using extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/azure_policy/)
@@ -117,19 +146,19 @@ weight: 3
 - [Updated scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on GKE as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_helm/)
 - [Updated scenario: Deploy GKE cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/gke_terraform/)
 
-### Azure Arc-enabled data services
+#### Azure Arc-enabled data services
 
 - [New scenario: Deploy Azure SQL Managed Instance with AD authentication support using Customer-managed keytab in directly connected mode on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_mi_ad_auth_arm_template/)
 - [New scenario: Migrate to Azure Arc-enabled SQL Managed Instance on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_migrate/)
 - [Feature: June 2022 image update](https://github.com/microsoft/azure_arc/pull/1247)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - Bug fixes: [#1253](https://github.com/microsoft/azure_arc/pull/1253), [#1264](https://github.com/microsoft/azure_arc/pull/1264)
 
-## May 2022
+### May 2022
 
-### Release highlights
+#### Release highlights
 
 - [Announcing ArcBox for DevOps](https://aka.ms/ArcBoxDevOpsBlog)
   - Added Azure Bastion support
@@ -153,7 +182,7 @@ weight: 3
 - [Bump AzCli 2.36.0 prerequisite across all READMEs](https://github.com/microsoft/azure_arc/pull/1188)
 - [Bump Azure Arc Data Controller images to May 2022 release](https://github.com/microsoft/azure_arc/pull/1205)
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Enable SSH access to Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_ssh/#enable-ssh-access-to-azure-arc-enabled-servers)
 - [New Scenario: Azure Arc-enabled servers connectivity behind a proxy server](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_proxy/#azure-arc-enabled-servers-connectivity-behind-a-proxy-server)
@@ -161,15 +190,15 @@ weight: 3
 - [Bug fix: Azure Automanage - incorrect description #1193](https://github.com/microsoft/azure_arc/issues/1193)
 - [Bug fix: Updated private link scenario to show private connection #1219](https://github.com/microsoft/azure_arc/pull/1219)
 
-### Azure Arc-enabled VMware vSphere scenarios
+#### Azure Arc-enabled VMware vSphere scenarios
 
 - [New Scenario: Connect VMware vCenter Server to Azure Arc using PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_vsphere/resource_bridge/powershell/)
 
-### Azure Arc-enabled SQL Server scenarios
+#### Azure Arc-enabled SQL Server scenarios
 
 - [Updated Scenario: Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server and connect it to Azure Arc using Terraform #1212](https://github.com/microsoft/azure_arc/pull/1212)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [Updated Scenario: Updated AKS Onboarding ARM Template Scenario #1152](https://github.com/microsoft/azure_arc/issues/1152)
 - [Updated Scenario: Updated AKS Onboarding Scenario - Terraform #1160](https://github.com/microsoft/azure_arc/issues/1160)
@@ -177,13 +206,13 @@ weight: 3
 - [Updated Scenario: Updated AKS GitOps Helm Scenario #1177](https://github.com/microsoft/azure_arc/issues/1177)
 - [Updated Scenario: Updated CAPI GitOps Helm Scenario #1186](https://github.com/microsoft/azure_arc/issues/1186)
 
-### Azure Arc-enabled data services
+#### Azure Arc-enabled data services
 
 - [New Scenario: Configure disaster recovery in Azure Arc-enabled SQL Managed Instance on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_dr/#configure-disaster-recovery-in-azure-arc-enabled-sql-managed-instance-on-aks-using-an-arm-template)
 - [Feature: May 2022 image update](https://github.com/microsoft/azure_arc/pull/1205)
 - [Bug fix: Azure ArcBox CSI Driver not installed #1150](https://github.com/microsoft/azure_arc/issues/1150)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - [New flavor: ArcBox for DevOps](https://aka.ms/ArcBoxDevOpsBlog)
 - [Feature: ArcBox-Client VM custom script extension should use protectedSettings instead of settings #1209](https://github.com/microsoft/azure_arc/issues/1209)
@@ -191,9 +220,9 @@ weight: 3
 - [Bug fix: Please change the way ServicePrincipal name is given in example #1176](https://github.com/microsoft/azure_arc/issues/1176)
 - [Bug fix: Log Analytics Workspace needs to be in different region to Automation Account #1187](https://github.com/microsoft/azure_arc/issues/1187)
 
-## April 2022
+### April 2022
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - [Updated Azure Arc Jumpstart Scenario Write-up Guidelines](https://azurearcjumpstart.io/scenario_guidelines/)
 - New and updated Azure Arc-enabled servers scenarios
@@ -202,16 +231,16 @@ weight: 3
 - Updated Azure Arc-enabled app services scenarios
 - Multiple Jumpstart ArcBox optimizations, enhancements and bug fixes
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Use Azure Private Link to securely connect networks to Azure Arc](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_privatelink/)
 
-### Azure Arc-enabled SQL Server scenarios
+#### Azure Arc-enabled SQL Server scenarios
 
 - [Bug fix: Arc enabled SQL Servers - missing registration for Microsoft.HybridCompute #1105](https://github.com/microsoft/azure_arc/issues/1105)
 - [Bug fix: Arc enables SQL Server - missing --scopes from az ad sp create-for-rbac #1106](https://github.com/microsoft/azure_arc/issues/1106)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Use GitOps in an Azure Arc-enabled Kubernetes cluster for managing Calico Network Policy](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/gitops/)
 - [Updated Scenario: Integrate Open Service Mesh (OSM) with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_osm_extension/)
@@ -219,7 +248,7 @@ weight: 3
 - [Bug fix: az connectedk8s fails on Ubuntu20.04 (Microk8s) - InternalError: Unable to install helm release: WARNING: Kubernetes configuration file is group-readable #1047](https://github.com/microsoft/azure_arc/issues/1047)
 - [Bug fix: Missing RBAC permission in docs for ARO #1052](https://github.com/microsoft/azure_arc/issues/1052)
 
-### Azure Arc-enabled data services
+#### Azure Arc-enabled data services
 
 - [New Scenario: Deploy a vanilla Azure Arc Data Controller in a directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_dc_vanilla_arm_template/)
 - [New Scenario: Deploy Azure SQL Managed Instance in directly connected mode on ARO using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aro/aro_mssql_mi_arm_template/)
@@ -228,14 +257,14 @@ weight: 3
 - [Updated Scenario: Deploy Azure PostgreSQL on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_postgresql_arm_template_ado/)
 - [Bug fix: The post deployment scripts inside the VM fails with the following error : "The resource 'Arc-Data-AKS' under the resource group 'Arc-Data-Demo' NOT FOUND #1050](https://github.com/microsoft/azure_arc/issues/1050)
 
-### Azure Arc-enabled app services scenarios
+#### Azure Arc-enabled app services scenarios
 
 - [Updated Scenario: Deploy an App Service app using custom container on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_app_service_arm_template/)
 - [Updated Scenario: Deploy Azure Function application on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_azure_function_arm_template/)
 - [Updated Scenario: Deploy an App Service app using custom container on Cluster API using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/apps_service_arm_template/)
 - [Updated Scenario: Deploy Azure Function application on Cluster API using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/azure_function_arm_template/)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - [Bump clusterctl to v1.1.3](https://github.com/microsoft/azure_arc/pull/1126)
 - [Bump CAPZ to v1.2.1](https://github.com/microsoft/azure_arc/pull/1126)
@@ -243,36 +272,36 @@ weight: 3
 - [Updating storageclass provisioner](https://github.com/microsoft/azure_arc/pull/1126)
 - [Remove debug flag](https://github.com/microsoft/azure_arc/pull/1126)
 
-## March 2022
+### March 2022
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - New and updated Azure Arc-enabled servers scenarios
 - New and updated Azure Arc-enabled Kubernetes scenario
 - Azure Bastion support for Azure Arc-enabled servers and data services
 - Updated Arc-enabled data services enhancements
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Monitoring, Alerting, and Visualization on Azure Arc-enabled servers](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_monitoring/)
 - [Updated Scenario: Update Azure Automanage with new ARM template #1017](https://github.com/microsoft/azure_arc/issues/1017)
 - [Feature: Adding Azure Bastion as an optional RDP/SSH method - Azure Arc-enabled servers #985](https://github.com/microsoft/azure_arc/issues/985)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Deploy an Azure Red Hat OpenShift cluster and connect it to Azure Arc using an Azure ARM template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aro/aro_arm_template/)
 - [Updated Scenario: Deploy EKS cluster and connect it to Azure Arc using Terraform #870](https://github.com/microsoft/azure_arc/issues/870)
 - [Feature: Hardening NSG inbound rule - Azure Arc-enabled Kubernetes #1000](https://github.com/microsoft/azure_arc/issues/1000)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Updated Scenario: Refactoring - Azure Arc-enabled data services scenarios (Cluster API) #1021](https://github.com/microsoft/azure_arc/issues/1021)
 - [Updated Scenario: Refactoring - Azure Arc-enabled data services scenarios (AKS) #1019](https://github.com/microsoft/azure_arc/issues/1019)
 - [Feature: Adding Azure Bastion as an optional RDP/SSH method - Azure Arc-enabled data services #987](https://github.com/microsoft/azure_arc/issues/987)
 
-## February 2022
+### February 2022
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - In this release, we reached 100 individual Jumpstart scenarios!
 - New Azure Arc-enabled servers scenario
@@ -280,23 +309,23 @@ weight: 3
 - Azure Arc-enabled data services enhancements
 - Multiple Jumpstart ArcBox optimizations, enhancements and bug fixes
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Use Azure Policy to audit if Azure Arc-enabled servers meet security baseline requirements](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_security_baseline/)
 - [Bug fix: CentOS VM Arc Onboarding Failure #957](https://github.com/microsoft/azure_arc/issues/957)
 - [Bug fix: VMware vSphere Windows Server VMs VMTools update #940](https://github.com/microsoft/azure_arc/issues/940)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [Updated Scenario: Deploy Kubernetes cluster and connect it to Azure Arc using Cluster API Azure provider #980](https://github.com/microsoft/azure_arc/issues/980)
 - [New Scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on Cluster API as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_gitops_helm/)
 - [New Scenario: Use Azure Policy on an Azure-Arc enabled Kubernetes cluster for applying ingress/egress rules with Calico network policy](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/multi_distributions/calico/)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Enhancement: Updates to Arc Data Services for Feb 2022 release #993](https://github.com/microsoft/azure_arc/pull/993)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - [ArcBox optimizations #965](https://github.com/microsoft/azure_arc/pull/965)
   - Replacing _sed_ with Kustomize functionality
@@ -310,9 +339,9 @@ weight: 3
   - Enhanced Troubleshooting section + screenshots
   - Updating all VMs SKU to v4
 
-## January 2022
+### January 2022
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - [Announcing Jumpstart ArcBox 2.0 release](https://aka.ms/ArcBox2Blog)
 
@@ -324,7 +353,7 @@ weight: 3
 
 - [Product rebranding: Microsoft Defender for Cloud and Microsoft Container Registry #927](https://github.com/microsoft/azure_arc/issues/925)
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Connect an existing Windows server to Azure Arc using Configuration Manager with PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/scaled_deployment/configuration_manager_scaled_runscript/)
 
@@ -336,7 +365,7 @@ weight: 3
 
 - [VMware vSphere Windows Server VMs VMTools update #940](https://github.com/microsoft/azure_arc/issues/940)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Deploy GitOps configurations and perform basic GitOps flow on Cluster API as an Azure Arc Connected Cluster (Flux v2)](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_gitops_basic/)
 
@@ -346,19 +375,21 @@ weight: 3
 
 - [Bug fix: Cloud Defender K8s extension failing to install #900](https://github.com/microsoft/azure_arc/issues/900)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Enhancement: Add support for data controller auto-upload logs and metrics #901](https://github.com/microsoft/azure_arc/issues/901)
 
 - [Bug fix: Creating data controller for the November release using kubectl #876](https://github.com/microsoft/azure_arc/issues/876)
 
-## December 2021
+## 2021
+
+### December 2021
 
 All of December 2021 release notes were consolidated to the January 2022 release notes.
 
-## November 2021
+### November 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - New scenario for Azure Key Vault with Cluster API as an Azure Arc Connected Cluster
 
@@ -366,7 +397,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - Support for Azure Arc-enabled data services 11/21 release
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Integrate Azure Key Vault with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_keyvault_extension/)
 
@@ -374,23 +405,23 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: gitops scenario uses helm even in "basic" scenario #814](https://github.com/microsoft/azure_arc/issues/814)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Enhancement: Support for Azure Arc-enabled data services 11/21 release #839](https://github.com/microsoft/azure_arc/issues/839)
 
 - [Enhancement: Support for CAPZ 1.0.0 #840](https://github.com/microsoft/azure_arc/issues/840)
 
-### Azure Arc-enabled app service
+#### Azure Arc-enabled app service
 
 - [Bug fix: Logic Apps on AKS scenario fails to complete on client VM #837](https://github.com/microsoft/azure_arc/issues/837)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - [Bug fix: Jumpstart ArcBox deployment failure - mgmtArtifactsAndPolicyDeployment FAILED #813](https://github.com/microsoft/azure_arc/issues/813)
 
-## October 2021
+### October 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - New Azure Arc-enabled servers scenario
 
@@ -400,13 +431,13 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - Reliability bugs and docs fixes
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Using Managed Identity on an Ubuntu Azure Arc-enabled server](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_managed_identity/linux/)
 
 - [Bug fix: Broken VHD blob link in Azure Arc-enabled servers for HCI scenario #802](https://github.com/microsoft/azure_arc/issues/802)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [Bug fix: The GKE basic gitops scenario screenshots to not match the actual deployments #783](https://github.com/microsoft/azure_arc/issues/783)
 
@@ -416,25 +447,25 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: gitops scenario uses helm even in "basic" scenario #814](https://github.com/microsoft/azure_arc/issues/814)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Bug fix: PostgreSQL ARM Template failing #765](https://github.com/microsoft/azure_arc/issues/765)
 
 - [Bug fix: az cli 2.25 bump](https://github.com/microsoft/azure_arc/issues/805)
 
-### Azure Arc-enabled app service
+#### Azure Arc-enabled app service
 
 - [New Scenario: Deploy an Azure API Management gateway on Cluster API (CAPI) using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/cluster_api/capi_azure/apimgmt_arm_template/)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - [Enhancement: Support for CAPZ 1.0.0 #840](https://github.com/microsoft/azure_arc/issues/840)
 
 - [Bug fix: Azure ArcBox fail to deploy because of bad dependencies between nested templates #809](https://github.com/microsoft/azure_arc/issues/809)
 
-## September 2021
+### September 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - New Azure Arc-enabled app service scenarios
 
@@ -444,11 +475,11 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - In this release, we introduced open-source version of the [Azure Arc validated architecture diagrams and visualization](https://azurearcjumpstart.io/overview/#diagrams)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [Bug fix: Terraform plan for GKE basic onboarding not compatible with TF 1.0 or with GKE clusters running 1.19 or higher #781](https://github.com/microsoft/azure_arc/issues/781)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Enhancement: Change SQL MI AKS LB port from 1433 to non-standard #763](https://github.com/microsoft/azure_arc/issues/763)
 
@@ -458,7 +489,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: PostgreSQL Deployment on EKS - data controller deployment failure #743](https://github.com/microsoft/azure_arc/issues/743)
 
-### Azure Arc-enabled app service
+#### Azure Arc-enabled app service
 
 - [Enhancement: Upgrade Client-VM to Windows Server 2022 on Azure-based scenarios #740](https://github.com/microsoft/azure_arc/issues/740)
 
@@ -474,7 +505,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: error when installing AZURE ML training model piece #758](https://github.com/microsoft/azure_arc/issues/758)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - [Enhancement: Change SQL MI and PostgreSQL ports to non standard #767](https://github.com/microsoft/azure_arc/issues/767)
 
@@ -484,9 +515,9 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Enhancement: Remove custom-locations-oid parameter from connected cluster onboarding scripts and adding _`--kubeconfig`_ parameter to custom location creation #778](https://github.com/microsoft/azure_arc/pull/778)
 
-## August 2021
+### August 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - New version of Jumpstart ArcBox
 
@@ -498,17 +529,17 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - Critical enhancements for Cluster API based scenarios
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New demo: Enable Azure Automanage on an Azure Arc-enabled server using an ARM template](https://www.youtube.com/watch?v=Tj1ypT516zM)
 
 - [Bug fix: Update Management #725](https://github.com/microsoft/azure_arc/issues/725)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [Bug fix: Azure Cluster API scenario for Azure Arc enabled Kubernetes script variables not matching #696](https://github.com/microsoft/azure_arc/issues/696)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [New Scenario: Perform database failover with SQL Managed Instance Availability Groups on AKS](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/day2/aks/aks_mssql_ha/)
 
@@ -520,7 +551,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: Azure Arc enabled data services for EKS : logon script does not end #711](https://github.com/microsoft/azure_arc/issues/711)
 
-### Azure Arc-enabled app service
+#### Azure Arc-enabled app service
 
 - [New Scenario: Deploy Azure Logic App on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_logic_app_arm_template/)
 
@@ -528,7 +559,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [New Scenario: Train, Deploy and call inference on an image classification model - MNIST dataset from Azure Blob Storage](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_ml/aks/aks_blob_mnist_arm_template/)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - New [Azure Monitor workbook](https://azurearcjumpstart.io/azure_jumpstart_arcbox/workbook/) included that provides single pane of glass monitoring for all ArcBox resources.
 - Remove port 22 from Cluster API control plane Network Security Group
@@ -538,9 +569,9 @@ All of December 2021 release notes were consolidated to the January 2022 release
 - Automation optimizations
 - Documentation revisions
 
-## July 2021
+### July 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - First new scenarios for Azure Arc-enabled app services
 
@@ -550,7 +581,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - Jumpstart ArcBox enhancements
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Enable Azure Automanage on an Azure Arc-enabled server using an ARM template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/)
 
@@ -560,13 +591,13 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: ARM Template fails deployment Update Management on Azure Arc-enabled servers #631](https://github.com/microsoft/azure_arc/issues/631)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Integrate Azure Monitor for Containers with AKS on Azure Stack HCI as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks_stack_hci/aks_hci_monitor/aks_hci_monitor_extension/)
 
 - [Bug fix: Cluster API fails with no "cluster" resource available #617](https://github.com/microsoft/azure_arc/issues/617)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Updated Scenario: Deploying vanilla Azure Arc-enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/dc_vanilla/)
 
@@ -596,7 +627,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: Azure Arc using Cluster API Azure provider > 0.5.0 #664](https://github.com/microsoft/azure_arc/issues/664)
 
-### Azure Arc-enabled app services scenarios
+#### Azure Arc-enabled app services scenarios
 
 - [New Scenario: Deploy an App Service app using custom container on AKS using an ARM Template](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_app_svc/aks/aks_app_service_arm_template/)
 
@@ -604,7 +635,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: Error when checking initialize status of K8SE stamp with kubectl Unexpected output from kubectl.exe when getting pod statuses #621](https://github.com/microsoft/azure_arc/issues/621)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - Improvements to Azure Policy experience. Updated policy names with (ArcBox) callout to easily identify policies created by ArcBox deployment. New policies to support onboarding Dependency Agents and Azure Defender for Kubernetes.
 - Add Change Tracking, Security, VMInsights solutions to deployment.
@@ -619,19 +650,19 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: failed to get file "infrastructure-components.yaml" #688](https://github.com/microsoft/azure_arc/issues/688)
 
-## June 2021
+### June 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - In this milestone, we introduced our new hosting show ["Jumpstart Lightning"](https://aka.ms/JumpstartLightning-blog), show where you get a chance to share with our team and the world your Azure Arc, Jumpstart contribution and Hybrid cloud awesome stories.
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Deploying Windows Server virtual machine in Azure Stack HCI and connect it to Azure Arc using PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/azure_stack_hci/azure_stack_hci_windows/)
 
 - [Bug fix: existing linux server onboarding fails #570](https://github.com/microsoft/azure_arc/issues/570)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [Updated Scenario: Deploy Alibaba Cloud Container Service for Kubernetes cluster and connect it to Azure Arc using Terraform](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/alibaba/alibaba_terraform/)
 
@@ -643,7 +674,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: Cluster API fails with no "cluster" resource available #617](https://github.com/microsoft/azure_arc/issues/617)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [New Scenario: Deploying vanilla Azure Arc-enabled data services in directly connected mode using Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/cluster_api/capi_azure/arm_template/dc_vanilla/)
 
@@ -671,20 +702,20 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: SQL MI Server alias for connection contains wrong value #561](https://github.com/microsoft/azure_arc/issues/561)
 
-### Jumpstart ArcBox
+#### Jumpstart ArcBox
 
 - Azure Arc-enabled data services components of ArcBox have been updated to use [directly connected mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity#connectivity-modes).
 - Required resource providers are now enabled automatically as part of the automation scripts.
 - Per updated Azure Arc-enabled data services requirements, ArcBox region support is restricted to East US, Northern Europe, and Western Europe.
 - Incorporated streamlined modular automation approach for Azure Arc-enabled data services used by the primary Jumpstart data services scenarios.
 
-### Azure Arc Jumpstart YouTube channel demos
+#### Azure Arc Jumpstart YouTube channel demos
 
 [New Demo: Deploy SQL Managed Instance on GKE with Azure Arc-enabled data services](https://youtu.be/1jjPmaTa3oc)
 
-## May 2021
+### May 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - In this milestone, we released the ["Jumpstart ArcBox" solution](https://azurearcjumpstart.io/azure_jumpstart_arcbox/), a sandbox environment that allows users to explore all the major capabilities of Azure Arc.
 
@@ -694,11 +725,11 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - All Terraform-based automation's were updated to support v0.15
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [Jumpstart enhancement: Added correlation ID to Arc server onboarding scripts](https://github.com/microsoft/azure_arc/pull/537)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Integrate Azure Defender with Cluster API as an Azure Arc Connected Cluster using Kubernetes extensions](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/cluster_api/cluster_api_defender_extension/)
 
@@ -708,7 +739,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: EKS cluster Terraform plan #521](https://github.com/microsoft/azure_arc/issues/521)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Bug fix: adding psql to client vm #519](https://github.com/microsoft/azure_arc/issues/519)
 
@@ -718,13 +749,13 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Jumpstart enhancement: fetching data services IP's based on kubectl #566](https://github.com/microsoft/azure_arc/issues/566)
 
-### Azure Arc Jumpstart YouTube channel demos
+#### Azure Arc Jumpstart YouTube channel demos
 
 [New Demo: Azure Defender extension on Azure Arc-enabled Kubernetes](https://www.youtube.com/watch?v=-B1-X4hCR98)
 
-## April 2021
+### April 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - [New Scenario: Integrate Azure Monitor for Containers with GKE as an Azure Arc Connected Cluster using Kubernetes extension](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_monitor_extension/)
 
@@ -740,7 +771,7 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: EKS cluster Terraform plan #521](https://github.com/microsoft/azure_arc/issues/521)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [New Scenario: Deploy Azure SQL Managed Instance on AKS using Azure DevOps Release Pipeline](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/aks/aks_mssql_arm_template_ado/)
 
@@ -760,15 +791,15 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Feature request: Adding psql to client vm #519](https://github.com/microsoft/azure_arc/issues/519)
 
-## March 2021
+### March 2021
 
-### Release highlights and general Jumpstart enhancements
+#### Release highlights
 
 - In this milestone, we released our [Jumpstart Scenario Write-up Guidelines](https://azurearcjumpstart.io/scenario_guidelines/) document to help our community with scenarios contribution.
 
 - [Update the "Feature request" template to include new write-up guidelines #473](https://github.com/microsoft/azure_arc/issues/473)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Deploy GitOps configurations and perform basic GitOps flow on AKS on Azure Stack HCI as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/aks_stack_hci/aks_hci_gitops_basic/)
 
@@ -784,11 +815,11 @@ All of December 2021 release notes were consolidated to the January 2022 release
 
 - [Bug fix: Deploy GitOps configurations and perform basic GitOps flow on GKE as an Azure Arc Connected Cluster - Helm Endpoint #460](https://github.com/microsoft/azure_arc/issues/460)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [Bug fix: SQL MI AKS ARM Template #437](https://github.com/microsoft/azure_arc/issues/437)
 
-## February 2021
+### February 2021
 
 ### Azure Arc Jumpstart YouTube channel demos
 
@@ -830,38 +861,38 @@ In this milestone, we launched our new YouTube channel.
 
 - [New Demo: Azure Monitor for containers with Azure Arc-enabled Kubernetes](https://youtu.be/8KNu2RSVwCs)
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Deploy AKS cluster on Azure Stack HCI and connect it to Azure Arc using PowerShell](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_stack_hci/aks_hci_powershell/)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [New Scenario: Deploy an Azure PostgreSQL Deployment on GKE using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_postgres_terraform/)
 
-## January 2021
+### January 2021
 
-### Azure Arc-enabled servers scenarios
+#### Azure Arc-enabled servers scenarios
 
 - [New Scenario: Deploy Azure Key Vault Extension to Azure Arc-enabled Ubuntu server and use a Key Vault managed certificate with Nginx](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_keyvault/)
 
 - [Updated Scenario: Connect Azure Arc-enabled servers to Azure Security Center](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_securitycenter/)
 
-### Azure Arc-enabled SQL Server scenarios
+#### Azure Arc-enabled SQL Server scenarios
 
 - [All the scenarios](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_sqlsrv/) in this section were updated to support new Azure Arc-enabled SQL Server onboarding script.
 
-### Azure Arc-enabled Kubernetes scenarios
+#### Azure Arc-enabled Kubernetes scenarios
 
 - [New Scenario: Deploy Kubernetes cluster and connect it to Azure Arc using Cluster API Azure provider](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/cluster_api/capi_azure/)
 
 - [Updated Scenario: Deploy GitOps configurations and perform Helm-based GitOps flow on GKE as an Azure Arc Connected Cluster](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/day2/gke/gke_gitops_helm/)
 
-### Azure Arc-enabled data services scenarios
+#### Azure Arc-enabled data services scenarios
 
 - [All the scenarios](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/) in this section were updated to support ["Directly connected"](https://docs.microsoft.com/azure/azure-arc/data/connectivity) mode
 
 - [New Scenario: Deploy an Azure SQL Managed Instance on GKE using a Terraform plan](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_data/gke/gke_mssql_mi_terraform/)
 
-### Bug fixes & alignments
+#### Bug fixes & alignments
 
 - [AKS Arc Disclaimer #336](https://github.com/microsoft/azure_arc/issues/336)

@@ -10,7 +10,9 @@ description: >
 
 The following Jumpstart scenario will guide you on how to onboard Azure Arc-enabled servers to [Update Management Center](https://learn.microsoft.com/azure/update-center/overview).
 
-Update management center is a unified service to help manage and govern updates for all your machines. You can monitor Windows and Linux update compliance across your deployments in Azure, on-premises, and on the other cloud platforms from a single dashboard. Using Update management center, you can make updates in real-time or schedule them within a defined maintenance window.
+> **NOTE: Currently, Update Management Center is in public preview.**
+
+Update Management Center is a unified service to help manage and govern updates for all your machines. You can monitor Windows and Linux update compliance across your deployments in Azure, on-premises, and on the other cloud platforms from a single dashboard. Using Update Management Center, you can make updates in real-time or schedule them within a defined maintenance window.
 
 > **NOTE: This scenario assumes you already deployed VMs or servers that are running on-premises or other clouds and you have connected them to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion:**
 
@@ -54,7 +56,7 @@ The steps below will help you get familiar with the automation and deployment fl
 
 ## Deployment Option 1: Azure portal
 
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided in the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json).
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided in the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updateManagementCenter/update-management-center.parameters.json).
 
   ![Screenshot of Azure portal deployment](./02.png)
 
@@ -68,13 +70,13 @@ As mentioned, this deployment will leverage ARM templates.
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- Edit the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json) providing the values that match your configuration as described below:
+- Edit the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updateManagementCenter/update-management-center.parameters.json) providing the values that match your configuration as described below:
 
     ![Screenshot of ARM template parameters file](./03.png)
 
   > **NOTE: For the _maintenanceTimeZone_ parameter, the list of time zones can be obtained by executing _[System.TimeZoneInfo]::GetSystemTimeZones()_ in PowerShell. Example: Pacific Standard Time, Romance Standard Time, Middle East Standard Time.**
 
-- Deploy the [ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center-template.json) by running the following command, specifying the resource group where you have your Azure Arc-enabled servers:
+- Deploy the [ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updateManagementCenter/update-management-center-template.json) by running the following command, specifying the resource group where you have your Azure Arc-enabled servers:
 
     ```shell
     az deployment group create --resource-group <Name of the Azure resource group> \
@@ -90,7 +92,7 @@ As mentioned, this deployment will leverage ARM templates.
 
 In the resource group that you specified as a parameter, there will be a new policy assignment named "_(jumpstart) Configure periodic checking for missing system updates on azure Arc-enabled servers_". This policy, once it's remediated, enables Periodic Assessment.
 
-Periodic Assessment is a setting on your machine that enables you to see the latest updates available for your machines and removes the hassle of performing assessment manually every time you need to check the update status. Once you enable this setting, update management center fetches updates on your machine once every 24 hours.
+Periodic Assessment is a setting on your machine that enables you to see the latest updates available for your machines and removes the hassle of performing assessment manually every time you need to check the update status. Once you enable this setting, Update Management Center fetches updates on your machine once every 24 hours.
 
 - Go to your **resource group** and click on **Policies**:
 
@@ -114,7 +116,7 @@ Periodic Assessment is a setting on your machine that enables you to see the lat
 
   > **NOTE: You will need to wait some time until the first update assessment is run.**
 
-- On the update assessment task is run, go back to your **Azure Arc-enabled server** and click on **Extensions**, you will see that a new extension has been installed. Update management center relies on this Azure extension designed to provide all the functionality required to interact with the operating system to manage the assessment and application of updates.
+- On the update assessment task is run, go back to your **Azure Arc-enabled server** and click on **Extensions**, you will see that a new extension has been installed. Update Management Center relies on this Azure extension designed to provide all the functionality required to interact with the operating system to manage the assessment and application of updates.
 
     ![Screenshot of Update Management Center extension](./10.png)
 
