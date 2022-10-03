@@ -54,7 +54,7 @@ The steps below will help you get familiar with the automation and deployment fl
 
 ## Deployment Option 1: Azure portal
 
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided in the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json).
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2FupdateManagementCenter%2Fupdate-management-center-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for just the ARM template parameters highlighted below. For more information about these parameters, see their description provided in the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updateManagementCenter/update-management-center.parameters.json).
 
   ![Screenshot of Azure portal deployment](./02.png)
 
@@ -68,13 +68,13 @@ As mentioned, this deployment will leverage ARM templates.
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
-- Edit the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center.parameters.json) providing the values that match your configuration as described below:
+- Edit the [parameters file](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updateManagementCenter/update-management-center.parameters.json) providing the values that match your configuration as described below:
 
     ![Screenshot of ARM template parameters file](./03.png)
 
   > **NOTE: For the _maintenanceTimeZone_ parameter, the list of time zones can be obtained by executing _[System.TimeZoneInfo]::GetSystemTimeZones()_ in PowerShell. Example: Pacific Standard Time, Romance Standard Time, Middle East Standard Time.**
 
-- Deploy the [ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updatemanagementcenter/update-management-center-template.json) by running the following command, specifying the resource group where you have your Azure Arc-enabled servers:
+- Deploy the [ARM template](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/updateManagementCenter/update-management-center-template.json) by running the following command, specifying the resource group where you have your Azure Arc-enabled servers:
 
     ```shell
     az deployment group create --resource-group <Name of the Azure resource group> \
