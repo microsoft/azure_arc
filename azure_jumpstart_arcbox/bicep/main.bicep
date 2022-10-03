@@ -190,4 +190,4 @@ module aksDeployment 'kubernetes/aks.bicep' = if (flavor == 'DataOps') {
   ]
 }
 
-output clientVmLogonUserName string = '${windowsAdminUsername}@${addsDomainName}'
+output clientVmLogonUserName string = flavor == 'DataOps' ? '${windowsAdminUsername}@${addsDomainName}' : ''

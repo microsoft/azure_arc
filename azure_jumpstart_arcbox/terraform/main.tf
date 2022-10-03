@@ -316,5 +316,6 @@ module "aks_clusters" {
 }
 
 output "clientVmLogonUserName" {
+  count               = var.deployment_flavor == "DataOps" ? 1 : 0
   value = "${var.client_admin_username}@${var.addsDomainName}"
 }
