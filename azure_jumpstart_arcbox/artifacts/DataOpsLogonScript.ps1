@@ -166,8 +166,11 @@ foreach ($cluster in $clusters) {
         Write-Host "Enabling Container Insights cluster extension"
         az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
         Write-Host "`n"
-        Write-Host "Enabling Azure Policy cluster extension"
-        az k8s-extension create --name "azurepolicy" --cluster-name $cluster.clusterName --cluster-type connectedClusters  --resource-group $Env:resourceGroup --extension-type Microsoft.PolicyInsights
+        Write-Host "Enabling Azure Policy on AKS clusters"
+        az aks enable-addons --addons azure-policy --name $cluster.clusterName --resource-group $Env:resourceGroup
+        Write-Host "`n"
+        Write-Host "Enabling Defender for Containers on AKS clusters"
+        az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
     }
 }
 
@@ -182,7 +185,6 @@ $kubectlMonShellAKSDr = Start-Process -PassThru PowerShell { $host.ui.RawUI.Wind
 Write-Header "Deploying Azure Arc Data Controller"
 foreach ($cluster in $clusters) {
     Start-Job -Name arcbox -ScriptBlock {
-        $ErrorActionPreference = 'SilentlyContinue'
         $cluster = $using:cluster
         $context = $cluster.context
         Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
@@ -291,7 +293,7 @@ foreach ($cluster in $clusters) {
     Write-Header "Enabling Data Controller Metrics & Logs Upload"
     $Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
     $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-    $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name ads-extension | convertFrom-json).identity.principalId
+    $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
     az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
