@@ -71,13 +71,13 @@ variable "github_username" {
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
-  default     = "microsoft"
+  default     = "sebassem"
 }
 
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "arcbox_dataops"
+  default     = "arcbox_dataops_parallelism"
 }
 
 variable "spn_client_id" {
@@ -176,7 +176,7 @@ module "management_artifacts" {
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
   deployment_flavor    = var.deployment_flavor
-  depends_on = [azurerm_resource_group.rg]
+  depends_on           = [azurerm_resource_group.rg]
 }
 
 module "management_policy" {
@@ -316,6 +316,5 @@ module "aks_clusters" {
 }
 
 output "clientVmLogonUserName" {
-  count               = var.deployment_flavor == "DataOps" ? 1 : 0
-  value = "${var.client_admin_username}@${var.addsDomainName}"
+  value = var.deployment_flavor == "DataOps" ? "${var.client_admin_username}@${var.addsDomainName}" : null
 }
