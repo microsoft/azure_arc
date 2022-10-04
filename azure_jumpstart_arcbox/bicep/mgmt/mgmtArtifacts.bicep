@@ -288,32 +288,6 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-0
         }
       }
       {
-        name: 'allow_DNS_UDP'
-        properties: {
-          priority: 1010
-          protocol: 'UDP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '53'
-        }
-      }
-      {
-        name: 'allow_DNS_TCP'
-        properties: {
-          priority: 1011
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '53'
-        }
-      }
-      {
         name: 'allow_SQLMI_mirroring_traffic'
         properties: {
           priority: 1012
