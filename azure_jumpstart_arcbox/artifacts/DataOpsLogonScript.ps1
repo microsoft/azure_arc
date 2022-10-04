@@ -161,8 +161,6 @@ foreach ($cluster in $clusters) {
             --location $Env:azureLocation `
             --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
             --kube-context $cluster.context
-
-        Start-Sleep -Seconds 10
         }
     }
 }
@@ -173,6 +171,8 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 }
 write-host "Successfully Arc-enabled the Kubernetes clusters"
 Get-job -name arcbox | Remove-job
+
+Start-Sleep -Seconds 10
 
 foreach ($cluster in $clusters){
       # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
