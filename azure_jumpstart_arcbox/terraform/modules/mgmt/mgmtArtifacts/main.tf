@@ -317,34 +317,6 @@ resource "azurerm_network_security_rule" "allow_Postgresql_traffic" {
   network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
-resource "azurerm_network_security_rule" "allow_DNS_UDP" {
-  name                        = "allow_DNS_UDP"
-  access                      = "Allow"
-  priority                    = 1010
-  source_address_prefix       = "*"
-  destination_port_range      = "53"
-  source_port_range           = "*"
-  protocol                    = "UDP"
-  direction                   = "Inbound"
-  destination_address_prefix  = "*"
-  resource_group_name         = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
-}
-
-resource "azurerm_network_security_rule" "allow_DNS_TCP" {
-  name                        = "allow_DNS_TCP"
-  access                      = "Allow"
-  priority                    = 1011
-  source_address_prefix       = "*"
-  destination_port_range      = "53"
-  source_port_range           = "*"
-  protocol                    = "TCP"
-  direction                   = "Inbound"
-  destination_address_prefix  = "*"
-  resource_group_name         = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
-}
-
 resource "azurerm_network_security_rule" "allow_SQLMI_mirroring_traffic" {
   name                        = "allow_SQLMI_mirroring_traffic"
   access                      = "Allow"

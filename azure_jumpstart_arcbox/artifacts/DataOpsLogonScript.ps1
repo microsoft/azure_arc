@@ -3,16 +3,13 @@ $Env:ArcBoxLogsDir = "C:\ArcBox\Logs"
 $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
-### To be removed ###
-#$guid= get-random -Minimum 1000 -Maximum 3000
 $clusters = @(
 
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' }
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-capi" }
 
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' }
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-aks" }
 
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr' }
-
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-aksdr" }
 )
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
@@ -90,122 +87,13 @@ get-WindowsFeature | Where-Object { $_.Name -like "RSAT-AD-Tools" } | Install-Wi
 get-WindowsFeature | Where-Object { $_.Name -like "RSAT-DNS-Server" } | Install-WindowsFeature
 Write-Host "`n"
 
-################################################
-# - Created Nested SQL VM
-################################################
-
-Write-Header "Creating Nested SQL VM"
-
-# Install and configure DHCP service (used by Hyper-V nested VMs)
-Write-Host "Configuring DHCP Service"
-$dnsClient = Get-DnsClient | Where-Object { $_.InterfaceAlias -eq "Ethernet" }
-Add-DhcpServerv4Scope -Name "ArcBox" `
-    -StartRange 10.10.1.100 `
-    -EndRange 10.10.1.200 `
-    -SubnetMask 255.255.255.0 `
-    -LeaseDuration 1.00:00:00 `
-    -State Active
-
-Set-DhcpServerv4OptionValue -ComputerName localhost `
-    -DnsDomain $dnsClient.ConnectionSpecificSuffix `
-    -DnsServer 168.63.129.16, 10.16.2.100 `
-    -Router 10.10.1.1 `
-    -Force
-
-
-Add-DhcpServerInDC -DnsName "arcbox-client.jumpstart.local"
-Restart-Service dhcpserver
-
-# Create the NAT network
-Write-Host "Creating Internal NAT"
-$natName = "InternalNat"
-New-NetNat -Name $natName -InternalIPInterfaceAddressPrefix 10.10.1.0/24
-
-# Create an internal switch with NAT
-Write-Host "Creating Internal vSwitch"
-$switchName = 'InternalNATSwitch'
-New-VMSwitch -Name $switchName -SwitchType Internal
-$adapter = Get-NetAdapter | Where-Object { $_.Name -like "*" + $switchName + "*" }
-
-# Create an internal network (gateway first)
-Write-Host "Creating Gateway"
-New-NetIPAddress -IPAddress 10.10.1.1 -PrefixLength 24 -InterfaceIndex $adapter.ifIndex
-
-# Enable Enhanced Session Mode on Host
-Write-Host "Enabling Enhanced Session Mode"
-Set-VMHost -EnableEnhancedSessionMode $true
-
-Write-Host "Fetching Nested VMs"
-$sourceFolder = 'https://jumpstart.blob.core.windows.net/v2images'
-$sas = "?sp=rl&st=2022-01-27T01:47:01Z&se=2025-01-27T09:47:01Z&spr=https&sv=2020-08-04&sr=c&sig=NB8g7f4JT3IM%2FL6bUfjFdmnGIqcc8WU015socFtkLYc%3D"
-$Env:AZCOPY_BUFFER_GB = 4
-Write-Output "Downloading nested VMs VHDX file for SQL. This can take some time, hold tight..."
-azcopy cp "$sourceFolder/ArcBox-SQL.vhdx$sas" "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" --check-length=false --log-level=ERROR
-
-
-# Create the nested SQL VM
-Write-Host "Create Hyper-V VMs"
-New-VM -Name ArcBox-SQL -MemoryStartupBytes 12GB -BootDevice VHD -VHDPath "$Env:ArcBoxVMDir\ArcBox-SQL.vhdx" -Path $Env:ArcBoxVMDir -Generation 2 -Switch $switchName
-Set-VMProcessor -VMName ArcBox-SQL -Count 2
-
-# We always want the VMs to start with the host and shut down cleanly with the host
-Write-Host "Set VM Auto Start/Stop"
-Set-VM -Name ArcBox-SQL -AutomaticStartAction Start -AutomaticStopAction ShutDown
-
-Write-Host "Enabling Guest Integration Service"
-Get-VM | Get-VMIntegrationService | Where-Object { -not($_.Enabled) } | Enable-VMIntegrationService -Verbose
-
-# Start all the VMs
-Write-Host "Starting SQL VM"
-Start-VM -Name ArcBox-SQL
-
-
-Write-Host "Creating VM Credentials"
-# Hard-coded username and password for the nested VMs
-$nestedWindowsUsername = "Administrator"
-$nestedWindowsPassword = "ArcDemo123!!"
-
-# Create Windows credential object
-$secWindowsPassword = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
-$winCreds = New-Object System.Management.Automation.PSCredential ($nestedWindowsUsername, $secWindowsPassword)
-
-# Restarting Windows VM Network Adapters
-Write-Host "Restarting Network Adapters"
-Start-Sleep -Seconds 20
-Invoke-Command -VMName ArcBox-SQL -ScriptBlock { Get-NetAdapter | Restart-NetAdapter } -Credential $winCreds
-Start-Sleep -Seconds 5
-
-# Configuring the local SQL VM
-Write-Host "Setting local SQL authentication and adding a SQL login"
-$localSQLUser = $Env:AZDATA_USERNAME
-$localSQLPassword = $Env:AZDATA_PASSWORD
-Invoke-Command -VMName ArcBox-SQL -Credential $winCreds -ScriptBlock {
-    Install-Module -Name SqlServer -AllowClobber -Force
-    $server = "localhost"
-    $user = $Using:localSQLUser
-    $LoginType = "SqlLogin"
-    $pass = ConvertTo-SecureString -String $Using:localSQLPassword -AsPlainText -Force
-    $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $user, $pass
-    Add-SqlLogin -ServerInstance $Server -LoginName $User -LoginType $LoginType -DefaultDatabase AdventureWorksLT2019 -Enable -GrantConnectSql -LoginPSCredential $Credential
-    $svr = New-Object ('Microsoft.SqlServer.Management.Smo.Server') $server
-    $svr.Settings.LoginMode = [Microsoft.SqlServer.Management.SMO.ServerLoginMode]::Mixed
-    $svr.Alter()
-    Restart-Service -Force MSSQLSERVER
-    $svrole = $svr.Roles | where { $_.Name -eq 'sysadmin' }
-    $svrole.AddMember($user)
-}
-
-# Creating Hyper-V Manager desktop shortcut
-Write-Host "Creating Hyper-V Shortcut"
-Copy-Item -Path "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Administrative Tools\Hyper-V Manager.lnk" -Destination "C:\Users\All Users\Desktop" -Force
-
-
 # Downloading CAPI Kubernetes cluster kubeconfig file
 Write-Header "Downloading CAPI K8s Kubeconfig"
 $sourceFile = "https://$Env:stagingStorageAccountName.blob.core.windows.net/staging-capi/config"
 $context = (Get-AzStorageAccount -ResourceGroupName $Env:resourceGroup).Context
 $sas = New-AzStorageAccountSASToken -Context $context -Service Blob -ResourceType Object -Permission racwdlup
 $sourceFile = $sourceFile + $sas
+azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config-capi"
 azcopy cp --check-md5 FailIfDifferentOrMissing $sourceFile  "C:\Users\$Env:USERNAME\.kube\config"
 
 # Downloading 'installCAPI.log' log file
@@ -247,10 +135,10 @@ Write-Host "`n"
 azdata --version
 
 # Getting AKS clusters' credentials
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file c:\users\arcdemo\.kube\config-aks
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file c:\users\arcdemo\.kube\config-aksdr
+
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
-
-Start-Sleep -Seconds 10
-
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
 
 kubectx aks="$Env:aksArcClusterName-admin"
@@ -259,77 +147,111 @@ kubectx capi="arcbox-capi"
 
 Start-Sleep -Seconds 10
 
+Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
-        Write-Header "Onboarding cluster as an Azure Arc-enabled Kubernetes cluster"
-        Write-Host "`n"
-        kubectx $cluster.context
+        Start-Job -Name arcbox -ScriptBlock {
+        $cluster = $using:cluster
         Write-Host "Checking K8s Nodes"
-        Write-Host "`n"
-        kubectl get nodes
+        kubectl get nodes --context $cluster.context
         Write-Host "`n"
         az connectedk8s connect --name $cluster.clusterName `
             --resource-group $Env:resourceGroup `
             --location $Env:azureLocation `
-            --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5"
-    
-        Start-Sleep -Seconds 20
-    
-        # Enabling Container Insights cluster extension on primary AKS cluster
-        Write-Host "`n"
-        Write-Host "Enabling Container Insights cluster extension"
-        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-        Write-Host "`n"
+            --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+            --kube-context $cluster.context
+
+        Start-Sleep -Seconds 10
+        }
     }
 }
+
+while ($(Get-Job -Name arcbox).State -eq 'Running') {
+    Write-Host -NoNewLine "."
+    Start-Sleep -Seconds 10
+}
+write-host "Successfully Arc-enabled the Kubernetes clusters"
+get-job -name arcbox | remove-job
+
+Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
+foreach ($cluster in $clusters) {
+    if ($cluster.context -ne 'capi') {
+        Start-Job -Name arcbox -ScriptBlock {
+        $cluster = $using:cluster
+        Write-Host "Checking K8s Nodes"
+        kubectl get nodes --kubeconfig $cluster.kubeConfig
+        Write-Host "`n"
+        az connectedk8s connect --name $cluster.clusterName `
+            --resource-group $Env:resourceGroup `
+            --location $Env:azureLocation `
+            --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
+            --kube-config $cluster.kubeConfig
+
+        Start-Sleep -Seconds 10
+        }
+    }
+}
+
+foreach ($cluster in $clusters){
+      # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
+      Write-Host "`n"
+      Write-Host "Enabling Container Insights cluster extension"
+      az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+      Write-Host "`n"
+      #Write-Host "Enabling Defender for Containers on AKS clusters"
+      #az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
+}
+
+
 
 ################################################
 # - Deploying data services on CAPI cluster
 ################################################
-$kubectlMonShell = Start-Process -PassThru PowerShell { for (0 -lt 1) { kubectl get pod -n arc; Start-Sleep -Seconds 5; Clear-Host } }
 
+$kubectlMonShellCapi = Start-Process -PassThru PowerShell { $host.ui.RawUI.WindowTitle = 'CAPI Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-capi" ; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShellAKS = Start-Process -PassThru PowerShell { $host.ui.RawUI.WindowTitle = 'AKS Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aks" ; Start-Sleep -Seconds 5; Clear-Host } }
+$kubectlMonShellAKSDr = Start-Process -PassThru PowerShell { $host.ui.RawUI.WindowTitle = 'AKS-DR Cluster'; for (0 -lt 1) { kubectl get pods -n arc --kubeconfig "C:\Users\$Env:USERNAME\.kube\config-aksdr" ; Start-Sleep -Seconds 5; Clear-Host } }
+
+Write-Header "Deploying Azure Arc Data Controller"
 foreach ($cluster in $clusters) {
+    Start-Job -Name arcbox -ScriptBlock {
+        $cluster = $using:cluster
+        $context = $cluster.context
+        Start-Transcript -Path "$Env:ArcBoxLogsDir\DataController-$context.log"
+        az k8s-extension create --name arc-data-services `
+            --extension-type microsoft.arcdataservices `
+            --cluster-type connectedClusters `
+            --cluster-name $cluster.clusterName `
+            --resource-group $Env:resourceGroup `
+            --auto-upgrade false `
+            --scope cluster `
+            --release-namespace arc `
+            --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
 
-    kubectx $cluster.context
-    # Installing the Azure Arc-enabled data services cluster extension on the capi cluster
-    Write-Host "Installing the Azure Arc-enabled data services cluster extension"
-    az k8s-extension create --name arc-data-services `
-        --extension-type microsoft.arcdataservices `
-        --cluster-type connectedClusters `
-        --cluster-name $cluster.clusterName `
-        --resource-group $Env:resourceGroup `
-        --auto-upgrade false `
-        --scope cluster `
-        --release-namespace arc `
-        --config Microsoft.CustomLocation.ServiceAccount=sa-bootstrapper
+        Write-Host "`n"
 
-    Write-Host "`n"
+        Do {
+            Write-Host "Waiting for bootstrapper pod, hold tight..."
+            Start-Sleep -Seconds 20
+            $podStatus = $(if (kubectl get pods -n arc --kubeconfig $cluster.kubeConfig | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($podStatus -eq "Nope")
+        Write-Host "Bootstrapper pod is ready!"
 
-    Do {
-        Write-Host "Waiting for bootstrapper pod, hold tight..."
+        $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
+        $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
+        az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig $cluster.kubeConfig --only-show-errors
+
         Start-Sleep -Seconds 20
-        $podStatus = $(if (kubectl get pods -n arc | Select-String "bootstrapper" | Select-String "Running" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($podStatus -eq "Nope")
-    Write-Host "Bootstrapper pod is ready!"
-    Write-Host "`n"
 
-    # Configuring Azure Arc Custom Location on the capi cluster 
-    Write-Header "Configuring Azure Arc Custom Location"
-    $connectedClusterId = az connectedk8s show --name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-    $extensionId = az k8s-extension show --name arc-data-services --cluster-type connectedClusters --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --query id -o tsv
-    az customlocation create --name $cluster.customLocation --resource-group $Env:resourceGroup --namespace arc --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config"
+        # Deploying Azure Arc Data Controller on the capi cluster
 
-    Start-Sleep -Seconds 20
-    # Deploying Azure Arc Data Controller on the capi cluster
-    Write-Header "Deploying Azure Arc Data Controller"
+        $context = $cluster.context
+        $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
+        $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+        $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
+        Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
 
-    $customLocationId = $(az customlocation show --name $cluster.customLocation --resource-group $Env:resourceGroup --query id -o tsv)
-    $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-    $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
-
-    Copy-Item "$Env:ArcBoxDir\dataController.parameters.json" -Destination "$Env:ArcBoxDir\dataController-stage.parameters.json"
-
-    $dataControllerParams = "$Env:ArcBoxDir\dataController-stage.parameters.json"
+        $dataControllerParams = "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
 
     (Get-Content -Path $dataControllerParams) -replace 'dataControllerName-stage', $cluster.dataController | Set-Content -Path $dataControllerParams
     (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage', $Env:resourceGroup | Set-Content -Path $dataControllerParams
@@ -343,19 +265,30 @@ foreach ($cluster in $clusters) {
     (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsWorkspaceId-stage', $workspaceId | Set-Content -Path $dataControllerParams
     (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage', $workspaceKey | Set-Content -Path $dataControllerParams
 
-    az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-stage.parameters.json"
-    Write-Host "`n"
+        az deployment group create --resource-group $Env:resourceGroup --name $cluster.dataController --template-file "$Env:ArcBoxDir\dataController.json" --parameters "$Env:ArcBoxDir\dataController-$context-stage.parameters.json"
+        Write-Host "`n"
 
-    Do {
-        Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
-        Start-Sleep -Seconds 45
-        $dcStatus = $(if (kubectl get datacontroller -n arc | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
-    } while ($dcStatus -eq "Nope")
-    Write-Host "Azure Arc data controller is ready!"
-    Write-Host "`n"
-    Remove-Item "$Env:ArcBoxDir\dataController-stage.parameters.json" -Force
+        Do {
+            Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+            Start-Sleep -Seconds 45
+            $dcStatus = $(if (kubectl get datacontroller -n arc --kubeconfig $cluster.kubeConfig | Select-String "Ready" -Quiet) { "Ready!" }Else { "Nope" })
+        } while ($dcStatus -eq "Nope")
+        Write-Host "Azure Arc data controller is ready!"
+        Write-Host "`n"
+        Remove-Item "$Env:ArcBoxDir\dataController-$context-stage.parameters.json" -Force
+
+        Stop-Transcript
+    }
 
 }
+
+while ($(Get-Job -Name arcbox).State -eq 'Running') {
+    Receive-Job -Name arcbox -WarningAction SilentlyContinue
+    Start-Sleep -Seconds 5
+}
+
+Get-Job -name arcbox | Remove-Job
+write-host "Successfully deployed Azure Arc Data Controllers"
 
 Write-Header "Deploying SQLMI"
 # Deploy SQL MI data services
@@ -366,16 +299,16 @@ Write-Header "Deploying App"
 & "$Env:ArcBoxDir\DataOpsAppScript.ps1"
 
 # Disable Edge 'First Run' Setup
-$edgePolicyRegistryPath  = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
+$edgePolicyRegistryPath = 'HKLM:SOFTWARE\Policies\Microsoft\Edge'
 $desktopSettingsRegistryPath = 'HKCU:SOFTWARE\Microsoft\Windows\Shell\Bags\1\Desktop'
-$firstRunRegistryName  = 'HideFirstRunExperience'
+$firstRunRegistryName = 'HideFirstRunExperience'
 $firstRunRegistryValue = '0x00000001'
 $savePasswordRegistryName = 'PasswordManagerEnabled'
 $savePasswordRegistryValue = '0x00000000'
 $autoArrangeRegistryName = 'FFlags'
 $autoArrangeRegistryValue = '1075839525'
 
- If (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
+If (-NOT (Test-Path -Path $edgePolicyRegistryPath)) {
     New-Item -Path $edgePolicyRegistryPath -Force | Out-Null
 }
 
@@ -385,15 +318,19 @@ Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryNa
 
 
 # Enabling data controller auto metrics & logs upload to log analytics
+
 foreach ($cluster in $clusters) {
     Write-Header "Enabling Data Controller Metrics & Logs Upload"
     $Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
     $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
+    $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
+    az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
 }
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services
+kubectx $clusters[0].context
 Write-Header "Creating Grafana & Kibana Shortcuts"
 $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 $GrafanaURL = "https://" + $GrafanaURL + ":3000"
@@ -409,7 +346,9 @@ $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
 $Favorite.TargetPath = $KibanaURL;
 $Favorite.Save()
 
-Stop-Process -Id $kubectlMonShell.Id
+Stop-Process -Id $kubectlMonShellCapi.Id
+Stop-Process -Id $kubectlMonShellAKS.Id
+Stop-Process -Id $kubectlMonShellAKSDr.Id
 
 # Changing to Jumpstart ArcBox wallpaper
 $code = @' 
@@ -439,6 +378,7 @@ if (-not $ArcServersLogonScript) {
 # Removing the LogonScript Scheduled Task so it won't run on next reboot
 Write-Header "Removing Logon Task"
 Unregister-ScheduledTask -TaskName "DataOpsLogonScript" -Confirm:$false
+Unregister-ScheduledTask -TaskName "ArcServersLogonScript" -Confirm:$false
 Start-Sleep -Seconds 5
 
 # Executing the deployment logs bundle PowerShell script in a new window
