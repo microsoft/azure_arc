@@ -146,45 +146,30 @@ kubectx aks-dr="$Env:aksdrArcClusterName-admin"
 kubectx capi="arcbox-capi"
 
 Start-Sleep -Seconds 10
-az extension add --name connectedk8s
 
 Write-Header "Onboarding clusters as an Azure Arc-enabled Kubernetes cluster"
 foreach ($cluster in $clusters) {
     if ($cluster.context -ne 'capi') {
-        Start-Job -Name arcbox -ScriptBlock {
-        $cluster = $using:cluster
         Write-Host "Checking K8s Nodes"
-        kubectl get nodes --context $cluster.context
+        kubectl get nodes --kubeconfig $cluster.kubeConfig
         Write-Host "`n"
         az connectedk8s connect --name $cluster.clusterName `
             --resource-group $Env:resourceGroup `
             --location $Env:azureLocation `
             --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5" `
-            --kube-context $cluster.context
-        }
+            --kube-config $cluster.kubeConfig
+
+        Start-Sleep -Seconds 10
+
+        # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
+        Write-Host "`n"
+        Write-Host "Enabling Container Insights cluster extension"
+        az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
+        Write-Host "`n"
+        #Write-Host "Enabling Defender for Containers on AKS clusters"
+        #az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
     }
 }
-
-while ($(Get-Job -Name arcbox).State -eq 'Running') {
-    Receive-Job -Name arcbox -WarningAction SilentlyContinue
-    Start-Sleep -Seconds 5
-}
-write-host "Successfully Arc-enabled the Kubernetes clusters"
-Get-job -name arcbox | Remove-job
-
-Start-Sleep -Seconds 10
-
-foreach ($cluster in $clusters){
-      # Enabling Container Insights and Azure Policy cluster extension on Arc-enabled cluster
-      Write-Host "`n"
-      Write-Host "Enabling Container Insights cluster extension"
-      az k8s-extension create --name "azuremonitor-containers" --cluster-name $cluster.clusterName --resource-group $Env:resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceId
-      Write-Host "`n"
-      #Write-Host "Enabling Defender for Containers on AKS clusters"
-      #az aks update --enable-defender --resource-group $Env:resourceGroup --name $cluster.clusterName
-}
-
-
 
 ################################################
 # - Deploying data services on CAPI cluster
