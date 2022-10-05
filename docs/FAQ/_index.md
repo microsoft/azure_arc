@@ -61,3 +61,9 @@ Each ArcBox flavor has a troubleshooting section of its documentation that you c
 - [Troubleshooting ArcBox for DevOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DevOps/#basic-troubleshooting)
 
 If you're still stuck, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on our GitHub repository and the Jumpstart team will try to assist you.
+
+## What are the costs for using HCIBox?
+
+HCIBox incurs normal Azure consumption charges for various Azure resources such as virtual machines and storage. You can view example estimates of HCIBox costs per flavor by clicking the links below.
+
+- [HCIBox cost estimate](https://aka.ms/HCIBoxCost)
