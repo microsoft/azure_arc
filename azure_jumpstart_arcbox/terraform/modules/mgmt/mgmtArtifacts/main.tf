@@ -103,7 +103,7 @@ locals {
 resource "random_string" "random" {
   length  = 13
   special = false
-  number  = true
+  numeric  = true
   upper   = false
 }
 
@@ -309,34 +309,6 @@ resource "azurerm_network_security_rule" "allow_Postgresql_traffic" {
   priority                    = 1009
   source_address_prefix       = "*"
   destination_port_range      = "15432"
-  source_port_range           = "*"
-  protocol                    = "TCP"
-  direction                   = "Inbound"
-  destination_address_prefix  = "*"
-  resource_group_name         = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
-}
-
-resource "azurerm_network_security_rule" "allow_DNS_UDP" {
-  name                        = "allow_DNS_UDP"
-  access                      = "Allow"
-  priority                    = 1010
-  source_address_prefix       = "*"
-  destination_port_range      = "53"
-  source_port_range           = "*"
-  protocol                    = "UDP"
-  direction                   = "Inbound"
-  destination_address_prefix  = "*"
-  resource_group_name         = data.azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.nsg.name
-}
-
-resource "azurerm_network_security_rule" "allow_DNS_TCP" {
-  name                        = "allow_DNS_TCP"
-  access                      = "Allow"
-  priority                    = 1011
-  source_address_prefix       = "*"
-  destination_port_range      = "53"
   source_port_range           = "*"
   protocol                    = "TCP"
   direction                   = "Inbound"
