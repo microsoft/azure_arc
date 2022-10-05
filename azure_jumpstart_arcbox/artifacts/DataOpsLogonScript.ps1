@@ -5,11 +5,11 @@ $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
 $clusters = @(
 
-    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-capi" }
+    [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-capi" }
 
-    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-aks" }
+    [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
 
-    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:USERNAME\.kube\config-aksdr" }
+    [pscustomobject]@{clusterName = $Env:aksdrArcClusterName ; dataController = "$Env:aksdrArcClusterName-dc" ; customLocation = "$Env:aksdrArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'DisasterRecovery' ; context = 'aks-dr'; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aksdr" }
 )
 
 Start-Transcript -Path $Env:ArcBoxLogsDir\DataOpsLogonScript.log
@@ -135,8 +135,8 @@ Write-Host "`n"
 azdata --version
 
 # Getting AKS clusters' credentials
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file c:\users\arcdemo\.kube\config-aks
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file c:\users\arcdemo\.kube\config-aksdr
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file "c:\users\$Env:adminUsername\.kube\config-aks"
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file "c:\users\$Env:adminUsername\.kube\config-aksdr"
 
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
