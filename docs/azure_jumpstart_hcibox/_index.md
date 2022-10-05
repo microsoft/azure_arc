@@ -311,7 +311,7 @@ HCIBox includes a deployment of a Windows Admin Center (WAC) gateway server. Win
 
 ### Azure Kubernetes Service
 
-HCIBox comes preconfigured with [Azure Kubernetes Service on Azure Stack HCI](https://learn.microsoft.com/azure-stack/aks-hci/). Open the [HCIBox AKS-HCI documentation](./AKSHCI/_index.md) to get started with AKS-HCI in HCIBox.
+HCIBox comes preconfigured with [Azure Kubernetes Service on Azure Stack HCI](https://learn.microsoft.com/azure-stack/aks-hci/). Open the [HCIBox AKS-HCI documentation](./AKS/_index.md) to get started with AKS-HCI in HCIBox.
 
 ![Screenshot showing AKS](./aks_portal.png)
 
@@ -337,16 +337,14 @@ Do you have an interesting use case to share? [Submit an issue](https://github.c
 
 ## Clean up the deployment
 
-To clean up your deployment, simply delete the resource groups using Azure CLI or Azure portal.
+To clean up your deployment, simply delete the resource groups using Azure CLI or Azure portal. Be sure to delete the ArcServers resource group first as seen in the example below.
 
 ```shell
 az group delete -n <name of your resource group>-ArcServers
 az group delete -n <name of your resource group>
 ```
 
-![Screenshot showing az group delete](./azdelete.png)
-
-![Screenshot showing group delete from Azure portal](./portaldelete.png)
+![Screenshot showing az group delete](./az_delete.png)
 
 ## Basic Troubleshooting
 
