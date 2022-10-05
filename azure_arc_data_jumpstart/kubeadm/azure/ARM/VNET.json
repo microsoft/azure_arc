@@ -1,0 +1,99 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "virtualNetworkName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the VNET"
+        }
+      },
+      "subnetName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the subnet in the virtual network"
+        }
+      },
+      "subnetName2": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the subnet in the virtual network"
+        }
+      },
+      "bastionSubnetName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of the subnet in the virtual network"
+        }
+      },
+      "addressPrefix": {
+        "type": "string",
+        "metadata": {
+          "description": "VNET CIDR"
+        }
+      },
+      "subnetAddressPrefix": {
+        "type": "string",
+        "metadata": {
+          "description": "Subnet CIDR"
+        }
+      },
+      "subnetAddressPrefix2": {
+        "type": "string",
+        "metadata": {
+          "description": "Subnet CIDR"
+        }
+      },
+      "bastionSubnetPrefix": {
+        "type": "string",
+        "metadata": {
+          "description": "Bastion subnet prefix"
+        }
+      },
+      "deployBastion": {
+        "type": "bool",
+        "metadata": {
+          "description": "Choice to deploy Bastion to connect to the client VM"
+        },
+        "defaultValue": false
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "comments": "Deploys a VNET and Subnet for Client and K8s VM",
+        "apiVersion": "2021-05-01",
+        "name": "[parameters('virtualNetworkName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": ["[parameters('addressPrefix')]"]
+          },
+          "subnets": [
+            {
+              "name": "[parameters('subnetName')]",
+              "properties": {
+                "addressPrefix": "[parameters('subnetAddressPrefix')]",
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              }
+            },
+            {
+              "name": "[parameters('subnetName2')]",
+              "properties": {
+                "addressPrefix": "[parameters('subnetAddressPrefix2')]",
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              }
+            },
+            {
+              "name": "[parameters('bastionSubnetName')]",
+              "properties": {
+                "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
