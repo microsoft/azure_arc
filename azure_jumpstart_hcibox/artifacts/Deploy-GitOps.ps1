@@ -119,12 +119,12 @@ Export-PfxCertificate -Cert "cert:\CurrentUser\My\$($cert.Thumbprint)" -FilePath
 Copy-VMFile AzSMGMT -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C:\VMConfigs\$certname.pfx" -FileSource Host
 $localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
-    Copy-VMFile AdminCenter -SourcePath "C:\VHDs\$using:certname.pfx" -DestinationPath "C:\VHDs\$certname.pfx" -FileSource Host
+    Enable-VMIntegrationService -VMName AdminCenter -Name "Guest Service Interface"
+    Copy-VMFile AdminCenter -SourcePath "C:\VMConfigs\$using:certname.pfx" -DestinationPath "C:\VHDs\$using:certname.pfx" -FileSource Host
 }
 Invoke-Command -ComputerName AdminCenter -Credential $adcred -ScriptBlock {
     Import-PfxCertificate -FilePath "C:\VHDs\$using:certname.pfx" -CertStoreLocation Cert:\LocalMachine\Root -Password $using:certPassword
 }
-
 
 Write-Host "Importing the TLS certificate to Key Vault"
 az keyvault certificate import --vault-name $keyVaultName --password "arcbox" -n $certname -f "$Env:TempDir\$certname.pfx"
