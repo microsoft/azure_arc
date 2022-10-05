@@ -57,6 +57,15 @@ export AZURE_RESOURCE_GROUP=$(sudo -u $adminUsername az resource list --query "[
 az -v
 echo ""
 
+echo "Registering resource providers"
+
+sudo -u $adminUsername az provider register --namespace Microsoft.Kubernetes --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.KubernetesConfiguration --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.ExtendedLocation --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.AzureArcData --wait
+
+echo ""
+
 # Installing snap
 sudo apt install snapd
 
