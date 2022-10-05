@@ -135,8 +135,8 @@ Write-Host "`n"
 azdata --version
 
 # Getting AKS clusters' credentials
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file c:\users\$Env:adminUsername\.kube\config-aks
-az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file c:\users\$Env:adminUsername\.kube\config-aksdr
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin --file "c:\users\$Env:adminUsername\.kube\config-aks"
+az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin --file "c:\users\$Env:adminUsername\.kube\config-aksdr"
 
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksArcClusterName --admin
 az aks get-credentials --resource-group $Env:resourceGroup --name $Env:aksdrArcClusterName --admin
