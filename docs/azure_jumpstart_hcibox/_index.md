@@ -241,7 +241,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing _HCIBox-Client_](./automation.png)
 
-  > **NOTE: The automation will take 3-4 hours to fully complete. Do not close the PowerShell during this time. When automation is completed successfully, the desktop background will be changed to the HCIBox wallpaper.**
+  > **NOTE: The automation will take 3-4 hours to fully complete. Do not close the PowerShell window during this time. When automation is completed successfully, the desktop background will be changed to the HCIBox wallpaper.**
 
 - Deployment is complete! Let's begin exploring the features of HCIBox!
 
