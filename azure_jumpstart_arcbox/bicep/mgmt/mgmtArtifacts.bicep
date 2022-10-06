@@ -137,7 +137,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
   }
 }
 
-resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
+resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = if (flavor == 'DataOps') {
   name: drVirtualNetworkName
   location: location
   properties: {
@@ -285,32 +285,6 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2022-01-0
           sourcePortRange: '*'
           destinationAddressPrefix: '*'
           destinationPortRange: '15432'
-        }
-      }
-      {
-        name: 'allow_DNS_UDP'
-        properties: {
-          priority: 1010
-          protocol: 'UDP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '53'
-        }
-      }
-      {
-        name: 'allow_DNS_TCP'
-        properties: {
-          priority: 1011
-          protocol: 'TCP'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '53'
         }
       }
       {

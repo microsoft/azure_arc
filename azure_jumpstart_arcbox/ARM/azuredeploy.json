@@ -71,7 +71,7 @@
       "metadata": {
         "description": "Target GitHub branch"
       },
-      "defaultValue": "arcbox_dataops"
+      "defaultValue": "main"
     },
     "deployBastion": {
       "type": "bool",
@@ -413,5 +413,12 @@
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+    "clientVmLogonUserName": {
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "type": "string",
+      "value": "[concat(parameters('windowsAdminUsername'),'@',parameters('addsDomainName'))]"
+    }
+  }
 }
