@@ -63,6 +63,7 @@ var policies = [
       'Full'
       'ITPro'
       'DevOps'
+      'DataOps'
     ]
     roleDefinition: '/subscriptions/${subscription().subscriptionId}/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c'
     parameters: {

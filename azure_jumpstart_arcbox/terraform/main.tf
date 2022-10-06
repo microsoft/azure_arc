@@ -77,7 +77,7 @@ variable "github_repo" {
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "arcbox_dataops"
+  default     = "main"
 }
 
 variable "spn_client_id" {
@@ -176,7 +176,7 @@ module "management_artifacts" {
   workspace_name       = var.workspace_name
   deploy_bastion       = var.deploy_bastion
   deployment_flavor    = var.deployment_flavor
-  depends_on = [azurerm_resource_group.rg]
+  depends_on           = [azurerm_resource_group.rg]
 }
 
 module "management_policy" {
@@ -313,4 +313,8 @@ module "aks_clusters" {
     module.management_storage,
     module.adds_vm
   ]
+}
+
+output "clientVmLogonUserName" {
+  value = var.deployment_flavor == "DataOps" ? "${var.client_admin_username}@${var.addsDomainName}" : null
 }
