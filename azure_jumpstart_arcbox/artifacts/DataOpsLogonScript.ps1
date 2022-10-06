@@ -291,7 +291,7 @@ foreach ($cluster in $clusters) {
     $Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
     $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
     $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
-    az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
+    az role assignment create --assignee-object-id $Env:MSI_OBJECT_ID --assignee-principal-type ServicePrincipal --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
     Start-Sleep -Seconds 15
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
