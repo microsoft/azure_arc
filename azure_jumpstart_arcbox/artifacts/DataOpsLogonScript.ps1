@@ -4,7 +4,6 @@ $Env:ArcBoxVMDir = "$Env:ArcBoxDir\Virtual Machines"
 $Env:ArcBoxIconDir = "C:\ArcBox\Icons"
 
 $clusters = @(
-
     [pscustomobject]@{clusterName = $Env:capiArcDataClusterName; dataController = "$Env:capiArcDataClusterName-dc" ; customLocation = "$Env:capiArcDataClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'capi' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-capi" }
 
     [pscustomobject]@{clusterName = $Env:aksArcClusterName ; dataController = "$Env:aksArcClusterName-dc" ; customLocation = "$Env:aksArcClusterName-cl" ; storageClassName = 'managed-premium' ; licenseType = 'LicenseIncluded' ; context = 'aks' ; kubeConfig = "C:\Users\$Env:adminUsername\.kube\config-aks" }
@@ -292,6 +291,7 @@ foreach ($cluster in $clusters) {
     $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
     $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
     az role assignment create --assignee $Env:MSI_OBJECT_ID --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
+    Start-Sleep -Seconds 15
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
 }
