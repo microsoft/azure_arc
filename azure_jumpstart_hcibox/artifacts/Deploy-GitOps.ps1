@@ -120,6 +120,7 @@ Copy-VMFile AzSMGMT -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C
 $localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
     Enable-VMIntegrationService -VMName AdminCenter -Name "Guest Service Interface"
+    Start-Sleep 20
     Copy-VMFile AdminCenter -SourcePath "C:\VMConfigs\$using:certname.pfx" -DestinationPath "C:\VHDs\$using:certname.pfx" -FileSource Host
 }
 Invoke-Command -ComputerName AdminCenter -Credential $adcred -ScriptBlock {
