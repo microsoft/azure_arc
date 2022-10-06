@@ -93,7 +93,7 @@ $Endpoints = $file.FullName
 foreach ($sqlInstance in $sqlInstances) {
 
     Start-Job -Name arcbox -ScriptBlock {
-        #$ErrorActionPreference = 'SilentlyContinue'
+        $ErrorActionPreference = 'SilentlyContinue'
         $WarningPreference = 'SilentlyContinue'
         $dcInfo = $using:dcInfo
         $Endpoints = $using:Endpoints
