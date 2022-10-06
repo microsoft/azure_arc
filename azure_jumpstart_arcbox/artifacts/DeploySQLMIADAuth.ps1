@@ -304,7 +304,9 @@ foreach ($sqlInstance in $sqlInstances) {
         # Write endpoint information in the file
     
         $SQLInstanceName = $sqlInstance.context.toupper()
-    
+        
+        Start-Sleep -Seconds 5
+        
         Add-Content $Endpoints "======================================================================"
         Add-Content $Endpoints ""
         Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"

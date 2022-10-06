@@ -77,7 +77,7 @@ variable "github_repo" {
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "arcbox_dataops"
+  default     = "main"
 }
 
 variable "spn_client_id" {

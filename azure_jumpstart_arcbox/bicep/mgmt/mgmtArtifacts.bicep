@@ -137,7 +137,7 @@ resource arcVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
   }
 }
 
-resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = {
+resource drVirtualNetwork 'Microsoft.Network/virtualNetworks@2022-01-01' = if (flavor == 'DataOps') {
   name: drVirtualNetworkName
   location: location
   properties: {
