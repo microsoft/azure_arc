@@ -112,7 +112,7 @@ Invoke-Expression 'cmd /c start Powershell -Command {
     Start-Sleep -Seconds 5
     Write-Host "`n"
     Write-Host "Creating deployment logs bundle"
-    7z a $Env:ArcBoxLogsDir\LogsBundle-"$RandomString".zip $Env:HCIBoxLogsDir\*.log
+    7z a $Env:HCIBoxLogsDir\LogsBundle-"$RandomString".zip $Env:HCIBoxLogsDir\*.log
 }'
 
 Stop-Transcript
