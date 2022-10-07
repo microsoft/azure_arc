@@ -58,7 +58,7 @@ HCIBox also includes a dedicated Windows Admin Center (WAC) gateway server. The 
 
   ![Screenshot showing WAC adding cluster](./wac_add_cluster.png)
 
-- Enter "hciboxcluster" for the cluster name, and use the domain account credential to connect to the cluster.
+- Enter "_hciboxcluster_" for the cluster name, and use the domain account credential to connect to the cluster.
 
   ![Screenshot showing WAC connection details](./wac_add_cluster_detail.png)
 
@@ -84,7 +84,7 @@ HCIBox also includes a dedicated Windows Admin Center (WAC) gateway server. The 
 
 - We can also seamlessly move the VM from one cluster node to another using [live migration](https://learn.microsoft.com/windows-server/virtualization/hyper-v/manage/live-migration-overview).
 
-- In the example below, we can see the LinuxGuest virtual machine is hosted on AzSHOST2.
+- In the example below, we can see the LinuxGuest virtual machine is hosted on _AzSHOST2_.
 
   ![Screenshot showing live migration step 1](./wac_virtual_machine_placement.png)
 
@@ -96,7 +96,7 @@ HCIBox also includes a dedicated Windows Admin Center (WAC) gateway server. The 
 
   ![Screenshot showing live migration dialog](./wac_virtual_machine_move_dialog.png)
 
-- The migrated virtual machine is now hosted on AzSHOST2.
+- The migrated virtual machine is now hosted on _AzSHOST2_.
 
   ![Screenshot showing migrated virtual machine](./wac_virtual_machine_move_complete.png)
 

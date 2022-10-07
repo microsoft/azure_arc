@@ -6,11 +6,11 @@ toc_hide: true
 
 # Jumpstart HCIBox - Virtual machine provisioning with Azure Arc
 
-Azure Stack HCI supports [VM provisioning the Azure portal](https://learn.microsoft.com/azure-stack/hci/manage/azure-arc-enabled-virtual-machines). HCIBox is preconfigured with [Arc resource bridge](https://learn.microsoft.com/azure-stack/hci/manage/azure-arc-enabled-virtual-machines#what-is-azure-arc-resource-bridge) to support this capability.
+Azure Stack HCI supports [VM provisioning the Azure portal](https://learn.microsoft.com/azure-stack/hci/manage/azure-arc-enabled-virtual-machines). HCIBox is pre-configured with [Arc resource bridge](https://learn.microsoft.com/azure-stack/hci/manage/azure-arc-enabled-virtual-machines#what-is-azure-arc-resource-bridge) to support this capability.
 
 ## Deploy a new Linux virtual machine
 
-HCIBox includes a preconfigured Linux virtual machine image that you can use to deploy new guest virtual machines on the HCI cluster. Follow these steps to deploy one in your HCIBox.
+HCIBox includes a pre-configured Linux virtual machine image that you can use to deploy new guest virtual machines on the HCI cluster. Follow these steps to deploy one in your HCIBox.
 
 - Navigate to the Azure Stack HCI cluster resource in your HCIBox resource group.
 
