@@ -29,14 +29,8 @@ Have you ever wanted to have a complete Azure Arc environment with just one clic
 
 [ArcBox](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) is a dedicated sandbox environment for exploring all things Azure Arc, and the best part is that the only prerequisite is an Azure subscription. With a one-click deployment, you get a full Azure Arc lab packed with technology including Azure Arc-enabled Servers, Kubernetes, Data Services and much more. Check out ArcBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
 
-<!-- ## Jumpstart HCIBox
+<p align="center"><a href="https://azurearcjumpstart.io/azure_jumpstart_arcbox/" target="_blank"><img src="/img/arcbox_logo.png" alt="jumpstart-arcbox-logo" width="250"></a></p>
 
-Are you eager to try out Azure Stack HCI but you don't have access to physical hardware? If so then HCIBox is the tool for you.
-
-[HCIBox](https://azurearcjumpstart.io/azure_jumpstart_hcibox/) is a dedicated Azure Stack HCI sandbox environment, and like ArcBox you only need an Azure subscription to get started. With a one-click deployment, you get a full Azure Stack HCI lab packed with technology including Azure Arc integration, Azure Kubernetes Service, Windows Admin Center and much more. Check out HCIBox today and start exploring a comprehensive hybrid sandbox powered by Azure Arc.
-
-<p align="center"><a href="https://azurearcjumpstart.io/azure_jumpstart_hcibox/" target="_blank"><img src="/img/hcibox_logo.png" alt="jumpstart-hcibox-logo" width="250"></a></p> 
--->
 ## Jumpstart YouTube Channel
 
 We know you are busy and sometimes all you need is just a good, short, solid recorded demo and we hope that here you will be able to find just that.
