@@ -20,6 +20,18 @@ variable "k3s_arc_cluster_name" {
   default     = "ArcBox-K3s"
 }
 
+variable "aks_arc_data_cluster_name" {
+  type        = string
+  description = "The name of the AKS cluster"
+  default     = "ArcBox-AKS-Data"
+}
+
+variable "aks_dr_arc_data_cluster_name" {
+  type        = string
+  description = "The name of the AKS cluster"
+  default     = "ArcBox-AKS-DR-Data"
+}
+
 variable "os_sku" {
   type        = string
   description = "The Windows version for the client VM."
@@ -99,7 +111,7 @@ variable "spn_tenant_id" {
 
 variable "deployment_flavor" {
   type        = string
-  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', and 'DevOps'."
+  description = "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps' and 'DataOps'."
 }
 
 variable "github_username" {
@@ -232,7 +244,8 @@ resource "azurerm_virtual_machine" "client" {
   location              = data.azurerm_resource_group.rg.location
   resource_group_name   = data.azurerm_resource_group.rg.name
   network_interface_ids = [ azurerm_network_interface.nic.id ]
-  vm_size               = var.deployment_flavor == "DevOps" ? "Standard_B4ms" : "Standard_D16s_v4"
+    vm_size             = var.deployment_flavor == "DevOps" ? "Standard_B4ms" : var.deployment_flavor == "DataOps" ? "Standard_D8s_v4" : "Standard_D16s_v4"
+
 
   storage_image_reference {
     publisher = "MicrosoftWindowsServer"
@@ -271,7 +284,7 @@ resource "azurerm_virtual_machine_extension" "custom_script" {
       "fileUris": [
           "${var.template_base_url}artifacts/Bootstrap.ps1"
       ],
-      "commandToExecute": "powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${var.admin_username} -spnClientId ${var.spn_client_id} -spnClientSecret ${var.spn_client_secret} -spnTenantId ${var.spn_tenant_id} -spnAuthority ${var.spn_authority} -subscriptionId ${data.azurerm_subscription.primary.subscription_id} -resourceGroup ${data.azurerm_resource_group.rg.name} -azdataUsername ${var.data_controller_username} -azdataPassword ${var.data_controller_password} -acceptEula ${var.accept_eula} -registryUsername ${var.registry_username} -registryPassword ${var.registry_password} -arcDcName ${var.data_controller_name} -azureLocation ${data.azurerm_resource_group.rg.location} -mssqlmiName ${var.sql_mi_name} -POSTGRES_NAME ${var.postgres_name} -POSTGRES_WORKER_NODE_COUNT ${var.postgres_worker_node_count} -POSTGRES_DATASIZE ${var.postgres_data_size} -POSTGRES_SERVICE_TYPE ${var.postgres_service_type} -stagingStorageAccountName ${var.storage_account_name} -workspaceName ${var.workspace_name} -templateBaseUrl ${var.template_base_url} -flavor ${var.deployment_flavor} -automationTriggerAtLogon ${var.trigger_at_logon} -capiArcDataClusterName ${var.capi_arc_data_cluster_name} -k3sArcClusterName ${var.k3s_arc_cluster_name} -githubUser ${var.github_username}"
+      "commandToExecute": "powershell.exe -ExecutionPolicy Bypass -File Bootstrap.ps1 -adminUsername ${var.admin_username} -adminPassword ${var.admin_password} -spnClientId ${var.spn_client_id} -spnClientSecret ${var.spn_client_secret} -spnTenantId ${var.spn_tenant_id} -spnAuthority ${var.spn_authority} -subscriptionId ${data.azurerm_subscription.primary.subscription_id} -resourceGroup ${data.azurerm_resource_group.rg.name} -azdataUsername ${var.data_controller_username} -azdataPassword ${var.data_controller_password} -acceptEula ${var.accept_eula} -registryUsername ${var.registry_username} -registryPassword ${var.registry_password} -arcDcName ${var.data_controller_name} -azureLocation ${data.azurerm_resource_group.rg.location} -mssqlmiName ${var.sql_mi_name} -POSTGRES_NAME ${var.postgres_name} -POSTGRES_WORKER_NODE_COUNT ${var.postgres_worker_node_count} -POSTGRES_DATASIZE ${var.postgres_data_size} -POSTGRES_SERVICE_TYPE ${var.postgres_service_type} -stagingStorageAccountName ${var.storage_account_name} -workspaceName ${var.workspace_name} -templateBaseUrl ${var.template_base_url} -flavor ${var.deployment_flavor} -automationTriggerAtLogon ${var.trigger_at_logon} -capiArcDataClusterName ${var.capi_arc_data_cluster_name} -k3sArcClusterName ${var.k3s_arc_cluster_name} -aksArcClusterName ${var.aks_arc_data_cluster_name} -aksdrArcClusterName ${var.aks_dr_arc_data_cluster_name} -githubUser ${var.github_username}"
     }
 SETTINGS
 }
