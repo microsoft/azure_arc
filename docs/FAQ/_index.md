@@ -66,7 +66,7 @@ Each ArcBox flavor has a troubleshooting section of its documentation that you c
 
 If you're still stuck, please [submit an issue](https://github.com/microsoft/azure_arc/issues/new/choose) on our GitHub repository and the Jumpstart team will try to assist you.
 
-## Jumpstart HCIBox
+<!-- ## Jumpstart HCIBox
 
 ### What Azure regions can HCIBox be deployed to?
 
@@ -81,4 +81,4 @@ HCIBox can be deployed to the following regions:
 
 HCIBox incurs normal Azure consumption charges for various Azure resources such as virtual machines and storage. You can view example estimates of HCIBox costs per flavor by clicking the links below.
 
-- [HCIBox cost estimate](https://aka.ms/HCIBoxCost)
+- [HCIBox cost estimate](https://aka.ms/HCIBoxCost) -->
