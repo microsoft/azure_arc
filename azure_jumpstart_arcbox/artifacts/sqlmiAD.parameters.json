@@ -71,7 +71,25 @@
             "value": "BusinessCritical"
         },        
         "licenseType": {
-            "value": "LicenseIncluded"
+            "value": "licenseType-stage"
+        },
+        "keyTab": {
+            "value": "keyTab-stage"
+        },
+        "sqlInstanceName": {
+            "value": "sqlInstanceName-stage"
+        },
+        "adAccountName":{
+            "value": "adAccountName-stage"
+        },
+        "adConnectorName": {
+            "value": "adConnectorName-stage"
+        },
+        "dnsName": {
+            "value": "dnsName-stage"
+        },
+        "dnsNameSecondary":{
+            "value": "dnsNameSecondary-stage"
         },
         "port": {
             "value": port-stage

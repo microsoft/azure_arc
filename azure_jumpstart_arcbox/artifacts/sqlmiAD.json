@@ -83,7 +83,32 @@
       "type": "String"
     },
     "licenseType": {
-      "type": "String"
+      "type": "String",
+      "defaultValue": "LicenseIncluded"
+    },
+    "keyTab": {
+      "type": "String",
+      "defaultValue": ""
+    },
+    "sqlInstanceName": {
+      "type": "string",
+      "defaultValue": "jumpstart-sql"
+    },
+    "adAccountName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "adConnectorName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "dnsName": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "dnsNameSecondary": {
+      "type": "string",
+      "defaultValue": ""
     },
     "port": {
       "type": "int"
@@ -95,7 +120,7 @@
     {
       "type": "Microsoft.AzureArcData/sqlManagedInstances",
       "apiVersion": "[parameters('apiVersion')]",
-      "name": "jumpstart-sql",
+      "name": "[parameters('sqlInstanceName')]",
       "location": "[parameters('location')]",
       "extendedLocation": {
         "type": "CustomLocation",
@@ -107,6 +132,11 @@
         "tier": "[parameters('pricingTier')]"
       },
       "properties": {
+        "activeDirectoryInformation": {
+          "keytabInformation": {
+            "keytab": "[parameters('keyTab')]"
+          }
+        },
         "admin": "[parameters('admin')]",
         "basicLoginInformation": {
           "username": "[parameters('admin')]",
@@ -119,10 +149,13 @@
             "services": {
               "primary": {
                 "type": "[parameters('serviceType')]",
+                "dnsName": "[parameters('dnsName')]",
                 "port": "[parameters('port')]"
+
               },
               "readableSecondaries": {
                 "type": "[parameters('readableSecondaries')]",
+                "dnsName": "[parameters('dnsNameSecondary')]",
                 "port": "[parameters('port')]"
               }
             },
@@ -165,6 +198,15 @@
                     "size": "[parameters('dataLogsStorageSize')]"
                   }
                 ]
+              }
+            },
+            "security": {
+              "activeDirectory": {
+                "accountName": "[parameters('adAccountName')]",
+                "connector": {
+                  "name": "[parameters('adConnectorName')]",
+                  "namespace": "arc"
+                }
               }
             },
             "settings": {
