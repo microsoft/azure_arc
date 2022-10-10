@@ -5,15 +5,15 @@ Start-Transcript -Path $Env:ArcBoxLogsDir\DeploySQL.log
 
 # Deployment environment variables
 $controllerName = "arcbox-dc" # This value needs to match the value of the data controller name as set by the ARM template deployment.
+$sqlInstanceName = "jumpstart-sql"
 
 # Deploying Azure Arc SQL Managed Instance
 Write-Host "`n"
 Write-Host "Deploying Azure Arc SQL Managed Instance"
 Write-Host "`n"
 
-$customLocationName = (Get-AzResource -ResourceGroupName $Env:resourceGroup -ResourceType Microsoft.ExtendedLocation/customLocations).Name
 $dataControllerId = $(az resource show --resource-group $Env:resourceGroup --name $controllerName --resource-type "Microsoft.AzureArcData/dataControllers" --query id -o tsv)
-$customLocationId = $(az customlocation show --name $customlocationName --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name "$Env:capiArcDataClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 
 ################################################
 # Localize ARM template
@@ -29,9 +29,9 @@ $memoryLimit = "8Gi"
 
 # Storage
 $StorageClassName = "managed-premium"
-$dataStorageSize = "5"
-$logsStorageSize = "5"
-$dataLogsStorageSize = "5"
+$dataStorageSize = "5Gi"
+$logsStorageSize = "5Gi"
+$dataLogsStorageSize = "5Gi"
 
 # High Availability
 $replicas = 3 # Deploy SQL MI "Business Critical" tier
@@ -58,6 +58,8 @@ $SQLParams = "$Env:ArcBoxDir\SQLMI.parameters.json"
 (Get-Content -Path $SQLParams) -replace 'logsSize-stage',$logsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'dataLogSize-stage',$dataLogsStorageSize | Set-Content -Path $SQLParams
 (Get-Content -Path $SQLParams) -replace 'replicasStage' ,$replicas | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'sqlInstanceName-stage' ,$sqlInstanceName | Set-Content -Path $SQLParams
+(Get-Content -Path $SQLParams) -replace 'port-stage' , 11433 | Set-Content -Path $SQLParams
 
 az deployment group create --resource-group $Env:resourceGroup --template-file "$Env:ArcBoxDir\SQLMI.json" --parameters "$Env:ArcBoxDir\SQLMI.parameters.json"
 Write-Host "`n"

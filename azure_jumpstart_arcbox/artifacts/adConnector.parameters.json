@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "connectorName": {
+        "value": "connectorName-stage"
+      },
+      "domainController": {
+        "value": "domainController-stage"
+      },
+      "netbiosDomainName": {
+        "value": "netbiosDomainName-stage"
+      },
+      "realm": {
+        "value": "realm-stage"
+      },
+      "serviceAccountProvisioning": {
+        "value": "serviceAccountProvisioning-stage"
+      },
+      "domainName": {
+        "value": "domainName-stage"
+      },
+      "preferK8sDnsForPtrLookups":{
+        "value": false
+      },
+      "apiVersion": {
+        "value": "2022-03-01-preview"
+      }
+    }
+  }

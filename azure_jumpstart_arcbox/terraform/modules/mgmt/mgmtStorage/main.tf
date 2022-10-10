@@ -21,7 +21,7 @@ data "azurerm_resource_group" "rg" {
 resource "random_string" "random" {
   length  = 13
   special = false
-  number  = true
+  numeric  = true
   upper   = false
 }
 

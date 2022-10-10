@@ -36,7 +36,7 @@
     },
     "readableSecondaries": {
       "type": "String"
-    },    
+    },
     "vCoresRequest": {
       "type": "String"
     },
@@ -84,6 +84,9 @@
     },
     "licenseType": {
       "type": "String"
+    },
+    "port": {
+      "type": "int"
     }
   },
   "variables": {},
@@ -116,10 +119,11 @@
             "services": {
               "primary": {
                 "type": "[parameters('serviceType')]",
-                "port": "11443"
+                "port": "[parameters('port')]"
               },
               "readableSecondaries": {
-                "type": "[parameters('readableSecondaries')]"
+                "type": "[parameters('readableSecondaries')]",
+                "port": "[parameters('port')]"
               }
             },
             "replicas": "[parameters('replicas')]",
