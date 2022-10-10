@@ -301,7 +301,7 @@ Azure Stack HCI integrates with [Azure Monitor](https://learn.microsoft.com/azur
 
 ### VM provisioning through Azure portal with Arc Resource Bridge
 
-Azure Stack HCI supports [VM provisioning the Azure portal](https://learn.microsoft.com/azure-stack/hci/manage/azure-arc-enabled-virtual-machines). Open the [HCIBox VM provisioning documentation](./RB/_index.md) to get started.
+Azure Stack HCI supports [VM provisioning through the Azure portal](https://learn.microsoft.com/azure-stack/hci/manage/azure-arc-enabled-virtual-machines). Open the [HCIBox VM provisioning documentation](./RB/_index.md) to get started.
 
 ![Screenshot showing VM provisioning blade](./vm_provisioning.png)
 
