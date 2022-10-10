@@ -51,4 +51,3 @@ override.tf.json
 terraform.rc
 
 *.out
-.VSCodeCounter/*
