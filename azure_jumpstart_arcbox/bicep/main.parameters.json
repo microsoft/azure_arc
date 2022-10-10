@@ -24,7 +24,7 @@
             "value": "<your unique Log Analytics workspace name>"
         },
         "flavor": {
-            "value":  "DataOps"
+            "value":  "Full"
         },
         "deployBastion": {
             "value": false
