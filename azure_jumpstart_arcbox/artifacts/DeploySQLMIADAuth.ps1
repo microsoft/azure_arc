@@ -286,47 +286,6 @@ foreach ($sqlInstance in $sqlInstances) {
             kubectl exec $podname -n arc --kubeconfig $sqlInstance.kubeConfig -c arc-sqlmi -- /opt/mssql-tools/bin/sqlcmd -S localhost -U $Env:AZDATA_USERNAME -P "$Env:AZDATA_PASSWORD" -Q "RESTORE DATABASE AdventureWorks2019 FROM  DISK = N'/var/opt/mssql/data/AdventureWorks2019.bak' WITH MOVE 'AdventureWorks2017' TO '/var/opt/mssql/data/AdventureWorks2019.mdf', MOVE 'AdventureWorks2017_Log' TO '/var/opt/mssql/data/AdventureWorks2019_Log.ldf'" 2>&1 $null
             Write-Host "Restoring AdventureWorks database completed."
         }
-    
-
-        # Retrieving SQL MI connection endpoint
-        $sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc --kubeconfig $sqlInstance.kubeConfig -o=jsonpath='{.status.endpoints.primary}'
-        $sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc --kubeconfig $sqlInstance.kubeConfig -o=jsonpath='{.status.endpoints.secondary}'
-        write-host "`n"
-    
-        # Get public ip of the SQLMI endpoint
-        $sqlmiIpaddress = kubectl get svc -n arc --kubeconfig $sqlInstance.kubeConfig "$sqlMIName-external-svc"  -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-        Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
-
-        # Get public ip of the secondary SQLMI endpoint
-        $sqlmiSecondaryIpaddress = kubectl get svc -n arc --kubeconfig $sqlInstance.kubeConfig  "$sqlMIName-secondary-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
-        Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
- 
-        # Write endpoint information in the file
-    
-        $SQLInstanceName = $sqlInstance.context.toupper()
-        
-        Start-Sleep -Seconds 5
-        
-        Add-Content $Endpoints "======================================================================"
-        Add-Content $Endpoints ""
-        Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"
-        $sqlmiEndPoint | Add-Content $Endpoints
-
-        Add-Content $Endpoints ""
-        Add-Content $Endpoints "$SQLInstanceName secondary external endpoint DNS name for AD Authentication:"
-        $sqlmiSecondaryEndPoint | Add-Content $Endpoints
-
-        Add-Content $Endpoints ""
-        Add-Content $Endpoints "SQL Managed Instance SQL login username:"
-        $env:AZDATA_USERNAME | Add-Content $Endpoints
-
-        Add-Content $Endpoints ""
-        Add-Content $Endpoints "SQL Managed Instance SQL login password:"
-        $env:AZDATA_PASSWORD | Add-Content $Endpoints
-        Add-Content $Endpoints ""
-    
-        Add-Content $Endpoints "======================================================================"
-        Add-Content $Endpoints ""
 
         Stop-Transcript
     }
@@ -340,6 +299,50 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 
 Get-Job -name arcbox | Remove-Job
 
+foreach ($sqlInstance in $sqlInstances){
+
+# Retrieving SQL MI connection endpoint
+$sqlMIName = $sqlInstance.instanceName
+$sqlmiEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc --kubeconfig $sqlInstance.kubeConfig -o=jsonpath='{.status.endpoints.primary}'
+$sqlmiSecondaryEndPoint = kubectl get SqlManagedInstance $sqlMIName -n arc --kubeconfig $sqlInstance.kubeConfig -o=jsonpath='{.status.endpoints.secondary}'
+write-host "`n"
+
+# Get public ip of the SQLMI endpoint
+$sqlmiIpaddress = kubectl get svc -n arc --kubeconfig $sqlInstance.kubeConfig "$sqlMIName-external-svc"  -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name $sqlMIName -AllowUpdateAny -IPv4Address $sqlmiIpaddress -TimeToLive 01:00:00 -AgeRecord
+
+# Get public ip of the secondary SQLMI endpoint
+$sqlmiSecondaryIpaddress = kubectl get svc -n arc --kubeconfig $sqlInstance.kubeConfig  "$sqlMIName-secondary-external-svc" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+Add-DnsServerResourceRecord -ComputerName $dcInfo.HostName -ZoneName $dcInfo.Domain -A -Name "$sqlMIName-secondary" -AllowUpdateAny -IPv4Address $sqlmiSecondaryIpaddress -TimeToLive 01:00:00 -AgeRecord
+
+# Write endpoint information in the file
+
+$SQLInstanceName = $sqlInstance.context.toupper()
+
+Start-Sleep -Seconds 5
+
+Add-Content $Endpoints "======================================================================"
+Add-Content $Endpoints ""
+Add-Content $Endpoints "$SQLInstanceName external endpoint DNS name for AD Authentication:"
+$sqlmiEndPoint | Add-Content $Endpoints
+
+Add-Content $Endpoints ""
+Add-Content $Endpoints "$SQLInstanceName secondary external endpoint DNS name for AD Authentication:"
+$sqlmiSecondaryEndPoint | Add-Content $Endpoints
+
+Add-Content $Endpoints ""
+Add-Content $Endpoints "SQL Managed Instance SQL login username:"
+$env:AZDATA_USERNAME | Add-Content $Endpoints
+
+Add-Content $Endpoints ""
+Add-Content $Endpoints "SQL Managed Instance SQL login password:"
+$env:AZDATA_PASSWORD | Add-Content $Endpoints
+Add-Content $Endpoints ""
+
+Add-Content $Endpoints "======================================================================"
+Add-Content $Endpoints ""
+
+}
 
 # Creating distributed DAG
 Write-Header "Configuring Disaster Recovery"
