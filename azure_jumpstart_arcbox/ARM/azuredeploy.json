@@ -49,12 +49,13 @@
     "flavor": {
       "type": "string",
       "metadata": {
-        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps'"
+        "description": "The flavor of ArcBox you want to deploy. Valid values are: 'Full', 'ITPro', 'DevOps', 'DataOps'"
       },
       "allowedValues": [
         "Full",
         "ITPro",
-        "DevOps"
+        "DevOps",
+        "DataOps"
       ],
       "defaultValue": "Full"
     },
@@ -85,6 +86,20 @@
         "description": "User's github account where they have forked https://github.com/microsoft/azure-arc-jumpstart-apps"
       },
       "defaultValue": "microsoft"
+    },
+    "addsDomainName": {
+      "type": "string",
+      "metadata": {
+        "description": "Active directory domain services domain name"
+      },
+      "defaultValue": "jumpstart.local"
+    },
+    "guid":{
+      "type": "string",
+      "metadata": {
+        "description": "Random GUID for cluster names"
+      },
+      "defaultValue": "[substring(newGuid(),0,4)]"
     }
   },
   "variables": {
@@ -93,7 +108,13 @@
     "capiTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/ubuntuCapi.json')]",
     "clientVmTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/clientVm/clientVm.json')]",
     "mgmtTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtArtifacts.json')]",
-    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]"
+    "mgmtStagingStorageUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/mgmtStagingStorage.json')]",
+    "addsVMTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/mgmt/addsVm.json')]",
+    "aksTemplateUrl": "[uri(variables('templateBaseUrl'), 'ARM/kubernetes/aks.json')]",
+    "capiArcDataClusterName": "[concat('ArcBox-CAPI-Data','-',parameters('guid'))]",
+    "k3sArcDataClusterName": "[concat('ArcBox-K3s','-',parameters('guid'))]",
+    "aksArcDataClusterName": "[concat('ArcBox-AKS-Data','-',parameters('guid'))]",
+    "aksDrArcDataClusterName": "[concat('ArcBox-AKS-DR-Data','-',parameters('guid'))]"
   },
   "resources": [
     {
@@ -102,9 +123,10 @@
       "name": "ubuntuCAPIDeployment",
       "dependsOn": [
         "stagingStorageAccountDeployment",
-        "mgmtArtifactsAndPolicyDeployment"
+        "mgmtArtifactsAndPolicyDeployment",
+        "updateVNetDNSServers"
       ],
-      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'))]",
+      "condition": "[or(equals(parameters('flavor'),'Full'),equals(parameters('flavor'),'DevOps'),equals(parameters('flavor'),'DataOps'))]",
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -138,6 +160,9 @@
           },
           "flavor": {
             "value": "[parameters('flavor')]"
+          },
+          "capiArcDataClusterName" : {
+            "value": "[variables('capiArcDataClusterName')]"
           }
         }
       }
@@ -181,6 +206,9 @@
           },
           "deployBastion": {
             "value": "[parameters('deployBastion')]"
+          },
+          "vmName":{
+            "value": "[variables('k3sArcDataClusterName')]"
           }
         }
       }
@@ -190,7 +218,8 @@
       "apiVersion": "2021-04-01",
       "name": "clientVmDeployment",
       "dependsOn": [
-        "stagingStorageAccountDeployment"
+        "stagingStorageAccountDeployment",
+        "updateVNetDNSServers"
       ],
       "properties": {
         "mode": "Incremental",
@@ -231,6 +260,18 @@
           },
           "githubUser": {
             "value": "[parameters('githubUser')]"
+          },
+          "capiArcDataClusterName": {
+            "value": "[variables('capiArcDataClusterName')]"
+          },
+          "k3sArcClusterName": {
+            "value": "[variables('k3sArcDataClusterName')]"
+          },
+          "aksArcClusterName": {
+            "value": "[variables('aksArcDataClusterName')]"
+          },
+          "aksdrArcClusterName": {
+            "value": "[variables('aksDrArcDataClusterName')]"
           }
         }
       }
@@ -272,6 +313,112 @@
           }
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Deploys Active Directory Domain Services Windows VM",
+      "apiVersion": "2021-04-01",
+      "name": "addsVmDeployment",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "dependsOn": [ "mgmtArtifactsAndPolicyDeployment" ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('addsVMTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "windowsAdminUsername": {
+            "value": "[parameters('windowsAdminUsername')]"
+          },
+          "windowsAdminPassword": {
+            "value": "[parameters('windowsAdminPassword')]"
+          },
+          "addsDomainName": {
+            "value": "[parameters('addsDomainName')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "comments": "Updates VNet DNS servers after ADDS VM is deployed",
+      "apiVersion": "2021-04-01",
+      "name": "updateVNetDNSServers",
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "dependsOn": [ "mgmtArtifactsAndPolicyDeployment", "addsVmDeployment" ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('mgmtTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workspaceName": {
+            "value": "[parameters('logAnalyticsWorkspaceName')]"
+          },
+          "templateBaseUrl": {
+            "value": "[variables('templateBaseUrl')]"
+          },
+          "flavor": {
+            "value": "[parameters('flavor')]"
+          },
+          "deployBastion": {
+            "value": "[parameters('deployBastion')]"
+          },
+          "dnsServers": {
+            "value": [ "10.16.2.100", "168.63.129.16" ]
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2021-04-01",
+      "name": "aksDeployment",
+      "dependsOn": [
+        "stagingStorageAccountDeployment",
+        "mgmtArtifactsAndPolicyDeployment",
+        "updateVNetDNSServers"
+      ],
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('aksTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sshRSAPublicKey": {
+            "value": "[parameters('sshRSAPublicKey')]"
+          },
+          "spnClientId": {
+            "value": "[parameters('spnClientId')]"
+          },
+          "spnClientSecret": {
+            "value": "[parameters('spnClientSecret')]"
+          },
+          "aksClusterName" : {
+            "value": "[variables('aksArcDataClusterName')]"
+          },
+          "drClusterName":{
+            "value": "[variables('aksDrArcDataClusterName')]"
+          }
+        }
+      }
     }
-  ]
+  ],
+  "outputs": {
+    "clientVmLogonUserName": {
+      "condition": "[equals(parameters('flavor'),'DataOps')]",
+      "type": "string",
+      "value": "[concat(parameters('windowsAdminUsername'),'@',parameters('addsDomainName'))]"
+    }
+  }
 }
