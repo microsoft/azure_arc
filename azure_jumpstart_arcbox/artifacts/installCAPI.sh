@@ -57,6 +57,15 @@ export AZURE_RESOURCE_GROUP=$(sudo -u $adminUsername az resource list --query "[
 az -v
 echo ""
 
+echo "Registering resource providers"
+
+sudo -u $adminUsername az provider register --namespace Microsoft.Kubernetes --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.KubernetesConfiguration --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.ExtendedLocation --wait
+sudo -u $adminUsername az provider register --namespace Microsoft.AzureArcData --wait
+
+echo ""
+
 # Installing snap
 sudo apt install snapd
 
@@ -223,8 +232,6 @@ sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUST
 # Onboarding the cluster to Azure Arc
 echo ""
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $AZURE_RESOURCE_GROUP --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-export guid=$(echo $RANDOM | md5sum | head -c 4; echo;)
-export capiArcDataClusterName=$(echo "${capiArcDataClusterName}"-"${guid}")
 sudo -u $adminUsername az connectedk8s connect --name $capiArcDataClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_arcbox' --correlation-id "6038cc5b-b814-4d20-bcaa-0f60392416d5"
 
 # Enabling Microsoft Defender for Containers and Container Insights cluster extensions
@@ -257,3 +264,6 @@ sudo -u $adminUsername az storage azcopy blob upload --container $storageContain
 echo ""
 log="/home/${adminUsername}/jumpstart_logs/installCAPI.log"
 sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $log
+
+
+

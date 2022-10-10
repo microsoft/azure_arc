@@ -1,0 +1,203 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "addsDomainName": {
+      "type": "string",
+      "defaultValue": "jumpstart.local",
+      "metadata": {
+        "description": "The FQDN of the domain"
+      }
+    },
+    "vmName": {
+      "type": "string",
+      "defaultValue": "ArcBox-ADDS",
+      "metadata": {
+        "description": "The name of your Virtual Machine"
+      }
+    },
+    "windowsAdminUsername": {
+      "type": "string",
+      "defaultValue": "arcdemo",
+      "metadata": {
+        "description": "Username for the Virtual Machine"
+      }
+    },
+    "windowsAdminPassword": {
+      "type": "securestring",
+      "minLength": 12,
+      "maxLength": 123,
+      "defaultValue": "ArcPassword123!!",
+      "metadata": {
+        "description": "Password for Windows account. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long."
+      }
+    },
+    "windowsOSVersion": {
+      "type": "string",
+      "defaultValue": "2022-datacenter-g2",
+      "metadata": {
+        "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version"
+      }
+    },
+    "azureLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "defaultValue": "Standard_B2ms",
+      "metadata": {
+        "description": "The size of the VM"
+      }
+    },
+    "deployBastion": {
+      "type": "bool",
+      "metadata": {
+        "description": "Choice to deploy Azure Bastion"
+      },
+      "defaultValue": false
+    },
+    "templateBaseUrl": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Base URL for ARM template"
+      }
+    }
+  },
+  "variables": {
+    "vmName": "[concat(parameters('vmName'))]",
+    "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
+    "virtualNetworkName": "ArcBox-VNet",
+    "dcSubnetName": "ArcBox-DC-Subnet",
+    "addsPrivateIPAddress": "10.16.2.100",
+    "bastionName": "ArcBox-Bastion",
+    "osDiskType": "Premium_LRS",
+    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('dcSubnetName'))]",
+    "networkInterfaceRef": "[resourceId('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+    "publicIpAddressName": "[if(not(parameters('deployBastion')),concat(parameters('vmName'), '-PIP' ), concat(variables('bastionName'),'-PIP'))]",
+    "PublicIPNoBastion": {
+      "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+    }
+
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2022-01-01",
+      "name": "[variables('networkInterfaceName')]",
+      "location": "[parameters('azureLocation')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              },
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[variables('addsPrivateIPAddress')]",
+              "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
+            }
+          }
+        ]
+      }
+    },
+    {
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2022-01-01",
+            "name": "[variables('publicIpAddressName')]",
+            "condition": "[not(parameters('deployBastion'))]",
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "publicIpAllocationMethod": "Static",
+                "publicIPAddressVersion": "IPv4",
+                "idleTimeoutInMinutes": 4
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            }
+        },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('vmName')]",
+      "location": "[parameters('azureLocation')]",
+      "dependsOn": [
+        "[variables('networkInterfaceRef')]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSize')]"
+        },
+        "storageProfile": {
+          "osDisk": {
+            "name": "[concat(variables('vmName'),'-OSDisk')]",
+            "caching": "ReadWrite",
+            "createOption": "fromImage",
+            "managedDisk": {
+              "storageAccountType": "[variables('osDiskType')]"
+            },
+            "diskSizeGB": 1024
+          },
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "[parameters('windowsOSVersion')]",
+            "version": "latest"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[variables('networkInterfaceRef')]"
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[variables('vmName')]",
+          "adminUsername": "[parameters('windowsAdminUsername')]",
+          "adminPassword": "[parameters('windowsAdminPassword')]",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": false
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('vmName'),'/DeployADDS')]",
+      "apiVersion": "2022-03-01",
+      "location": "[parameters('azureLocation')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.10",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[uri(parameters('templateBaseUrl'), 'artifacts/SetupADDS.ps1')]"
+          ],
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Bypass -File SetupADDS.ps1', ' -domainName ', parameters('addsDomainName'), ' -domainAdminUsername ', parameters('windowsAdminUsername'), ' -domainAdminPassword ', parameters('windowsAdminPassword'), ' -templateBaseUrl ', parameters('templateBaseUrl'))]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "scriptfile": {
+      "type": "string",
+      "value": "[uri(parameters('templateBaseUrl'), 'artifacts/SetupADDS.ps1')]"
+    }
+  }
+}
