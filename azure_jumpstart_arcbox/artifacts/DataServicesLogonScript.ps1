@@ -156,15 +156,6 @@ Write-Header "Deploying SQLMI & PostgreSQL"
 & "$Env:ArcBoxDir\DeploySQLMI.ps1"
 & "$Env:ArcBoxDir\DeployPostgreSQL.ps1"
 
-# Enabling data controller auto metrics & logs upload to log analytics
-Write-Header "Enabling Data Controller Metrics & Logs Upload"
-$Env:WORKSPACE_ID=$(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-$Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $connectedClusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
-az role assignment create --assignee-object-id $Env:MSI_OBJECT_ID --assignee-principal-type ServicePrincipal --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
-az arcdata dc update --name arcbox-dc --resource-group $Env:resourceGroup --auto-upload-logs true
-az arcdata dc update --name arcbox-dc --resource-group $Env:resourceGroup --auto-upload-metrics true
-
 # Replacing Azure Data Studio settings template file
 Write-Header "Updating Azure Data Studio Settings"
 New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force

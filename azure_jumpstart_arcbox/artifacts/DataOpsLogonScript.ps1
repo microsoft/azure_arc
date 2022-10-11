@@ -283,20 +283,6 @@ New-ItemProperty -Path $edgePolicyRegistryPath -Name $firstRunRegistryName -Valu
 New-ItemProperty -Path $edgePolicyRegistryPath -Name $savePasswordRegistryName -Value $savePasswordRegistryValue -PropertyType DWORD -Force
 Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryName -Value $autoArrangeRegistryValue -Force
 
-
-# Enabling data controller auto metrics & logs upload to log analytics
-
-<#foreach ($cluster in $clusters) {
-    Write-Header "Enabling Data Controller Metrics & Logs Upload"
-    $Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-    $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
-    $Env:MSI_OBJECT_ID = (az k8s-extension show --resource-group $Env:resourceGroup  --cluster-name $cluster.clusterName --cluster-type connectedClusters --name arc-data-services | convertFrom-json).identity.principalId
-    az role assignment create --assignee-object-id $Env:MSI_OBJECT_ID --assignee-principal-type ServicePrincipal --role 'Monitoring Metrics Publisher' --scope "/subscriptions/$Env:subscriptionId/resourceGroups/$Env:resourceGroup"
-    Start-Sleep -Seconds 15
-    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
-    az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
-}#>
-
 # Creating desktop url shortcuts for built-in Grafana and Kibana services
 kubectx $clusters[0].context
 Write-Header "Creating Grafana & Kibana Shortcuts"
