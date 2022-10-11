@@ -1,8 +1,8 @@
-<!-- ---
+---
 type: docs
 weight: 200
 toc_hide: true
---- -->
+---
 
 # Jumpstart HCIBox - Windows Admin Center operations
 

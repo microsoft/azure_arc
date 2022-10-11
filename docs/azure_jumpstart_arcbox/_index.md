@@ -35,10 +35,9 @@ ArcBox comes in multiple "flavors", or configurations, which can be selected to 
 
     ![ArcBox for DevOps architecture diagram](./arch_devops.png)
 
-<!-- - [ArcBox for DataOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DataOps)
+- [ArcBox for DataOps](https://azurearcjumpstart.io/azure_jumpstart_arcbox/DataOps)
     This essential Azure Arc-enabled SQL Managed Instance sandbox with the included capabilities such as Active Directory authentication, point-in-time restore, high availability, disaster recovery, and more.
 
     ![ArcBox for DevOps architecture diagram](./arch_dataops.png)
 
 To get started with one of the flavors of ArcBox, click the relevant links above to view the detailed README for each flavor. For additional questions, please review the [Jumpstart FAQ](https://aka.ms/Jumpstart-FAQ).
--->

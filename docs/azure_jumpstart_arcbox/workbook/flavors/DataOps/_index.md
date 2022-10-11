@@ -1,9 +1,9 @@
-<!-- ---
+---
 type: docs
 weight: 99
 toc_hide: true
 ---
--->
+
 # Jumpstart ArcBox for DataOps - Azure Monitor Workbook
 
 ArcBox for DataOps is a special "flavor" of ArcBox that is intended for users who want to experience Azure Arc-enabled SQL Managed Instance capabilities in a sandbox environment. This document provides specific guidance on the included ArcBox [Azure Monitor Workbook](https://docs.microsoft.com/azure/azure-monitor/visualize/workbooks-overview). Please refer to the main [ArcBox documentation](https://azurearcjumpstart.io/azure_jumpstart_arcbox/) for information on deploying and using ArcBox.

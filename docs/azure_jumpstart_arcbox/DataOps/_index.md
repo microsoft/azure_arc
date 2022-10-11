@@ -1,9 +1,9 @@
-<!-- ---
+---
 type: docs
 linkTitle: "Jumpstart ArcBox for DataOps"
 weight: 4
 ---
--->
+
 
 ## Jumpstart ArcBox for DataOps
 

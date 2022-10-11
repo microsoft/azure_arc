@@ -1,8 +1,8 @@
-<!-- ---
+---
 type: docs
 weight: 100
 toc_hide: true
---- -->
+---
 
 # Jumpstart HCIBox - Virtual machine provisioning with Azure Arc
 
