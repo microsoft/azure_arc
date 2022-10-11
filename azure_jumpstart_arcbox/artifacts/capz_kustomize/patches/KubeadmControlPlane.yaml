@@ -27,7 +27,7 @@ spec:
           mountPath: /etc/kubernetes/azure.json
           name: cloud-config
           readOnly: true
-        timeoutForControlPlane: 20m
+        timeoutForControlPlane: 30m
       controllerManager:
         extraArgs:
           allocate-node-cidrs: "false"
