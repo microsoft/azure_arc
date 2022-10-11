@@ -2683,7 +2683,7 @@ function New-SDNS2DCluster {
 function Test-InternetConnect {
     $testIP = '1.1.1.1'
     $ErrorActionPreference = "Stop"  
-    $intConnect = Test-Connection -ComputerName $testip -Quiet -Count 2
+    $intConnect = Test-NetConnection -ComputerName $testip -Port 80
 
     if (!$intConnect) {
         Write-Error "Unable to connect to Internet. An Internet connection is required."
