@@ -299,6 +299,7 @@ while ($(Get-Job -Name arcbox).State -eq 'Running') {
 
 Get-Job -name arcbox | Remove-Job
 
+Write-Header "Generating endpoints file"
 foreach ($sqlInstance in $sqlInstances){
 
 # Retrieving SQL MI connection endpoint
