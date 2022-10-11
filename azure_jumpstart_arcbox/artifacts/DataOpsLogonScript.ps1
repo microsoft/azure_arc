@@ -286,7 +286,7 @@ Set-ItemProperty -Path $desktopSettingsRegistryPath -Name $autoArrangeRegistryNa
 
 # Enabling data controller auto metrics & logs upload to log analytics
 
-foreach ($cluster in $clusters) {
+<#foreach ($cluster in $clusters) {
     Write-Header "Enabling Data Controller Metrics & Logs Upload"
     $Env:WORKSPACE_ID = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
     $Env:WORKSPACE_SHARED_KEY = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName  --query primarySharedKey -o tsv)
@@ -295,7 +295,7 @@ foreach ($cluster in $clusters) {
     Start-Sleep -Seconds 15
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-logs true
     az arcdata dc update --name $cluster.dataController --resource-group $Env:resourceGroup --auto-upload-metrics true
-}
+}#>
 
 # Creating desktop url shortcuts for built-in Grafana and Kibana services
 kubectx $clusters[0].context
