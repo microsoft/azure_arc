@@ -4,12 +4,14 @@
     "parameters": {
         "grafanaName": {
             "type": "string",
+            "defaultValue": "grafana-ama-jumpstart",
             "metadata": {
                 "description": "Name of the Azure Managed Grafana."
             }
         },
         "workspaceName": {
             "type": "string",
+            "defaultValue": "la-ama-jumpstart",
             "metadata": {
                 "description": "Name of the Log Analytics workspace."
             }
