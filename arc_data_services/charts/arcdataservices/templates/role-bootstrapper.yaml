@@ -69,6 +69,7 @@ rules:
 - apiGroups:
   - arcdata.microsoft.com
   resources:
+  - activedirectoryconnectors
   - monitors
   - otelcollectors
   - telemetryrouters
