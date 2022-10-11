@@ -404,13 +404,13 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 After configuring access to the Client VM, you have to connect using the UPN format whether you are connecting using RDP or Azure Bastion.
 Example:
 
-- Username: arcdemo@jumpstart.local
+- Username: arcdemo@&#65279;jumpstart.local
 
   ![Screenshot showing connecting to the VM using UPN format](./domain_login.png)
 
   ![Screenshot showing connecting to the VM using UPN format in Bastion](./domain_login_bastion.png)
 
-> **Warning: Logging into the Client VM without the UPN format _username@jumpstart.local_ will prevent the automation from running automatically.**
+> **Warning: Logging into the Client VM without the UPN format _username@&#65279;jumpstart.local_ will prevent the automation from running automatically.**
 
 #### The Logon scripts
 
