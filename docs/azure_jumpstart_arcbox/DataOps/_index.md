@@ -208,7 +208,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing Azure portal deployment of ArcBox](./portal_deploy03.png)
   
-    > **NOTE: The deployment can take up to 45 minutes.**
+    > **NOTE: The deployment can take up to 45 minutes. If it keeps running for more than that, please check the troubleshooting guide.**
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -245,7 +245,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![Screenshot showing az deployment group create](./az_deploy.png)
   
-  > **NOTE: The deployment can take up to 45 minutes.**
+  > **NOTE: The deployment can take up to 45 minutes. If it keeps running for more than that, please check the troubleshooting guide.**
 
 ## Deployment Option 3: Azure Bicep deployment via Azure CLI
 
@@ -282,7 +282,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   az deployment group create -g "<resource-group-name>" -f "main.bicep" -p "main.parameters.json"
   ```
   
-  > **NOTE: The deployment can take up to 45 minutes.**
+  > **NOTE: The deployment can take up to 45 minutes. If it keeps running for more than that, please check the troubleshooting guide.**
 
 ## Deployment Option 4: HashiCorp Terraform Deployment
 
@@ -307,7 +307,6 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   client_admin_ssh    = "C:/Temp/rsa.pub"
   deployment_flavor   = "DataOps"
   deploy_bastion      = false
-  github_username     = "GitHubUser"
   ```
 
 - Variable Reference:
@@ -319,8 +318,8 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
   - **_`client_admin_ssh`_** - SSH public key path, used for Linux VMs
   - **_`deployment_flavor`_** - Use the value "DataOps" to specify that you want to deploy the DataOps flavor of ArcBox
   - _`deployBastion`_ - Set to true if you want to use Azure Bastion to connect to _ArcBox-Client_
-  - **_`client_admin_username`_** - Admin username for Windows & Linux VMs
-  - **_`client_admin_password`_** - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
+  - _`client_admin_username`_ - Admin username for Windows & Linux VMs
+  - _`client_admin_password`_ - Admin password for Windows VMs. Password must have 3 of the following: 1 lower case character, 1 upper case character, 1 number, and 1 special character. The value must be between 12 and 123 characters long.
   - **_`workspace_name`_** - Unique name for the ArcBox Log Analytics workspace that will be created
 
   > **NOTE: Any variables in bold are required. If any optional parameters are not provided, defaults will be used.**
@@ -345,7 +344,7 @@ ArcBox uses an advanced automation flow to deploy and configure all necessary re
 
   ![terraform plan](./terraform_apply.png)
   
-  > **NOTE: The deployment can take up to 45 minutes.**
+  > **NOTE: The deployment can take up to 45 minutes. If it keeps running for more than that, please check the troubleshooting guide.**
 
 ## Start post-deployment automation
 
