@@ -192,7 +192,7 @@ sudo cp -i "/etc/kubernetes/admin.conf" "/home/${adminUsername}/.kube/config"
 sudo chown -R $adminUsername "/home/${adminUsername}/.kube/config"
 
 # Install network provider (weave)
-sudo -u $adminUsername kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+sudo -u $adminUsername kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
 
 # Remove the taint that limits the master node to schedule workloads
 sudo -u $adminUsername kubectl taint nodes --all node-role.kubernetes.io/control-plane-
