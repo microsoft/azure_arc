@@ -1,0 +1,70 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "connectorName": {
+      "type": "string"
+    },
+    "domainController": {
+      "type": "string"
+    },
+    "netbiosDomainName": {
+      "type": "string"
+    },
+    "realm": {
+      "type": "string"
+    },
+    "serviceAccountProvisioning": {
+      "type": "string",
+      "defaultValue": "manual"
+    },
+    "domainName": {
+      "type": "string"
+    },
+    "nameserverIPAddresses": {
+      "type": "array",
+      "defaultValue": [ "10.16.2.100" ]
+    },
+    "replicas": {
+      "type": "int",
+      "defaultValue": 2
+    },
+    "preferK8sDnsForPtrLookups": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "apiVersion": {
+      "type": "String"
+    }
+  },
+  "variables": {},
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.AzureArcData/dataControllers/activeDirectoryConnectors",
+      "apiVersion": "[parameters('apiVersion')]",
+      "name": "[parameters('connectorName')]",
+      "properties": {
+        "spec": {
+          "activeDirectory": {
+            "serviceAccountProvisioning": "[parameters('serviceAccountProvisioning')]",
+            "domainControllers": {
+              "primaryDomainController": {
+                "hostname": "[parameters('domainController')]"
+              }
+            },
+            "netbiosDomainName": "[parameters('netbiosDomainName')]",
+            "realm": "[parameters('realm')]"
+          },
+          "dns": {
+            "domainName": "[parameters('domainName')]",
+            "nameserverIPAddresses": "[parameters('nameserverIPAddresses')]",
+            "preferK8sDnsForPtrLookups": "[parameters('preferK8sDnsForPtrLookups')]",
+            "replicas": "[parameters('replicas')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
