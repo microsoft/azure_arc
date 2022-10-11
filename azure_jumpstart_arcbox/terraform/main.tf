@@ -71,13 +71,13 @@ variable "github_username" {
 variable "github_repo" {
   type        = string
   description = "Specify a GitHub repo (used for testing purposes)"
-  default     = "sebassem"
+  default     = "microsoft"
 }
 
 variable "github_branch" {
   type        = string
   description = "Specify a GitHub branch (used for testing purposes)"
-  default     = "arcbox_dataops_readme_fixes"
+  default     = "main"
 }
 
 variable "spn_client_id" {
