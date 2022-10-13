@@ -15,11 +15,11 @@ echo ""
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
-  export CLUSTERCTL_VERSION="1.2.0" # Do not change!
+  export CLUSTERCTL_VERSION="1.2.3" # Do not change!
   export CAPI_PROVIDER="azure" # Do not change!
-  export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
-  export KUBERNETES_VERSION="1.24.3" # Do not change!
-  export AZURE_DISK_CSI_DRIVER_VERSION="1.21.0"
+  export CAPI_PROVIDER_VERSION="1.5.2" # Do not change!
+  export KUBERNETES_VERSION="1.24.6" # Do not change!
+  export AZURE_DISK_CSI_DRIVER_VERSION="1.23.0"
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
   export WORKER_MACHINE_COUNT="<Workers node count>"
@@ -214,7 +214,7 @@ echo ""
 
   # Converting the Rancher K3s cluster to a Cluster API management cluster
   echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-  clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
+  clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --wait-providers
   echo "Making sure cluster is ready..."
   echo ""
   kubectl wait --for=condition=Available --timeout=90s --all deployments -A >/dev/null
