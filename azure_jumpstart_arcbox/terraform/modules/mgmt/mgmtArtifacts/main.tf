@@ -511,7 +511,7 @@ resource "azurerm_bastion_host" "bastionHost" {
   ip_configuration {
     name                 = "IpConf"
     public_ip_address_id = azurerm_public_ip.publicIpAddress[0].id
-    subnet_id            = local.bastionSubnetRef
+    subnet_id            = azurerm_subnet.AzureBastionSubnet[0].id
   }
 
 }

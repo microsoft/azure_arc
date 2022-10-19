@@ -22,8 +22,10 @@ Realm              : Active Directory domain name or Kerberos realm (upper case)
 NetbiosDomainName  : NetBIOS name of the AD domain. Typically the first label of the realm (upper case).
 Account            : Active Directory account name pre-created for the SQL MI instance.
 Password           : Password for the Active Directory account name pre-created for the SQL MI instance.
-DnsName            : Fully-qualified DNS name for the SQL endpoint.
-Port               : External port number for the SQL endpoint.
+DnsName            : Fully-qualified DNS name for the primary SQL endpoint.
+Port               : External port number for the primary SQL endpoint.
+SecondaryDnsName   : (Optional) Fully-qualified DNS name for the secondary SQL endpoint.
+SecondaryPort      : (Optional) External port number for the secondary SQL endpoint.
 KeytabFile         : Keytab file name to generate.
 SecretName         : Keytab secret name to generate.
 SecretNamespace    : Keytab secret namespace.
@@ -37,23 +39,40 @@ param(
     [Parameter(Mandatory)][SecureString] $Password,
     [Parameter(Mandatory)]$DnsName,
     [Parameter(Mandatory)]$Port,
+    [Parameter(Mandatory=$false)]$SecondaryDnsName,
+    [Parameter(Mandatory=$false)]$SecondaryPort,
     [Parameter(Mandatory)]$KeytabFile,
     [Parameter(Mandatory)]$SecretName,
     [Parameter(Mandatory)]$SecretNamespace,
     [Parameter(Mandatory)]$SecretFile
-) 
+)
 
+$RegularPasswordIntPtr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($Password)
+$RegularPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($RegularPasswordIntPtr)
+[System.Runtime.InteropServices.Marshal]::FreeHGlobal($RegularPasswordIntPtr)
 
 # Generate keytab using ktpass.exe.
 #
-ktpass /princ $Account@$Realm /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser $NetbiosDomainName\$Account /out $KeytabFile -setpass /pass $Password
-ktpass /princ $Account@$Realm /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $Password
+ktpass /princ $Account@$Realm /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser $NetbiosDomainName\$Account /out $KeytabFile -setpass /pass $StdPassword
+ktpass /princ $Account@$Realm /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
 
-ktpass /princ MSSQLSvc/$DnsName@$Realm /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $Password
-ktpass /princ MSSQLSvc/$DnsName@$Realm /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $Password
+ktpass /princ MSSQLSvc/$DnsName@$Realm /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
+ktpass /princ MSSQLSvc/$DnsName@$Realm /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
 
-ktpass /princ MSSQLSvc/${DnsName}:$Port@$Realm /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $Password
-ktpass /princ MSSQLSvc/${DnsName}:$Port@$Realm /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $Password
+ktpass /princ MSSQLSvc/${DnsName}:$Port@$Realm /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
+ktpass /princ MSSQLSvc/${DnsName}:$Port@$Realm /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
+
+if ($PSBoundParameters.ContainsKey('SecondaryDnsName'))
+{
+  ktpass /princ MSSQLSvc/$SecondaryDnsName@$Realm /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
+  ktpass /princ MSSQLSvc/$SecondaryDnsName@$Realm /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
+
+  if ($PSBoundParameters.ContainsKey('SecondaryPort'))
+  {
+    ktpass /princ MSSQLSvc/${SecondaryDnsName}:$SecondaryPort@$Realm /ptype KRB5_NT_PRINCIPAL /crypto aes256-sha1 /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
+    ktpass /princ MSSQLSvc/${SecondaryDnsName}:$SecondaryPort@$Realm /ptype KRB5_NT_PRINCIPAL /crypto rc4-hmac-nt /mapuser $NetbiosDomainName\$Account /in $KeytabFile /out $KeytabFile -setpass -setupn /pass $StdPassword
+  }
+}
 
 Write-Host ""
 Write-Host "Wrote Keytab to file '$KeytabFile'."
