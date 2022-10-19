@@ -52,7 +52,7 @@ The steps below will help you get familiar with the automation and deployment fl
 
 ## Deployment Option 1: Azure portal
 
-- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2Fgrafana%2Fgrafana-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
+- Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fstalejohnsen%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2Fgrafana%2Fgrafana-template.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
 > **NOTE:** Use the following command to get the AAD id of the current signed in user and copy it to the Grafana Adminprincipal Id parameter:
 
