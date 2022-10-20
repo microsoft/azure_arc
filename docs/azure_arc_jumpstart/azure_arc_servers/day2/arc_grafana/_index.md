@@ -169,19 +169,4 @@ Complete the following steps to clean up your environment:
 - [Delete the Log Analytics workspace](https://docs.microsoft.com/azure/azure-monitor/logs/delete-workspace#powershell)
 - [Delete Azure Managed Grafana instance](https://learn.microsoft.com/cli/azure/grafana?view=azure-cli-latest#az-grafana-delete)
 
-As an alternative approach use the following script to clean up the resources that was created during this scenario:
-
-  ```shell
-  ArcResourceGroup="<Name of the Azure resource group>"
-  ArcMachineName="<Name of the Arc-enabled server>"
-  ArcSubscription="<Id of your subscription>"
-  
-  az connectedmachine extension delete --name AzureMonitorWindowsAgent --machine-name $ArcMachineName --resource-group $ArcResourceGroup
-  
-  az monitor data-collection rule association delete --name "arc-win-demovminsights-dcr-association" --resource "/subscriptions/$ArcSubscription/resourcegroups/$ArcResourceGroup/providers/microsoft.hybridcompute/machines/$ArcMachineName"
-  
-  az monitor data-collection rule delete --name "MSVMI-la-ama-jumpstart" --resource-group $ArcResourceGroup
-  
-  az grafana delete --name grafana-ama-jumpstart --resource-group $ArcResourceGroup
-  
-  az monitor log-analytics workspace delete --resource-group $ArcResourceGroup --workspace-name la-ama-jumpstart
+As an alternative you can use this [_clean-up script_](https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/grafana/grafana-cleanup-script.sh). Edit the variables in the script to fit your environment.
