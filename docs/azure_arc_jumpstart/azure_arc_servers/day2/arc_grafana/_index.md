@@ -98,7 +98,7 @@ As mentioned, this deployment will leverage ARM templates.
 
     ![Screenshot of Data Collection Rules and Log Analytics workspace](./08.png)
 
-- Note that the template deployment has also created a required role assignment at resource group level. It will be used by **Azure Managed Grafana** to be able to access your monitoring data from its **Managed Identity**:
+- Note that the template deployment has also created a required role assignment at the resource group level. It will be used by **Azure Managed Grafana** to be able to access your monitoring data from its **Managed Identity**:
 
     ![Screenshot showing Access control (IAM) blade](./09.png)
 
