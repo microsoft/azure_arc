@@ -17,7 +17,7 @@
     "myIpAddress": {
       "value": "<your IP address>"
     },
-    "logAnalayticsWorkspaceName": {
+    "logAnalyticsWorkspaceName": {
       "value": "<your unique Log Analytics workspace name>"
     },
     "servicePrincipalAppId": {
