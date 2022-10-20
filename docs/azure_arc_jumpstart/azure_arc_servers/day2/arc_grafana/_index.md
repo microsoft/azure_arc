@@ -100,31 +100,31 @@ As mentioned, this deployment will leverage ARM templates.
 
 - Note that the template deployment has also created a required role assignment at resource group level. It will be used by **Azure Managed Grafana** to be able to access your monitoring data from its **Managed Identity**:
 
-    ![Screenshot showing Access control (IAM) blade](./08_2.png)
+    ![Screenshot showing Access control (IAM) blade](./09.png)
 
 - If you click on the **Data Collection Rule (DCR)**, you will see the **Resources** attached to it and the collected **Data Sources**.
 
   - On the **Resources** blade, you will see your Windows Azure Arc-enabled server:
 
-    ![Screenshot of Windows Data Collection Rules - Resources](./09.png)
+    ![Screenshot of Windows Data Collection Rules - Resources](./10.png)
 
   - On the **Data Sources** blade, you will see _Performance Counters_
 
-    ![Screenshot of Windows Data Collection Rules - Perf Counters](./10.png)
+    ![Screenshot of Windows Data Collection Rules - Perf Counters](./11.png)
 
   - If you click on _Performance Counters_, you will see the **Data source** that is collected and the **Destination**, which is the Log Analytics workspace created as part of this scenario:
 
-    ![Screenshot of Windows Data Collection Rules - Perf Counters - Data Source](./11.png)
+    ![Screenshot of Windows Data Collection Rules - Perf Counters - Data Source](./12.png)
 
-    ![Screenshot of Windows Data Collection Rules - Perf Counters - Destination](./12.png)
+    ![Screenshot of Windows Data Collection Rules - Perf Counters - Destination](./13.png)
 
 - Go back to your **resource group** and click on the **Log Analytics Workspace**:
 
-  ![Screenshot of Log Analytics workspace](./13.png)
+  ![Screenshot of Log Analytics workspace](./14.png)
 
 - Click on **Logs** and close the **Queries** pop-up window:
 
-  ![Screenshot of Log Analytics workspace - Logs section](./14.png)
+  ![Screenshot of Log Analytics workspace - Logs section](./15.png)
 
 - **Run** the following **query**. It will show you the **data types collected** by the **Azure Monitor Agent (AMA)** on each machine by using the **Data Collection Rules (DCR)**:
 
@@ -135,29 +135,29 @@ As mentioned, this deployment will leverage ARM templates.
   | sort by Computer asc
   ```
 
-  ![Screenshot of Log Analytics workspace - Query](./15.png)
+  ![Screenshot of Log Analytics workspace - Query](./16.png)
 
 - It is time to explore **Azure Managed Grafana** and the included sample dashboard. Go back to your **resource group** and click on **Azure Managed Grafana**:
 
-  ![Screenshot of Azure Managed Grafana resource group](./16.png)
+  ![Screenshot of Azure Managed Grafana resource group](./17.png)
 
 - In the **Azure Managed Grafana** overview click on the **Endpoint** url to open the Grafana web interface.
 
     > **NOTE: Authenticate to Grafana with the user you provided in the template deployment (grafanaAdminprincipalId) or add your current user to one of the Azure RBAC roles: Grafana Admin, Grafana Editor, Grafana Viewer**.
 
-  ![Screenshot showing Azure Managed Grafana endpoint location](./17.png)
+  ![Screenshot showing Azure Managed Grafana endpoint location](./18.png)
 
 - Click on **Dashboards** and expand **Azure Monitor** to explore the included sample dashboards. Click on **Azure / Insights / Virtual Machines by Workspace**.
 
-  ![Screenshot of Azure Managed Grafana Dashboards navigation area](./18.png)
+  ![Screenshot of Azure Managed Grafana Dashboards navigation area](./19.png)
 
 - Finally, explore the included panels with monitoring data from your **Log Analytics workspace** and Azure Arc-enabled server.
 
-  ![Screenshot of Azure Managed Grafana Virtual Machine by Workspace sample dashboard](./19.png)
+  ![Screenshot of Azure Managed Grafana Virtual Machine by Workspace sample dashboard](./20.png)
 
 - As an added bonus, you also have the flexibility to use Azure Monitor and Virtual Machine Insights to visualize the monitoring data collected by **Azure Monitor Agent (AMA)**.
 
-  ![Screenshot of Azure Monitor Virtual Machines Insights](./20.png)
+  ![Screenshot of Azure Monitor Virtual Machines Insights](./21.png)
 
 ## Clean up environment
 
