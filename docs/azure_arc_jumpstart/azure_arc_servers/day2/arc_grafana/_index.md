@@ -44,7 +44,7 @@ This Jumpstart scenario provides multiple paths for deploying and configuring re
 
 The steps below will help you get familiar with the automation and deployment flow.
 
-1. User provides the ARM template parameter values, either via the portal or editing the parameters file. These parameter values are being used throughout the deployment.
+1. User provides the ARM template parameter values, either via the portal or by editing the parameters file. These parameter values are used throughout the deployment.
 
 2. User deploys the ARM template at the resource group level.
 
@@ -98,7 +98,7 @@ As mentioned, this deployment will leverage ARM templates.
 
     ![Screenshot of Data Collection Rules and Log Analytics workspace](./08.png)
 
-- Note that the template deployment has also created a required role assignment at resource group level. It will be used by **Azure Managed Grafana** to be able to access your monitoring data from its **Managed Identity**:
+- Note that the template deployment has also created a required role assignment at the resource group level. It will be used by **Azure Managed Grafana** to be able to access your monitoring data from its **Managed Identity**:
 
     ![Screenshot showing Access control (IAM) blade](./09.png)
 
@@ -143,7 +143,7 @@ As mentioned, this deployment will leverage ARM templates.
 
 - In the **Azure Managed Grafana** overview click on the **Endpoint** url to open the Grafana web interface.
 
-    > **NOTE: Authenticate to Grafana with the user you provided in the template deployment (grafanaAdminprincipalId) or add your current user to one of the Azure RBAC roles: Grafana Admin, Grafana Editor, Grafana Viewer**.
+    > **NOTE: Authenticate to Grafana with the user account name you provided in the template deployment (_grafanaAdminprincipalId_) or add your current user account name to one of the Azure Role-based access control (RBAC) roles: _Grafana Admin_, _Grafana Editor_, _Grafana Viewer_**.
 
   ![Screenshot showing Azure Managed Grafana endpoint location](./18.png)
 
