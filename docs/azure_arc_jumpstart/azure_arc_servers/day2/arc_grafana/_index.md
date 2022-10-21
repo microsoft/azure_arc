@@ -82,7 +82,7 @@ As mentioned, this deployment will leverage ARM templates.
 
     ```shell
     az deployment group create --resource-group <Name of the Azure resource group> \
-    --template-uri "https://github.com/microsoft/azure_arc/blob/main/azure_arc_servers_jumpstart/grafana/grafana-template.json" \
+    --template-uri "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_servers_jumpstart/grafana/grafana-template.json" \
     --parameters <grafana-template.parameters.json parameter file location>
     ```
 
