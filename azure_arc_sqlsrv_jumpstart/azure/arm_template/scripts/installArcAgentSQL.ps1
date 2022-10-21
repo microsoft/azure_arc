@@ -4,9 +4,10 @@
     [string]$servicePrincipalTenantId
 )
 
-$ArcBoxLogsDir = "C:\ArcBox\Logs"
+$Env:JumpstartLogsDir = "C:\Jumpstart\Logs"
+$Env:JumpstartTempDir = "C:\Temp"
 
-Start-Transcript -Path $ArcBoxLogsDir\installArcAgentSQL.log
+Start-Transcript -Path $Env:JumpstartLogsDir\installArcAgentSQL.log
 
 $ErrorActionPreference = 'SilentlyContinue'
 
@@ -15,8 +16,8 @@ $subId = $subscriptionId
 $resourceGroup = $myResourceGroup
 $location = $azureLocation
 $proxy=""
-$resourceTags= @{"Project"="jumpstart_arcbox"}
-$arcMachineName = "ArcBox-SQL"
+$resourceTags= @{"Project"="jumpstart_sql"}
+$arcMachineName = $Env:COMPUTERNAME
 $workspaceName = $logAnalyticsWorkspaceName
 
 # These optional variables can be replaced with valid service principal details
@@ -369,8 +370,8 @@ $nestedWindowsUsername = "Administrator"
 $nestedWindowsPassword = "ArcDemo123!!"
 
 Write-Host "Create SQL Azure Assessment"
-Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip"
-Expand-Archive "C:\Temp\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "$Env:JumpstartTempDir\Microsoft.PowerShell.Oms.Assessments.zip"
+Expand-Archive "$Env:JumpstartTempDir\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
 $Env:PSModulePath = $Env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
 Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
 $SecureString = ConvertTo-SecureString $nestedWindowsPassword -AsPlainText -Force
