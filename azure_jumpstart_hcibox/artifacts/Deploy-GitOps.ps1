@@ -45,7 +45,7 @@ $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID 
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Setting kubeconfig
-$clusterName = az connectedk8s list --resource-group HCIBox --query "[].{Name:name} | [? contains(Name,'hcibox')]" --output tsv
+$clusterName = az connectedk8s list --resource-group $Env:resourceGroup --query "[].{Name:name} | [? contains(Name,'hcibox')]" --output tsv
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     kubectl get nodes
