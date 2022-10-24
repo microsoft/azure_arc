@@ -45,7 +45,7 @@ $psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientID 
 Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Setting kubeconfig
-$clusterName = az connectedk8s list --resource-group HCIBox --query "[].{Name:name} | [? contains(Name,'hcibox')]" --output tsv
+$clusterName = az connectedk8s list --resource-group $Env:resourceGroup --query "[].{Name:name} | [? contains(Name,'hcibox')]" --output tsv
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock  {
     Get-AksHciCredential -name $using:clusterName -Confirm:$false
     kubectl get nodes
@@ -120,7 +120,6 @@ Copy-VMFile AzSMGMT -SourcePath "$Env:TempDir\$certname.pfx" -DestinationPath "C
 $localCred = new-object -typename System.Management.Automation.PSCredential -argumentlist "Administrator", (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
     Enable-VMIntegrationService -VMName AdminCenter -Name "Guest Service Interface"
-    Copy-VMFile AdminCenter -SourcePath "C:\VMConfigs\$using:certname.pfx" -DestinationPath "C:\VHDs\$using:certname.pfx" -FileSource Host
 }
 Start-Sleep 20
 Invoke-Command -VMName AzSMGMT -Credential $localcred -ScriptBlock {
