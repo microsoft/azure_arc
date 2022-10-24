@@ -366,8 +366,8 @@ $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
 New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
 
-$nestedWindowsUsername = "Administrator"
-$nestedWindowsPassword = "ArcDemo123!!"
+$nestedWindowsUsername = $Env:adminUsername
+$nestedWindowsPassword = $Env:adminPassword
 
 Write-Host "Create SQL Azure Assessment"
 Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "$Env:JumpstartTempDir\Microsoft.PowerShell.Oms.Assessments.zip"
