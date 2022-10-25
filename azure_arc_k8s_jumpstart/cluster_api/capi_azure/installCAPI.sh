@@ -10,8 +10,8 @@ echo ""
   sudo apt-get update
 
   # Set deployment GitHub repository environment variables
-  export githubAccount="zaidmohd" # Do not change unless deploying from personal GitHub account
-  export githubBranch="capi-refresh" # Do not change unless deploying from personal GitHub branch
+  export githubAccount="microsoft" # Do not change unless deploying from personal GitHub account
+  export githubBranch="main" # Do not change unless deploying from personal GitHub branch
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
