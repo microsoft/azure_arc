@@ -16,7 +16,7 @@ $subId = $subscriptionId
 $resourceGroup = $myResourceGroup
 $location = $azureLocation
 $proxy=""
-$resourceTags= @{"Project"="jumpstart_arcbox"}
+$resourceTags= @{"Project"="jumpstart_sql"}
 $arcMachineName = $Env:COMPUTERNAME
 $workspaceName = $logAnalyticsWorkspaceName
 
@@ -31,10 +31,6 @@ $servicePrincipalTenantId = $spnTenantId
 $servicePrincipalSecret = $spnClientSecret
 
 $unattended = $servicePrincipalAppId -And $servicePrincipalTenantId -And $servicePrincipalSecret
-
-$azurePassword = ConvertTo-SecureString $servicePrincipalSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($servicePrincipalAppId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $servicePrincipalTenantId -ServicePrincipal
 
 function Get-AzSPNRoleAssignment {
     param(
@@ -204,7 +200,7 @@ function Install-PowershellModule() {
 
 # Confirm that Azure powershell module is installed, and install if not present
 #
-if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
+if (-Not (Get-InstalledModule -Name Az -MinimumVersion 8.0.0 -ErrorAction SilentlyContinue)) {
     Install-PowershellModule
     if (-Not (Get-InstalledModule -Name Az -ErrorAction SilentlyContinue)) {
         Write-Warning -Category NotInstalled -Message "Failed to install Azure Powershell Module. Please confirm that Az module is installed before continuing."
@@ -370,11 +366,11 @@ $Setting = @{ "workspaceId" = $workspaceId }
 $protectedSetting = @{ "workspaceKey" = $workspaceKey }
 New-AzConnectedMachineExtension -Name "MicrosoftMonitoringAgent" -ResourceGroupName $resourceGroup -MachineName $arcMachineName -Location $location -Publisher "Microsoft.EnterpriseCloud.Monitoring" -Settings $Setting -ProtectedSetting $protectedSetting -ExtensionType "MicrosoftMonitoringAgent"
 
-$nestedWindowsUsername = $Env:adminUsername
-$nestedWindowsPassword = $Env:adminPassword
+$nestedWindowsUsername = "Administrator"
+$nestedWindowsPassword = "ArcDemo123!!"
 
 Write-Host "Create SQL Azure Assessment"
-Invoke-WebRequest ($Env:templateBaseUrl + "arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip") -OutFile "$Env:JumpstartTempDir\Microsoft.PowerShell.Oms.Assessments.zip"
+Invoke-WebRequest "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_sqlsrv_jumpstart/azure/arm_template/scripts/Microsoft.PowerShell.Oms.Assessments.zip" -OutFile "$Env:JumpstartTempDir\Microsoft.PowerShell.Oms.Assessments.zip"
 Expand-Archive "$Env:JumpstartTempDir\Microsoft.PowerShell.Oms.Assessments.zip" -DestinationPath 'C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell'
 $Env:PSModulePath = $Env:PSModulePath + ";C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\"
 Import-Module "C:\Program Files\Microsoft Monitoring Agent\Agent\PowerShell\Microsoft.PowerShell.Oms.Assessments\Microsoft.PowerShell.Oms.Assessments.dll"
