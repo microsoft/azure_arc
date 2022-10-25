@@ -381,7 +381,7 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
   ![Screenshot showing ArcBox-Client](./automation.png)
 
-- Deployment is complete! Let's begin exploring the features of Azure Arc-enabled servres with ArcBox for IT Pros!
+- Deployment is complete! Let's begin exploring the features of Azure Arc-enabled servers with ArcBox for IT Pros!
 
   ![Screenshot showing complete deployment](./arcbox_complete.png)
 
