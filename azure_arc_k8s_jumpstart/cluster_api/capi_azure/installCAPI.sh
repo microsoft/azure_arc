@@ -15,17 +15,19 @@ echo ""
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
-  export CLUSTERCTL_VERSION="1.2.0" # Do not change!
+  export GUID=$(echo $RANDOM | md5sum | head -c 4; echo;) # Do not change!
+  export CLUSTERCTL_VERSION="1.2.4" # Do not change!
   export CAPI_PROVIDER="azure" # Do not change!
-  export CAPI_PROVIDER_VERSION="1.4.0" # Do not change!
-  export KUBERNETES_VERSION="1.24.3" # Do not change!
-  export AZURE_DISK_CSI_DRIVER_VERSION="1.21.0"
+  export CAPI_PROVIDER_VERSION="1.5.3" # Do not change!
+  export KUBERNETES_VERSION="1.24.7" # Do not change!
+  export AZURE_DISK_CSI_DRIVER_VERSION="1.23.0"
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
   export WORKER_MACHINE_COUNT="<Workers node count>"
   export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
   export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
-  export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME,,}") # Converting to lowercase variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+  export AZURE_ARC_CLUSTER_RESOURCE_NAME_GUID=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME}"-"${GUID}") # Append GUID to the name
+  export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME_GUID,,}") # Converting to lowercase variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
   export AZURE_RESOURCE_GROUP="<Azure resource group name>"
   export AZURE_SUBSCRIPTION_ID="<Azure subscription id>"
   export AZURE_TENANT_ID="<Azure tenant id>"
@@ -214,7 +216,7 @@ echo ""
 
   # Converting the Rancher K3s cluster to a Cluster API management cluster
   echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-  clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
+  clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --wait-providers
   echo "Making sure cluster is ready..."
   echo ""
   kubectl wait --for=condition=Available --timeout=90s --all deployments -A >/dev/null
@@ -227,7 +229,7 @@ echo ""
   curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
   curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
   curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
-  sed -i "s/{CLUSTERCTL_VERSION}/$CLUSTERCTL_VERSION/" capz_kustomize/kustomization.yaml
+  sed -e "s|CAPI_PROVIDER_VERSION|v$CAPI_PROVIDER_VERSION|" -i capz_kustomize/kustomization.yaml
   kubectl kustomize capz_kustomize/ > jumpstart.yaml
   clusterctl generate yaml --from jumpstart.yaml > template.yaml
   echo ""
@@ -308,12 +310,6 @@ EOF
   echo ""
   az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --kube-config $CLUSTER_NAME.kubeconfig --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
   echo ""
-
-  # Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
-  echo ""
-  curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh -o install-driver.sh
-  sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply/g' install-driver.sh
-  source ./install-driver.sh v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
 
 } 2>&1 | tee -a $LOG_FILE # Send terminal output to log file
 
