@@ -311,12 +311,6 @@ EOF
   az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --kube-config $CLUSTER_NAME.kubeconfig --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
   echo ""
 
-  # Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
-  echo ""
-  curl -skSL https://raw.githubusercontent.com/kubernetes-sigs/azuredisk-csi-driver/v${AZURE_DISK_CSI_DRIVER_VERSION}/deploy/install-driver.sh -o install-driver.sh
-  sed -i 's/kubectl apply/sudo -u ${adminUsername} kubectl apply/g' install-driver.sh
-  source ./install-driver.sh v${AZURE_DISK_CSI_DRIVER_VERSION} snapshot --
-
 } 2>&1 | tee -a $LOG_FILE # Send terminal output to log file
 
 echo ""
