@@ -10,8 +10,8 @@ echo ""
   sudo apt-get update
 
   # Set deployment GitHub repository environment variables
-  export githubAccount="microsoft" # Do not change unless deploying from personal GitHub account
-  export githubBranch="main" # Do not change unless deploying from personal GitHub branch
+  export githubAccount="zaidmohd" # Do not change unless deploying from personal GitHub account
+  export githubBranch="capi-refresh" # Do not change unless deploying from personal GitHub branch
   export templateBaseUrl="https://raw.githubusercontent.com/${githubAccount}/azure_arc/${githubBranch}/azure_arc_k8s_jumpstart/cluster_api/capi_azure/" # Do not change!
 
   # Set deployment environment variables
@@ -229,7 +229,7 @@ echo ""
   curl -o capz_kustomize/patches/Cluster.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/Cluster.yaml
   curl -o capz_kustomize/patches/KubeadmControlPlane.yaml ${templateBaseUrl}artifacts/capz_kustomize/patches/KubeadmControlPlane.yaml
   curl -o capz_kustomize/kustomization.yaml ${templateBaseUrl}artifacts/capz_kustomize/kustomization.yaml
-  sed -i "s/{CAPI_PROVIDER_VERSION}/$CAPI_PROVIDER_VERSION/" capz_kustomize/kustomization.yaml
+  sed -e "s|CAPI_PROVIDER_VERSION|v$CAPI_PROVIDER_VERSION|" -i capz_kustomize/kustomization.yaml
   kubectl kustomize capz_kustomize/ > jumpstart.yaml
   clusterctl generate yaml --from jumpstart.yaml > template.yaml
   echo ""
