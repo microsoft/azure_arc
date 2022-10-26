@@ -157,7 +157,7 @@ kubectl create secret generic "${AZURE_CLUSTER_IDENTITY_SECRET_NAME}" --from-lit
 
 # Converting the Rancher K3s cluster to a Cluster API management cluster
 echo "Converting the Kubernetes cluster to a management cluster with the Cluster API Azure Provider (CAPZ)..."
-clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION}
+clusterctl init --infrastructure=azure:v${CAPI_PROVIDER_VERSION} --wait-providers
 echo "Making sure cluster is ready..."
 echo ""
 sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
