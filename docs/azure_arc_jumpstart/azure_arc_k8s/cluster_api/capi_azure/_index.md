@@ -8,7 +8,7 @@ description: >
 
 ## Deploy Kubernetes cluster and connect it to Azure Arc using Cluster API Azure provider
 
-The following Jumpstart scenario will guide you on to deploy an Kubernetes cluster in Azure virtual machines and connected it as an Azure Arc cluster resource by using the [Kubernetes Cluster API (CAPI) project](https://cluster-api.sigs.k8s.io/introduction.html) and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
+The following Jumpstart scenario will guide you on how to deploy a Kubernetes cluster in Azure virtual machines and connected it as an Azure Arc cluster resource by using the [Kubernetes Cluster API (CAPI) project](https://cluster-api.sigs.k8s.io/introduction.html) and it's [Cluster API Azure provider (CAPZ)](https://cloudblogs.microsoft.com/opensource/2020/12/15/introducing-cluster-api-provider-azure-capz-kubernetes-cluster-management/).
 
 ## Architecture (In a nutshell)
 
@@ -20,7 +20,7 @@ in this scenario, a [Rancher K3s](https://rancher.com/docs/k3s/latest/en/), sing
 
 ## Prerequisites
 
-- The automation for this scenario is designed with the assumption of an existing (brownfield) Ubuntu server is already deployed. This can achieved in multiple ways but we recommend using either an [Ubuntu Azure virtual machine](https://docs.microsoft.com/azure/virtual-machines/linux/quick-create-portal) or Ubuntu deployed [using Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/windows/wsl/install).
+- The automation for this scenario is designed with the assumption that an existing (brownfield) Ubuntu server is already deployed. This can achieved in multiple ways but we recommend using either an [Ubuntu Azure virtual machine](https://docs.microsoft.com/azure/virtual-machines/linux/quick-create-portal) or Ubuntu deployed [using Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/windows/wsl/install).
 
 - Clone the Azure Arc Jumpstart repository
 
@@ -89,7 +89,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - In the your directory of the cloned Jumpstart repository, navigate to where the [*arc_capi_azure*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/installCAPI.sh) bash script is located. Alternatively, you can also download just the script instead of cloning the entire repository.
 
-  The script will transform the Rancher K3s Kubernetes cluster to a CAPI management cluster with the Azure Cluster API provisioned (CAPZ) components that are needed. It will then deploy the workload cluster and it's Azure resources based on the environment variables as described in the next bullet. Upon deployment completion, the cluster will be onboard as an Azure Arc-enabled Kubernetes cluster.
+  The script will transform the Rancher K3s Kubernetes cluster to a CAPI management cluster with the Azure Cluster API provisioned (CAPZ) components that are needed. It will then deploy the workload cluster and it's Azure resources based on the environment variables as described in the next bullet. Upon deployment completion, the cluster will be onboarded as an Azure Arc-enabled Kubernetes cluster.
 
     > **Disclaimer: The CAPI/CAPZ *clusterctl* CLI tool commands used in the script are taken straight from the ["Cluster API Book"](https://cluster-api.sigs.k8s.io/user/quick-start.html) and deserves it's writers all the credit for it!**
     **The reason being for this process to be included is to provide you with the end-to-end user experience which also include the proprietary automation developed for this Jumpstart scenario.**
@@ -128,7 +128,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     ![Screenshot showing the user environment variables](./04.png)
 
-- Execute the script using the below command. The script runtime can take ~10-20min, depends on the number of control plane and worker nodes you chose to deploy.
+- Execute the script using the below command. The script runtime can take ~10-20min, depending on the number of control plane and worker nodes you chose to deploy.
 
   ```shell
   sudo chmod +x installCAPI.sh && . ./installCAPI.sh
@@ -144,7 +144,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
     ![Screenshot showing the script runtime](./08.png)
 
-- Upon completion, you will have a new Cluster API Kubernetes cluster deployed on top of Azure virtual machines that is already onboard as an Azure Arc-enabled Kubernetes cluster.
+- Upon completion, you will have a new Cluster API Kubernetes cluster deployed on top of Azure virtual machines that are already onboarded as an Azure Arc-enabled Kubernetes cluster.
 
   ![Screenshot showing the Azure resource group](./09.png)
 
