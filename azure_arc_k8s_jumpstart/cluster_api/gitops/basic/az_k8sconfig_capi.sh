@@ -76,4 +76,4 @@ az k8s-configuration flux create \
 --scope namespace \
 --url $appClonedRepo \
 --branch main \
---kustomization name=app path=./hello-arc/ingress
+--kustomization name=ingress path=./hello-arc/ingress
