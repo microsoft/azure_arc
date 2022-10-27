@@ -318,11 +318,11 @@ else {
 
     Write-Output "Onboarding the nested Linux VMs as an Azure Arc-enabled servers"
 
-    $ubuntuSession = New-SSHSession -ComputerName $UbuntuVm01Ip -Credential $linCreds -Force -WarningAction SilentlyContinue
+    $ubuntuSession = New-SSHSession -ComputerName $Ubuntu01VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
     $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
     $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
-    $ubuntuSession = New-SSHSession -ComputerName $UbuntuVm02Ip -Credential $linCreds -Force -WarningAction SilentlyContinue
+    $ubuntuSession = New-SSHSession -ComputerName $Ubuntu02VmIp -Credential $linCreds -Force -WarningAction SilentlyContinue
     $Command = "sudo sh /home/$nestedLinuxUsername/installArcAgentModifiedUbuntu.sh"
     $(Invoke-SSHCommand -SSHSession $ubuntuSession -Command $Command -Timeout 600 -WarningAction SilentlyContinue).Output
 
