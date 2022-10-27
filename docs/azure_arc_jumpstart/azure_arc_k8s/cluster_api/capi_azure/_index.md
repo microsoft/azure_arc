@@ -87,7 +87,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - As mentioned in the prerequisites section, an existing Ubuntu machine is required.
 
-- In the your directory of the cloned Jumpstart repository, navigate to where the [*arc_capi_azure*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/installCAPI.sh) bash script is located. Alternatively, you can also download just the script instead of cloning the entire repository.
+- In the your directory of the cloned Jumpstart repository, navigate to where the [*installCAPI*](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/capi_azure/installCAPI.sh) bash script is located. Alternatively, you can also download just the script instead of cloning the entire repository.
 
   The script will transform the Rancher K3s Kubernetes cluster to a CAPI management cluster with the Azure Cluster API provisioned (CAPZ) components that are needed. It will then deploy the workload cluster and it's Azure resources based on the environment variables as described in the next bullet. Upon deployment completion, the cluster will be onboarded as an Azure Arc-enabled Kubernetes cluster.
 

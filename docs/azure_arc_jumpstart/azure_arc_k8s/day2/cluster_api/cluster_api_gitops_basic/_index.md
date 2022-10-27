@@ -18,15 +18,7 @@ GitOps on Azure Arc-enabled Kubernetes uses [Flux](https://fluxcd.io/docs/), a p
 
 ## Prerequisites
 
-- Fork the ["Azure Arc Jumpstart"](https://github.com/microsoft/azure_arc) repository. In this scenario, you will be making changes on your own forked repository to initiate the GitOps flow.
-
-- Clone the forked Azure Arc Jumpstart repository.
-
-    For example:
-
-    ```shell
-    git clone https://github.com/**zaidmohd**/azure_arc.git
-    ```
+- Fork the ["Azure Arc Jumpstart Apps"](https://github.com/microsoft/azure-arc-jumpstart-apps) repository. In this scenario, you will be making changes on your own forked repository to initiate the GitOps flow.
 
 - (Optional) Install the "Tab Auto Refresh" extension for your browser. This will help you to show the real-time changes on the application in an automated way.
 
@@ -97,6 +89,16 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - User is making an edit on the GitHub repo that will cause Flux GitOps to detect this change and trigger an update to the pod deployment.
 
+## Cluster-level Config vs. Namespace-level Config
+
+### Cluster-level Config
+
+With Cluster-level GitOps config, the goal is to have "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Mesh, security products, monitoring solutions, etc. A very popular example will also be ingress controllers, which is exactly the Nginx ingress controller we will deploy in the next section.
+
+### Namespace-level Config
+
+With Namespace-level GitOps config, the goal is to have Kubernetes resources deployed only in the namespace selected. The most obvious use-case here is simply your application and its respective pods, services, ingress routes, etc. In the next section, will have the "Hello Arc" application deployed on a dedicated namespace.
+
 ## Azure Arc Kubernetes GitOps Configuration
 
 To create the GitOps Configuration, we will use the _k8s-configuration flux create_ command while passing in values for the mandatory parameters. This scenario provides you with the automation to configure the GitOps on your Azure Arc-enabled Kubernetes cluster.
@@ -109,17 +111,15 @@ To create the GitOps Configuration, we will use the _k8s-configuration flux crea
 
     ![Screenshot showing Azure Portal with no Azure Arc-enabled Kubernetes GitOps configurations](./04.png)
 
-## Cluster-level Config vs. Namespace-level Config
+### Deployment
 
-### Cluster-level Config
+- Download [the script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/gitops/basic/az_k8sconfig_capi.sh) using below command
 
-With Cluster-level GitOps config, the goal is to have "horizontal components" or "management components" deployed on your Kubernetes cluster which will then be used by your applications. Good examples are Service Mesh, security products, monitoring solutions, etc. A very popular example will also be ingress controllers, which is exactly the Nginx ingress controller we will deploy in the next section.
+    ```shell
+    curl -L https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/cluster_api/gitops/basic/az_k8sconfig_capi.sh -o ~/az_k8sconfig_capi.sh
+    ```
 
-### Namespace-level Config
-
-With Namespace-level GitOps config, the goal is to have Kubernetes resources deployed only in the namespace selected. The most obvious use-case here is simply your application and its respective pods, services, ingress routes, etc. In the next section, will have the "Hello Arc" application deployed on a dedicated namespace.
-
-- Edit the environment variables [in the script](https://github.com/microsoft/azure_arc/blob/main/azure_arc_k8s_jumpstart/cluster_api/gitops/basic/az_k8sconfig_capi.sh) to match your environment parameters followed by running the _`. ./az_k8sconfig_capi.sh`_ command.
+- Edit the environment variables to match your environment parameters followed by running the _`. ./az_k8sconfig_capi.sh`_ command.
 
     ![Screenshot parameter](./05.png)
 
@@ -201,7 +201,7 @@ With Namespace-level GitOps config, the goal is to have Kubernetes resources dep
   
     ![kubectl get pods -n hello-arc -w](./14.png)
 
-  - In **Your fork** of the "Azure Arc Jumpstart" repository, open the *hello_arc.yaml* file (/azure_arc/artifacts/hello-arc/yaml/hello_arc.yaml).
+  - In **Your fork** of the "Azure Arc Jumpstart App" repository, open the *hello_arc.yaml* file (/hello-arc/yaml/hello_arc.yaml).
 
   - The external IP address of the Kubernetes Service seen using the ```kubectl get svc -n hello-arc``` command.
 
