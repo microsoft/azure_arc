@@ -20,7 +20,6 @@ echo ""
   export CAPI_PROVIDER="azure" # Do not change!
   export CAPI_PROVIDER_VERSION="1.5.3" # Do not change!
   export KUBERNETES_VERSION="1.24.7" # Do not change!
-  export AZURE_DISK_CSI_DRIVER_VERSION="1.23.0"
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
   export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
   export WORKER_MACHINE_COUNT="<Workers node count>"
