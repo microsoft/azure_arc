@@ -1,0 +1,97 @@
+---
+type: docs
+title: "Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster"
+linkTitle: "Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster"
+weight: 4
+description: >
+---
+
+## Using Cluster Connect to connect to an Azure Arc-enabled Kubernetes cluster
+
+The following Jumpstart scenario will guide you through how to use the [cluster connect](https://docs.microsoft.com/azure/azure-arc/kubernetes/cluster-connect) capability of an Azure Arc connected Kubernetes cluster to manage and connect to the cluster securely without opening inbound firewall ports.
+
+  > **NOTE: This scenario assumes you already deployed a Kubernetes cluster and connected it to Azure Arc. If you haven't, this repository offers you a way to do so in an automated fashion**
+
+- **[Azure Kubernetes Service](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks/)**
+- **[AKS on Azure Stack HCI](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aks_stack_hci/)**
+- **[Kubernetes Cluster API](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/cluster_api/)**
+- **[Azure Red Hat OpenShift](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/aro/)**
+- **[Amazon Elastic Kubernetes Service](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/eks/)**
+- **[Google Kubernetes Engine](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/gke/)**
+- **[Alibaba Cloud Container Service for Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/alibaba/)**
+- **[Rancher K3s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/rancher_k3s/)**
+- **[Kind](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/kind/)**
+- **[MicroK8s](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/microk8s/)**
+- **[Platform9 Managed Kubernetes](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_k8s/pf9/)**
+
+## Prerequisites
+
+- Clone the Azure Arc Jumpstart repository
+
+    ```shell
+    git clone https://github.com/microsoft/azure_arc.git
+    ```
+
+- [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
+
+  ```shell
+  az --version
+  ```
+
+- [Install or update to the latest version of the *connectedk8s* CLI extension](https://learn.microsoft.com/azure/azure-arc/kubernetes/cluster-connect?tabs=azure-cli).
+
+  ```shell
+  az extension add --name connectedk8s
+  ```
+
+- As mentioned, this scenario starts at the point where you already have an Azure Arc connected cluster.
+
+    ![Existing Azure Arc connected cluster](./01.png)
+
+## Azure Arc Kubernetes Connected Cluster Configuration
+
+The following steps walk through using the connected cluster functionality using Azure Active Directory; however, it can also be done using a service account token.  The benefit of using Azure Active Directory authentication is that your current, logged in user from the Azure CLI will be used and you won't have to obtain a service account token from your cluster.
+
+- First, get the resource ID of the cluster by running and updating the values below to reflect your cluster name and resource group name
+
+  ```shell
+  CLUSTER_NAME=<cluster-name>
+  RESOURCE_GROUP=<resource-group-name>
+  ARM_ID_CLUSTER=$(az connectedk8s show -n $CLUSTER_NAME -g $RESOURCE_GROUP --query id -o tsv)
+  ```
+
+- Second, obtain the *objectId* of your Azure Active Directory user account
+
+  ```shell
+  AAD_ENTITY_OBJECT_ID=$(az ad signed-in-user show --query userPrincipalName -o tsv)
+  ```
+
+- Finally, create the ClusterRoleBinding using the following:
+
+  ```shell
+  kubectl create clusterrolebinding jumpstart-user-binding --clusterrole cluster-admin --user=$AAD_ENTITY_OBJECT_ID
+  ```
+
+## Access Cluster
+
+From your terminal, run the following command to establish the proxy to the cluster
+  ```shell
+  az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
+  ```
+
+## Run Kubectl Commands
+
+With the proxy established, in another terminal session run a kubectl.
+
+  ```shell
+  kubectl get nodes
+  ```
+
+  ![Running Kubectl Command](./02.png)
+
+## Close Proxy Connection
+
+In your terminal, press *CTRL+C* to close the proxy session.
+
+  ![Closing Proxy to connected cluster](./03.png)
+
