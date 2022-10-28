@@ -178,7 +178,7 @@ echo ""
   sudo mkdir $HOME/.kube
   sudo curl -sLS https://get.k3sup.dev | sh
   sudo cp k3sup /usr/local/bin/k3sup
-  sudo k3sup install --local --context capimgmt --k3s-extra-args '--no-deploy traefik'
+  sudo k3sup install --local --context capimgmt --k3s-extra-args '--no-deploy traefik' --k3s-version 'v1.24.7+k3s1'
   sudo chmod 644 /etc/rancher/k3s/k3s.yaml
   sudo cp kubeconfig $HOME/.kube/config
   sudo cp kubeconfig $HOME/.kube/config-mgmt
