@@ -28,7 +28,7 @@ publicIp=$(curl icanhazip.com)
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -sLS https://get.k3sup.dev | sh
 sudo cp k3sup /usr/local/bin/k3sup
-sudo k3sup install --local --context arck3sdemo --ip $publicIp
+sudo k3sup install --local --context arck3sdemo --ip $publicIp --k3s-version 'v1.24.7+k3s1'
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo cp kubeconfig /home/${adminUsername}/.kube/config
 chown -R $adminUsername /home/${adminUsername}/.kube/
