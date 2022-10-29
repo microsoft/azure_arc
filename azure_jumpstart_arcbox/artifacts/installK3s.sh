@@ -61,7 +61,7 @@ sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 echo ""
 echo "Making sure Rancher K3s cluster is ready..."
 echo ""
-sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A --kubeconfig /etc/rancher/k3s/k3s.yaml >/dev/null
 sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
 echo ""
 
