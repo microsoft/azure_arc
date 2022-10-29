@@ -11,5 +11,7 @@ wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh # 2>/dev/null
 # Install the hybrid agent
 bash ~/install_linux_azcmagent.sh # 2>/dev/null
 
+ArcServerResourceName=$(hostname |sed -e "s/\b\(.\)/\u\1/g")
+
 # Run connect command
-azcmagent connect --service-principal-id $spnClientId --service-principal-secret $spnClientSecret --resource-group $resourceGroup --tenant-id $spnTenantId --location $Azurelocation --subscription-id $subscriptionId --resource-name "ArcBox-Ubuntu" --cloud "AzureCloud" --tags "Project=jumpstart_arcbox" --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+azcmagent connect --service-principal-id $spnClientId --service-principal-secret $spnClientSecret --resource-group $resourceGroup --tenant-id $spnTenantId --location $Azurelocation --subscription-id $subscriptionId --resource-name "${ArcServerResourceName}" --cloud "AzureCloud" --tags "Project=jumpstart_arcbox" --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
