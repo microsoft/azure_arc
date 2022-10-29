@@ -52,6 +52,9 @@ sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+kubectl config set-context arcbox-k3s
+
 echo ""
 echo "Making sure Rancher K3s cluster is ready..."
 echo ""
