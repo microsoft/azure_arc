@@ -41,7 +41,8 @@ sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
 
 # Installing Rancher K3s cluster (single control plane)
-sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
+echo ""
+sudo mkdir ~/.kube
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
@@ -49,6 +50,13 @@ sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
 sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 chown -R $adminUsername /home/${adminUsername}/.kube/
 chown -R staginguser /home/${adminUsername}/.kube/config.staging
+
+echo ""
+echo "Making sure Rancher K3s cluster is ready..."
+echo ""
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
+sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+echo ""
 
 # Installing Helm 3
 sudo snap install helm --classic
