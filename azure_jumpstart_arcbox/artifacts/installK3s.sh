@@ -40,15 +40,13 @@ sudo curl -o /etc/profile.d/welcomeCAPI.sh ${templateBaseUrl}artifacts/welcomeK3
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
 while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
 
-# Installing Rancher K3s single master cluster using k3sup
-publicIp=$(hostname -i)
+# Installing Rancher K3s cluster (single control plane)
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sLS https://get.k3sup.dev | sh
-# sudo cp k3sup /usr/local/bin/k3sup
-sudo k3sup install --local --context arcbox-k3s --ip $publicIp --k3s-extra-args '--no-deploy traefik' --k3s-version 'v1.24.7+k3s1'
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo cp kubeconfig /home/${adminUsername}/.kube/config
-sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
+sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 chown -R $adminUsername /home/${adminUsername}/.kube/
 chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
