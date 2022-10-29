@@ -11,7 +11,6 @@ wget https://aka.ms/azcmagent -O ~/install_linux_azcmagent.sh # 2>/dev/null
 # Install the hybrid agent
 bash ~/install_linux_azcmagent.sh # 2>/dev/null
 
-# export ArcServerResourceName=$(echo -n "${HOSTNAME}" | sed 's/\b\([[:alpha:]]\)\([[:alpha:]]*\)\b/\u\1\L\2/g')
 ArcServerResourceName=$(hostname |sed -e "s/\b\(.\)/\u\1/g")
 
 # Run connect command
