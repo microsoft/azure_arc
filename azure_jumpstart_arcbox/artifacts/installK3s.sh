@@ -42,8 +42,10 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 
 # Installing Rancher K3s cluster (single control plane)
 echo ""
+# publicIp=$(hostname -i)
 sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
+# curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp}" sh -
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
@@ -53,8 +55,8 @@ sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-kubectl config set-context arcbox-k3s
+# export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+# kubectl config set-context arcbox-k3s
 
 echo ""
 echo "Making sure Rancher K3s cluster is ready..."
