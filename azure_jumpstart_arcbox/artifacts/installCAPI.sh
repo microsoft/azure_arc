@@ -130,12 +130,6 @@ sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 kubectl config set-context arcboxcapimgmt
 
-
-
-
-
-
-
 # Installing clusterctl
 echo ""
 curl -L https://github.com/kubernetes-sigs/cluster-api/releases/download/v${CLUSTERCTL_VERSION}/clusterctl-linux-amd64 -o clusterctl
