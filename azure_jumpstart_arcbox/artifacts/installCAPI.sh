@@ -113,19 +113,16 @@ export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
-# Installing Rancher K3s single node cluster using k3sup
+# Installing Rancher K3s cluster (single control plane)
 echo ""
 sudo mkdir ~/.kube
-sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sLS https://get.k3sup.dev | sh
-sudo k3sup install --local --context arcboxcapimgmt --k3s-extra-args '--no-deploy traefik' --k3s-version 'v1.24.7+k3s1'
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo cp kubeconfig ~/.kube/config
-sudo cp kubeconfig /home/${adminUsername}/.kube/config
-sudo cp /var/lib/waagent/custom-script/download/0/kubeconfig /home/${adminUsername}/.kube/config-mgmt
-sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
-sudo chown -R $adminUsername /home/${adminUsername}/.kube/
-sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
+sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
+chown -R $adminUsername /home/${adminUsername}/.kube/
+chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 export KUBECONFIG=/var/lib/waagent/custom-script/download/0/kubeconfig
 kubectl config set-context arcboxcapimgmt
