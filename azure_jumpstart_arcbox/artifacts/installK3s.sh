@@ -46,7 +46,6 @@ publicIp=$(hostname -i)
 sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp}" sh -
-# curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
 sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
@@ -57,6 +56,7 @@ sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 kubectl config set-context arcbox-k3s
+sleep 30
 kubectl get pods --all-namespaces
 echo ""
 echo ""
@@ -79,6 +79,18 @@ echo ""
 echo ""
 echo ""
 sudo kubectl get nodes -o wide --kubeconfig /etc/rancher/k3s/k3s.yaml | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+echo ""
+echo ""
+echo ""
+
+echo ""
+echo "Making sure Rancher K3s cluster is ready..."
+echo ""
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments
+echo ""
+echo ""
+echo ""
+sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
 echo ""
 echo ""
 echo ""
