@@ -15,7 +15,7 @@
                 "description": "The name of you Virtual Machine."
             }
         },
-        "ArcK8sClusterName": {
+        "capiArcDataClusterName": {
             "type": "string",
             "defaultValue": "Arc-DataSvc-CAPI",
             "metadata": {
@@ -320,7 +320,7 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('ArcK8sClusterName'), ' ',parameters('templateBaseUrl'))]",
+                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('capiArcDataClusterName'), ' ',parameters('templateBaseUrl'))]",
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]"
                     ]
