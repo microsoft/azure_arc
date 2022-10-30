@@ -52,10 +52,11 @@ sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
 sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
+sudo chown -R $adminUsername /home/${adminUsername}/.kube/config
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-kubectl config set-context arcbox-k3s
+export KUBECONFIG=~/.kube/config
+# kubectl config set-context arcbox-k3s
 sleep 30
 kubectl get pods --all-namespaces
 echo ""
