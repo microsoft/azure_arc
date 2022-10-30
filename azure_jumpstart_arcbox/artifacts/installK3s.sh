@@ -34,7 +34,7 @@ chmod +x vars.sh
 . ./vars.sh
 
 # Creating login message of the day (motd)
-sudo curl -o /etc/profile.d/welcomeCAPI.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
+sudo curl -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
@@ -45,7 +45,7 @@ echo ""
 publicIp=$(hostname -i)
 sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp}" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp}" INSTALL_K3S_VERSION="v1.24.7+k3s1" sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
 sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
@@ -71,7 +71,10 @@ sudo -u $adminUsername az extension add --name connectedk8s
 sudo -u $adminUsername az extension add --name k8s-configuration
 sudo -u $adminUsername az extension add --name k8s-extension
 
+echo "Log in to Azure"
 sudo -u $adminUsername az login --service-principal --username $SPN_CLIENT_ID --password $SPN_CLIENT_SECRET --tenant $SPN_TENANT_ID
+az -v
+echo ""
 
 # Registering Azure resource providers
 sudo -u $adminUsername az provider register --namespace 'Microsoft.Kubernetes' --wait
@@ -88,14 +91,17 @@ workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $
 sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $resourceGroup --location $location --tags 'Project=jumpstart_arcbox' --only-show-errors
 
 # Enabling Container Insights and Microsoft Defender for Containers cluster extensions
+echo ""
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
+echo ""
 sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId --only-show-errors
 
-# Enable Azure Policy for Kubernetes on the cluster
-sudo -u $adminUsername az provider register --namespace 'Microsoft.PolicyInsights' --wait
-sudo -u $adminUsername az k8s-extension create --cluster-type connectedClusters --cluster-name $vmName --resource-group $resourceGroup --extension-type Microsoft.PolicyInsights --name arc-azurepolicy --only-show-errors
+# Enabling Azure Policy for Kubernetes on the cluster
+echo ""
+sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights --only-show-errors
 
 # Copying Rancher K3s kubeconfig file to staging storage account
+echo ""
 sudo -u $adminUsername az extension add --upgrade -n storage-preview
 storageAccountRG=$(sudo -u $adminUsername az storage account show --name $stagingStorageAccountName --query 'resourceGroup' | sed -e 's/^"//' -e 's/"$//')
 storageContainerName="staging-k3s"
