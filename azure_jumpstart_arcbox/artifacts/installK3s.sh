@@ -52,52 +52,17 @@ sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
 sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
 sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
-sudo chown -R $adminUsername /home/${adminUsername}/.kube/config
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
-
-export KUBECONFIG=~/.kube/config
-# kubectl config set-context arcbox-k3s
-sleep 30
-kubectl get pods --all-namespaces
-echo ""
-echo ""
-echo ""
-sudo kubectl get pods --all-namespaces
-echo ""
-echo ""
-echo ""
-kubectl get pods --all-namespaces --kubeconfig /etc/rancher/k3s/k3s.yaml
-echo ""
-echo ""
-echo ""
-sudo kubectl get pods --all-namespaces --kubeconfig /etc/rancher/k3s/k3s.yaml
-
-echo ""
-echo "Making sure Rancher K3s cluster is ready..."
-echo ""
-sudo kubectl wait --for=condition=Available --timeout=60s --all deployments --kubeconfig /etc/rancher/k3s/k3s.yaml
-echo ""
-echo ""
-echo ""
-sudo kubectl get nodes -o wide --kubeconfig /etc/rancher/k3s/k3s.yaml | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
-echo ""
-echo ""
-echo ""
-
-echo ""
-echo "Making sure Rancher K3s cluster is ready..."
-echo ""
-sudo kubectl wait --for=condition=Available --timeout=60s --all deployments
-echo ""
-echo ""
-echo ""
-sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
-echo ""
-echo ""
-echo ""
 
 # Installing Helm 3
 sudo snap install helm --classic
+
+echo ""
+echo "Making sure Rancher K3s cluster is ready..."
+echo ""
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A >/dev/null
+sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+echo ""
 
 # Installing Azure CLI & Azure Arc extensions
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
