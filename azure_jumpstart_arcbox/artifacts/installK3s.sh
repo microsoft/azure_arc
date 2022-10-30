@@ -57,31 +57,20 @@ sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 # export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 # kubectl config set-context arcbox-k3s
+kubectl get pods --all-namespaces
+echo ""
+echo ""
+echo ""
+sudo kubectl get pods --all-namespaces
 
 echo ""
 echo "Making sure Rancher K3s cluster is ready..."
 echo ""
-sudo kubectl wait --for=condition=Available --timeout=60s --all deployments --kubeconfig /home/${adminUsername}/.kube/config -A
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments
 echo ""
 echo ""
 echo ""
-sudo kubectl wait --for=condition=Available --timeout=60s --all deployments --kubeconfig ~/.kube/config -A
-echo ""
-echo ""
-echo ""
-sudo kubectl wait --for=condition=Available --timeout=60s --all deployments --kubeconfig /etc/rancher/k3s/k3s.yaml -A
-echo ""
-echo ""
-echo ""
-sudo kubectl get nodes -o wide --kubeconfig /home/${adminUsername}/.kube/config -A | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
-echo ""
-echo ""
-echo ""
-sudo kubectl get nodes -o wide --kubeconfig --kubeconfig ~/.kube/config -A | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
-echo ""
-echo ""
-echo ""
-sudo kubectl get nodes -o wide --kubeconfig /etc/rancher/k3s/k3s.yaml -A | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
 echo ""
 echo ""
 echo ""
