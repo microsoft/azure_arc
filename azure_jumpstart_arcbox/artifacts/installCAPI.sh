@@ -264,6 +264,3 @@ sudo -u $adminUsername az storage azcopy blob upload --container $storageContain
 echo ""
 log="/home/${adminUsername}/jumpstart_logs/installCAPI.log"
 sudo -u $adminUsername az storage azcopy blob upload --container $storageContainerName --account-name $stagingStorageAccountName --account-key $storageAccountKey --source $log
-
-
-
