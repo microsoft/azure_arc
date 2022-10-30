@@ -42,11 +42,11 @@ while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/ins
 
 # Installing Rancher K3s cluster (single control plane)
 echo ""
-# publicIp=$(hostname -i)
+publicIp=$(hostname -i)
 sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-# curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp}" sh -
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp}" sh -
+# curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
 sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
 sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
@@ -61,8 +61,29 @@ sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 echo ""
 echo "Making sure Rancher K3s cluster is ready..."
 echo ""
-sudo kubectl wait --for=condition=Available --timeout=60s --all deployments -A --kubeconfig /etc/rancher/k3s/k3s.yaml >/dev/null
-sudo kubectl get nodes -o wide | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments --kubeconfig /home/${adminUsername}/.kube/config -A
+echo ""
+echo ""
+echo ""
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments --kubeconfig ~/.kube/config -A
+echo ""
+echo ""
+echo ""
+sudo kubectl wait --for=condition=Available --timeout=60s --all deployments --kubeconfig /etc/rancher/k3s/k3s.yaml -A
+echo ""
+echo ""
+echo ""
+sudo kubectl get nodes -o wide --kubeconfig /home/${adminUsername}/.kube/config -A | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+echo ""
+echo ""
+echo ""
+sudo kubectl get nodes -o wide --kubeconfig --kubeconfig ~/.kube/config -A | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+echo ""
+echo ""
+echo ""
+sudo kubectl get nodes -o wide --kubeconfig /etc/rancher/k3s/k3s.yaml -A | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+echo ""
+echo ""
 echo ""
 
 # Installing Helm 3
