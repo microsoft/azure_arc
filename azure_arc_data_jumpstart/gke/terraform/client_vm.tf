@@ -29,7 +29,7 @@ resource "google_compute_instance" "default" {
   zone         = "us-central1-a"
   boot_disk {
     initialize_params {
-      image = "windows-cloud/windows-2019"
+      image = "windows-cloud/windows-2022"
     }
   }
   network_interface {
