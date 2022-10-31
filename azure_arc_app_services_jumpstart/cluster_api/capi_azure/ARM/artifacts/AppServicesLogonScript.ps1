@@ -7,27 +7,29 @@ az login --service-principal --username $Env:spnClientId --password $Env:spnClie
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
+# $connectedClusterName = $Env:capiArcAppClusterName
 $namespace="appservices"
 $extensionName = "arc-app-services"
 $extensionVersion = "0.13.1"
 $apiVersion = "2020-07-01-preview"
 $storageClassName = "managed-premium"
-$kubeEnvironmentName=$Env:connectedClusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
+# $kubeEnvironmentName=$Env:connectedClusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
+$kubeEnvironmentName="$Env:capiArcAppClusterName-kube"
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
 $logAnalyticsKeyEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceKey))
 
 # Required for azcopy
-$azurePassword = ConvertTo-SecureString $env:spnClientSecret -AsPlainText -Force
-$psCred = New-Object System.Management.Automation.PSCredential($env:spnClientId , $azurePassword)
-Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincipal
+$azurePassword = ConvertTo-SecureString $Env:spnClientSecret -AsPlainText -Force
+$psCred = New-Object System.Management.Automation.PSCredential($Env:spnClientId , $azurePassword)
+Connect-AzAccount -Credential $psCred -TenantId $Env:spnTenantId -ServicePrincipal
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
 # subscription user deployed ARM template to. This is needed in case Service 
 # Principal has access to multiple subscriptions, which can break the automation logic
-az account set --subscription $env:subscriptionId
+az account set --subscription $Env:subscriptionId
 
 # Making extension install dynamic
 az config set extension.use_dynamic_install=yes_without_prompt
@@ -57,8 +59,8 @@ kubectl get nodes
 Write-Host "`n"
 
 # Localize kubeconfig
-$env:KUBECONTEXT = kubectl config current-context
-$env:KUBECONFIG = "C:\Users\$env:adminUsername\.kube\config"
+$Env:KUBECONTEXT = kubectl config current-context
+$Env:KUBECONFIG = "C:\Users\$Env:adminUsername\.kube\config"
 
 Start-Sleep -Seconds 10
 $kubectlMonShell = Start-Process -PassThru PowerShell {for (0 -lt 1) {kubectl get pod -n appservices; Start-Sleep -Seconds 5; Clear-Host }}
@@ -73,7 +75,7 @@ az k8s-extension create `
    --name $extensionName `
    --version $extensionVersion `
    --cluster-type connectedClusters `
-   --cluster-name $Env:connectedClusterName `
+   --cluster-name $Env:capiArcAppClusterName `
    --extension-type 'Microsoft.Web.Appservice' `
    --release-train stable `
    --auto-upgrade-minor-version false `
@@ -92,7 +94,7 @@ az k8s-extension create `
 
    $extensionId=$(az k8s-extension show `
    --cluster-type connectedClusters `
-   --cluster-name $Env:connectedClusterName `
+   --cluster-name $Env:capiArcAppClusterName `
    --resource-group $Env:resourceGroup `
    --name $extensionName `
    --query id `
@@ -116,35 +118,35 @@ Do {
 Write-Host "`n"
 Write-Host "Deploying App Service Kubernetes Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
-$connectedClusterId = az connectedk8s show --name $Env:connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:connectedClusterName --resource-group $env:resourceGroup --query id -o tsv
-$customLocationId = $(az customlocation create --name 'jumpstart-cl' --resource-group $env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$env:USERNAME\.kube\config" --query id -o tsv)
-az appservice kube create --resource-group $env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $env:azureLocation --output none
+$connectedClusterId = az connectedk8s show --name $Env:capiArcAppClusterName --resource-group $Env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:capiArcAppClusterName --resource-group $Env:resourceGroup --query id -o tsv
+$customLocationId = $(az customlocation create --name "$Env:capiArcAppClusterName-cl" --resource-group $Env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" --query id -o tsv)
+az appservice kube create --resource-group $Env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $Env:azureLocation --output none
 
 Write-Host "`n"
 Do {
    Write-Host "Waiting for kube environment to become available. Hold tight, this might take a few minutes..."
    Start-Sleep -Seconds 15
-   $kubeEnvironmentNameStatus = $(if(az appservice kube show --resource-group $env:resourceGroup --name $kubeEnvironmentName | Select-String '"provisioningState": "Succeeded"' -Quiet){"Ready!"}Else{"Nope"})
+   $kubeEnvironmentNameStatus = $(if(az appservice kube show --resource-group $Env:resourceGroup --name $kubeEnvironmentName | Select-String '"provisioningState": "Succeeded"' -Quiet){"Ready!"}Else{"Nope"})
    } while ($kubeEnvironmentNameStatus -eq "Nope")
 
 
-if ( $env:deployAppService -eq $true )
+if ( $Env:deployAppService -eq $true )
 {
     & "C:\Temp\deployAppService.ps1"
 }
 
-if ( $env:deployFunction -eq $true )
+if ( $Env:deployFunction -eq $true )
 {
     & "C:\Temp\deployFunction.ps1"
 }
 
-if ( $env:deployLogicApp -eq $true )
+if ( $Env:deployLogicApp -eq $true )
 {
     & "C:\Temp\deployLogicApp.ps1"
 }
 
-if ( $env:deployApiMgmt -eq $true )
+if ( $Env:deployApiMgmt -eq $true )
 {
     & "C:\Temp\deployApiMgmt.ps1"
 }
