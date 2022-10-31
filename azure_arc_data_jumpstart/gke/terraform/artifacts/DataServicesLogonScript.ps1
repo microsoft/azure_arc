@@ -237,7 +237,6 @@ if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
     Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
     # Creating desktop url shortcuts for built-in Grafana and Kibana services
-    SetDefaultBrowser edge
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     $GrafanaURL = "https://"+$GrafanaURL+":3000"
     $Shell = New-Object -ComObject ("WScript.Shell")
