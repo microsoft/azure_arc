@@ -21,7 +21,7 @@ func new --name HttpJumpstart --template "HTTP trigger" --authlevel "anonymous"
 $extensionName = "arc-app-services"
 Write-Host "Creating the new Azure Function application in the Kubernetes environment"
 Write-Host "`n"
-$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name "$Env:capiArcAppClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 $functionAppName = "JumpstartFunction-" + -join ((48..57) + (97..122) | Get-Random -Count 5 | ForEach-Object {[char]$_})
 az functionapp create --resource-group $Env:resourceGroup --name $functionAppName --custom-location $customLocationId --storage-account $storageAccountName --functions-version 3 --runtime dotnet
 
