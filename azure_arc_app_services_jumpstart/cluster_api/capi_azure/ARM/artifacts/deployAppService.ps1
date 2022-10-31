@@ -3,7 +3,7 @@ Start-Transcript -Path C:\Temp\deployAppService.log
 Write-Host "`n"
 Write-Host "Creating App Service plan. Hold tight, this might take a few minutes..."
 Write-Host "`n"
-$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $Env:resourceGroup --query id -o tsv)
+$customLocationId = $(az customlocation show --name "$Env:capiArcAppClusterName-cl" --resource-group $Env:resourceGroup --query id -o tsv)
 az appservice plan create --resource-group $Env:resourceGroup --name Jumpstart --custom-location $customLocationId --per-site-scaling --is-linux --sku K1
 
 Write-Host "`n"

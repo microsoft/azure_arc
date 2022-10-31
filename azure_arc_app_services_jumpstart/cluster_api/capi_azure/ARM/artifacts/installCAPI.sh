@@ -21,7 +21,7 @@ echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
 echo $location:$6 | awk '{print substr($1,2); }' >> vars.sh
 echo $stagingStorageAccountName:$7 | awk '{print substr($1,2); }' >> vars.sh
 echo $logAnalyticsWorkspace:$8 | awk '{print substr($1,2); }' >> vars.sh
-echo $connectedClusterName:$9 | awk '{print substr($1,2); }' >> vars.sh
+echo $capiArcAppClusterName:$9 | awk '{print substr($1,2); }' >> vars.sh
 echo $templateBaseUrl:${10} | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export SPN_CLIENT_ID=/' vars.sh
@@ -31,7 +31,7 @@ sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export location=/' vars.sh
 sed -i '8s/^/export stagingStorageAccountName=/' vars.sh
 sed -i '9s/^/export logAnalyticsWorkspace=/' vars.sh
-sed -i '10s/^/export connectedClusterName=/' vars.sh
+sed -i '10s/^/export capiArcAppClusterName=/' vars.sh
 sed -i '11s/^/export templateBaseUrl=/' vars.sh
 
 chmod +x vars.sh
@@ -93,11 +93,12 @@ export CAPI_PROVIDER="azure" # Do not change!
 export CAPI_PROVIDER_VERSION="1.5.3" # Do not change!
 export KUBERNETES_VERSION="1.24.7" # Do not change!
 export AZURE_DISK_CSI_DRIVER_VERSION="1.23.0" # Do not change!
+export K3S_VERSION="1.24.7+k3s1" # Do not change!
 export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
 export CONTROL_PLANE_MACHINE_COUNT="3" # Do not change!
 export WORKER_MACHINE_COUNT="3"
 export AZURE_LOCATION=$location # Name of the Azure datacenter location.
-export CLUSTER_NAME=$(echo "${connectedClusterName,,}") # Converting to lowercase case variable > # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+export CLUSTER_NAME=$(echo "${capiArcAppClusterName,,}") # Converting to lowercase case variable > # Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
 export AZURE_SUBSCRIPTION_ID=$subscriptionId
 export AZURE_TENANT_ID=$SPN_TENANT_ID
 export AZURE_CLIENT_ID=$SPN_CLIENT_ID
@@ -116,21 +117,21 @@ export AZURE_CLUSTER_IDENTITY_SECRET_NAME="cluster-identity-secret"
 export CLUSTER_IDENTITY_NAME="cluster-identity"
 export AZURE_CLUSTER_IDENTITY_SECRET_NAMESPACE="default"
 
-# Installing Rancher K3s single node cluster using k3sup
+# Installing Rancher K3s cluster (single control plane)
 echo ""
 sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sLS https://get.k3sup.dev | sh
-sudo k3sup install --local --context arcappcapimgmt --k3s-extra-args '--no-deploy traefik' --k3s-version 'v1.24.7+k3s1'
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" INSTALL_K3S_VERSION=v${K3S_VERSION} sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo cp kubeconfig ~/.kube/config
-sudo cp kubeconfig /home/${adminUsername}/.kube/config
-sudo cp /var/lib/waagent/custom-script/download/0/kubeconfig /home/${adminUsername}/.kube/config-mgmt
-sudo cp kubeconfig /home/${adminUsername}/.kube/config.staging
+sudo kubectl config rename-context default arcappcapimgmt --kubeconfig /etc/rancher/k3s/k3s.yaml
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config-mgmt
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
 sudo chown -R $adminUsername /home/${adminUsername}/.kube/
 sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
-export KUBECONFIG=/var/lib/waagent/custom-script/download/0/kubeconfig
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 kubectl config set-context arcappcapimgmt
 
 # Installing clusterctl
@@ -235,17 +236,17 @@ sudo -u $adminUsername kubectl config rename-context "$CLUSTER_NAME-admin@$CLUST
 # Onboarding the cluster to Azure Arc
 echo ""
 workspaceResourceId=$(sudo -u $adminUsername az resource show --resource-group $AZURE_RESOURCE_GROUP --name $logAnalyticsWorkspace --resource-type "Microsoft.OperationalInsights/workspaces" --query id -o tsv)
-sudo -u $adminUsername az connectedk8s connect --name $connectedClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_azure_arc_app_services' --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+sudo -u $adminUsername az connectedk8s connect --name $capiArcAppClusterName --resource-group $AZURE_RESOURCE_GROUP --location $location --tags 'Project=jumpstart_azure_arc_app_services' --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
 
 # Enabling Microsoft Defender for Containers and Container Insights cluster extensions
 echo ""
-sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $connectedClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+sudo -u $adminUsername az k8s-extension create -n "azure-defender" --cluster-name $capiArcAppClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureDefender.Kubernetes --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 echo ""
-sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $connectedClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
+sudo -u $adminUsername az k8s-extension create --name "azuremonitor-containers" --cluster-name $capiArcAppClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers --configuration-settings logAnalyticsWorkspaceResourceID=$workspaceResourceId
 
 # Enabling Azure Policy for Kubernetes on the cluster
 echo ""
-sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $connectedClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights 
+sudo -u $adminUsername az k8s-extension create --name "arc-azurepolicy" --cluster-name $capiArcAppClusterName --resource-group $AZURE_RESOURCE_GROUP --cluster-type connectedClusters --extension-type Microsoft.PolicyInsights 
 
 # Deploying The Azure disk Container Storage Interface (CSI) Kubernetes driver
 echo ""
