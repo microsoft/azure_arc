@@ -16,7 +16,7 @@ param (
     [string]$deploySQLMI,
     [string]$SQLMIHA,    
     [string]$deployPostgreSQL,
-    [string]$ArcK8sClusterName,
+    [string]$capiArcDataClusterName,
     [string]$templateBaseUrl
 )
 
@@ -37,7 +37,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('deploySQLMI', $deploySQLMI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('SQLMIHA', $SQLMIHA,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployPostgreSQL', $deployPostgreSQL,[System.EnvironmentVariableTarget]::Machine)
-[System.Environment]::SetEnvironmentVariable('ArcK8sClusterName', $ArcK8sClusterName,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('capiArcDataClusterName', $capiArcDataClusterName,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 
 # Create path
