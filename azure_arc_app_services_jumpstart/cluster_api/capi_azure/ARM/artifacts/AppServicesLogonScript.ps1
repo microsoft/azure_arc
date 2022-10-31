@@ -7,14 +7,14 @@ az login --service-principal --username $Env:spnClientId --password $Env:spnClie
 
 # Deployment environment variables
 $Env:TempDir = "C:\Temp"
-$connectedClusterName = $Env:capiArcAppClusterName
+# $connectedClusterName = $Env:capiArcAppClusterName
 $namespace="appservices"
 $extensionName = "arc-app-services"
 $extensionVersion = "0.13.1"
 $apiVersion = "2020-07-01-preview"
 $storageClassName = "managed-premium"
 # $kubeEnvironmentName=$Env:connectedClusterName + "-" + -join ((48..57) + (97..122) | Get-Random -Count 4 | ForEach-Object {[char]$_})
-$kubeEnvironmentName="$Env:connectedClusterName-kube"
+$kubeEnvironmentName="$Env:capiArcAppClusterName-kube"
 $workspaceId = $(az resource show --resource-group $Env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
 $workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $Env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 $logAnalyticsWorkspaceIdEnc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($workspaceId))
@@ -75,7 +75,7 @@ az k8s-extension create `
    --name $extensionName `
    --version $extensionVersion `
    --cluster-type connectedClusters `
-   --cluster-name $Env:connectedClusterName `
+   --cluster-name $Env:capiArcAppClusterName `
    --extension-type 'Microsoft.Web.Appservice' `
    --release-train stable `
    --auto-upgrade-minor-version false `
@@ -94,7 +94,7 @@ az k8s-extension create `
 
    $extensionId=$(az k8s-extension show `
    --cluster-type connectedClusters `
-   --cluster-name $Env:connectedClusterName `
+   --cluster-name $Env:capiArcAppClusterName `
    --resource-group $Env:resourceGroup `
    --name $extensionName `
    --query id `
@@ -118,8 +118,8 @@ Do {
 Write-Host "`n"
 Write-Host "Deploying App Service Kubernetes Environment. Hold tight, this might take a few minutes..."
 Write-Host "`n"
-$connectedClusterId = az connectedk8s show --name $Env:connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
-$extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:connectedClusterName --resource-group $Env:resourceGroup --query id -o tsv
+$connectedClusterId = az connectedk8s show --name $Env:capiArcAppClusterName --resource-group $Env:resourceGroup --query id -o tsv
+$extensionId = az k8s-extension show --name $extensionName --cluster-type connectedClusters --cluster-name $Env:capiArcAppClusterName --resource-group $Env:resourceGroup --query id -o tsv
 $customLocationId = $(az customlocation create --name "$Env:capiArcAppClusterName-cl" --resource-group $Env:resourceGroup --namespace appservices --host-resource-id $connectedClusterId --cluster-extension-ids $extensionId --kubeconfig "C:\Users\$Env:USERNAME\.kube\config" --query id -o tsv)
 az appservice kube create --resource-group $Env:resourceGroup --name $kubeEnvironmentName --custom-location $customLocationId --location $Env:azureLocation --output none
 
