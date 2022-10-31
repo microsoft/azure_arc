@@ -15,7 +15,7 @@
                 "description": "The name of you Virtual Machine."
             }
         },
-        "connectedClusterName": {
+        "capiArcAppClusterName": {
             "type": "string",
             "defaultValue": "Arc-AppSvc-CAPI",
             "metadata": {
@@ -344,7 +344,7 @@
                 "settings": {
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('connectedClusterName'), ' ',parameters('templateBaseUrl'))]",
+                    "commandToExecute": "[concat('bash installCAPI.sh', ' ', parameters('adminUsername'), ' ', parameters('spnClientId'), ' ', parameters('spnClientSecret'), ' ', parameters('spnTenantId'), ' ', parameters('vmName'), ' ', parameters('azureLocation'), ' ', parameters('stagingStorageAccountName'), ' ', parameters('logAnalyticsWorkspaceName'), ' ', parameters('capiArcAppClusterName'), ' ',parameters('templateBaseUrl'))]",
                     "fileUris": [
                         "[uri(parameters('templateBaseUrl'), 'artifacts/installCAPI.sh')]"
                     ]
