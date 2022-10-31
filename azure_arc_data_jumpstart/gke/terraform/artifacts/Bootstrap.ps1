@@ -44,7 +44,7 @@ Invoke-WebRequest ($env:templateBaseUrl + "artifacts/wallpaper.png") -OutFile "C
 # Installing tools
 workflow ClientTools_01
         {
-            $chocolateyAppList = 'setdefaultbrowser,azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,ssms,dotnetcore-3.1-sdk'
+            $chocolateyAppList = 'azure-cli,az.powershell,kubernetes-cli,vcredist140,microsoft-edge,azcopy10,vscode,putty.install,kubernetes-helm,grep,ssms,dotnetcore-3.1-sdk'
             #Run commands in parallel.
             Parallel 
                 {
