@@ -44,11 +44,11 @@ By the end of this scenario, you will have a GKE cluster deployed with an Azure 
 
 - Google Cloud account with billing enabled - [Create a free trial account](https://cloud.google.com/free). To create Windows Server virtual machines, you must upgraded your account to enable billing. Click Billing from the menu and then select Upgrade in the lower right.
 
+    ![Screenshot showing how to enable billing on GCP account](./01.png)
+
     ![Screenshot showing how to enable billing on GCP account](./02.png)
 
     ![Screenshot showing how to enable billing on GCP account](./03.png)
-
-    ![Screenshot showing how to enable billing on GCP account](./04.png)
 
     ***Disclaimer*** - **To prevent unexpected charges, please follow the "Delete the deployment" section at the end of this README**
 
@@ -93,11 +93,11 @@ By the end of this scenario, you will have a GKE cluster deployed with an Azure 
 
   - Browse to <https://console.cloud.google.com/> and login with your Google Cloud account. Once logged in, click on Select a project
 
-    ![GCP new project](./05.png)
+    ![GCP new project](./04.png)
 
   - [Create a new project](https://cloud.google.com/resource-manager/docs/creating-managing-projects) named "Azure Arc Demo".
 
-    ![GCP new project](./05_0.png)
+    ![GCP new project](./05.png)
 
     ![GCP new project](./06.png)
 
@@ -278,9 +278,9 @@ As mentioned, the Terraform plan and automation scripts will deploy a GKE cluste
 
 - Run the ```terraform apply "infra.out"``` command and wait for the plan to finish. **Runtime for deploying all the GCP resources for this plan is ~20-30min.**
 
-- Once completed, you can review the GKE cluster and the worker nodes resources as well as the GCP compute instance VM created.
-
   ![terraform apply completed](./24.png)
+
+- Once completed, you can review the GKE cluster and the worker nodes resources as well as the GCP compute instance VM created.
 
   ![GKE cluster](./25.png)
 
