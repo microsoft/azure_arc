@@ -11,6 +11,63 @@ weight: 5
 
 ## 2022
 
+### October 2022
+
+#### Release highlights
+
+- Jumpstart ArcBox for DataOps general availability - [Blog post](https://aka.ms/ArcBoxDataOpsBlog)
+- Jumpstart HCI public preview - [Blog post](https://aka.ms/JumpstartHCIBoxBlog)
+- Removing CentOS 8 Stream from ArcBox
+- Switch from k3sup to upstream Rancher K3s installation
+- New Azure Arc-enabled servers scenarios
+
+#### Azure Arc-enabled servers
+
+- [New scenario: Dashboard visualization on Azure Arc-enabled servers with Azure Managed Grafana and Azure Monitor Agent](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_grafana/#dashboard-visualization-on-azure-arc-enabled-servers-with-azure-managed-grafana-and-azure-monitor-agent) - Community contribution from [@stalejohnsen](https://github.com/stalejohnsen)
+- [Bug fix: Fix broken urls Update Management Center scenario #1407](https://github.com/microsoft/azure_arc/issues/1407)
+
+#### Azure Arc-enabled SQL Server
+
+- [Bug fix: Deploy an Azure Virtual Machine with Windows Server & Microsoft SQL Server failing #1393](https://github.com/microsoft/azure_arc/issues/1393)
+- [Bug fix: Automation Script not working #1394](https://github.com/microsoft/azure_arc/issues/1394)
+
+#### Azure Arc-enabled Kubernetes
+
+- [Enhancement: CAPI versions bump and _wait-providers_ flag #1472](https://github.com/microsoft/azure_arc/issues/1472)
+- [Bug fix: CAPI Vanilla scenario failing #1457](https://github.com/microsoft/azure_arc/issues/1457)
+- [Bug fix: Update CAPI basic GitOps scenario #1469](https://github.com/microsoft/azure_arc/issues/1469)
+- [Bug fix: Update CAPI GitOps Basic Readme #1481](https://github.com/microsoft/azure_arc/issues/1481)
+
+#### Azure Arc-enabled data services
+
+- [Enhancement: Switch from k3sup to upstream Rancher K3s installation in Azure Arc-enabled data services scenarios #1489](https://github.com/microsoft/azure_arc/issues/1489)
+
+#### Azure Arc-enabled app services
+
+- [Enhancement: Switch from k3sup to upstream Rancher K3s installation in Azure Arc-enabled app services scenarios #1491](https://github.com/microsoft/azure_arc/issues/1491)
+
+#### Azure Arc-enabled machine learning
+
+- [Bug fix: The ML scenario is broken because the URI for Weave Scope has changed #1475](https://github.com/microsoft/azure_arc/issues/1475)
+
+#### Jumpstart ArcBox
+
+- [New ArcBox flavor: Jumpstart ArcBox for DataOps [general availability](https://github.com/microsoft/azure_arc/issues/1428)
+  - [Product page](https://aka.ms/ArcBoxDataOps)
+  - [Blog post](https://aka.ms/ArcBoxDataOpsBlog)
+- [Enhancement: CAPI versions bump and _wait-providers_ flag #1472](https://github.com/microsoft/azure_arc/issues/1472)
+- [Enhancement: Remove CentOS 8 Stream from ArcBox #1484](https://github.com/microsoft/azure_arc/issues/1484)
+- [Enhancement: Switch from k3sup to upstream Rancher K3s installation in ArcBox #1488](https://github.com/microsoft/azure_arc/issues/1488)
+- [Bug fix: "MyIpAddress" parameter not available in ArcBox #1395](https://github.com/microsoft/azure_arc/issues/1395)
+- [Bug fix: azure_jumpstart_hcibox/artifacts/Deploy-GitOps.ps1 errors #1464](https://github.com/microsoft/azure_arc/issues/1464)
+
+#### Jumpstart HCIBox
+
+- Jumpstart HCIBox public preview
+  - [Product page](https://aka.ms/JumpstartHCIBox)
+  - [Blog post](https://aka.ms/JumpstartHCIBoxBlog)
+- [Enhancement: Update HCIBox to use 22H2 image #1465](https://github.com/microsoft/azure_arc/issues/1465)
+
 ### September 2022
 
 #### Release highlights
