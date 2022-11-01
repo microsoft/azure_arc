@@ -10,9 +10,7 @@ description: >
 
 The following scenario will guide you on how to deploy a "Ready to Go" environment so you can deploy Azure Arc-enabled data services on a [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine) cluster using [Terraform](https://www.terraform.io/).
 
-By the end of this scenario, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity)), Azure Arc-enabled PostgreSQL server with a sample database and a Microsoft Windows Server 2022 (Datacenter) GKE compute instance VM installed & pre-configured with all the required tools needed to work with Azure Arc data services:
-
-![Deployed Architecture](./01.png)
+By the end of this scenario, you will have a GKE cluster deployed with an Azure Arc Data Controller ([in "Directly Connected" mode](https://docs.microsoft.com/azure/azure-arc/data/connectivity)), Azure Arc-enabled PostgreSQL server with a sample database and a Microsoft Windows Server 2022 (Datacenter) GKE compute instance VM installed & pre-configured with all the required tools needed to work with Azure Arc data services.
 
 > **NOTE: Currently, Azure Arc-enabled data services with PostgreSQL is in [public preview](https://docs.microsoft.com/azure/azure-arc/data/release-notes)**.
 
@@ -196,32 +194,61 @@ Read the below explanation to get familiar with the automation and deployment fl
 
 ## Terraform variables
 
-- Before running the Terraform plan, create the terraform variables file (.tfvars). An example .tfvars file is located [here](https://github.com/microsoft/azure_arc/blob/main/azure_arc_data_jumpstart/gke/terraform/example/tf_variables_datacontroller_postgresql_example.tfvars)
+- Before running the Terraform plan, create a terraform.tfvars file in the root of the terraform folder and supply some values for your environment.
 
-  - *gcp_project_id*='Your GCP Project ID (Created in the prerequisites section)'
-  - *gcp_credentials_filename*='Your GCP Credentials JSON filename (Created in the prerequisites section)'
-  - *gcp_region*='GCP region where resource will be created'
-  - *gcp_zone*='GCP zone where resource will be created'
-  - *gke_cluster_name*='GKE cluster name'
-  - *admin_username*='GKE cluster administrator username'
-  - *admin_password*='GKE cluster administrator password'
-  - *windows_username*='Windows Server Client compute instance VM administrator username'
-  - *windows_password*='Windows Server Client compute instance VM administrator password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols as well as **not containing** the user's account name or parts of the user's full name that exceed two consecutive characters)
-  - *SPN_CLIENT_ID*='Your Azure service principal name'
-  - *SPN_CLIENT_SECRET*='Your Azure service principal password'
-  - *SPN_TENANT_ID*='Your Azure tenant ID'
-  - *SPN_AUTHORITY*=_https://login.microsoftonline.com_ **Do not change**
-  - *AZDATA_USERNAME*='Azure Arc Data Controller admin username'
-  - *AZDATA_PASSWORD*='Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
-  - *ARC_DC_NAME*='Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
-  - *ARC_DC_SUBSCRIPTION*='Azure Arc Data Controller Azure subscription ID'
-  - *ARC_DC_RG*='Azure resource group where all future Azure Arc resources will be deployed'
-  - *ARC_DC_REGION*='Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
-  - *deploy_SQLMI*='Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller only scenario we leave it set to false'
-  - *SQLMIHA*='Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this data controller vanilla scenario we leave it set to false'
-  - *deploy_PostgreSQL*='Boolean that sets whether or not to deploy PostgreSQL, for this scenario we leave it set to true'
-  - *templateBaseUrl*='GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well - e.g. `https://raw.githubusercontent.com/your--github--account/azure_arc/your--branch/azure_arc_data_jumpstart/gke/terraform/`.'
-  - *MY_IP*='Your Client IP'
+   ```HCL
+    gcp_project_id           = "azure-arc-demo-277620"
+    gcp_credentials_filename = "account.json"
+    gcp_region               = "us-west1"
+    gcp_zone                 = "us-west1-a"
+    gke_cluster_name         = "arc-data-gke"
+    admin_username           = "arcdemo"
+    admin_password           = "ArcDemo1234567!!"
+    windows_username         = "arcdemo"
+    windows_password         = "Passw0rd123!!"
+    SPN_CLIENT_ID            = "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
+    SPN_CLIENT_SECRET        = "33333333-XXXX-YTYT-9c21-7777777777"
+    SPN_TENANT_ID            = "33333333-XXXX-41af-1111-7777777777"
+    SPN_AUTHORITY            = "https://login.microsoftonline.com"
+    AZDATA_USERNAME          = "arcdemo"
+    AZDATA_PASSWORD          = "Arcdemo123!!"
+    ARC_DC_NAME              = "arcdatactrl"
+    ARC_DC_SUBSCRIPTION      = "32323232-XXXXX-YYYYY-9e8f-88888888888"
+    ARC_DC_RG                = "Arc-Data-GKE-Demo"
+    ARC_DC_REGION            = "eastus"
+    deploy_SQLMI             = false
+    SQLMIHA                  = false
+    deploy_PostgreSQL        = true
+    templateBaseUrl          = "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_data_jumpstart/gke/terraform/"
+    MY_IP                    = "192.168.10.10"
+  ```
+
+- Variable reference:
+
+  - **_`gcp_project_id`_** - 'Your GCP Project ID (Created in the prerequisites section)'
+  - **_`gcp_credentials_filename`_** - 'Your GCP Credentials JSON filename (Created in the prerequisites section)'
+  - **_`gcp_region`_** - 'GCP region where resource will be created'
+  - **_`gcp_zone`_** - 'GCP zone where resource will be created'
+  - **_`gke_cluster_name`_** - 'GKE cluster name'
+  - **_`admin_username`_** - 'GKE cluster administrator username'
+  - **_`admin_password`_** - 'GKE cluster administrator password'
+  - **_`windows_username`_** - 'Windows Server Client compute instance VM administrator username'
+  - **_`windows_password`_** - 'Windows Server Client compute instance VM administrator password' (The password must be at least 8 characters long and contain characters from three of the following four sets: uppercase letters, lowercase letters, numbers, and symbols as well as **not containing** the user's account name or parts of the user's full name that exceed two consecutive characters)
+  - **_`SPN_CLIENT_ID`_** - 'Your Azure service principal name'
+  - **_`SPN_CLIENT_SECRET`_** - 'Your Azure service principal password'
+  - **_`SPN_TENANT_ID`_** - 'Your Azure tenant ID'
+  - **_`SPN_AUTHORITY`_** - _https://login.microsoftonline.com_ **Do not change**
+  - **_`AZDATA_USERNAME`_** - 'Azure Arc Data Controller admin username'
+  - **_`AZDATA_PASSWORD`_** - 'Azure Arc Data Controller admin password' (The password must be at least 8 characters long and contain characters from the following four sets: uppercase letters, lowercase letters, numbers, and symbols)
+  - **_`ARC_DC_NAME`_** - 'Azure Arc Data Controller name' (The name must consist of lowercase alphanumeric characters or '-', and must start and end with a alphanumeric character. This name will be used for k8s namespace as well)
+  - **_`ARC_DC_SUBSCRIPTION`_** - 'Azure Arc Data Controller Azure subscription ID'
+  - **_`ARC_DC_RG`_** - 'Azure resource group where all future Azure Arc resources will be deployed'
+  - **_`ARC_DC_REGION`_** - 'Azure location where the Azure Arc Data Controller resource will be created in Azure' (Currently, supported regions supported are eastus, eastus2, centralus, westus2, westeurope, southeastasia)
+  - **_`deploy_SQLMI`_** - 'Boolean that sets whether or not to deploy SQL Managed Instance, for this data controller only scenario we leave it set to false'
+  - **_`SQLMIHA`_** - 'Boolean that sets whether or not to deploy SQL Managed Instance with high-availability (business continuity) configurations, for this data controller vanilla scenario we leave it set to false'
+  - **_`deploy_PostgreSQL`_** - 'Boolean that sets whether or not to deploy PostgreSQL, for this scenario we leave it set to true'
+  - **_`templateBaseUrl`_** - 'GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well - e.g. `https://raw.githubusercontent.com/your--github--account/azure_arc/your--branch/azure_arc_data_jumpstart/gke/terraform/`.'
+  - **_`MY_IP`_** - 'Your Client IP'
 
 ### Custom Location RP OID variable
 
@@ -232,13 +259,13 @@ Read the below explanation to get familiar with the automation and deployment fl
   #### Option 1: Bash
 
   ```bash
-  export TF_VAR_CL_OID=$(az ad sp list --all | grep '"displayName": "Custom Locations RP",' -A 2 | sed -En "s/\"id\": \"(.*)\",/\1/p")
+  export TF_VAR_CL_OID=$(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
   ```
 
   #### Option 2: PowerShell
 
   ```powershell
-  $Env:TF_VAR_CL_OID=(az ad sp list --all | Select-String '"displayName": "Custom Locations RP",' -Context 0,2) -Replace '.*\s*.*\s*"id": "(.*)",\n*','$1'
+  $Env:TF_VAR_CL_OID=(az ad sp list --filter "displayname eq 'Custom Locations RP'" --query "[?appDisplayName=='Custom Locations RP'].id" -o tsv)
   ```
 
 ## Deployment
@@ -257,11 +284,11 @@ As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data C
 
   ![terraform init](./22.png)
 
-- (Optional but recommended) Run the ```terraform plan -var-file="<.tfvars file name>"``` command to make sure everything is configured properly.
+- (Optional but recommended) Run the ```terraform plan -out=infra.out"``` command to make sure everything is configured properly.
 
   ![terraform plan](./23.png)
 
-- Run the ```terraform apply --auto-approve -var-file="<.tfvars file name>"``` command and wait for the plan to finish. **Runtime for deploying all the GCP resources for this plan is ~20-30min.**
+- Run the ```terraform apply "infra.out"``` command and wait for the plan to finish. **Runtime for deploying all the GCP resources for this plan is ~20-30min.**
 
 - Once completed, you can review the GKE cluster and the worker nodes resources as well as the GCP compute instance VM created.
 
@@ -291,7 +318,7 @@ Now that we have both the GKE cluster and the Windows Server Client instance cre
 
 - At first login, as mentioned in the "Automation Flow" section, a logon script will get executed. This script was created as part of the automated deployment process.
 
-    Let the script run its course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the GKE cluster. **The logon script run time is approximately 10min long**.
+    Let the script run its course and **do not close** the PowerShell session, this will be done for you once completed. You will notice that the Azure Arc Data Controller gets deployed on the GKE cluster. **The logon script run time is approximately 1h long**.
 
     Once the script finishes its run, the logon script PowerShell session will be closed and the Azure Arc Data Controller will be deployed on the GKE cluster and be ready to use.
 
