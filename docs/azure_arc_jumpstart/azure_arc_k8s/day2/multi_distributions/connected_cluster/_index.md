@@ -32,6 +32,12 @@ The following Jumpstart scenario will guide you through how to use the [cluster 
     git clone https://github.com/microsoft/azure_arc.git
     ```
 
+- Ensure you are logged in to the Azure CLI 
+
+  ```shell
+  az login
+  ```
+
 - [Install or update Azure CLI to version 2.36.0 and above](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest). Use the below command to check your current installed version.
 
   ```shell
@@ -74,10 +80,13 @@ The following steps walk through using the connected cluster functionality using
 
 ## Access Cluster
 
-From your terminal, run the following command to establish the proxy to the cluster
+From your terminal, run the following command to establish the proxy to the cluster.  Note that the specific port number that's used may differ from the screenshot below.
+
   ```shell
   az connectedk8s proxy -n $CLUSTER_NAME -g $RESOURCE_GROUP
   ```
+
+  ![Proxy established](./02.png)
 
 ## Run Kubectl Commands
 
@@ -87,11 +96,16 @@ With the proxy established, in another terminal session run a kubectl.
   kubectl get nodes
   ```
 
-  ![Running Kubectl Command](./02.png)
+  ![Running kubectl command](./03.png)
+
+If you already have a workload running on your cluster, you can view it using other kubectl commands, like the following screenshot illustrates:
+
+  ![Example kubectl command](./04.png)
 
 ## Close Proxy Connection
 
 In your terminal, press *CTRL+C* to close the proxy session.
 
-  ![Closing Proxy to connected cluster](./03.png)
+  ![Closing Proxy to connected cluster](./05.png)
 
+With the proxy session now closed, access to the cluster using kubectl via the proxy is disabled.
