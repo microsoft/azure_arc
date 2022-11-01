@@ -284,7 +284,7 @@ As mentioned, the Terraform plan will deploy a GKE cluster, the Azure Arc Data C
 
   ![terraform init](./22.png)
 
-- (Optional but recommended) Run the ```terraform plan -out=infra.out"``` command to make sure everything is configured properly.
+- Run the ```terraform plan -out=infra.out``` command to make sure everything is configured properly.
 
   ![terraform plan](./23.png)
 
