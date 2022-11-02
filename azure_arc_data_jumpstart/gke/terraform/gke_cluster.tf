@@ -8,15 +8,6 @@ resource "google_container_cluster" "arcdemo" {
   # node pool and immediately delete it.
   remove_default_node_pool = true
   initial_node_count       = 1
-
-  # master_auth {
-  #   username = var.admin_username
-  #   password = var.admin_password
-
-  #   client_certificate_config {
-  #     issue_client_certificate = true
-  #   }
-  # }
   depends_on = [azurerm_resource_group.arc-data-demo]
 }
 
@@ -24,11 +15,11 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
   name       = "arcdemo-node-pool"
   location   = var.gcp_region
   cluster    = google_container_cluster.arcdemo.name
-  node_count = var.gke_cluster_node_count
+  node_count = 1
 
   node_config {
     preemptible  = true
-    machine_type = "n1-standard-4"
+    machine_type = "n1-standard-8"
 
     metadata = {
       disable-legacy-endpoints = "true"

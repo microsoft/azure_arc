@@ -13,6 +13,8 @@ resource "google_compute_firewall" "default" {
   target_tags = ["arc"]
 
   depends_on = [google_container_cluster.arcdemo]
+
+  source_ranges = [var.MY_IP]
 }
 
 resource "google_compute_network" "default" {
@@ -22,11 +24,12 @@ resource "google_compute_network" "default" {
 // A single Google Cloud Engine instance
 resource "google_compute_instance" "default" {
   name         = "arc-gcp-demo"
-  machine_type = "n1-standard-2"
+  machine_type = "n1-standard-4"
   tags         = ["arc"]
+  zone         = "us-central1-a"
   boot_disk {
     initialize_params {
-      image = "windows-cloud/windows-2019"
+      image = "windows-cloud/windows-2022"
     }
   }
   network_interface {
@@ -102,21 +105,6 @@ resource "google_compute_instance" "default" {
     }
   }
 
-  provisioner "file" {
-    source      = "artifacts/local_ssd_sc.yaml"
-    destination = "C:/Temp/local_ssd_sc.yaml"
-
-    connection {
-      host     = google_compute_instance.default.network_interface.0.access_config.0.nat_ip
-      https    = false
-      insecure = true
-      timeout  = "20m"
-      type     = "winrm"
-      user     = var.windows_username
-      password = var.windows_password
-    }
-  }
-
   provisioner "remote-exec" {
     inline = [
       "powershell.exe -File C://Temp/azure_arc.ps1"
@@ -164,24 +152,27 @@ resource "local_file" "password_reset" {
 
 resource "local_file" "azure_arc" {
   content = templatefile("artifacts/azure_arc.ps1.tmpl", {
-    adminUsername          = var.windows_username
-    gcpCredentialsFilename = var.gcp_credentials_filename
-    gkeClusterName         = var.gke_cluster_name
-    gcpRegion              = var.gcp_region
-    spnClientId            = var.SPN_CLIENT_ID
-    spnClientSecret        = var.SPN_CLIENT_SECRET
-    spnTenantId            = var.SPN_TENANT_ID
-    spnAuthority           = var.SPN_AUTHORITY
-    AZDATA_USERNAME        = var.AZDATA_USERNAME
-    AZDATA_PASSWORD        = var.AZDATA_PASSWORD
-    ACCEPT_EULA            = var.ACCEPT_EULA
-    arcDcName              = var.ARC_DC_NAME
-    subscriptionId         = var.ARC_DC_SUBSCRIPTION
-    resourceGroup          = var.ARC_DC_RG
-    azureLocation          = var.ARC_DC_REGION
-    deploySQLMI            = var.deploy_SQLMI
-    deployPostgreSQL       = var.deploy_PostgreSQL
-    templateBaseUrl        = var.templateBaseUrl
+    adminUsername              = var.windows_username
+    gcpCredentialsFilename     = var.gcp_credentials_filename
+    gkeClusterName             = var.gke_cluster_name
+    gcpRegion                  = var.gcp_region
+    spnClientId                = var.SPN_CLIENT_ID
+    spnClientSecret            = var.SPN_CLIENT_SECRET
+    spnTenantId                = var.SPN_TENANT_ID
+    spnAuthority               = var.SPN_AUTHORITY
+    AZDATA_USERNAME            = var.AZDATA_USERNAME
+    AZDATA_PASSWORD            = var.AZDATA_PASSWORD
+    ACCEPT_EULA                = var.ACCEPT_EULA
+    arcDcName                  = var.ARC_DC_NAME
+    subscriptionId             = var.ARC_DC_SUBSCRIPTION
+    resourceGroup              = var.ARC_DC_RG
+    azureLocation              = var.ARC_DC_REGION
+    deploySQLMI                = var.deploy_SQLMI
+    deployPostgreSQL           = var.deploy_PostgreSQL
+    templateBaseUrl            = var.templateBaseUrl
+    USE_GKE_GCLOUD_AUTH_PLUGIN = var.USE_GKE_GCLOUD_AUTH_PLUGIN
+    CL_OID                     = var.CL_OID
+    SQLMIHA                    = var.SQLMIHA
     }
   )
   filename = "artifacts/azure_arc.ps1"

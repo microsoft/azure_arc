@@ -65,13 +65,13 @@
             "value": "arcdata"
         },
         "dataStorageClass": {
-            "value": "local-ssd"
+            "value": "premium-rwo"
         },
         "dataStorageSize": {
             "value": "5Gi"
         },
         "logsStorageClass": {
-            "value": "local-ssd"
+            "value": "premium-rwo"
         },
         "logsStorageSize": {
             "value": "5Gi"

@@ -68,8 +68,8 @@
             "value": "2022-03-01-preview"
         },
         "pricingTier": {
-            "value": "GeneralPurpose"
-        },        
+            "value": "pricingTier-stage"
+        },
         "licenseType": {
             "value": "LicenseIncluded"
         }
