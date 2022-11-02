@@ -1,7 +1,9 @@
 Start-Transcript -Path C:\Temp\DataServicesLogonScript.log
 
 # Deployment environment variables
-$connectedClusterName="Arc-Data-GKE-K8s"
+$Env:TempDir = "C:\Temp"
+$suffix=-join ((97..122) | Get-Random -Count 4 | % {[char]$_})
+$connectedClusterName="Arc-Data-GKE-K8s-$suffix"
 
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
@@ -12,16 +14,22 @@ Connect-AzAccount -Credential $psCred -TenantId $env:spnTenantId -ServicePrincip
 # Login as service principal
 az login --service-principal --username $env:spnClientId --password $env:spnClientSecret --tenant $env:spnTenantId
 
-# Installing Azure CLI arcdata extension
+# Making extension install dynamic
+az config set extension.use_dynamic_install=yes_without_prompt
+# Installing Azure CLI extensions
 Write-Host "`n"
-Write-Host "Installing Azure CLI arcdata extension"
+Write-Host "Installing Azure CLI extensions"
 az extension add --name arcdata
+az extension add --name connectedk8s
+az extension add --name k8s-extension
+Write-Host "`n"
+az -v
 
 # Set default subscription to run commands against
 # "subscriptionId" value comes from clientVM.json ARM template, based on which 
 # subscription user deployed ARM template to. This is needed in case Service 
 # Principal has access to multiple subscriptions, which can break the automation logic
-az account set --subscription $env:subscriptionId
+az account set --subscription $Env:subscriptionId
 
 # Installing Azure Data Studio extensions
 Write-Host "`n"
@@ -62,21 +70,21 @@ Write-Host "`n"
 az provider show --namespace Microsoft.AzureArcData -o table
 Write-Host "`n"
 
-# Adding Azure Arc CLI extensions
-Write-Host "Adding Azure Arc CLI extensions"
-az config set extension.use_dynamic_install=yes_without_prompt
-
 Write-Host "`n"
 az -v
 
 # Settings up kubectl
 Write-Host "Setting up the kubectl & azdata environment"
 Write-Host "`n"
-$env:gcp_credentials_file_path="C:\Temp\$env:gcpCredentialsFilename"
+$env:gcp_credentials_file_path="$Env:TempDir\$env:gcpCredentialsFilename"
 gcloud auth activate-service-account --key-file $env:gcp_credentials_file_path
-gcloud container clusters get-credentials $env:gkeClusterName --region $env:gcpRegion  
-kubectl version
-kubectl apply -f 'C:\Temp\local_ssd_sc.yaml'
+choco install python3 --version=3.7.3 -y # You need to install python (ERROR: Cannot use bundled Python installation to update Cloud SDK in non-interactive mode. Please run again in interactive mode.)
+$env:CLOUDSDK_PYTHON = "C:\Python37\python.exe"
+gcloud components install gke-gcloud-auth-plugin --quiet
+gcloud components update --quiet
+gcloud container clusters get-credentials $env:gkeClusterName --region $env:gcpRegion
+
+kubectl version --output=json
 
 Write-Host "Checking kubernetes nodes"
 Write-Host "`n"
@@ -105,7 +113,9 @@ az connectedk8s connect --name $connectedClusterName `
 
 Start-Sleep -Seconds 10
 
-# Create Azure Arc-enabled Data Services extension
+# Installing Azure Arc-enabled data services extension
+Write-Host "`n"
+Write-Host "Installing Azure Arc-enabled data services extension"
 az k8s-extension create --name arc-data-services `
                         --extension-type microsoft.arcdataservices `
                         --cluster-type connectedClusters `
@@ -132,12 +142,17 @@ $extensionId = az k8s-extension show --name arc-data-services `
 Start-Sleep -Seconds 20
 
 # Create Custom Location
-az customlocation create --name 'jumpstart-cl' `
+az connectedk8s enable-features -n $connectedClusterName `
+                                -g $Env:resourceGroup `
+                                --custom-locations-oid $Env:CL_OID `
+                                --features cluster-connect custom-locations
+
+$customlocationName = "jumpstart-cl-$suffix"
+az customlocation create --name $customlocationName `
                          --resource-group $env:resourceGroup `
                          --namespace arc `
                          --host-resource-id $connectedClusterId `
-                         --cluster-extension-ids $extensionId `
-                         --kubeconfig $env:KUBECONFIG
+                         --cluster-extension-ids $extensionId
 
 # Deploying Azure Monitor for containers Kubernetes extension instance
 Write-Host "Create Azure Monitor for containers Kubernetes extension instance"
@@ -149,31 +164,22 @@ az k8s-extension create --name "azuremonitor-containers" `
                         --cluster-type connectedClusters `
                         --extension-type Microsoft.AzureMonitor.Containers
 
-# Deploying Azure Defender Kubernetes extension instance
-Write-Host "Create Azure Defender Kubernetes extension instance"
-Write-Host "`n"
-az k8s-extension create --name "azure-defender" `
-                        --cluster-name $connectedClusterName `
-                        --resource-group $env:resourceGroup `
-                        --cluster-type connectedClusters `
-                        --extension-type Microsoft.AzureDefender.Kubernetes
-
 # Creating Log Analytics Workspace for Metric Upload
 Write-Host "Deploying Log Analytics Workspace"
 Write-Host "`n"
-
+$Env:workspaceName="jumpstartlaws"
 az monitor log-analytics workspace create --resource-group $env:resourceGroup `
-                                          --workspace-name "jumpstartlaws"
+                                          --workspace-name $Env:workspaceName
 
 # Deploying Azure Arc Data Controller
 Write-Host "Deploying Azure Arc Data Controller"
 Write-Host "`n"
 
-$customLocationId = $(az customlocation show --name "jumpstart-cl" --resource-group $env:resourceGroup --query id -o tsv)
-$workspaceId = $(az resource show --resource-group $env:resourceGroup --name "jumpstartlaws" --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name "jumpstartlaws" --query primarySharedKey -o tsv)
+$customLocationId = $(az customlocation show --name $customlocationName --resource-group $env:resourceGroup --query id -o tsv)
+$workspaceId = $(az resource show --resource-group $env:resourceGroup --name $Env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
+$workspaceKey = $(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $Env:workspaceName --query primarySharedKey -o tsv)
 
-$dataControllerParams = "C:\Temp\dataController.parameters.json"
+$dataControllerParams = "$Env:TempDir\dataController.parameters.json"
 
 (Get-Content -Path $dataControllerParams) -replace 'resourceGroup-stage',$env:resourceGroup | Set-Content -Path $dataControllerParams
 (Get-Content -Path $dataControllerParams) -replace 'azdataUsername-stage',$env:AZDATA_USERNAME | Set-Content -Path $dataControllerParams
@@ -187,62 +193,67 @@ $dataControllerParams = "C:\Temp\dataController.parameters.json"
 (Get-Content -Path $dataControllerParams) -replace 'logAnalyticsPrimaryKey-stage',$workspaceKey | Set-Content -Path $dataControllerParams
 
 az deployment group create --resource-group $env:resourceGroup `
-                           --template-file "C:\Temp\dataController.json" `
-                           --parameters "C:\Temp\dataController.parameters.json"
+                           --template-file "$Env:TempDir\dataController.json" `
+                           --parameters "$Env:TempDir\dataController.parameters.json"
 Write-Host "`n"
 
 Do {
-    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes..."
+    Write-Host "Waiting for data controller. Hold tight, this might take a few minutes...(45s sleeping loop)"
     Start-Sleep -Seconds 45
     $dcStatus = $(if(kubectl get datacontroller -n arc | Select-String "Ready" -Quiet){"Ready!"}Else{"Nope"})
     } while ($dcStatus -eq "Nope")
+
+Write-Host "`n"
 Write-Host "Azure Arc data controller is ready!"
 Write-Host "`n"
 
 # If flag set, deploy SQL MI
 if ( $env:deploySQLMI -eq $true )
 {
-    & "C:\Temp\DeploySQLMI.ps1"
+    & "$Env:TempDir\DeploySQLMI.ps1"
 }
 
 # If flag set, deploy PostgreSQL
 if ( $env:deployPostgreSQL -eq $true )
 {
-    & "C:\Temp\DeployPostgreSQL.ps1"
+    & "$Env:TempDir\DeployPostgreSQL.ps1"
 }
 
 # Enabling data controller auto metrics & logs upload to log analytics
+Write-Host "`n"
 Write-Host "Enabling data controller auto metrics & logs upload to log analytics"
 Write-Host "`n"
-$Env:WORKSPACE_ID=$(az resource show --resource-group $env:resourceGroup --name $env:workspaceName --resource-type "Microsoft.OperationalInsights/workspaces" --query properties.customerId -o tsv)
-$Env:WORKSPACE_SHARED_KEY=$(az monitor log-analytics workspace get-shared-keys --resource-group $env:resourceGroup --workspace-name $env:workspaceName  --query primarySharedKey -o tsv)
+
+$Env:WORKSPACE_ID=$workspaceId
+$Env:WORKSPACE_SHARED_KEY=$workspaceKey
 az arcdata dc update --name jumpstart-dc --resource-group $env:resourceGroup --auto-upload-logs true
 az arcdata dc update --name jumpstart-dc --resource-group $env:resourceGroup --auto-upload-metrics true
 
 # Applying Azure Data Studio settings template file and operations url shortcut
-if ( $env:deploySQLMI -eq $true -or $env:deployPostgreSQL -eq $true ){
+if ( $Env:deploySQLMI -eq $true -or $Env:deployPostgreSQL -eq $true ){
+    Write-Host "`n"
     Write-Host "Copying Azure Data Studio settings template file"
-    New-Item -Path "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
-    Copy-Item -Path "C:\Temp\settingsTemplate.json" -Destination "C:\Users\$env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
+    New-Item -Path "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\" -Name "User" -ItemType "directory" -Force
+    Copy-Item -Path "$Env:TempDir\settingsTemplate.json" -Destination "C:\Users\$Env:adminUsername\AppData\Roaming\azuredatastudio\User\settings.json"
 
-    # Creating desktop url shortcuts for built-in Grafana and Kibana services 
+    # Creating desktop url shortcuts for built-in Grafana and Kibana services
     $GrafanaURL = kubectl get service/metricsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     $GrafanaURL = "https://"+$GrafanaURL+":3000"
     $Shell = New-Object -ComObject ("WScript.Shell")
-    $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Grafana.url")
+    $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Grafana.url")
     $Favorite.TargetPath = $GrafanaURL;
     $Favorite.Save()
 
     $KibanaURL = kubectl get service/logsui-external-svc -n arc -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
     $KibanaURL = "https://"+$KibanaURL+":5601"
     $Shell = New-Object -ComObject ("WScript.Shell")
-    $Favorite = $Shell.CreateShortcut($env:USERPROFILE + "\Desktop\Kibana.url")
+    $Favorite = $Shell.CreateShortcut($Env:USERPROFILE + "\Desktop\Kibana.url")
     $Favorite.TargetPath = $KibanaURL;
     $Favorite.Save()
 }
 
 # Changing to Client VM wallpaper
-$imgPath="C:\Temp\wallpaper.png"
+$imgPath="$Env:TempDir\wallpaper.png"
 $code = @' 
 using System.Runtime.InteropServices; 
 namespace Win32{ 
