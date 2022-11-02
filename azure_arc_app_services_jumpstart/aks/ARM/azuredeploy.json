@@ -237,9 +237,6 @@
                     "spnTenantId": {
                         "value": "[parameters('spnTenantId')]"
                     },
-                    "myIpAddress": {
-                        "value": "[parameters('myIpAddress')]"
-                    },
                     "workspaceName": {
                         "value": "[parameters('logAnalyticsWorkspaceName')]"
                     },
