@@ -228,6 +228,7 @@
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
             "apiVersion": "2022-05-01",
             "condition" : "[parameters('deployBastion')]",
+            "dependsOn": ["[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"],
             "name": "[concat(parameters('networkSecurityGroupName'),'/allow_RDP_3389')]",
             "properties": {
                 "priority": 1001,
