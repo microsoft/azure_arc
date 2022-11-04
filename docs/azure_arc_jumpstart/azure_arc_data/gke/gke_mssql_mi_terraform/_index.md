@@ -238,7 +238,7 @@ Read the below explanation to get familiar with the automation and deployment fl
   - **_`templateBaseUrl`_** - GitHub URL to the deployment template - filled in by default to point to [Microsoft/Azure Arc](https://github.com/microsoft/azure_arc) repository, but you can point this to your forked repo as well - e.g. `https://raw.githubusercontent.com/your--github--account/azure_arc/your--branch/azure_arc_data_jumpstart/gke/terraform/`
   - **_`MY_IP`_** - Your Client IP
 
-### Azure Custom Location Resource Provider (RP) OID variable
+### Azure Custom Location Resource Provider (RP) and the Object ID (OID) environment variable
 
 - You also need to get the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) OID to export it as an environment variable:
 
