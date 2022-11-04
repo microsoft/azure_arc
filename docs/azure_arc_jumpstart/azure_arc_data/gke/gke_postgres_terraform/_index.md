@@ -252,7 +252,7 @@ Read the below explanation to get familiar with the automation and deployment fl
 
 ### Azure Custom Location Resource Provider (RP) and the Object ID (OID) environment variable
 
-- You also need to get the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) OID to export it as an environment variable:
+- You will also need to get the Azure Custom Location Resource Provider ([RP](https://learn.microsoft.com/azure/azure-resource-manager/management/resource-providers-and-types)) OID and export it as an environment variable:
 
   > **NOTE: You need permissions to list all the service principals.**
 
