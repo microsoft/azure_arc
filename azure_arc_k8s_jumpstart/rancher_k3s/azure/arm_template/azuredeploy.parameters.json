@@ -17,8 +17,8 @@
         "tenantId": {
             "value": "<Your Azure tenant ID>"
         },
-        "myIpAddress": {
-            "value": "<Your IP address>"
+        "deployBastion": {
+            "value": "(true/false)"
         }
     }
 }
