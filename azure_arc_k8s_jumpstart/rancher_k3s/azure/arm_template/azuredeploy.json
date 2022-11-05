@@ -54,12 +54,12 @@
         },
         "ubuntuOSVersion": {
             "type": "string",
-            "defaultValue": "18.04-LTS",
+            "defaultValue": "20_04-lts-gen2",
             "allowedValues": [
-                "18.04-LTS"
+                "20_04-lts-gen2"
             ],
             "metadata": {
-                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version"
             }
         },
         "location": {
@@ -97,21 +97,43 @@
                 "description": "Name of the Network Security Group"
             }
         },
-        "myIpAddress": {
+        "deployBastion": {
+        "type": "bool",
+        "metadata": {
+            "description": "Choice to deploy Bastion to connect to the Ubuntu VM"
+        },
+        "defaultValue": false
+        },
+        "bastionSubnetPrefix": {
+        "type": "string",
+        "metadata": {
+            "description": "Bastion subnet prefix"
+        }
+        },
+        "k3sArcClusterName": {
             "type": "string",
             "metadata": {
-                "description": "Your IP address"
-            }
-        }
+                "description": "The name of the k3s cluster"
+            },
+            "defaultValue": "Arc-k3s-Demo"
+        },        
+        "guid":{
+        "type": "string",
+        "metadata": {
+            "description": "Random GUID for cluster names"
+        },
+        "defaultValue": "[substring(newGuid(),0,4)]"
+        }        
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
+        "k3sArcClusterName": "[concat('Arc-k3s-Demo','-',parameters('guid'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
         "osDiskType": "Premium_LRS",
-        "subnetAddressPrefix": "10.1.0.0/24",
-        "addressPrefix": "10.1.0.0/16",
+        "addressPrefix": "172.16.0.0/16",
+        "subnetAddressPrefix": "172.16.1.0/24",
         "linuxConfiguration": {
             "disablePasswordAuthentication": false,
             "ssh": {
@@ -144,9 +166,7 @@
                                 "id": "[variables('subnetRef')]"
                             },
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIpAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
-                            }
+                            "publicIpAddress": "[if(not(parameters('deployBastion')),variables('PublicIPNoBastion'),json('null'))]"
                         }
                     }
                 ],
@@ -169,7 +189,19 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[parameters('myIpAddress')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22"
+                        }
+                    },
+                    {
+                        "name": "allow_SSH",
+                        "properties": {
+                            "priority": 1001,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "*",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"
@@ -252,7 +284,7 @@
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "32323"
                         }
-                    }
+                    }                                                            
                 ]
             }
         },
@@ -275,6 +307,12 @@
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
+                    },
+                    {
+                        "name": "AzureBastionSubnet",
+                        "properties": {
+                        "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+                        }
                     }
                 ]
             }
@@ -290,7 +328,7 @@
                 "idleTimeoutInMinutes": 4
             },
             "sku": {
-                "name": "Basic",
+                "name": "[if(not(parameters('deployBastion')),'Basic','Standard')]",
                 "tier": "Regional"
             }
         },
@@ -334,7 +372,7 @@
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPasswordOrKey')]",
                     "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
-                }
+                }                
             }
         },
         {
@@ -354,8 +392,8 @@
                     "timestamp": 123456789
                 },
                 "protectedSettings": {
-                    "commandToExecute": "[concat('bash install_k3s.sh', ' ', parameters('adminUsername'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('vmName'), ' ', parameters('location'))]",
-                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/install_k3s.sh" ]
+                    "commandToExecute": "[concat('bash installK3s.sh', ' ', parameters('adminUsername'), ' ', parameters('appId'), ' ', parameters('password'), ' ', parameters('tenantId'), ' ', parameters('k3sArcClusterName'), ' ', parameters('location'))]",
+                    "fileUris": [ "https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/scripts/installK3s.sh" ]
                 }
             }
         }

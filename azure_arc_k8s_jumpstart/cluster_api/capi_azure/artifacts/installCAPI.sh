@@ -20,14 +20,15 @@ echo ""
   export CAPI_PROVIDER="azure" # Do not change!
   export CAPI_PROVIDER_VERSION="1.5.3" # Do not change!
   export KUBERNETES_VERSION="1.24.7" # Do not change!
+  export K3S_VERSION="1.24.7+k3s1" # Do not change!
   export AZURE_ENVIRONMENT="AzurePublicCloud" # Do not change!
-  export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>"
-  export WORKER_MACHINE_COUNT="<Workers node count>"
-  export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus"
-  export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal
-  export AZURE_ARC_CLUSTER_RESOURCE_NAME_GUID=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME}"-"${GUID}") # Append GUID to the name
-  export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME_GUID,,}") # Converting to lowercase variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
-  export AZURE_RESOURCE_GROUP="<Azure resource group name>"
+  export CONTROL_PLANE_MACHINE_COUNT="<Control Plane node count>" # Control Plane node count. For example: 1
+  export WORKER_MACHINE_COUNT="<Workers node count>" # Workers node count. For example: 2
+  export AZURE_LOCATION="<Azure region>" # Name of the Azure datacenter location. For example: "eastus2"
+  export AZURE_RESOURCE_GROUP="<Azure resource group name>"# Name of the Azure resource group name. For example: "Arc-CAPI-Demo"
+  export AZURE_ARC_CLUSTER_RESOURCE_NAME="<Azure Arc-enabled Kubernetes cluster resource name>" # Name of the Azure Arc-enabled Kubernetes cluster resource name as it will shown in the Azure portal. A GUID suffix will be added automatically. Do not change!
+  export AZURE_ARC_CLUSTER_RESOURCE_GUID_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_NAME}"-"${GUID}") # Append GUID to the Azure Arc-enabled Kubernetes cluster resource name. Do not change!
+  export CLUSTER_NAME=$(echo "${AZURE_ARC_CLUSTER_RESOURCE_GUID_NAME,,}") # Converting to lowercase case variable > Name of the CAPI workload cluster. Must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*'). Do not change!
   export AZURE_SUBSCRIPTION_ID="<Azure subscription id>"
   export AZURE_TENANT_ID="<Azure tenant id>"
   export AZURE_CLIENT_ID="<Azure SPN application client id>"
@@ -171,19 +172,15 @@ echo ""
   helm version
   echo ""
 
-  # Deploying Rancher K3s single node cluster using k3sup
-  echo "Deploying Rancher K3s single node cluster using k3sup"
+  # Deploying Rancher K3s cluster (single control plane)
+  echo "Deploying Rancher K3s cluster (single control plane)"
   echo ""
   sudo mkdir $HOME/.kube
-  sudo curl -sLS https://get.k3sup.dev | sh
-  sudo cp k3sup /usr/local/bin/k3sup
-  sudo k3sup install --local --context capimgmt --k3s-extra-args '--no-deploy traefik' --k3s-version 'v1.24.7+k3s1'
+  curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik" INSTALL_K3S_VERSION=v${K3S_VERSION} sh -
   sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-  sudo cp kubeconfig $HOME/.kube/config
-  sudo cp kubeconfig $HOME/.kube/config-mgmt
+  sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
+  sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config-mgmt
   sudo chown -R $USER $HOME/.kube/
-  export KUBECONFIG=$HOME/.kube/config
-  kubectl config set-context capimgmt
 
   # Registering Azure Arc providers
   echo ""
@@ -231,7 +228,6 @@ echo ""
   sed -e "s|CAPI_PROVIDER_VERSION|v$CAPI_PROVIDER_VERSION|" -i capz_kustomize/kustomization.yaml
   kubectl kustomize capz_kustomize/ > jumpstart.yaml
   clusterctl generate yaml --from jumpstart.yaml > template.yaml
-  echo ""
 
   # Creating Microsoft Defender for Cloud audit secret
   echo ""
@@ -307,7 +303,7 @@ EOF
   echo ""
 
   echo ""
-  az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --kube-config $CLUSTER_NAME.kubeconfig --correlation-id "d009f5dd-dba8-4ac7-bac9-b54ef3a6671a"
+  az connectedk8s connect --name $AZURE_ARC_CLUSTER_RESOURCE_GUID_NAME --resource-group $AZURE_RESOURCE_GROUP --location $AZURE_LOCATION --kube-config $CLUSTER_NAME.kubeconfig
   echo ""
 
 } 2>&1 | tee -a $LOG_FILE # Send terminal output to log file
