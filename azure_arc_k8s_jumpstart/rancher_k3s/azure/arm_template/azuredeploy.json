@@ -104,12 +104,7 @@
         },
         "defaultValue": false
         },
-        "bastionSubnetPrefix": {
-        "type": "string",
-        "metadata": {
-            "description": "Bastion subnet prefix"
-        }
-        },
+
         "k3sArcClusterName": {
             "type": "string",
             "metadata": {
@@ -134,6 +129,7 @@
         "osDiskType": "Premium_LRS",
         "addressPrefix": "172.16.0.0/16",
         "subnetAddressPrefix": "172.16.1.0/24",
+        "bastionSubnetPrefix": "172.16.2.64/26",
         "linuxConfiguration": {
             "disablePasswordAuthentication": false,
             "ssh": {
