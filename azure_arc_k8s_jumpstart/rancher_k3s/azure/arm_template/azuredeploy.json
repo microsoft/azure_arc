@@ -110,7 +110,7 @@
             "metadata": {
                 "description": "The name of the k3s cluster"
             },
-            "defaultValue": "Arc-k3s-Demo"
+            "defaultValue": "Arc-K3s-Demo"
         },        
         "guid":{
         "type": "string",
@@ -122,7 +122,7 @@
     },
     "variables": {
         "vmName": "[concat(parameters('vmName'))]",
-        "k3sArcClusterName": "[concat('Arc-k3s-Demo','-',parameters('guid'))]",
+        "k3sArcClusterName": "[concat('Arc-K3s-Demo','-',parameters('guid'))]",
         "publicIpAddressName": "[concat(parameters('vmName'), '-PIP' )]",
         "networkInterfaceName": "[concat(parameters('vmName'),'-NIC')]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
