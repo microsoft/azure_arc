@@ -25,6 +25,12 @@ sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export k3sArcClusterName=/' vars.sh
 sed -i '8s/^/export azureLocation=/' vars.sh
 
+echo ""
+echo ""
+cat vars.sh 
+echo ""
+echo ""
+
 chmod +x vars.sh 
 . ./vars.sh
 
