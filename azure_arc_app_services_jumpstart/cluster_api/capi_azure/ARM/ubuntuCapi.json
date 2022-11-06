@@ -227,6 +227,13 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2021-05-01",
             "name": "[parameters('networkSecurityGroupName')]",
+            "location": "[parameters('azureLocation')]"
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2021-05-01",
+            "name": "[parameters('networkSecurityGroupName')]",
+            "condition": "[parameters('deployBastion')]",
             "location": "[parameters('azureLocation')]",
             "properties": {
                 "securityRules": [
@@ -237,7 +244,7 @@
                             "protocol": "TCP",
                             "access": "Allow",
                             "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
+                            "sourceAddressPrefix": "[variables('bastionSubnetPrefix')]",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "22"

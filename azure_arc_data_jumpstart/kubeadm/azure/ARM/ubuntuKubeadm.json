@@ -2,12 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "myIpAddress": {
-            "type": "string",
-            "metadata": {
-                "description": "Your public IP address, used to RDP to the client VM"
-            }
-        },
         "vmName": {
             "type": "string",
             "defaultValue": "Arc-Data-Kubeadm-MGMT",
@@ -178,19 +172,6 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "allow_SSH",
-                        "properties": {
-                            "priority": 1000,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "22"
-                        }
-                    },
-                    {
                         "name": "kubeadmWeb",
                         "properties": {
                             "priority": 1001,
@@ -201,6 +182,30 @@
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "destinationPortRange": "6443"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2021-05-01",
+            "name": "[parameters('networkSecurityGroupName')]",
+            "condition": "[parameters('deployBastion')]",
+            "location": "[parameters('azureLocation')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "allow_SSH",
+                        "properties": {
+                            "priority": 1002,
+                            "protocol": "TCP",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "sourceAddressPrefix": "[variables('bastionSubnetPrefix')]",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "22"
                         }
                     }
                 ]
