@@ -4,6 +4,10 @@ exec 2>&1
 
 sudo apt-get update
 
+sudo sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
+sudo adduser staginguser --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password
+sudo echo "staginguser:ArcPassw0rd" | sudo chpasswd
+
 # Injecting environment variables
 echo '#!/bin/bash' >> vars.sh
 echo $adminUsername:$1 | awk '{print substr($1,2); }' >> vars.sh
@@ -24,16 +28,32 @@ sed -i '8s/^/export location=/' vars.sh
 chmod +x vars.sh 
 . ./vars.sh
 
-publicIp=$(curl icanhazip.com)
 
-# Installing Rancer K3s single master cluster using k3sup
+export K3S_VERSION="1.24.7+k3s1"
+
+chmod +x vars.sh
+. ./vars.sh
+
+# # Creating login message of the day (motd)
+# sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
+
+# Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
+sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
+while sleep 1; do sudo -s rsync -a /var/lib/waagent/custom-script/download/0/installK3s.log /home/${adminUsername}/jumpstart_logs/installK3s.log; done &
+
+# Installing Rancher K3s cluster (single control plane)
+echo ""
+publicIp=$(hostname -i)
+sudo mkdir ~/.kube
 sudo -u $adminUsername mkdir /home/${adminUsername}/.kube
-curl -sLS https://get.k3sup.dev | sh
-sudo cp k3sup /usr/local/bin/k3sup
-sudo k3sup install --local --context arck3sdemo --ip $publicIp --k3s-version 'v1.24.7+k3s1'
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --disable traefik --node-external-ip ${publicIp}" INSTALL_K3S_VERSION=v${K3S_VERSION} sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-sudo cp kubeconfig /home/${adminUsername}/.kube/config
-chown -R $adminUsername /home/${adminUsername}/.kube/
+sudo kubectl config rename-context default arcbox-k3s --kubeconfig /etc/rancher/k3s/k3s.yaml
+sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config
+sudo cp /etc/rancher/k3s/k3s.yaml /home/${adminUsername}/.kube/config.staging
+sudo chown -R $adminUsername /home/${adminUsername}/.kube/
+sudo chown -R staginguser /home/${adminUsername}/.kube/config.staging
 
 # Installing Helm 3
 sudo snap install helm --classic
