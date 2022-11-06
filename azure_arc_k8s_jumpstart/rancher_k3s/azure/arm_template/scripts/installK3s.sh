@@ -28,11 +28,7 @@ sed -i '8s/^/export azureLocation=/' vars.sh
 chmod +x vars.sh 
 . ./vars.sh
 
-
 export K3S_VERSION="1.24.7+k3s1"
-
-chmod +x vars.sh
-. ./vars.sh
 
 # # Creating login message of the day (motd)
 # sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh

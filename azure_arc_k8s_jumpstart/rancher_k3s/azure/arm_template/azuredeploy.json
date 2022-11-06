@@ -113,10 +113,10 @@
             "defaultValue": "Arc-K3s-Demo"
         },        
         "guid":{
-        "type": "string",
-        "metadata": {
-            "description": "Random GUID for cluster names"
-        },
+            "type": "string",
+            "metadata": {
+                "description": "Random GUID for cluster names"
+            },
         "defaultValue": "[substring(newGuid(),0,4)]"
         }        
     },
