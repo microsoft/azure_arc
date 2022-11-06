@@ -1,6 +1,10 @@
 #!/bin/bash
-exec >installK3s.log
-exec 2>&1
+mkdir ~/jumpstart_logs
+LOG_FILE=~/jumpstart_logs/installK3s.log
+echo ""
+tput setaf 6;echo "Script log can be found in `tput sitm`${LOG_FILE}`tput ritm`" | expand | awk 'length($0) > length(longest) { longest = $0 } { lines[NR] = $0 } END { gsub(/./, "=", longest); print "/=" longest "=\\"; n = length(longest); for(i = 1; i <= NR; ++i) { printf("| %s %*s\n", lines[i], n - length(lines[i]) + 1, "|"); } print "\\=" longest "=/" }'
+tput sgr0
+echo ""
 
 sudo apt-get update
 
@@ -78,41 +82,3 @@ sudo -u $adminUsername az connectedk8s connect --name $vmName --resource-group $
 sudo -u $adminUsername az k8s-extension create -n "azuremonitor-containers" --cluster-name $vmName --resource-group $resourceGroup --cluster-type connectedClusters --extension-type Microsoft.AzureMonitor.Containers
 
 sudo service sshd restart
-
-# Creating "hello-world" Kubernetes yaml
-sudo cat <<EOT >> hello-kubernetes.yaml
-# hello-kubernetes.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: hello-kubernetes
-spec:
-  type: LoadBalancer
-  ports:
-  - port: 32323
-    targetPort: 8080
-  selector:
-    app: hello-kubernetes
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: hello-kubernetes
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: hello-kubernetes
-  template:
-    metadata:
-      labels:
-        app: hello-kubernetes
-    spec:
-      containers:
-      - name: hello-kubernetes
-        image: paulbouwer/hello-kubernetes:1.8
-        ports:
-        - containerPort: 8080
-EOT
-
-sudo cp hello-kubernetes.yaml /home/${adminUsername}/hello-kubernetes.yaml
