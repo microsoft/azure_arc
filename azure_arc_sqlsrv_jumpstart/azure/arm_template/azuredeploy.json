@@ -23,12 +23,6 @@
                 "description": "Windows password for the Virtual Machine"
             }
         },
-        "myIpAddress": {
-            "type": "string",
-            "metadata": {
-                "description": "IP address allowed SSH and RDP access to Azure resources. Usually this is your home or office public IP address"
-            }
-        },
         "windowsOSVersion": {
             "type": "string",
             "defaultValue": "2022-datacenter-g2",
@@ -196,25 +190,25 @@
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2019-02-01",
+            "apiVersion": "2022-05-01",
             "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[resourceGroup().location]",
+            "location": "[resourceGroup().location]"
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+            "apiVersion": "2022-05-01",
+            "condition": "[parameters('deployBastion')]",
+            "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]" ],
+            "name": "[concat(parameters('networkSecurityGroupName'),'/allow_RDP_3389')]",
             "properties": {
-                "securityRules": [
-                    {
-                        "name": "allow_RDP_3389",
-                        "properties": {
-                            "priority": 1001,
-                            "protocol": "TCP",
-                            "access": "Allow",
-                            "direction": "Inbound",
-                            "sourceAddressPrefix": "[if(parameters('deployBastion'),variables('bastionSubnetPrefix'),parameters('myIpAddress'))]",
-                            "sourcePortRange": "*",
-                            "destinationAddressPrefix": "*",
-                            "destinationPortRange": "3389"
-                        }
-                    }
-                ]
+                "priority": 1001,
+                "protocol": "TCP",
+                "access": "Allow",
+                "direction": "Inbound",
+                "sourceAddressPrefix": "[variables('bastionSubnetPrefix')]",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "*",
+                "destinationPortRange": "3389"
             }
         },
         {

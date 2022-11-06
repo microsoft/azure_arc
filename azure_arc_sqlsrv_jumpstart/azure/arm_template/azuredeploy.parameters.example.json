@@ -14,9 +14,6 @@
         "adminPassword": {
             "value": "ArcPassword123!!"
         },
-        "myIpAddress": {
-            "value": "192.168.10.10"
-        },
         "servicePrincipalAppId": {
             "value": "33333333-XXXX-YYYY-XXXX-YTYTYTYT"
         },
