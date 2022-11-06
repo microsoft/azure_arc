@@ -161,14 +161,14 @@
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups",
-      "apiVersion": "2019-02-01",
+      "apiVersion": "2022-05-01",
       "name": "[parameters('networkSecurityGroupName')]",
       "location": "[parameters('azureLocation')]"
     },
     {
       "type": "Microsoft.Network/networkSecurityGroups/securityRules",
       "apiVersion": "2022-05-01",
-      "name": "[parameters('networkSecurityGroupName')]",
+      "name": "[concat(parameters('networkSecurityGroupName'),'/allow_SSH_22')]",
       "condition": "[parameters('deployBastion')]",
       "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]" ],
       "properties": {
