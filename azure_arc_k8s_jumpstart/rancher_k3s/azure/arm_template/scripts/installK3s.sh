@@ -15,15 +15,13 @@ echo $appId:$2 | awk '{print substr($1,2); }' >> vars.sh
 echo $password:$3 | awk '{print substr($1,2); }' >> vars.sh
 echo $tenantId:$4 | awk '{print substr($1,2); }' >> vars.sh
 echo $vmName:$5 | awk '{print substr($1,2); }' >> vars.sh
-echo $k3sArcClusterName:$6 | awk '{print substr($1,2); }' >> vars.sh
-echo $azureLocation:$7 | awk '{print substr($1,2); }' >> vars.sh
+echo $azureLocation:$6 | awk '{print substr($1,2); }' >> vars.sh
 sed -i '2s/^/export adminUsername=/' vars.sh
 sed -i '3s/^/export appId=/' vars.sh
 sed -i '4s/^/export password=/' vars.sh
 sed -i '5s/^/export tenantId=/' vars.sh
 sed -i '6s/^/export vmName=/' vars.sh
-sed -i '7s/^/export k3sArcClusterName=/' vars.sh
-sed -i '8s/^/export azureLocation=/' vars.sh
+sed -i '7s/^/export azureLocation=/' vars.sh
 
 echo ""
 echo ""
