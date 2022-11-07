@@ -25,19 +25,13 @@ sed -i '6s/^/export vmName=/' vars.sh
 sed -i '7s/^/export azureLocation=/' vars.sh
 sed -i '8s/^/export templateBaseUrl=/' vars.sh
 
-echo ""
-echo ""
-cat vars.sh 
-echo ""
-echo ""
-
 chmod +x vars.sh 
 . ./vars.sh
 
 export K3S_VERSION="1.24.7+k3s1"
 
 # Creating login message of the day (motd)
-sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}artifacts/welcomeK3s.sh
+sudo curl -v -o /etc/profile.d/welcomeK3s.sh ${templateBaseUrl}scripts/welcomeK3s.sh
 
 # Syncing this script log to 'jumpstart_logs' directory for ease of troubleshooting
 sudo -u $adminUsername mkdir -p /home/${adminUsername}/jumpstart_logs
