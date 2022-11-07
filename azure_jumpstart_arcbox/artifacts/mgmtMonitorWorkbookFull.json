@@ -439,15 +439,17 @@
                       "label": "Azure Arc-enabled server",
                       "type": 5,
                       "isRequired": true,
-                      "value": "ArcBox-CentOS",
+                      "query": "resources\r\n| where type == \"microsoft.hybridcompute/machines\"\r\n| project name",
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "showDefault": false
                       },
-                      "jsonData": "[[\r\n    { \"value\":\"ArcBox-SQL\", \"label\":\"ArcBox-SQL\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu-01\", \"label\":\"ArcBox-Ubuntu-01\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Ubuntu-02\", \"label\":\"ArcBox-Ubuntu-02\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K19\", \"label\":\"ArcBox-Win2K19\", \"group\":\"Select\" },\r\n    { \"value\":\"ArcBox-Win2K22\", \"label\":\"ArcBox-Win2K22\", \"group\":\"Select\" },\r\n]",
                       "timeContext": {
                         "durationMs": 86400000
-                      }
+                      },
+                      "queryType": 1,
+                      "resourceType": "microsoft.resourcegraph/resources",
+                      "value": "ArcBox-Win2K19"
                     },
                     {
                       "id": "f21caac6-fae7-44b5-ba4f-a2d3593953b0",
