@@ -417,11 +417,10 @@
                       "type": 5,
                       "description": "Select at least one workspace that contains continuous export data based on the selected subscriptions",
                       "isRequired": true,
-                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces'\r\n| project id",
+                      "query": "resources\r\n| where type =~ 'microsoft.operationalinsights/workspaces' and resourceGroup == '{ResourceGroup}'\r\n| project id",
                       "crossComponentResources": [
-                        "value::all"
+                        "{Subscription}"
                       ],
-                      "value": "/subscriptions/{Subscription}/resourceGroups/{resourceGroup}/providers/Microsoft.OperationalInsights/workspaces/<workspace>",
                       "typeSettings": {
                         "resourceTypeFilter": {
                           "microsoft.operationalinsights/workspaces": true
@@ -430,7 +429,8 @@
                         "showDefault": false
                       },
                       "queryType": 1,
-                      "resourceType": "microsoft.resourcegraph/resources"
+                      "resourceType": "microsoft.resourcegraph/resources",
+                      "value": null
                     },
                     {
                       "id": "71c18150-396c-4f92-a41f-18125550ec3d",
@@ -439,7 +439,10 @@
                       "label": "Azure Arc-enabled server",
                       "type": 5,
                       "isRequired": true,
-                      "query": "resources\r\n| where type == \"microsoft.hybridcompute/machines\"\r\n| project name",
+                      "query": "resources\r\n| where type == \"microsoft.hybridcompute/machines\" and resourceGroup == '{ResourceGroup}'\r\n| project name",
+                      "crossComponentResources": [
+                        "{Subscription}"
+                      ],
                       "typeSettings": {
                         "additionalResourceOptions": [],
                         "showDefault": false
@@ -449,7 +452,7 @@
                       },
                       "queryType": 1,
                       "resourceType": "microsoft.resourcegraph/resources",
-                      "value": "ArcBox-Win2K19"
+                      "value": null
                     },
                     {
                       "id": "f21caac6-fae7-44b5-ba4f-a2d3593953b0",
@@ -2477,7 +2480,7 @@
                         "{Workspace}"
                       ],
                       "value": [
-                        "ArcBox-SQL"
+                        null
                       ],
                       "typeSettings": {
                         "additionalResourceOptions": [
