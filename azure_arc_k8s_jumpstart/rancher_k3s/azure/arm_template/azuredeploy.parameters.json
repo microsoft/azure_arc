@@ -18,7 +18,7 @@
             "value": "<Your Azure tenant ID>"
         },
         "deployBastion": {
-            "value": "(true/false)"
+            "value": false
         }
     }
 }
