@@ -23,7 +23,12 @@ $certdns = "hcibox.devops.com"
 
 $appClonedRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
 
-Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+try {
+    Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+}
+catch {
+    Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
+}
 
 # Import Configuration Module
 $ConfigurationDataFile = "$Env:HCIBoxDir\HCIBox-Config.psd1"
