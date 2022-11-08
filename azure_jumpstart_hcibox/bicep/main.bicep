@@ -20,6 +20,9 @@ param windowsAdminPassword string
 @description('Name for your log analytics workspace')
 param logAnalyticsWorkspaceName string
 
+@description('Option to disable automatic cluster registration. Setting this to false will also disable deploying AKS and Resource bridge')
+param registerCluster bool = true
+
 @description('Option to deploy AKS-HCI with HCIBox')
 param deployAKSHCI bool = true
 
@@ -76,6 +79,7 @@ module hostDeployment 'host/host.bicep' = {
     templateBaseUrl: templateBaseUrl
     subnetId: networkDeployment.outputs.subnetId
     deployBastion: deployBastion
+    registerCluster: registerCluster
     deployAKSHCI: deployAKSHCI
     deployResourceBridge: deployResourceBridge
     location: location

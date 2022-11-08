@@ -10,6 +10,7 @@ param (
     [string]$stagingStorageAccountName,
     [string]$workspaceName,
     [string]$templateBaseUrl,
+    [string]$registerCluster,
     [string]$deployAKSHCI,
     [string]$deployResourceBridge
 )
@@ -29,6 +30,7 @@ param (
 [System.Environment]::SetEnvironmentVariable('templateBaseUrl', $templateBaseUrl,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployAKSHCI', $deployAKSHCI,[System.EnvironmentVariableTarget]::Machine)
 [System.Environment]::SetEnvironmentVariable('deployResourceBridge', $deployResourceBridge,[System.EnvironmentVariableTarget]::Machine)
+[System.Environment]::SetEnvironmentVariable('registerCluster', $registerCluster,[System.EnvironmentVariableTarget]::Machine)
 
 # Creating HCIBox path
 Write-Output "Creating HCIBox paths"
