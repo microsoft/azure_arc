@@ -62,16 +62,22 @@ Write-Header "Deploying HCI cluster"
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
 
 # Register HCI cluster
-Write-Header "Registering HCI cluster"
-& "$Env:HCIBoxDir\Register-AzSHCI.ps1"
+if ($env:registerCluster) {
+    Write-Header "Registering HCI cluster"
+    & "$Env:HCIBoxDir\Register-AzSHCI.ps1"
+}
 
 # deploy AKS
-Write-Header "Deploying AKS"
-& "$Env:HCIBoxDir\Deploy-AKS.ps1"
+if ($env:registerCluster && $env:deployAKSHCI) {
+    Write-Header "Deploying AKS"
+    & "$Env:HCIBoxDir\Deploy-AKS.ps1"
+}
 
 # Deploy Arc Resource Bridge
-Write-Header "Deploying Arc Resource Bridge"
-& "$Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1"
+if ($env:registerCluster && $env:deployArcResourceBridge) {
+    Write-Header "Deploying Arc Resource Bridge"
+    & "$Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1"
+}
 
 # deploy Data services
 # Write-Header "Deploying Azure Arc-enabled data services and SQL Managed Instance"

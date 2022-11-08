@@ -66,6 +66,15 @@ $spnTenantId = $env:spnTenantId
 $resource_name = "HCIBox-ResourceBridge"
 $location = "eastus"
 $custom_location_name = "hcibox-rb-cl"
+
+if ($env:deployAKSHCI -eq "false") {
+    Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
+        $vnet = New-MocNetworkSetting -Name $using:SDNConfig.AKSvnetname -vswitchName $using:SDNConfig.AKSvSwitchName -vipPoolStart $using:SDNConfig.AKSVIPStartIP -vipPoolEnd $using:SDNConfig.AKSVIPEndIP
+        Set-MocConfig -workingDir $using:csv_path\ResourceBridge -vnet $vnet -imageDir $using:csv_path\imageStore -skipHostLimitChecks -cloudConfigLocation $using:csv_path\cloudStore -catalog aks-hci-stable-catalogs-ext -ring stable -CloudServiceIP $using:SDNConfig.AKSCloudSvcidr -createAutoConfigContainers $false
+        Install-Moc
+    }
+}
+
 Invoke-Command -VMName $SDNConfig.HostList[0] -Credential $adcred -ScriptBlock {
     New-ArcHciConfigFiles -subscriptionId $using:subId -location eastus -resourceGroup $using:rg -resourceName $using:resource_name -workDirectory $using:csv_path\ResourceBridge -controlPlaneIP $using:SDNConfig.rbCpip  -k8snodeippoolstart $using:SDNConfig.rbIp -k8snodeippoolend $using:SDNConfig.rbIp -gateway $using:SDNConfig.AKSGWIP -dnsservers $using:SDNConfig.AKSDNSIP -ipaddressprefix $using:SDNConfig.AKSIPPrefix
 }
