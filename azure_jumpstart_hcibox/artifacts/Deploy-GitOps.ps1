@@ -23,6 +23,8 @@ $certdns = "hcibox.devops.com"
 
 $appClonedRepo = "https://github.com/microsoft/azure-arc-jumpstart-apps"
 
+if ($host.Name -match 'ISE') {throw "Running this script in PowerShell ISE is not supported"}
+
 try {
     Start-Transcript -Path $Env:HCIBoxLogsDir\Deploy-GitOps.log
 }
