@@ -96,7 +96,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   ![Screenshot showing Azure portal deployment](./01.png)
 
-  ![Screenshot showing Azure portal deployment](./02.png)
+  ![Screenshot showing Azure portal deployment completion](./02.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -116,7 +116,7 @@ The deployment is using the template parameters file. Before initiating the depl
   For example:
 
   ```shell
-  az group create --name Arc-K3s-Demo --location "East US"
+  az group create --name Arc-K3s-Demo --location "East US 2"
   az deployment group create \
   --resource-group Arc-K3s-Demo \
   --name arck3sdemo01 \
@@ -126,32 +126,10 @@ The deployment is using the template parameters file. Before initiating the depl
 
   Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc-enabled Kubernetes cluster in a new resource group.
 
-  ![Azure resource group](./03.png)
-
-## K3s External Access
-
-Traefik is the (default) ingress controller for k3s and uses port 80. To test external access to k3s cluster, an "_hello-world_" deployment was for you and it is included in the _home_ directory [(credit)](https://github.com/paulbouwer/hello-kubernetes).
-
-- Since port 80 is taken by Traefik [(read more about here)](https://github.com/rancher/k3s/issues/436), the deployment LoadBalancer was changed to use port 32323 along side with the matching Azure Network Security Group (NSG).
-
-  ![Azure Network Security Group (NSG) rule](./04.png)
-
-  ![hello-kubernetes.yaml file](./05.png)
-
-- To deploy it, use the ```kubectl apply -f hello-kubernetes.yaml``` command. Run ```kubectl get pods``` and ```kubectl get svc``` to check that the pods and the service has been created.
-
-  ![kubectl apply -f hello-kubernetes.yaml command](./06.png)
-
-  ![kubectl get pods command](./07.png)
-
-  ![kubectl get svc command](./08.png)
-
-- In your browser, enter the _cluster_public_ip:32323_ which will bring up the _hello-world_ application.
-
-  ![hello-kubernetes application in a web browser](./09.png)
+  ![Screenshot showing Azure resource group](./03.png)
 
 ## Delete the deployment
 
 To delete environment, simply just delete the Azure resource group.
 
-![Delete Azure resource group](./10.png)
+![Screenshot showing Delete Azure resource group](./04.png)
