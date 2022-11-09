@@ -114,9 +114,9 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 - Click the <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmicrosoft%2Fazure_arc%2Fmain%2Fazure_arc_servers_jumpstart%2Fazure%2Fwindows%2Farm_template%2Fazuredeploy.json" target="_blank"><img src="https://aka.ms/deploytoazurebutton"/></a> button and enter values for the the ARM template parameters.
 
-  ![Screenshot showing Azure portal deployment](./01.jpg)
+  ![Screenshot showing Azure portal deployment](./01.png)
 
-  ![Screenshot showing Azure portal deployment](./02.jpg)
+  ![Screenshot showing Azure portal deployment](./02.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
@@ -158,9 +158,9 @@ As mentioned, this deployment will leverage ARM templates. You will deploy a sin
 
 - Once Azure resources has been provisioned, you will be able to see it in Azure portal.
 
-    ![Screenshot ARM template output](./03.jpg)
+    ![Screenshot ARM template output](./03.png)
 
-    ![Screenshot resources in resource group](./04.jpg)
+    ![Screenshot resources in resource group](./04.png)
 
 ## Windows Login & Post Deployment
 
@@ -213,22 +213,22 @@ If you already have [Microsoft Defender for Cloud](https://docs.microsoft.com/az
 
     > **NOTE: The script run time is ~1-2min long.**
 
-    ![Screenshot script output](./13.jpg)
+    ![Screenshot script output](./13.png)
 
-    ![Screenshot script output](./14.jpg)
+    ![Screenshot script output](./14.png)
 
-    ![Screenshot script output](./15.jpg)
+    ![Screenshot script output](./15.png)
 
-    ![Screenshot script output](./16.jpg)
+    ![Screenshot script output](./16.png)
 
 - Upon successful run, a new Azure Arc-enabled server will be added to the resource group.
 
-![Screenshot Azure Arc-enabled server on resource group](./17.jpg)
+![Screenshot Azure Arc-enabled server on resource group](./17.png)
 
-![Screenshot Azure Arc-enabled server details](./18.jpg)
+![Screenshot Azure Arc-enabled server details](./18.png)
 
 ## Cleanup
 
 To delete the entire deployment, simply delete the resource group from the Azure portal.
 
-![Screenshot delete resource group](./19.jpg)
+![Screenshot delete resource group](./19.png)
