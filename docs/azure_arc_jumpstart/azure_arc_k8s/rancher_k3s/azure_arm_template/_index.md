@@ -96,11 +96,11 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
   ![Screenshot showing Azure portal deployment](./01.png)
 
-  ![Screenshot showing Azure portal deployment](./02.png)
+  ![Screenshot showing Azure portal deployment completion](./02.png)
 
 ## Deployment Option 2: ARM template with Azure CLI
 
-The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include your IP address, the OS username and password as well as the appId, password and tenant generated from the service principal creation.  
+The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include the OS username and password as well as the appId, password and tenant generated from the service principal creation.  
 
 - To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template) and run the below command:
 
@@ -116,7 +116,7 @@ The deployment is using the template parameters file. Before initiating the depl
   For example:
 
   ```shell
-  az group create --name Arc-K3s-Demo --location "East US"
+  az group create --name Arc-K3s-Demo --location "East US 2"
   az deployment group create \
   --resource-group Arc-K3s-Demo \
   --name arck3sdemo01 \
@@ -126,32 +126,22 @@ The deployment is using the template parameters file. Before initiating the depl
 
   Upon completion, you will have new VM installed as a single-host k3s cluster which is already projected as an Azure Arc-enabled Kubernetes cluster in a new resource group.
 
-  ![Azure resource group](./03.png)
+  ![Screenshot showing Azure resource group](./03.png)
 
-## K3s External Access
+## Logging
 
-Traefik is the (default) ingress controller for k3s and uses port 80. To test external access to k3s cluster, an "_hello-world_" deployment was for you and it is included in the _home_ directory [(credit)](https://github.com/paulbouwer/hello-kubernetes).
+For ease of troubleshooting and tracking, a deployment log will be created automatically as part of the script runtime. To view the deployment log use the below command:
 
-- Since port 80 is taken by Traefik [(read more about here)](https://github.com/rancher/k3s/issues/436), the deployment LoadBalancer was changed to use port 32323 along side with the matching Azure Network Security Group (NSG).
+```shell
+cat /home/<USER>/jumpstart_logs/installK3s.log
+```
 
-  ![Azure Network Security Group (NSG) rule](./04.png)
+![Screenshot showing the installK3s log file](./04.png)
 
-  ![hello-kubernetes.yaml file](./05.png)
+> **NOTE: For enhanced security posture, SSH (22) port are not open by default in this scenario. You will need to create a network security group (NSG) rule to allow network access to port 22, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
 
-- To deploy it, use the ```kubectl apply -f hello-kubernetes.yaml``` command. Run ```kubectl get pods``` and ```kubectl get svc``` to check that the pods and the service has been created.
-
-  ![kubectl apply -f hello-kubernetes.yaml command](./06.png)
-
-  ![kubectl get pods command](./07.png)
-
-  ![kubectl get svc command](./08.png)
-
-- In your browser, enter the _cluster_public_ip:32323_ which will bring up the _hello-world_ application.
-
-  ![hello-kubernetes application in a web browser](./09.png)
-
-## Delete the deployment
+## Cleanup
 
 To delete environment, simply just delete the Azure resource group.
 
-![Delete Azure resource group](./10.png)
+![Screenshot showing Delete Azure resource group](./05.png)
