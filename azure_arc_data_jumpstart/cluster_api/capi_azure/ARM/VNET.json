@@ -29,7 +29,7 @@
     "bastionSubnetPrefix": {
       "type": "string",
       "metadata": {
-        "description": "Bastion subnet prefix"
+        "description": "Azure Bastion subnet IP prefix"
       }
     }
   },
