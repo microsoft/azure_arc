@@ -62,19 +62,19 @@ Write-Header "Deploying HCI cluster"
 & "$Env:HCIBoxDir\New-HCIBoxCluster.ps1"
 
 # Register HCI cluster
-if ($env:registerCluster) {
+if ($env:registerCluster -eq $true) {
     Write-Header "Registering HCI cluster"
     & "$Env:HCIBoxDir\Register-AzSHCI.ps1"
 }
 
 # deploy AKS
-if ($env:registerCluster && $env:deployAKSHCI) {
+if (($env:registerCluster -eq $true) -and ($env:deployAKSHCI -eq $true)) {
     Write-Header "Deploying AKS"
     & "$Env:HCIBoxDir\Deploy-AKS.ps1"
 }
 
 # Deploy Arc Resource Bridge
-if ($env:registerCluster && $env:deployArcResourceBridge) {
+if (($env:registerCluster -eq $true) -and ($env:deployArcResourceBridge -eq $true)) {
     Write-Header "Deploying Arc Resource Bridge"
     & "$Env:HCIBoxDir\Deploy-ArcResourceBridge.ps1"
 }
