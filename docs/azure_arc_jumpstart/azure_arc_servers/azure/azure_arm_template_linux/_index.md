@@ -173,7 +173,7 @@ Various options are available to connect to _Arc-Data-Client_ VM, depending on t
 
 By design, port ssh is not allowed on the network security group. Therefore, you must create an NSG rule to allow inbound ssh.
 
-- Open the _Arc-Data-Client-NSG_ resource in Azure portal and click "Add" to add a new rule.
+- Open the _Arc-Linux-Demo-NSG_ resource in Azure portal and click "Add" to add a new rule.
 
   ![Screenshot showing Arc-App-Client NSG with blocked ssh](./05.png)
 
