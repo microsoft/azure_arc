@@ -100,7 +100,7 @@ For you to get familiar with the automation and deployment flow, below is an exp
 
 ## Deployment Option 2: ARM template with Azure CLI
 
-The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include your IP address, the OS username and password as well as the appId, password and tenant generated from the service principal creation.  
+The deployment is using the template parameters file. Before initiating the deployment, edit the [_azuredeploy.parameters.json_](https://raw.githubusercontent.com/microsoft/azure_arc/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template/azuredeploy.parameters.json) file to include the OS username and password as well as the appId, password and tenant generated from the service principal creation.  
 
 - To deploy the ARM template, navigate to the [deployment folder](https://github.com/microsoft/azure_arc/tree/main/azure_arc_k8s_jumpstart/rancher_k3s/azure/arm_template) and run the below command:
 
@@ -128,8 +128,20 @@ The deployment is using the template parameters file. Before initiating the depl
 
   ![Screenshot showing Azure resource group](./03.png)
 
-## Delete the deployment
+## Logging
+
+For ease of troubleshooting and tracking, a deployment log will be created automatically as part of the script runtime. To view the deployment log use the below command:
+
+```shell
+cat /home/<USER>/jumpstart_logs/installK3s.log
+```
+
+![Screenshot showing the installK3s log file](./04.png)
+
+   > **NOTE: For enhanced security posture, SSH (22) port are not open by default in this scenario. You will need to create a network security group (NSG) rule to allow network access to port 22, or use [Azure Bastion](https://docs.microsoft.com/azure/bastion/bastion-overview) or [Just-in-Time (JIT)](https://docs.microsoft.com/azure/defender-for-cloud/just-in-time-access-usage?tabs=jit-config-asc%2Cjit-request-asc) access to connect to the VM.**
+
+## Cleanup
 
 To delete environment, simply just delete the Azure resource group.
 
-![Screenshot showing Delete Azure resource group](./04.png)
+![Screenshot showing Delete Azure resource group](./05.png)
